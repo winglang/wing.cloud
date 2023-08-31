@@ -1,0 +1,30 @@
+---
+// Welcome to Astro! Everything between these triple-dash code fences
+// is your "component frontmatter". It never runs in the browser.
+console.log("This runs in your terminal, not the browser!");
+const user = {
+  name: "Cristian",
+};
+
+import Head from "../components/Head.astro";
+import Heading from "../components/Heading.astro";
+---
+
+<html>
+  <Head />
+  <body>
+    <Heading title={`Hello, ${user.name}!`} />
+    <ul>
+      <li>
+        <a href="/dashboard" class="font-medium text-blue-500 underline"
+          >Go to Dashboard</a
+        >
+      </li>
+      <li>
+        <a href="/other" class="font-medium text-blue-500 underline"
+          >Go to Other</a
+        >
+      </li>
+    </ul>
+  </body>
+</html>
