@@ -9,14 +9,16 @@ import { name } from "../package.json" assert { type: "json" };
 const VIRTUAL_MODULE_ID = "virtual:@wingcloud/vite-dynamodb-plugin";
 const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`;
 
-const imageName = "amazon/dynamodb-local:2.0.0";
-const imagePort = "8000";
+const IMAGE_NAME = "amazon/dynamodb-local:2.0.0";
+const IMAGE_PORT = "8000";
+const MAX_CREATE_TABLE_COMMAND_ATTEMPTS = 20;
 
 const nanoid = customAlphabet(urlAlphabet);
 
 export default function (): Plugin {
   let hostPort: number | undefined;
   const containerName = `cloud.wing.dynamodb.${nanoid()}`;
+  const tableName = nanoid();
   return {
     name,
     resolveId(id) {
@@ -36,12 +38,15 @@ export default function (): Plugin {
             secretAccessKey: "local",
           },
           endpoint: "http://localhost:${hostPort}",
-        });`;
+        });
+
+        export const TableName = "${tableName}";
+        `;
       }
     },
     async buildStart(options) {
       // Pull docker image
-      await runCommand("docker", ["pull", imageName]);
+      await runCommand("docker", ["pull", IMAGE_NAME]);
 
       // Run the container and allow docker to assign a host port dynamically
       await runCommand("docker", [
@@ -50,8 +55,8 @@ export default function (): Plugin {
         "--name",
         containerName,
         "-p",
-        imagePort,
-        imageName,
+        IMAGE_PORT,
+        IMAGE_NAME,
       ]);
 
       // Make sure to kill the container
@@ -71,7 +76,7 @@ export default function (): Plugin {
       // Inspect the container to get the host port
       const out = await runCommand("docker", ["inspect", containerName]);
       hostPort = Number(
-        JSON.parse(out)[0].NetworkSettings.Ports[`${imagePort}/tcp`][0]
+        JSON.parse(out)[0].NetworkSettings.Ports[`${IMAGE_PORT}/tcp`][0]
           .HostPort,
       );
 
@@ -87,26 +92,39 @@ export default function (): Plugin {
         },
         endpoint: `http://localhost:${hostPort}`,
       });
-      await client.send(
-        new CreateTableCommand({
-          TableName: nanoid(),
-          AttributeDefinitions: [
-            {
-              AttributeName: "pk",
-              AttributeType: "S",
-            },
-            {
-              AttributeName: "sk",
-              AttributeType: "S",
-            },
-          ],
-          KeySchema: [
-            { AttributeName: "pk", KeyType: "HASH" },
-            { AttributeName: "sk", KeyType: "RANGE" },
-          ],
-          BillingMode: "PAY_PER_REQUEST",
-        }),
-      );
+
+      const createTableCommand = new CreateTableCommand({
+        TableName: tableName,
+        AttributeDefinitions: [
+          {
+            AttributeName: "pk",
+            AttributeType: "S",
+          },
+          {
+            AttributeName: "sk",
+            AttributeType: "S",
+          },
+        ],
+        KeySchema: [
+          { AttributeName: "pk", KeyType: "HASH" },
+          { AttributeName: "sk", KeyType: "RANGE" },
+        ],
+        BillingMode: "PAY_PER_REQUEST",
+      });
+
+      // dynamodb server process might take some time to start
+      let attemptNumber = 0;
+      while (true) {
+        try {
+          await client.send(createTableCommand);
+          break;
+        } catch (error) {
+          if (++attemptNumber >= MAX_CREATE_TABLE_COMMAND_ATTEMPTS) {
+            throw error;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 50));
+        }
+      }
     },
   };
 }
