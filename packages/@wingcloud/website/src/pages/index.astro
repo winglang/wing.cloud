@@ -2,7 +2,10 @@
 import Head from "../components/Head.astro";
 import Heading from "../components/Heading.astro";
 
-import { client, TableName } from "virtual:@wingcloud/astro-dynamodb-integration";
+import {
+  client,
+  TableName,
+} from "virtual:@wingcloud/astro-dynamodb-integration";
 import { PutItemCommand, GetItemCommand } from "@aws-sdk/client-dynamodb";
 await client.send(
   new PutItemCommand({
@@ -27,7 +30,7 @@ const user = await client.send(
 ---
 
 <html>
-  <Head />
+  <Head title="Welcome" />
   <body>
     <Heading title={`Hello, ${user.Item?.["name"]?.S}!`} />
     <ul>
