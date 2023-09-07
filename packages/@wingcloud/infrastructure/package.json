@@ -13,7 +13,7 @@
     "winglang": "^0.29.5"
   },
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.267",
+    "@cloudy-ts/eslint-plugin": "^0.0.268",
     "@types/express": "^4.17.17",
     "@types/node": "^20.5.9",
     "@typescript-eslint/eslint-plugin": "^6.6.0",

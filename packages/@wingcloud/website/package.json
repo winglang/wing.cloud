@@ -5,7 +5,7 @@
   "sideEffects": false,
   "dependencies": {
     "@astrojs/node": "^6.0.0",
-    "@astrojs/react": "^3.0.0",
+    "@astrojs/react": "^3.0.1",
     "@astrojs/tailwind": "^5.0.0",
     "@aws-sdk/client-dynamodb": "^3.405.0",
     "@trpc/server": "^10.38.1",
@@ -17,7 +17,7 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.267",
+    "@cloudy-ts/eslint-plugin": "^0.0.268",
     "@types/node": "^20.5.9",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
