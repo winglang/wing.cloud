@@ -1,7 +1,7 @@
 import node from "@astrojs/node";
 import react from "@astrojs/react";
 import tailwind from "@astrojs/tailwind";
-import dynamodb from "@wingcloud/vite-dynamodb-plugin";
+import { dynamodb } from "@wingcloud/astro-dynamodb-integration";
 import { defineConfig } from "astro/config";
 
 // https://astro.build/config
@@ -10,10 +10,7 @@ export default defineConfig({
   adapter: node({
     mode: "middleware",
   }),
-  integrations: [tailwind(), react()],
+  integrations: [tailwind(), react(), dynamodb()],
   trailingSlash: "never",
   outDir: "./lib",
-  vite: {
-    plugins: [dynamodb()],
-  },
 });

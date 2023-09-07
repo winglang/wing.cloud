@@ -2,7 +2,7 @@
 import Head from "../components/Head.astro";
 import Heading from "../components/Heading.astro";
 
-import { client, TableName } from "virtual:@wingcloud/vite-dynamodb-plugin";
+import { client, TableName } from "virtual:@wingcloud/astro-dynamodb-integration";
 import { PutItemCommand, GetItemCommand } from "@aws-sdk/client-dynamodb";
 await client.send(
   new PutItemCommand({

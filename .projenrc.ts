@@ -12,21 +12,22 @@ const monorepo = new MonorepoProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-const viteDynamodbPlugin = new TypescriptProject({
+const astroDynamodbIntegration = new TypescriptProject({
   monorepo,
-  name: "@wingcloud/vite-dynamodb-plugin",
+  name: "@wingcloud/astro-dynamodb-integration",
   peerDeps: ["@aws-sdk/client-dynamodb"],
 });
 
-viteDynamodbPlugin.addFields({
+astroDynamodbIntegration.addFields({
   types: "src/index.ts",
 });
-viteDynamodbPlugin.addDevDeps("vite");
-viteDynamodbPlugin.addDevDeps("nanoid");
-viteDynamodbPlugin.addDevDeps("@aws-sdk/client-dynamodb");
+astroDynamodbIntegration.addDevDeps("astro");
+astroDynamodbIntegration.addDevDeps("vite");
+astroDynamodbIntegration.addDevDeps("nanoid");
+astroDynamodbIntegration.addDevDeps("@aws-sdk/client-dynamodb");
 
-viteDynamodbPlugin.addDeps("@winglang/sdk");
-viteDynamodbPlugin.addDeps("death");
+astroDynamodbIntegration.addDeps("@winglang/sdk");
+astroDynamodbIntegration.addDeps("death");
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new TypescriptProject({
@@ -42,7 +43,7 @@ website.addDeps("@astrojs/node");
 website.addDeps("@astrojs/react", "react", "react-dom");
 website.addDevDeps("@types/react", "@types/react-dom");
 
-website.addDeps(viteDynamodbPlugin.name, "@aws-sdk/client-dynamodb");
+website.addDeps(astroDynamodbIntegration.name, "@aws-sdk/client-dynamodb");
 
 website.addDeps("@astrojs/tailwind", "tailwindcss");
 
