@@ -6,7 +6,7 @@ node_modules/
 !/.projen/files.json
 /.projen
 /.turbo
-/package.json
+!/package.json
 /tsconfig.json
 /lib
 /tsup.config.ts
