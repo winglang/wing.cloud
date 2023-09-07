@@ -1,19 +1,35 @@
 ---
-// Welcome to Astro! Everything between these triple-dash code fences
-// is your "component frontmatter". It never runs in the browser.
-console.log("This runs in your terminal, not the browser!");
-const user = {
-  name: "Cristian",
-};
-
 import Head from "../components/Head.astro";
 import Heading from "../components/Heading.astro";
+
+import { client, TableName } from "virtual:@wingcloud/vite-dynamodb-plugin";
+import { PutItemCommand, GetItemCommand } from "@aws-sdk/client-dynamodb";
+await client.send(
+  new PutItemCommand({
+    TableName,
+    Item: {
+      pk: { S: "user" },
+      sk: { S: "user" },
+      name: { S: "Cristian" },
+    },
+  }),
+);
+
+const user = await client.send(
+  new GetItemCommand({
+    TableName,
+    Key: {
+      pk: { S: "user" },
+      sk: { S: "user" },
+    },
+  }),
+);
 ---
 
 <html>
   <Head />
   <body>
-    <Heading title={`Hello, ${user.name}!`} />
+    <Heading title={`Hello, ${user.Item?.["name"]?.S}!`} />
     <ul>
       <li>
         <a href="/dashboard" class="font-medium text-blue-500 underline"
