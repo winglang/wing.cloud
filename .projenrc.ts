@@ -12,6 +12,23 @@ const monorepo = new MonorepoProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const viteDynamodbPlugin = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/vite-dynamodb-plugin",
+  peerDeps: ["@aws-sdk/client-dynamodb"],
+});
+
+viteDynamodbPlugin.addFields({
+  types: "src/index.ts",
+});
+viteDynamodbPlugin.addDevDeps("vite");
+viteDynamodbPlugin.addDevDeps("nanoid");
+viteDynamodbPlugin.addDevDeps("@aws-sdk/client-dynamodb");
+
+viteDynamodbPlugin.addDeps("@winglang/sdk");
+viteDynamodbPlugin.addDeps("death");
+
+///////////////////////////////////////////////////////////////////////////////
 const website = new TypescriptProject({
   monorepo,
   name: "@wingcloud/website",
@@ -24,6 +41,8 @@ website.addDeps("@astrojs/node");
 
 website.addDeps("@astrojs/react", "react", "react-dom");
 website.addDevDeps("@types/react", "@types/react-dom");
+
+website.addDeps(viteDynamodbPlugin.name, "@aws-sdk/client-dynamodb");
 
 website.addDeps("@astrojs/tailwind", "tailwindcss");
 
@@ -39,6 +58,8 @@ new JsonFile(website, ".prettierrc.json", {
     plugins: ["prettier-plugin-astro"],
   },
 });
+
+website.addDeps("@aws-sdk/client-dynamodb");
 
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
