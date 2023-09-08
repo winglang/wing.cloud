@@ -46,6 +46,7 @@ astroDynamodbIntegration.addDeps("death");
 const website = new TypescriptProject({
   monorepo,
   name: "@wingcloud/website",
+  outdir: "apps/@wingcloud/website",
 });
 website.addDeps("astro");
 // website.devTask.reset("astro dev --open");
@@ -87,7 +88,7 @@ website.addDeps(opaqueType.name);
 const infrastructure = new TypescriptProject({
   monorepo,
   name: "@wingcloud/infrastructure",
-  outdir: "packages/@wingcloud/infrastructure",
+  outdir: "apps/@wingcloud/infrastructure",
 });
 infrastructure.addFields({ type: "commonjs" });
 

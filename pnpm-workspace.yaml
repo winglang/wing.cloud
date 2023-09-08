@@ -4,5 +4,5 @@ packages:
   - packages/@wingcloud/opaque-type
   - packages/@wingcloud/nanoid62
   - packages/@wingcloud/astro-dynamodb-integration
-  - packages/@wingcloud/website
-  - packages/@wingcloud/infrastructure
+  - apps/@wingcloud/website
+  - apps/@wingcloud/infrastructure
