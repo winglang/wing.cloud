@@ -1,38 +1,48 @@
 # `@wingcloud/astro`
 
-Integration for Astro that creates uses Docker to create a local DynamoDB instance. Provides a virtual module that can be used to interact with it.
+Astro integration for Wing Cloud. Features:
+
+- Creates a DynamoDB table for development, and provides a virtual module to interact with it
+- Generates type definitions based on the `.env.example` file
 
 ## Usage
 
-`astro.config.mjs`:
+Add the integration to `astro.config.mjs`:
 
 ```ts
-import { dynamodb } from "@wingcloud/astro";
+import wingcloud from "@wingcloud/astro";
 import { defineConfig } from "astro/config";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [dynamodb()],
+  integrations: [wingcloud()],
 });
 ```
 
-`src/pages/index.astro`:
+Configure TypeScript to use the generated types:
 
-```markdown
+```json
+{
+  "compilerOptions": {
+    "include": [".wingcloud/**/*"]
+  }
+}
+```
+
+Use the DynamoDB table. See the following example in `src/pages/index.astro`:
+
+```html
 ---
-import { client, TableName } from "virtual:@wingcloud/astro/dynamodb";
-import { PutItemCommand } from "@aws-sdk/client-dynamodb";
+import { dynamodb, TableName } from "virtual:@wingcloud/astro/dynamodb";
 
-await client.send(
-  new PutItemCommand({
-    TableName,
-    Item: {
-      pk: { S: "user_1" },
-      sk: { S: "#" },
-      name: { S: "John" },
-    },
-  }),
-);
+await client.putItem({
+  TableName,
+  Item: {
+    pk: { S: "user_1" },
+    sk: { S: "#" },
+    name: { S: "John" },
+  },
+});
 ---
 
 <html>

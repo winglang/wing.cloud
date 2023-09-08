@@ -5,6 +5,8 @@ import { parse } from "dotenv";
 
 import { name } from "../package.json" assert { type: "json" };
 
+import { DEFAULT_TYPES_DIRECTORY } from "./defaults.js";
+
 export const dotenv = (): AstroIntegration => {
   return {
     name: `${name}:dotenv`,
@@ -33,7 +35,7 @@ export const dotenv = (): AstroIntegration => {
           "",
         );
 
-        const dir = new URL(`.wing/${name}/`, config.root);
+        const dir = new URL(`${DEFAULT_TYPES_DIRECTORY}/`, config.root);
         await mkdir(dir, { recursive: true });
         await writeFile(new URL("dotenv.d.ts", dir), dotenvDts.join("\n"));
       },

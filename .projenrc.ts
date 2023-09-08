@@ -78,8 +78,10 @@ new JsonFile(website, ".prettierrc.json", {
 
 website.addDeps(astro.name);
 website.addDevDeps("@aws-sdk/client-dynamodb");
-website.addGitIgnore("/.wing/");
-website.tryFindObjectFile("tsconfig.json")?.addToArray("include", ".wing/**/*");
+website.addGitIgnore("/.wingcloud/");
+website
+  .tryFindObjectFile("tsconfig.json")
+  ?.addToArray("include", ".wingcloud/**/*");
 
 website.addGitIgnore("/.env");
 

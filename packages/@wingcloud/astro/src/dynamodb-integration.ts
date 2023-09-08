@@ -8,6 +8,8 @@ import { type Plugin as VitePlugin } from "vite";
 
 import { name } from "../package.json" assert { type: "json" };
 
+import { DEFAULT_TYPES_DIRECTORY } from "./defaults.js";
+
 export const VIRTUAL_MODULE_ID = `virtual:${name}/dynamodb`;
 const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`;
 
@@ -150,7 +152,7 @@ export const dynamodb = (): AstroIntegration => {
         });
 
         logger.debug(`Generating type definitions for ${VIRTUAL_MODULE_ID}...`);
-        const dir = new URL(`.wing/${name}/`, config.root);
+        const dir = new URL(`${DEFAULT_TYPES_DIRECTORY}/`, config.root);
         await mkdir(dir, { recursive: true });
         await writeFile(
           new URL("shim.d.ts", dir),
