@@ -3,7 +3,16 @@ import type { APIRoute } from "astro";
 const GITHUB_APP_CLIENT_ID = import.meta.env.GITHUB_APP_CLIENT_ID;
 const GITHUB_APP_CLIENT_SECRET = import.meta.env.GITHUB_APP_CLIENT_SECRET;
 
-const exchangeCode = async (code: string): Promise<any> => {
+interface TokenData {
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  refresh_token_expires_in: number;
+  scope: string;
+  token_type: string;
+}
+
+const exchangeCode = async (code: string): Promise<TokenData> => {
   const response = await fetch("https://github.com/login/oauth/access_token", {
     method: "POST",
     headers: {
@@ -25,7 +34,11 @@ const exchangeCode = async (code: string): Promise<any> => {
   return await response.json();
 };
 
-const getUserInfo = async (token: string): Promise<any> => {
+interface UserInfo {
+  login: string;
+}
+
+const getUserInfo = async (token: string): Promise<UserInfo> => {
   const response = await fetch("https://api.github.com/user", {
     method: "GET",
     headers: {
