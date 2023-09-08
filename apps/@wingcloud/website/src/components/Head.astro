@@ -1,0 +1,13 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title } = Astro.props;
+---
+
+<head>
+  <title>{title ? `${title} | ` : ""}Wing Cloud</title>
+
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+</head>
