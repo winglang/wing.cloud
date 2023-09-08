@@ -60,6 +60,7 @@ new JsonFile(website, ".prettierrc.json", {
 
 website.addDeps(astroDynamodbIntegration.name, "@aws-sdk/client-dynamodb");
 website.addGitIgnore("/.wing/");
+website.addGitIgnore(".env");
 website.tryFindObjectFile("tsconfig.json")?.addToArray("include", ".wing/**/*");
 
 ///////////////////////////////////////////////////////////////////////////////
