@@ -1,8 +1,39 @@
 import type { APIRoute } from "astro";
-// import { app } from "../../../firebase/server";
-// import { getAuth } from "firebase-admin/auth";
+import * as jose from "jose";
 
 export const GET: APIRoute = async ({ request, cookies, redirect }) => {
+  const secret = new TextEncoder().encode(
+    "cc7e0d44fd473002f1c42167459001140ec6389b7353f8088f4d9a95f2f596f2",
+  );
+  const jwt = await new jose.SignJWT({})
+    .setSubject("skyrpex")
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("1h")
+    .sign(secret);
+
+  // const jwt = await new jose.EncryptJWT({})
+  //   .setSubject("skyrpex")
+  //   .setProtectedHeader({ alg: "dir", enc: "A128CBC-HS256" })
+  //   .setIssuedAt()
+  //   .setExpirationTime("1h")
+  //   .encrypt(secret);
+
+  console.log(jwt);
+
+  cookies.set("Authorization", jwt, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+  });
+
+  return new Response(
+    JSON.stringify({
+      body: "Hello, world!",
+      jwt,
+    }),
+  );
+
   // const auth = getAuth(app);
 
   // /* Get token from request headers */
@@ -24,9 +55,9 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
   //   expiresIn: fiveDays,
   // });
 
-  cookies.set("session", "my-cookie", {
-    path: "/",
-  });
+  // cookies.set("session", "my-cookie", {
+  //   path: "/",
+  // });
 
-  return redirect("/dashboard");
+  // return redirect("/dashboard");
 };
