@@ -7,8 +7,7 @@ import { getLoggedInUserId } from "../utils/authorization.js";
  * Astro locals object.
  */
 export const auth = defineMiddleware(async ({ cookies, locals }, next) => {
-  const userId = await getLoggedInUserId(cookies);
-  locals.userId = userId;
+  locals.userId = await getLoggedInUserId(cookies);
 
   return next();
 });

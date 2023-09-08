@@ -1,18 +1,21 @@
 import { defineMiddleware, sequence } from "astro:middleware";
 
+const ALLOWED_PATHS = new Set(["/", "/callback"]);
+
 /**
  * Redirects users to the home page if they are not logged in.
  */
 export const redirect = defineMiddleware(
   async ({ url, redirect, locals }, next) => {
-    if (
-      url.pathname !== "/" &&
-      url.pathname !== "/callback" &&
-      !locals.userId
-    ) {
-      return redirect("/");
+    const isAllowed = ALLOWED_PATHS.has(url.pathname);
+    if (isAllowed) {
+      return next();
     }
 
-    return next();
+    if (locals.userId) {
+      return next();
+    }
+
+    return redirect("/");
   },
 );
