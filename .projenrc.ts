@@ -43,8 +43,6 @@ website.addDeps("@astrojs/node");
 website.addDeps("@astrojs/react", "react", "react-dom");
 website.addDevDeps("@types/react", "@types/react-dom");
 
-website.addDeps(astroDynamodbIntegration.name, "@aws-sdk/client-dynamodb");
-
 website.addDeps("@astrojs/tailwind", "tailwindcss");
 
 website.addDeps("@trpc/server", "zod");
@@ -60,7 +58,9 @@ new JsonFile(website, ".prettierrc.json", {
   },
 });
 
-website.addDeps("@aws-sdk/client-dynamodb");
+website.addDeps(astroDynamodbIntegration.name, "@aws-sdk/client-dynamodb");
+website.addGitIgnore("/.wing/");
+website.tryFindObjectFile("tsconfig.json")?.addToArray("include", ".wing/**/*");
 
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({

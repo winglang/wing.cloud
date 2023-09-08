@@ -33,7 +33,6 @@ export const vitePlugin = ({ logger }: VitePluginOptions): Plugin => {
     },
     load(id) {
       if (id === RESOLVED_VIRTUAL_MODULE_ID) {
-        // return `export const port = ${hostPort}`;
         return `import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
         export const client = new DynamoDBClient({
@@ -51,11 +50,14 @@ export const vitePlugin = ({ logger }: VitePluginOptions): Plugin => {
     },
     async buildStart(options) {
       // Pull docker image
-      logger.info("Pulling image...");
-      await runCommand("docker", ["pull", IMAGE_NAME]);
+      if (!(await runCommand("docker", ["images", "-q", IMAGE_NAME]))) {
+        logger.info("Pulling DynamoDB image...");
+        await runCommand("docker", ["pull", IMAGE_NAME]);
+        logger.info("Done.");
+      }
 
       // Run the container and allow docker to assign a host port dynamically
-      logger.info("Starting container...");
+      logger.debug("Starting container...");
       await runCommand("docker", [
         "run",
         "--detach",
@@ -76,13 +78,13 @@ export const vitePlugin = ({ logger }: VitePluginOptions): Plugin => {
           return;
         }
 
-        logger.info("Removing container...");
+        logger.debug("Removing container...");
         execSync(`docker remove --force ${containerName}`);
         isContainerDead = true;
       });
 
       // Inspect the container to get the host port
-      logger.info("Retrieving container port...");
+      logger.debug("Retrieving container port...");
       const out = await runCommand("docker", ["inspect", containerName]);
       hostPort = Number(
         JSON.parse(out)[0].NetworkSettings.Ports[`${IMAGE_PORT}/tcp`][0]
@@ -90,6 +92,7 @@ export const vitePlugin = ({ logger }: VitePluginOptions): Plugin => {
       );
 
       // Create the table
+      logger.debug("Creating the table...");
       const { DynamoDBClient, CreateTableCommand } = await import(
         "@aws-sdk/client-dynamodb"
       );
