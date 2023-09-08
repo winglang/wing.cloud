@@ -42,6 +42,8 @@ astroDynamodbIntegration.addDevDeps("@aws-sdk/client-dynamodb");
 astroDynamodbIntegration.addDeps("@winglang/sdk");
 astroDynamodbIntegration.addDeps("death");
 
+astroDynamodbIntegration.addDeps("dotenv");
+
 ///////////////////////////////////////////////////////////////////////////////
 const website = new TypescriptProject({
   monorepo,

@@ -5,7 +5,8 @@
   "sideEffects": false,
   "dependencies": {
     "@winglang/sdk": "^0.29.8",
-    "death": "^1.1.0"
+    "death": "^1.1.0",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.408.0",
