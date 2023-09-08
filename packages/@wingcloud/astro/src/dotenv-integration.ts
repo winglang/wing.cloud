@@ -5,12 +5,12 @@ import { parse } from "dotenv";
 
 import { name } from "../package.json" assert { type: "json" };
 
-export const environmentTypes = (): AstroIntegration => {
+export const dotenv = (): AstroIntegration => {
   return {
-    name: `${name}:environment-types`,
+    name: `${name}:dotenv`,
     hooks: {
       "astro:config:setup": async ({ config, logger }) => {
-        logger.debug("Generating environment type definitions...");
+        logger.debug("Generating dotenv type definitions...");
         const env = parse(await readFile(new URL(".env.example", config.root)));
 
         let dotenvDts = [

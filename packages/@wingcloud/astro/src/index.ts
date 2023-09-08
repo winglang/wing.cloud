@@ -1,6 +1,6 @@
 import type { AstroIntegration } from "astro";
 
+import { dotenv } from "./dotenv-integration.js";
 import { dynamodb } from "./dynamodb-integration.js";
-import { environmentTypes } from "./environment-types-integration.js";
 
-export default (): AstroIntegration[] => [dynamodb(), environmentTypes()];
+export default (): AstroIntegration[] => [dynamodb(), dotenv()];
