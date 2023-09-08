@@ -1,28 +1,31 @@
 ---
-// Welcome to Astro! Everything between these triple-dash code fences
-// is your "component frontmatter". It never runs in the browser.
-console.log("This runs in your terminal, not the browser!");
-
-
-const projects = ["compiler", "console", "preview environments"];
-
-import Head from "../components/Head.astro";
-import Heading from "../components/Heading.astro";
+import { ScanCommand } from "@aws-sdk/client-dynamodb";
+import { Code } from "astro:components";
 
 const username = Astro.url.searchParams.get("username");
 
 const user = {
   name: username,
 };
+
+import {
+  client,
+  TableName,
+} from "virtual:@wingcloud/astro-dynamodb-integration";
+import Layout from "../components/Layout.astro";
+
+const { Items } = await client.send(
+  new ScanCommand({
+    TableName,
+  }),
+);
 ---
 
-<html>
-  <Head />
-  <body class="p-6">
-    <Heading title={`Dashboard for ${user.name}`} />
-    <ul>
-      {projects.map((project) => <li>{project}</li>)}
-    </ul>
-    <a href="/" class="font-medium text-blue-500 underline">Back to index</a>
-  </body>
-</html>
+<Layout title="Dashboard">
+  <a href="/" class="font-medium text-blue-500 underline">Back to index</a>
+
+  <!-- <code class="whitespace-pre-wrap font-mono text-xs">
+      {JSON.stringify(Items, undefined, 2)}
+    </code> -->
+  <Code code={JSON.stringify(Items, undefined, 2)} lang="json" wrap />
+</Layout>

@@ -1,0 +1,19 @@
+---
+import Head from "./Head.astro";
+import Heading from "./Heading.astro";
+
+interface Props {
+  title?: string;
+}
+
+const { title } = Astro.props;
+---
+
+<html>
+  <Head title={title} />
+  <body class="container mx-auto p-6">
+    {title && <Heading title={title} />}
+
+    <slot />
+  </body>
+</html>

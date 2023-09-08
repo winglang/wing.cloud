@@ -1,54 +1,28 @@
 ---
-import Head from "../components/Head.astro";
-import Heading from "../components/Heading.astro";
-
-import {
-  client,
-  TableName,
-} from "virtual:@wingcloud/astro-dynamodb-integration";
-import { PutItemCommand, GetItemCommand } from "@aws-sdk/client-dynamodb";
-await client.send(
-  new PutItemCommand({
-    TableName,
-    Item: {
-      pk: { S: "user" },
-      sk: { S: "user" },
-      name: { S: "Wingnut" },
-    },
-  }),
-);
-
-const user = await client.send(
-  new GetItemCommand({
-    TableName,
-    Key: {
-      pk: { S: "user" },
-      sk: { S: "user" },
-    },
-  }),
-);
+import Layout from "../components/Layout.astro";
 
 const GITHUB_APP_CLIENT_ID = import.meta.env.GITHUB_APP_CLIENT_ID;
 ---
 
-<html>
-  <Head title="Welcome" />
-  <body class="p-6">
-    <Heading title={`Hello, ${user.Item?.["name"]?.S}!`}/>
-    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-4">
-      <a href=`https://github.com/login/oauth/authorize?client_id=${GITHUB_APP_CLIENT_ID}`>Login with GitHub</a>
-    </button>
-    <ul>
-      <li>
-        <a href="/dashboard" class="font-medium text-blue-500 underline"
-          >Go to Dashboard</a
-        >
-      </li>
-      <li>
-        <a href="/other" class="font-medium text-blue-500 underline"
-          >Go to Other</a
-        >
-      </li>
-    </ul>
-  </body>
-</html>
+<Layout title="Wing Cloud">
+  <button
+    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-4"
+  >
+    <a
+      href=`https://github.com/login/oauth/authorize?client_id=${GITHUB_APP_CLIENT_ID}`
+      >Login with GitHub</a
+    >
+  </button>
+  <ul>
+    <li>
+      <a href="/dashboard" class="font-medium text-blue-500 underline"
+        >Go to Dashboard</a
+      >
+    </li>
+    <li>
+      <a href="/other" class="font-medium text-blue-500 underline"
+        >Go to Other</a
+      >
+    </li>
+  </ul>
+</Layout>
