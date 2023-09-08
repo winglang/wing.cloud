@@ -1,4 +1,4 @@
-import { dynamodb, TableName } from "virtual:@wingcloud/astro";
+import { dynamodb, TableName } from "virtual:@wingcloud/astro/dynamodb";
 
 import type { GitHubLogin } from "../types/github.js";
 import { createUserId, type UserId } from "../types/user.js";

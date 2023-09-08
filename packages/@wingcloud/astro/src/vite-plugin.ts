@@ -7,7 +7,7 @@ import { type Plugin } from "vite";
 
 import { name } from "../package.json" assert { type: "json" };
 
-const VIRTUAL_MODULE_ID = `virtual:${name}`;
+export const VIRTUAL_MODULE_ID = `virtual:${name}/dynamodb`;
 const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`;
 
 const IMAGE_NAME = "amazon/dynamodb-local:2.0.0";

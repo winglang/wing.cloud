@@ -20,7 +20,7 @@ export default defineConfig({
 
 ```markdown
 ---
-import { client, TableName } from "virtual:@wingcloud/astro";
+import { client, TableName } from "virtual:@wingcloud/astro/dynamodb";
 import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 
 await client.send(
