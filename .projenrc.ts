@@ -48,8 +48,10 @@ const website = new TypescriptProject({
   name: "@wingcloud/website",
 });
 website.addDeps("astro");
-website.devTask.reset("astro dev --open");
-website.compileTask.reset("astro build");
+// website.devTask.reset("astro dev --open");
+// website.compileTask.reset("astro build");
+website.addScript("dev", "astro dev --open");
+website.addScript("compile", "astro build");
 
 website.addDeps("@astrojs/node");
 

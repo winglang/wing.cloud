@@ -1,7 +1,7 @@
 import type { AstroCookies } from "astro";
 import * as jose from "jose";
 
-import type { UserId } from "../db/user.js";
+import type { UserId } from "../database/user.js";
 
 import type { GitHubTokens } from "./github.js";
 

@@ -3,5 +3,11 @@
 ## Dev
 
 ```bash
-turbo dev
+nr dev
+```
+
+## Compile
+
+```bash
+turbo compile
 ```

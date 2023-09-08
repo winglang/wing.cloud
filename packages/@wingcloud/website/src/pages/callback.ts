@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 
-import { getOrCreateUser } from "../db/user.js";
+import { getOrCreateUser } from "../database/user.js";
 import { setAuthorizationCookie } from "../utils/authorization.js";
 import { getGitHubLoginFromCode } from "../utils/github.js";
 

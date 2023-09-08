@@ -40,10 +40,10 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "projen dev",
+    "dev": "astro dev --open",
     "test": "vitest run",
-    "default": "projen default",
     "compile": "projen compile",
+    "default": "projen default",
     "build": "projen build",
     "lint": "projen lint"
   },
