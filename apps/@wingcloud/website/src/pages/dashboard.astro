@@ -1,0 +1,30 @@
+---
+import { Code } from "astro:components";
+
+import { dynamodb, TableName } from "virtual:@wingcloud/astro/dynamodb";
+import Layout from "../components/Layout.astro";
+
+import { unmarshall } from "@aws-sdk/util-dynamodb";
+
+const { Items } = await dynamodb.scan({
+  TableName,
+});
+---
+
+<Layout title="Dashboard">
+  <a href="/" class="font-medium text-blue-500 underline">Back to index</a>
+
+  {
+    Items && (
+      <Code
+        code={JSON.stringify(
+          Items.map((item) => unmarshall(item)),
+          undefined,
+          2,
+        )}
+        lang="json"
+        wrap
+      />
+    )
+  }
+</Layout>

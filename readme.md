@@ -27,7 +27,16 @@ turbo dev
 
 ## Update
 
+Update dependencies from all packages:
+
 ```sh
-pnpm up -rL
+pnpm up -r
+projen
+```
+
+Check latest versions of dependencies:
+
+```sh
+pnpm up -riL
 projen
 ```
