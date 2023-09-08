@@ -7,7 +7,7 @@ import type { GitHubTokens } from "./github.js";
 
 const APP_SECRET = new TextEncoder().encode(import.meta.env.APP_SECRET);
 const JWT_EXPIRATION_TIME = "1h";
-const COOKIE_NAME = "Authorization";
+export const AUTH_COOKIE_NAME = "Authorization";
 
 export const createAuthorizationJwt = async (
   userId: UserId,
@@ -33,7 +33,7 @@ export const setAuthorizationCookie = async (
 ) => {
   const jwt = await createAuthorizationJwt(userId, tokens);
 
-  cookies.set(COOKIE_NAME, jwt, {
+  cookies.set(AUTH_COOKIE_NAME, jwt, {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
@@ -41,7 +41,7 @@ export const setAuthorizationCookie = async (
 };
 
 export const getLoggedInUserId = async (cookies: AstroCookies) => {
-  const jwt = cookies.get(COOKIE_NAME);
+  const jwt = cookies.get(AUTH_COOKIE_NAME);
   if (!jwt) {
     return;
   }
