@@ -29,6 +29,12 @@ Configure TypeScript to use the generated types:
 }
 ```
 
+Optionally, ignore the generated types in `.gitignore`:
+
+```
+/.wingcloud/
+```
+
 Use the DynamoDB table. See the following example in `src/pages/index.astro`:
 
 ```html
