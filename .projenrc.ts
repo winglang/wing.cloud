@@ -62,6 +62,8 @@ website.addDeps(astroDynamodbIntegration.name, "@aws-sdk/client-dynamodb");
 website.addGitIgnore("/.wing/");
 website.tryFindObjectFile("tsconfig.json")?.addToArray("include", ".wing/**/*");
 
+website.addDeps("jose");
+
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
   monorepo,
