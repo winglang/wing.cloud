@@ -7,7 +7,7 @@ node_modules/
 /.turbo
 !/package.json
 /tsconfig.json
-/pnpm-workspace.yaml
+!/pnpm-workspace.yaml
 /turbo.json
 /.prettierrc.json
 /.editorconfig
