@@ -1,7 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
 
-import { authorizeURL } from "../utils/github.js";
-
 const ALLOWED_PATHS = new Set(["/", "/callback"]);
 
 /**
@@ -18,6 +16,6 @@ export const redirect = defineMiddleware(
       return next();
     }
 
-    return redirect(authorizeURL);
+    return redirect("/");
   },
 );
