@@ -1,23 +1,27 @@
 import { defineMiddleware, sequence } from "astro:middleware";
 
-const auth = defineMiddleware(async ({ url, cookies, generator }, next) => {
-  // if (url.pathname !== "/") {
+import { getLoggedInUserId } from "./utils/authorization.js";
 
-  // }
-  const response = await next();
-  console.log("auth response");
-  response.headers.set("x-astro", generator);
-  return response;
+/**
+ * Retrieves the logged in user ID from the request cookies and sets it in the
+ * Astro locals object.
+ */
+const auth = defineMiddleware(async ({ cookies, locals }, next) => {
+  const userId = await getLoggedInUserId(cookies);
+  locals.userId = userId;
+
+  return next();
 });
 
-// const greeting = defineMiddleware(async (_, next) => {
-//   console.log("greeting request");
-//   const response = await next();
-//   console.log("greeting response");
-//   return response;
-// });
+/**
+ * Redirects users to the home page if they are not logged in.
+ */
+const redirect = defineMiddleware(async ({ url, redirect, locals }, next) => {
+  if (url.pathname !== "/" && !locals.userId) {
+    return redirect("/");
+  }
 
-export const onRequest = sequence(
-  auth,
-  // greeting
-);
+  return next();
+});
+
+export const onRequest = sequence(auth, redirect);

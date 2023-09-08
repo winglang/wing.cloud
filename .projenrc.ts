@@ -12,6 +12,19 @@ const monorepo = new MonorepoProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const opaqueType = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/opaque-type",
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const nanoid62 = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/nanoid62",
+  deps: ["nanoid"],
+});
+
+///////////////////////////////////////////////////////////////////////////////
 const astroDynamodbIntegration = new TypescriptProject({
   monorepo,
   name: "@wingcloud/astro-dynamodb-integration",
@@ -65,6 +78,8 @@ website.tryFindObjectFile("tsconfig.json")?.addToArray("include", ".wing/**/*");
 website.addGitIgnore("/.env");
 
 website.addDeps("jose");
+website.addDeps(nanoid62.name);
+website.addDeps(opaqueType.name);
 
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
