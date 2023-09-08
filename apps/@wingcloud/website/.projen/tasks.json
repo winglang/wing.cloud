@@ -67,7 +67,7 @@
       "description": "Lint the code",
       "steps": [
         {
-          "exec": "eslint --fix --ext .ts,.tsx ."
+          "exec": "eslint --ext .js,.cjs,.ts,.cts,.mts,.tsx,.astro --no-error-on-unmatched-pattern . --fix"
         }
       ]
     },

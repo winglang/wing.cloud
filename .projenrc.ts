@@ -1,8 +1,4 @@
-import {
-  MonorepoProject,
-  NodeProject,
-  TypescriptProject,
-} from "@skyrpex/wingen";
+import { MonorepoProject, TypescriptProject } from "@skyrpex/wingen";
 import { JsonFile } from "projen";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,9 +27,6 @@ const astro = new TypescriptProject({
   peerDeps: ["@aws-sdk/client-dynamodb"],
 });
 
-astro.addFields({
-  types: "src/index.ts",
-});
 astro.addDevDeps("astro");
 astro.addDevDeps("vite");
 astro.addDevDeps("nanoid");
@@ -51,8 +44,6 @@ const website = new TypescriptProject({
   outdir: "apps/@wingcloud/website",
 });
 website.addDeps("astro");
-// website.devTask.reset("astro dev --open");
-// website.compileTask.reset("astro build");
 website.addScript("dev", "astro dev --open");
 website.addScript("compile", "astro build");
 
@@ -89,6 +80,29 @@ website.addDeps("@aws-sdk/util-dynamodb");
 website.addDeps("jose");
 website.addDeps(nanoid62.name);
 website.addDeps(opaqueType.name);
+
+{
+  const project = website;
+  project.addDevDeps("eslint-plugin-astro");
+  const eslint = project.tryFindObjectFile(".eslintrc.json")!;
+  eslint.addOverride("root", true);
+  eslint.addToArray("extends", "plugin:astro/recommended");
+  eslint.addToArray("overrides", {
+    files: ["*.astro"],
+    parser: "astro-eslint-parser",
+    parserOptions: {
+      parser: "@typescript-eslint/parser",
+      extraFileExtensions: [".astro"],
+    },
+    rules: {
+      // Allow returning outside of a function.
+      "unicorn/prefer-module": "off",
+    },
+  });
+  project.lintTask.reset(
+    "eslint --ext .js,.cjs,.ts,.cts,.mts,.tsx,.astro --no-error-on-unmatched-pattern . --fix",
+  );
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
