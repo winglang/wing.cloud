@@ -12,3 +12,4 @@ node_modules/
 /.eslintrc.json
 /.eslintignore
 /.prettierrc.json
+.wing/

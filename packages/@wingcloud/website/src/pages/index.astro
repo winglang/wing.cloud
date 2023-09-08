@@ -2,7 +2,10 @@
 import Head from "../components/Head.astro";
 import Heading from "../components/Heading.astro";
 
-import { client, TableName } from "virtual:@wingcloud/vite-dynamodb-plugin";
+import {
+  client,
+  TableName,
+} from "virtual:@wingcloud/astro-dynamodb-integration";
 import { PutItemCommand, GetItemCommand } from "@aws-sdk/client-dynamodb";
 await client.send(
   new PutItemCommand({
@@ -29,7 +32,7 @@ const GITHUB_APP_CLIENT_ID = import.meta.env["GITHUB_APP_CLIENT_ID"];
 ---
 
 <html>
-  <Head />
+  <Head title="Welcome" />
   <body>
     <Heading title={`Hello, ${user.Item?.["name"]?.S}!`}/>
     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-4">

@@ -1,12 +1,13 @@
 import { execSync } from "node:child_process";
 
 import { runCommand } from "@winglang/sdk/lib/shared/misc.js";
+import type { AstroIntegrationLogger } from "astro";
 import { customAlphabet, urlAlphabet } from "nanoid";
 import { type Plugin } from "vite";
 
 import { name } from "../package.json" assert { type: "json" };
 
-const VIRTUAL_MODULE_ID = "virtual:@wingcloud/vite-dynamodb-plugin";
+const VIRTUAL_MODULE_ID = `virtual:${name}`;
 const RESOLVED_VIRTUAL_MODULE_ID = `\0${VIRTUAL_MODULE_ID}`;
 
 const IMAGE_NAME = "amazon/dynamodb-local:2.0.0";
@@ -15,7 +16,11 @@ const MAX_CREATE_TABLE_COMMAND_ATTEMPTS = 20;
 
 const nanoid = customAlphabet(urlAlphabet);
 
-export default function (): Plugin {
+export type VitePluginOptions = {
+  logger: AstroIntegrationLogger;
+};
+
+export const vitePlugin = ({ logger }: VitePluginOptions): Plugin => {
   let hostPort: number | undefined;
   const containerName = `cloud.wing.dynamodb.${nanoid()}`;
   const tableName = nanoid();
@@ -28,7 +33,6 @@ export default function (): Plugin {
     },
     load(id) {
       if (id === RESOLVED_VIRTUAL_MODULE_ID) {
-        // return `export const port = ${hostPort}`;
         return `import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
         export const client = new DynamoDBClient({
@@ -46,9 +50,14 @@ export default function (): Plugin {
     },
     async buildStart(options) {
       // Pull docker image
-      await runCommand("docker", ["pull", IMAGE_NAME]);
+      if (!(await runCommand("docker", ["images", "-q", IMAGE_NAME]))) {
+        logger.info("Pulling DynamoDB image...");
+        await runCommand("docker", ["pull", IMAGE_NAME]);
+        logger.info("Done.");
+      }
 
       // Run the container and allow docker to assign a host port dynamically
+      logger.debug("Starting container...");
       await runCommand("docker", [
         "run",
         "--detach",
@@ -69,11 +78,13 @@ export default function (): Plugin {
           return;
         }
 
+        logger.debug("Removing container...");
         execSync(`docker remove --force ${containerName}`);
         isContainerDead = true;
       });
 
       // Inspect the container to get the host port
+      logger.debug("Retrieving container port...");
       const out = await runCommand("docker", ["inspect", containerName]);
       hostPort = Number(
         JSON.parse(out)[0].NetworkSettings.Ports[`${IMAGE_PORT}/tcp`][0]
@@ -81,6 +92,7 @@ export default function (): Plugin {
       );
 
       // Create the table
+      logger.debug("Creating the table...");
       const { DynamoDBClient, CreateTableCommand } = await import(
         "@aws-sdk/client-dynamodb"
       );
@@ -127,4 +139,4 @@ export default function (): Plugin {
       }
     },
   };
-}
+};
