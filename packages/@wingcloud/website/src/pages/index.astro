@@ -13,7 +13,7 @@ await client.send(
     Item: {
       pk: { S: "user" },
       sk: { S: "user" },
-      name: { S: "Cristian" },
+      name: { S: "Wingnut" },
     },
   }),
 );
@@ -28,12 +28,12 @@ const user = await client.send(
   }),
 );
 
-const GITHUB_APP_CLIENT_ID = import.meta.env["GITHUB_APP_CLIENT_ID"];
+const GITHUB_APP_CLIENT_ID = import.meta.env.GITHUB_APP_CLIENT_ID;
 ---
 
 <html>
   <Head title="Welcome" />
-  <body>
+  <body class="p-6">
     <Heading title={`Hello, ${user.Item?.["name"]?.S}!`}/>
     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-4">
       <a href=`https://github.com/login/oauth/authorize?client_id=${GITHUB_APP_CLIENT_ID}`>Login with GitHub</a>

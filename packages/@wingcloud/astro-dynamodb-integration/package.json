@@ -4,12 +4,12 @@
   "type": "module",
   "sideEffects": false,
   "dependencies": {
-    "@winglang/sdk": "^0.29.5",
+    "@winglang/sdk": "^0.29.8",
     "death": "^1.1.0"
   },
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.405.0",
-    "@cloudy-ts/eslint-plugin": "^0.0.268",
+    "@aws-sdk/client-dynamodb": "^3.408.0",
+    "@cloudy-ts/eslint-plugin": "^0.0.269",
     "@types/node": "^20.5.9",
     "@typescript-eslint/eslint-plugin": "^6.6.0",
     "@typescript-eslint/parser": "^6.6.0",

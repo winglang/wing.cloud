@@ -2,19 +2,23 @@
 // Welcome to Astro! Everything between these triple-dash code fences
 // is your "component frontmatter". It never runs in the browser.
 console.log("This runs in your terminal, not the browser!");
-const user = {
-  name: "Cristian",
-};
+
 
 const projects = ["compiler", "console", "preview environments"];
 
 import Head from "../components/Head.astro";
 import Heading from "../components/Heading.astro";
+
+const username = Astro.url.searchParams.get("username");
+
+const user = {
+  name: username,
+};
 ---
 
 <html>
   <Head />
-  <body>
+  <body class="p-6">
     <Heading title={`Dashboard for ${user.name}`} />
     <ul>
       {projects.map((project) => <li>{project}</li>)}
