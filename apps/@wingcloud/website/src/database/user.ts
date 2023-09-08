@@ -2,21 +2,10 @@ import {
   GetItemCommand,
   TransactWriteItemsCommand,
 } from "@aws-sdk/client-dynamodb";
-import { nanoid62 } from "@wingcloud/nanoid62";
-import type { OpaqueType } from "@wingcloud/opaque-type";
 import * as dynamodb from "virtual:@wingcloud/astro-dynamodb-integration";
 
-import type { GitHubLogin } from "../utils/github.js";
-
-/**
- * Represents a user ID.
- *
- * @example "user_abc123"
- */
-export type UserId = OpaqueType<
-  `user_${string}`,
-  { readonly t: unique symbol }
->;
+import type { GitHubLogin } from "../types/github.js";
+import { createUserId, type UserId } from "../types/user.js";
 
 /**
  * Get the user ID from a GitHub login.
@@ -41,14 +30,9 @@ export const getUserIdFromLogin = async (login: GitHubLogin) => {
 };
 
 /**
- * Create a new user ID.
- */
-export const createUserId = async () => {
-  return `user_${await nanoid62()}` as UserId;
-};
-
-/**
- * Create a new user.
+ * Create a new user given a GitHub login.
+ *
+ * @throws If a user with the same GitHub login already exists.
  */
 export const createUser = async (login: GitHubLogin) => {
   const userId = await createUserId();

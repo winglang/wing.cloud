@@ -1,12 +1,7 @@
-import type { OpaqueType } from "@wingcloud/opaque-type";
+import type { GitHubLogin } from "../types/github.js";
 
 const GITHUB_APP_CLIENT_ID = import.meta.env.GITHUB_APP_CLIENT_ID;
 const GITHUB_APP_CLIENT_SECRET = import.meta.env.GITHUB_APP_CLIENT_SECRET;
-
-/**
- * Represents a GitHub login name.
- */
-export type GitHubLogin = OpaqueType<string, { readonly t: unique symbol }>;
 
 export interface GitHubTokens {
   access_token: string;
@@ -79,3 +74,8 @@ export const getGitHubLoginFromCode = async (code: string) => {
     tokens,
   };
 };
+
+/**
+ * The URL to redirect the user to in order to start the GitHub OAuth flow.
+ */
+export const authorizeURL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_APP_CLIENT_ID}`;
