@@ -1,4 +1,4 @@
-# `@wingcloud/astro-dynamodb-integration`
+# `@wingcloud/astro`
 
 Integration for Astro that creates uses Docker to create a local DynamoDB instance. Provides a virtual module that can be used to interact with it.
 
@@ -7,7 +7,7 @@ Integration for Astro that creates uses Docker to create a local DynamoDB instan
 `astro.config.mjs`:
 
 ```ts
-import { dynamodb } from "@wingcloud/astro-dynamodb-integration";
+import { dynamodb } from "@wingcloud/astro";
 import { defineConfig } from "astro/config";
 
 // https://astro.build/config
@@ -20,7 +20,7 @@ export default defineConfig({
 
 ```markdown
 ---
-import { client, TableName } from "virtual:@wingcloud/vite-dynamodb-plugin";
+import { client, TableName } from "virtual:@wingcloud/astro";
 import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 
 await client.send(

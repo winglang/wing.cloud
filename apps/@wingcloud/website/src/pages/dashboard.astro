@@ -1,10 +1,7 @@
 ---
 import { Code } from "astro:components";
 
-import {
-  dynamodb,
-  TableName,
-} from "virtual:@wingcloud/astro-dynamodb-integration";
+import { dynamodb, TableName } from "virtual:@wingcloud/astro";
 import Layout from "../components/Layout.astro";
 
 import { unmarshall } from "@aws-sdk/util-dynamodb";

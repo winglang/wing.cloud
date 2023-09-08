@@ -9,7 +9,7 @@
     "@astrojs/tailwind": "^5.0.0",
     "@aws-sdk/util-dynamodb": "^3.408.0",
     "@trpc/server": "^10.38.1",
-    "@wingcloud/astro-dynamodb-integration": "workspace:^",
+    "@wingcloud/astro": "workspace:^",
     "@wingcloud/nanoid62": "workspace:^",
     "@wingcloud/opaque-type": "workspace:^",
     "astro": "^3.0.11",

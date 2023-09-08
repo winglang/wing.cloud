@@ -25,24 +25,24 @@ const nanoid62 = new TypescriptProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-const astroDynamodbIntegration = new TypescriptProject({
+const astro = new TypescriptProject({
   monorepo,
-  name: "@wingcloud/astro-dynamodb-integration",
+  name: "@wingcloud/astro",
   peerDeps: ["@aws-sdk/client-dynamodb"],
 });
 
-astroDynamodbIntegration.addFields({
+astro.addFields({
   types: "src/index.ts",
 });
-astroDynamodbIntegration.addDevDeps("astro");
-astroDynamodbIntegration.addDevDeps("vite");
-astroDynamodbIntegration.addDevDeps("nanoid");
-astroDynamodbIntegration.addDevDeps("@aws-sdk/client-dynamodb");
+astro.addDevDeps("astro");
+astro.addDevDeps("vite");
+astro.addDevDeps("nanoid");
+astro.addDevDeps("@aws-sdk/client-dynamodb");
 
-astroDynamodbIntegration.addDeps("@winglang/sdk");
-astroDynamodbIntegration.addDeps("death");
+astro.addDeps("@winglang/sdk");
+astro.addDeps("death");
 
-astroDynamodbIntegration.addDeps("dotenv");
+astro.addDeps("dotenv");
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new TypescriptProject({
@@ -76,7 +76,7 @@ new JsonFile(website, ".prettierrc.json", {
   },
 });
 
-website.addDeps(astroDynamodbIntegration.name);
+website.addDeps(astro.name);
 website.addDevDeps("@aws-sdk/client-dynamodb");
 website.addGitIgnore("/.wing/");
 website.tryFindObjectFile("tsconfig.json")?.addToArray("include", ".wing/**/*");

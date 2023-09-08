@@ -121,9 +121,9 @@ importers:
       '@trpc/server':
         specifier: ^10.38.1
         version: 10.38.1
-      '@wingcloud/astro-dynamodb-integration':
+      '@wingcloud/astro':
         specifier: workspace:^
-        version: link:../../../packages/@wingcloud/astro-dynamodb-integration
+        version: link:../../../packages/@wingcloud/astro
       '@wingcloud/nanoid62':
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/nanoid62
@@ -204,7 +204,7 @@ importers:
         specifier: ^0.34.4
         version: 0.34.4
 
-  packages/@wingcloud/astro-dynamodb-integration:
+  packages/@wingcloud/astro:
     dependencies:
       '@winglang/sdk':
         specifier: ^0.29.8
@@ -3961,8 +3961,6 @@ packages:
       '@wingconsole/server': 0.29.8(constructs@10.2.70)
       express: 4.18.2
     transitivePeerDependencies:
-      - '@aws-sdk/signature-v4-crt'
-      - aws-crt
       - constructs
       - encoding
       - supports-color
@@ -3978,10 +3976,7 @@ packages:
       launch-editor: 2.6.0
       ms: 2.1.3
     transitivePeerDependencies:
-      - '@aws-sdk/signature-v4-crt'
-      - aws-crt
       - constructs
-      - encoding
       - supports-color
     dev: false
 
@@ -3992,10 +3987,7 @@ packages:
       '@winglang/sdk': 0.29.8(constructs@10.2.70)
       wasi-js: 1.7.3
     transitivePeerDependencies:
-      - '@aws-sdk/signature-v4-crt'
-      - aws-crt
       - constructs
-      - encoding
       - supports-color
     dev: false
     bundledDependencies:
@@ -4036,11 +4028,6 @@ packages:
       nanoid: 3.3.6
       safe-stable-stringify: 2.4.3
       uuid: 8.3.2
-    transitivePeerDependencies:
-      - '@aws-sdk/signature-v4-crt'
-      - aws-crt
-      - encoding
-      - supports-color
     dev: false
     bundledDependencies:
       - '@aws-sdk/client-cloudwatch-logs'
@@ -9603,8 +9590,6 @@ packages:
       uuid: 8.3.2
       vscode-languageserver: 8.1.0
     transitivePeerDependencies:
-      - '@aws-sdk/signature-v4-crt'
-      - aws-crt
       - constructs
       - encoding
       - supports-color

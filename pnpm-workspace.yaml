@@ -3,6 +3,6 @@
 packages:
   - packages/@wingcloud/opaque-type
   - packages/@wingcloud/nanoid62
-  - packages/@wingcloud/astro-dynamodb-integration
+  - packages/@wingcloud/astro
   - apps/@wingcloud/website
   - apps/@wingcloud/infrastructure
