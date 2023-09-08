@@ -12,6 +12,6 @@ interface ImportMeta {
 
 declare namespace App {
   interface Locals {
-    userId: import("./database/user.js").UserId | undefined;
+    userId: import("./types/user.js").UserId | undefined;
   }
 }
