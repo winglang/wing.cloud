@@ -4,16 +4,16 @@ import { type AstroConfig, type AstroIntegrationLogger } from "astro";
 
 import { name } from "../package.json" assert { type: "json" };
 
-export type GenerateTypeDefintionsOptions = {
+export type GenerateVirtualModuleTypeDefintionsOptions = {
   config: AstroConfig;
   logger: AstroIntegrationLogger;
 };
 
-export const generateTypeDefinitions = async ({
+export const generateVirtualModuleTypeDefinitions = async ({
   config,
   logger,
-}: GenerateTypeDefintionsOptions) => {
-  logger.debug("Generating type definitions...");
+}: GenerateVirtualModuleTypeDefintionsOptions) => {
+  logger.debug(`Generating type definitions for ${name}...`);
   const dir = new URL(`.wing/${name}/`, config.root);
   await mkdir(dir, { recursive: true });
   await writeFile(
@@ -24,6 +24,7 @@ export const generateTypeDefinitions = async ({
       '\texport const dynamodb: import("@aws-sdk/client-dynamodb").DynamoDB;',
       "\texport const TableName: string;",
       "}",
+      "",
     ].join("\n"),
   );
 };

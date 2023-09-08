@@ -2,7 +2,8 @@ import { type AstroIntegration } from "astro";
 
 import { name } from "../package.json" assert { type: "json" };
 
-import { generateTypeDefinitions } from "./generate-type-definitions.js";
+import { generateEnvironmentTypeDefinitions } from "./generate-environment-type-definitions.js";
+import { generateVirtualModuleTypeDefinitions } from "./generate-virtual-module-type-definitions.js";
 import { vitePlugin } from "./vite-plugin.js";
 
 export const dynamodb = (): AstroIntegration => {
@@ -16,7 +17,8 @@ export const dynamodb = (): AstroIntegration => {
           },
         });
 
-        void generateTypeDefinitions({ config, logger });
+        void generateVirtualModuleTypeDefinitions({ config, logger });
+        void generateEnvironmentTypeDefinitions({ config, logger });
       },
     },
   };
