@@ -1,31 +1,33 @@
 ---
-import { ScanCommand } from "@aws-sdk/client-dynamodb";
 import { Code } from "astro:components";
 
-const username = Astro.url.searchParams.get("username");
-
-const user = {
-  name: username,
-};
-
 import {
-  client,
+  dynamodb,
   TableName,
 } from "virtual:@wingcloud/astro-dynamodb-integration";
 import Layout from "../components/Layout.astro";
 
-const { Items } = await client.send(
-  new ScanCommand({
-    TableName,
-  }),
-);
+import { unmarshall } from "@aws-sdk/util-dynamodb";
+
+const { Items } = await dynamodb.scan({
+  TableName,
+});
 ---
 
 <Layout title="Dashboard">
   <a href="/" class="font-medium text-blue-500 underline">Back to index</a>
 
-  <!-- <code class="whitespace-pre-wrap font-mono text-xs">
-      {JSON.stringify(Items, undefined, 2)}
-    </code> -->
-  <Code code={JSON.stringify(Items, undefined, 2)} lang="json" wrap />
+  {
+    Items && (
+      <Code
+        code={JSON.stringify(
+          Items.map((item) => unmarshall(item)),
+          undefined,
+          2,
+        )}
+        lang="json"
+        wrap
+      />
+    )
+  }
 </Layout>

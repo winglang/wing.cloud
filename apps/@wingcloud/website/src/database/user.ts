@@ -1,8 +1,7 @@
 import {
-  GetItemCommand,
-  TransactWriteItemsCommand,
-} from "@aws-sdk/client-dynamodb";
-import * as dynamodb from "virtual:@wingcloud/astro-dynamodb-integration";
+  dynamodb,
+  TableName,
+} from "virtual:@wingcloud/astro-dynamodb-integration";
 
 import type { GitHubLogin } from "../types/github.js";
 import { createUserId, type UserId } from "../types/user.js";
@@ -11,20 +10,18 @@ import { createUserId, type UserId } from "../types/user.js";
  * Get the user ID from a GitHub login.
  */
 export const getUserIdFromLogin = async (login: GitHubLogin) => {
-  const { Item } = await dynamodb.client.send(
-    new GetItemCommand({
-      TableName: dynamodb.TableName,
-      Key: {
-        pk: {
-          S: `login#${login}`,
-        },
-        sk: {
-          S: "#",
-        },
+  const { Item } = await dynamodb.getItem({
+    TableName: TableName,
+    Key: {
+      pk: {
+        S: `login#${login}`,
       },
-      AttributesToGet: ["userId"],
-    }),
-  );
+      sk: {
+        S: "#",
+      },
+    },
+    AttributesToGet: ["userId"],
+  });
 
   return Item?.["userId"]?.S as UserId | undefined;
 };
@@ -38,50 +35,48 @@ export const createUser = async (login: GitHubLogin) => {
   const userId = await createUserId();
 
   // Perform a transaction to ensure that the user is created atomically.
-  await dynamodb.client.send(
-    new TransactWriteItemsCommand({
-      TransactItems: [
-        // This item is used to look up the user ID from the GitHub login,
-        // and to ensure there's only one user per GitHub login.
-        {
-          Put: {
-            TableName: dynamodb.TableName,
-            Item: {
-              pk: {
-                S: `login#${login}`,
-              },
-              sk: {
-                S: "#",
-              },
-              userId: {
-                S: userId,
-              },
+  await dynamodb.transactWriteItems({
+    TransactItems: [
+      // This item is used to look up the user ID from the GitHub login,
+      // and to ensure there's only one user per GitHub login.
+      {
+        Put: {
+          TableName,
+          Item: {
+            pk: {
+              S: `login#${login}`,
+            },
+            sk: {
+              S: "#",
+            },
+            userId: {
+              S: userId,
             },
           },
         },
-        // This item holds the user data.
-        {
-          Put: {
-            TableName: dynamodb.TableName,
-            Item: {
-              pk: {
-                S: `user#${userId}`,
-              },
-              sk: {
-                S: "#",
-              },
-              userId: {
-                S: userId,
-              },
-              login: {
-                S: login,
-              },
+      },
+      // This item holds the user data.
+      {
+        Put: {
+          TableName,
+          Item: {
+            pk: {
+              S: `user#${userId}`,
+            },
+            sk: {
+              S: "#",
+            },
+            userId: {
+              S: userId,
+            },
+            login: {
+              S: login,
             },
           },
         },
-      ],
-    }),
-  );
+      },
+    ],
+  });
 
   return userId;
 };

@@ -33,9 +33,9 @@ export const vitePlugin = ({ logger }: VitePluginOptions): Plugin => {
     },
     load(id) {
       if (id === RESOLVED_VIRTUAL_MODULE_ID) {
-        return `import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+        return `import { DynamoDB } from "@aws-sdk/client-dynamodb";
 
-        export const client = new DynamoDBClient({
+        export const dynamodb = new DynamoDB({
           region: "local",
           credentials: {
             accessKeyId: "local",
@@ -48,15 +48,15 @@ export const vitePlugin = ({ logger }: VitePluginOptions): Plugin => {
         `;
       }
     },
-    async buildStart(options) {
-      // Pull docker image
+    async buildStart() {
+      // Pull docker image.
       if (!(await runCommand("docker", ["images", "-q", IMAGE_NAME]))) {
         logger.info("Pulling DynamoDB image...");
         await runCommand("docker", ["pull", IMAGE_NAME]);
         logger.info("Done.");
       }
 
-      // Run the container and allow docker to assign a host port dynamically
+      // Run the container and allow docker to assign a host port dynamically.
       logger.debug("Starting container...");
       await runCommand("docker", [
         "run",
@@ -68,7 +68,7 @@ export const vitePlugin = ({ logger }: VitePluginOptions): Plugin => {
         IMAGE_NAME,
       ]);
 
-      // Make sure to kill the container
+      // Make sure to kill the container.
       // @ts-ignore-next-line
       const { default: DEATH } = await import("death");
       let isContainerDead = false;
@@ -83,7 +83,7 @@ export const vitePlugin = ({ logger }: VitePluginOptions): Plugin => {
         isContainerDead = true;
       });
 
-      // Inspect the container to get the host port
+      // Inspect the container to get the host port.
       logger.debug("Retrieving container port...");
       const out = await runCommand("docker", ["inspect", containerName]);
       hostPort = Number(
@@ -91,7 +91,7 @@ export const vitePlugin = ({ logger }: VitePluginOptions): Plugin => {
           .HostPort,
       );
 
-      // Create the table
+      // Create the table.
       logger.debug("Creating the table...");
       const { DynamoDBClient, CreateTableCommand } = await import(
         "@aws-sdk/client-dynamodb"
@@ -124,7 +124,7 @@ export const vitePlugin = ({ logger }: VitePluginOptions): Plugin => {
         BillingMode: "PAY_PER_REQUEST",
       });
 
-      // dynamodb server process might take some time to start
+      // The DynamoDB process might take some time to start.
       let attemptNumber = 0;
       while (true) {
         try {

@@ -74,12 +74,14 @@ new JsonFile(website, ".prettierrc.json", {
   },
 });
 
-website.addDeps(astroDynamodbIntegration.name, "@aws-sdk/client-dynamodb");
+website.addDeps(astroDynamodbIntegration.name);
+website.addDevDeps("@aws-sdk/client-dynamodb");
 website.addGitIgnore("/.wing/");
 website.tryFindObjectFile("tsconfig.json")?.addToArray("include", ".wing/**/*");
 
 website.addGitIgnore("/.env");
 
+website.addDeps("@aws-sdk/util-dynamodb");
 website.addDeps("jose");
 website.addDeps(nanoid62.name);
 website.addDeps(opaqueType.name);

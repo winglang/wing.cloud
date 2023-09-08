@@ -7,7 +7,7 @@
     "@astrojs/node": "^6.0.0",
     "@astrojs/react": "^3.0.2",
     "@astrojs/tailwind": "^5.0.0",
-    "@aws-sdk/client-dynamodb": "^3.408.0",
+    "@aws-sdk/util-dynamodb": "^3.408.0",
     "@trpc/server": "^10.38.1",
     "@wingcloud/astro-dynamodb-integration": "workspace:^",
     "@wingcloud/nanoid62": "workspace:^",
@@ -20,6 +20,7 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.408.0",
     "@cloudy-ts/eslint-plugin": "^0.0.269",
     "@types/node": "18",
     "@types/react": "^18.2.21",
