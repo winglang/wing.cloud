@@ -63,6 +63,8 @@ website.addGitIgnore("/.wing/");
 website.addGitIgnore(".env");
 website.tryFindObjectFile("tsconfig.json")?.addToArray("include", ".wing/**/*");
 
+website.addDeps("jose");
+
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
   monorepo,
