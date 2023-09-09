@@ -1,8 +1,8 @@
 ---
 import Layout from "../components/layout.astro";
 import { getOrCreateUser } from "../database/user.js";
-import { setAuthorizationCookie } from "../utils/authorization.js";
-import { getGitHubLoginFromCode } from "../utils/github.js";
+import { setAuthorizationCookie } from "../services/authorization.js";
+import { getGitHubLoginFromCode } from "../services/github.js";
 
 const code = Astro.url.searchParams.get("code");
 if (code) {
