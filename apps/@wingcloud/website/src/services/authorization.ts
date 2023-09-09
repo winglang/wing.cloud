@@ -9,17 +9,26 @@ const APP_SECRET = new TextEncoder().encode(import.meta.env.APP_SECRET);
 const JWT_EXPIRATION_TIME = "1h";
 export const AUTH_COOKIE_NAME = "Authorization";
 
+export type JwtPayload = {
+  sub: UserId;
+  accessToken: string;
+  expiresIn: number;
+  refreshToken: string;
+  refreshTokenExpiresIn: number;
+};
+
 export const createAuthorizationJwt = async (
   userId: UserId,
   tokens: GitHubTokens,
 ) => {
   return await new jose.SignJWT({
+    sub: userId,
     accessToken: tokens.access_token,
     expiresIn: tokens.expires_in,
     refreshToken: tokens.refresh_token,
     refreshTokenExpiresIn: tokens.refresh_token_expires_in,
-  })
-    .setSubject(userId)
+  } satisfies JwtPayload)
+    // .setSubject(userId)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(JWT_EXPIRATION_TIME)
@@ -40,7 +49,7 @@ export const setAuthorizationCookie = async (
   });
 };
 
-export const getLoggedInUserId = async (cookies: AstroCookies) => {
+export const getAuthorizationPayload = async (cookies: AstroCookies) => {
   const jwt = cookies.get(AUTH_COOKIE_NAME);
   if (!jwt) {
     return;
@@ -50,7 +59,11 @@ export const getLoggedInUserId = async (cookies: AstroCookies) => {
     algorithms: ["HS256"],
   });
 
-  const payload = JSON.parse(verifyResult.payload.toString());
+  return JSON.parse(verifyResult.payload.toString()) as JwtPayload;
+};
 
-  return payload.sub as UserId;
+export const getSignedInUserId = async (cookies: AstroCookies) => {
+  const payload = await getAuthorizationPayload(cookies);
+
+  return payload?.sub;
 };

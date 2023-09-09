@@ -77,5 +77,7 @@ export const getGitHubLoginFromCode = async (code: string) => {
 
 /**
  * The URL to redirect the user to in order to start the GitHub OAuth flow.
+ *
+ * @todo Add `state` parameter to prevent CSRF attacks.
  */
 export const authorizeURL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_APP_CLIENT_ID}`;

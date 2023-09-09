@@ -11,7 +11,16 @@ const { Items } = await dynamodb.scan({
 ---
 
 <Layout title="Dashboard">
-  <a href="/" class="font-medium text-blue-500 underline">Back to index</a>
+  <ul>
+    <li>
+      <a href="/new" class="font-medium text-blue-500 underline">New Project</a>
+    </li>
+    <li>
+      <a class="font-medium text-blue-500 underline" href="/sign-out">
+        Sign Out
+      </a>
+    </li>
+  </ul>
 
   {
     Items && (

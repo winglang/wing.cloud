@@ -48,21 +48,23 @@ export const dynamodb = (): AstroIntegration => {
         ]);
 
         // Make sure to kill the container.
-        // @ts-ignore-next-line
-        const { default: DEATH } = await import("death");
-        let isContainerDead = false;
-        DEATH(() => {
-          // The DEATH callback seems to be called twice.
-          if (isContainerDead) {
-            return;
-          }
+        {
+          // @ts-ignore-next-line
+          const { default: DEATH } = await import("death");
+          let isContainerDead = false;
+          DEATH(() => {
+            // The DEATH callback seems to be called twice.
+            if (isContainerDead) {
+              return;
+            }
 
-          logger.debug("Removing container...");
-          execSync(`docker remove --force ${containerName}`, {
-            stdio: "ignore",
+            logger.debug("Removing container...");
+            execSync(`docker remove --force ${containerName}`, {
+              stdio: "ignore",
+            });
+            isContainerDead = true;
           });
-          isContainerDead = true;
-        });
+        }
 
         // Inspect the container to get the host port.
         logger.debug("Retrieving container port...");

@@ -7,15 +7,20 @@ const ALLOWED_PATHS = new Set(["/", "/callback"]);
  */
 export const redirect = defineMiddleware(
   async ({ url, redirect, locals }, next) => {
-    const isAllowed = ALLOWED_PATHS.has(url.pathname);
-    if (isAllowed) {
-      return next();
+    // const isAllowed = ALLOWED_PATHS.has(url.pathname);
+    // if (isAllowed) {
+    //   return next();
+    // }
+
+    const isSignedIn = locals.userId !== undefined;
+    if (isSignedIn && url.pathname === "/") {
+      return redirect("/dashboard");
     }
 
-    if (locals.userId) {
-      return next();
+    if (!isSignedIn && !ALLOWED_PATHS.has(url.pathname)) {
+      return redirect("/");
     }
 
-    return redirect("/");
+    return next();
   },
 );
