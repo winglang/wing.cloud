@@ -1,10 +1,9 @@
 ---
-import { Code } from "astro:components";
-
-import { dynamodb, TableName } from "virtual:@wingcloud/astro/dynamodb";
-import Layout from "../components/Layout.astro";
-
 import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { Code } from "astro:components";
+import { dynamodb, TableName } from "virtual:@wingcloud/astro/dynamodb";
+
+import Layout from "../components/layout.astro";
 
 const { Items } = await dynamodb.scan({
   TableName,

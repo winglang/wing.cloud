@@ -67,7 +67,7 @@
       "description": "Lint the code",
       "steps": [
         {
-          "exec": "eslint --fix --ext .ts,.tsx ."
+          "exec": "eslint --fix --ext .ts,.tsx,.astro ."
         }
       ]
     },

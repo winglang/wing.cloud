@@ -1,6 +1,5 @@
 ---
-import Head from "./Head.astro";
-import Heading from "./Heading.astro";
+import Heading from "./heading.astro";
 
 interface Props {
   title?: string;
@@ -10,7 +9,12 @@ const { title } = Astro.props;
 ---
 
 <html>
-  <Head title={title} />
+  <head>
+    <title>{title ? `${title} | ` : ""}Wing Cloud</title>
+
+    <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+  </head>
+
   <body class="container mx-auto p-6">
     {title && <Heading title={title} />}
 
