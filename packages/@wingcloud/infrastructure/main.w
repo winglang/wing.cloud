@@ -13,12 +13,12 @@ class AstroWebsite  {
 
   init() {
     let api = new cloud.Api() as "Api";
-    api.get("*", inflight (event) => {
-      return AstroWebsite.handlerAdapter(event);
-    });
-    api.post("*", inflight (event) => {
-      return AstroWebsite.handlerAdapter(event);
-    });
+    // api.get("*", inflight (event) => {
+    //   return AstroWebsite.handlerAdapter(event);
+    // });
+    // api.post("*", inflight (event) => {
+    //   return AstroWebsite.handlerAdapter(event);
+    // });
 
     // let bucket = new cloud.Bucket() as "Files";
     // let files = AstroWebsite.getFiles();
@@ -32,7 +32,7 @@ class AstroWebsite  {
   }
 }
 
-let website = new AstroWebsite();
+// let website = new AstroWebsite();
 
 // bring "@cdktf/provider-aws" as aws;
 
@@ -78,3 +78,24 @@ let website = new AstroWebsite();
 // let d = new Cdn(
 //   bucket: b,
 // );
+
+// Previews environment runtime
+class Runtime {
+  logs: cloud.Bucket;
+  init() {
+    this.logs = new cloud.Bucket() as "deployment logs";
+    // use a function to generate the IAM user with the permissions to write to the bucket
+    new cloud.Function(inflight () => {
+      this.logs.put("example", ".com");
+    }) as "runtime function";
+  }
+}
+
+let runtime = new Runtime();
+
+let wingApi = new cloud.Api() as "wing api";
+wingApi.post("/report", inflight () => {
+  return {
+    status: 200
+  };
+});

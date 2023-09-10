@@ -1,0 +1,38 @@
+{
+  "name": "flyiolib",
+  "version": "1.0.0",
+  "description": "Fly.io client library",
+  "main": "index.js",
+  "scripts": {
+    "build": "jsii",
+    "build:watch": "jsii --watch",
+    "package": "jsii-pacmak"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Wing Cloud",
+    "email": "support@wing.cloud"
+  },
+  "repository": {
+    "url": "https://github.com/winglang/wing.cloud.git"
+  },
+  "license": "ISC",
+  "stability": "experimental",
+  "types": "index.d.ts",
+  "jsii": {
+    "outdir": "dist",
+    "targets": [],
+    "versionFormat": "full"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.9",
+    "jsii": "^5.2.2",
+    "jsii-pacmak": "^1.88.0"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "bundledDependencies": [
+    "node-fetch"
+  ]
+}
