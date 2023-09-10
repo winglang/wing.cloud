@@ -1,0 +1,7 @@
+---
+import { AUTH_COOKIE_NAME } from "../services/authorization.js";
+
+Astro.cookies.delete(AUTH_COOKIE_NAME);
+
+return Astro.redirect("/");
+---

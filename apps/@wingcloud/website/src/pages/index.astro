@@ -1,0 +1,48 @@
+---
+import Layout from "../components/layout.astro";
+import { authorizeURL } from "../services/github.js";
+
+const { userId } = Astro.locals;
+---
+
+<Layout title="Wing Cloud">
+  <div class="py-2">
+    {
+      !userId && (
+        <a
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-4"
+          href={authorizeURL}
+        >
+          Sign In with GitHub
+        </a>
+      )
+    }
+
+    {
+      userId && (
+        <a
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-4"
+          href="/sign-out"
+        >
+          Sign Out
+        </a>
+      )
+    }
+  </div>
+  {
+    userId && (
+      <ul>
+        <li>
+          <a href="/dashboard" class="font-medium text-blue-500 underline">
+            Go to Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="/other" class="font-medium text-blue-500 underline">
+            Go to Other
+          </a>
+        </li>
+      </ul>
+    )
+  }
+</Layout>

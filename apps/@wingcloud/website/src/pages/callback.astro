@@ -1,0 +1,21 @@
+---
+import Layout from "../components/layout.astro";
+import { getOrCreateUser } from "../database/user.js";
+import { setAuthorizationCookie } from "../services/authorization.js";
+import { getGitHubLoginFromCode } from "../services/github.js";
+
+const code = Astro.url.searchParams.get("code");
+if (code) {
+  const { login, tokens } = await getGitHubLoginFromCode(code);
+
+  const userId = await getOrCreateUser(login);
+
+  setAuthorizationCookie(userId, tokens, Astro.cookies);
+
+  return Astro.redirect("/dashboard");
+}
+---
+
+<Layout title="Something went wrong">
+  <p>The code query param is missing</p>
+</Layout>

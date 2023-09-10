@@ -1,8 +1,4 @@
-import {
-  MonorepoProject,
-  NodeProject,
-  TypescriptProject,
-} from "@skyrpex/wingen";
+import { MonorepoProject, TypescriptProject } from "@skyrpex/wingen";
 import { JsonFile } from "projen";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -12,13 +8,44 @@ const monorepo = new MonorepoProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const opaqueType = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/opaque-type",
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const nanoid62 = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/nanoid62",
+  deps: ["nanoid"],
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const astro = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/astro",
+  peerDeps: ["@aws-sdk/client-dynamodb"],
+});
+
+astro.addDevDeps("astro");
+astro.addDevDeps("vite");
+astro.addDevDeps("nanoid");
+astro.addDevDeps("@aws-sdk/client-dynamodb");
+
+astro.addDeps("@winglang/sdk");
+astro.addDeps("death");
+
+astro.addDeps("dotenv");
+
+///////////////////////////////////////////////////////////////////////////////
 const website = new TypescriptProject({
   monorepo,
   name: "@wingcloud/website",
+  outdir: "apps/@wingcloud/website",
 });
 website.addDeps("astro");
-website.devTask.reset("astro dev --open");
-website.compileTask.reset("astro build");
+website.addScript("dev", "astro dev --open");
+website.addScript("compile", "astro build");
 
 website.addDeps("@astrojs/node");
 
@@ -40,11 +67,46 @@ new JsonFile(website, ".prettierrc.json", {
   },
 });
 
+website.addDeps(astro.name);
+website.addDevDeps("@aws-sdk/client-dynamodb");
+website.addGitIgnore("/.wingcloud/");
+website
+  .tryFindObjectFile("tsconfig.json")
+  ?.addToArray("include", ".wingcloud/**/*");
+
+website.addGitIgnore("/.env");
+
+website.addDeps("@aws-sdk/util-dynamodb");
+website.addDeps("jose");
+website.addDeps(nanoid62.name);
+website.addDeps(opaqueType.name);
+
+{
+  const project = website;
+  project.addDevDeps("eslint-plugin-astro");
+  const eslint = project.tryFindObjectFile(".eslintrc.json")!;
+  eslint.addOverride("root", true);
+  eslint.addToArray("extends", "plugin:astro/recommended");
+  eslint.addToArray("overrides", {
+    files: ["*.astro"],
+    parser: "astro-eslint-parser",
+    parserOptions: {
+      parser: "@typescript-eslint/parser",
+      extraFileExtensions: [".astro"],
+    },
+    rules: {
+      // Allow returning outside of a function.
+      "unicorn/prefer-module": "off",
+    },
+  });
+  project.lintTask.reset("eslint --fix --ext .ts,.tsx,.astro .");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
   monorepo,
   name: "@wingcloud/infrastructure",
-  outdir: "packages/@wingcloud/infrastructure",
+  outdir: "apps/@wingcloud/infrastructure",
 });
 infrastructure.addFields({ type: "commonjs" });
 
