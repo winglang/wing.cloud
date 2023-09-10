@@ -7,6 +7,8 @@ const getBucketName = () => {
 
 export const handler = async (
   imageName: string,
+  repo: string,
+  entryfile: string,
   flyToken: string,
   wingApiUrl: string,
   awsAccessKeyId: string,
@@ -18,6 +20,8 @@ export const handler = async (
     imageName: imageName,
     memoryMb: 1024,
     env: {
+      GIT_REPO: repo,
+      ENTRYFILE: entryfile,
       LOGS_BUCKET_NAME: getBucketName(),
       WING_CLOUD_URL: wingApiUrl,
       AWS_ACCESS_KEY_ID: awsAccessKeyId, 
@@ -26,4 +30,5 @@ export const handler = async (
     },
     port: 3000
   });
+  return app.url();
 }
