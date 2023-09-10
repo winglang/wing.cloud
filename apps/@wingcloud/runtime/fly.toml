@@ -1,7 +1,4 @@
-# fly.toml app configuration file generated for wing-runtime-flyio-test on 2023-09-10T15:22:07+03:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
+# This file is intended for testing. use it to deploy the runtim to fly.io.
 
 app = "wing-runtime-flyio-test"
 primary_region = "lhr"
