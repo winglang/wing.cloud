@@ -29,7 +29,7 @@
           "exec": "tsup"
         },
         {
-          "exec": "wing compile main.w --target tf-aws"
+          "exec": "wing compile main.w --target sim && wing compile main.w --target tf-aws"
         }
       ]
     },

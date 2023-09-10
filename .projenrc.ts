@@ -7,6 +7,8 @@ const monorepo = new MonorepoProject({
   name: "@wingcloud/monorepo",
 });
 
+monorepo.addGitIgnore("target/");
+
 ///////////////////////////////////////////////////////////////////////////////
 const opaqueType = new TypescriptProject({
   monorepo,
@@ -112,7 +114,7 @@ infrastructure.addFields({ type: "commonjs" });
 
 infrastructure.addDeps("winglang");
 infrastructure.devTask.exec("wing it main.w");
-infrastructure.compileTask.exec("wing compile main.w --target tf-aws");
+infrastructure.compileTask.exec("wing compile main.w --target sim && wing compile main.w --target tf-aws");
 infrastructure.addGitIgnore("/target/");
 
 infrastructure.addDeps("express", "@vendia/serverless-express");
@@ -123,6 +125,40 @@ infrastructure.addDeps("glob");
 infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-aws");
 
 infrastructure.addDevDeps(website.name);
+
+///////////////////////////////////////////////////////////////////////////////
+// const runtime = new TypescriptProject({
+//   monorepo,
+//   name: "@wingcloud/runtime",
+//   outdir: "apps/@wingcloud/runtime",
+// });
+
+// runtime.addDeps("winglang");
+// runtime.addDeps("@winglang/sdk");
+// runtime.addDeps("@wingconsole/app");
+// runtime.addDeps("jsonwebtoken");
+// runtime.addDeps("jwk-to-pem");
+// runtime.addDeps("node-jose");
+// runtime.addDeps("node-fetch");
+
+// runtime.addDevDeps("@types/express");
+// runtime.addDevDeps("@types/jsonwebtoken");
+// runtime.addDevDeps("@types/jwk-to-pem");
+// runtime.addDevDeps("@types/node-jose");
+// runtime.addDevDeps("@types/node");
+// runtime.addDevDeps("simple-git");
+// runtime.addDevDeps("tsup");
+// runtime.addDevDeps("typescript");
+// runtime.addDevDeps("vitest");
+// runtime.addDevDeps(infrastructure.name);
+
+// runtime.devTask.exec("tsup --watch --onSuccess 'node dist/entrypoint-local.js'");
+// runtime.compileTask.exec("tsup");
+// runtime.testTask.exec("vitest");
+
+// runtime.addGitIgnore("node_modules/");
+// runtime.addGitIgnore("target/");
+// runtime.addGitIgnore("dist/");
 
 ///////////////////////////////////////////////////////////////////////////////
 monorepo.synth();

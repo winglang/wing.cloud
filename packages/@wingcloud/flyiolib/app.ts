@@ -1,4 +1,4 @@
-import { FlyClient } from "./client";
+import { FlyClient, ICreateMachineResult } from "./client";
 
 export interface IAppProps {
   readonly client: FlyClient;
@@ -118,5 +118,24 @@ export class App {
    */
   public async removeMachine(machineId: string) {
     return this.props.client.deleteMachine(this.props.name, machineId);
+  }
+
+  /**
+   * Update all machines of this app with the given props
+   * @param props the props of the new machines
+   * @returns machine creation result
+   */
+  public async update(props: ICreateMachineProps) {
+    const info = await this.machinesInfo();
+    for (let machine of info) {
+      await this.removeMachine(machine.id);
+    }
+
+    const result: ICreateMachineResult[] = [];
+    for (let i = 0; i < info.length; i++) {
+      result.push(await this.addMachine(props));
+    }
+
+    return result;
   }
 }

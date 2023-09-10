@@ -1,0 +1,33 @@
+# fly.toml app configuration file generated for wing-runtime-flyio-test on 2023-09-10T15:22:07+03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "wing-runtime-flyio-test"
+primary_region = "lhr"
+
+[build]
+  dockerfile = "Dockerfile"
+  ignorefile = ".dockerignore"
+
+[env]
+  AWS_ACCESS_KEY_ID = "<access_key_id>"
+  AWS_SECRET_ACCESS_KEY = "<secret_access_key>"
+  AWS_REGION = "us-east-1"
+  LOGS_BUCKET_NAME = "deployment-logs-c859575b-20230910115814345800000003"
+  WING_CLOUD_URL = "https://rpcidee4cc.execute-api.us-east-1.amazonaws.com/prod"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 3000
+  auto_stop_machines = false
+  auto_start_machines = false
+  min_machines_running = 1
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]

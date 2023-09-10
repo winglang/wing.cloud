@@ -1,5 +1,5 @@
 {
-  "name": "flyiolib",
+  "name": "@wingcloud/flyiolib",
   "version": "1.0.0",
   "description": "Fly.io client library",
   "main": "index.js",

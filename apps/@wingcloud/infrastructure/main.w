@@ -79,23 +79,52 @@ class AstroWebsite  {
 //   bucket: b,
 // );
 
-// Previews environment runtime
-class Runtime {
-  logs: cloud.Bucket;
-  init() {
-    this.logs = new cloud.Bucket() as "deployment logs";
-    // use a function to generate the IAM user with the permissions to write to the bucket
-    new cloud.Function(inflight () => {
-      this.logs.put("example", ".com");
-    }) as "runtime function";
-  }
-}
-
-let runtime = new Runtime();
-
 let wingApi = new cloud.Api() as "wing api";
 wingApi.post("/report", inflight () => {
   return {
     status: 200
   };
 });
+
+// Previews environment runtime
+class Runtime {
+  extern "./src/fly.mts" static inflight handler(
+    imageName: str,
+    flyToken: str,
+    wingApiUrl: str,
+    awsAccessKeyId: str,
+    awsSecretAccessKey: str
+  );
+
+  logs: cloud.Bucket;
+  flyToken: cloud.Secret;
+  awsAccessKeyId: cloud.Secret;
+  awsSecretAccessKey: cloud.Secret;
+  init() {
+    this.logs = new cloud.Bucket() as "deployment logs";
+    this.flyToken = new cloud.Secret(name: "wing.cloud/runtime/flyToken");
+    this.awsAccessKeyId = new cloud.Secret(name: "wing.cloud/runtime/awsAccessKeyId");
+    this.awsSecretAccessKey = new cloud.Secret(name: "wing.cloud/runtime/awsSecretAccessKey");
+    
+    // use a function to generate the IAM role with the permissions to write to the bucket
+    new cloud.Function(inflight () => {
+      // permissions:
+      this.logs.put;
+
+      // TODO: get bucket name from `this.logs` resource
+      Runtime.handler(
+        "registry.fly.io/wing-runtime-flyio-test:deployment-01H9ZGZX4Y64EYJ6TCT2Y4YDFV",
+        this.flyToken.value(),
+        wingApi.url,
+        this.awsAccessKeyId.value(),
+        this.awsSecretAccessKey.value());
+    }) as "runtime function";
+    
+    test "ass" {
+      let flyToken = this.flyToken.value();
+    }
+  }
+
+}
+
+let runtime = new Runtime();
