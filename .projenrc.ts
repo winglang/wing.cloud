@@ -25,23 +25,6 @@ const nanoid62 = new TypescriptProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-const astro = new TypescriptProject({
-  monorepo,
-  name: "@wingcloud/astro",
-  peerDeps: ["@aws-sdk/client-dynamodb"],
-});
-
-astro.addDevDeps("astro");
-astro.addDevDeps("vite");
-astro.addDevDeps("nanoid");
-astro.addDevDeps("@aws-sdk/client-dynamodb");
-
-astro.addDeps("@winglang/sdk");
-astro.addDeps("death");
-
-astro.addDeps("dotenv");
-
-///////////////////////////////////////////////////////////////////////////////
 type NodeEsmProjectOptions = Omit<NodeProjectOptions, "parent"> & {
   monorepo: MonorepoProject;
 };

@@ -18,7 +18,6 @@ export const api = (): Plugin => {
   let port: number | undefined;
   let server: ReturnType<typeof spawn> | undefined;
   let containerName: string | undefined;
-  // let container: ReturnType<typeof spawn> | undefined;
   return {
     name: "api",
     async configureServer(context) {
@@ -160,7 +159,6 @@ export const api = (): Plugin => {
     closeBundle() {
       server?.kill();
 
-      // container?.kill();
       if (containerName) {
         this.debug("Removing container...");
         spawnSync("docker", ["remove", "--force", containerName], {
