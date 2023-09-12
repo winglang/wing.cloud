@@ -30,11 +30,9 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsup --watch",
     "test": "vitest run",
     "default": "projen default",
-    "compile": "projen compile",
-    "build": "projen build",
     "lint": "projen lint"
   },
   "exports": {

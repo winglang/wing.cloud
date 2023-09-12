@@ -80,8 +80,9 @@ const api = new TypescriptProject({
 
 api.addGitIgnore("/.env");
 
-api.addDevDeps("tsx");
-api.addScript("dev", "tsx watch src/index.ts");
+api.removeTask("dev");
+api.removeTask("build");
+api.removeTask("compile");
 
 api.addDeps("express");
 api.addDevDeps("@types/express");
@@ -107,7 +108,7 @@ website.addDevDeps("@types/react", "@types/react-dom");
 
 website.addDevDeps(vite.name);
 
-website.addDevDeps(api.name, "tsx", "get-port");
+website.addDevDeps(api.name, "tsx", "get-port", "zod");
 
 website.addDeps("tailwindcss");
 
@@ -126,9 +127,16 @@ website.addDeps("jose");
 website.addDeps(nanoid62.name);
 website.addDeps(opaqueType.name);
 
+website.addDevDeps("@types/node@18");
 website
   .tryFindObjectFile("tsconfig.json")
   ?.addOverride("compilerOptions.esModuleInterop", true);
+website
+  .tryFindObjectFile("tsconfig.json")
+  ?.addToArray("include", "./plugins/**/*");
+
+website.addDevDeps("node-fetch");
+website.addDevDeps("nanoid");
 
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
