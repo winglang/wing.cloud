@@ -111,12 +111,12 @@ website.addDeps(nanoid62.name);
 website.addDeps(opaqueType.name);
 
 website.addDevDeps("@types/node@18");
-website
-  .tryFindObjectFile("tsconfig.json")
-  ?.addOverride("compilerOptions.esModuleInterop", true);
-website
-  .tryFindObjectFile("tsconfig.json")
-  ?.addToArray("include", "./plugins/**/*");
+{
+  const tsconfig = website.tryFindObjectFile("tsconfig.json")!;
+  tsconfig.addOverride("compilerOptions.jsx", "react-jsx");
+  tsconfig.addToArray("compilerOptions.lib", "DOM", "DOM.Iterable");
+  tsconfig.addToArray("include", "plugins/**/*");
+}
 
 website.addDevDeps("node-fetch");
 website.addDevDeps("nanoid");
