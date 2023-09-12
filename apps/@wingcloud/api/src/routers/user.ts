@@ -17,6 +17,8 @@ export const router = t.router({
         sk: { S: "#" },
       },
     });
-    return Item;
+    return {
+      name: Item?.["name"]?.S ?? "<unknown>",
+    };
   }),
 });

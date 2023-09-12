@@ -1,7 +1,7 @@
 import { t } from "../trpc.js";
 
-const routers = await Promise.all([import("./user.js")]);
+import { router as user } from "./user.js";
 
-export const router = t.mergeRouters(...routers.map((m) => m.router));
+export const router = t.mergeRouters(user);
 
 export type Router = typeof router;

@@ -92,6 +92,12 @@ website.addDevDeps("@types/react", "@types/react-dom");
 website.addDevDeps(vite.name);
 
 website.addDevDeps(api.name, "tsx", "get-port", "zod");
+website.addDeps(
+  "@trpc/client",
+  "@trpc/server",
+  "@trpc/react-query",
+  "@tanstack/react-query",
+);
 
 website.addDeps("tailwindcss");
 

@@ -1,3 +1,13 @@
+import { trpc } from "../utils/trpc.js";
+
 export const Message = () => {
-  return <h1>hello world!!</h1>;
+  const getUserById = trpc.getUserById.useQuery();
+
+  return (
+    <>
+      <h1>hello world!!</h1>
+
+      <code>{JSON.stringify(getUserById.data)}</code>
+    </>
+  );
 };
