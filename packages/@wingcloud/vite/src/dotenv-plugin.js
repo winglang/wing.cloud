@@ -6,20 +6,30 @@ import { DEFAULT_TYPES_DIRECTORY, PACKAGE_NAME } from "./defaults.js";
 
 /**
  * @param {import("node:fs").PathLike} path
- * @return {Promise<import("dotenv").DotenvParseOutput>}
+ * @return {Promise<import("dotenv").DotenvParseOutput|undefined>}
  */
 const readEnvFile = async (path) => {
   try {
-    await stat(envExampleFilename);
-  } catch (error) {
-    // File does not exist
+    await stat(path);
+  } catch {
+    // File does not exist.
     return {};
   }
-  if (await stat(envExampleFilename)) {
-    return;
+
+  return parse(await readFile(path));
+};
+
+/**
+ * @param {string} value
+ * @param {string|string[]} prefix
+ * @return {boolean}
+ */
+const startsWith = (value, prefix) => {
+  if (Array.isArray(prefix)) {
+    return prefix.some((p) => value.startsWith(p));
   }
 
-  return parse(await readFile(new URL(".env.example", root)));
+  return value.startsWith(prefix);
 };
 
 /**
@@ -27,21 +37,29 @@ const readEnvFile = async (path) => {
  */
 export const dotenv = () => {
   /**
-   * @type {{ config?: import("vite").UserConfig }
+   * @type {{
+   *  root?: string;
+   *  envPrefix?: string|string[];
+   * }}
    */
   const context = {};
   return {
     name: `${PACKAGE_NAME}:dotenv`,
     configResolved(config) {
-      context.config = config;
+      context.root = config.root;
+      context.envPrefix = config.envPrefix ?? "VITE_";
     },
     async buildStart() {
-      if (!context.config) {
-        throw new Error("No config found");
+      if (!context.root) {
+        throw new Error("[root] is missing");
       }
 
-      const root = `file://${context.config.root}/`;
-      const envPrefix = context.config.envPrefix ?? "VITE_";
+      if (!context.envPrefix) {
+        throw new Error("[envPrefix] is missing");
+      }
+
+      const root = `file://${context.root}/`;
+      const envPrefix = context.envPrefix;
       const envExampleFilename = new URL(".env.example", root);
 
       this.debug("Generating dotenv type definitions...");
@@ -51,8 +69,8 @@ export const dotenv = () => {
       ];
       try {
         const env = await readEnvFile(envExampleFilename);
-        for (const [key, value] of Object.entries(env)) {
-          if (!key.startsWith(envPrefix)) {
+        for (const [key, value] of Object.entries(env ?? {})) {
+          if (!startsWith(key, envPrefix)) {
             continue;
           }
           const type = typeof value === "string" ? "string" : "unknown";
@@ -62,7 +80,11 @@ export const dotenv = () => {
           );
         }
       } catch (error) {
-        this.error(error);
+        this.error(
+          error instanceof Error
+            ? error
+            : new Error("Unknown error", { cause: error }),
+        );
       }
       dotenvDts.push(
         "}",
