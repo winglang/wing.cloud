@@ -4,5 +4,7 @@ packages:
   - packages/@wingcloud/opaque-type
   - packages/@wingcloud/nanoid62
   - packages/@wingcloud/astro
+  - packages/@wingcloud/vite
+  - apps/@wingcloud/api
   - apps/@wingcloud/website
   - apps/@wingcloud/infrastructure

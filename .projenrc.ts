@@ -1,5 +1,9 @@
-import { MonorepoProject, TypescriptProject } from "@skyrpex/wingen";
-import { JsonFile } from "projen";
+import {
+  MonorepoProject,
+  NodeProject,
+  TypescriptProject,
+  type NodeProjectOptions,
+} from "@skyrpex/wingen";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -38,36 +42,77 @@ astro.addDeps("death");
 astro.addDeps("dotenv");
 
 ///////////////////////////////////////////////////////////////////////////////
+type NodeEsmProjectOptions = Omit<NodeProjectOptions, "parent"> & {
+  monorepo: MonorepoProject;
+};
+
+class NodeEsmProject extends NodeProject {
+  constructor(options: NodeEsmProjectOptions) {
+    super({
+      outdir: `packages/${options.name}`,
+      ...options,
+      parent: options.monorepo,
+    });
+
+    this.addFields({
+      type: "module",
+      exports: { ".": "./src/index.js" },
+      types: "./src/index.d.ts",
+    });
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+const vite = new NodeEsmProject({
+  monorepo,
+  name: "@wingcloud/vite",
+});
+
+vite.addDevDeps("vite");
+vite.addDeps("dotenv");
+
+///////////////////////////////////////////////////////////////////////////////
+const api = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/api",
+  outdir: "apps/@wingcloud/api",
+});
+
+api.addGitIgnore("/.env");
+
+api.addDevDeps("tsx");
+api.addScript("dev", "tsx watch src/index.ts");
+
+api.addDeps("express");
+api.addDevDeps("@types/express");
+
+api.addDeps("@trpc/server", "zod");
+api.addDeps("nanoid");
+api.addDeps("@aws-sdk/client-dynamodb");
+api.addDeps("@winglang/sdk");
+
+///////////////////////////////////////////////////////////////////////////////
 const website = new TypescriptProject({
   monorepo,
   name: "@wingcloud/website",
   outdir: "apps/@wingcloud/website",
 });
-website.addDeps("astro");
-website.addScript("dev", "astro dev --open");
-website.addScript("compile", "astro build");
+website.addDeps("vite");
+website.addScript("dev", "vite dev --open");
+website.addScript("compile", "vite build");
 
-website.addDeps("@astrojs/node");
-
-website.addDeps("@astrojs/react", "react", "react-dom");
+website.addDevDeps("@vitejs/plugin-react-swc");
+website.addDeps("react", "react-dom");
 website.addDevDeps("@types/react", "@types/react-dom");
 
-website.addDeps("@astrojs/tailwind", "tailwindcss");
+website.addDevDeps(vite.name);
+
+website.addDevDeps(api.name, "tsx", "get-port");
+
+website.addDeps("tailwindcss");
 
 website.addDeps("@trpc/server", "zod");
 
-website.addDevDeps("prettier-plugin-astro");
-new JsonFile(website, ".prettierrc.json", {
-  marker: false,
-  obj: {
-    tabWidth: 2,
-    useTabs: false,
-    trailingComma: "all",
-    plugins: ["prettier-plugin-astro"],
-  },
-});
-
-website.addDeps(astro.name);
 website.addDevDeps("@aws-sdk/client-dynamodb");
 website.addGitIgnore("/.wingcloud/");
 website
@@ -81,26 +126,9 @@ website.addDeps("jose");
 website.addDeps(nanoid62.name);
 website.addDeps(opaqueType.name);
 
-{
-  const project = website;
-  project.addDevDeps("eslint-plugin-astro");
-  const eslint = project.tryFindObjectFile(".eslintrc.json")!;
-  eslint.addOverride("root", true);
-  eslint.addToArray("extends", "plugin:astro/recommended");
-  eslint.addToArray("overrides", {
-    files: ["*.astro"],
-    parser: "astro-eslint-parser",
-    parserOptions: {
-      parser: "@typescript-eslint/parser",
-      extraFileExtensions: [".astro"],
-    },
-    rules: {
-      // Allow returning outside of a function.
-      "unicorn/prefer-module": "off",
-    },
-  });
-  project.lintTask.reset("eslint --fix --ext .ts,.tsx,.astro .");
-}
+website
+  .tryFindObjectFile("tsconfig.json")
+  ?.addOverride("compilerOptions.esModuleInterop", true);
 
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
