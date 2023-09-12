@@ -38,3 +38,21 @@ export const getContext = () => {
     examplesDir,
   };
 };
+
+export interface TextContextCallbackProps {
+  logsBucket: cloud.IBucketClient;
+  wingApiUrl: string;
+  examplesDir: string;
+};
+
+export const withTestContext = async (cb: (props: TextContextCallbackProps) => Promise<void>) => {
+  const sim = new testing.Simulator({ simfile: resolve(join(__dirname, "../../infrastructure/target/main.wsim")) });
+  await sim.start();
+  const logsBucket = sim.getResource("root/Default/Runtime/deployment logs") as cloud.IBucketClient;
+  const wingApi = sim.getResource("root/Default/wing api") as cloud.Api;
+  const wingApiUrl = wingApi.url;
+
+  await cb({ logsBucket, wingApiUrl, examplesDir });
+
+  await sim.stop();
+};

@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 export interface KeyStore {
   publicKey(): string;
-  createToken(data: Record<string, string>): Promise<string>;
+  createToken(data: Record<string, any>): Promise<string>;
 };
 
 export async function createKeyStore(issuer: string): Promise<KeyStore> {
@@ -17,12 +17,13 @@ export async function createKeyStore(issuer: string): Promise<KeyStore> {
   }
   
   const privateKey = jwkToPem(key.toJSON(true) as any, { private: true })
+  const publicKey = jwkToPem(key.toJSON() as any);
 
   return {
     publicKey: () => {
-      return jwkToPem(keyStore.toJSON() as any);
+      return publicKey;
     },
-    createToken: async (data: Record<string, string>) => {
+    createToken: async (data: Record<string, any>) => {
       // jwt.verify(token, publicKey);
       return jwt.sign(data, privateKey, {
         algorithm: 'RS256',

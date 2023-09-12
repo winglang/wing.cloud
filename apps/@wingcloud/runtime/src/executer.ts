@@ -6,6 +6,8 @@ export interface ExecProps {
   throwOnFailure?: boolean,
   env?: Record<string, string>
   logfile?: string;
+  dontAppendPrefix?: boolean;
+  dontAppendSuffix?: boolean;
 };
 
 export class Executer {
@@ -30,13 +32,17 @@ export class Executer {
       outfile = openSync(logfile, 'a');
     }
     
-    appendFileSync(logfile, `Running ${command} ${args}\n`, "utf-8");
+    if (!options?.dontAppendPrefix) {
+      appendFileSync(logfile, `Running ${command} ${args}\n`, "utf-8");
+    }
     const subprocess = spawnSync(command, args, {
       cwd: options?.cwd,
       stdio: [ 'ignore', outfile, errfile ],
       env: options?.env ? { ...options.env, PATH: process.env.PATH } : process.env
     });
-    appendFileSync(logfile, `Command ${command} exited with status ${subprocess.status}\n`, "utf-8");
+    if (!options?.dontAppendSuffix) {
+      appendFileSync(logfile, `Command ${command} exited with status ${subprocess.status}\n`, "utf-8");
+    }
     if ((options?.throwOnFailure && subprocess.status !== 0) || subprocess.status === null) {
       throw new Error(`command ${command} failed with status ${subprocess.status}`);
     }

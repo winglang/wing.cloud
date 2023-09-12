@@ -3,28 +3,28 @@ import { KeyStore } from "./auth/key-store";
 import { EnvironmentContext } from "./environment";
 
 export interface ReportEnvironmentStatusInput {
-  environmentId: string,
-  status: EnvironmentStatus
+  environmentId: string;
+  status: EnvironmentStatus;
+  data?: Record<string, any>;
 };
 
-export type EnvironmentStatus = "deploying" | "running" | "error" | "stopped";
+export type EnvironmentStatus = "deploying" | "tests" | "running" | "error" | "stopped";
 
 export function useReportStatus(context: EnvironmentContext, keyStore: KeyStore) {
-  return async function report(status: EnvironmentStatus) {
+  return async function report(status: EnvironmentStatus, payload?: Record<string, any>) {
     console.log("updating status", status);
-    const token = await keyStore.createToken({
+    const data: ReportEnvironmentStatusInput = {
       environmentId: context.environment.entryfile,
-      status
-    });
+      status,
+      data: payload
+    };
+    const token = await keyStore.createToken(data);
     await fetch(`${context.wingApiUrl}/report`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({
-        environmentId: context.environment.entryfile,
-        status
-      } as ReportEnvironmentStatusInput)
+      body: JSON.stringify(data)
     });
   }
 };

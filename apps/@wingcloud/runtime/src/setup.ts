@@ -1,14 +1,22 @@
-import { existsSync, mkdtempSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { Executer } from "./executer";
-import { randomBytes } from "node:crypto";
-import { fileBucketWrite } from "./storage/file-bucket-write";
+import { useBucketWrite } from "./storage/bucket-write";
 import { EnvironmentContext } from "./environment";
+import { wingTest } from "./wing/test";
+import { installWing } from "./wing/install";
 
 export interface SetupProps {
   e: Executer;
   context: EnvironmentContext;
+}
+
+export interface WingPaths { 
+  "winglang": string,
+  "@wingconsole/app": string;
+  "@winglang/compiler": string;
+  "@winglang/sdk": string;
 }
 
 export class Setup {
@@ -27,10 +35,10 @@ export class Setup {
     const entrydir = dirname(entryfilePath);
     await this.gitClone();
     await this.npmInstall(entrydir);
-    const wingCli = await this.installWing(entrydir);
-    await this.wingTest(wingCli.winglang, entryfilePath)
+    const wingPaths = await this.runInstallWing(entrydir);
+    const testResults = await this.runWingTest(wingPaths, entryfilePath)
 
-    return { paths: wingCli, entryfilePath };
+    return { paths: wingPaths, entryfilePath, testResults };
   }
   
   private async gitClone() {
@@ -43,33 +51,17 @@ export class Setup {
     }
   }
   
-  private async installWing(cwd: string) {
-    const getLocalWing = (cwd: string) => {
-      try {
-        const wingPath = require.resolve("winglang", { paths: [cwd] });
-        return { "winglang": wingPath, "@wingconsole/app": require.resolve("@wingconsole/app", { paths: [cwd] }) };
-      } catch (err) { 
-        return null; 
-      }
-    };
-  
-    let paths = getLocalWing(cwd);
-    if (!paths) {
-      const wingDir = mkdtempSync(join(tmpdir(), "wing-"));
-      await this.e.exec("npm", ["init", "-y"], { cwd: wingDir, throwOnFailure: true });
-      await this.e.exec("npm", ["install", "winglang"], { cwd: wingDir, throwOnFailure: true });
-      paths = getLocalWing(wingDir);
-      if (!paths) {
-        throw new Error("failed to install winglang");
-      }
-    }
-    
-    return paths;
+  private async runInstallWing(cwd: string) {
+    return installWing(cwd, this.e);
   }
   
-  private async wingTest(wingPath: string, entryfile: string) {
-    const logfile = join(tmpdir(), "test-log-" + randomBytes(8).toString("hex"));
-    await this.e.exec("node", [wingPath, "test", entryfile], { cwd: dirname(entryfile), env: {}, logfile });
-    await fileBucketWrite({ file: logfile, key: this.context.environment.bucketKey("test"), bucket: this.context.logsBucket });
+  private async runWingTest(wingPaths: WingPaths, entryfile: string) {
+    return wingTest({
+      wingCompilerPath: wingPaths["@winglang/compiler"],
+      wingSdkPath: wingPaths["@winglang/sdk"],
+      entryfilePath: entryfile,
+      environment: this.context.environment,
+      bucketWrite: useBucketWrite({ bucket: this.context.logsBucket })
+    });
   }
 }

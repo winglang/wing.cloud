@@ -12,5 +12,6 @@ new cloud.OnDeploy(inflight () => {
 });
 
 test "Hello, world!" {
+  log("a test log");
   assert(redis.get("hello")?.length == 36);
 }

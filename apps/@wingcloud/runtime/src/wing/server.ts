@@ -2,16 +2,17 @@ import { Application } from "express";
 import { createConsoleApp } from "@wingconsole/app";
 import { readFile } from "fs/promises";
 import { appendFileSync } from "fs";
-import { KeyStore } from "./auth/key-store";
+import { KeyStore } from "../auth/key-store";
 
 export interface StartServerProps {
   consolePath: string;
   entryfilePath: string;
   logfile: string;
   keyStore: KeyStore;
+  requestedPort?: number;
 }
 
-export async function startServer({ consolePath, entryfilePath, logfile, keyStore }: StartServerProps) {
+export async function startServer({ consolePath, entryfilePath, logfile, keyStore, requestedPort }: StartServerProps) {
   const wingConsole = require(consolePath);
   const create: typeof createConsoleApp = wingConsole.createConsoleApp;
   const writeMessageToFile = (message: any, ...props: any) => {
@@ -19,7 +20,7 @@ export async function startServer({ consolePath, entryfilePath, logfile, keyStor
   };
   const { port, close } = await create({
     wingfile: entryfilePath,
-    requestedPort: 3000,
+    requestedPort,
     log: {
       info: writeMessageToFile,
       error: writeMessageToFile,

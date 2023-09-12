@@ -17,5 +17,5 @@ export async function handler({ logsBucket, wingApiUrl }: HandlerProps) {
   const gitProvider = getGitProvider(repo, gitToken);
   const environment = new Environment(entryfile, { repo, sha });
   
-  await run({ context: { environment, gitProvider, logsBucket, wingApiUrl } });
+  await run({ context: { environment, gitProvider, logsBucket, wingApiUrl }, requestedPort: 3000 });
 }

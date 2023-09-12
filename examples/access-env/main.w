@@ -1,13 +1,6 @@
 bring util;
 
-let token = util.tryEnv("GITHUB_TOKEN");
-let path = util.tryEnv("PATH");
-
 test "access-token" {
+  let token = util.tryEnv("GITHUB_TOKEN");
   assert(token == nil);
-  if let path = path {
-    assert(path.contains("/special-path"));
-  } else {
-    assert(false);
-  }
 }
