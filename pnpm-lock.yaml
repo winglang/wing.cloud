@@ -36,6 +36,9 @@ importers:
       '@aws-sdk/client-dynamodb':
         specifier: ^3.410.0
         version: 3.410.0
+      '@aws-sdk/util-dynamodb':
+        specifier: ^3.410.0
+        version: 3.410.0
       '@trpc/server':
         specifier: ^10.38.2
         version: 10.38.2
@@ -51,6 +54,9 @@ importers:
       express:
         specifier: ^4.18.2
         version: 4.18.2
+      jose:
+        specifier: ^4.14.6
+        version: 4.14.6
       nanoid:
         specifier: ^4.0.2
         version: 4.0.2
@@ -179,9 +185,6 @@ importers:
 
   apps/@wingcloud/website:
     dependencies:
-      '@aws-sdk/util-dynamodb':
-        specifier: ^3.410.0
-        version: 3.410.0
       '@tanstack/react-query':
         specifier: ^4.35.0
         version: 4.35.0(react-dom@18.2.0)(react@18.2.0)
@@ -194,9 +197,6 @@ importers:
       '@trpc/server':
         specifier: ^10.38.2
         version: 10.38.2
-      jose:
-        specifier: ^4.14.6
-        version: 4.14.6
       react:
         specifier: ^18.2.0
         version: 18.2.0

@@ -73,9 +73,12 @@ api.addDevDeps("@types/express");
 api.addDeps("@trpc/server", "zod");
 api.addDeps("nanoid");
 api.addDeps("@aws-sdk/client-dynamodb");
+api.addDeps("@aws-sdk/util-dynamodb");
 api.addDeps("@winglang/sdk");
 api.addDeps(opaqueType.name);
 api.addDeps(nanoid62.name);
+api.addDeps("jose");
+api.addDeps("node-fetch");
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new TypescriptProject({
@@ -112,9 +115,6 @@ website
   ?.addToArray("include", ".wingcloud/**/*");
 
 website.addGitIgnore("/.env");
-
-website.addDeps("@aws-sdk/util-dynamodb");
-website.addDeps("jose");
 
 website.addDevDeps("@types/node@18");
 {
