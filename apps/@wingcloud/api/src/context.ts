@@ -1,4 +1,4 @@
-import { DynamoDB } from "@aws-sdk/client-dynamodb";
+import { type DynamoDB } from "@aws-sdk/client-dynamodb";
 
 export type Context = {
   dynamodb: DynamoDB;
