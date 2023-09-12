@@ -74,6 +74,8 @@ api.addDeps("@trpc/server", "zod");
 api.addDeps("nanoid");
 api.addDeps("@aws-sdk/client-dynamodb");
 api.addDeps("@winglang/sdk");
+api.addDeps(opaqueType.name);
+api.addDeps(nanoid62.name);
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new TypescriptProject({
@@ -113,8 +115,6 @@ website.addGitIgnore("/.env");
 
 website.addDeps("@aws-sdk/util-dynamodb");
 website.addDeps("jose");
-website.addDeps(nanoid62.name);
-website.addDeps(opaqueType.name);
 
 website.addDevDeps("@types/node@18");
 {

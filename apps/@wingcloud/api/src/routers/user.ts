@@ -1,24 +1,40 @@
+import { createUser, getUserIdFromLogin } from "../database/user.js";
 import { t } from "../trpc.js";
+import * as z from "../zod.js";
 
 export const router = t.router({
-  getUserById: t.procedure.query(async ({ ctx }) => {
-    await ctx.dynamodb.putItem({
+  getUserIdFromLogin: t.procedure
+    .input(
+      z.object({
+        login: z.gitHubLogin(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const userId = await getUserIdFromLogin(ctx, input.login);
+
+      return {
+        login: input.login,
+        userId: userId ?? "<unknown>",
+      };
+    }),
+  validateUserId: t.procedure
+    .input(
+      z.object({
+        login: z.gitHubLogin(),
+        // userId: z.userId(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = await createUser(ctx, input.login);
+      return {
+        userId,
+      };
+    }),
+  allUsers: t.procedure.query(async ({ ctx }) => {
+    const { Items } = await ctx.dynamodb.scan({
       TableName: ctx.tableName,
-      Item: {
-        pk: { S: "user" },
-        sk: { S: "#" },
-        name: { S: "Cristian" },
-      },
     });
-    const { Item } = await ctx.dynamodb.getItem({
-      TableName: ctx.tableName,
-      Key: {
-        pk: { S: "user" },
-        sk: { S: "#" },
-      },
-    });
-    return {
-      name: Item?.["name"]?.S ?? "<unknown>",
-    };
+
+    return { Items };
   }),
 });

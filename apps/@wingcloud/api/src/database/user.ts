@@ -1,14 +1,22 @@
-import { dynamodb, TableName } from "virtual:@wingcloud/astro/dynamodb";
+import type { DynamoDB } from "@aws-sdk/client-dynamodb";
 
 import type { GitHubLogin } from "../types/github.js";
 import { createUserId, type UserId } from "../types/user.js";
 
+type Context = {
+  dynamodb: DynamoDB;
+  tableName: string;
+};
+
 /**
  * Get the user ID from a GitHub login.
  */
-export const getUserIdFromLogin = async (login: GitHubLogin) => {
-  const { Item } = await dynamodb.getItem({
-    TableName: TableName,
+export const getUserIdFromLogin = async (
+  context: Context,
+  login: GitHubLogin,
+) => {
+  const { Item } = await context.dynamodb.getItem({
+    TableName: context.tableName,
     Key: {
       pk: {
         S: `login#${login}`,
@@ -28,17 +36,17 @@ export const getUserIdFromLogin = async (login: GitHubLogin) => {
  *
  * @throws If a user with the same GitHub login already exists.
  */
-export const createUser = async (login: GitHubLogin) => {
+export const createUser = async (context: Context, login: GitHubLogin) => {
   const userId = await createUserId();
 
   // Perform a transaction to ensure that the user is created atomically.
-  await dynamodb.transactWriteItems({
+  await context.dynamodb.transactWriteItems({
     TransactItems: [
       // This item is used to look up the user ID from the GitHub login,
       // and to ensure there's only one user per GitHub login.
       {
         Put: {
-          TableName,
+          TableName: context.tableName,
           Item: {
             pk: {
               S: `login#${login}`,
@@ -50,12 +58,13 @@ export const createUser = async (login: GitHubLogin) => {
               S: userId,
             },
           },
+          ConditionExpression: "attribute_not_exists(pk)",
         },
       },
       // This item holds the user data.
       {
         Put: {
-          TableName,
+          TableName: context.tableName,
           Item: {
             pk: {
               S: `user#${userId}`,
@@ -81,10 +90,8 @@ export const createUser = async (login: GitHubLogin) => {
 /**
  * Get the user ID for a GitHub login, creating the user if necessary.
  */
-export const getOrCreateUser = async (login: GitHubLogin) => {
-  let userId = await getUserIdFromLogin(login);
-  if (!userId) {
-    userId = await createUser(login);
-  }
-  return userId;
+export const getOrCreateUser = async (context: Context, login: GitHubLogin) => {
+  const userId = await getUserIdFromLogin(context, login);
+
+  return userId ?? (await createUser(context, login));
 };

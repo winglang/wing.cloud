@@ -39,6 +39,12 @@ importers:
       '@trpc/server':
         specifier: ^10.38.2
         version: 10.38.2
+      '@wingcloud/nanoid62':
+        specifier: workspace:^
+        version: link:../../../packages/@wingcloud/nanoid62
+      '@wingcloud/opaque-type':
+        specifier: workspace:^
+        version: link:../../../packages/@wingcloud/opaque-type
       '@winglang/sdk':
         specifier: ^0.29.21
         version: 0.29.21(constructs@10.2.70)
@@ -188,12 +194,6 @@ importers:
       '@trpc/server':
         specifier: ^10.38.2
         version: 10.38.2
-      '@wingcloud/nanoid62':
-        specifier: workspace:^
-        version: link:../../../packages/@wingcloud/nanoid62
-      '@wingcloud/opaque-type':
-        specifier: workspace:^
-        version: link:../../../packages/@wingcloud/opaque-type
       jose:
         specifier: ^4.14.6
         version: 4.14.6
