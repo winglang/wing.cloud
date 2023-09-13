@@ -105,7 +105,7 @@ export const createOrUpdateUser = async (
     TableName: context.tableName,
     Key: {
       pk: {
-        S: `login#${login}`,
+        S: `user#${userId}`,
       },
       sk: {
         S: "#",
