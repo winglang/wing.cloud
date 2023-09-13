@@ -1,6 +1,8 @@
+import { unmarshall } from "@aws-sdk/util-dynamodb";
+
 import { createUser, getUserIdFromLogin } from "../database/user.js";
 import { t } from "../trpc.js";
-import * as z from "../zod.js";
+import * as z from "../validations/index.js";
 
 export const router = t.router({
   getUserIdFromLogin: t.procedure
@@ -33,8 +35,15 @@ export const router = t.router({
   allUsers: t.procedure.query(async ({ ctx }) => {
     const { Items } = await ctx.dynamodb.scan({
       TableName: ctx.tableName,
+      // FilterExpression: "begins_with(pk, :pk)",
+      // ExpressionAttributeValues: {
+      //   ":pk": {
+      //     S: "login#",
+      //   },
+      // },
     });
 
-    return { Items };
+    // return { Items };
+    return { Items: Items?.map((item) => unmarshall(item)) };
   }),
 });
