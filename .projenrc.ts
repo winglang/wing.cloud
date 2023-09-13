@@ -1,8 +1,7 @@
 import {
   MonorepoProject,
-  NodeProject,
   TypescriptProject,
-  type NodeProjectOptions,
+  NodeEsmProject,
 } from "@skyrpex/wingen";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,27 +22,6 @@ const nanoid62 = new TypescriptProject({
   name: "@wingcloud/nanoid62",
   deps: ["nanoid"],
 });
-
-///////////////////////////////////////////////////////////////////////////////
-type NodeEsmProjectOptions = Omit<NodeProjectOptions, "parent"> & {
-  monorepo: MonorepoProject;
-};
-
-class NodeEsmProject extends NodeProject {
-  constructor(options: NodeEsmProjectOptions) {
-    super({
-      outdir: `packages/${options.name}`,
-      ...options,
-      parent: options.monorepo,
-    });
-
-    this.addFields({
-      type: "module",
-      exports: { ".": "./src/index.js" },
-      types: "./src/index.d.ts",
-    });
-  }
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 const vite = new NodeEsmProject({
