@@ -7,7 +7,5 @@ node_modules/
 /.turbo
 !/package.json
 /tsconfig.json
-/lib
-/tsup.config.ts
 !/.eslintrc.json
 !/.eslintignore

@@ -26,9 +26,6 @@
       "description": "Only compile",
       "steps": [
         {
-          "exec": "tsup"
-        },
-        {
           "exec": "wing compile main.w --target tf-aws"
         }
       ]
