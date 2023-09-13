@@ -2,6 +2,9 @@ import {
   MonorepoProject,
   TypescriptProject,
   NodeEsmProject,
+  NodeProject,
+  TypescriptConfig,
+  Eslint,
 } from "@skyrpex/wingen";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -59,11 +62,17 @@ api.addDeps("jose");
 api.addDeps("node-fetch");
 
 ///////////////////////////////////////////////////////////////////////////////
-const website = new TypescriptProject({
-  monorepo,
+const website = new NodeProject({
+  parent: monorepo,
   name: "@wingcloud/website",
   outdir: "apps/@wingcloud/website",
 });
+website.addDevDeps("typescript", "@types/node@18");
+new TypescriptConfig(website, {
+  include: ["src/**/*"],
+});
+new Eslint(website);
+
 website.addDeps("vite");
 website.addScript("dev", "vite dev --open");
 website.addScript("compile", "vite build");
@@ -71,6 +80,8 @@ website.addScript("compile", "vite build");
 website.addDevDeps("@vitejs/plugin-react-swc");
 website.addDeps("react", "react-dom");
 website.addDevDeps("@types/react", "@types/react-dom");
+
+website.addDeps("react-router-dom");
 
 website.addDevDeps(vite.name);
 

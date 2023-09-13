@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { useState } from "react";
+import { RouterProvider } from "react-router-dom";
 
-import { Message } from "./components/message.js";
+import { router } from "./router.jsx";
 import { trpc } from "./utils/trpc.js";
 
 export const App = () => {
@@ -20,7 +21,7 @@ export const App = () => {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <Message />
+        <RouterProvider router={router} />
       </QueryClientProvider>
     </trpc.Provider>
   );
