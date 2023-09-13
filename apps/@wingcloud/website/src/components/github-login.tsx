@@ -1,23 +1,24 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { trpc } from "../utils/trpc.js";
 
 export const GithubLogin = () => {
   const authorizeUrl = trpc["github/authorizeUrl"].useQuery();
+  const [redirect, setRedirect] = useState(false);
 
-  const redirect = useCallback(() => {
-    if (!authorizeUrl.data) {
+  useEffect(() => {
+    if (!authorizeUrl.data || !redirect) {
       return;
     }
     window.location.href = authorizeUrl.data;
-  }, [authorizeUrl.data]);
+  }, [authorizeUrl.data, redirect]);
 
   return (
     <>
       <button
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex gap-x-2"
-        onClick={redirect}
+        onClick={() => setRedirect(true)}
       >
         <span>Login with Github</span>
         <svg
