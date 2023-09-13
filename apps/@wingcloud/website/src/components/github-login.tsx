@@ -19,6 +19,7 @@ export const GithubLogin = () => {
       <button
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex gap-x-2"
         onClick={() => setRedirect(true)}
+        disabled={redirect}
       >
         <span>Login with Github</span>
         <svg
