@@ -4,7 +4,7 @@ import { DynamoDB } from "@aws-sdk/client-dynamodb";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import express from "express";
 
-import { type Context } from "./context.js";
+import { buildCreateContext } from "./context.js";
 import { router } from "./routers/index.js";
 
 export { type Router } from "./routers/index.js";
@@ -31,13 +31,10 @@ export const start = async (options: StartOptions) => {
     "/trpc",
     trpcExpress.createExpressMiddleware({
       router,
-      createContext() {
-        // return createContext({ ...context, dynamodb: options.dynamodb });
-        return {
-          dynamodb,
-          tableName: options.dynamodb.tableName,
-        } satisfies Context;
-      },
+      createContext: buildCreateContext({
+        dynamodb,
+        tableName: options.dynamodb.tableName,
+      }),
     }),
   );
 
