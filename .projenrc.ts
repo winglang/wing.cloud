@@ -70,6 +70,8 @@ api.removeTask("compile");
 api.addDeps("express");
 api.addDevDeps("@types/express");
 
+api.addDeps("dotenv");
+
 api.addDeps("@trpc/server", "zod");
 api.addDeps("nanoid");
 api.addDeps("@aws-sdk/client-dynamodb");

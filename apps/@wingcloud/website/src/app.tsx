@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { useState } from "react";
 
+import { GithubLogin } from "./components/github-login.js";
 import { Message } from "./components/message.js";
 import { trpc } from "./utils/trpc.js";
 
@@ -20,6 +21,7 @@ export const App = () => {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
+        <GithubLogin />
         <Message />
       </QueryClientProvider>
     </trpc.Provider>

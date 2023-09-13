@@ -2,6 +2,10 @@ import type { Server } from "node:http";
 
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
 import * as trpcExpress from "@trpc/server/adapters/express";
+import * as dotenv from "dotenv";
+dotenv.config({
+  path: new URL("../.env", import.meta.url),
+});
 import express from "express";
 
 import { buildCreateContext } from "./context.js";
