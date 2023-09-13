@@ -1,3 +1,4 @@
+// TODO: Use state to prevent man-in-the-middle attacks.
 const GITHUB_APP_CLIENT_ID = import.meta.env.VITE_GITHUB_APP_CLIENT_ID;
 const AUTHORIZE_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_APP_CLIENT_ID}`;
 
