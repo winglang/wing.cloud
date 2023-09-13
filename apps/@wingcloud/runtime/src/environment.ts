@@ -1,14 +1,19 @@
-import * as crypto from "crypto";
+import * as crypto from "node:crypto";
+
 import { cloud } from "@winglang/sdk";
-import { GitCommit, GitProvider } from "./git/provider";
+
+import { type GitCommit, GitProvider } from "./git/provider.js";
 
 export class Environment {
-  constructor(public entryfile: string, public commit: GitCommit) {
-
-  }
+  constructor(
+    public entryfile: string,
+    public commit: GitCommit,
+  ) {}
 
   testKey(pass: boolean, testPath: string) {
-    return this.bucketKey(`tests/${pass ? "passed" : "failed"}/${this.hashKey(testPath)}`);
+    return this.bucketKey(
+      `tests/${pass ? "passed" : "failed"}/${this.hashKey(testPath)}`,
+    );
   }
 
   deploymentKey() {
@@ -29,4 +34,4 @@ export interface EnvironmentContext {
   gitProvider: GitProvider;
   logsBucket: cloud.IBucketClient;
   wingApiUrl: string;
-};
+}

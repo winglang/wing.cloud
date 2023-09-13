@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 
 export interface IClientCreateMachineProps {
   appName: string;
@@ -81,10 +81,11 @@ export class FlyClient {
    */
   constructor(token?: string) {
     if (!token) {
-      if (!process.env.FLY_API_TOKEN) {
+      const envToken = process.env["FLY_API_TOKEN"];
+      if (!envToken) {
         throw new Error("environment variable FLY_API_TOKEN not set");
       }
-      this.token = process.env.FLY_API_TOKEN;
+      this.token = envToken;
     } else {
       this.token = token;
     }

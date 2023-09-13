@@ -27,6 +27,54 @@ const nanoid62 = new TypescriptProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const flyio = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/flyio",
+  description: "Fly.io client library"
+});
+
+flyio.compileTask.reset();
+flyio.compileTask.exec("jsii");
+flyio.packageTask.exec("jsii-pacmak");
+flyio.addScript("compile:watch", "jsii --watch");
+
+flyio.addDeps("node-fetch@2.6.4");
+flyio.addDevDeps("@types/node-fetch@2.6.4");
+flyio.addDevDeps("@types/node@18");
+flyio.addDevDeps("jsii");
+flyio.addDevDeps("jsii-pacmak");
+
+flyio.tryRemoveFile("./tsconfig.json");
+flyio.tryRemoveFile("./tsup.config.ts");
+
+flyio.addGitIgnore("**/*.js");
+flyio.addGitIgnore("**/*.d.ts");
+flyio.addGitIgnore(".jsii");
+flyio.addGitIgnore("tsconfig.tsbuildinfo");
+
+{
+  const packageJson = flyio.tryFindObjectFile("package.json")!;
+  packageJson.addOverride("jsii", {
+    "outdir": "dist",
+    "targets": [],
+    "versionFormat": "full"
+  });
+  packageJson.addOverride("bundledDependencies", [
+    "node-fetch"
+  ]);
+  packageJson.addOverride("author", {
+    name: "wing.cloud",
+    url: "https://wing.cloud"
+  });
+  packageJson.addOverride("repository", {
+    type: "git",
+    url: "https://github.com/winglang/wing.cloud"
+  });
+  packageJson.addOverride("license", "BSD-3-Clause");
+  packageJson.addOverride("main", "./lib/index.js");
+}
+
+///////////////////////////////////////////////////////////////////////////////
 type NodeEsmProjectOptions = Omit<NodeProjectOptions, "parent"> & {
   monorepo: MonorepoProject;
 };
@@ -150,40 +198,41 @@ infrastructure.addDeps("glob");
 infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-aws");
 
 infrastructure.addDevDeps(website.name);
+infrastructure.addDevDeps(flyio.name);
 
 ///////////////////////////////////////////////////////////////////////////////
-// const runtime = new TypescriptProject({
-//   monorepo,
-//   name: "@wingcloud/runtime",
-//   outdir: "apps/@wingcloud/runtime",
-// });
+const runtime = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/runtime",
+  outdir: "apps/@wingcloud/runtime",
+});
 
-// runtime.addDeps("winglang");
-// runtime.addDeps("@winglang/sdk");
-// runtime.addDeps("@wingconsole/app");
-// runtime.addDeps("jsonwebtoken");
-// runtime.addDeps("jwk-to-pem");
-// runtime.addDeps("node-jose");
-// runtime.addDeps("node-fetch");
+runtime.addDeps("winglang");
+runtime.addDeps("@winglang/sdk");
+runtime.addDeps("@wingconsole/app");
+runtime.addDeps("express");
+runtime.addDeps("jsonwebtoken");
+runtime.addDeps("jwk-to-pem");
+runtime.addDeps("node-jose");
+runtime.addDeps("node-fetch");
 
-// runtime.addDevDeps("@types/express");
-// runtime.addDevDeps("@types/jsonwebtoken");
-// runtime.addDevDeps("@types/jwk-to-pem");
-// runtime.addDevDeps("@types/node-jose");
-// runtime.addDevDeps("@types/node");
-// runtime.addDevDeps("simple-git");
-// runtime.addDevDeps("tsup");
-// runtime.addDevDeps("typescript");
-// runtime.addDevDeps("vitest");
-// runtime.addDevDeps(infrastructure.name);
+runtime.addDevDeps("@types/express");
+runtime.addDevDeps("@types/jsonwebtoken");
+runtime.addDevDeps("@types/jwk-to-pem");
+runtime.addDevDeps("@types/node-jose");
+runtime.addDevDeps("@types/node@18");
+runtime.addDevDeps("simple-git");
+runtime.addDevDeps("tsup");
+runtime.addDevDeps("typescript");
+runtime.addDevDeps("vitest");
+runtime.addDevDeps(infrastructure.name);
 
-// runtime.devTask.exec("tsup --watch --onSuccess 'node dist/entrypoint-local.js'");
-// runtime.compileTask.exec("tsup");
-// runtime.testTask.exec("vitest");
+runtime.devTask.exec("tsup --watch --onSuccess 'node lib/entrypoint-local.js'");
+runtime.testTask.exec("vitest");
 
-// runtime.addGitIgnore("node_modules/");
-// runtime.addGitIgnore("target/");
-// runtime.addGitIgnore("dist/");
+runtime.addGitIgnore("node_modules/");
+runtime.addGitIgnore("target/");
+runtime.addGitIgnore("dist/");
 
 ///////////////////////////////////////////////////////////////////////////////
 monorepo.synth();

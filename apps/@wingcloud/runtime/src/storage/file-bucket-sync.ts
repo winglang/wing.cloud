@@ -1,23 +1,27 @@
-import { cloud } from '@winglang/sdk';
-import { readFileSync } from 'fs';
+import { readFileSync } from "node:fs";
+
+import { cloud } from "@winglang/sdk";
 
 export interface FileBucketSyncProps {
   file: string;
   key: string;
   bucket: cloud.IBucketClient;
-};
+}
 
 export function fileBucketSync({ file, key, bucket }: FileBucketSyncProps) {
   //TODO: use streaming when supported
   let clear: NodeJS.Timeout;
   const sync = async () => {
     try {
-      const contents = readFileSync(file, "utf-8");
+      const contents = readFileSync(file, "utf8");
       await bucket.put(key, contents);
-    } catch (err) {
-      console.error("failed to sync logs, retrying...", err);
+    } catch (error) {
+      console.error("failed to sync logs, retrying...", error);
     } finally {
-      clear = setTimeout(sync, parseInt(process.env.FILE_BUCKET_SYNC_MS || "5000"));
+      clear = setTimeout(
+        sync,
+        Number.parseInt(process.env["FILE_BUCKET_SYNC_MS"] || "5000"),
+      );
     }
   };
   sync();
@@ -25,6 +29,6 @@ export function fileBucketSync({ file, key, bucket }: FileBucketSyncProps) {
   return {
     cancelSync: () => {
       clearTimeout(clear);
-    }
-  }
-};
+    },
+  };
+}

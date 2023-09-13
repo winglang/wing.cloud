@@ -1,4 +1,4 @@
-import { GitCommit, GitProvider } from "./provider";
+import { type GitCommit, GitProvider } from "./provider.js";
 
 export class GithubProvider extends GitProvider {
   constructor(private token: string) {

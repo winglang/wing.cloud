@@ -1,4 +1,4 @@
-## `@wingcloud/flyiolib`
+## `@wingcloud/flyio`
 
 This JSII library provides interface to control fly.io apps and machines. 
 

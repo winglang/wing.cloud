@@ -1,6 +1,8 @@
-import { GithubProvider } from "./github";
-import { LocalGitProvider } from "./local";
+import { GithubProvider } from "./github.js";
+import { LocalGitProvider } from "./local.js";
 
 export const getGitProvider = (repo: string, gitToken: string) => {
-  return repo.startsWith("file://") ? new LocalGitProvider() : new GithubProvider(gitToken);
+  return repo.startsWith("file://")
+    ? new LocalGitProvider()
+    : new GithubProvider(gitToken);
 };

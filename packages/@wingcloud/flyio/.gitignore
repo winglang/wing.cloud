@@ -11,5 +11,7 @@ node_modules/
 /tsup.config.ts
 !/.eslintrc.json
 !/.eslintignore
-/.wingcloud/
-/.env
+**/*.js
+**/*.d.ts
+.jsii
+tsconfig.tsbuildinfo

@@ -18,4 +18,4 @@ ENV DOCKER_TMPDIR=/data/docker/tmp
 
 ENTRYPOINT ["./entrypoint.sh"]
 
-CMD ["node", "dist/entrypoint-flyio.js"]
+CMD ["node", "lib/entrypoint-flyio.js"]

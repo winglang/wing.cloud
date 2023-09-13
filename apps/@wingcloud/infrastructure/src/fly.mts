@@ -1,4 +1,4 @@
-import { Fly, FlyClient } from "../../../../packages/@wingcloud/flyiolib/index"
+import { Fly, FlyClient } from "../../../../packages/@wingcloud/flyio/index"
 
 const getBucketName = () => {
   const key = Object.keys(process.env).find(k => k.startsWith("BUCKET_NAME_"));

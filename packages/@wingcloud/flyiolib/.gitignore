@@ -1,5 +1,0 @@
-*.js
-*.d.ts
-tsconfig.*
-dist/
-.jsii
