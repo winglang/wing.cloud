@@ -23,6 +23,7 @@
   },
   "include": [
     "src/**/*",
-    "plugins/**/*"
+    "plugins/**/*",
+    ".wingcloud/**/*"
   ]
 }

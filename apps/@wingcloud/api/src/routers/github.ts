@@ -4,10 +4,6 @@ import { t } from "../trpc.js";
 import * as z from "../validations/index.js";
 
 export const router = t.router({
-  "github/authorizeUrl": t.procedure.query(async () => {
-    const clientId = process.env["GITHUB_APP_CLIENT_ID"];
-    return `https://github.com/login/oauth/authorize?client_id=${clientId}`;
-  }),
   "github/callback": t.procedure
     .input(
       z.object({

@@ -101,18 +101,14 @@ website.addDeps("@trpc/server", "zod");
 
 website.addDevDeps("@aws-sdk/client-dynamodb");
 website.addGitIgnore("/.wingcloud/");
-website
-  .tryFindObjectFile("tsconfig.json")
-  ?.addToArray("include", ".wingcloud/**/*");
 
 website.addGitIgnore("/.env");
 
-website.addDevDeps("@types/node@18");
 {
   const tsconfig = website.tryFindObjectFile("tsconfig.json")!;
   tsconfig.addOverride("compilerOptions.jsx", "react-jsx");
   tsconfig.addToArray("compilerOptions.lib", "DOM", "DOM.Iterable");
-  tsconfig.addToArray("include", "plugins/**/*");
+  tsconfig.addToArray("include", "plugins/**/*", ".wingcloud/**/*");
 }
 
 website.addDevDeps("node-fetch");
