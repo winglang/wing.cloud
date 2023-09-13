@@ -1,6 +1,6 @@
+import * as jose from "jose";
 import jwt from "jsonwebtoken";
 import jwkToPem from "jwk-to-pem";
-import * as jose from "jose";
 
 export interface KeyStore {
   publicKey(): string;
@@ -10,8 +10,11 @@ export interface KeyStore {
 export async function createKeyStore(issuer: string): Promise<KeyStore> {
   const keyStore = await jose.generateKeyPair("RS256");
 
-  const privateKey = jwkToPem(await jose.exportJWK(keyStore.privateKey) as any, { private: true });
-  const publicKey = jwkToPem(await jose.exportJWK(keyStore.publicKey) as any);
+  const privateKey = jwkToPem(
+    (await jose.exportJWK(keyStore.privateKey)) as any,
+    { private: true },
+  );
+  const publicKey = jwkToPem((await jose.exportJWK(keyStore.publicKey)) as any);
 
   return {
     publicKey: () => {

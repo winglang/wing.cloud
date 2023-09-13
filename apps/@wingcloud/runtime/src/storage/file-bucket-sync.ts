@@ -2,6 +2,10 @@ import { readFileSync } from "node:fs";
 
 import { cloud } from "@winglang/sdk";
 
+const fileBucketSyncMs = Number.parseInt(
+  process.env["FILE_BUCKET_SYNC_MS"] || "5000",
+);
+
 export interface FileBucketSyncProps {
   file: string;
   key: string;
@@ -18,10 +22,7 @@ export function fileBucketSync({ file, key, bucket }: FileBucketSyncProps) {
     } catch (error) {
       console.error("failed to sync logs, retrying...", error);
     } finally {
-      clear = setTimeout(
-        sync,
-        Number.parseInt(process.env["FILE_BUCKET_SYNC_MS"] || "5000"),
-      );
+      clear = setTimeout(sync, fileBucketSyncMs);
     }
   };
   sync();
