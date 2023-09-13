@@ -17,6 +17,9 @@ export const Component = () => {
         onSuccess: () => {
           navigate("/dashboard/team");
         },
+        onError: () => {
+          navigate("/");
+        },
       },
     );
   }, []);
