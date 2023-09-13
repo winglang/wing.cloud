@@ -14,7 +14,7 @@ importers:
     devDependencies:
       '@skyrpex/wingen':
         specifier: ^0.5.0
-        version: 0.5.0(projen@0.73.18)
+        version: 0.5.0(projen@0.73.19)
       '@types/node':
         specifier: '18'
         version: 18.17.14
@@ -23,7 +23,7 @@ importers:
         version: 3.0.3
       projen:
         specifier: ^0.73.18
-        version: 0.73.18
+        version: 0.73.19
       tsx:
         specifier: ^3.12.9
         version: 3.12.9
@@ -51,6 +51,9 @@ importers:
       '@winglang/sdk':
         specifier: ^0.30.3
         version: 0.30.3(constructs@10.2.70)
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
       express:
         specifier: ^4.18.2
         version: 4.18.2
@@ -2207,11 +2210,6 @@ packages:
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
     dev: true
 
-  /@eslint-community/regexpp@4.8.1:
-    resolution: {integrity: sha512-PWiOzLIUAjN/w5K17PoF4n6sKBw0gqLHPhywmYHP4t1VFQQVYeb1yWsJwnMVEMl3tUHME7X/SJPZLmtG7XBDxQ==}
-    engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
-    dev: true
-
   /@eslint/eslintrc@2.1.2:
     resolution: {integrity: sha512-+wvgpDsrB1YqAMdEUCcnTlpfVBH7Vqn6A/NT3D8WVXFIaKMlErPIZT3oCIAVCOtarRpMtelZLqJeU3t7WY6X6g==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -2402,20 +2400,20 @@ packages:
     engines: {node: '>=14.0.0'}
     dev: false
 
-  /@segment/analytics-core@1.3.1:
-    resolution: {integrity: sha512-KGblJ8WQNC4t0j31zeyYBm2thHWuPULNAoP7waU5ts7Asz9ipvGoHqFSLG6warqvcnBdkiRbNam242zmxX53oA==}
+  /@segment/analytics-core@1.3.0:
+    resolution: {integrity: sha512-ujScWZH49NK1hYlp2/EMw45nOPEh+pmTydAnR6gSkRNucZD4fuinvpPL03rmFCw8ibaMuKLAdgPJfQ0gkLKZ5A==}
     dependencies:
       '@lukeed/uuid': 2.0.1
       dset: 3.1.2
       tslib: 2.6.2
     dev: false
 
-  /@segment/analytics-node@1.1.1:
-    resolution: {integrity: sha512-YNn32SfD8KrxIBowLz3MVav0GzhGIbBRgAtjW4Kv57oHwgaJNSLEp/z/ypnu7vAqUjm9jAwAW9Wfc24ssZI49g==}
+  /@segment/analytics-node@1.1.0:
+    resolution: {integrity: sha512-q8MPpvQJgMUSIRmQXficA33ZmLQ6s5YqUMr623xJhhfp/TGkkgfpcdMk+qSniZVIm8JuQRXm8Mbh922LG3goBQ==}
     engines: {node: '>=14'}
     dependencies:
       '@lukeed/uuid': 2.0.1
-      '@segment/analytics-core': 1.3.1
+      '@segment/analytics-core': 1.3.0
       buffer: 6.0.3
       node-fetch: 2.7.0
       tslib: 2.6.2
@@ -2427,13 +2425,13 @@ packages:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
     dev: true
 
-  /@skyrpex/wingen@0.5.0(projen@0.73.18):
+  /@skyrpex/wingen@0.5.0(projen@0.73.19):
     resolution: {integrity: sha512-2HpQANCDn312j23EzI610jrh0UpXWwT/9sxEf+j5JlbWffda65UCfYYpcD++DY4RE+WIzNRJGLO4SKewp2y3bA==}
     peerDependencies:
       projen: ^0.72.1
     dependencies:
       case: 1.6.3
-      projen: 0.73.18
+      projen: 0.73.19
     dev: true
     bundledDependencies:
       - case
@@ -3344,7 +3342,7 @@ packages:
   /@wingconsole/app@0.30.3(constructs@10.2.70):
     resolution: {integrity: sha512-PCrPNLY57aeuYYtmAZk50e2DRT2S86R0DL0kZdZOHk8GWZVQ4AMI+p8Vamva7AiHwlStVGDo4F1T5SLrE/v66A==}
     dependencies:
-      '@segment/analytics-node': 1.1.1
+      '@segment/analytics-node': 1.1.0
       '@wingconsole/server': 0.30.3(constructs@10.2.70)
       express: 4.18.2
     transitivePeerDependencies:
@@ -3861,10 +3859,7 @@ packages:
     peerDependencies:
       constructs: ^10.0.25
     dependencies:
-      archiver: 5.3.1
       constructs: 10.2.70
-      json-stable-stringify: 1.0.2
-      semver: 7.5.4
     dev: false
     bundledDependencies:
       - archiver
@@ -3953,8 +3948,8 @@ packages:
       restore-cursor: 3.1.0
     dev: false
 
-  /cli-spinners@2.9.1:
-    resolution: {integrity: sha512-jHgecW0pxkonBJdrKsqxgRX9AcG+u/5k0Q7WPDfi8AogLAdwxEkyYYNWwZ5GvVFoFx2uiY1eNcSK00fh+1+FyQ==}
+  /cli-spinners@2.9.0:
+    resolution: {integrity: sha512-4/aL9X3Wh0yiMQlE+eeRhWP6vclO3QRtw1JHKIT0FFUs5FjpFmESqtMvYZ0+lbzBw900b95mS0hohy+qn2VK/g==}
     engines: {node: '>=6'}
     dev: false
 
@@ -4621,7 +4616,7 @@ packages:
     hasBin: true
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.49.0)
-      '@eslint-community/regexpp': 4.8.1
+      '@eslint-community/regexpp': 4.8.0
       '@eslint/eslintrc': 2.1.2
       '@eslint/js': 8.49.0
       '@humanwhocodes/config-array': 0.11.11
@@ -6101,7 +6096,7 @@ packages:
       bl: 4.1.0
       chalk: 4.1.2
       cli-cursor: 3.1.0
-      cli-spinners: 2.9.1
+      cli-spinners: 2.9.0
       is-interactive: 1.0.0
       is-unicode-supported: 0.1.0
       log-symbols: 4.1.0
@@ -6358,8 +6353,8 @@ packages:
     engines: {node: '>= 0.6.0'}
     dev: false
 
-  /projen@0.73.18:
-    resolution: {integrity: sha512-WfhSzKOxKHMB4VrEUI+KnPauGTuh4aaHw2cO/N6vYN7nX5ELDbm9Rhtid1q9s4WpN9c5kwiBcEU26UjvMoSDtg==}
+  /projen@0.73.19:
+    resolution: {integrity: sha512-Y4VyrzJQ9Q2dMfXrgiFiK8PpGAuYlMCCO9FsKghz5O/zXZQBLjkLevOc8pdIs0Ura/MxS9cckAkeGeiI/0Q0gw==}
     engines: {node: '>= 14.0.0'}
     hasBin: true
     dependencies:
@@ -7617,7 +7612,7 @@ packages:
     engines: {node: '>=v18.0.0'}
     hasBin: true
     dependencies:
-      '@segment/analytics-node': 1.1.1
+      '@segment/analytics-node': 1.1.0
       '@wingconsole/app': 0.30.3(constructs@10.2.70)
       '@wingconsole/server': 0.30.3(constructs@10.2.70)
       '@winglang/compiler': 0.30.3(constructs@10.2.70)

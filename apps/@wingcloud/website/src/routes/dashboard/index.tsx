@@ -1,9 +1,9 @@
-import { GithubLogin } from "../components/github-login.js";
+import { Outlet } from "react-router-dom";
 
 export const Component = () => {
   return (
     <div className="p-6">
-      <GithubLogin />
+      <Outlet />
     </div>
   );
 };
