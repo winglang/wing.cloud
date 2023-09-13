@@ -27,12 +27,9 @@ const exchangeCodeForTokens = async (code: string): Promise<GitHubTokens> => {
 
   if (!response.ok) {
     const error = (await response.json()) as any;
-    throw new Error(
-      `Failed to exchange code for access token. error: ${error.error}`,
-      {
-        cause: response,
-      },
-    );
+    throw new Error("Failed to exchange code for access token", {
+      cause: response,
+    });
   }
 
   return (await response.json()) as GitHubTokens;
