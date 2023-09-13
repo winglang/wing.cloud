@@ -23,12 +23,7 @@
     },
     "compile": {
       "name": "compile",
-      "description": "Only compile",
-      "steps": [
-        {
-          "exec": "tsup"
-        }
-      ]
+      "description": "Only compile"
     },
     "default": {
       "name": "default",
@@ -64,12 +59,7 @@
     },
     "lint": {
       "name": "lint",
-      "description": "Lint the code",
-      "steps": [
-        {
-          "exec": "eslint --fix --ext .ts,.tsx ."
-        }
-      ]
+      "description": "Lint the code"
     },
     "package": {
       "name": "package",

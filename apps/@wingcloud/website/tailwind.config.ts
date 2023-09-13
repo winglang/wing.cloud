@@ -1,5 +1,5 @@
 import { Config } from "tailwindcss";
 
 export default {
-  content: ["src/**/*"],
+  content: ["index.html", "src/**/*"],
 } satisfies Config;
