@@ -9,5 +9,5 @@ node_modules/
 /tsconfig.json
 /lib
 /tsup.config.ts
-/.eslintrc.json
-/.eslintignore
+!/.eslintrc.json
+!/.eslintignore
