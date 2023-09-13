@@ -23,12 +23,7 @@
     },
     "compile": {
       "name": "compile",
-      "description": "Only compile",
-      "steps": [
-        {
-          "exec": "tsup"
-        }
-      ]
+      "description": "Only compile"
     },
     "default": {
       "name": "default",

@@ -1,8 +1,10 @@
 import {
   MonorepoProject,
-  NodeProject,
   TypescriptProject,
-  type NodeProjectOptions,
+  NodeEsmProject,
+  NodeProject,
+  TypescriptConfig,
+  Eslint,
 } from "@skyrpex/wingen";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,27 +25,6 @@ const nanoid62 = new TypescriptProject({
   name: "@wingcloud/nanoid62",
   deps: ["nanoid"],
 });
-
-///////////////////////////////////////////////////////////////////////////////
-type NodeEsmProjectOptions = Omit<NodeProjectOptions, "parent"> & {
-  monorepo: MonorepoProject;
-};
-
-class NodeEsmProject extends NodeProject {
-  constructor(options: NodeEsmProjectOptions) {
-    super({
-      outdir: `packages/${options.name}`,
-      ...options,
-      parent: options.monorepo,
-    });
-
-    this.addFields({
-      type: "module",
-      exports: { ".": "./src/index.js" },
-      types: "./src/index.d.ts",
-    });
-  }
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 const vite = new NodeEsmProject({
@@ -83,11 +64,17 @@ api.addDeps("jose");
 api.addDeps("node-fetch");
 
 ///////////////////////////////////////////////////////////////////////////////
-const website = new TypescriptProject({
-  monorepo,
+const website = new NodeProject({
+  parent: monorepo,
   name: "@wingcloud/website",
   outdir: "apps/@wingcloud/website",
 });
+website.addDevDeps("typescript", "@types/node@18");
+new TypescriptConfig(website, {
+  include: ["src/**/*"],
+});
+new Eslint(website);
+
 website.addDeps("vite");
 website.addScript("dev", "vite dev --open");
 website.addScript("compile", "vite build");
@@ -95,6 +82,8 @@ website.addScript("compile", "vite build");
 website.addDevDeps("@vitejs/plugin-react-swc");
 website.addDeps("react", "react-dom");
 website.addDevDeps("@types/react", "@types/react-dom");
+
+website.addDeps("react-router-dom");
 
 website.addDevDeps(vite.name);
 
