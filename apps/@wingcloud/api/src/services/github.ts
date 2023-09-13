@@ -18,7 +18,7 @@ const exchangeCodeForTokens = async (code: string): Promise<GitHubTokens> => {
   const response = await fetch("https://github.com/login/oauth/access_token", {
     method: "POST",
     headers: {
-      ContentType: "application/json",
+      "Content-Type": "application/json",
       Accept: "application/json",
     },
     body: JSON.stringify({
@@ -71,10 +71,10 @@ const getUserInfo = async (token: string): Promise<UserInfo> => {
 export const getGitHubLoginFromCode = async (code: string) => {
   const tokens = await exchangeCodeForTokens(code);
 
-  //const { login } = await getUserInfo(tokens.access_token);
+  const { login } = await getUserInfo(tokens.access_token);
 
   return {
-    login: "test" as GitHubLogin,
+    login,
     tokens,
   };
 };

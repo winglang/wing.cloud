@@ -7,7 +7,6 @@ export const GithubLogin = () => {
   const code = new URLSearchParams(window.location.search).get("code");
   useEffect(() => {
     if (code) {
-      console.log("code", code);
       const response = callback.mutate(
         {
           code,
@@ -15,7 +14,7 @@ export const GithubLogin = () => {
         {
           onSuccess: () => {
             console.log("response", response);
-            //window.location.href = "/";
+            window.location.href = "/";
           },
         },
       );

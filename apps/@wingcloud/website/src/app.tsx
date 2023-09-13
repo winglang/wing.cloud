@@ -21,8 +21,12 @@ export const App = () => {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <GithubLogin />
-        <Message />
+        <div className="p-6">
+          <GithubLogin />
+          <div className="py-4">
+            <Message />
+          </div>
+        </div>
       </QueryClientProvider>
     </trpc.Provider>
   );
