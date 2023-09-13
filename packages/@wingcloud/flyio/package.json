@@ -20,20 +20,21 @@
     "eslint-plugin-unicorn": "^48.0.1",
     "jsii": "^5.2.2",
     "jsii-pacmak": "^1.88.0",
-    "tsup": "^7.2.0",
     "tsx": "^3.12.9",
     "typescript": "^5.2.2",
     "vitest": "^0.34.4"
   },
+  "bundledDependencies": [
+    "node-fetch"
+  ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "tsup --watch",
     "test": "vitest run",
-    "compile:watch": "jsii --watch",
     "default": "projen default",
     "compile": "projen compile",
     "package": "projen package",
     "build": "projen build",
+    "dev": "projen dev",
     "lint": "projen lint"
   },
   "exports": {
@@ -50,9 +51,6 @@
     "targets": [],
     "versionFormat": "full"
   },
-  "bundledDependencies": [
-    "node-fetch"
-  ],
   "author": {
     "name": "wing.cloud",
     "url": "https://wing.cloud"

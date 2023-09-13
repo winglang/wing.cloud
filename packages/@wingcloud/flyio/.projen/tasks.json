@@ -42,7 +42,12 @@
     },
     "dev": {
       "name": "dev",
-      "description": "Start the development task"
+      "description": "Start the development task",
+      "steps": [
+        {
+          "exec": "jsii --watch"
+        }
+      ]
     },
     "install": {
       "name": "install",

@@ -1,8 +1,10 @@
 import {
   MonorepoProject,
-  NodeProject,
   TypescriptProject,
-  type NodeProjectOptions,
+  NodeEsmProject,
+  NodeProject,
+  TypescriptConfig,
+  Eslint,
 } from "@skyrpex/wingen";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -36,64 +38,40 @@ const flyio = new TypescriptProject({
 flyio.compileTask.reset();
 flyio.compileTask.exec("jsii");
 flyio.packageTask.exec("jsii-pacmak");
-flyio.addScript("compile:watch", "jsii --watch");
+flyio.devTask.exec("jsii --watch");
 
 flyio.addDeps("node-fetch@2.6.4");
 flyio.addDevDeps("@types/node-fetch@2.6.4");
-flyio.addDevDeps("@types/node@18");
 flyio.addDevDeps("jsii");
 flyio.addDevDeps("jsii-pacmak");
 
 flyio.tryRemoveFile("./tsconfig.json");
-flyio.tryRemoveFile("./tsup.config.ts");
 
 flyio.addGitIgnore("**/*.js");
 flyio.addGitIgnore("**/*.d.ts");
 flyio.addGitIgnore(".jsii");
 flyio.addGitIgnore("tsconfig.tsbuildinfo");
-
-{
-  const packageJson = flyio.tryFindObjectFile("package.json")!;
-  packageJson.addOverride("jsii", {
+flyio.addGitIgnore("/lib");
+flyio.addFields({
+  jsii: {
     "outdir": "dist",
     "targets": [],
     "versionFormat": "full"
-  });
-  packageJson.addOverride("bundledDependencies", [
+  },
+  bundledDependencies: [
     "node-fetch"
-  ]);
-  packageJson.addOverride("author", {
+  ],
+  author: {
     name: "wing.cloud",
     url: "https://wing.cloud"
-  });
-  packageJson.addOverride("repository", {
+  },
+  repository: {
     type: "git",
     url: "https://github.com/winglang/wing.cloud"
-  });
-  packageJson.addOverride("license", "BSD-3-Clause");
-  packageJson.addOverride("main", "./lib/index.js");
-}
-
-///////////////////////////////////////////////////////////////////////////////
-type NodeEsmProjectOptions = Omit<NodeProjectOptions, "parent"> & {
-  monorepo: MonorepoProject;
-};
-
-class NodeEsmProject extends NodeProject {
-  constructor(options: NodeEsmProjectOptions) {
-    super({
-      outdir: `packages/${options.name}`,
-      ...options,
-      parent: options.monorepo,
-    });
-
-    this.addFields({
-      type: "module",
-      exports: { ".": "./src/index.js" },
-      types: "./src/index.d.ts",
-    });
-  }
-}
+  },
+  license: "BSD-3-Clause",
+  main: "./lib/index.js"
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 const vite = new NodeEsmProject({
@@ -131,11 +109,17 @@ api.addDeps("jose");
 api.addDeps("node-fetch");
 
 ///////////////////////////////////////////////////////////////////////////////
-const website = new TypescriptProject({
-  monorepo,
+const website = new NodeProject({
+  parent: monorepo,
   name: "@wingcloud/website",
   outdir: "apps/@wingcloud/website",
 });
+website.addDevDeps("typescript", "@types/node@18");
+new TypescriptConfig(website, {
+  include: ["src/**/*"],
+});
+new Eslint(website);
+
 website.addDeps("vite");
 website.addScript("dev", "vite dev --open");
 website.addScript("compile", "vite build");
@@ -143,6 +127,8 @@ website.addScript("compile", "vite build");
 website.addDevDeps("@vitejs/plugin-react-swc");
 website.addDeps("react", "react-dom");
 website.addDevDeps("@types/react", "@types/react-dom");
+
+website.addDeps("react-router-dom");
 
 website.addDevDeps(vite.name);
 
@@ -187,7 +173,8 @@ infrastructure.addFields({ type: "commonjs" });
 
 infrastructure.addDeps("winglang");
 infrastructure.devTask.exec("wing it main.w");
-infrastructure.compileTask.exec("wing compile main.w --target sim && wing compile main.w --target tf-aws");
+infrastructure.compileTask.exec("wing compile main.w --target sim");
+infrastructure.compileTask.exec("wing compile main.w --target tf-aws");
 infrastructure.addGitIgnore("/target/");
 
 infrastructure.addDeps("express", "@vendia/serverless-express");
@@ -205,6 +192,19 @@ const runtime = new TypescriptProject({
   monorepo,
   name: "@wingcloud/runtime",
   outdir: "apps/@wingcloud/runtime",
+  tsup: {
+    entry: [
+      "src/**/*.ts"
+    ],
+    outDir: "lib",
+    format: [
+      "esm"
+    ],
+    target: "node18",
+    dts: true,
+    bundle: false,
+    clean: true
+  }
 });
 
 runtime.addDeps("winglang");
@@ -213,26 +213,18 @@ runtime.addDeps("@wingconsole/app");
 runtime.addDeps("express");
 runtime.addDeps("jsonwebtoken");
 runtime.addDeps("jwk-to-pem");
-runtime.addDeps("node-jose");
+runtime.addDeps("jose");
 runtime.addDeps("node-fetch");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/jsonwebtoken");
 runtime.addDevDeps("@types/jwk-to-pem");
-runtime.addDevDeps("@types/node-jose");
-runtime.addDevDeps("@types/node@18");
 runtime.addDevDeps("simple-git");
-runtime.addDevDeps("tsup");
-runtime.addDevDeps("typescript");
-runtime.addDevDeps("vitest");
 runtime.addDevDeps(infrastructure.name);
 
-runtime.devTask.exec("tsup --watch --onSuccess 'node lib/entrypoint-local.js'");
-runtime.testTask.exec("vitest");
-
-runtime.addGitIgnore("node_modules/");
 runtime.addGitIgnore("target/");
-runtime.addGitIgnore("dist/");
+
+runtime.devTask.exec("tsup --watch --onSuccess 'node lib/entrypoint-local.js'");
 
 ///////////////////////////////////////////////////////////////////////////////
 monorepo.synth();

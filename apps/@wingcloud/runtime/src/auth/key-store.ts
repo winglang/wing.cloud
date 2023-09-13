@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import jwkToPem from "jwk-to-pem";
-import jose from "node-jose";
+import * as jose from "jose";
 
 export interface KeyStore {
   publicKey(): string;
@@ -8,23 +8,16 @@ export interface KeyStore {
 }
 
 export async function createKeyStore(issuer: string): Promise<KeyStore> {
-  const keyStore = jose.JWK.createKeyStore();
-  await keyStore.generate("RSA", 2048, { alg: "RS256", use: "sig" });
-  const key = keyStore.all({ use: "sig" })[0];
+  const keyStore = await jose.generateKeyPair("RS256");
 
-  if (!key) {
-    throw new Error("failed to create signing keys");
-  }
-
-  const privateKey = jwkToPem(key.toJSON(true) as any, { private: true });
-  const publicKey = jwkToPem(key.toJSON() as any);
+  const privateKey = jwkToPem(await jose.exportJWK(keyStore.privateKey) as any, { private: true });
+  const publicKey = jwkToPem(await jose.exportJWK(keyStore.publicKey) as any);
 
   return {
     publicKey: () => {
       return publicKey;
     },
     createToken: async (data: Record<string, any>) => {
-      // jwt.verify(token, publicKey);
       return jwt.sign(data, privateKey, {
         algorithm: "RS256",
         expiresIn: "1h",
