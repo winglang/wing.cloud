@@ -104,7 +104,7 @@ website.addDeps(
   "@tanstack/react-query",
 );
 
-website.addDeps("tailwindcss");
+website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 
 website.addDeps("@trpc/server", "zod");
 
