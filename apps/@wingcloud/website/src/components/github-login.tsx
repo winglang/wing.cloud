@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { trpc } from "../utils/trpc.js";
 
@@ -6,7 +7,10 @@ export const GithubLogin = () => {
   const authorizeUrl = trpc["github/authorizeUrl"].useQuery();
 
   const redirect = useCallback(() => {
-    window.location.href = authorizeUrl.data || "";
+    if (!authorizeUrl.data) {
+      return;
+    }
+    window.location.href = authorizeUrl.data;
   }, [authorizeUrl.data]);
 
   return (

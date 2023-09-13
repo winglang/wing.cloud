@@ -1,18 +1,21 @@
 import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { trpc } from "../../utils/trpc.js";
 
 export const Component = () => {
   const callback = trpc["github/callback"].useMutation();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   useEffect(() => {
-    const response = callback.mutate(
+    callback.mutate(
       {
-        code: new URLSearchParams(window.location.search).get("code") || "",
+        code: searchParams.get("code") ?? "",
       },
       {
         onSuccess: () => {
-          console.log("response", response);
-          window.location.href = "/dashboard/team";
+          navigate("/dashboard/team");
         },
       },
     );

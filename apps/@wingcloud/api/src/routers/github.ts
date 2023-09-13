@@ -17,7 +17,12 @@ export const router = t.router({
     .mutation(async ({ ctx, input }) => {
       const { login, tokens } = await getGitHubLoginFromCode(input.code);
 
-      createOrUpdateUser(ctx, login, tokens.access_token, tokens.refresh_token);
+      await createOrUpdateUser(
+        ctx,
+        login,
+        tokens.access_token,
+        tokens.refresh_token,
+      );
       return login;
     }),
 });

@@ -12,6 +12,9 @@ export interface GitHubTokens {
 }
 
 const exchangeCodeForTokens = async (code: string): Promise<GitHubTokens> => {
+  const GITHUB_APP_CLIENT_ID = process.env["GITHUB_APP_CLIENT_ID"];
+  const GITHUB_APP_CLIENT_SECRET = process.env["GITHUB_APP_CLIENT_SECRET"];
+
   const response = await fetch("https://github.com/login/oauth/access_token", {
     method: "POST",
     headers: {
@@ -20,13 +23,12 @@ const exchangeCodeForTokens = async (code: string): Promise<GitHubTokens> => {
     },
     body: JSON.stringify({
       code: code,
-      client_id: process.env["GITHUB_APP_CLIENT_ID"],
-      client_secret: process.env["GITHUB_APP_CLIENT_SECRET"],
+      client_id: GITHUB_APP_CLIENT_ID,
+      client_secret: GITHUB_APP_CLIENT_SECRET,
     }),
   });
 
   if (!response.ok) {
-    const error = (await response.json()) as any;
     throw new Error("Failed to exchange code for access token", {
       cause: response,
     });
@@ -42,12 +44,13 @@ interface UserInfo {
 }
 
 const getUserInfo = async (token: string): Promise<UserInfo> => {
+  const GITHUB_APP_CLIENT_ID = process.env["GITHUB_APP_CLIENT_ID"] || "";
   const response = await fetch("https://api.github.com/user", {
     method: "GET",
     headers: {
       Accept: "application/json",
-      UserAgent: process.env["GITHUB_APP_CLIENT_ID"] || "",
-      ContentType: "application/json",
+      "User-Agent": GITHUB_APP_CLIENT_ID,
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
   });
