@@ -15,14 +15,19 @@ export const Component = () => {
     },
     onError: (error) => {
       console.error(error);
-      setError("Something went wrong.");
+      setError(error.message);
     },
   });
   useEffect(() => {
+    const code = searchParams.get("code") || "";
+    if (!code) {
+      setError("No code provided");
+    }
+
     if (!initialized.current) {
       initialized.current = true;
       callback.mutate({
-        code: searchParams.get("code") ?? "",
+        code,
       });
     }
   }, []);
