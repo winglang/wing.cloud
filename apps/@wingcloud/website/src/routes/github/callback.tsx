@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { trpc } from "../../utils/trpc.js";
 
@@ -7,6 +7,8 @@ export const Component = () => {
   const callback = trpc["github/callback"].useMutation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  const [error, setError] = useState("");
 
   useEffect(() => {
     callback.mutate(
@@ -17,11 +19,19 @@ export const Component = () => {
         onSuccess: () => {
           navigate("/dashboard/team");
         },
-        onError: () => {
-          navigate("/");
+        onError: (error) => {
+          console.error(error);
+          setError("Something went wrong.");
         },
       },
     );
   }, []);
-  return <></>;
+  return (
+    error && (
+      <div className="p-6">
+        <div className="text-md">{error}</div>
+        <Link to="/">Go to the home page</Link>
+      </div>
+    )
+  );
 };
