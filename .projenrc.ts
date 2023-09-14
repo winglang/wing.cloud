@@ -13,8 +13,6 @@ const monorepo = new MonorepoProject({
   name: "@wingcloud/monorepo",
 });
 
-monorepo.addGitIgnore("target/");
-
 ///////////////////////////////////////////////////////////////////////////////
 const opaqueType = new TypescriptProject({
   monorepo,

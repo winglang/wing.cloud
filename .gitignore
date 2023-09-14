@@ -11,4 +11,3 @@ node_modules/
 /turbo.json
 /.prettierrc.json
 /.editorconfig
-target/
