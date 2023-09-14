@@ -33,11 +33,14 @@ export const Component = () => {
   }, []);
 
   return (
-    error && (
-      <div className="p-6">
-        <div className="text-md">{error}</div>
-        <Link to="/">Go to the home page</Link>
-      </div>
-    )
+    <div className="p-6">
+      {error && (
+        <div>
+          <div>{error}</div>
+          <Link to="/">Go to the home page</Link>
+        </div>
+      )}
+      {!error && <div className="text-xs">Loading...</div>}
+    </div>
   );
 };
