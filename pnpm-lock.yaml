@@ -45,6 +45,9 @@ importers:
       '@wingcloud/express-cookies':
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/express-cookies
+      '@wingcloud/get-environment-variable':
+        specifier: workspace:^
+        version: link:../../../packages/@wingcloud/get-environment-variable
       '@wingcloud/nanoid62':
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/nanoid62
@@ -337,6 +340,48 @@ importers:
       express:
         specifier: ^4.18.2
         version: 4.18.2
+      tsx:
+        specifier: ^3.12.10
+        version: 3.12.10
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
+      vitest:
+        specifier: ^0.34.4
+        version: 0.34.4
+
+  packages/@wingcloud/get-environment-variable:
+    devDependencies:
+      '@cloudy-ts/eslint-plugin':
+        specifier: ^0.0.274
+        version: 0.0.274(eslint@8.49.0)
+      '@types/node':
+        specifier: '18'
+        version: 18.17.14
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^6.7.0
+        version: 6.7.0(@typescript-eslint/parser@6.7.0)(eslint@8.49.0)(typescript@5.2.2)
+      '@typescript-eslint/parser':
+        specifier: ^6.7.0
+        version: 6.7.0(eslint@8.49.0)(typescript@5.2.2)
+      eslint-config-prettier:
+        specifier: ^9.0.0
+        version: 9.0.0(eslint@8.49.0)
+      eslint-import-resolver-node:
+        specifier: ^0.3.9
+        version: 0.3.9
+      eslint-import-resolver-typescript:
+        specifier: ^3.6.0
+        version: 3.6.0(@typescript-eslint/parser@6.7.0)(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.28.1)(eslint@8.49.0)
+      eslint-plugin-import:
+        specifier: ^2.28.1
+        version: 2.28.1(@typescript-eslint/parser@6.7.0)(eslint-import-resolver-typescript@3.6.0)(eslint@8.49.0)
+      eslint-plugin-prettier:
+        specifier: ^5.0.0
+        version: 5.0.0(eslint-config-prettier@9.0.0)(eslint@8.49.0)(prettier@3.0.3)
+      eslint-plugin-unicorn:
+        specifier: ^48.0.1
+        version: 48.0.1(eslint@8.49.0)
       tsx:
         specifier: ^3.12.10
         version: 3.12.10

@@ -4,6 +4,7 @@ packages:
   - packages/@wingcloud/opaque-type
   - packages/@wingcloud/nanoid62
   - packages/@wingcloud/express-cookies
+  - packages/@wingcloud/get-environment-variable
   - packages/@wingcloud/vite
   - apps/@wingcloud/api
   - apps/@wingcloud/website

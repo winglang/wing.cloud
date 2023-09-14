@@ -1,16 +1,12 @@
+import { getEnvironmentVariable } from "@wingcloud/get-environment-variable";
 import fetch from "node-fetch";
 
 import type { GitHubLogin } from "../types/github.js";
 
-const GITHUB_APP_CLIENT_ID = process.env["GITHUB_APP_CLIENT_ID"];
-if (!GITHUB_APP_CLIENT_ID) {
-  throw new Error("Missing GITHUB_APP_CLIENT_ID.");
-}
-
-const GITHUB_APP_CLIENT_SECRET = process.env["GITHUB_APP_CLIENT_SECRET"];
-if (!GITHUB_APP_CLIENT_SECRET) {
-  throw new Error("Missing GITHUB_APP_CLIENT_SECRET.");
-}
+const GITHUB_APP_CLIENT_ID = getEnvironmentVariable("GITHUB_APP_CLIENT_ID");
+const GITHUB_APP_CLIENT_SECRET = getEnvironmentVariable(
+  "GITHUB_APP_CLIENT_SECRET",
+);
 
 export interface GitHubTokens {
   access_token: string;

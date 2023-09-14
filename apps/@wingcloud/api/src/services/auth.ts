@@ -1,14 +1,17 @@
 import type { Cookies } from "@wingcloud/express-cookies";
+import { getEnvironmentVariable } from "@wingcloud/get-environment-variable";
 import * as jose from "jose";
 
 import type { UserId } from "../types/user.js";
 
 import type { GitHubTokens } from "./github.js";
 
-const APP_SECRET = new TextEncoder().encode(process.env["APP_SECRET"]);
+const APP_SECRET = new TextEncoder().encode(
+  getEnvironmentVariable("APP_SECRET"),
+);
+const SECURE_COOKIE = getEnvironmentVariable("SECURE_COOKIE") === "true";
+const COOKIE_NAME = "Auth";
 const JWT_EXPIRATION_TIME = "1h";
-export const AUTH_COOKIE_NAME = "Auth";
-const SECURE_COOKIE = process.env["SECURE_COOKIE"] === "true";
 
 export const createAuthJwt = async (userId: UserId, tokens: GitHubTokens) => {
   return await new jose.SignJWT({
@@ -31,7 +34,7 @@ export const setAuthCookie = async (
 ) => {
   const jwt = await createAuthJwt(userId, tokens);
 
-  cookies.set(AUTH_COOKIE_NAME, jwt, {
+  cookies.set(COOKIE_NAME, jwt, {
     path: "/",
     httpOnly: true,
     secure: SECURE_COOKIE,
@@ -40,7 +43,7 @@ export const setAuthCookie = async (
 };
 
 export const getLoggedInUserId = async (cookies: Cookies) => {
-  const jwt = cookies.get(AUTH_COOKIE_NAME);
+  const jwt = cookies.get(COOKIE_NAME);
   if (!jwt) {
     return;
   }

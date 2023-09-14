@@ -36,6 +36,12 @@ const cookies = new TypescriptProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const env = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/get-environment-variable",
+});
+
+///////////////////////////////////////////////////////////////////////////////
 const vite = new NodeEsmProject({
   monorepo,
   name: "@wingcloud/vite",
@@ -73,6 +79,7 @@ api.addDeps(nanoid62.name);
 api.addDeps("jose");
 api.addDeps("node-fetch");
 api.addDeps(cookies.name);
+api.addDeps(env.name);
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
