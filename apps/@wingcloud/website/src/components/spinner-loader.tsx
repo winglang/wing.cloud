@@ -7,9 +7,6 @@ export interface SpinnerLoaderProps {
    * The size of the progress bar.
    */
   size?: SpinnerLoaderSize;
-  /**
-   * className
-   */
   className?: string;
 }
 
