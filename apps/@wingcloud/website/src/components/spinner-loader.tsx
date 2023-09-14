@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import clsx from "clsx";
 
 export type SpinnerLoaderSize = "xs" | "sm" | "md" | "lg";
 
@@ -21,7 +21,7 @@ export const SpinnerLoader = ({
     <div role="status" className={"self-center"}>
       <svg
         aria-hidden="true"
-        className={classNames(
+        className={clsx(
           "text-slate-200 animate-spin dark:text-slate-600 fill-slate-600 dark:fill-slate-200",
           className,
           size === "xs" && "w-4 h-4",
