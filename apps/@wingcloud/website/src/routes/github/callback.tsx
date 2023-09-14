@@ -21,7 +21,6 @@ export const Component = () => {
   useEffect(() => {
     if (!initialized.current) {
       initialized.current = true;
-      console.log(searchParams.get("code"));
       callback.mutate({
         code: searchParams.get("code") ?? "",
       });
