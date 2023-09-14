@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
+import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { trpc } from "../../utils/trpc.js";
 
 export const Component = () => {
@@ -40,7 +41,11 @@ export const Component = () => {
           <Link to="/">Go to the home page</Link>
         </div>
       )}
-      {!error && <div className="text-xs">Loading...</div>}
+      {!error && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <SpinnerLoader data-testid="main-view-loader" />
+        </div>
+      )}
     </div>
   );
 };

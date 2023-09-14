@@ -103,8 +103,9 @@ website.addDeps(
   "@trpc/client",
   "@trpc/server",
   "@trpc/react-query",
-  "@tanstack/react-query",
+  "@tanstack/react-query"
 );
+website.addDeps("classnames");
 
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 
