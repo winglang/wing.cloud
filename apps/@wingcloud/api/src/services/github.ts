@@ -56,8 +56,7 @@ const getUserInfo = async (token: string): Promise<UserInfo> => {
   });
 
   if (!response.ok) {
-    console.error(response.statusText);
-    throw new Error("Failed to fetch user information.");
+    throw new Error("Failed to fetch user information.", { cause: response });
   }
 
   return (await response.json()) as UserInfo;

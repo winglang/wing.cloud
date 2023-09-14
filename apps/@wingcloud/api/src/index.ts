@@ -2,6 +2,7 @@ import type { Server } from "node:http";
 
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
 import * as trpcExpress from "@trpc/server/adapters/express";
+import { createCookiesMiddleware } from "@wingcloud/express-cookies";
 import * as dotenv from "dotenv";
 dotenv.config({
   path: new URL("../.env", import.meta.url),
@@ -28,6 +29,8 @@ export type StartOptions = {
 
 export const start = async (options: StartOptions) => {
   const app = express();
+
+  app.use(createCookiesMiddleware());
 
   const dynamodb = new DynamoDB(options.dynamodb);
 

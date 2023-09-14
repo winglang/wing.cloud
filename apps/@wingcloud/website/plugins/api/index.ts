@@ -125,22 +125,16 @@ export const api = (): Plugin => {
         [
           "tsx",
           "watch",
+          "--clear-screen=0",
           new URL("start-api-dev-server.ts", import.meta.url).pathname,
           `--port=${port}`,
           `--dynamodb=${JSON.stringify(dynamodbProps)}`,
         ],
         {
           detached: true,
+          stdio: "inherit",
         },
       );
-
-      server.on("message", (data) => {
-        this.info(data.toString());
-      });
-
-      server.on("error", (error) => {
-        this.error(error);
-      });
 
       // `tsx` needs some time to parse and execute the server file.
       let attempts = 0;

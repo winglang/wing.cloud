@@ -88,47 +88,6 @@ export const createUser = async (context: Context, login: GitHubLogin) => {
 };
 
 /**
- * Create or update a user given a GitHub login.
- */
-export const createOrUpdateUser = async (
-  context: Context,
-  login: GitHubLogin,
-  token: string,
-  refresh_token: string,
-) => {
-  let userId = await getUserIdFromLogin(context, login);
-  if (!userId) {
-    userId = await createUser(context, login);
-  }
-  // store token and refresh_token
-  await context.dynamodb.updateItem({
-    TableName: context.tableName,
-    Key: {
-      pk: {
-        S: `user#${userId}`,
-      },
-      sk: {
-        S: "#",
-      },
-    },
-    AttributeUpdates: {
-      token: {
-        Value: {
-          S: token,
-        },
-      },
-      refresh_token: {
-        Value: {
-          S: refresh_token,
-        },
-      },
-    },
-  });
-
-  return userId;
-};
-
-/**
  * Get the user ID for a GitHub login, creating the user if necessary.
  */
 export const getOrCreateUser = async (context: Context, login: GitHubLogin) => {

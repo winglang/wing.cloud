@@ -27,10 +27,20 @@ const nanoid62 = new TypescriptProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const cookies = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/express-cookies",
+  deps: ["cookie"],
+  devDeps: ["express", "@types/express", "@types/cookie"],
+  peerDeps: ["express"],
+});
+
+///////////////////////////////////////////////////////////////////////////////
 const vite = new NodeEsmProject({
   monorepo,
   name: "@wingcloud/vite",
 });
+vite.addFields({ types: "./src/index.d.ts" });
 
 vite.addDevDeps("vite");
 vite.addDeps("dotenv");
@@ -62,6 +72,7 @@ api.addDeps(opaqueType.name);
 api.addDeps(nanoid62.name);
 api.addDeps("jose");
 api.addDeps("node-fetch");
+api.addDeps(cookies.name);
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
