@@ -6,5 +6,4 @@ import { api } from "./plugins/index.js";
 
 export default defineConfig({
   plugins: [api(), react(), wingcloud()],
-  clearScreen: false,
 });

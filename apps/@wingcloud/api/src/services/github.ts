@@ -2,9 +2,15 @@ import fetch from "node-fetch";
 
 import type { GitHubLogin } from "../types/github.js";
 
-const GITHUB_APP_CLIENT_ID = () => process.env["GITHUB_APP_CLIENT_ID"] || "";
-const GITHUB_APP_CLIENT_SECRET = () =>
-  process.env["GITHUB_APP_CLIENT_SECRET"] || "";
+const GITHUB_APP_CLIENT_ID = process.env["GITHUB_APP_CLIENT_ID"];
+if (!GITHUB_APP_CLIENT_ID) {
+  throw new Error("Missing GITHUB_APP_CLIENT_ID.");
+}
+
+const GITHUB_APP_CLIENT_SECRET = process.env["GITHUB_APP_CLIENT_SECRET"];
+if (!GITHUB_APP_CLIENT_SECRET) {
+  throw new Error("Missing GITHUB_APP_CLIENT_SECRET.");
+}
 
 export interface GitHubTokens {
   access_token: string;
@@ -24,8 +30,8 @@ const exchangeCodeForTokens = async (code: string): Promise<GitHubTokens> => {
     },
     body: JSON.stringify({
       code: code,
-      client_id: GITHUB_APP_CLIENT_ID(),
-      client_secret: GITHUB_APP_CLIENT_SECRET(),
+      client_id: GITHUB_APP_CLIENT_ID,
+      client_secret: GITHUB_APP_CLIENT_SECRET,
     }),
   });
 
@@ -49,7 +55,7 @@ const getUserInfo = async (token: string): Promise<UserInfo> => {
     method: "GET",
     headers: {
       Accept: "application/json",
-      "User-Agent": GITHUB_APP_CLIENT_ID(),
+      "User-Agent": GITHUB_APP_CLIENT_ID,
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },

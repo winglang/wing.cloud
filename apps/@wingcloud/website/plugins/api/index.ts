@@ -132,8 +132,13 @@ export const api = (): Plugin => {
         ],
         {
           detached: true,
-          stdio: "inherit",
         },
+      );
+      server.stdout?.on("data", (data) =>
+        console.log(`[@wingcloud/api] ${data.toString()}`),
+      );
+      server.stderr?.on("data", (data) =>
+        console.log(`[@wingcloud/api] ${data.toString()}`),
       );
 
       // `tsx` needs some time to parse and execute the server file.
