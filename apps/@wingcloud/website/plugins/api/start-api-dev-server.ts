@@ -1,6 +1,6 @@
 import { parseArgs } from "node:util";
 
-import { start } from "@wingcloud/api";
+import { createAPIServer } from "@wingcloud/api";
 import * as z from "zod";
 
 const args = parseArgs({
@@ -34,4 +34,4 @@ export type DynamodbProps = z.infer<typeof dynamodbParser>;
 
 const dynamodb = dynamodbParser.parse(JSON.parse(args.values.dynamodb ?? "{}"));
 
-await start({ port, dynamodb });
+await createAPIServer({ port, dynamodb });

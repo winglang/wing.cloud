@@ -27,10 +27,26 @@ const nanoid62 = new TypescriptProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const cookies = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/express-cookies",
+  deps: ["cookie"],
+  devDeps: ["express", "@types/express", "@types/cookie"],
+  peerDeps: ["express"],
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const env = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/get-environment-variable",
+});
+
+///////////////////////////////////////////////////////////////////////////////
 const vite = new NodeEsmProject({
   monorepo,
   name: "@wingcloud/vite",
 });
+vite.addFields({ types: "./src/index.d.ts" });
 
 vite.addDevDeps("vite");
 vite.addDeps("dotenv");
@@ -51,6 +67,8 @@ api.removeTask("compile");
 api.addDeps("express");
 api.addDevDeps("@types/express");
 
+api.addDeps("dotenv");
+
 api.addDeps("@trpc/server", "zod");
 api.addDeps("nanoid");
 api.addDeps("@aws-sdk/client-dynamodb");
@@ -60,6 +78,8 @@ api.addDeps(opaqueType.name);
 api.addDeps(nanoid62.name);
 api.addDeps("jose");
 api.addDeps("node-fetch");
+api.addDeps(cookies.name);
+api.addDeps(env.name);
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
@@ -92,6 +112,7 @@ website.addDeps(
   "@trpc/react-query",
   "@tanstack/react-query",
 );
+website.addDeps("clsx");
 
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 
@@ -99,18 +120,14 @@ website.addDeps("@trpc/server", "zod");
 
 website.addDevDeps("@aws-sdk/client-dynamodb");
 website.addGitIgnore("/.wingcloud/");
-website
-  .tryFindObjectFile("tsconfig.json")
-  ?.addToArray("include", ".wingcloud/**/*");
 
 website.addGitIgnore("/.env");
 
-website.addDevDeps("@types/node@18");
 {
   const tsconfig = website.tryFindObjectFile("tsconfig.json")!;
   tsconfig.addOverride("compilerOptions.jsx", "react-jsx");
   tsconfig.addToArray("compilerOptions.lib", "DOM", "DOM.Iterable");
-  tsconfig.addToArray("include", "plugins/**/*");
+  tsconfig.addToArray("include", "plugins/**/*", ".wingcloud/**/*");
 }
 
 website.addDevDeps("node-fetch");

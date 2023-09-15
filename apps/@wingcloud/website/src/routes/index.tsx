@@ -1,15 +1,13 @@
-import { Link, Outlet } from "react-router-dom";
+import { GithubLogin } from "../components/github-login.js";
+import { trpc } from "../utils/trpc.js";
 
 export const Component = () => {
+  const self = trpc.self.useQuery();
   return (
-    <>
-      <h1>Index</h1>
+    <div className="p-6">
+      <GithubLogin />
 
-      <Outlet />
-
-      <p>
-        <Link to="/team">Go to the team page</Link>
-      </p>
-    </>
+      <div>self: {self.data?.userId}</div>
+    </div>
   );
 };

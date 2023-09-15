@@ -1,6 +1,8 @@
 import { type DynamoDB } from "@aws-sdk/client-dynamodb";
 import { type CreateExpressContextOptions } from "@trpc/server/adapters/express";
+import { cookiesFromRequest } from "@wingcloud/express-cookies";
 
+import { getLoggedInUserId } from "./services/auth.js";
 import type { UserId } from "./types/user.js";
 
 export type Context = {
@@ -17,16 +19,18 @@ export type BuildCreateContextOptions = {
 };
 
 export const buildCreateContext = (options: BuildCreateContextOptions) => {
-  return ({
+  return async ({
     req: request,
     res: response,
-  }: CreateExpressContextOptions): Context => {
-    // TODO: Get userId from JWT cookie.
+  }: CreateExpressContextOptions) => {
+    const cookies = cookiesFromRequest(request);
+    const userId = await getLoggedInUserId(cookies);
     return {
       dynamodb: options.dynamodb,
       tableName: options.tableName,
       request,
       response,
-    };
+      userId,
+    } satisfies Context;
   };
 };
