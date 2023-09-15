@@ -1,32 +1,12 @@
-import { nanoid62 } from "@wingcloud/nanoid62";
-import type { OpaqueType } from "@wingcloud/opaque-type";
+import { buildPrefixedTypeId, type TypeOf } from "@wingcloud/type-prefixed-id";
 
-const PREFIX = "user_" as const;
+const { createId, idFromString, valueType } = buildPrefixedTypeId("user");
 
 /**
  * Represents a user ID.
  *
  * @example "user_abc123"
  */
-export type UserId = OpaqueType<
-  `${typeof PREFIX}${string}`,
-  { readonly t: unique symbol }
->;
+export type UserId = TypeOf<typeof valueType>;
 
-/**
- * Create a new user ID.
- */
-export const createUserId = async () => {
-  return `${PREFIX}${await nanoid62()}` as UserId;
-};
-
-/**
- * Creates a user ID from a string.
- */
-export const userIdFromString = (userId: string): UserId => {
-  if (!userId.startsWith(PREFIX)) {
-    throw new Error(`Must start with "${PREFIX}"`);
-  }
-
-  return userId as UserId;
-};
+export { createId as createUserId, idFromString as userIdFromString };

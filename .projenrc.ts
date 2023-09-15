@@ -16,7 +16,7 @@ const monorepo = new MonorepoProject({
 ///////////////////////////////////////////////////////////////////////////////
 const opaqueType = new TypescriptProject({
   monorepo,
-  name: "@wingcloud/opaque-type",
+  name: "@wingcloud/type-opaque",
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,6 +24,13 @@ const nanoid62 = new TypescriptProject({
   monorepo,
   name: "@wingcloud/nanoid62",
   deps: ["nanoid"],
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const prefixedIdType = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/type-prefixed-id",
+  deps: [nanoid62.name],
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,6 +82,7 @@ api.addDeps("@aws-sdk/client-dynamodb");
 api.addDeps("@aws-sdk/util-dynamodb");
 api.addDeps("@winglang/sdk");
 api.addDeps(opaqueType.name);
+api.addDeps(prefixedIdType.name);
 api.addDeps(nanoid62.name);
 api.addDeps("jose");
 api.addDeps("node-fetch");
