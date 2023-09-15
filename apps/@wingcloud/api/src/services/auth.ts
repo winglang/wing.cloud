@@ -56,3 +56,23 @@ export const getLoggedInUserId = async (cookies: Cookies) => {
 
   return payload.sub as UserId;
 };
+
+export const getLoggedInUserTokens = async (cookies: Cookies) => {
+  const jwt = cookies.get(COOKIE_NAME);
+  if (!jwt) {
+    return;
+  }
+
+  const verifyResult = await jose.compactVerify(jwt, APP_SECRET, {
+    algorithms: ["HS256"],
+  });
+
+  const payload = JSON.parse(verifyResult.payload.toString());
+
+  return {
+    accessToken: payload.accessToken,
+    expiresIn: payload.expiresIn,
+    refreshToken: payload.refreshToken,
+    refreshTokenExpiresIn: payload.refreshTokenExpiresIn,
+  };
+};

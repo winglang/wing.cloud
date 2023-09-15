@@ -1,8 +1,15 @@
 import { cookiesFromRequest } from "@wingcloud/express-cookies";
 
 import { getOrCreateUser } from "../database/user.js";
-import { setAuthCookie } from "../services/auth.js";
-import { getGitHubLoginFromCode } from "../services/github.js";
+import {
+  getLoggedInUserId,
+  getLoggedInUserTokens,
+  setAuthCookie,
+} from "../services/auth.js";
+import {
+  getGitHubLoginFromCode,
+  listUserProjects,
+} from "../services/github.js";
 import { t } from "../trpc.js";
 import * as z from "../validations/index.js";
 
@@ -24,4 +31,19 @@ export const router = t.router({
 
       return login;
     }),
+  "github/list-projects": t.procedure.query(async ({ ctx }) => {
+    const cookies = cookiesFromRequest(ctx.request);
+
+    const tokens = await getLoggedInUserTokens(cookies);
+
+    if (!tokens) {
+      return;
+    }
+
+    const projects = await listUserProjects(tokens?.accessToken);
+    return projects.map((project) => ({
+      id: project.id,
+      name: project.name,
+    }));
+  }),
 });

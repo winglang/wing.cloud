@@ -1,21 +1,16 @@
 import { getEnvironmentVariable } from "@wingcloud/get-environment-variable";
 import fetch from "node-fetch";
 
-import type { GitHubLogin } from "../types/github.js";
+import type {
+  GitHubLogin,
+  GitHubTokens,
+  GithubProject,
+} from "../types/github.js";
 
 const GITHUB_APP_CLIENT_ID = getEnvironmentVariable("GITHUB_APP_CLIENT_ID");
 const GITHUB_APP_CLIENT_SECRET = getEnvironmentVariable(
   "GITHUB_APP_CLIENT_SECRET",
 );
-
-export interface GitHubTokens {
-  access_token: string;
-  expires_in: number;
-  refresh_token: string;
-  refresh_token_expires_in: number;
-  token_type: string;
-  scope: string;
-}
 
 const exchangeCodeForTokens = async (code: string): Promise<GitHubTokens> => {
   const response = await fetch("https://github.com/login/oauth/access_token", {
@@ -62,6 +57,24 @@ const getUserInfo = async (token: string): Promise<UserInfo> => {
   }
 
   return (await response.json()) as UserInfo;
+};
+
+export const listUserProjects = async (token: string) => {
+  const response = await fetch("https://api.github.com/user/repos", {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "User-Agent": GITHUB_APP_CLIENT_ID,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch user information.", { cause: response });
+  }
+
+  return (await response.json()) as GithubProject[];
 };
 
 export const getGitHubLoginFromCode = async (code: string) => {
