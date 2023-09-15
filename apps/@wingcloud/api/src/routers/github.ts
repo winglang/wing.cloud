@@ -4,7 +4,7 @@ import { getOrCreateUser } from "../database/user.js";
 import { getLoggedInUserTokens, setAuthCookie } from "../services/auth.js";
 import {
   getGitHubLoginFromCode,
-  listInstallationRepositories,
+  listAppInstallations,
   listUserProjects,
 } from "../services/github.js";
 import { t } from "../trpc.js";
@@ -37,10 +37,23 @@ export const router = t.router({
       return;
     }
 
-    const projects = await listInstallationRepositories(tokens?.accessToken);
+    const projects = await listUserProjects(tokens.accessToken);
     return projects.map((project) => ({
       id: project.id,
       name: project.name,
     }));
+  }),
+  "github/list-installations": t.procedure.query(async ({ ctx }) => {
+    const cookies = cookiesFromRequest(ctx.request);
+
+    const tokens = await getLoggedInUserTokens(cookies);
+
+    if (!tokens) {
+      return;
+    }
+
+    const installations = await listAppInstallations(tokens.accessToken);
+
+    return installations;
   }),
 });

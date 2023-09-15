@@ -73,10 +73,7 @@ export const listUserOrganizations = async (token: string) => {
   return organizations;
 };
 
-export const getOrganizationInstallation = async (
-  token: string,
-  orgId: number,
-) => {
+const getOrganizationInstallation = async (token: string, orgId: number) => {
   const app = new App({
     appId: GITHUB_APP_ID,
     privateKey: GITHUB_APP_PRIVATE_KEY,
@@ -92,7 +89,7 @@ export const getOrganizationInstallation = async (
   return orgInstallation;
 };
 
-export const listInstallationRepositories = async (token: string) => {
+export const listAppInstallations = async (token: string) => {
   const app = new App({
     appId: GITHUB_APP_ID,
     privateKey: GITHUB_APP_PRIVATE_KEY,
