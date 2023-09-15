@@ -2,9 +2,8 @@ import type { Cookies } from "@wingcloud/express-cookies";
 import { getEnvironmentVariable } from "@wingcloud/get-environment-variable";
 import * as jose from "jose";
 
+import type { GitHubTokens } from "../types/github.js";
 import type { UserId } from "../types/user.js";
-
-import type { GitHubTokens } from "./github.js";
 
 const APP_SECRET = new TextEncoder().encode(
   getEnvironmentVariable("APP_SECRET"),

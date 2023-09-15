@@ -1,13 +1,10 @@
 import { cookiesFromRequest } from "@wingcloud/express-cookies";
 
 import { getOrCreateUser } from "../database/user.js";
-import {
-  getLoggedInUserId,
-  getLoggedInUserTokens,
-  setAuthCookie,
-} from "../services/auth.js";
+import { getLoggedInUserTokens, setAuthCookie } from "../services/auth.js";
 import {
   getGitHubLoginFromCode,
+  listInstallationRepositories,
   listUserProjects,
 } from "../services/github.js";
 import { t } from "../trpc.js";
@@ -40,7 +37,7 @@ export const router = t.router({
       return;
     }
 
-    const projects = await listUserProjects(tokens?.accessToken);
+    const projects = await listInstallationRepositories(tokens?.accessToken);
     return projects.map((project) => ({
       id: project.id,
       name: project.name,

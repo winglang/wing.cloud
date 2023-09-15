@@ -80,6 +80,7 @@ api.addDeps("jose");
 api.addDeps("node-fetch");
 api.addDeps(cookies.name);
 api.addDeps(env.name);
+api.addDeps("octokit");
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
