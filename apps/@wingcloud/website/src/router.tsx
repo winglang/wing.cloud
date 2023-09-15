@@ -16,6 +16,10 @@ export const router = createBrowserRouter([
         path: "team",
         lazy: () => import("./routes/dashboard/team.js"),
       },
+      {
+        path: "projects",
+        lazy: () => import("./routes/dashboard/projects.js"),
+      },
     ],
   },
   {

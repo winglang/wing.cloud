@@ -12,7 +12,7 @@ export const Component = () => {
 
   const callback = trpc["github/callback"].useMutation({
     onSuccess: () => {
-      navigate("/dashboard/team");
+      navigate("/dashboard/projects");
     },
     onError: (error) => {
       console.error(error);
