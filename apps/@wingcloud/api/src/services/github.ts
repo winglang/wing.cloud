@@ -105,7 +105,10 @@ export const listInstallationRepositories = async (token: string) => {
 
   const userOrgs = await listUserOrganizations(token);
 
-  let repositories = [] as any[];
+  let repositories = [] as {
+    id: number;
+    name: string;
+  }[];
 
   for (const org of userOrgs) {
     const orgInstallation = await getOrganizationInstallation(token, org.id);
