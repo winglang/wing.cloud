@@ -21,3 +21,23 @@ export type GitHubTokens = {
   token_type: string;
   scope: string;
 };
+
+/**
+ * Represents a GitHub repository ID.
+ *
+ * @example "winglang/wing"
+ */
+export type GitHubRepositoryId = OpaqueType<
+  `${string}/${string}`,
+  { readonly t: unique symbol }
+>;
+
+/**
+ * Creates a GitHub repository ID from a string.
+ */
+export const gitHubRepositoryIdFromString = (
+  owner: string,
+  repository: string,
+): GitHubRepositoryId => {
+  return `${owner}/${repository}` as GitHubRepositoryId;
+};
