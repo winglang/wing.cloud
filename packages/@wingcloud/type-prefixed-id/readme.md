@@ -1,17 +1,15 @@
-# `@wingcloud/type-prefixed-type`
+# `@wingcloud/type-prefixed-id`
 
 A helper to make a type-safe prefixed types.
 
 ## Usage
 
 ```ts
-import type { OpaqueType } from "@wingcloud/opaque-type";
+import { buildPrefixedTypeId, type TypeOf } from "@wingcloud/type-prefixed-id";
 
-type AccountId = OpaqueType<number, { readonly t: unique symbol }>;
-type PersonId = OpaqueType<number, { readonly t: unique symbol }>;
+const { createId, idFromString, valueType } = buildPrefixedTypeId("project");
 
-const createPersonId = () => 1 as PersonId;
+export type ProjectId = TypeOf<typeof valueType>;
 
-// This will fail to compile, as they are fundamentally different types.
-const accountId: AccountId = createPersonId();
+export { createId as createProjectId, idFromString as projectIdFromString };
 ```
