@@ -2,7 +2,11 @@ import { getEnvironmentVariable } from "@wingcloud/get-environment-variable";
 import fetch from "node-fetch";
 import { App, Octokit } from "octokit";
 
-import { gitHubLoginFromString, type GitHubTokens } from "../types/github.js";
+import {
+  gitHubLoginFromString,
+  type GitHubLogin,
+  type GitHubTokens,
+} from "../types/github.js";
 
 const GITHUB_APP_CLIENT_ID = getEnvironmentVariable("GITHUB_APP_CLIENT_ID");
 const GITHUB_APP_CLIENT_SECRET = getEnvironmentVariable(
@@ -51,25 +55,6 @@ export const getUser = async (token: string) => {
   });
   const { data: user } = await octokit.request("GET /user");
   return { ...user, login: gitHubLoginFromString(user.login) };
-};
-
-export const listUserRepos = async (token: string) => {
-  const octokit = new Octokit({
-    auth: token,
-  });
-
-  const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser();
-  return repos;
-};
-
-export const listUserOrganizations = async (token: string) => {
-  const octokit = new Octokit({
-    auth: token,
-  });
-
-  const { data: organizations } =
-    await octokit.rest.orgs.listForAuthenticatedUser();
-  return organizations;
 };
 
 export const listUserInstallations = async (token: string) => {
