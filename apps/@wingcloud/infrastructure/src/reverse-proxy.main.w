@@ -3,13 +3,17 @@ bring "cdktf" as cdktf;
 bring "@cdktf/provider-aws" as awsProvider;
 bring "@cdktf/provider-dnsimple" as dnsimpleProvider;
 
-new dnsimpleProvider.provider.DnsimpleProvider();
-new cdktf.TerraformVariable({
+let DNSIMPLE_TOKEN = new cdktf.TerraformVariable({
   type: "string",
 }) as "DNSIMPLE_TOKEN";
-new cdktf.TerraformVariable({
+let DNSIMPLE_ACCOUNT = new cdktf.TerraformVariable({
   type: "string",
 }) as "DNSIMPLE_ACCOUNT";
+
+new dnsimpleProvider.provider.DnsimpleProvider({
+  token: "${DNSIMPLE_TOKEN}",
+  account: "${DNSIMPLE_ACCOUNT}"
+});
 
 struct DNSRecordProps {
   zoneName: str;
@@ -283,7 +287,3 @@ let reverseProxy = new ReverseProxy(
   zoneName: "dev.wing.cloud",
   aliases: ["www.dev.wing.cloud"],
 );
-
-//terraform apply -var="DNSIMPLE_ACCOUNT=138247" -var="DNSIMPLE_TOKEN=dnsimple_a_IBsv2FsZjnIIX8accxPrUgqZDB7CwkFH"
-//DNSIMPLE_TOKEN=dnsimple_a_IBsv2FsZjnIIX8accxPrUgqZDB7CwkFH
-//DNSIMPLE_ACCOUNT=138247
