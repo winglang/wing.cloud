@@ -5,6 +5,7 @@
   "sideEffects": false,
   "dependencies": {
     "@cdktf/provider-aws": "^17.0.5",
+    "@cdktf/provider-dnsimple": "^7.0.1",
     "@vendia/serverless-express": "^4.10.4",
     "cdktf": "^0.18.0",
     "constructs": "^10.2.70",

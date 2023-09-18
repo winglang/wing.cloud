@@ -160,6 +160,7 @@ infrastructure.addDevDeps("@types/express");
 infrastructure.addDeps("glob");
 
 infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-aws");
+infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-dnsimple");
 
 infrastructure.addDevDeps(website.name);
 

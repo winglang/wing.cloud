@@ -127,6 +127,9 @@ importers:
       '@cdktf/provider-aws':
         specifier: ^17.0.5
         version: 17.0.5(cdktf@0.18.0)(constructs@10.2.70)
+      '@cdktf/provider-dnsimple':
+        specifier: ^7.0.1
+        version: 7.0.1(cdktf@0.18.0)(constructs@10.2.70)
       '@vendia/serverless-express':
         specifier: ^4.10.4
         version: 4.10.4
@@ -444,8 +447,8 @@ importers:
   packages/@wingcloud/type-opaque:
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.275
-        version: 0.0.275(eslint@8.49.0)
+        specifier: ^0.0.278
+        version: 0.0.278(eslint@8.49.0)
       '@types/node':
         specifier: '18'
         version: 18.17.14
@@ -493,8 +496,8 @@ importers:
         version: 3.22.2
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.275
-        version: 0.0.275(eslint@8.49.0)
+        specifier: ^0.0.278
+        version: 0.0.278(eslint@8.49.0)
       '@types/node':
         specifier: '18'
         version: 18.17.14
@@ -2140,6 +2143,17 @@ packages:
       constructs: 10.2.70
     dev: false
 
+  /@cdktf/provider-dnsimple@7.0.1(cdktf@0.18.0)(constructs@10.2.70):
+    resolution: {integrity: sha512-0Js8yvKIsWd/zu5elda2As7gOJprA16C+nNmFN5Zq+yCEjDmqxWH+9razPc5mTuy1QHHmTn+4pjiDZQLXgAzow==}
+    engines: {node: '>= 16.14.0'}
+    peerDependencies:
+      cdktf: ^0.18.0
+      constructs: ^10.0.0
+    dependencies:
+      cdktf: 0.18.0(constructs@10.2.70)
+      constructs: 10.2.70
+    dev: false
+
   /@cloudy-ts/eslint-plugin@0.0.273(eslint@8.49.0):
     resolution: {integrity: sha512-XxUA3Z95BvD1ZR12qF+To5k5WYNU68WfkSi/aHzKGcsTlDKxNMiUBugCSHABMZP4cWQjwhwl3EKG7h19hab2rg==}
     engines: {node: '>= 18.16.0'}
@@ -2158,8 +2172,8 @@ packages:
       eslint: 8.49.0
     dev: true
 
-  /@cloudy-ts/eslint-plugin@0.0.275(eslint@8.49.0):
-    resolution: {integrity: sha512-7aaUIX6BcVSXU3COSSpXQAAIAft60v+m0EY7G/TNfUDuCI7YqE8JovVIk4HsWZeV+jvwTfgTa2qh+n0XALM4lg==}
+  /@cloudy-ts/eslint-plugin@0.0.278(eslint@8.49.0):
+    resolution: {integrity: sha512-K6etWKNbPxAJNIwc+FLZK43H8l8mmzbG8bvoUu8trdzfIGR+2sCJuHKpRxweCOexDHC0smFnX8mjY2E+kQRi0Q==}
     engines: {node: '>= 18.16.0'}
     peerDependencies:
       eslint: ^8.49.0
