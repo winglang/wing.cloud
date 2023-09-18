@@ -24,10 +24,10 @@ export interface ValueType<T extends string> {
  *
  * @example ```ts
  * const { createId, idFromString, valueType } = buildPrefixedTypeId("project");
- * export type ProjectId = TypeOf<typeof valueType>;
+ * export type ProjectId = TypeFromValueType<typeof valueType>;
  * ```
  */
-export type TypeOf<T> = T extends ValueType<infer U>
+export type TypeFromValueType<T> = T extends ValueType<infer U>
   ? U extends PrefixedId<infer R>
     ? PrefixedId<R>
     : never

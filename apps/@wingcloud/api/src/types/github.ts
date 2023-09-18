@@ -1,4 +1,4 @@
-import type { OpaqueType } from "@wingcloud/opaque-type";
+import type { OpaqueType } from "@wingcloud/type-opaque";
 
 /**
  * Represents a GitHub login name.
