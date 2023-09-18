@@ -9,6 +9,8 @@ import { trpc } from "../../utils/trpc.js";
 const GITHUB_APP_NAME = import.meta.env["GITHUB_APP_NAME"];
 
 export const Component = () => {
+  const userId = trpc["self"].useQuery();
+
   const [installationId, setInstallationId] = useState<string>();
   const [repositoryId, setRepositoryId] = useState<string>();
 
@@ -24,23 +26,25 @@ export const Component = () => {
     },
   );
 
+  const projectsList = trpc["user.listProjects"].useQuery(
+    {
+      owner: userId.data?.userId ?? "",
+    },
+    {
+      enabled: !!userId.data?.userId,
+    },
+  );
+
   const createProjectMutation = trpc["user.createProject"].useMutation();
 
   const createProject = useCallback(async () => {
-    if (!installationId || !repositoryId) {
-      return;
-    }
-    const owner = installations.data?.find(
-      (installation) => installation.id.toString() === installationId,
-    )?.name;
-
-    if (!owner) {
+    if (!repositoryId) {
       return;
     }
 
     await createProjectMutation.mutateAsync({
       repositoryId,
-      owner,
+      owner: userId.data?.userId ?? "",
     });
 
     setShowAddProjectModal(false);
@@ -50,26 +54,46 @@ export const Component = () => {
     <>
       <div className="space-y-4">
         <div className="gap-2 w-full">
-          <h1 className="font-semibold">Projects</h1>
+          <h1>
+            <span className="font-semibold">Projects</span>
+            <span>({userId.data?.userId})</span>
+          </h1>
 
           <div className="flex flex-col items-center justify-center gap-y-2 pt-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-8 h-8 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="
+            {!projectsList.data && (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-8 h-8 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="
                     M12 4v16m8-8H4
                   "
-              />
-            </svg>
-            <p className="text-gray-400">No Projects</p>
+                  />
+                </svg>
+                <p className="text-gray-400">No Projects</p>
+              </>
+            )}
+            {projectsList.data &&
+              projectsList.data.map((project) => (
+                <div
+                  key={project.id}
+                  className={clsx(
+                    "flex justify-center items-center w-32 h-32 rounded",
+                    "border rounded",
+                    "hover:bg-slate-50 dark:hover:bg-slate-750",
+                  )}
+                >
+                  <div>{project.repository.name}</div>
+                </div>
+              ))}
 
             <button
               className={clsx(

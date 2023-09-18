@@ -52,9 +52,21 @@ export const router = t.router({
     return { Items: Items?.map((item) => unmarshall(item)) };
   }),
   "user.listProjects": t.procedure
-    .input(z.object({}))
+    .input(
+      z.object({
+        owner: z.string(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
-      throw new Error("Not implemented");
+      return [
+        {
+          id: "project_123",
+          name: "projectId",
+          repository: {
+            name: "repoName",
+          },
+        },
+      ];
     }),
   "user.listRepositories": t.procedure
     .input(z.object({}))
