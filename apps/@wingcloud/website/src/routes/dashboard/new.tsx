@@ -68,7 +68,7 @@ export const Component = () => {
               btnClassName="w-full bg-sky-50 py-2 rounded border"
             />
 
-            <div className="flex justify-end cursor-pointer">
+            <div className="justify-end cursor-pointer flex flex-col gap-1">
               {repos.data?.map((repo) => (
                 <button
                   className={clsx(
