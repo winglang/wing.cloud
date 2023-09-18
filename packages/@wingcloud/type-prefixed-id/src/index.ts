@@ -1,4 +1,5 @@
 import { nanoid62 } from "@wingcloud/nanoid62";
+import * as z from "zod";
 
 /**
  * Represents a prefixed ID.
@@ -47,7 +48,7 @@ export interface BuildPrefixedTypeIdResult<T extends string> {
    * Creates an ID from a string. Validates that the string starts with the prefix.
    *
    * @example ```ts
-   * const id = idFromString("user_abc123");
+   * const id = idFromString(value);
    * ```
    */
   idFromString(id: string): PrefixedId<T>;
@@ -93,4 +94,39 @@ export const buildPrefixedTypeId = <T extends string>(
     },
     valueType: {} as ValueType<Id>,
   };
+};
+
+/**
+ * Creates a Zod validator for a prefixed ID.
+ *
+ * @example ```ts
+ * const { idFromString } = buildPrefixedTypeId("myprefix");
+ * export const validateId = createValidator(idFromString);
+ *
+ * // ...
+ *
+ * z.object({ id: validateId() });
+ * ```
+ */
+export const createValidator = <Id extends PrefixedId<string>>(
+  idFromString: (value: string) => Id,
+) => {
+  return () =>
+    z.string().transform((value, ctx) => {
+      try {
+        return idFromString(value);
+      } catch (error) {
+        if (error instanceof Error) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            // message: `Invalid input: ${error.message.toLowerCase()}`,
+            message: error.message,
+          });
+
+          return z.NEVER;
+        } else {
+          throw error;
+        }
+      }
+    });
 };

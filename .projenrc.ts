@@ -30,7 +30,7 @@ const nanoid62 = new TypescriptProject({
 const prefixedIdType = new TypescriptProject({
   monorepo,
   name: "@wingcloud/type-prefixed-id",
-  deps: [nanoid62.name],
+  deps: [nanoid62.name, "zod"],
 });
 
 ///////////////////////////////////////////////////////////////////////////////

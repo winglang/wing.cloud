@@ -51,4 +51,14 @@ export const router = t.router({
     // return { Items };
     return { Items: Items?.map((item) => unmarshall(item)) };
   }),
+  "user.listProjects": t.procedure
+    .input(z.object({}))
+    .query(async ({ ctx, input }) => {
+      throw new Error("Not implemented");
+    }),
+  "user.listRepositories": t.procedure
+    .input(z.object({}))
+    .query(async ({ ctx, input }) => {
+      throw new Error("Not implemented");
+    }),
 });
