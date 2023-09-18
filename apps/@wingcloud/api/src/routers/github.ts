@@ -10,6 +10,18 @@ import {
 import { t } from "../trpc.js";
 import * as z from "../validations/index.js";
 
+export type GitHubInstallation = {
+  id: number;
+  name: string;
+};
+
+export type GitHubRepo = {
+  id: number;
+  name: string;
+  imgUrl: string;
+  private: boolean;
+};
+
 export const router = t.router({
   "github.callback": t.procedure
     .input(
@@ -43,10 +55,8 @@ export const router = t.router({
       id: installation.id,
       // @ts-ignore-next-line
       name: installation.account?.login,
-    })) as {
-      id: number;
-      name: string;
-    }[];
+      iconUrl: installation.account?.avatar_url,
+    })) as GitHubInstallation[];
   }),
 
   "github.listRepos": t.procedure
@@ -71,6 +81,8 @@ export const router = t.router({
       return repos.map((repo) => ({
         id: repo.id,
         name: repo.name,
-      }));
+        imgUrl: repo.owner?.avatar_url,
+        private: repo.private,
+      })) as GitHubRepo[];
     }),
 });

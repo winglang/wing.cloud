@@ -1,4 +1,8 @@
-import { CircleStackIcon } from "@heroicons/react/20/solid";
+import {
+  CircleStackIcon,
+  LockClosedIcon,
+  LockOpenIcon,
+} from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -57,7 +61,6 @@ export const Component = () => {
 
           <div className="gap-4 mb-4 flex flex-col text-sm">
             <Select
-              disabled={!projectName}
               items={(installations.data || []).map((installation) => ({
                 value: installation.id.toString(),
                 label: installation.name || "",
@@ -72,15 +75,25 @@ export const Component = () => {
               {repos.data?.map((repo) => (
                 <button
                   className={clsx(
-                    "w-full p-2 rounded border text-left ",
+                    "w-full p-2 rounded border text-left flex",
                     repo.id.toString() === repositoryId
                       ? "bg-sky-50 border-sky-400"
                       : "bg-white",
                   )}
                   onClick={() => setRepositoryId(repo.id.toString())}
                 >
-                  <CircleStackIcon className="w-4 h-4 inline-block mr-2 text-slate-400" />
+                  <img
+                    src={repo.imgUrl}
+                    className="w-5 h-5 inline-block mr-2 rounded-full"
+                  />
                   <span>{repo.name}</span>
+                  <div className="flex grow justify-end text-slate-500">
+                    {repo.private ? (
+                      <LockClosedIcon className="w-4 h-4 inline-block" />
+                    ) : (
+                      <LockOpenIcon className="w-4 h-4 inline-block" />
+                    )}
+                  </div>
                 </button>
               ))}
 
