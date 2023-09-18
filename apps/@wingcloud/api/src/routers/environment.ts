@@ -14,9 +14,6 @@ export const router = t.router({
     .input(z.environmentId())
     .mutation(async ({ ctx, input }) => {
       throw new Error("Not implemented");
-      return {
-        environmentId: input,
-      };
     }),
   "environment.getLogsPresignedURL": t.procedure
     .input(z.environmentId())
