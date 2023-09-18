@@ -37,12 +37,15 @@ export const Component = () => {
           <div className="flex flex-wrap gap-4 pt-4">
             {projectsList.data &&
               projectsList.data.map((project, key) => (
-                <div
+                <button
+                  onClick={() => {
+                    navigate(`/dashboard/projects/${project?.projectId}`);
+                  }}
                   key={project?.projectId || key}
                   className="flex flex-col justify-center items-center w-32 h-32 rounded-lg border border-gray-300 p-4 hover:bg-gray-100 transition duration-300"
                 >
                   <div className="text-center">{project?.name}</div>
-                </div>
+                </button>
               ))}
             <button
               onClick={() => {
