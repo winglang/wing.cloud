@@ -45,12 +45,15 @@ export const router = t.router({
     .input(
       z.object({
         owner: z.string(),
+        projectName: z.string(),
         repositoryId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const { projectId } = await createProject(
         ctx,
+        input.owner,
+        input.projectName,
         gitHubRepositoryIdFromString(input.owner, input.repositoryId),
       );
 

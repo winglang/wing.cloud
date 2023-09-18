@@ -1,5 +1,6 @@
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 
+import { listUserProjects, getProject } from "../database/project.js";
 import { createUser, getUserIdFromLogin } from "../database/user.js";
 import { t } from "../trpc.js";
 import * as z from "../validations/index.js";
@@ -58,15 +59,16 @@ export const router = t.router({
       }),
     )
     .query(async ({ ctx, input }) => {
-      return [
-        {
-          id: "project_123",
-          name: "projectId",
-          repository: {
-            name: "repoName",
-          },
-        },
-      ];
+      const projectIds = await listUserProjects(ctx, input.owner);
+      if (!projectIds) {
+        return [];
+      }
+
+      const projectsPromise = projectIds.map((projectId) => {
+        return getProject(ctx, projectId);
+      });
+
+      return await Promise.all(projectsPromise);
     }),
   "user.listRepositories": t.procedure
     .input(z.object({}))
