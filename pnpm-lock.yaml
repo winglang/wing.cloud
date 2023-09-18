@@ -500,6 +500,9 @@ importers:
       '@wingcloud/nanoid62':
         specifier: workspace:^
         version: link:../nanoid62
+      zod:
+        specifier: ^3.22.2
+        version: 3.22.2
     devDependencies:
       '@cloudy-ts/eslint-plugin':
         specifier: ^0.0.275
