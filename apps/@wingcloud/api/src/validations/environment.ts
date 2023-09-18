@@ -1,11 +1,11 @@
 import * as z from "zod";
 
-import { userIdFromString } from "../types/user.js";
+import { environmentIdFromString } from "../types/environment.js";
 
-export const userId = () =>
+export const environmentId = () =>
   z.string().transform((value, ctx) => {
     try {
-      return userIdFromString(value);
+      return environmentIdFromString(value);
     } catch (error) {
       if (error instanceof Error) {
         ctx.addIssue({

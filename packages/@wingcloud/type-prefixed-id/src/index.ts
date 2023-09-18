@@ -47,7 +47,7 @@ export interface BuildPrefixedTypeIdResult<T extends string> {
    * Creates an ID from a string. Validates that the string starts with the prefix.
    *
    * @example ```ts
-   * const id = idFromString("user_abc123");
+   * const id = idFromString(value);
    * ```
    */
   idFromString(id: string): PrefixedId<T>;
