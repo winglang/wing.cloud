@@ -5,6 +5,11 @@ import { t } from "../trpc.js";
 import * as z from "../validations/index.js";
 
 export const router = t.router({
+  self: t.procedure.query(async ({ ctx }) => {
+    return {
+      userId: ctx.userId,
+    };
+  }),
   getUserIdFromLogin: t.procedure
     .input(
       z.object({

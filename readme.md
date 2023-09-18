@@ -21,8 +21,19 @@ projen
 
 ## Dev
 
+Copy the .env.example files as .env for the api and website packages:
+
 ```sh
-turbo dev
+cp apps/@wingcloud/api/.env.example apps/@wingcloud/api/.env
+
+cp apps/@wingcloud/website/.env.example apps/@wingcloud/website/.env
+```
+
+Run the website:
+
+```sh
+cd apps/@wingcloud/website
+nr dev
 ```
 
 ## Update

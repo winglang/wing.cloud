@@ -6,13 +6,21 @@ import { NoMatch } from "./components/no-match.js";
 export const router = createBrowserRouter([
   {
     path: "/",
-    lazy: () => import("./routes/index.jsx"),
+    lazy: () => import("./routes/index.js"),
+  },
+  {
+    path: "/dashboard",
+    lazy: () => import("./routes/dashboard/index.jsx"),
     children: [
       {
         path: "team",
-        lazy: () => import("./routes/team.jsx"),
+        lazy: () => import("./routes/dashboard/team.js"),
       },
     ],
+  },
+  {
+    path: "/github/callback",
+    lazy: () => import("./routes/github/callback.jsx"),
   },
   {
     path: "*",

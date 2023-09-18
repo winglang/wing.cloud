@@ -1,18 +1,19 @@
-import type { AstroCookies } from "astro";
+import type { Cookies } from "@wingcloud/express-cookies";
+import { getEnvironmentVariable } from "@wingcloud/get-environment-variable";
 import * as jose from "jose";
 
 import type { UserId } from "../types/user.js";
 
 import type { GitHubTokens } from "./github.js";
 
-const APP_SECRET = new TextEncoder().encode(import.meta.env.APP_SECRET);
+const APP_SECRET = new TextEncoder().encode(
+  getEnvironmentVariable("APP_SECRET"),
+);
+const SECURE_COOKIE = getEnvironmentVariable("SECURE_COOKIE") === "true";
+const COOKIE_NAME = "Auth";
 const JWT_EXPIRATION_TIME = "1h";
-export const AUTH_COOKIE_NAME = "Authorization";
 
-export const createAuthorizationJwt = async (
-  userId: UserId,
-  tokens: GitHubTokens,
-) => {
+export const createAuthJwt = async (userId: UserId, tokens: GitHubTokens) => {
   return await new jose.SignJWT({
     accessToken: tokens.access_token,
     expiresIn: tokens.expires_in,
@@ -26,27 +27,28 @@ export const createAuthorizationJwt = async (
     .sign(APP_SECRET);
 };
 
-export const setAuthorizationCookie = async (
+export const setAuthCookie = async (
   userId: UserId,
   tokens: GitHubTokens,
-  cookies: AstroCookies,
+  cookies: Cookies,
 ) => {
-  const jwt = await createAuthorizationJwt(userId, tokens);
+  const jwt = await createAuthJwt(userId, tokens);
 
-  cookies.set(AUTH_COOKIE_NAME, jwt, {
+  cookies.set(COOKIE_NAME, jwt, {
+    path: "/",
     httpOnly: true,
-    secure: true,
+    secure: SECURE_COOKIE,
     sameSite: "lax",
   });
 };
 
-export const getLoggedInUserId = async (cookies: AstroCookies) => {
-  const jwt = cookies.get(AUTH_COOKIE_NAME);
+export const getLoggedInUserId = async (cookies: Cookies) => {
+  const jwt = cookies.get(COOKIE_NAME);
   if (!jwt) {
     return;
   }
 
-  const verifyResult = await jose.compactVerify(jwt.value, APP_SECRET, {
+  const verifyResult = await jose.compactVerify(jwt, APP_SECRET, {
     algorithms: ["HS256"],
   });
 
