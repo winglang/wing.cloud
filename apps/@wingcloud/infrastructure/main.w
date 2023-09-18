@@ -1,4 +1,5 @@
 bring cloud;
+bring http;
 
 // And the sun, and the moon, and the stars, and the flowers.
 
@@ -13,12 +14,12 @@ class AstroWebsite  {
 
   init() {
     let api = new cloud.Api() as "Api";
-    api.get("*", inflight (event) => {
-      return AstroWebsite.handlerAdapter(event);
-    });
-    api.post("*", inflight (event) => {
-      return AstroWebsite.handlerAdapter(event);
-    });
+    // api.get("*", inflight (event) => {
+    //   return AstroWebsite.handlerAdapter(event);
+    // });
+    // api.post("*", inflight (event) => {
+    //   return AstroWebsite.handlerAdapter(event);
+    // });
 
     // let bucket = new cloud.Bucket() as "Files";
     // let files = AstroWebsite.getFiles();
@@ -32,7 +33,7 @@ class AstroWebsite  {
   }
 }
 
-let website = new AstroWebsite();
+// let website = new AstroWebsite();
 
 // bring "@cdktf/provider-aws" as aws;
 
@@ -78,3 +79,77 @@ let website = new AstroWebsite();
 // let d = new Cdn(
 //   bucket: b,
 // );
+
+let wingApi = new cloud.Api() as "wing api";
+wingApi.post("/report", inflight () => {
+  return {
+    status: 200
+  };
+});
+
+// Previews environment runtime
+class Runtime {
+  extern "./src/fly.mts" static inflight handler(
+    imageName: str,
+    repo: str,
+    entryfile: str,
+    flyToken: str,
+    wingApiUrl: str,
+    awsAccessKeyId: str,
+    awsSecretAccessKey: str
+  ): str;
+
+  logs: cloud.Bucket;
+  flyToken: cloud.Secret;
+  awsAccessKeyId: cloud.Secret;
+  awsSecretAccessKey: cloud.Secret;
+  init() {
+    this.logs = new cloud.Bucket() as "deployment logs";
+    this.flyToken = new cloud.Secret(name: "wing.cloud/runtime/flyToken") as "flyToken";
+    this.awsAccessKeyId = new cloud.Secret(name: "wing.cloud/runtime/awsAccessKeyId") as "awsAccessKeyId";
+    this.awsSecretAccessKey = new cloud.Secret(name: "wing.cloud/runtime/awsSecretAccessKey") as "awsSecretAccessKey";
+    
+    // use a function to generate the IAM role with the permissions to write to the bucket
+    new cloud.Function(inflight () => {
+      // permissions:
+      this.logs.put;
+    }) as "runtime function";
+
+    // FOR TESTS
+    let forTests = new cloud.Api();
+    forTests.post("/", inflight (req) => {
+      // hack to get bucket name in extern
+      this.logs.put;
+
+      let body = Json.parse(req.body ?? "");
+      let repo = body.get("repo").asStr();
+      let entryfile = body.get("entryfile").asStr();
+
+      // TODO: get bucket name from `this.logs` resource
+      let url = Runtime.handler(
+        "registry.fly.io/wing-runtime-flyio-test:deployment-01H9ZGZX4Y64EYJ6TCT2Y4YDFV",
+        repo,
+        entryfile,
+        this.flyToken.value(),
+        wingApi.url,
+        this.awsAccessKeyId.value(),
+        this.awsSecretAccessKey.value());
+      return {
+        status: 200,
+        body: Json.stringify({
+          url
+        })
+      };
+    });
+    
+    test "deploy preview environment" {
+      http.post(forTests.url, body: Json.stringify({
+        repo: "eladcon/examples",
+        entryfile: "examples/redis/main.w"
+      }));
+    }
+  }
+
+}
+
+let runtime = new Runtime();

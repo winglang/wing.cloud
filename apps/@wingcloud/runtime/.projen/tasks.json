@@ -26,10 +26,7 @@
       "description": "Only compile",
       "steps": [
         {
-          "exec": "wing compile main.w --target sim"
-        },
-        {
-          "exec": "wing compile main.w --target tf-aws"
+          "exec": "tsup"
         }
       ]
     },
@@ -48,7 +45,7 @@
       "description": "Start the development task",
       "steps": [
         {
-          "exec": "wing it main.w"
+          "exec": "tsup --watch --onSuccess 'node lib/entrypoint-local.js'"
         }
       ]
     },
