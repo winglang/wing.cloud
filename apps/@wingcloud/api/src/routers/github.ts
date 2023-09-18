@@ -11,7 +11,7 @@ import { t } from "../trpc.js";
 import * as z from "../validations/index.js";
 
 export const router = t.router({
-  "github/callback": t.procedure
+  "github.callback": t.procedure
     .input(
       z.object({
         code: z.string(),
@@ -29,7 +29,7 @@ export const router = t.router({
       return login;
     }),
 
-  "github/list-installations": t.procedure.query(async ({ ctx }) => {
+  "github.listInstallations": t.procedure.query(async ({ ctx }) => {
     const cookies = cookiesFromRequest(ctx.request);
 
     const tokens = await getLoggedInUserTokens(cookies);
@@ -39,14 +39,17 @@ export const router = t.router({
     }
 
     const installations = await listUserInstallations(tokens.accessToken);
-
     return installations.map((installation) => ({
       id: installation.id,
+      // @ts-ignore-next-line
       name: installation.account?.login,
-    }));
+    })) as {
+      id: number;
+      name: string;
+    }[];
   }),
 
-  "github/list-repos": t.procedure
+  "github.listRepos": t.procedure
     .input(
       z.object({
         installationId: z.string(),

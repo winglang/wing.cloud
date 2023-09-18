@@ -10,7 +10,7 @@ export const Component = () => {
   const [error, setError] = useState("");
   const initialized = useRef(false);
 
-  const callback = trpc["github/callback"].useMutation({
+  const callback = trpc["github.callback"].useMutation({
     onSuccess: () => {
       navigate("/dashboard/projects");
     },

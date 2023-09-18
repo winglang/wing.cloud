@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Modal } from "../../components/modal.js";
@@ -10,12 +10,12 @@ const GITHUB_APP_NAME = import.meta.env["GITHUB_APP_NAME"];
 
 export const Component = () => {
   const [installationId, setInstallationId] = useState<string>();
-  const [repoId, setRepoId] = useState<string>();
+  const [repositoryId, setRepositoryId] = useState<string>();
 
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
 
-  const installations = trpc["github/list-installations"].useQuery();
-  const repos = trpc["github/list-repos"].useQuery(
+  const installations = trpc["github.listInstallations"].useQuery();
+  const repos = trpc["github.listRepos"].useQuery(
     {
       installationId: installationId || "",
     },
@@ -23,6 +23,28 @@ export const Component = () => {
       enabled: !!installationId,
     },
   );
+
+  const createProjectMutation = trpc["user.createProject"].useMutation();
+
+  const createProject = useCallback(async () => {
+    if (!installationId || !repositoryId) {
+      return;
+    }
+    const owner = installations.data?.find(
+      (installation) => installation.id.toString() === installationId,
+    )?.name;
+
+    if (!owner) {
+      return;
+    }
+
+    await createProjectMutation.mutateAsync({
+      repositoryId,
+      owner,
+    });
+
+    setShowAddProjectModal(false);
+  }, [installationId, repositoryId, installations, createProjectMutation]);
 
   return (
     <>
@@ -73,41 +95,53 @@ export const Component = () => {
       >
         <div className="text-md space-x-1 w-full space-y-2">
           <h1 className="text-xl">Create Project</h1>
-          <Select
-            className="mt-2"
-            items={
-              installations.data?.map((installation) => ({
-                value: installation.id.toString(),
-                label: installation.name,
-              })) ?? []
-            }
-            placeholder="Select a Git namespace"
-            onChange={setInstallationId}
-            value={installationId?.toString() ?? ""}
-            btnClassName={clsx(
-              "text-xs text-left outline-none rounded-l",
-              "pl-2.5 pr-6 py-1.5",
-              "border",
-            )}
-          />
 
-          <Select
-            className="mt-2"
-            items={
-              repos.data?.map((repo) => ({
-                value: repo.id.toString(),
-                label: repo.name,
-              })) ?? []
-            }
-            placeholder="Select a repository"
-            onChange={setRepoId}
-            value={repoId ?? ""}
-            btnClassName={clsx(
-              "text-xs text-left outline-none rounded-l",
-              "pl-2.5 pr-6 py-1.5",
-              "border",
-            )}
-          />
+          <div className="flex gap-4 text-xs">
+            <Select
+              items={
+                installations.data?.map((installation) => ({
+                  value: installation.id.toString(),
+                  label: installation.name || "",
+                })) ?? []
+              }
+              placeholder="Select a Git namespace"
+              onChange={setInstallationId}
+              value={installationId?.toString() ?? ""}
+              btnClassName={clsx(
+                "outline-none rounded",
+                "pl-2.5 pr-6 py-1.5",
+                "border",
+              )}
+            />
+
+            <Select
+              items={
+                repos.data?.map((repo) => ({
+                  value: repo.id.toString(),
+                  label: repo.name,
+                })) ?? []
+              }
+              placeholder="Select a repository"
+              onChange={setRepositoryId}
+              value={repositoryId ?? ""}
+              btnClassName={clsx(
+                "outline-none rounded",
+                "pl-2.5 pr-6 py-1.5",
+                "border",
+              )}
+            />
+            <div className="flex grow justify-end">
+              <button
+                className={clsx(
+                  "hover:bg-slate-100 text-slate-700 px-2 rounded border text-xs py-0 h-full",
+                  "focus:outline-none focus:shadow-outline",
+                )}
+                onClick={createProject}
+              >
+                Create Project
+              </button>
+            </div>
+          </div>
 
           <p className="text-xs">
             Missing Git repository?{" "}

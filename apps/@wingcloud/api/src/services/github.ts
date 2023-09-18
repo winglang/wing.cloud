@@ -1,6 +1,6 @@
 import { getEnvironmentVariable } from "@wingcloud/get-environment-variable";
 import fetch from "node-fetch";
-import { App, Octokit } from "octokit";
+import { Octokit } from "octokit";
 
 import {
   gitHubLoginFromString,
@@ -12,8 +12,6 @@ const GITHUB_APP_CLIENT_ID = getEnvironmentVariable("GITHUB_APP_CLIENT_ID");
 const GITHUB_APP_CLIENT_SECRET = getEnvironmentVariable(
   "GITHUB_APP_CLIENT_SECRET",
 );
-const GITHUB_APP_ID = getEnvironmentVariable("GITHUB_APP_ID");
-const GITHUB_APP_PRIVATE_KEY = getEnvironmentVariable("GITHUB_APP_PRIVATE_KEY");
 
 const exchangeCodeForTokens = async (code: string): Promise<GitHubTokens> => {
   const response = await fetch("https://github.com/login/oauth/access_token", {

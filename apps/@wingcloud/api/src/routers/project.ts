@@ -1,5 +1,6 @@
 import { createProject } from "../database/project.js";
 import { t } from "../trpc.js";
+import { gitHubRepositoryIdFromString } from "../types/github.js";
 import * as z from "../validations/index.js";
 
 export const router = t.router({
@@ -30,7 +31,7 @@ export const router = t.router({
     .mutation(async ({ ctx, input }) => {
       throw new Error("Not implemented");
     }),
-  "project.lsitEnvironmentVariables": t.procedure
+  "project.listEnvironmentVariables": t.procedure
     .input(z.object({}))
     .query(async ({ ctx, input }) => {
       throw new Error("Not implemented");
@@ -41,8 +42,20 @@ export const router = t.router({
       throw new Error("Not implemented");
     }),
   "user.createProject": t.procedure
-    .input(z.object({}))
+    .input(
+      z.object({
+        owner: z.string(),
+        repositoryId: z.string(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
-      throw new Error("Not implemented");
+      const { projectId } = await createProject(
+        ctx,
+        gitHubRepositoryIdFromString(input.owner, input.repositoryId),
+      );
+
+      return {
+        projectId,
+      };
     }),
 });
