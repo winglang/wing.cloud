@@ -1,3 +1,5 @@
+import { url } from "node:inspector";
+
 import { PlusIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { useCallback, useState } from "react";
@@ -5,9 +7,10 @@ import { Link } from "react-router-dom";
 
 import { Modal } from "../../components/modal.js";
 import { Select } from "../../components/select.js";
+import { openPopupWindow } from "../../utils/popup-window.js";
 import { trpc } from "../../utils/trpc.js";
 
-const GITHUB_APP_NAME = import.meta.env["GITHUB_APP_NAME"];
+const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
 
 export const Component = () => {
   const userId = trpc["self"].useQuery();
@@ -138,13 +141,16 @@ export const Component = () => {
 
           <div className="text-xs space-y-2 text-center">
             <p className="">Missing Git repository?</p>
-            <a
-              href={`https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`}
-              target="__blank"
+            <button
               className="text-blue-600"
+              onClick={() =>
+                openPopupWindow({
+                  url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
+                })
+              }
             >
               Adjust GitHub App Permissions →
-            </a>
+            </button>
           </div>
         </div>
       </Modal>
