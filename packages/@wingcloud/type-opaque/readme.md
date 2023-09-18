@@ -1,11 +1,11 @@
-# `@wingcloud/opaque-type`
+# `@wingcloud/type-opaque`
 
 A type helper to make a opaque types.
 
 ## Usage
 
 ```ts
-import type { OpaqueType } from "@wingcloud/opaque-type";
+import type { OpaqueType } from "@wingcloud/type-opaque";
 
 type AccountId = OpaqueType<number, { readonly t: unique symbol }>;
 type PersonId = OpaqueType<number, { readonly t: unique symbol }>;

@@ -1,10 +1,14 @@
 {
-  "name": "@wingcloud/opaque-type",
+  "name": "@wingcloud/type-prefixed-id",
   "version": "0.0.0",
   "type": "module",
   "sideEffects": false,
+  "dependencies": {
+    "@wingcloud/nanoid62": "workspace:^",
+    "zod": "^3.22.2"
+  },
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.273",
+    "@cloudy-ts/eslint-plugin": "^0.0.275",
     "@types/node": "18",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
