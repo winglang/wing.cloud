@@ -640,7 +640,7 @@ importers:
         version: 0.0.275(eslint@8.49.0)
       '@types/node':
         specifier: '18'
-        version: 18.17.14
+        version: 18.0.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^6.7.0
         version: 6.7.0(@typescript-eslint/parser@6.7.0)(eslint@8.49.0)(typescript@5.2.2)
@@ -4377,7 +4377,10 @@ packages:
     peerDependencies:
       constructs: ^10.0.25
     dependencies:
+      archiver: 5.3.1
       constructs: 10.2.70
+      json-stable-stringify: 1.0.2
+      semver: 7.5.4
     dev: false
     bundledDependencies:
       - archiver
