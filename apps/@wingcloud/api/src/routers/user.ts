@@ -3,6 +3,7 @@ import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { listUserProjects, getProject } from "../database/project.js";
 import { createUser, getUserIdFromLogin } from "../database/user.js";
 import { t } from "../trpc.js";
+import { createProjectId, projectIdFromString } from "../types/project.js";
 import * as z from "../validations/index.js";
 
 export const router = t.router({
@@ -65,7 +66,7 @@ export const router = t.router({
       }
 
       const projectsPromise = projectIds.map((projectId) => {
-        return getProject(ctx, projectId);
+        return getProject(ctx, projectIdFromString(projectId));
       });
 
       return await Promise.all(projectsPromise);

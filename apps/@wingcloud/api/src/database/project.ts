@@ -1,4 +1,5 @@
-import { AttributeValue, type DynamoDB } from "@aws-sdk/client-dynamodb";
+import { type DynamoDB } from "@aws-sdk/client-dynamodb";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
 import type { GitHubRepositoryId } from "../types/github.js";
 import { createProjectId, type ProjectId } from "../types/project.js";
@@ -9,9 +10,9 @@ type Context = {
 };
 
 export interface ProjectItem {
-  projectId: { S: ProjectId };
-  name: { S: string };
-  repository: { S: GitHubRepositoryId };
+  projectId: ProjectId;
+  name: string;
+  repository: GitHubRepositoryId;
 }
 
 /**
@@ -26,9 +27,9 @@ export const createProject = async (
   const projectId = await createProjectId();
 
   const projectItem: ProjectItem = {
-    projectId: { S: projectId },
-    name: { S: name },
-    repository: { S: repository },
+    projectId: projectId,
+    name: name,
+    repository: repository,
   };
 
   await context.dynamodb.transactWriteItems({
@@ -39,7 +40,7 @@ export const createProject = async (
           Item: {
             pk: { S: `PROJECT#${projectId}` },
             sk: { S: "#" },
-            ...projectItem,
+            ...marshall(projectItem),
           },
         },
       },
@@ -49,7 +50,7 @@ export const createProject = async (
           Item: {
             pk: { S: `USER#${userId}` },
             sk: { S: `PROJECT#${projectId}` },
-            ...projectItem,
+            ...marshall(projectItem),
           },
         },
       },
@@ -80,5 +81,32 @@ export const getProject = async (
     },
   });
 
-  return Item as ProjectItem | undefined;
+  if (!Item) {
+    return undefined;
+  }
+
+  return unmarshall(Item) as ProjectItem;
+};
+
+/**
+ * List the projects for a user.
+ */
+export const listUserProjects = async (context: Context, userId: string) => {
+  const { Items } = await context.dynamodb.query({
+    TableName: context.tableName,
+    KeyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+    ExpressionAttributeValues: {
+      ":pk": {
+        S: `USER#${userId}`,
+      },
+      ":sk": {
+        S: "PROJECT#",
+      },
+    },
+  });
+
+  return Items?.map((item) => {
+    const projectItem = unmarshall(item) as ProjectItem;
+    return projectItem.projectId;
+  }).filter(Boolean);
 };

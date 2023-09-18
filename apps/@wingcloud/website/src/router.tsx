@@ -20,6 +20,10 @@ export const router = createBrowserRouter([
         path: "projects",
         lazy: () => import("./routes/dashboard/projects.js"),
       },
+      {
+        path: "new",
+        lazy: () => import("./routes/dashboard/new.js"),
+      },
     ],
   },
   {
