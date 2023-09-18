@@ -4,8 +4,8 @@ import { getOrCreateUser } from "../database/user.js";
 import { getLoggedInUserTokens, setAuthCookie } from "../services/auth.js";
 import {
   getGitHubLoginFromCode,
-  listAppInstallations,
-  listUserProjects,
+  listUserInstallations,
+  listInstallationRepos,
 } from "../services/github.js";
 import { t } from "../trpc.js";
 import * as z from "../validations/index.js";
@@ -28,21 +28,7 @@ export const router = t.router({
 
       return login;
     }),
-  "github/list-projects": t.procedure.query(async ({ ctx }) => {
-    const cookies = cookiesFromRequest(ctx.request);
 
-    const tokens = await getLoggedInUserTokens(cookies);
-
-    if (!tokens) {
-      return;
-    }
-
-    const projects = await listUserProjects(tokens.accessToken);
-    return projects.map((project) => ({
-      id: project.id,
-      name: project.name,
-    }));
-  }),
   "github/list-installations": t.procedure.query(async ({ ctx }) => {
     const cookies = cookiesFromRequest(ctx.request);
 
@@ -52,8 +38,36 @@ export const router = t.router({
       return;
     }
 
-    const installations = await listAppInstallations(tokens.accessToken);
+    const installations = await listUserInstallations(tokens.accessToken);
 
-    return installations;
+    return installations.map((installation) => ({
+      id: installation.id,
+      name: installation.account?.login,
+    }));
   }),
+
+  "github/list-repos": t.procedure
+    .input(
+      z.object({
+        installationId: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const cookies = cookiesFromRequest(ctx.request);
+
+      const tokens = await getLoggedInUserTokens(cookies);
+
+      if (!tokens) {
+        return;
+      }
+
+      const repos = await listInstallationRepos(
+        tokens.accessToken,
+        Number(input.installationId),
+      );
+      return repos.map((repo) => ({
+        id: repo.id,
+        name: repo.name,
+      }));
+    }),
 });

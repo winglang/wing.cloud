@@ -2,7 +2,7 @@ import { getEnvironmentVariable } from "@wingcloud/get-environment-variable";
 import fetch from "node-fetch";
 import { App, Octokit } from "octokit";
 
-import type { GitHubTokens } from "../types/github.js";
+import type { GitHubLogin, GitHubTokens } from "../types/github.js";
 
 const GITHUB_APP_CLIENT_ID = getEnvironmentVariable("GITHUB_APP_CLIENT_ID");
 const GITHUB_APP_CLIENT_SECRET = getEnvironmentVariable(
@@ -40,7 +40,7 @@ export const getGitHubLoginFromCode = async (code: string) => {
   const { login } = await getUser(tokens.access_token);
 
   return {
-    login,
+    login: login as GitHubLogin,
     tokens,
   };
 };
@@ -53,14 +53,13 @@ export const getUser = async (token: string) => {
   return user;
 };
 
-export const listUserProjects = async (token: string) => {
+export const listUserRepos = async (token: string) => {
   const octokit = new Octokit({
     auth: token,
   });
 
-  const { data: projects } =
-    await octokit.rest.repos.listForAuthenticatedUser();
-  return projects;
+  const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser();
+  return repos;
 };
 
 export const listUserOrganizations = async (token: string) => {
@@ -73,64 +72,28 @@ export const listUserOrganizations = async (token: string) => {
   return organizations;
 };
 
-const getOrganizationInstallation = async (token: string, orgId: number) => {
-  const app = new App({
-    appId: GITHUB_APP_ID,
-    privateKey: GITHUB_APP_PRIVATE_KEY,
-  });
-
-  const { data: orgInstallation } = await app.octokit.request(
-    "GET /orgs/{org}/installation",
-    {
-      org: `${orgId}`,
-    },
-  );
-
-  return orgInstallation;
-};
-
-export const listAppInstallations = async (token: string) => {
-  const app = new App({
-    appId: GITHUB_APP_ID,
-    privateKey: GITHUB_APP_PRIVATE_KEY,
-  });
+export const listUserInstallations = async (token: string) => {
   const octokit = new Octokit({
     auth: token,
   });
 
-  const userOrgs = await listUserOrganizations(token);
+  const { data: installations } =
+    await octokit.rest.apps.listInstallationsForAuthenticatedUser();
+  return installations.installations;
+};
 
-  let repositories = [] as {
-    id: number;
-    name: string;
-  }[];
+export const listInstallationRepos = async (
+  token: string,
+  installationId: number,
+) => {
+  const octokit = new Octokit({
+    auth: token,
+  });
 
-  for (const org of userOrgs) {
-    const orgInstallation = await getOrganizationInstallation(token, org.id);
-
-    const { data: orgRepos } =
-      await octokit.rest.apps.listInstallationReposForAuthenticatedUser({
-        installation_id: orgInstallation.id,
-      });
-
-    repositories = [...repositories, ...orgRepos.repositories];
-  }
-
-  const user = await getUser(token);
-
-  const { data: userInstallation } = await app.octokit.request(
-    "GET /users/{username}/installation",
-    {
-      username: user.login,
-    },
-  );
-
-  const { data: userRepos } =
+  const { data: orgRepos } =
     await octokit.rest.apps.listInstallationReposForAuthenticatedUser({
-      installation_id: userInstallation.id,
+      installation_id: installationId,
     });
 
-  repositories = [...repositories, ...userRepos.repositories];
-
-  return repositories;
+  return orgRepos.repositories;
 };
