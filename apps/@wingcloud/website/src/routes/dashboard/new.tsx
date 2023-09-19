@@ -74,10 +74,8 @@ export const Component = () => {
               {repos.data?.map((repo) => (
                 <button
                   className={clsx(
-                    "w-full p-2 rounded border text-left flex",
-                    repo.id.toString() === repositoryId
-                      ? "bg-sky-50 border-sky-400"
-                      : "bg-white",
+                    "w-full p-2 rounded border text-left flex items-center",
+                    repo.id.toString() === repositoryId && "border-sky-400",
                   )}
                   onClick={() => {
                     setRepositoryId(repo.id.toString());
@@ -91,12 +89,25 @@ export const Component = () => {
                     className="w-5 h-5 inline-block mr-2 rounded-full"
                   />
                   <span>{repo.name}</span>
-                  <div className="flex grow justify-end text-slate-500">
+                  <div className="text-slate-500 mx-1 items-center">
                     {repo.private ? (
-                      <LockClosedIcon className="w-4 h-4 inline-block" />
+                      <LockClosedIcon className="w-3 h-3 inline-block" />
                     ) : (
-                      <LockOpenIcon className="w-4 h-4 inline-block" />
+                      <LockOpenIcon className="w-3 h-3 inline-block" />
                     )}
+                  </div>
+
+                  <div className="flex grow justify-end text-slate-500 items-center">
+                    <div
+                      className={clsx(
+                        "mr-2 py-0.5 px-1 rounded border text-xs",
+                        repo.id.toString() === repositoryId
+                          ? "bg-sky-100 border-sky-400"
+                          : "bg-white",
+                      )}
+                    >
+                      Choose
+                    </div>
                   </div>
                 </button>
               ))}
