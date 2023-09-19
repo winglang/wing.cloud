@@ -1,8 +1,4 @@
-import {
-  CircleStackIcon,
-  LockClosedIcon,
-  LockOpenIcon,
-} from "@heroicons/react/20/solid";
+import { LockClosedIcon, LockOpenIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -65,7 +61,7 @@ export const Component = () => {
                 value: installation.id.toString(),
                 label: installation.name || "",
               }))}
-              placeholder="Select a Git namespace"
+              placeholder="Select a GitHub namespace"
               onChange={setInstallationId}
               value={installationId.toString()}
               btnClassName="w-full bg-sky-50 py-2 rounded border"

@@ -1,13 +1,6 @@
-import { url } from "node:inspector";
-
 import { PlusIcon } from "@heroicons/react/20/solid";
-import clsx from "clsx";
-import { useCallback, useState } from "react";
-import { Link, redirect, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import { Modal } from "../../components/modal.js";
-import { Select } from "../../components/select.js";
-import { openPopupWindow } from "../../utils/popup-window.js";
 import { trpc } from "../../utils/trpc.js";
 
 const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
