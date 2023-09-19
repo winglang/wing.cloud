@@ -128,7 +128,7 @@ export const Component = () => {
               onClick={createProject}
               disabled={!repositoryId || !installationId || !projectName}
             >
-              Create Project
+              Deploy
             </button>
           </div>
         </div>
