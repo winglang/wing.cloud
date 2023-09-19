@@ -62,7 +62,10 @@ export const Component = () => {
                 label: installation.name || "",
               }))}
               placeholder="Select a GitHub namespace"
-              onChange={setInstallationId}
+              onChange={(value) => {
+                setInstallationId(value);
+                setRepositoryId("");
+              }}
               value={installationId.toString()}
               btnClassName="w-full bg-sky-50 py-2 rounded border"
             />
@@ -76,7 +79,12 @@ export const Component = () => {
                       ? "bg-sky-50 border-sky-400"
                       : "bg-white",
                   )}
-                  onClick={() => setRepositoryId(repo.id.toString())}
+                  onClick={() => {
+                    setRepositoryId(repo.id.toString());
+                    if (!projectName) {
+                      setProjectName(repo.name);
+                    }
+                  }}
                 >
                   <img
                     src={repo.imgUrl}
