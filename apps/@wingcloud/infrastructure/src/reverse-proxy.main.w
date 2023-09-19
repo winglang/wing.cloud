@@ -60,7 +60,7 @@ struct DNSimpleValidateCertificateProps {
   subDomain: str;
 }
 
-// this class intoduces some strange workarounds for validating a certificate
+// this class introduces some strange workarounds for validating a certificate
 // see https://github.com/hashicorp/terraform-cdk/issues/2178
 class DNSimpleValidatedCertificate {
   certificate: Certificate;
@@ -94,6 +94,37 @@ class DNSimpleValidatedCertificate {
   }
 }
 
+struct CachePolicyProps {
+  name: str;
+}
+
+class CachePolicy {
+  policy: awsProvider.cloudfrontCachePolicy.CloudfrontCachePolicy;
+
+  init(props: CachePolicyProps) {
+    this.policy = new awsProvider.cloudfrontCachePolicy.CloudfrontCachePolicy(
+      defaultTtl: 60,
+      maxTtl: 86400,
+      minTtl: 0,
+      name: props.name,
+      parametersInCacheKeyAndForwardedToOrigin: {
+        cookiesConfig: {
+          cookieBehavior: "all"
+        },
+        headersConfig: {
+          headerBehavior: "whitelist",
+          headers: {
+            items: ["Accept-Datetime", "Accept-Encoding", "Accept-Language", "User-Agent", "Referer", "Origin", "X-Forwarded-Host"]
+          }
+        },
+        queryStringsConfig: {
+          queryStringBehavior: "all"
+        }
+      }
+    );
+  }
+}
+
 struct Origin {
   domainName: str;
   originId: str;
@@ -108,7 +139,7 @@ struct OriginCustomConfig {
   originSslProtocols: Array<str>;
 }
 
-// extends Origin
+// extends Origin?
 struct HttpOrigin {
   domainName: str;
   originId: str;
@@ -116,21 +147,21 @@ struct HttpOrigin {
 }
 
 struct CloudFrontDistributionProps {
-  validatedCertificte: DNSimpleValidatedCertificate;
+  validatedCertificate: DNSimpleValidatedCertificate;
   aliases: Array<str>;
   origins: Array<Origin>;
 }
 
 class CloudFrontDistribution {
-  destribution: awsProvider.cloudfrontDistribution.CloudfrontDistribution;
+  distribution: awsProvider.cloudfrontDistribution.CloudfrontDistribution;
 
-  // how to return Origin OR Nil?
-  getDefaultOrigin (origins: Array<Origin>): Origin {
+  getDefaultOriginId (origins: Array<Origin>): str {
     for origin in origins {
       if origin.isDefault {
-        return origin;
+        return origin.originId;
       }
     }
+    return "";
   }
 
   getHttpOrigins (origins: Array<Origin>): MutArray<HttpOrigin> {
@@ -148,10 +179,11 @@ class CloudFrontDistribution {
       };
       enhancedOrigins.push(enhancedOrigin);
     }
+
     return enhancedOrigins;
   }
 
-  getOrderedCacheBehaviorForOrigins (origins: Array<Origin>): MutArray<Json> {
+  getOrderedCacheBehaviorForOrigins (origins: Array<Origin>, cachePolicyId: str): MutArray<Json> {
     let cacheBehaviors = MutArray<Json>[];
     for origin in origins {
       if origin.isDefault {
@@ -164,18 +196,7 @@ class CloudFrontDistribution {
           cachedMethods: ["GET", "HEAD"],
           targetOriginId: origin.originId,
           viewerProtocolPolicy: "redirect-to-https",
-          defaultTtl: 60,
-          maxTtl: 86400,
-          minTtl: 0,
-          forwardedValues: {
-            queryString: true,
-            cookies: {
-              forward: "all"
-            },
-            headers: [
-              "*"
-            ]
-          }
+          cachePolicyId: cachePolicyId
         }
       );
     }
@@ -185,7 +206,9 @@ class CloudFrontDistribution {
 
   init(props: CloudFrontDistributionProps) {
 
-    this.destribution = new awsProvider.cloudfrontDistribution.CloudfrontDistribution(
+    let cachePolicy = new CachePolicy(name: "cache-policy-for-${this.getDefaultOriginId(props.origins)}");
+
+    this.distribution = new awsProvider.cloudfrontDistribution.CloudfrontDistribution(
       enabled: true,
       isIpv6Enabled: true,
       restrictions: {
@@ -196,22 +219,11 @@ class CloudFrontDistribution {
       defaultCacheBehavior: {
         allowedMethods: ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"],
         cachedMethods: ["GET", "HEAD"],
-        targetOriginId: this.getDefaultOrigin(props.origins).originId,
+        targetOriginId: this.getDefaultOriginId(props.origins),
         viewerProtocolPolicy: "redirect-to-https",
-        defaultTtl: 60,
-        maxTtl: 86400,
-        minTtl: 0,
-        forwardedValues: {
-          queryString: true,
-          cookies: {
-            forward: "all"
-          },
-          headers: [
-            "*"
-          ]
-        }
+        cachePolicyId: cachePolicy.policy.id
       },
-      orderedCacheBehavior: this.getOrderedCacheBehaviorForOrigins(props.origins),
+      orderedCacheBehavior: this.getOrderedCacheBehaviorForOrigins(props.origins, cachePolicy.policy.id),
       viewerCertificate: {
         acmCertificateArn: props.validatedCertificte.certificate.certificate.arn,
         sslSupportMethod: "sni-only"
@@ -239,7 +251,7 @@ class ReverseProxy {
     );
     //create distribution
     let cloudFrontDist = new CloudFrontDistribution(
-      validatedCertificte: validatedCertificate,
+      validatedCertificate: validatedCertificate,
       aliases: props.aliases,
       origins: props.origins
     );
@@ -256,8 +268,8 @@ class ReverseProxy {
 
 ////////   test    ////////
 
-let zoneName = "dev.wing.cloud";
-let subDomain = "www";
+let zoneName = "wingcloud.io";
+let subDomain = "dev";
 
 let origins = Array<Origin>[
   {
@@ -267,15 +279,15 @@ let origins = Array<Origin>[
     isDefault: true
   },
   {
-    domainName: "site-demo-eta.vercel.app",
+    domainName: "site-api.vercel.app",
     originId: "api.demo.site",
-    pathPattern: "/api/*",
+    pathPattern: "/api",
     isDefault: false
   },
   {
-    domainName: "site-demo-eta.vercel.app",
+    domainName: "site-dashboard-phi.vercel.app",
     originId: "dashboard.demo.site",
-    pathPattern: "/dashboard/*",
+    pathPattern: "/dashboard",
     isDefault: false
   }
 ];
@@ -283,7 +295,8 @@ let origins = Array<Origin>[
 
 let reverseProxy = new ReverseProxy(
   origins: origins,
-  subDomain: "www",
-  zoneName: "dev.wing.cloud",
-  aliases: ["www.dev.wing.cloud"],
+  subDomain: subDomain,
+  zoneName: zoneName,
+  aliases: [ "${subDomain}.${zoneName}"],
 );
+
