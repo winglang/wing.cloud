@@ -26,6 +26,9 @@
       "description": "Only compile",
       "steps": [
         {
+          "exec": "wing compile main.w --target sim"
+        },
+        {
           "exec": "wing compile main.w --target tf-aws"
         }
       ]
