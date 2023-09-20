@@ -1,6 +1,6 @@
 import { LockClosedIcon, LockOpenIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Select } from "../../components/select.js";
@@ -12,9 +12,18 @@ const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
 export const Component = () => {
   const navigate = useNavigate();
 
+  const [projectName, setProjectName] = useState("");
   const [installationId, setInstallationId] = useState("");
 
   const installations = trpc["github.listInstallations"].useQuery();
+  const selectedInstallation = useMemo(
+    () =>
+      installations.data?.find(
+        (installation) => installation.id.toString() === installationId,
+      ),
+    [installations.data, installationId],
+  );
+
   const repos = trpc["github. listRepositories"].useQuery(
     {
       installationId: installationId || "",
@@ -24,21 +33,37 @@ export const Component = () => {
     },
   );
 
-  const importRepository = useCallback((name: string, repositoryId: string) => {
-    // naviagate to /import passing repositoryId as query param
-    navigate(
-      `/dashboard/import?repositoryName=${name}&repositoryId=${repositoryId}`,
-    );
-  }, []);
+  const createProjectMutation = trpc["user.createProject"].useMutation();
+
+  const createProject = useCallback(
+    async (repositoryId: string) => {
+      if (!repositoryId) {
+        return;
+      }
+      await createProjectMutation.mutateAsync({
+        repositoryId,
+        projectName,
+      });
+      navigate("/dashboard/projects");
+    },
+    [projectName, createProjectMutation],
+  );
 
   return (
     <>
       <div className="flex justify-center pt-10">
         <div className="space-y-6 w-[25rem] bg-white rounded-lg  shadow-xl border p-6">
-          <h1 className="text-xl font-bold">Import Repository</h1>
+          <h1 className="text-xl font-bold">New Project</h1>
 
           <div className="text-sm">
             <div className="gap-4 mb-4 flex flex-col text-sm">
+              <input
+                className="w-full p-2 rounded border focus:outline-none mb-4 bg-sky-50"
+                placeholder="Project Name"
+                value={projectName}
+                onChange={(event) => setProjectName(event.target.value)}
+              />
+
               <Select
                 items={(installations.data || []).map((installation) => ({
                   value: installation.id.toString(),
@@ -64,7 +89,10 @@ export const Component = () => {
                       src={repo.imgUrl}
                       className="w-5 h-5 inline-block mr-2 rounded-full"
                     />
-                    <span>{repo.name}</span>
+                    <span>
+                      {selectedInstallation ? selectedInstallation.name : ""}/
+                      {repo.name}
+                    </span>
                     <div className="mx-1 items-center">
                       {repo.private && (
                         <LockClosedIcon className="w-3 h-3 inline-block" />
@@ -77,9 +105,9 @@ export const Component = () => {
                           "mr-2 py-0.5 px-1 rounded border text-xs cursor-pointer",
                           "hover:bg-sky-50 transition duration-300",
                         )}
-                        onClick={() =>
-                          importRepository(repo.name, repo.id.toString())
-                        }
+                        onClick={() => {
+                          createProject(repo.id.toString());
+                        }}
                         disabled={!installationId}
                       >
                         Import
