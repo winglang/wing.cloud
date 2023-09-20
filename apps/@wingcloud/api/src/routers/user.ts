@@ -1,7 +1,9 @@
 import { unmarshall } from "@aws-sdk/util-dynamodb";
+import { cookiesFromRequest } from "@wingcloud/express-cookies";
 
 import { listUserProjects, getProject } from "../database/project.js";
 import { createUser, getUserIdFromLogin } from "../database/user.js";
+import { getLoggedInUserId } from "../services/auth.js";
 import { t } from "../trpc.js";
 import { createProjectId, projectIdFromString } from "../types/project.js";
 import * as z from "../validations/index.js";
@@ -53,24 +55,25 @@ export const router = t.router({
     // return { Items };
     return { Items: Items?.map((item) => unmarshall(item)) };
   }),
-  "user.listProjects": t.procedure
-    .input(
-      z.object({
-        owner: z.string(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const projectIds = await listUserProjects(ctx, input.owner);
-      if (!projectIds) {
-        return [];
-      }
+  "user.listProjects": t.procedure.query(async ({ ctx, input }) => {
+    const cookies = cookiesFromRequest(ctx.request);
 
-      const projectsPromise = projectIds.map((projectId) => {
-        return getProject(ctx, projectIdFromString(projectId));
-      });
+    const userId = await getLoggedInUserId(cookies);
+    if (!userId) {
+      return [];
+    }
 
-      return await Promise.all(projectsPromise);
-    }),
+    const projectIds = await listUserProjects(ctx, userId);
+    if (!projectIds) {
+      return [];
+    }
+
+    const projectsPromise = projectIds.map((projectId) => {
+      return getProject(ctx, projectIdFromString(projectId));
+    });
+
+    return await Promise.all(projectsPromise);
+  }),
   "user.listRepositories": t.procedure
     .input(z.object({}))
     .query(async ({ ctx, input }) => {

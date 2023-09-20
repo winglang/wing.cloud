@@ -59,7 +59,7 @@ export const router = t.router({
     })) as GitHubInstallation[];
   }),
 
-  "github.listRepos": t.procedure
+  "github. listRepositories": t.procedure
     .input(
       z.object({
         installationId: z.string(),

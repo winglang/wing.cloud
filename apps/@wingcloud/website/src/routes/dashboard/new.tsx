@@ -18,7 +18,7 @@ export const Component = () => {
   const [repositoryId, setRepositoryId] = useState("");
 
   const installations = trpc["github.listInstallations"].useQuery();
-  const repos = trpc["github.listRepos"].useQuery(
+  const repos = trpc["github. listRepositories"].useQuery(
     {
       installationId: installationId || "",
     },

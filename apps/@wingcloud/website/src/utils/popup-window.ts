@@ -11,7 +11,7 @@ export const openPopupWindow = ({
   const topPosition = window.screen.height / 2 - (height / 2 + 50);
   window.open(
     url,
-    "Window2",
+    "_blank",
     "status=no,height=" +
       height +
       ",width=" +

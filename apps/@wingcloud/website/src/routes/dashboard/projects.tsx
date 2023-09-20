@@ -9,14 +9,7 @@ export const Component = () => {
   const userId = trpc["self"].useQuery();
   const navigate = useNavigate();
 
-  const projectsList = trpc["user.listProjects"].useQuery(
-    {
-      owner: userId.data?.userId || "",
-    },
-    {
-      enabled: !!userId.data?.userId,
-    },
-  );
+  const projectsList = trpc["user.listProjects"].useQuery();
 
   return (
     <>

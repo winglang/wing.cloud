@@ -32,6 +32,8 @@ export const createProject = async (
     repository: repository,
   };
 
+  const item = marshall(projectItem);
+
   await context.dynamodb.transactWriteItems({
     TransactItems: [
       {
@@ -40,7 +42,7 @@ export const createProject = async (
           Item: {
             pk: { S: `PROJECT#${projectId}` },
             sk: { S: "#" },
-            ...marshall(projectItem),
+            ...item,
           },
         },
       },
@@ -50,7 +52,7 @@ export const createProject = async (
           Item: {
             pk: { S: `USER#${userId}` },
             sk: { S: `PROJECT#${projectId}` },
-            ...marshall(projectItem),
+            ...item,
           },
         },
       },
@@ -106,7 +108,6 @@ export const listUserProjects = async (context: Context, userId: string) => {
   });
 
   return Items?.map((item) => {
-    const projectItem = unmarshall(item) as ProjectItem;
-    return projectItem.projectId;
+    return item["projectId"]!.S! as ProjectId;
   }).filter(Boolean);
 };
