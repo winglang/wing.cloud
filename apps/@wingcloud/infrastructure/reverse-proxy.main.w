@@ -1,5 +1,6 @@
 bring cloud;
 bring util;
+bring http;
 bring "cdktf" as cdktf;
 bring "@cdktf/provider-dnsimple" as dnsimpleProvider;
 bring "./src/reverse-proxy/dnsimple.w" as DNSimple;
@@ -176,8 +177,24 @@ let reverseProxy = new ReverseProxy(
   aliases: ["${subDomain}.${zoneName}"],
 );
 
-// timing issues
+struct TestsResults {
+  url: str;
+  status: num;
+}
+
 test "get reverse proxy url and paths" {
   log(reverseProxy.url());
   log(Json.stringify(reverseProxy.paths()));
+  let results = MutArray<TestsResults>[];
+  // how can I create a reasginable bool variable?
+  for path in reverseProxy.paths() {
+    let response = http.get(reverseProxy.url() + path);
+    results.push({
+      url: reverseProxy.url() + path,
+      status: response.status,
+    });
+    assert(response.status == 200);
+  }
+  log(Json.stringify(results));
 }
+
