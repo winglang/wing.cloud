@@ -30,7 +30,7 @@ const nanoid62 = new TypescriptProject({
 const flyio = new TypescriptProject({
   monorepo,
   name: "@wingcloud/flyio",
-  description: "Fly.io client library"
+  description: "Fly.io client library",
 });
 
 flyio.compileTask.reset();
@@ -52,23 +52,21 @@ flyio.addGitIgnore("tsconfig.tsbuildinfo");
 flyio.addGitIgnore("/lib");
 flyio.addFields({
   jsii: {
-    "outdir": "dist",
-    "targets": [],
-    "versionFormat": "full"
+    outdir: "dist",
+    targets: [],
+    versionFormat: "full",
   },
-  bundledDependencies: [
-    "node-fetch"
-  ],
+  bundledDependencies: ["node-fetch"],
   author: {
     name: "wing.cloud",
-    url: "https://wing.cloud"
+    url: "https://wing.cloud",
   },
   repository: {
     type: "git",
-    url: "https://github.com/winglang/wing.cloud"
+    url: "https://github.com/winglang/wing.cloud",
   },
   license: "BSD-3-Clause",
-  main: "./lib/index.js"
+  main: "./lib/index.js",
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -216,18 +214,14 @@ const runtime = new TypescriptProject({
   name: "@wingcloud/runtime",
   outdir: "apps/@wingcloud/runtime",
   tsup: {
-    entry: [
-      "src/**/*.ts"
-    ],
+    entry: ["src/**/*.ts"],
     outDir: "lib",
-    format: [
-      "esm"
-    ],
+    format: ["esm"],
     target: "node18",
     dts: true,
     bundle: false,
-    clean: true
-  }
+    clean: true,
+  },
 });
 
 runtime.addDeps("winglang");
