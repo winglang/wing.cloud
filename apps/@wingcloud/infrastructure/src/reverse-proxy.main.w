@@ -24,7 +24,7 @@ struct DNSRecordProps {
 }
 
 class DNSimpleZoneRecord {
-  record: dnsimpleProvider.zoneRecord.ZoneRecord;
+  pub record: dnsimpleProvider.zoneRecord.ZoneRecord;
 
   init(props: DNSRecordProps) {
     this.record = new dnsimpleProvider.zoneRecord.ZoneRecord(
@@ -42,7 +42,7 @@ struct CertificateProps {
 }
 
 class Certificate {
-  certificate: awsProvider.acmCertificate.AcmCertificate;
+  pub certificate: awsProvider.acmCertificate.AcmCertificate;
 
   init(props: CertificateProps) {
     this.certificate = new awsProvider.acmCertificate.AcmCertificate(
@@ -63,7 +63,7 @@ struct DNSimpleValidateCertificateProps {
 // this class introduces some strange workarounds for validating a certificate
 // see https://github.com/hashicorp/terraform-cdk/issues/2178
 class DNSimpleValidatedCertificate {
-  certificate: Certificate;
+  pub certificate: Certificate;
 
   init(props: DNSimpleValidateCertificateProps) {
     this.certificate = new Certificate(domainName: "${props.subDomain}.${props.zoneName}");
@@ -99,7 +99,7 @@ struct CachePolicyProps {
 }
 
 class CachePolicy {
-  policy: awsProvider.cloudfrontCachePolicy.CloudfrontCachePolicy;
+  pub policy: awsProvider.cloudfrontCachePolicy.CloudfrontCachePolicy;
 
   init(props: CachePolicyProps) {
     this.policy = new awsProvider.cloudfrontCachePolicy.CloudfrontCachePolicy(
@@ -153,7 +153,7 @@ struct CloudFrontDistributionProps {
 }
 
 class CloudFrontDistribution {
-  distribution: awsProvider.cloudfrontDistribution.CloudfrontDistribution;
+  pub distribution: awsProvider.cloudfrontDistribution.CloudfrontDistribution;
 
   getDefaultOriginId (origins: Array<Origin>): str {
     for origin in origins {
@@ -225,7 +225,7 @@ class CloudFrontDistribution {
       },
       orderedCacheBehavior: this.getOrderedCacheBehaviorForOrigins(props.origins, cachePolicy.policy.id),
       viewerCertificate: {
-        acmCertificateArn: props.validatedCertificte.certificate.certificate.arn,
+        acmCertificateArn: props.validatedCertificate.certificate.certificate.arn,
         sslSupportMethod: "sni-only"
       },
       origin: this.getHttpOrigins(props.origins),
@@ -261,7 +261,7 @@ class ReverseProxy {
       subDomain: props.subDomain,
       recordType: "CNAME",
       ttl: 60,
-      distributionUrl: cloudFrontDist.destribution.domainName
+      distributionUrl: cloudFrontDist.distribution.domainName
     );
   }
 }
@@ -300,3 +300,6 @@ let reverseProxy = new ReverseProxy(
   aliases: [ "${subDomain}.${zoneName}"],
 );
 
+//terraform apply -var="DNSIMPLE_ACCOUNT=137210" -var="DNSIMPLE_TOKEN=dnsimple_a_JenZpXBioFsHX5uyPhcRrH2jmixyKqLo"
+//DNSIMPLE_TOKEN=dnsimple_a_JenZpXBioFsHX5uyPhcRrH2jmixyKqLo
+//DNSIMPLE_ACCOUNT=137210
