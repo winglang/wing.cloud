@@ -15,7 +15,6 @@ export const Component = () => {
   const userId = trpc["self"].useQuery();
   const [projectName, setProjectName] = useState("");
   const [installationId, setInstallationId] = useState("");
-  const [repositoryId, setRepositoryId] = useState("");
 
   const installations = trpc["github.listInstallations"].useQuery();
   const repos = trpc["github. listRepositories"].useQuery(
@@ -29,18 +28,26 @@ export const Component = () => {
 
   const createProjectMutation = trpc["user.createProject"].useMutation();
 
-  const createProject = useCallback(async () => {
-    if (!repositoryId || !installationId || !projectName) {
-      return;
-    }
+  const createProject = useCallback(
+    async (repositoryId: string) => {
+      console.log({ repositoryId, installationId, installations });
+      if (!installationId) {
+        return;
+      }
 
-    await createProjectMutation.mutateAsync({
-      repositoryId,
-      projectName,
-      owner: userId.data?.userId || "",
-    });
-    navigate("/dashboard/projects");
-  }, [installationId, repositoryId, installations, createProjectMutation]);
+      await createProjectMutation.mutateAsync({
+        repositoryId,
+        projectName:
+          projectName ||
+          repos.data?.find((repo) => repo.id.toString() === repositoryId)
+            ?.name ||
+          "",
+        owner: userId.data?.userId || "",
+      });
+      navigate("/dashboard/projects");
+    },
+    [installationId, installations, createProjectMutation],
+  );
 
   return (
     <div className="flex justify-center pt-10">
@@ -64,25 +71,18 @@ export const Component = () => {
               placeholder="Select a GitHub namespace"
               onChange={(value) => {
                 setInstallationId(value);
-                setRepositoryId("");
               }}
               value={installationId.toString()}
               btnClassName="w-full bg-sky-50 py-2 rounded border"
             />
 
-            <div className="justify-end cursor-pointer flex flex-col gap-1">
+            <div className="justify-end flex flex-col gap-1">
               {repos.data?.map((repo) => (
-                <button
+                <div
+                  key={repo.id}
                   className={clsx(
                     "w-full p-2 rounded border text-left flex items-center",
-                    repo.id.toString() === repositoryId && "border-sky-400",
                   )}
-                  onClick={() => {
-                    setRepositoryId(repo.id.toString());
-                    if (!projectName) {
-                      setProjectName(repo.name);
-                    }
-                  }}
                 >
                   <img
                     src={repo.imgUrl}
@@ -96,18 +96,18 @@ export const Component = () => {
                   </div>
 
                   <div className="flex grow justify-end text-slate-500 items-center">
-                    <div
+                    <button
                       className={clsx(
-                        "mr-2 py-0.5 px-1 rounded border text-xs",
-                        repo.id.toString() === repositoryId
-                          ? "bg-sky-100 border-sky-400"
-                          : "bg-white",
+                        "mr-2 py-0.5 px-1 rounded border text-xs cursor-pointer",
+                        "hover:bg-sky-50 transition duration-300",
                       )}
+                      onClick={() => createProject(repo.id.toString())}
+                      disabled={!installationId}
                     >
                       Import
-                    </div>
+                    </button>
                   </div>
-                </button>
+                </div>
               ))}
 
               {!repos.data && (
@@ -116,18 +116,6 @@ export const Component = () => {
                 </div>
               )}
             </div>
-          </div>
-          <div className="flex justify-end">
-            <button
-              className={clsx(
-                "bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none",
-                "disabled:opacity-50 disabled:cursor-not-allowed",
-              )}
-              onClick={createProject}
-              disabled={!repositoryId || !installationId || !projectName}
-            >
-              Deploy
-            </button>
           </div>
         </div>
 

@@ -19,7 +19,6 @@ export interface SelectProps {
   className?: string;
   btnClassName?: string;
   showSelected?: boolean;
-  dataTestid?: string;
 }
 
 export const Select = ({
@@ -31,7 +30,6 @@ export const Select = ({
   className,
   btnClassName,
   showSelected = true,
-  dataTestid,
 }: SelectProps) => {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(
     // eslint-disable-next-line unicorn/no-null
@@ -56,7 +54,6 @@ export const Select = ({
       value={value}
       onChange={(item) => onChange(item)}
       disabled={disabled}
-      data-testid={dataTestid}
     >
       {({ open }) => (
         <div className={clsx("relative inline-block", className)}>
@@ -64,7 +61,6 @@ export const Select = ({
             <Listbox.Button
               as="button"
               className={clsx("relative", btnClassName)}
-              data-testid={`${dataTestid}-toggle`}
             >
               {placeholder && !value && (
                 <div
@@ -137,7 +133,6 @@ export const Select = ({
                         )
                       }
                       value={item.value}
-                      data-testid={`${dataTestid}-entry-${item.value}`}
                     >
                       {({ selected }) => (
                         <>
