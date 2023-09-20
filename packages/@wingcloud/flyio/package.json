@@ -4,11 +4,12 @@
   "type": "commonjs",
   "sideEffects": false,
   "dependencies": {
-    "node-fetch": "^3.3.2"
+    "node-fetch": "2"
   },
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.280",
     "@types/node": "18",
+    "@types/node-fetch": "2",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",
     "eslint-config-prettier": "^9.0.0",

@@ -175,7 +175,7 @@ export class FlyClient {
           deleteApp(appId: $input) {
             organization {
               id
-            } 
+            }
           }
         }`,
         variables: {
