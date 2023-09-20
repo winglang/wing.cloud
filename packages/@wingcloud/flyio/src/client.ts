@@ -24,28 +24,28 @@ export interface IApp {
   readonly id: string;
   readonly createdAt: string;
   readonly machines: IAppMachines;
-};
+}
 
 export interface IGetAppResultDataApps {
-  readonly nodes: IApp[]
+  readonly nodes: IApp[];
   readonly totalCount: number;
-};
+}
 
 export interface IGetAppResultData {
   readonly apps: IGetAppResultDataApps;
-};
+}
 
 export interface IAppsResult {
   readonly data: IGetAppResultData;
-};
+}
 
 export interface ICountResultDataApps {
   readonly totalCount: number;
-};
+}
 
 export interface ICountResultData {
   readonly apps: ICountResultDataApps;
-};
+}
 
 export interface ICountResult {
   readonly data: ICountResultData;
@@ -75,19 +75,19 @@ export class FlyClient {
   apiUrl = "https://api.machines.dev/v1";
 
   /**
-   * 
+   *
    * @param token Fly.io api token. Optional.
-   * By default will use the `FLY_API_TOKEN` env var. 
+   * By default will use the `FLY_API_TOKEN` env var.
    */
   constructor(token?: string) {
-    if (!token) {
+    if (token) {
+      this.token = token;
+    } else {
       const envToken = process.env["FLY_API_TOKEN"];
       if (!envToken) {
         throw new Error("environment variable FLY_API_TOKEN not set");
       }
       this.token = envToken;
-    } else {
-      this.token = token;
     }
   }
 
@@ -96,9 +96,9 @@ export class FlyClient {
    */
   _headers() {
     return {
-      "Authorization": `Bearer ${this.token}`,
-      "Content-Type": "application/json"
-    }
+      Authorization: `Bearer ${this.token}`,
+      "Content-Type": "application/json",
+    };
   }
 
   async apps() {
@@ -106,7 +106,7 @@ export class FlyClient {
       method: "POST",
       headers: this._headers(),
       body: JSON.stringify({
-        "query":`query getapps {
+        query: `query getapps {
           apps {
             nodes{
               id
@@ -122,13 +122,13 @@ export class FlyClient {
             }
             totalCount
           }
-        }`
-      })
+        }`,
+      }),
     });
     if (!appsRespone.ok) {
       throw new Error("failed to get apps");
     }
-    const apps = await appsRespone.json() as IAppsResult;
+    const apps = (await appsRespone.json()) as IAppsResult;
     return apps;
   }
 
@@ -137,17 +137,17 @@ export class FlyClient {
       method: "POST",
       headers: this._headers(),
       body: JSON.stringify({
-        "query":`query getapps {
+        query: `query getapps {
           apps {
             totalCount
           }
-        }`
-      })
+        }`,
+      }),
     });
     if (!countRes.ok) {
       throw new Error("failed to get app count" + countRes.status);
     }
-    const count = await countRes.json() as ICountResult;
+    const count = (await countRes.json()) as ICountResult;
     return count.data.apps.totalCount;
   }
 
@@ -156,14 +156,14 @@ export class FlyClient {
       method: "POST",
       headers: this._headers(),
       body: JSON.stringify({
-        "app_name": appName,
-        "org_slug": "personal"
-      })
+        app_name: appName,
+        org_slug: "personal",
+      }),
     });
     if (!appRes.ok) {
       throw new Error("failed to create app: " + appName);
     }
-    console.log(await appRes.text())
+    console.log(await appRes.text());
   }
 
   async deleteApp(appName: string) {
@@ -171,17 +171,17 @@ export class FlyClient {
       method: "POST",
       headers: this._headers(),
       body: JSON.stringify({
-        "query":`mutation Delete($input:ID!) {
+        query: `mutation Delete($input:ID!) {
           deleteApp(appId: $input) {
             organization {
               id
             } 
           }
         }`,
-        "variables":{
-          "input": appName
-        }
-      })
+        variables: {
+          input: appName,
+        },
+      }),
     });
     if (!deleteRes.ok) {
       throw new Error("failed to delete app " + appName);
@@ -193,85 +193,103 @@ export class FlyClient {
       method: "POST",
       headers: this._headers(),
       body: JSON.stringify({
-        "query":"mutation($input: AllocateIPAddressInput!) { allocateIpAddress(input: $input) { ipAddress { id address type region createdAt } } }",
-        "variables":{"input":{"appId":appName,"type":"shared_v4"}}
-      })
-    })
+        query:
+          "mutation($input: AllocateIPAddressInput!) { allocateIpAddress(input: $input) { ipAddress { id address type region createdAt } } }",
+        variables: { input: { appId: appName, type: "shared_v4" } },
+      }),
+    });
     if (!ipRes.ok) {
-      throw new Error(`failed to create shared ip: ${appName} + ${await ipRes.text()}`);
+      throw new Error(
+        `failed to create shared ip: ${appName} + ${await ipRes.text()}`,
+      );
     }
   }
 
-  async createMachine({appName, imageName, port, region, memoryMb, env}: IClientCreateMachineProps) {
+  async createMachine({
+    appName,
+    imageName,
+    port,
+    region,
+    memoryMb,
+    env,
+  }: IClientCreateMachineProps) {
     const machineRes = await fetch(`${this.apiUrl}/apps/${appName}/machines`, {
       method: "POST",
       headers: this._headers(),
       body: JSON.stringify({
-        "region": region ?? undefined,
-        "config": {
-          "guest": {
-            "cpus": 1,
-            "cpu_kind": "shared",
-            "memory_mb": memoryMb ?? 512
+        region: region ?? undefined,
+        config: {
+          guest: {
+            cpus: 1,
+            cpu_kind: "shared",
+            memory_mb: memoryMb ?? 512,
           },
-          "env": env ?? {},
-          "auto_destroy": true,
-          "image": imageName,
-          "services": [
+          env: env ?? {},
+          auto_destroy: true,
+          image: imageName,
+          services: [
             {
-              "ports": [
+              ports: [
                 {
-                  "port": 443,
-                  "handlers": [
-                    "tls",
-                    "http"
-                  ]
+                  port: 443,
+                  handlers: ["tls", "http"],
                 },
                 {
-                  "port": 80,
-                  "handlers": [
-                    "http"
-                  ]
-                }
+                  port: 80,
+                  handlers: ["http"],
+                },
               ],
-              "protocol": "tcp",
-              "internal_port": port
-            }
+              protocol: "tcp",
+              internal_port: port,
+            },
           ],
-        }
-      })
+        },
+      }),
     });
     if (!machineRes.ok) {
       throw new Error("failed to create machine: " + appName);
     }
-    const rdata = await machineRes.json() as IRuntimeCreateMachineResult;
+    const rdata = (await machineRes.json()) as IRuntimeCreateMachineResult;
     const data: ICreateMachineResult = {
       id: rdata.id,
       instanceId: rdata.instance_id,
-    }
+    };
     if (!data.id || !data.instanceId) {
-      throw new Error("unexpected create machine data: " + JSON.stringify(data));
+      throw new Error(
+        "unexpected create machine data: " + JSON.stringify(data),
+      );
     }
     return data;
   }
 
   async deleteMachine(appName: string, id: string) {
-    const machineRes = await fetch(`${this.apiUrl}/apps/${appName}/machines/${id}?force=true`, {
-      method: "DELETE",
-      headers: this._headers(),
-    });
+    const machineRes = await fetch(
+      `${this.apiUrl}/apps/${appName}/machines/${id}?force=true`,
+      {
+        method: "DELETE",
+        headers: this._headers(),
+      },
+    );
     if (!machineRes.ok) {
       throw new Error("failed to delete machine: " + appName);
     }
   }
 
-  async waitForMachineState(appName: string, machineResult: ICreateMachineResult) {
-    const waitRes = await fetch(`${this.apiUrl}/apps/${appName}/machines/${machineResult.id}/wait?instance_id=${machineResult.instanceId}`, {
-      method: "GET",
-      headers: this._headers(),
-    });
+  async waitForMachineState(
+    appName: string,
+    machineResult: ICreateMachineResult,
+  ) {
+    const waitRes = await fetch(
+      `${this.apiUrl}/apps/${appName}/machines/${machineResult.id}/wait?instance_id=${machineResult.instanceId}`,
+      {
+        method: "GET",
+        headers: this._headers(),
+      },
+    );
     if (!waitRes.ok) {
-      throw new Error("failed to wait for machine: " + appName + ":" + machineResult.id);
+      throw new Error(
+        "failed to wait for machine: " + appName + ":" + machineResult.id,
+      );
     }
   }
 
@@ -280,7 +298,7 @@ export class FlyClient {
       method: "POST",
       headers: this._headers(),
       body: JSON.stringify({
-        "query":`query getapp($input:String) {
+        query: `query getapp($input:String) {
           app(name:$input) {
             id
             machines {
@@ -294,15 +312,15 @@ export class FlyClient {
             createdAt
           }
         }`,
-        "variables":{
-          "input": appName
-        }
-      })
+        variables: {
+          input: appName,
+        },
+      }),
     });
     if (!res.ok) {
       throw new Error("failed to get app machines: " + appName);
     }
-    const verifyMachineResult = await res.json() as IGetAppResult
+    const verifyMachineResult = (await res.json()) as IGetAppResult;
     return verifyMachineResult;
   }
 }

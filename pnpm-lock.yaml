@@ -13,8 +13,8 @@ importers:
         version: 1.10.14
     devDependencies:
       '@skyrpex/wingen':
-        specifier: ^0.6.0
-        version: 0.6.0(projen@0.73.26)
+        specifier: ^0.6.1
+        version: 0.6.1(projen@0.73.26)
       '@types/node':
         specifier: '18'
         version: 18.0.0
@@ -2760,12 +2760,11 @@ packages:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
     dev: true
 
-  /@skyrpex/wingen@0.6.0(projen@0.73.26):
-    resolution: {integrity: sha512-dapY0KgaT910jqRJBliYqxe3BwHPdCGnrtDTQmQTzGz2meV5xjc7tZ6Nm6K3tAOu1qMCfQzynkJLqmZlUBMicg==}
+  /@skyrpex/wingen@0.6.1(projen@0.73.26):
+    resolution: {integrity: sha512-ado3581TIpip34MBiyzhfVEA6K+RmIsRPPyGgj7PSr05jUldvOFFvrTaks0FZ4Kpz2mQo2BTnVzJwStADre8Ag==}
     peerDependencies:
       projen: ^0.72.1
     dependencies:
-      case: 1.6.3
       projen: 0.73.26
     dev: true
     bundledDependencies:
