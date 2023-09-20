@@ -1,19 +1,22 @@
 bring cloud;
+bring util;
 bring "cdktf" as cdktf;
 bring "@cdktf/provider-aws" as awsProvider;
 bring "@cdktf/provider-dnsimple" as dnsimpleProvider;
 
-let DNSIMPLE_TOKEN = new cdktf.TerraformVariable({
-  type: "string",
-}) as "DNSIMPLE_TOKEN";
-let DNSIMPLE_ACCOUNT = new cdktf.TerraformVariable({
-  type: "string",
-}) as "DNSIMPLE_ACCOUNT";
-
-new dnsimpleProvider.provider.DnsimpleProvider({
-  token: "${DNSIMPLE_TOKEN}",
-  account: "${DNSIMPLE_ACCOUNT}"
-});
+if util.env("WING_TARGET") == "tf-aws" {
+  let DNSIMPLE_TOKEN = new cdktf.TerraformVariable({
+    type: "string",
+  }) as "DNSIMPLE_TOKEN";
+  let DNSIMPLE_ACCOUNT = new cdktf.TerraformVariable({
+    type: "string",
+  }) as "DNSIMPLE_ACCOUNT";
+  
+  new dnsimpleProvider.provider.DnsimpleProvider({
+    token: "${DNSIMPLE_TOKEN}",
+    account: "${DNSIMPLE_ACCOUNT}"
+  });
+}
 
 struct DNSRecordProps {
   zoneName: str;
@@ -234,6 +237,18 @@ class CloudFrontDistribution {
   }
 }
 
+struct ReverseProxyServerProps{
+  origins: Array<Origin>;
+}
+
+class Utils {
+  extern "./src/reverse-proxy/reverse-proxy-local.mts" pub static inflight startReverseProxyServer(props: ReverseProxyServerProps): num ;
+}
+
+interface IReverseProxy {
+  inflight url(): str;
+}
+
 struct ReverseProxyProps {
   zoneName: str;
   subDomain: str;
@@ -241,9 +256,29 @@ struct ReverseProxyProps {
   origins: Array<Origin>;
 }
 
-class ReverseProxy {
+class ReverseProxy impl IReverseProxy {
+  inner: IReverseProxy?;
 
   init(props: ReverseProxyProps) {
+    if util.env("WING_TARGET") == "sim" {
+      this.inner = new ReverseProxy_sim(props);
+    } elif util.env("WING_TARGET") == "tf-aws" {
+      this.inner = new ReverseProxy_tfaws(props);
+    }
+  }
+
+  pub inflight url(): str {
+    if let inner = this.inner {
+      return inner.url();
+    }
+    throw "not implemented";
+  }
+}
+
+class ReverseProxy_tfaws impl IReverseProxy {
+  aliases: Array<str>;
+  init(props: ReverseProxyProps) {
+    this.aliases = props.aliases;
     //validated certificate
     let validatedCertificate = new DNSimpleValidatedCertificate(
       zoneName: props.zoneName,
@@ -264,9 +299,41 @@ class ReverseProxy {
       distributionUrl: cloudFrontDist.distribution.domainName
     );
   }
+
+  pub inflight url(): str {
+    return this.aliases.at(0);
+  }
+}
+
+class ReverseProxy_sim impl IReverseProxy {
+  urlkey: str;
+  bucket: cloud.Bucket;
+
+  init(props: ReverseProxyProps) {
+    this.urlkey = "url.txt";
+    this.bucket = new cloud.Bucket() as "Reverse Proxy Bucket";
+    new cloud.Service(
+      onStart: inflight () => {
+        log("origins ${props.origins}");
+        let port = Utils.startReverseProxyServer(origins: props.origins);
+        this.bucket.put(this.urlkey, "http://localhost:${port}");
+      },
+      onStop: inflight () => {
+        log("stop!");
+      }
+    );
+  }
+
+  pub inflight url(): str {
+    util.waitUntil(() => {
+      return this.bucket.exists(this.urlkey);
+    });
+    return this.bucket.get(this.urlkey);
+  }
 }
 
 ////////   test    ////////
+
 
 let zoneName = "wingcloud.io";
 let subDomain = "dev";
@@ -292,13 +359,17 @@ let origins = Array<Origin>[
   }
 ];
 
-
 let reverseProxy = new ReverseProxy(
   origins: origins,
   subDomain: subDomain,
   zoneName: zoneName,
-  aliases: [ "${subDomain}.${zoneName}"],
+  aliases: ["${subDomain}.${zoneName}"],
 );
+
+// timing issues
+test "get url" {
+  log(reverseProxy.url());
+}
 
 //terraform apply -var="DNSIMPLE_ACCOUNT=137210" -var="DNSIMPLE_TOKEN=dnsimple_a_JenZpXBioFsHX5uyPhcRrH2jmixyKqLo"
 //DNSIMPLE_TOKEN=dnsimple_a_JenZpXBioFsHX5uyPhcRrH2jmixyKqLo
