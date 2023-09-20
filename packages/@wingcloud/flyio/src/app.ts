@@ -1,4 +1,4 @@
-import { FlyClient, ICreateMachineResult } from "./client";
+import { FlyClient, ICreateMachineResult } from "./client.js";
 
 export interface IAppProps {
   readonly client: FlyClient;
@@ -36,9 +36,7 @@ export class Fly {
  * Represent a Fly.io app
  */
 export class App {
-  constructor(public props: IAppProps) {
-
-  }
+  constructor(public props: IAppProps) {}
 
   /**
    * Get the hostname of this app (e.g. app-name.fly.dev).
@@ -67,7 +65,7 @@ export class App {
    */
   public async isReady() {
     const res = await this.props.client.getApp(this.props.name);
-    return res.data.app.machines.nodes.every(n => n.state === "started");
+    return res.data.app.machines.nodes.every((n) => n.state === "started");
   }
 
   /**
@@ -108,7 +106,10 @@ export class App {
       env: props.env,
     });
     if (wait) {
-      await this.props.client.waitForMachineState(this.props.name, createMachineResult);
+      await this.props.client.waitForMachineState(
+        this.props.name,
+        createMachineResult,
+      );
     }
     return createMachineResult;
   }

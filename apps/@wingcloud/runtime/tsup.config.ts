@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable prettier/prettier */
 import { defineConfig } from "tsup";
 
 export default defineConfig({
