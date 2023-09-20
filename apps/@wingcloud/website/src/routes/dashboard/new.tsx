@@ -89,11 +89,9 @@ export const Component = () => {
                     className="w-5 h-5 inline-block mr-2 rounded-full"
                   />
                   <span>{repo.name}</span>
-                  <div className="text-slate-500 mx-1 items-center">
-                    {repo.private ? (
+                  <div className="mx-1 items-center">
+                    {repo.private && (
                       <LockClosedIcon className="w-3 h-3 inline-block" />
-                    ) : (
-                      <LockOpenIcon className="w-3 h-3 inline-block" />
                     )}
                   </div>
 
