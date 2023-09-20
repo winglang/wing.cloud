@@ -51,12 +51,21 @@ export const router = t.router({
     }
 
     const installations = await listUserInstallations(tokens.accessToken);
-    return installations.map((installation) => ({
-      id: installation.id,
-      // @ts-ignore-next-line
-      name: installation.account?.login,
-      iconUrl: installation.account?.avatar_url,
-    })) as GitHubInstallation[];
+    return installations
+      .map((installation) => {
+        if (!installation.account) {
+          return;
+        }
+        const account = installation.account;
+        const name = "login" in account ? account.login : account.name;
+
+        return {
+          id: installation.id,
+          name: name || "<unknown>",
+          iconUrl: account.avatar_url,
+        };
+      })
+      .filter(Boolean) as GitHubInstallation[];
   }),
 
   "github. listRepositories": t.procedure
