@@ -1,9 +1,11 @@
-import { Fly, FlyClient } from "../../../../packages/@wingcloud/flyio/index"
+import { Fly, FlyClient } from "@wingcloud/flyio";
 
 const getBucketName = () => {
-  const key = Object.keys(process.env).find(k => k.startsWith("BUCKET_NAME_"));
+  const key = Object.keys(process.env).find((k) =>
+    k.startsWith("BUCKET_NAME_"),
+  );
   return process.env[key!]!;
-}
+};
 
 export const handler = async (
   imageName: string,
@@ -12,7 +14,7 @@ export const handler = async (
   flyToken: string,
   wingApiUrl: string,
   awsAccessKeyId: string,
-  awsSecretAccessKey: string
+  awsSecretAccessKey: string,
 ) => {
   const fly = new Fly(new FlyClient(flyToken));
   const app = fly.app("wing-runtime-flyio-test");
@@ -24,11 +26,11 @@ export const handler = async (
       ENTRYFILE: entryfile,
       LOGS_BUCKET_NAME: getBucketName(),
       WING_CLOUD_URL: wingApiUrl,
-      AWS_ACCESS_KEY_ID: awsAccessKeyId, 
-      AWS_SECRET_ACCESS_KEY: awsSecretAccessKey, 
-      AWS_REGION: process.env["AWS_REGION"] || "us-east-1"
+      AWS_ACCESS_KEY_ID: awsAccessKeyId,
+      AWS_SECRET_ACCESS_KEY: awsSecretAccessKey,
+      AWS_REGION: process.env["AWS_REGION"] || "us-east-1",
     },
-    port: 3000
+    port: 3000,
   });
   return app.url();
-}
+};

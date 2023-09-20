@@ -6,6 +6,7 @@ import {
   TypescriptConfig,
   Eslint,
 } from "@skyrpex/wingen";
+import { JsonFile } from "projen";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -44,12 +45,30 @@ flyio.addDevDeps("jsii-pacmak");
 
 flyio.tryRemoveFile("./tsconfig.json");
 
+new JsonFile(flyio, "turbo.json", {
+  marker: false,
+  obj: {
+    $schema: "https://turbo.build/schema.json",
+    extends: ["//"],
+    pipeline: {
+      compile: {
+        outputs: ["./src/**/*.js", "./src/**/*.d.ts"],
+      },
+    },
+  },
+});
+
 flyio.addGitIgnore("**/*.js");
 flyio.addGitIgnore("**/*.d.ts");
 flyio.addGitIgnore(".jsii");
 flyio.addGitIgnore("tsconfig.tsbuildinfo");
-flyio.addGitIgnore("/lib");
 flyio.addFields({
+  type: "commonjs",
+  main: "./src/index.js",
+  exports: {
+    ".": "./src/index.js",
+  },
+  types: "./src/index.d.ts",
   jsii: {
     outdir: "dist",
     targets: [],
@@ -65,7 +84,6 @@ flyio.addFields({
     url: "https://github.com/winglang/wing.cloud",
   },
   license: "BSD-3-Clause",
-  main: "./lib/index.js",
 });
 
 ///////////////////////////////////////////////////////////////////////////////
