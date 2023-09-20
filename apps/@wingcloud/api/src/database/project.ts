@@ -107,7 +107,5 @@ export const listUserProjects = async (context: Context, userId: string) => {
     },
   });
 
-  return Items?.map((item) => {
-    return item["projectId"]!.S! as ProjectId;
-  }).filter(Boolean);
+  return Items?.map((item) => unmarshall(item)) ?? [];
 };

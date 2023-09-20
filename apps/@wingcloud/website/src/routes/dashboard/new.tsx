@@ -106,7 +106,7 @@ export const Component = () => {
                           : "bg-white",
                       )}
                     >
-                      Choose
+                      Import
                     </div>
                   </div>
                 </button>

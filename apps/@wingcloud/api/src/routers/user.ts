@@ -63,16 +63,7 @@ export const router = t.router({
       return [];
     }
 
-    const projectIds = await listUserProjects(ctx, userId);
-    if (!projectIds) {
-      return [];
-    }
-
-    const projectsPromise = projectIds.map((projectId) => {
-      return getProject(ctx, projectIdFromString(projectId));
-    });
-
-    return await Promise.all(projectsPromise);
+    return await listUserProjects(ctx, userId);
   }),
   "user.listRepositories": t.procedure
     .input(z.object({}))
