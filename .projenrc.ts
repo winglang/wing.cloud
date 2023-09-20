@@ -38,8 +38,7 @@ flyio.compileTask.exec("jsii");
 flyio.packageTask.exec("jsii-pacmak");
 flyio.devTask.exec("jsii --watch");
 
-flyio.addDeps("node-fetch@2.6.4");
-flyio.addDevDeps("@types/node-fetch@2.6.4");
+flyio.addDeps("node-fetch");
 flyio.addDevDeps("jsii");
 flyio.addDevDeps("jsii-pacmak");
 

@@ -4,20 +4,20 @@
   "type": "commonjs",
   "sideEffects": false,
   "dependencies": {
-    "@cdktf/provider-aws": "^17.0.5",
+    "@cdktf/provider-aws": "^17.0.6",
     "@vendia/serverless-express": "^4.10.4",
     "cdktf": "^0.18.0",
     "constructs": "^10.2.70",
     "express": "^4.18.2",
     "glob": "^10.3.4",
-    "winglang": "^0.30.3"
+    "winglang": "^0.31.10"
   },
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.273",
+    "@cloudy-ts/eslint-plugin": "^0.0.280",
     "@types/express": "^4.17.17",
     "@types/node": "18",
-    "@typescript-eslint/eslint-plugin": "^6.7.0",
-    "@typescript-eslint/parser": "^6.7.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.2",
+    "@typescript-eslint/parser": "^6.7.2",
     "@wingcloud/flyio": "workspace:^",
     "@wingcloud/website": "workspace:^",
     "eslint-config-prettier": "^9.0.0",
@@ -26,7 +26,7 @@
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-unicorn": "^48.0.1",
-    "tsx": "^3.12.9",
+    "tsx": "^3.12.10",
     "typescript": "^5.2.2",
     "vitest": "^0.34.4"
   },
