@@ -30,7 +30,6 @@ export const Component = () => {
 
   const createProject = useCallback(
     async (repositoryId: string) => {
-      console.log({ repositoryId, installationId, installations });
       if (!installationId) {
         return;
       }
