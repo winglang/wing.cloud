@@ -44,17 +44,19 @@ export const router = t.router({
   "user.createProject": t.procedure
     .input(
       z.object({
-        owner: z.string(),
         projectName: z.string(),
         repositoryId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      if (!ctx.userId) {
+        throw new Error("Not logged in");
+      }
       const { projectId } = await createProject(
         ctx,
-        input.owner,
+        ctx.userId,
         input.projectName,
-        gitHubRepositoryIdFromString(input.owner, input.repositoryId),
+        gitHubRepositoryIdFromString(ctx.userId, input.repositoryId),
       );
 
       return {

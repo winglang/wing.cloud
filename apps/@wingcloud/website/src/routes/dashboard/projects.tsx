@@ -3,8 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { trpc } from "../../utils/trpc.js";
 
-const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
-
 export const Component = () => {
   const userId = trpc["self"].useQuery();
   const navigate = useNavigate();

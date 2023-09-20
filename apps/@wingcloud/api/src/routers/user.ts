@@ -1,7 +1,11 @@
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { cookiesFromRequest } from "@wingcloud/express-cookies";
 
-import { listUserProjects, getProject } from "../database/project.js";
+import {
+  listUserProjects,
+  getProject,
+  type ProjectItem,
+} from "../database/project.js";
 import { createUser, getUserIdFromLogin } from "../database/user.js";
 import { getLoggedInUserId } from "../services/auth.js";
 import { t } from "../trpc.js";
@@ -58,10 +62,13 @@ export const router = t.router({
   }),
   "user.listProjects": t.procedure.query(async ({ ctx, input }) => {
     if (!ctx.userId) {
-      return;
+      return [];
     }
 
-    return await listUserProjects(ctx, userIdFromString(ctx.userId));
+    return (await listUserProjects(
+      ctx,
+      userIdFromString(ctx.userId),
+    )) as ProjectItem[];
   }),
   "user.listRepositories": t.procedure
     .input(z.object({}))
