@@ -30,6 +30,7 @@ class Utils {
 
 interface IReverseProxy {
   inflight url(): str;
+  inflight paths(): MutArray<str>;
 }
 
 struct ReverseProxyProps {
@@ -56,12 +57,21 @@ class ReverseProxy impl IReverseProxy {
     }
     throw "not implemented";
   }
+
+  pub inflight paths(): MutArray<str> {
+    if let inner = this.inner {
+      return inner.paths();
+    }
+    throw "not implemented";
+  }
 }
 
 class ReverseProxy_tfaws impl IReverseProxy {
   aliases: Array<str>;
+  origins: Array<CloudFront.Origin>;
   init(props: ReverseProxyProps) {
     this.aliases = props.aliases;
+    this.origins = props.origins;
     //validated certificate
     let validatedCertificate = new DNSimple.DNSimpleValidatedCertificate(
       zoneName: props.zoneName,
@@ -86,15 +96,26 @@ class ReverseProxy_tfaws impl IReverseProxy {
   pub inflight url(): str {
     return this.aliases.at(0);
   }
+
+  pub inflight paths(): MutArray<str> {
+    // do we have array.map?
+    let paths = MutArray<str>[];
+    for origin in this.origins {
+      paths.push(origin.pathPattern);
+    }
+    return paths;
+  }
 }
 
 class ReverseProxy_sim impl IReverseProxy {
   urlkey: str;
   bucket: cloud.Bucket;
+  origins: Array<CloudFront.Origin>;
 
   init(props: ReverseProxyProps) {
     this.urlkey = "url.txt";
     this.bucket = new cloud.Bucket() as "Reverse Proxy Bucket";
+    this.origins = props.origins;
     new cloud.Service(
       onStart: inflight () => {
         log("origins ${props.origins}");
@@ -112,6 +133,15 @@ class ReverseProxy_sim impl IReverseProxy {
       return this.bucket.exists(this.urlkey);
     });
     return this.bucket.get(this.urlkey);
+  }
+
+  pub inflight paths(): MutArray<str> {
+    // do we have array.map?
+    let paths = MutArray<str>[];
+    for origin in this.origins {
+      paths.push(origin.pathPattern);
+    }
+    return paths;
   }
 }
 
@@ -147,10 +177,7 @@ let reverseProxy = new ReverseProxy(
 );
 
 // timing issues
-test "get url" {
+test "get reverse proxy url and paths" {
   log(reverseProxy.url());
+  log(Json.stringify(reverseProxy.paths()));
 }
-
-//terraform apply -var="DNSIMPLE_ACCOUNT=137210" -var="DNSIMPLE_TOKEN=dnsimple_a_JenZpXBioFsHX5uyPhcRrH2jmixyKqLo"
-//DNSIMPLE_TOKEN=dnsimple_a_JenZpXBioFsHX5uyPhcRrH2jmixyKqLo
-//DNSIMPLE_ACCOUNT=137210
