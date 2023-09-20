@@ -6,6 +6,7 @@ import { createUser, getUserIdFromLogin } from "../database/user.js";
 import { getLoggedInUserId } from "../services/auth.js";
 import { t } from "../trpc.js";
 import { createProjectId, projectIdFromString } from "../types/project.js";
+import { userIdFromString } from "../types/user.js";
 import * as z from "../validations/index.js";
 
 export const router = t.router({
@@ -56,14 +57,11 @@ export const router = t.router({
     return { Items: Items?.map((item) => unmarshall(item)) };
   }),
   "user.listProjects": t.procedure.query(async ({ ctx, input }) => {
-    const cookies = cookiesFromRequest(ctx.request);
-
-    const userId = await getLoggedInUserId(cookies);
-    if (!userId) {
-      return [];
+    if (!ctx.userId) {
+      return;
     }
 
-    return await listUserProjects(ctx, userId);
+    return await listUserProjects(ctx, userIdFromString(ctx.userId));
   }),
   "user.listRepositories": t.procedure
     .input(z.object({}))
