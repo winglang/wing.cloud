@@ -1,5 +1,4 @@
 import { unmarshall } from "@aws-sdk/util-dynamodb";
-import { cookiesFromRequest } from "@wingcloud/express-cookies";
 
 import {
   listUserProjects,
@@ -7,9 +6,7 @@ import {
   type ProjectItem,
 } from "../database/project.js";
 import { createUser, getUserIdFromLogin } from "../database/user.js";
-import { getLoggedInUserId } from "../services/auth.js";
 import { t } from "../trpc.js";
-import { createProjectId, projectIdFromString } from "../types/project.js";
 import { userIdFromString } from "../types/user.js";
 import * as z from "../validations/index.js";
 
