@@ -100,7 +100,6 @@ class ReverseProxy_sim impl IReverseProxy {
     this.origins = props.origins;
     new cloud.Service(
       onStart: inflight () => {
-        log("origins ${props.origins}");
         let port = ReverseProxy_sim.startReverseProxyServer(origins: props.origins);
         this.bucket.put(this.urlkey, "http://localhost:${port}");
       },
@@ -128,7 +127,6 @@ class ReverseProxy_sim impl IReverseProxy {
 }
 
 ////////   test    ////////
-
 
 let zoneName = "wingcloud.io";
 let subDomain = "dev";
