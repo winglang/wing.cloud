@@ -6,6 +6,7 @@ import {
   TypescriptConfig,
   Eslint,
 } from "@skyrpex/wingen";
+import { JsonFile } from "projen";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -24,6 +25,66 @@ const nanoid62 = new TypescriptProject({
   monorepo,
   name: "@wingcloud/nanoid62",
   deps: ["nanoid"],
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const flyio = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/flyio",
+  description: "Fly.io client library",
+});
+
+flyio.compileTask.reset();
+flyio.compileTask.exec("jsii");
+flyio.packageTask.exec("jsii-pacmak");
+flyio.devTask.exec("jsii --watch");
+
+flyio.addDeps("node-fetch@2");
+flyio.addDevDeps("@types/node-fetch@2");
+flyio.addDevDeps("jsii");
+flyio.addDevDeps("jsii-pacmak");
+
+flyio.tryRemoveFile("./tsconfig.json");
+
+new JsonFile(flyio, "turbo.json", {
+  marker: false,
+  obj: {
+    $schema: "https://turbo.build/schema.json",
+    extends: ["//"],
+    pipeline: {
+      compile: {
+        outputs: ["./src/**/*.js", "./src/**/*.d.ts"],
+      },
+    },
+  },
+});
+
+flyio.addGitIgnore("**/*.js");
+flyio.addGitIgnore("**/*.d.ts");
+flyio.addGitIgnore(".jsii");
+flyio.addGitIgnore("tsconfig.tsbuildinfo");
+flyio.addFields({
+  type: "commonjs",
+  main: "./src/index.js",
+  exports: {
+    ".": "./src/index.js",
+  },
+  types: "./src/index.d.ts",
+  jsii: {
+    outdir: "dist",
+    targets: [],
+    versionFormat: "full",
+  },
+  bundledDependencies: ["node-fetch"],
+  author: {
+    name: "wing.cloud",
+    url: "https://wing.cloud",
+  },
+  repository: {
+    type: "git",
+    url: "https://github.com/winglang/wing.cloud",
+  },
+  license: "BSD-3-Clause",
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,6 +149,7 @@ api.addDeps("jose");
 api.addDeps("node-fetch");
 api.addDeps(cookies.name);
 api.addDeps(env.name);
+api.addDeps("octokit");
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
@@ -104,6 +166,7 @@ new Eslint(website);
 website.addDeps("vite");
 website.addScript("dev", "vite dev --open");
 website.addScript("compile", "vite build");
+website.addGitIgnore("/dist/");
 
 website.addDevDeps("@vitejs/plugin-react-swc");
 website.addDeps("react", "react-dom");
@@ -121,6 +184,9 @@ website.addDeps(
   "@tanstack/react-query",
 );
 website.addDeps("clsx");
+website.addDeps("@headlessui/react");
+website.addDeps("@heroicons/react");
+website.addDeps("react-popper");
 
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 
@@ -151,6 +217,7 @@ infrastructure.addFields({ type: "commonjs" });
 
 infrastructure.addDeps("winglang");
 infrastructure.devTask.exec("wing it main.w");
+infrastructure.compileTask.exec("wing compile main.w --target sim");
 infrastructure.compileTask.exec("wing compile main.w --target tf-aws");
 infrastructure.addGitIgnore("/target/");
 
@@ -162,6 +229,42 @@ infrastructure.addDeps("glob");
 infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-aws", "@cdktf/provider-dnsimple");
 
 infrastructure.addDevDeps(website.name);
+infrastructure.addDevDeps(flyio.name);
+
+///////////////////////////////////////////////////////////////////////////////
+const runtime = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/runtime",
+  outdir: "apps/@wingcloud/runtime",
+  tsup: {
+    entry: ["src/**/*.ts"],
+    outDir: "lib",
+    format: ["esm"],
+    target: "node18",
+    dts: true,
+    bundle: false,
+    clean: true,
+  },
+});
+
+runtime.addDeps("winglang");
+runtime.addDeps("@winglang/sdk");
+runtime.addDeps("@wingconsole/app");
+runtime.addDeps("express");
+runtime.addDeps("jsonwebtoken");
+runtime.addDeps("jwk-to-pem");
+runtime.addDeps("jose");
+runtime.addDeps("node-fetch");
+
+runtime.addDevDeps("@types/express");
+runtime.addDevDeps("@types/jsonwebtoken");
+runtime.addDevDeps("@types/jwk-to-pem");
+runtime.addDevDeps("simple-git");
+runtime.addDevDeps(infrastructure.name);
+
+runtime.addGitIgnore("target/");
+
+runtime.devTask.exec("tsup --watch --onSuccess 'node lib/entrypoint-local.js'");
 
 ///////////////////////////////////////////////////////////////////////////////
 monorepo.synth();

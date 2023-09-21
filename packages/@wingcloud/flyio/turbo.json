@@ -1,0 +1,14 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": [
+    "//"
+  ],
+  "pipeline": {
+    "compile": {
+      "outputs": [
+        "./src/**/*.js",
+        "./src/**/*.d.ts"
+      ]
+    }
+  }
+}
