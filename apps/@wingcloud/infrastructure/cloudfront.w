@@ -1,7 +1,6 @@
 bring cloud;
 bring util;
-bring "cdktf" as cdktf;
-bring "@cdktf/provider-aws" as awsProvider;
+bring "@cdktf/provider-aws" as aws;
 bring "dnsimple.w" as DNSimple;
 
 struct CachePolicyProps {
@@ -9,10 +8,10 @@ struct CachePolicyProps {
 }
 
 class CachePolicy {
-  pub policy: awsProvider.cloudfrontCachePolicy.CloudfrontCachePolicy;
+  pub policy: aws.cloudfrontCachePolicy.CloudfrontCachePolicy;
 
   init(props: CachePolicyProps) {
-    this.policy = new awsProvider.cloudfrontCachePolicy.CloudfrontCachePolicy(
+    this.policy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
       defaultTtl: 60,
       maxTtl: 86400,
       minTtl: 0,
@@ -61,7 +60,7 @@ struct CloudFrontDistributionProps {
 }
 
 class CloudFrontDistribution {
-  pub distribution: awsProvider.cloudfrontDistribution.CloudfrontDistribution;
+  pub distribution: aws.cloudfrontDistribution.CloudfrontDistribution;
 
   getDefaultOriginId (origins: Array<Origin>): str {
     for origin in origins {
@@ -116,7 +115,7 @@ class CloudFrontDistribution {
 
     let cachePolicy = new CachePolicy(name: "cache-policy-for-${this.getDefaultOriginId(props.origins)}");
 
-    this.distribution = new awsProvider.cloudfrontDistribution.CloudfrontDistribution(
+    this.distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
       enabled: true,
       isIpv6Enabled: true,
       restrictions: {

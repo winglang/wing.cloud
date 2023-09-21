@@ -1,8 +1,6 @@
 bring cloud;
 bring util;
 bring http;
-bring "cdktf" as cdktf;
-bring "@cdktf/provider-dnsimple" as dnsimpleProvider;
 bring "dnsimple.w" as DNSimple;
 bring "cloudfront.w" as CloudFront;
 
@@ -120,7 +118,7 @@ class ReverseProxy_sim impl IReverseProxy {
   }
 
   pub inflight paths(): MutArray<str> {
-    // do we have array.map?
+    // do we have array.map??
     let paths = MutArray<str>[];
     for origin in this.origins {
       paths.push(origin.pathPattern);
@@ -183,4 +181,3 @@ test "get reverse proxy url and paths" {
   log("Tests results: ${Json.stringify(results)}");
   assert(!failure);
 }
-

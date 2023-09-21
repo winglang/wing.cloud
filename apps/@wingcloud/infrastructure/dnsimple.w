@@ -1,9 +1,8 @@
 bring util;
 bring cloud;
 bring "constructs" as constructs;
-bring "cdktf" as cdktf;
-bring "@cdktf/provider-aws" as awsProvider;
-bring "@cdktf/provider-dnsimple" as dnsimpleProvider;
+bring "@cdktf/provider-aws" as aws;
+bring "@cdktf/provider-dnsimple" as dnsimple;
 
 struct DNSRecordProps {
   zoneName: str;
@@ -15,25 +14,15 @@ struct DNSRecordProps {
 
 class Dummy {}
 
-class DNSimpleProvider {
-  init() {
-    if util.env("WING_TARGET") != "tf-aws" {
-      return this;
-    }
-    
-    let uid = "dnsimple-provider-CA10E5CC-36D7-412A-B4FC-1C98AF521569";
+class Once {
+  init(uid: str, block: (): void) {
     let root = std.Node.of(this).root;
     let exists = root.node.tryFindChild(uid);
-    if exists? { return this; }
-    new Dummy() as uid in DNSimpleProvider.toResource(root);
-
-    let DNSIMPLE_TOKEN = new cdktf.TerraformVariable({ type: "string" }) as "DNSIMPLE_TOKEN";
-    let DNSIMPLE_ACCOUNT = new cdktf.TerraformVariable({ type: "string" }) as "DNSIMPLE_ACCOUNT";
-
-    new dnsimpleProvider.provider.DnsimpleProvider(
-      token: "${DNSIMPLE_TOKEN}",
-      account: "${DNSIMPLE_ACCOUNT}"
-    );
+    if exists? { 
+      return this;
+    }
+    new Dummy() as uid in Once.toResource(root);
+    block();
   }
 
   // this is an ugly hack
@@ -41,12 +30,24 @@ class DNSimpleProvider {
   extern "./util.js" static toResource(o: constructs.IConstruct): Dummy;
 }
 
+class DNSimpleProvider {
+  init() {
+    if util.env("WING_TARGET") != "tf-aws" {
+      return this;
+    }
+
+    new Once("dnsimple-provider-ca10e5cc", () => {
+      new dnsimple.provider.DnsimpleProvider();
+    });
+  }
+}
+
 class DNSimpleZoneRecord {
-  pub record: dnsimpleProvider.zoneRecord.ZoneRecord;
+  pub record: dnsimple.zoneRecord.ZoneRecord;
 
   init(props: DNSRecordProps) {
     new DNSimpleProvider();
-    this.record = new dnsimpleProvider.zoneRecord.ZoneRecord(
+    this.record = new dnsimple.zoneRecord.ZoneRecord(
       zoneName: props.zoneName,
       name: props.subDomain, // For the root domain, use an empty string. For subdomains, use the subdomain part (like 'www' for 'www.yourdomain.com')
       value: props.distributionUrl, // This a CloudFront URL. CloudFront distribution domain or any other target.
@@ -61,10 +62,10 @@ struct CertificateProps {
 }
 
 class Certificate {
-  pub certificate: awsProvider.acmCertificate.AcmCertificate;
+  pub certificate: aws.acmCertificate.AcmCertificate;
 
   init(props: CertificateProps) {
-    this.certificate = new awsProvider.acmCertificate.AcmCertificate(
+    this.certificate = new aws.acmCertificate.AcmCertificate(
       domainName: props.domainName,
       validationMethod: "DNS",
       lifecycle: {
@@ -105,7 +106,7 @@ class DNSimpleValidatedCertificate {
       }
     }");
 
-    let certValidation = new awsProvider.acmCertificateValidation.AcmCertificateValidation(
+    let certValidation = new aws.acmCertificateValidation.AcmCertificateValidation(
       certificateArn: this.certificate.certificate.arn
     )as "${props.zoneName}.aws.acmCertificateValidation.AcmCertificateValidation";
 
