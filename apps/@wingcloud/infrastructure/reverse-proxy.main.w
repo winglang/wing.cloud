@@ -3,30 +3,11 @@ bring util;
 bring http;
 bring "cdktf" as cdktf;
 bring "@cdktf/provider-dnsimple" as dnsimpleProvider;
-bring "./src/reverse-proxy/dnsimple.w" as DNSimple;
-bring "./src/reverse-proxy/cloudfront.w" as CloudFront;
-
-if util.env("WING_TARGET") == "tf-aws" {
-  let DNSIMPLE_TOKEN = new cdktf.TerraformVariable({
-    type: "string",
-  }) as "DNSIMPLE_TOKEN";
-  let DNSIMPLE_ACCOUNT = new cdktf.TerraformVariable({
-    type: "string",
-  }) as "DNSIMPLE_ACCOUNT";
-  
-  new dnsimpleProvider.provider.DnsimpleProvider({
-    token: "${DNSIMPLE_TOKEN}",
-    account: "${DNSIMPLE_ACCOUNT}"
-  });
-}
-
+bring "dnsimple.w" as DNSimple;
+bring "cloudfront.w" as CloudFront;
 
 struct ReverseProxyServerProps{
   origins: Array<CloudFront.Origin>;
-}
-
-class Utils {
-  extern "./src/reverse-proxy/reverse-proxy-local.mts" pub static inflight startReverseProxyServer(props: ReverseProxyServerProps): num ;
 }
 
 interface IReverseProxy {
@@ -113,6 +94,8 @@ class ReverseProxy_sim impl IReverseProxy {
   bucket: cloud.Bucket;
   origins: Array<CloudFront.Origin>;
 
+  extern "./reverse-proxy-local.mts" pub static inflight startReverseProxyServer(props: ReverseProxyServerProps): num ;
+
   init(props: ReverseProxyProps) {
     this.urlkey = "url.txt";
     this.bucket = new cloud.Bucket() as "Reverse Proxy Bucket";
@@ -120,7 +103,7 @@ class ReverseProxy_sim impl IReverseProxy {
     new cloud.Service(
       onStart: inflight () => {
         log("origins ${props.origins}");
-        let port = Utils.startReverseProxyServer(origins: props.origins);
+        let port = ReverseProxy_sim.startReverseProxyServer(origins: props.origins);
         this.bucket.put(this.urlkey, "http://localhost:${port}");
       },
       onStop: inflight () => {

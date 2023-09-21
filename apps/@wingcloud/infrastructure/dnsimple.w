@@ -1,4 +1,6 @@
+bring util;
 bring cloud;
+bring "constructs" as constructs;
 bring "cdktf" as cdktf;
 bring "@cdktf/provider-aws" as awsProvider;
 bring "@cdktf/provider-dnsimple" as dnsimpleProvider;
@@ -11,10 +13,39 @@ struct DNSRecordProps {
   distributionUrl: str;
 }
 
+class Dummy {}
+
+class DNSimpleProvider {
+  init() {
+    if util.env("WING_TARGET") != "tf-aws" {
+      return this;
+    }
+    
+    let uid = "dnsimple-provider-CA10E5CC-36D7-412A-B4FC-1C98AF521569";
+    let root = std.Node.of(this).root;
+    let exists = root.node.tryFindChild(uid);
+    if exists? { return this; }
+    new Dummy() as uid in DNSimpleProvider.toResource(root);
+
+    let DNSIMPLE_TOKEN = new cdktf.TerraformVariable({ type: "string" }) as "DNSIMPLE_TOKEN";
+    let DNSIMPLE_ACCOUNT = new cdktf.TerraformVariable({ type: "string" }) as "DNSIMPLE_ACCOUNT";
+
+    new dnsimpleProvider.provider.DnsimpleProvider(
+      token: "${DNSIMPLE_TOKEN}",
+      account: "${DNSIMPLE_ACCOUNT}"
+    );
+  }
+
+  // this is an ugly hack
+  // the path to the utils should be relative to the .main.w file!!!!!
+  extern "./util.js" static toResource(o: constructs.IConstruct): Dummy;
+}
+
 class DNSimpleZoneRecord {
   pub record: dnsimpleProvider.zoneRecord.ZoneRecord;
 
   init(props: DNSRecordProps) {
+    new DNSimpleProvider();
     this.record = new dnsimpleProvider.zoneRecord.ZoneRecord(
       zoneName: props.zoneName,
       name: props.subDomain, // For the root domain, use an empty string. For subdomains, use the subdomain part (like 'www' for 'www.yourdomain.com')
