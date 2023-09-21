@@ -2,9 +2,8 @@ import type { Cookies } from "@wingcloud/express-cookies";
 import { getEnvironmentVariable } from "@wingcloud/get-environment-variable";
 import * as jose from "jose";
 
+import type { GitHubTokens } from "../types/github.js";
 import type { UserId } from "../types/user.js";
-
-import type { GitHubTokens } from "./github.js";
 
 const APP_SECRET = new TextEncoder().encode(
   getEnvironmentVariable("APP_SECRET"),
@@ -55,4 +54,24 @@ export const getLoggedInUserId = async (cookies: Cookies) => {
   const payload = JSON.parse(verifyResult.payload.toString());
 
   return payload.sub as UserId;
+};
+
+export const getLoggedInUserTokens = async (cookies: Cookies) => {
+  const jwt = cookies.get(COOKIE_NAME);
+  if (!jwt) {
+    return;
+  }
+
+  const verifyResult = await jose.compactVerify(jwt, APP_SECRET, {
+    algorithms: ["HS256"],
+  });
+
+  const payload = JSON.parse(verifyResult.payload.toString());
+
+  return {
+    accessToken: payload.accessToken,
+    expiresIn: payload.expiresIn,
+    refreshToken: payload.refreshToken,
+    refreshTokenExpiresIn: payload.refreshTokenExpiresIn,
+  };
 };

@@ -1,7 +1,13 @@
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 
+import {
+  listUserProjects,
+  getProject,
+  type ProjectItem,
+} from "../database/project.js";
 import { createUser, getUserIdFromLogin } from "../database/user.js";
 import { t } from "../trpc.js";
+import { userIdFromString } from "../types/user.js";
 import * as z from "../validations/index.js";
 
 export const router = t.router({
@@ -51,15 +57,16 @@ export const router = t.router({
     // return { Items };
     return { Items: Items?.map((item) => unmarshall(item)) };
   }),
-  "user.listProjects": t.procedure
-    .input(
-      z.object({
-        owner: z.string(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      throw new Error("Not implemented");
-    }),
+  "user.listProjects": t.procedure.query(async ({ ctx, input }) => {
+    if (!ctx.userId) {
+      return [];
+    }
+
+    return (await listUserProjects(
+      ctx,
+      userIdFromString(ctx.userId),
+    )) as ProjectItem[];
+  }),
   "user.listRepositories": t.procedure
     .input(z.object({}))
     .query(async ({ ctx, input }) => {

@@ -1,3 +1,4 @@
+import { createProject } from "../database/project.js";
 import { t } from "../trpc.js";
 import { gitHubRepositoryIdFromString } from "../types/github.js";
 import * as z from "../validations/index.js";
@@ -43,12 +44,23 @@ export const router = t.router({
   "user.createProject": t.procedure
     .input(
       z.object({
-        owner: z.string(),
         projectName: z.string(),
         repositoryId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      throw new Error("Not implemented");
+      if (!ctx.userId) {
+        throw new Error("Not logged in");
+      }
+      const { projectId } = await createProject(
+        ctx,
+        ctx.userId,
+        input.projectName,
+        gitHubRepositoryIdFromString(ctx.userId, input.repositoryId),
+      );
+
+      return {
+        projectId,
+      };
     }),
 });
