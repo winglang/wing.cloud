@@ -64,6 +64,12 @@ flyio.addGitIgnore("**/*.d.ts");
 flyio.addGitIgnore(".jsii");
 flyio.addGitIgnore("tsconfig.tsbuildinfo");
 flyio.addFields({
+  type: "commonjs",
+  main: "./src/index.js",
+  exports: {
+    ".": "./src/index.js",
+  },
+  types: "./src/index.d.ts",
   jsii: {
     outdir: "dist",
     targets: [],
@@ -79,7 +85,6 @@ flyio.addFields({
     url: "https://github.com/winglang/wing.cloud",
   },
   license: "BSD-3-Clause",
-  main: "./lib/index.js",
 });
 
 ///////////////////////////////////////////////////////////////////////////////
