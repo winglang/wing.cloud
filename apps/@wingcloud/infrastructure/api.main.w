@@ -1,0 +1,70 @@
+bring cloud;
+bring "./projects.w" as Projects;
+
+let projects = new Projects.Projects();
+
+let api = new cloud.Api();
+
+api.get("/project.get", inflight (request) => {
+  // TODO: Authorize.
+  let project = projects.get(
+    id: request.query.get("id"),
+  );
+  return {
+      status: 200,
+      body: Json.stringify({
+          project,
+      }),
+  };
+});
+// api.get("/project.listEnvironments", inflight () => {});
+api.post("/project.rename", inflight (request) => {
+  // TODO: Authorize.
+  let body = Json.parse(request.body ?? "");
+  projects.rename(
+    id: body.get("id").asStr(),
+    name: body.get("name").asStr(),
+  );
+  return {
+    status: 200,
+  };
+});
+// api.post("/project.delete", inflight () => {});
+// api.post("/project.changeBuildSettings", inflight () => {});
+// api.get("/project.listEnvironmentVariables", inflight () => {});
+// api.post("/project.updateEnvironmentVariables", inflight () => {});
+
+// {"name": "acme", "repository": "skyrpex/acme"}
+api.post("/user.createProject", inflight (request) => {
+  let body = Json.parse(request.body ?? "");
+  let project = projects.create(
+    name: body.get("name").asStr(),
+    repository: body.get("repository").asStr(),
+    // TODO: Parse authentication cookie.
+    userId: "user_1",
+  );
+  return {
+    status: 200,
+    body: Json.stringify({
+      project,
+    }),
+  };
+});
+api.get("/user.listProjects", inflight () => {
+  return {
+    status: 200,
+    body: Json.stringify({
+      projects: projects.list(
+        // TODO: Parse authentication cookie.
+        userId: "user_1",
+      ),
+    }),
+  };
+});
+// api.get("/user.listRepositories", inflight () => {});
+
+// api.post("/signIn.callback", inflight () => {});
+
+// api.get("/environment.get", inflight () => {});
+// api.post("/environment.updateStatus", inflight () => {});
+// api.post("/environment.generateLogsPresignedURL", inflight () => {});
