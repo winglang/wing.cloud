@@ -183,18 +183,21 @@ struct TestsResults {
 }
 
 test "get reverse proxy url and paths" {
-  log(reverseProxy.url());
-  log(Json.stringify(reverseProxy.paths()));
+  log("Domain name: ${reverseProxy.url()}");
+  log("Urls: ${Json.stringify(reverseProxy.paths())}");
   let results = MutArray<TestsResults>[];
-  // how can I create a reasginable bool variable?
+  let var failure = false;
   for path in reverseProxy.paths() {
     let response = http.get(reverseProxy.url() + path);
+    if response.status != 200 {
+      failure = true;
+    }
     results.push({
       url: reverseProxy.url() + path,
       status: response.status,
     });
-    assert(response.status == 200);
   }
-  log(Json.stringify(results));
+  log("Tests results: ${Json.stringify(results)}");
+  assert(!failure);
 }
 
