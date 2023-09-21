@@ -9,8 +9,8 @@ node_modules/
 !/tsconfig.json
 !/.eslintrc.json
 !/.eslintignore
+!/turbo.json
 **/*.js
 **/*.d.ts
 .jsii
 tsconfig.tsbuildinfo
-/lib

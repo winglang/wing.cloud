@@ -20,6 +20,7 @@ export const api = (): Plugin => {
   let containerName: string | undefined;
   return {
     name: "api",
+    apply: "serve",
     async configureServer(context) {
       server?.kill();
 

@@ -6,6 +6,7 @@ import {
   TypescriptConfig,
   Eslint,
 } from "@skyrpex/wingen";
+import { JsonFile } from "projen";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -38,18 +39,30 @@ flyio.compileTask.exec("jsii");
 flyio.packageTask.exec("jsii-pacmak");
 flyio.devTask.exec("jsii --watch");
 
-flyio.addDeps("node-fetch@2.6.4");
-flyio.addDevDeps("@types/node-fetch@2.6.4");
+flyio.addDeps("node-fetch@2");
+flyio.addDevDeps("@types/node-fetch@2");
 flyio.addDevDeps("jsii");
 flyio.addDevDeps("jsii-pacmak");
 
 flyio.tryRemoveFile("./tsconfig.json");
 
+new JsonFile(flyio, "turbo.json", {
+  marker: false,
+  obj: {
+    $schema: "https://turbo.build/schema.json",
+    extends: ["//"],
+    pipeline: {
+      compile: {
+        outputs: ["./src/**/*.js", "./src/**/*.d.ts"],
+      },
+    },
+  },
+});
+
 flyio.addGitIgnore("**/*.js");
 flyio.addGitIgnore("**/*.d.ts");
 flyio.addGitIgnore(".jsii");
 flyio.addGitIgnore("tsconfig.tsbuildinfo");
-flyio.addGitIgnore("/lib");
 flyio.addFields({
   jsii: {
     outdir: "dist",
@@ -148,6 +161,7 @@ new Eslint(website);
 website.addDeps("vite");
 website.addScript("dev", "vite dev --open");
 website.addScript("compile", "vite build");
+website.addGitIgnore("/dist/");
 
 website.addDevDeps("@vitejs/plugin-react-swc");
 website.addDeps("react", "react-dom");
