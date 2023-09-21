@@ -27,6 +27,10 @@ struct ListProjectsOptions {
     userId: str;
 }
 
+struct DeleteProjectOptions {
+    id: str;
+}
+
 class Projects {
     table: ex.DynamodbTable;
 
@@ -131,5 +135,21 @@ class Projects {
     pub inflight list(options: ListProjectsOptions): Array<Project> {
       // TODO: Implement DynamoDB query.
       return [];
+    }
+
+    pub inflight delete(options: DeleteProjectOptions): void {
+      let project = this.get(id: options.id);
+      this.table.deleteItem({
+        key: {
+          pk: "PROJECT#${options.id}",
+          sk: "#",
+        },
+      });
+      this.table.deleteItem({
+        key: {
+          pk: "USER#${project.userId}",
+          sk: "PROJECT#${project.id}",
+        },
+      });
     }
 }

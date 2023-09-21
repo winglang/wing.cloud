@@ -29,7 +29,16 @@ api.post("/project.rename", inflight (request) => {
     status: 200,
   };
 });
-// api.post("/project.delete", inflight () => {});
+api.post("/project.delete", inflight (request) => {
+  // TODO: Authorize.
+  let body = Json.parse(request.body ?? "");
+  projects.delete(
+    id: body.get("id").asStr(),
+  );
+  return {
+    status: 200,
+  };
+});
 // api.post("/project.changeBuildSettings", inflight () => {});
 // api.get("/project.listEnvironmentVariables", inflight () => {});
 // api.post("/project.updateEnvironmentVariables", inflight () => {});
