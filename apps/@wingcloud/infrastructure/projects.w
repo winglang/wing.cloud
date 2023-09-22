@@ -133,8 +133,23 @@ class Projects {
     }
 
     pub inflight list(options: ListProjectsOptions): Array<Project> {
-      // TODO: Implement DynamoDB query.
-      return [];
+      let result = this.table.query(
+        keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+        expressionAttributeValues: {
+          ":pk": "USER#${options.userId}",
+          ":sk": "PROJECT#",
+        },
+      );
+      let var projects: Array<Project> = [];
+      for item in result.items {
+       projects = projects.concat([Project {
+          id: item.get("id").asStr(),
+          name: item.get("name").asStr(),
+          repository: item.get("repository").asStr(),
+          userId: item.get("userId").asStr(),
+        }]);
+      }
+      return projects;
     }
 
     pub inflight delete(options: DeleteProjectOptions): void {

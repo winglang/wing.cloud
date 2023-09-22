@@ -13,7 +13,7 @@ api.get("/project.get", inflight (request) => {
   return {
       status: 200,
       body: Json.stringify({
-          project,
+          project: project,
       }),
   };
 });
@@ -55,7 +55,7 @@ api.post("/user.createProject", inflight (request) => {
   return {
     status: 200,
     body: Json.stringify({
-      project,
+      project: project,
     }),
   };
 });
@@ -77,3 +77,26 @@ api.get("/user.listProjects", inflight () => {
 // api.get("/environment.get", inflight () => {});
 // api.post("/environment.updateStatus", inflight () => {});
 // api.post("/environment.generateLogsPresignedURL", inflight () => {});
+
+bring http;
+
+new cloud.Function(inflight () => {
+  let response = http.post("${api.url}/user.createProject", {
+    body: Json.stringify({
+      name: "acme",
+      repository: "skyrpex/acme",
+    }),
+  });
+  let projectId = Json.parse(response.body ?? "").get("project").get("id").asStr();
+  log("projectId = ${projectId}");
+
+  http.post("${api.url}/user.createProject", {
+    body: Json.stringify({
+      name: "starlight",
+      repository: "starlight/starlight",
+    }),
+  });
+
+  let response2 = http.get("${api.url}/user.listProjects");
+  log(response2.body ?? "");
+}) as "Test API";
