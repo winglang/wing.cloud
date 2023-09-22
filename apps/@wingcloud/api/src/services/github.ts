@@ -1,21 +1,17 @@
 import { getEnvironmentVariable } from "@wingcloud/get-environment-variable";
 import fetch from "node-fetch";
+import { Octokit } from "octokit";
 
-import type { GitHubLogin } from "../types/github.js";
+import {
+  gitHubLoginFromString,
+  type GitHubLogin,
+  type GitHubTokens,
+} from "../types/github.js";
 
 const GITHUB_APP_CLIENT_ID = getEnvironmentVariable("GITHUB_APP_CLIENT_ID");
 const GITHUB_APP_CLIENT_SECRET = getEnvironmentVariable(
   "GITHUB_APP_CLIENT_SECRET",
 );
-
-export interface GitHubTokens {
-  access_token: string;
-  expires_in: number;
-  refresh_token: string;
-  refresh_token_expires_in: number;
-  token_type: string;
-  scope: string;
-}
 
 const exchangeCodeForTokens = async (code: string): Promise<GitHubTokens> => {
   const response = await fetch("https://github.com/login/oauth/access_token", {
@@ -40,37 +36,47 @@ const exchangeCodeForTokens = async (code: string): Promise<GitHubTokens> => {
   return (await response.json()) as GitHubTokens;
 };
 
-interface UserInfo {
-  login: GitHubLogin;
-  name: string | undefined;
-  gravatar_url: string | undefined;
-}
-
-const getUserInfo = async (token: string): Promise<UserInfo> => {
-  const response = await fetch("https://api.github.com/user", {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "User-Agent": GITHUB_APP_CLIENT_ID,
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch user information.", { cause: response });
-  }
-
-  return (await response.json()) as UserInfo;
-};
-
 export const getGitHubLoginFromCode = async (code: string) => {
   const tokens = await exchangeCodeForTokens(code);
 
-  const { login } = await getUserInfo(tokens.access_token);
+  const { login } = await getUser(tokens.access_token);
 
   return {
-    login,
+    login: login as GitHubLogin,
     tokens,
   };
+};
+
+export const getUser = async (token: string) => {
+  const octokit = new Octokit({
+    auth: token,
+  });
+  const { data: user } = await octokit.request("GET /user");
+  return { ...user, login: gitHubLoginFromString(user.login) };
+};
+
+export const listUserInstallations = async (token: string) => {
+  const octokit = new Octokit({
+    auth: token,
+  });
+
+  const { data: installations } =
+    await octokit.rest.apps.listInstallationsForAuthenticatedUser();
+  return installations.installations;
+};
+
+export const listInstallationRepos = async (
+  token: string,
+  installationId: number,
+) => {
+  const octokit = new Octokit({
+    auth: token,
+  });
+
+  const { data: orgRepos } =
+    await octokit.rest.apps.listInstallationReposForAuthenticatedUser({
+      installation_id: installationId,
+    });
+
+  return orgRepos.repositories;
 };

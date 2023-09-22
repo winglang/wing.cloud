@@ -149,6 +149,7 @@ api.addDeps("jose");
 api.addDeps("node-fetch");
 api.addDeps(cookies.name);
 api.addDeps(env.name);
+api.addDeps("octokit");
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
@@ -183,6 +184,9 @@ website.addDeps(
   "@tanstack/react-query",
 );
 website.addDeps("clsx");
+website.addDeps("@headlessui/react");
+website.addDeps("@heroicons/react");
+website.addDeps("react-popper");
 
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 

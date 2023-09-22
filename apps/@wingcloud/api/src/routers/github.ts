@@ -1,13 +1,29 @@
 import { cookiesFromRequest } from "@wingcloud/express-cookies";
 
 import { getOrCreateUser } from "../database/user.js";
-import { setAuthCookie } from "../services/auth.js";
-import { getGitHubLoginFromCode } from "../services/github.js";
+import { getLoggedInUserTokens, setAuthCookie } from "../services/auth.js";
+import {
+  getGitHubLoginFromCode,
+  listUserInstallations,
+  listInstallationRepos,
+} from "../services/github.js";
 import { t } from "../trpc.js";
 import * as z from "../validations/index.js";
 
+export type GitHubInstallation = {
+  id: number;
+  name: string;
+};
+
+export type GitHubRepo = {
+  id: number;
+  name: string;
+  imgUrl: string;
+  private: boolean;
+};
+
 export const router = t.router({
-  "github/callback": t.procedure
+  "github.callback": t.procedure
     .input(
       z.object({
         code: z.string(),
@@ -23,5 +39,59 @@ export const router = t.router({
       await setAuthCookie(userId, tokens, cookies);
 
       return login;
+    }),
+
+  "github.listInstallations": t.procedure.query(async ({ ctx }) => {
+    const cookies = cookiesFromRequest(ctx.request);
+
+    const tokens = await getLoggedInUserTokens(cookies);
+
+    if (!tokens) {
+      return;
+    }
+
+    const installations = await listUserInstallations(tokens.accessToken);
+    return installations
+      .map((installation) => {
+        if (!installation.account) {
+          return;
+        }
+        const account = installation.account;
+        const name = "login" in account ? account.login : account.name;
+
+        return {
+          id: installation.id,
+          name: name || "<unknown>",
+          iconUrl: account.avatar_url,
+        };
+      })
+      .filter(Boolean) as GitHubInstallation[];
+  }),
+
+  "github. listRepositories": t.procedure
+    .input(
+      z.object({
+        installationId: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const cookies = cookiesFromRequest(ctx.request);
+
+      const tokens = await getLoggedInUserTokens(cookies);
+
+      if (!tokens) {
+        return;
+      }
+
+      const repos = await listInstallationRepos(
+        tokens.accessToken,
+        Number(input.installationId),
+      );
+      return repos.map((repo) => ({
+        id: repo.id,
+        name: repo.name,
+        imgUrl: repo.owner?.avatar_url,
+        private: repo.private,
+      })) as GitHubRepo[];
     }),
 });
