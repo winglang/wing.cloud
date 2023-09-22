@@ -7,8 +7,8 @@
     "nanoid": "^5.0.1"
   },
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.281",
-    "@types/node": "18",
+    "@cloudy-ts/eslint-plugin": "^0.0.282",
+    "@types/node": "^18.17.18",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",
     "eslint-config-prettier": "^9.0.0",
@@ -19,7 +19,7 @@
     "eslint-plugin-unicorn": "^48.0.1",
     "tsx": "^3.12.10",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.4"
+    "vitest": "^0.34.5"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",

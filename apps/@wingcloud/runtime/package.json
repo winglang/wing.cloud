@@ -4,21 +4,21 @@
   "type": "module",
   "sideEffects": false,
   "dependencies": {
-    "@wingconsole/app": "^0.31.18",
-    "@winglang/sdk": "^0.31.18",
+    "@wingconsole/app": "^0.32.0",
+    "@winglang/sdk": "^0.32.0",
     "express": "^4.18.2",
     "jose": "^4.14.6",
     "jsonwebtoken": "^9.0.2",
     "jwk-to-pem": "^2.0.5",
     "node-fetch": "^3.3.2",
-    "winglang": "^0.31.18"
+    "winglang": "^0.32.0"
   },
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.281",
+    "@cloudy-ts/eslint-plugin": "^0.0.282",
     "@types/express": "^4.17.17",
     "@types/jsonwebtoken": "^9.0.3",
     "@types/jwk-to-pem": "^2.0.1",
-    "@types/node": "18",
+    "@types/node": "^18.17.18",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",
     "@wingcloud/infrastructure": "workspace:^",
@@ -32,7 +32,7 @@
     "tsup": "^7.2.0",
     "tsx": "^3.12.10",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.4"
+    "vitest": "^0.34.5"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",

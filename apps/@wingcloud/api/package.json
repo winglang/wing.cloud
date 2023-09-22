@@ -6,13 +6,13 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.417.0",
     "@aws-sdk/util-dynamodb": "^3.417.0",
-    "@trpc/server": "^10.38.3",
+    "@trpc/server": "^10.38.4",
     "@wingcloud/express-cookies": "workspace:^",
     "@wingcloud/get-environment-variable": "workspace:^",
     "@wingcloud/nanoid62": "workspace:^",
     "@wingcloud/type-opaque": "workspace:^",
     "@wingcloud/type-prefixed-id": "workspace:^",
-    "@winglang/sdk": "^0.31.18",
+    "@winglang/sdk": "^0.32.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "jose": "^4.14.6",
@@ -22,9 +22,9 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.281",
+    "@cloudy-ts/eslint-plugin": "^0.0.282",
     "@types/express": "^4.17.17",
-    "@types/node": "18",
+    "@types/node": "^18.17.18",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",
     "eslint-config-prettier": "^9.0.0",
@@ -35,7 +35,7 @@
     "eslint-plugin-unicorn": "^48.0.1",
     "tsx": "^3.12.10",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.4"
+    "vitest": "^0.34.5"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
