@@ -130,6 +130,9 @@ importers:
       '@cdktf/provider-aws':
         specifier: ^17.0.6
         version: 17.0.6(cdktf@0.18.0)(constructs@10.2.70)
+      '@cdktf/provider-dnsimple':
+        specifier: ^7.0.1
+        version: 7.0.1(cdktf@0.18.0)(constructs@10.2.70)
       '@vendia/serverless-express':
         specifier: ^4.10.4
         version: 4.10.4
@@ -145,6 +148,9 @@ importers:
       glob:
         specifier: ^10.3.4
         version: 10.3.4
+      http-proxy:
+        specifier: ^1.18.1
+        version: 1.18.1
       winglang:
         specifier: ^0.31.12
         version: 0.31.12(constructs@10.2.70)
@@ -155,6 +161,9 @@ importers:
       '@types/express':
         specifier: ^4.17.17
         version: 4.17.17
+      '@types/http-proxy':
+        specifier: ^1.17.12
+        version: 1.17.12
       '@types/node':
         specifier: '18'
         version: 18.17.18
@@ -2305,6 +2314,17 @@ packages:
       constructs: 10.2.70
     dev: false
 
+  /@cdktf/provider-dnsimple@7.0.1(cdktf@0.18.0)(constructs@10.2.70):
+    resolution: {integrity: sha512-0Js8yvKIsWd/zu5elda2As7gOJprA16C+nNmFN5Zq+yCEjDmqxWH+9razPc5mTuy1QHHmTn+4pjiDZQLXgAzow==}
+    engines: {node: '>= 16.14.0'}
+    peerDependencies:
+      cdktf: ^0.18.0
+      constructs: ^10.0.0
+    dependencies:
+      cdktf: 0.18.0(constructs@10.2.70)
+      constructs: 10.2.70
+    dev: false
+
   /@cloudy-ts/eslint-plugin@0.0.273(eslint@8.49.0):
     resolution: {integrity: sha512-XxUA3Z95BvD1ZR12qF+To5k5WYNU68WfkSi/aHzKGcsTlDKxNMiUBugCSHABMZP4cWQjwhwl3EKG7h19hab2rg==}
     engines: {node: '>= 18.16.0'}
@@ -3681,6 +3701,12 @@ packages:
 
   /@types/http-errors@2.0.2:
     resolution: {integrity: sha512-lPG6KlZs88gef6aD85z3HNkztpj7w2R7HmR3gygjfXCQmsLloWNARFkMuzKiiY8FGdh1XDpgBdrSf4aKDiA7Kg==}
+    dev: true
+
+  /@types/http-proxy@1.17.12:
+    resolution: {integrity: sha512-kQtujO08dVtQ2wXAuSFfk9ASy3sug4+ogFR8Kd8UgP8PEuc1/G/8yjYRmp//PcDNJEUKOza/MrQu15bouEUCiw==}
+    dependencies:
+      '@types/node': 18.17.14
     dev: true
 
   /@types/json-schema@7.0.13:
@@ -5498,6 +5524,10 @@ packages:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
 
+  /eventemitter3@4.0.7:
+    resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
+    dev: false
+
   /events@3.3.0:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
     engines: {node: '>=0.8.x'}
@@ -5681,6 +5711,16 @@ packages:
   /flatted@3.2.9:
     resolution: {integrity: sha512-36yxDn5H7OFZQla0/jFJmbIKTdZAQHngCedGxiMmpNfEZM0sdEeT+WczLQrjK6D7o2aiyLYDnkw0R3JK0Qv1RQ==}
     dev: true
+
+  /follow-redirects@1.15.3:
+    resolution: {integrity: sha512-1VzOtuEM8pC9SFU1E+8KfTjZyMztRsgEfwQl44z8A25uy13jSzTj6dyK2Df52iV0vgHCfBwLhDWevLn95w5v6Q==}
+    engines: {node: '>=4.0'}
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
+    dev: false
 
   /for-each@0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}
@@ -6004,6 +6044,17 @@ packages:
       debug: 4.3.4
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /http-proxy@1.18.1:
+    resolution: {integrity: sha512-7mz/721AbnJwIVbnaSv1Cz3Am0ZLT/UBwkC92VlxhXv/k/BBQfM2fXElQNC27BVGr0uwUpplYPQM9LnaBMR5NQ==}
+    engines: {node: '>=8.0.0'}
+    dependencies:
+      eventemitter3: 4.0.7
+      follow-redirects: 1.15.3
+      requires-port: 1.0.0
+    transitivePeerDependencies:
+      - debug
     dev: false
 
   /https-proxy-agent@5.0.1:
@@ -7610,6 +7661,10 @@ packages:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /requires-port@1.0.0:
+    resolution: {integrity: sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==}
+    dev: false
 
   /resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}

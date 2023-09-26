@@ -221,12 +221,12 @@ infrastructure.compileTask.exec("wing compile main.w --target sim");
 infrastructure.compileTask.exec("wing compile main.w --target tf-aws");
 infrastructure.addGitIgnore("/target/");
 
-infrastructure.addDeps("express", "@vendia/serverless-express");
-infrastructure.addDevDeps("@types/express");
+infrastructure.addDeps("express", "@vendia/serverless-express", "http-proxy");
+infrastructure.addDevDeps("@types/express", "@types/http-proxy");
 
 infrastructure.addDeps("glob");
 
-infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-aws");
+infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-aws", "@cdktf/provider-dnsimple");
 
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(flyio.name);
