@@ -3,13 +3,13 @@ import { tmpdir } from "node:os";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { testing, cloud } from "@winglang/sdk";
+import { simulator, cloud } from "@winglang/sdk";
 import { simpleGit } from "simple-git";
 import { beforeEach, afterEach, beforeAll } from "vitest";
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 
-let sim: testing.Simulator;
+let sim: simulator.Simulator;
 let logsBucket: cloud.IBucketClient;
 let wingApiUrl: string;
 let examplesDir: string;
@@ -26,7 +26,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  sim = new testing.Simulator({
+  sim = new simulator.Simulator({
     simfile: resolve(join(currentDir, "../../infrastructure/target/main.wsim")),
   });
   await sim.start();
@@ -58,7 +58,7 @@ export interface TextContextCallbackProps {
 export const withTestContext = async (
   cb: (props: TextContextCallbackProps) => Promise<void>,
 ) => {
-  const sim = new testing.Simulator({
+  const sim = new simulator.Simulator({
     simfile: resolve(join(currentDir, "../../infrastructure/target/main.wsim")),
   });
   await sim.start();

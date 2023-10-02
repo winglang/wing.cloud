@@ -141,7 +141,7 @@ api.addDeps("@trpc/server", "zod");
 api.addDeps("nanoid");
 api.addDeps("@aws-sdk/client-dynamodb");
 api.addDeps("@aws-sdk/util-dynamodb");
-api.addDeps("@winglang/sdk");
+api.addDeps("@winglang/sdk@0.34.6");
 api.addDeps(opaqueType.name);
 api.addDeps(prefixedIdType.name);
 api.addDeps(nanoid62.name);
@@ -215,14 +215,21 @@ const infrastructure = new TypescriptProject({
 });
 infrastructure.addFields({ type: "commonjs" });
 
-infrastructure.addDeps("winglang");
+infrastructure.addDeps("winglang@0.34.6");
 infrastructure.devTask.exec("wing it main.w");
 infrastructure.compileTask.exec("wing compile main.w --target sim");
 infrastructure.compileTask.exec("wing compile main.w --target tf-aws");
 infrastructure.addGitIgnore("/target/");
 
-infrastructure.addDeps("express", "@vendia/serverless-express", "http-proxy");
+infrastructure.addDeps("express", "@vendia/serverless-express");
+infrastructure.addDeps("express", "@vendia/serverless-express");
+infrastructure.addDeps("@probot/adapter-aws-lambda-serverless");
+infrastructure.addDeps("http-proxy");
+infrastructure.addDeps("jsonwebtoken");
+infrastructure.addDeps("node-fetch");
 infrastructure.addDevDeps("@types/express", "@types/http-proxy");
+infrastructure.addDevDeps("@types/jsonwebtoken");
+infrastructure.addDevDeps("@types/express");
 
 infrastructure.addDeps("glob");
 
@@ -247,9 +254,10 @@ const runtime = new TypescriptProject({
   },
 });
 
-runtime.addDeps("winglang");
-runtime.addDeps("@winglang/sdk");
-runtime.addDeps("@wingconsole/app");
+runtime.addDeps("winglang@0.34.6");
+runtime.addDeps("@winglang/sdk@0.34.6");
+runtime.addDeps("@winglang/compiler@0.34.6");
+runtime.addDeps("@wingconsole/app@0.34.6");
 runtime.addDeps("express");
 runtime.addDeps("jsonwebtoken");
 runtime.addDeps("jwk-to-pem");
@@ -260,7 +268,7 @@ runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/jsonwebtoken");
 runtime.addDevDeps("@types/jwk-to-pem");
 runtime.addDevDeps("simple-git");
-runtime.addDevDeps(infrastructure.name);
+runtime.addDevDeps("msw");
 
 runtime.addGitIgnore("target/");
 

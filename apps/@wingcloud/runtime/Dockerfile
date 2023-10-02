@@ -9,10 +9,22 @@ WORKDIR /app
 
 COPY --from=buildx /buildx /root/.docker/cli-plugins/docker-buildx
 
-COPY . .
+RUN npm i -g pnpm projen
 
-RUN npm install
-RUN npm run compile
+COPY package.json ./package.json
+RUN pnpm install
+
+COPY ./src ./src
+COPY ./.projen ./.projen
+COPY ./etc ./etc
+COPY ./docker-entrypoint.d ./docker-entrypoint.d
+COPY ./tsconfig.json ./tsconfig.json
+COPY ./tsup.config.ts ./tsup.config.ts
+COPY ./entrypoint.sh ./entrypoint.sh
+RUN pnpm run compile
+
+ARG SETUP_DOCKER="true"
+RUN if [ "$SETUP_DOCKER" == "false" ]; then rm -rf ./docker-entrypoint.d; fi
 
 ENV DOCKER_TMPDIR=/data/docker/tmp
 

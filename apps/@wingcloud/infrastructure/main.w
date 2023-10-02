@@ -1,6 +1,10 @@
 bring cloud;
 bring http;
 bring ex;
+bring util;
+bring "./runtime/runtime-callbacks.w" as runtime_callbacks;
+bring "./runtime/runtime.w" as runtime;
+bring "./probot.w" as probot;
 
 // And the sun, and the moon, and the stars, and the flowers.
 
@@ -81,118 +85,57 @@ class AstroWebsite  {
 //   bucket: b,
 // );
 
+let runtimeCallbacks = new runtime_callbacks.RuntimeCallbacks();
+
 let wingApi = new cloud.Api() as "wing api";
-wingApi.post("/report", inflight () => {
+wingApi.post("/report", inflight (req) => {
+  runtimeCallbacks.topic.publish(req.body ?? "");
+
   return {
     status: 200
   };
 });
 
-// Previews environment runtime
-class Runtime {
-  extern "./src/fly.mts" static inflight handler(
-    imageName: str,
-    repo: str,
-    entryfile: str,
-    flyToken: str,
-    wingApiUrl: str,
-    awsAccessKeyId: str,
-    awsSecretAccessKey: str
-  ): str;
+let rntm = new runtime.RuntimeService(wingApi.url);
+new probot.ProbotApp(rntm.api.url, runtimeCallbacks);
 
-  logs: cloud.Bucket;
-  flyToken: cloud.Secret;
-  awsAccessKeyId: cloud.Secret;
-  awsSecretAccessKey: cloud.Secret;
-  init() {
-    this.logs = new cloud.Bucket() as "deployment logs";
-    this.flyToken = new cloud.Secret(name: "wing.cloud/runtime/flyToken") as "flyToken";
-    this.awsAccessKeyId = new cloud.Secret(name: "wing.cloud/runtime/awsAccessKeyId") as "awsAccessKeyId";
-    this.awsSecretAccessKey = new cloud.Secret(name: "wing.cloud/runtime/awsSecretAccessKey") as "awsSecretAccessKey";
+// class Probot {
+//   extern "./src/probot.cjs" pub static inflight handler(appId: str, privateKey: str, request: cloud.ApiRequest): void;
+// }
 
-    // use a function to generate the IAM role with the permissions to write to the bucket
-    new cloud.Function(inflight () => {
-      // permissions:
-      this.logs.put;
-    }) as "runtime function";
+// let api = new cloud.Api();
 
-    // FOR TESTS
-    let forTests = new cloud.Api();
-    forTests.post("/", inflight (req) => {
-      // hack to get bucket name in extern
-      this.logs.put;
+// let probotAppId =  new cloud.Secret(name: "wing.cloud/probot/app_id") as "probotAppId";
+// let probotSecretKey = new cloud.Secret(name: "wing.cloud/probot/secret_key") as "probotSecretKey";
 
-      let body = Json.parse(req.body ?? "");
-      let repo = body.get("repo").asStr();
-      let entryfile = body.get("entryfile").asStr();
+// let db = new ex.Table(ex.TableProps{
+//   name: "wing.cloud/probot/db",
+//   primaryKey: "repositoryId",
+//   columns: {
+//       repositoryId: ex.ColumnType.STRING,
+//       entryPoints: ex.ColumnType.STRING,
+//   }
+// });
 
-      // TODO: get bucket name from `this.logs` resource
-      let url = Runtime.handler(
-        "registry.fly.io/wing-runtime-flyio-test:deployment-01H9ZGZX4Y64EYJ6TCT2Y4YDFV",
-        repo,
-        entryfile,
-        this.flyToken.value(),
-        wingApi.url,
-        this.awsAccessKeyId.value(),
-        this.awsSecretAccessKey.value());
-      return {
-        status: 200,
-        body: Json.stringify({
-          url
-        })
-      };
-    });
+// api.post("/github/webhook", inflight (request: cloud.ApiRequest): cloud.ApiResponse => {
+//   let body = Json.tryParse(request.body);
+//   let repoId = "${body?.tryGet("repository")?.tryGet("id")}";
 
-    test "deploy preview environment" {
-      http.post(forTests.url, body: Json.stringify({
-        repo: "eladcon/examples",
-        entryfile: "examples/redis/main.w"
-      }));
-    }
-  }
+//   if repoId == "" {
+//       return cloud.ApiResponse {
+//           status: 400,
+//           body: Json.stringify({ ok: false, error: "Invalid request body" })
+//       };
+//   }
 
-}
+//   Probot.handler(probotAppId.value(), probotSecretKey.value(), request);
+//   return cloud.ApiResponse {
+//       status: 200,
+//       body: Json.stringify({ ok: true })
+//   };
 
-let runtime = new Runtime();
-
-
-class Probot {
-  extern "./probot.cjs" pub static inflight handler(appId: str, privateKey: str, request: cloud.ApiRequest): void;
-}
-
-let api = new cloud.Api();
-
-let probotAppId =  new cloud.Secret(name: "wing.cloud/probot/app_id") as "probotAppId";
-let probotSecretKey = new cloud.Secret(name: "wing.cloud/probot/secret_key") as "probotSecretKey";
-
-let db = new ex.Table(ex.TableProps{
-  name: "wing.cloud/probot/db",
-  primaryKey: "repositoryId",
-  columns: {
-      repositoryId: ex.ColumnType.STRING,
-      entryPoints: ex.ColumnType.STRING,
-  }
-});
-
-api.post("/github/webhook", inflight (request: cloud.ApiRequest): cloud.ApiResponse => {
-  let body = Json.tryParse(request.body);
-  let repoId = "${body?.tryGet("repository")?.tryGet("id")}";
-
-  if repoId == "" {
-      return cloud.ApiResponse {
-          status: 400,
-          body: Json.stringify({ ok: false, error: "Invalid request body" })
-      };
-  }
-
-  Probot.handler(probotAppId.value(), probotSecretKey.value(), request);
-  return cloud.ApiResponse {
-      status: 200,
-      body: Json.stringify({ ok: true })
-  };
-
-  return cloud.ApiResponse {
-      status: 200,
-      body: Json.stringify({ ok: true , data: "No project found"})
-  };
-});
+//   return cloud.ApiResponse {
+//       status: 200,
+//       body: Json.stringify({ ok: true , data: "No project found"})
+//   };
+// });
