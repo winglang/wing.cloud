@@ -88,7 +88,7 @@ class Projects {
     pub inflight rename(options: RenameProjectOptions): void {
       let project = this.get(id: options.id);
 
-      // TODO: Need something like Promise.all() to run these in parallel.
+      // TODO: Need batchWriteItem to run them in parallel.
       this.table.updateItem({
         key: {
           pk: "PROJECT#${project.id}",

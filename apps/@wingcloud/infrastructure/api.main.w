@@ -80,7 +80,7 @@ api.get("/user.listProjects", inflight () => {
 
 bring http;
 
-new cloud.Function(inflight () => {
+test "Test API" {
   let response = http.post("${api.url}/user.createProject", {
     body: Json.stringify({
       name: "acme",
@@ -99,4 +99,4 @@ new cloud.Function(inflight () => {
 
   let response2 = http.get("${api.url}/user.listProjects");
   log(response2.body ?? "");
-}) as "Test API";
+}
