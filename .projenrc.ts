@@ -141,7 +141,7 @@ api.addDeps("@trpc/server", "zod");
 api.addDeps("nanoid");
 api.addDeps("@aws-sdk/client-dynamodb");
 api.addDeps("@aws-sdk/util-dynamodb");
-api.addDeps("@winglang/sdk@0.34.6");
+api.addDeps("@winglang/sdk@0.34.13");
 api.addDeps(opaqueType.name);
 api.addDeps(prefixedIdType.name);
 api.addDeps(nanoid62.name);
@@ -215,7 +215,7 @@ const infrastructure = new TypescriptProject({
 });
 infrastructure.addFields({ type: "commonjs" });
 
-infrastructure.addDeps("winglang@0.34.6");
+infrastructure.addDeps("winglang@0.34.13");
 infrastructure.devTask.exec("wing it main.w");
 infrastructure.compileTask.exec("wing compile main.w --target sim");
 infrastructure.compileTask.exec("wing compile main.w --target tf-aws");
@@ -233,7 +233,7 @@ infrastructure.addDevDeps("@types/express");
 
 infrastructure.addDeps("glob");
 
-infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-aws", "@cdktf/provider-dnsimple");
+infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-aws", "@cdktf/provider-dnsimple", "@cdktf/provider-docker", "@cdktf/provider-null");
 
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(flyio.name);
@@ -254,10 +254,10 @@ const runtime = new TypescriptProject({
   },
 });
 
-runtime.addDeps("winglang@0.34.6");
-runtime.addDeps("@winglang/sdk@0.34.6");
-runtime.addDeps("@winglang/compiler@0.34.6");
-runtime.addDeps("@wingconsole/app@0.34.6");
+runtime.addDeps("winglang@0.34.13");
+runtime.addDeps("@winglang/sdk@0.34.13");
+runtime.addDeps("@winglang/compiler@0.34.13");
+runtime.addDeps("@wingconsole/app@0.34.13");
 runtime.addDeps("express");
 runtime.addDeps("jsonwebtoken");
 runtime.addDeps("jwk-to-pem");

@@ -5,6 +5,7 @@ bring util;
 bring "constructs" as constructs;
 bring "../containers.w" as containers;
 bring "../flyio" as flyio;
+bring "./runtime-docker.w" as runtimeDocker;
 
 struct RuntimeHandleOptions {
   gitToken: str?;
@@ -65,53 +66,46 @@ class RuntimeHandler_sim impl IRuntimeHandler {
 }
 
 class RuntimeHandler_flyio impl IRuntimeHandler {
-  extern "./src/fly.mts" static inflight handler(
-    imageName: str,
-    repo: str,
-    entryfile: str,
-    flyToken: str,
-    wingApiUrl: str,
-    awsAccessKeyId: str,
-    awsSecretAccessKey: str
-  ): str;
-
   flyToken: cloud.Secret;
   awsAccessKeyId: cloud.Secret;
   awsSecretAccessKey: cloud.Secret;
+  image: runtimeDocker.RuntimeDockerImage;
   init() {
     this.flyToken = new cloud.Secret(name: "wing.cloud/runtime/flyToken") as "flyToken";
     this.awsAccessKeyId = new cloud.Secret(name: "wing.cloud/runtime/awsAccessKeyId") as "awsAccessKeyId";
     this.awsSecretAccessKey = new cloud.Secret(name: "wing.cloud/runtime/awsSecretAccessKey") as "awsSecretAccessKey";
+    this.image = new runtimeDocker.RuntimeDockerImage();
   }
 
   pub inflight handleRequest(opts: RuntimeHandleOptions): str {
-    // TODO: use opts.logsBucketName
-    let fly = new flyio.Fly(new flyio.Client(this.flyToken.value()));
-    let app = fly.app("");
+    let flyClient = new flyio.Client(this.flyToken.value());
+    flyClient._init(this.flyToken.value());
+    let fly = new flyio.Fly(flyClient);
+    let app = fly.app("wing-preview-${util.nanoid(alphabet: "0123456789abcdefghijklmnopqrstuvwxyz", size: 10)}");
+    let exists = app.exists();
+    if !exists {
+      app.create();
+    }
 
     let env = MutMap<str>{
       "GIT_REPO" => opts.gitRepo,
       "GIT_SHA" => opts.gitSha,
       "ENTRYFILE" => opts.entryfile,
-      "LOGS_BUCKET_NAME" => "stam", // opts.logsBucketName,
+      "LOGS_BUCKET_NAME" => opts.logsBucketName,
       "WING_CLOUD_URL" => opts.wingCloudUrl
     };
 
     if let token = opts.gitToken {
       env.set("GIT_TOKEN", token);
     }
-    // app.update(imageName: );
+    
+    if exists {
+      app.update(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024);
+    } else {
+      app.addMachine(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024);
+    }
 
-    let url = RuntimeHandler_flyio.handler(
-      "registry.fly.io/wing-runtime-flyio-test:deployment-01H9ZGZX4Y64EYJ6TCT2Y4YDFV",
-      opts.gitRepo,
-      opts.entryfile,
-      this.flyToken.value(),
-      opts.wingCloudUrl,
-      this.awsAccessKeyId.value(),
-      this.awsSecretAccessKey.value());
-
-    return "";
+    return app.url();
   }
 }
 
@@ -170,9 +164,10 @@ class RuntimeService {
     });
 
     test "deploy preview environment" {
-      http.post(this.api.url, body: Json.stringify({
+      let res = http.post(this.api.url, body: Json.stringify({
         repo: "eladcon/examples",
-        entryfile: "examples/redis/main.w"
+        sha: "fix-api-basic-auth",
+        entryfile: "examples/api-basic-auth-middleware/basic-auth.w"
       }));
     }
   }

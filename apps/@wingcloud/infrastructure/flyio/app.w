@@ -128,6 +128,10 @@ inflight class App {
 
     return result.copy();
   }
+
+  pub exists(): bool {
+    return this.props.client.isAppExists(this.props.name);
+  }
 }
 
 /**

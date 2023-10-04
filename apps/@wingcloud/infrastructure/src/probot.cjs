@@ -110,7 +110,7 @@ module.exports.handler = async (appId, privateKey, event) => {
     probot: createProbot({
       overrides: {
         appId,
-        privateKey,
+        privateKey: privateKey.trim().replace(/\\n/g, "\n", ),
       },
     }),
   });

@@ -1,8 +1,8 @@
 bring cloud;
 bring util;
 bring http;
-bring "dnsimple.w" as DNSimple;
-bring "cloudfront.w" as CloudFront;
+bring "./dnsimple.w" as DNSimple;
+bring "./cloudfront.w" as CloudFront;
 
 struct ReverseProxyServerProps{
   origins: Array<CloudFront.Origin>;
@@ -98,15 +98,14 @@ class ReverseProxy_sim impl IReverseProxy {
     this.urlkey = "url.txt";
     this.bucket = new cloud.Bucket() as "Reverse Proxy Bucket";
     this.origins = props.origins;
-    new cloud.Service(
-      onStart: inflight () => {
-        let port = ReverseProxy_sim.startReverseProxyServer(origins: props.origins);
-        this.bucket.put(this.urlkey, "http://localhost:${port}");
-      },
-      onStop: inflight () => {
+    new cloud.Service(inflight () => {
+      let port = ReverseProxy_sim.startReverseProxyServer(origins: props.origins);
+      this.bucket.put(this.urlkey, "http://localhost:${port}");
+
+      return () => {
         log("stop!");
-      }
-    );
+      };
+    });
   }
 
   pub inflight url(): str {

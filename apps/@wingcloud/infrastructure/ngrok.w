@@ -15,8 +15,6 @@ class Ngrok {
   init(url: str) {
     this.b = new cloud.Bucket();
     new cloud.Service(inflight () => {
-      log("svc1");
-
       let u = url;
       let parts = u.split(":");
       let port = parts.at(parts.length - 1);

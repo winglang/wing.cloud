@@ -10,5 +10,5 @@ export const createGithubAppJwt = async (appId: string, privateKey: string) => {
     "iss": appId,
   }
 
-  return jwt.sign(payload, privateKey, { algorithm: "RS256" });
+  return jwt.sign(payload, privateKey.trim().replace(/\\n/g, "\n", ), { algorithm: "RS256" });
 };

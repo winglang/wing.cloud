@@ -19,7 +19,6 @@ class GithubApp {
 
     if util.tryEnv("WING_TARGET") == "sim" {
       this.ngrok = new ngrok.Ngrok(this.webhook.url);
-      log("33333 ${this.ngrok}");
     }
 
     let deploy = new cloud.OnDeploy(inflight () => {
