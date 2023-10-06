@@ -143,8 +143,6 @@ test "Test API" {
   log(response2.body ?? "");
 }
 
-let var x = 0;
-
 test "Rename project" {
   let response = http.post("${api.url}/user.createProject", {
     body: Json.stringify({
