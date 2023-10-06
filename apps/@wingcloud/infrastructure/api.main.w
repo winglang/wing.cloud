@@ -5,39 +5,62 @@ let projects = new Projects.Projects();
 
 let api = new cloud.Api();
 
-api.get("/project.get", inflight (request) => {
-  // TODO: Authorize.
-  let project = projects.get(
-    id: request.query.get("id"),
-  );
-  return {
-      status: 200,
+let captureUnhandledErrors = inflight (handler: inflight (): cloud.ApiResponse): cloud.ApiResponse => {
+  try {
+    return handler();
+  } catch error {
+    return {
+      status: 500,
       body: Json.stringify({
-          project: project,
+        error: error,
       }),
-  };
+    };
+  }
+};
+
+api.get("/project.get", inflight (request) => {
+  return captureUnhandledErrors(inflight () => {
+    let input = Projects.GetProjectOptions.fromJson(request.query);
+
+    // TODO: Authorize.
+    let project = projects.get(input);
+
+    return {
+        status: 200,
+        body: Json.stringify({
+            project: project,
+        }),
+    };
+  });
 });
 // api.get("/project.listEnvironments", inflight () => {});
 api.post("/project.rename", inflight (request) => {
-  // TODO: Authorize.
-  let body = Json.parse(request.body ?? "");
-  projects.rename(
-    id: body.get("id").asStr(),
-    name: body.get("name").asStr(),
-  );
-  return {
-    status: 200,
-  };
+  return captureUnhandledErrors(inflight () => {
+    let input = Projects.RenameProjectOptions.fromJson(
+      Json.parse(request.body ?? ""),
+    );
+
+    // TODO: Authorize.
+    projects.rename(input);
+
+    return {
+      status: 200,
+    };
+  });
 });
 api.post("/project.delete", inflight (request) => {
-  // TODO: Authorize.
-  let body = Json.parse(request.body ?? "");
-  projects.delete(
-    id: body.get("id").asStr(),
-  );
-  return {
-    status: 200,
-  };
+  return captureUnhandledErrors(inflight () => {
+    let input = Projects.DeleteProjectOptions.fromJson(
+      Json.parse(request.body ?? ""),
+    );
+
+    // TODO: Authorize.
+    projects.delete(input);
+
+    return {
+      status: 200,
+    };
+  });
 });
 // api.post("/project.changeBuildSettings", inflight () => {});
 // api.get("/project.listEnvironmentVariables", inflight () => {});
@@ -45,30 +68,41 @@ api.post("/project.delete", inflight (request) => {
 
 // {"name": "acme", "repository": "skyrpex/acme"}
 api.post("/user.createProject", inflight (request) => {
-  let body = Json.parse(request.body ?? "");
-  let project = projects.create(
-    name: body.get("name").asStr(),
-    repository: body.get("repository").asStr(),
-    // TODO: Parse authentication cookie.
-    userId: "user_1",
-  );
-  return {
-    status: 200,
-    body: Json.stringify({
-      project: project,
-    }),
-  };
+  return captureUnhandledErrors(inflight () => {
+    let body = Json.parse(request.body ?? "");
+    let input = Projects.CreateProjectOptions {
+      name: body.get("name").asStr(),
+      repository: body.get("repository").asStr(),
+      // TODO: Parse authentication cookie.
+      userId: "user_1",
+    };
+
+    let project = projects.create(input);
+
+    return {
+      status: 200,
+      body: Json.stringify({
+        project: project,
+      }),
+    };
+  });
 });
 api.get("/user.listProjects", inflight () => {
-  return {
-    status: 200,
-    body: Json.stringify({
-      projects: projects.list(
-        // TODO: Parse authentication cookie.
-        userId: "user_1",
-      ),
-    }),
-  };
+  return captureUnhandledErrors(inflight () => {
+    let input = Projects.ListProjectsOptions {
+      // TODO: Parse authentication cookie.
+      userId: "user_1",
+    };
+
+    let userProjects = projects.list(input);
+
+    return {
+      status: 200,
+      body: Json.stringify({
+        projects: userProjects,
+      }),
+    };
+  });
 });
 // api.get("/user.listRepositories", inflight () => {});
 
@@ -90,6 +124,14 @@ test "Test API" {
   let projectId = Json.parse(response.body ?? "").get("project").get("id").asStr();
   log("projectId = ${projectId}");
 
+  let renameResponse = http.post("${api.url}/project.rename", {
+    body: Json.stringify({
+      id: projectId,
+      name: "test",
+    }),
+  });
+  log(renameResponse.body ?? "");
+
   http.post("${api.url}/user.createProject", {
     body: Json.stringify({
       name: "starlight",
@@ -99,4 +141,25 @@ test "Test API" {
 
   let response2 = http.get("${api.url}/user.listProjects");
   log(response2.body ?? "");
+}
+
+let var x = 0;
+
+test "Rename project" {
+  let response = http.post("${api.url}/user.createProject", {
+    body: Json.stringify({
+      name: "acme",
+      repository: "skyrpex/acme",
+    }),
+  });
+  let projectId = Json.parse(response.body ?? "").get("project").get("id").asStr();
+  log("projectId = ${projectId}");
+
+  let renameResponse = http.post("${api.url}/project.rename", {
+    body: Json.stringify({
+      id: projectId,
+      name: "test",
+    }),
+  });
+  log(renameResponse.body ?? "");
 }
