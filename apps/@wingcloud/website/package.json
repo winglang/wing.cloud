@@ -21,7 +21,7 @@
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.425.0",
     "@cloudy-ts/eslint-plugin": "^0.0.295",
-    "@types/node": "^18.18.3",
+    "@types/node": "18",
     "@types/react": "^18.2.25",
     "@types/react-dom": "^18.2.10",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
@@ -43,7 +43,7 @@
     "tailwindcss": "^3.3.3",
     "tsx": "^3.13.0",
     "typescript": "^5.2.2",
-    "zod": "^3.22.2"
+    "zod": "^3.22.4"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
