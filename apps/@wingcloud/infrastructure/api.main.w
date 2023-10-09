@@ -1,12 +1,24 @@
 bring cloud;
 bring http;
+bring ex;
 
 bring "./cookie.w" as Cookie;
 bring "./github.w" as GitHub;
 bring "./jwt.w" as JWT;
 bring "./projects.w" as Projects;
+bring "./users.w" as Users;
 
-let projects = new Projects.Projects();
+let table = new ex.DynamodbTable(
+  name: "data",
+  attributeDefinitions: {
+    "pk": "S",
+    "sk": "S",
+  },
+  hashKey: "pk",
+  rangeKey: "sk",
+);
+let projects = new Projects.Projects(table);
+let users = new Users.Users(table);
 
 let api = new cloud.Api();
 
@@ -27,14 +39,17 @@ let GITHUB_APP_CLIENT_ID = new cloud.Secret(name: "wing.cloud/GITHUB_APP_CLIENT_
 let GITHUB_APP_CLIENT_SECRET = new cloud.Secret(name: "wing.cloud/GITHUB_APP_CLIENT_SECRET") as "GITHUB_APP_CLIENT_SECRET";
 let APP_SECRET = new cloud.Secret(name: "wing.cloud/APP_SECRET") as "APP_SECRET";
 
+let AUTH_COOKIE_NAME = "auth";
+
 struct GitHubCallbackOptions {
   code: str;
   // installation_id: str?;
   // setup_action: str?;
 }
 
+// https://github.com/login/oauth/authorize?client_id=Iv1.29ba054d6e919d9c
 api.get("/github.callback", inflight (request) => {
-  return captureUnhandledErrors(inflight () => {
+  // return captureUnhandledErrors(inflight () => {
     let input = GitHubCallbackOptions {
       code: request.query.get("code"),
       // installation_id: request.query.get("installation_id"),
@@ -46,10 +61,12 @@ api.get("/github.callback", inflight (request) => {
       clientId: GITHUB_APP_CLIENT_ID.value(),
       clientSecret: GITHUB_APP_CLIENT_SECRET.value(),
     );
+    log("tokens = ${Json.stringify(tokens)}");
 
-    // TODO: Get or create user.
-    // let userId = getorCreateUser(...);
-    let userId = "user_1";
+    let gitHubLogin = GitHub.Exchange.getLoginFromAccessToken(tokens.access_token);
+    log("gitHubLogin = ${gitHubLogin}");
+    let userId = users.getOrCreate(gitHubLogin: gitHubLogin);
+    log("userId = ${userId}");
 
     let jwt = JWT.JWT.sign(
       userId: userId,
@@ -58,7 +75,7 @@ api.get("/github.callback", inflight (request) => {
     );
 
     let authCookie = Cookie.Cookie.serialize(
-      "auth",
+      AUTH_COOKIE_NAME,
       jwt,
       {
         httpOnly: true,
@@ -76,7 +93,7 @@ api.get("/github.callback", inflight (request) => {
         "Set-Cookie": authCookie,
       },
     };
-  });
+  // });
 });
 
 api.get("/project.get", inflight (request) => {

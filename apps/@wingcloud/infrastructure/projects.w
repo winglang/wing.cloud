@@ -34,16 +34,8 @@ struct DeleteProjectOptions {
 class Projects {
   table: ex.DynamodbTable;
 
-  init() {
-    this.table = new ex.DynamodbTable(
-      name: "projects",
-      attributeDefinitions: {
-        "pk": "S",
-        "sk": "S",
-      },
-      hashKey: "pk",
-      rangeKey: "sk",
-    );
+  init(table: ex.DynamodbTable) {
+    this.table = table;
   }
 
   pub inflight create(options: CreateProjectOptions): Project {

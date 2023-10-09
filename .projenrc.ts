@@ -233,6 +233,8 @@ infrastructure.addDeps("cookie");
 
 infrastructure.addDeps("jose");
 
+infrastructure.addDeps("octokit", "node-fetch");
+
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(flyio.name);
 
