@@ -34,7 +34,6 @@ class Ngrok {
   }
 
   pub inflight waitForUrl(): str {
-    let var i = 0;
     util.waitUntil(inflight () => {
       return this.b.exists("public_url");
     }, timeout: 10s);
