@@ -32,12 +32,9 @@ class GithubApp {
 
   inflight listen() {
     let var publicUrl = this.webhook.url;
-    log("2222 ${this.ngrok}");
     if let ngrok = this.ngrok {
       publicUrl = ngrok.waitForUrl();
     }
-
-    log("111, ${publicUrl}");
 
     let jwt = GithubApp.createGithubAppJwt(this.appId.value(), this.privateKey.value());
 

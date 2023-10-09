@@ -149,7 +149,6 @@ inflight class App {
 
   pub listApps(): Array<App> {
     let res = this.client.apps();
-    // const res = await this.client.apps();
     let apps = MutArray<App>[];
     for app in res.data.apps.nodes {
       apps.push(new App(client: this.client, name: app.id));

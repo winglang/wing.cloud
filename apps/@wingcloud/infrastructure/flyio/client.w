@@ -72,8 +72,8 @@ struct IGetAppResult {
 
 inflight class Client {
   var token: str;
-  var graphqlUrl: str = "https://api.fly.io/graphql";
-  var apiUrl: str = "https://api.machines.dev/v1";
+  var graphqlUrl: str;
+  var apiUrl: str;
 
   /**
    *

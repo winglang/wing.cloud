@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 
-// import { GithubProjects } from "../../components/github-projects.js";
 import { Message } from "../../components/message.js";
 
 export const Component = () => {
