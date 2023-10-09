@@ -231,6 +231,8 @@ infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-aws");
 infrastructure.addDevDeps("@types/cookie");
 infrastructure.addDeps("cookie");
 
+infrastructure.addDeps("jose");
+
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(flyio.name);
 

@@ -148,6 +148,9 @@ importers:
       glob:
         specifier: ^10.3.10
         version: 10.3.10
+      jose:
+        specifier: ^4.15.2
+        version: 4.15.2
       winglang:
         specifier: ^0.35.5
         version: 0.35.5(constructs@10.2.70)
@@ -5414,7 +5417,7 @@ packages:
     dependencies:
       semver: 7.5.4
       shelljs: 0.8.5
-      typescript: 5.3.0-dev.20231006
+      typescript: 5.3.0-dev.20231009
     dev: true
 
   /dset@3.1.2:
@@ -9406,8 +9409,8 @@ packages:
     hasBin: true
     dev: true
 
-  /typescript@5.3.0-dev.20231006:
-    resolution: {integrity: sha512-jD5wAzdZhl5Emk89dTMb7EqlUmO+n+U/uldQsSMxYh1HQG9J5Ti63B6em7Ob7DgoT7pvbqFUBn3X7UxaBba1Tg==}
+  /typescript@5.3.0-dev.20231009:
+    resolution: {integrity: sha512-0JwLa29peN3wK/3uUMHTr9bzLwJ7BIloeN3JTyHj0aeyoowNMJXjpVMSTu8geVzfP4RPL9vM/7iyVPrPBmLBaQ==}
     engines: {node: '>=14.17'}
     hasBin: true
     dev: true

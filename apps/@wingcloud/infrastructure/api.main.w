@@ -1,8 +1,10 @@
 bring cloud;
 bring http;
 
-bring "./projects.w" as Projects;
 bring "./cookie.w" as Cookie;
+bring "./github.w" as GitHub;
+bring "./jwt.w" as JWT;
+bring "./projects.w" as Projects;
 
 let projects = new Projects.Projects();
 
@@ -23,35 +25,7 @@ let captureUnhandledErrors = inflight (handler: inflight (): cloud.ApiResponse):
 
 let GITHUB_APP_CLIENT_ID = new cloud.Secret(name: "wing.cloud/GITHUB_APP_CLIENT_ID") as "GITHUB_APP_CLIENT_ID";
 let GITHUB_APP_CLIENT_SECRET = new cloud.Secret(name: "wing.cloud/GITHUB_APP_CLIENT_SECRET") as "GITHUB_APP_CLIENT_SECRET";
-
-struct GitHubTokens {
-  access_token: str;
-  expires_in: num;
-  refresh_token: str;
-  refresh_token_expires_in: num;
-  token_type: str;
-  scope: str;
-}
-
-let exchangeCodeForTokens = inflight (code: str): GitHubTokens => {
-  let response = http.post("https://github.com/login/oauth/access_token", {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: Json.stringify({
-      code: code,
-      client_id: GITHUB_APP_CLIENT_ID.value(),
-      client_secret: GITHUB_APP_CLIENT_SECRET.value(),
-    }),
-  });
-
-  if response.ok == false {
-    throw "Failed to exchange code for tokens";
-  }
-
-  return GitHubTokens.fromJson(Json.parse(response.body ?? ""));
-};
+let APP_SECRET = new cloud.Secret(name: "wing.cloud/APP_SECRET") as "APP_SECRET";
 
 struct GitHubCallbackOptions {
   code: str;
@@ -59,42 +33,39 @@ struct GitHubCallbackOptions {
   // setup_action: str?;
 }
 
-api.get("/test", inflight (request) => {
-  return {
-    status: 200,
-    headers: {
-      "Set-Cookie": Cookie.Cookie.serialize("auth", "123", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-      }),
-    },
-  };
-});
-api.get("/test2", inflight (request) => {
-  let cookies = Cookie.Cookie.parse(request.headers?.get("cookie") ?? "");
-  log(Json.stringify(cookies));
-  return {
-    status: 200,
-  };
-});
-
 api.get("/github.callback", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
-    // let input = GitHubCallbackOptions.fromJson(Json.parse(request.body ?? ""));
     let input = GitHubCallbackOptions {
       code: request.query.get("code"),
       // installation_id: request.query.get("installation_id"),
       // setup_action: request.query.get("setup_action"),
     };
 
-    let tokens = exchangeCodeForTokens(input.code);
+    let tokens = GitHub.Exchange.codeForTokens(
+      code: input.code,
+      clientId: GITHUB_APP_CLIENT_ID.value(),
+      clientSecret: GITHUB_APP_CLIENT_SECRET.value(),
+    );
 
+    // TODO: Get or create user.
     // let userId = getorCreateUser(...);
+    let userId = "user_1";
 
-    // TODO: Set auth cookie.
+    let jwt = JWT.JWT.sign(
+      userId: userId,
+      tokens: tokens,
+      secret: APP_SECRET.value(),
+    );
 
-    log(Json.stringify(tokens));
+    let authCookie = Cookie.Cookie.serialize(
+      "auth",
+      jwt,
+      {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      },
+    );
 
     return {
       status: 200,
@@ -102,7 +73,7 @@ api.get("/github.callback", inflight (request) => {
 
       }),
       headers: {
-        "Set-Cookie": "auth=123",
+        "Set-Cookie": authCookie,
       },
     };
   });
