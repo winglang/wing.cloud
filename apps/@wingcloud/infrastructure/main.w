@@ -39,3 +39,9 @@ wingApi.post("/report", inflight (req) => {
 
 let rntm = new runtime.RuntimeService(wingApi.url);
 new probot.ProbotApp(rntm.api.url, runtimeCallbacks);
+
+let website = new ex.ReactApp(
+  projectPath: "../website",
+  startCommand: "pnpm dev --port 5174",
+  buildCommand: "pnpm build",
+ );
