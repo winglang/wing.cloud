@@ -23,10 +23,11 @@ export const run = async function ({ context, requestedPort }: RunProps) {
   const keyStore = await createKeyStore(context.environment.entryfile);
   const report = useReportStatus(context, keyStore);
 
+  const e = new Executer(logfile);
+
   try {
     await report("deploying");
 
-    const e = new Executer(logfile);
     const { cancelSync } = fileBucketSync({
       file: logfile,
       key: context.environment.deploymentKey(),

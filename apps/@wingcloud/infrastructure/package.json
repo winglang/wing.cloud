@@ -5,19 +5,25 @@
   "sideEffects": false,
   "dependencies": {
     "@cdktf/provider-aws": "^17.0.6",
-    "@cdktf/provider-dnsimple": "^7.0.1",
+    "@cdktf/provider-dnsimple": "^7.0.3",
+    "@cdktf/provider-docker": "^9.0.0",
+    "@cdktf/provider-null": "^8.0.0",
+    "@probot/adapter-aws-lambda-serverless": "^3.0.4",
     "@vendia/serverless-express": "^4.10.4",
     "cdktf": "^0.18.0",
     "constructs": "^10.2.70",
     "express": "^4.18.2",
     "glob": "^10.3.4",
     "http-proxy": "^1.18.1",
-    "winglang": "^0.31.12"
+    "jsonwebtoken": "^9.0.2",
+    "node-fetch": "^3.3.2",
+    "winglang": "^0.34.13"
   },
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.280",
     "@types/express": "^4.17.17",
     "@types/http-proxy": "^1.17.12",
+    "@types/jsonwebtoken": "^9.0.3",
     "@types/node": "18",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",

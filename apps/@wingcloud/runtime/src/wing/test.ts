@@ -1,5 +1,5 @@
 import { compile as compileFn, Target } from "@winglang/compiler";
-import { testing, std } from "@winglang/sdk";
+import { simulator, std } from "@winglang/sdk";
 
 import { Environment } from "../environment.js";
 
@@ -46,7 +46,7 @@ export async function wingTest(props: WingTestProps) {
 
   try {
     const wingSdk = await import(props.wingSdkPath);
-    const simulator: testing.Simulator = await new wingSdk.testing.Simulator({
+    const simulator: simulator.Simulator = await new wingSdk.simulator.Simulator({
       simfile,
     });
     await simulator.start();

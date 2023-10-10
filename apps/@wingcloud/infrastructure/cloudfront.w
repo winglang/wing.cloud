@@ -1,7 +1,7 @@
 bring cloud;
 bring util;
 bring "@cdktf/provider-aws" as aws;
-bring "dnsimple.w" as DNSimple;
+bring "./dnsimple.w" as DNSimple;
 
 struct CachePolicyProps {
   name: str;
