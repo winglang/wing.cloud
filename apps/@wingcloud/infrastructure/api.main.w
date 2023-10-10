@@ -49,7 +49,7 @@ struct GitHubCallbackOptions {
 
 // https://github.com/login/oauth/authorize?client_id=Iv1.29ba054d6e919d9c
 api.get("/github.callback", inflight (request) => {
-  // return captureUnhandledErrors(inflight () => {
+  return captureUnhandledErrors(inflight () => {
     let input = GitHubCallbackOptions {
       code: request.query.get("code"),
       // installation_id: request.query.get("installation_id"),
@@ -93,8 +93,18 @@ api.get("/github.callback", inflight (request) => {
         "Set-Cookie": authCookie,
       },
     };
-  // });
+  });
 });
+
+let getUserFromCookie = inflight (request: cloud.ApiRequest): str? => {
+  let cookies = request.headers?.get("Cookie") ?? "";
+  let jwt = Cookie.Cookie.parse(cookies).get(AUTH_COOKIE_NAME);
+  let payload = JWT.JWT.verify(
+    jwt: jwt,
+    secret: APP_SECRET.value(),
+  );
+  return payload.userId;
+};
 
 api.get("/project.get", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
@@ -102,6 +112,8 @@ api.get("/project.get", inflight (request) => {
 
     // TODO: Authorize.
     let project = projects.get(input);
+
+    let userId = getUserFromCookie(request);
 
     return {
         status: 200,
