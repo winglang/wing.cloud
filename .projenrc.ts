@@ -8,8 +8,6 @@ import {
 } from "@skyrpex/wingen";
 import { JsonFile } from "projen";
 
-const WING_VERSION = "0.34.13";
-
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
   devDeps: ["@skyrpex/wingen"],
@@ -143,7 +141,7 @@ api.addDeps("@trpc/server", "zod");
 api.addDeps("nanoid");
 api.addDeps("@aws-sdk/client-dynamodb");
 api.addDeps("@aws-sdk/util-dynamodb");
-api.addDeps(`@winglang/sdk@${WING_VERSION}`);
+api.addDeps(`@winglang/sdk`);
 api.addDeps(opaqueType.name);
 api.addDeps(prefixedIdType.name);
 api.addDeps(nanoid62.name);
@@ -217,7 +215,7 @@ const infrastructure = new TypescriptProject({
 });
 infrastructure.addFields({ type: "commonjs" });
 
-infrastructure.addDeps(`winglang@${WING_VERSION}`);
+infrastructure.addDeps(`winglang`);
 infrastructure.devTask.exec("wing it main.w");
 infrastructure.compileTask.exec("wing compile main.w --target sim");
 infrastructure.compileTask.exec("wing compile main.w --target tf-aws");
@@ -255,10 +253,10 @@ const runtime = new TypescriptProject({
   },
 });
 
-runtime.addDeps(`winglang@${WING_VERSION}`);
-runtime.addDeps(`@winglang/sdk@${WING_VERSION}`);
-runtime.addDeps(`@winglang/compiler@${WING_VERSION}`);
-runtime.addDeps(`@wingconsole/app@${WING_VERSION}`);
+runtime.addDeps(`winglang`);
+runtime.addDeps(`@winglang/sdk`);
+runtime.addDeps(`@winglang/compiler`);
+runtime.addDeps(`@wingconsole/app`);
 runtime.addDeps("express");
 runtime.addDeps("jsonwebtoken");
 runtime.addDeps("jwk-to-pem");

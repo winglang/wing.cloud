@@ -8,7 +8,7 @@ bring "./lowkeys-map.w" as lowkeys;
 bring "./github-app.w" as github;
 bring "./runtime/runtime-callbacks.w" as runtime_callbacks;
 
-struct VerifyAndRecieveProps {
+struct VerifyAndReceieveProps {
   id: str;
   name: str;
   signature: str;
@@ -17,7 +17,7 @@ struct VerifyAndRecieveProps {
 
 interface IProbotWebhooks {
   inflight on(name: str, handler: inflight (): void);
-  inflight verifyAndReceive(props: VerifyAndRecieveProps);
+  inflight verifyAndReceive(props: VerifyAndReceieveProps);
 }
 
 interface IProbotAuth {
@@ -59,7 +59,7 @@ inflight class ProbotAdapter {
     this.instance?.webhooks?.on("pull_request.synchronize", handler);
   }
 
-  pub verifyAndReceive(props: VerifyAndRecieveProps) {
+  pub verifyAndReceive(props: VerifyAndReceieveProps) {
     this.instance?.webhooks?.verifyAndReceive(props);
   }
 
@@ -100,7 +100,7 @@ class ProbotApp {
 
     this.githubApp = new github.GithubApp(this.probotAppId, this.probotSecretKey, inflight (req) => {
       this.listen();
-      this.adapter.verifyAndReceive(this.getVerifyAndRecievePropsProps(req));
+      this.adapter.verifyAndReceive(this.getVerifyAndReceievePropsProps(req));
 
       return {
         status: 200
@@ -128,7 +128,7 @@ class ProbotApp {
     });
   }
 
-  inflight getVerifyAndRecievePropsProps(req: cloud.ApiRequest): VerifyAndRecieveProps {
+  inflight getVerifyAndReceievePropsProps(req: cloud.ApiRequest): VerifyAndReceieveProps {
     let lowkeysHeaders = lowkeys.LowkeysMap.fromMap(req.headers ?? {});
     if !lowkeysHeaders.has("x-github-delivery") {
       throw "getVerifyProps: missing id header";

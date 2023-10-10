@@ -17,7 +17,7 @@
     "http-proxy": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^3.3.2",
-    "winglang": "0.34.13"
+    "winglang": "^0.34.13"
   },
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.280",
