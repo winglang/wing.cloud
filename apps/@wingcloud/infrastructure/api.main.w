@@ -41,23 +41,13 @@ let APP_SECRET = new cloud.Secret(name: "wing.cloud/APP_SECRET") as "APP_SECRET"
 
 let AUTH_COOKIE_NAME = "auth";
 
-struct GitHubCallbackOptions {
-  code: str;
-  // installation_id: str?;
-  // setup_action: str?;
-}
-
 // https://github.com/login/oauth/authorize?client_id=Iv1.29ba054d6e919d9c
 api.get("/github.callback", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
-    let input = GitHubCallbackOptions {
-      code: request.query.get("code"),
-      // installation_id: request.query.get("installation_id"),
-      // setup_action: request.query.get("setup_action"),
-    };
+    let code = request.query.get("code");
 
     let tokens = GitHub.Exchange.codeForTokens(
-      code: input.code,
+      code: code,
       clientId: GITHUB_APP_CLIENT_ID.value(),
       clientSecret: GITHUB_APP_CLIENT_SECRET.value(),
     );
@@ -86,9 +76,6 @@ api.get("/github.callback", inflight (request) => {
 
     return {
       status: 200,
-      body: Json.stringify({
-
-      }),
       headers: {
         "Set-Cookie": authCookie,
       },
@@ -96,18 +83,28 @@ api.get("/github.callback", inflight (request) => {
   });
 });
 
-let getUserFromCookie = inflight (request: cloud.ApiRequest): str? => {
-  let cookies = request.headers?.get("Cookie") ?? "";
-  let jwt = Cookie.Cookie.parse(cookies).get(AUTH_COOKIE_NAME);
-  let payload = JWT.JWT.verify(
-    jwt: jwt,
-    secret: APP_SECRET.value(),
-  );
-  return payload.userId;
+let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
+  if let cookies = request.headers?.get("Cookie") {
+    let jwt = Cookie.Cookie.parse(cookies).get(AUTH_COOKIE_NAME);
+    log("jwt = ${jwt}");
+
+    return JWT.JWT.verify(
+      jwt: jwt,
+      secret: APP_SECRET.value(),
+    );
+  }
+
+};
+
+let getUserFromCookie = inflight (request: cloud.ApiRequest) => {
+  let payload = getJWTPayloadFromCookie(request);
+  return payload?.userId;
 };
 
 api.get("/project.get", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
+    let userId2 = getUserFromCookie(request);
+    log("userId2 = ${userId2}");
     let input = Projects.GetProjectOptions.fromJson(request.query);
 
     // TODO: Authorize.
