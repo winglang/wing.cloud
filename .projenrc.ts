@@ -234,6 +234,13 @@ infrastructure.addDeps("glob");
 
 infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-aws", "@cdktf/provider-dnsimple", "@cdktf/provider-docker", "@cdktf/provider-null");
 
+infrastructure.addDevDeps("@types/cookie");
+infrastructure.addDeps("cookie");
+
+infrastructure.addDeps("jose");
+
+infrastructure.addDeps("octokit", "node-fetch");
+
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(flyio.name);
 

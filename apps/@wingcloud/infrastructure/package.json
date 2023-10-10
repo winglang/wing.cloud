@@ -10,8 +10,9 @@
     "@cdktf/provider-null": "^8.0.0",
     "@probot/adapter-aws-lambda-serverless": "^3.0.4",
     "@vendia/serverless-express": "^4.10.4",
-    "cdktf": "^0.18.0",
-    "constructs": "^10.2.70",
+    "cdktf": "^0.18.2",
+    "constructs": "^10.3.0",
+    "cookie": "^0.5.0",
     "express": "^4.18.2",
     "glob": "^10.3.4",
     "http-proxy": "^1.18.1",
@@ -31,13 +32,13 @@
     "@wingcloud/website": "workspace:^",
     "eslint-config-prettier": "^9.0.0",
     "eslint-import-resolver-node": "^0.3.9",
-    "eslint-import-resolver-typescript": "^3.6.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-unicorn": "^48.0.1",
-    "tsx": "^3.12.10",
+    "tsx": "^3.13.0",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.4"
+    "vitest": "^0.34.6"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",

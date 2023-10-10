@@ -4,14 +4,14 @@
   "type": "module",
   "sideEffects": false,
   "dependencies": {
-    "turbo": "^1.10.14"
+    "turbo": "^1.10.15"
   },
   "devDependencies": {
     "@skyrpex/wingen": "^0.6.1",
-    "@types/node": "18",
+    "@types/node": "^18.18.4",
     "prettier": "^3.0.3",
-    "projen": "^0.73.27",
-    "tsx": "^3.12.10",
+    "projen": "^0.74.6",
+    "tsx": "^3.13.0",
     "typescript": "^5.2.2"
   },
   "scripts": {
