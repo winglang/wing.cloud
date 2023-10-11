@@ -9,28 +9,28 @@ export const getLoginFromAccessToken = async (accessToken: string) => {
   return user.login;
 };
 
-// export const listUserInstallations = async (token: string) => {
-//   const octokit = new Octokit({
-//     auth: token,
-//   });
+export const listUserInstallations = async (token: string) => {
+  const octokit = new Octokit({
+    auth: token,
+  });
 
-//   const { data: installations } =
-//     await octokit.rest.apps.listInstallationsForAuthenticatedUser();
-//   return installations.installations;
-// };
+  const { data: installations } =
+    await octokit.rest.apps.listInstallationsForAuthenticatedUser();
+  return installations.installations;
+};
 
-// export const listInstallationRepos = async (
-//   token: string,
-//   installationId: number,
-// ) => {
-//   const octokit = new Octokit({
-//     auth: token,
-//   });
+export const listInstallationRepos = async (
+  token: string,
+  installationId: number,
+) => {
+  const octokit = new Octokit({
+    auth: token,
+  });
 
-//   const { data: orgRepos } =
-//     await octokit.rest.apps.listInstallationReposForAuthenticatedUser({
-//       installation_id: installationId,
-//     });
+  const { data: orgRepos } =
+    await octokit.rest.apps.listInstallationReposForAuthenticatedUser({
+      installation_id: installationId,
+    });
 
-//   return orgRepos.repositories;
-// };
+  return orgRepos.repositories;
+};

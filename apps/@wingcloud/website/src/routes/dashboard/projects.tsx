@@ -1,13 +1,18 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
 import { Link, useNavigate } from "react-router-dom";
 
-import { trpc } from "../../utils/trpc.js";
+import { useClient } from "../../utils/use-client.js";
 
 export const Component = () => {
-  const userId = trpc["self"].useQuery();
+  // @ts-ignore-next-line
+  const apiUrl = window.wingEnv.API_URL;
+  const client = useClient(apiUrl);
+
   const navigate = useNavigate();
 
-  const projectsList = trpc["user.listProjects"].useQuery();
+  const projectsList = client.query("user.listProjects");
+
+  console.log(projectsList);
 
   return (
     <>
@@ -15,12 +20,11 @@ export const Component = () => {
         <div className="gap-2 w-full">
           <h1 className="flex justify-between items-center">
             <span className="font-semibold text-xl">Projects</span>
-            <span className="text-gray-500">({userId.data?.userId})</span>
           </h1>
 
           <div className="flex flex-wrap gap-4 pt-4">
             {projectsList.data &&
-              projectsList.data.map((project, key) => (
+              projectsList.data.projects.map((project, key) => (
                 <button
                   onClick={() => {
                     navigate(`/dashboard/projects/${project?.projectId}`);

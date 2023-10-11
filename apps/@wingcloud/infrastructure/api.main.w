@@ -20,7 +20,12 @@ let table = new ex.DynamodbTable(
 let projects = new Projects.Projects(table);
 let users = new Users.Users(table);
 
-let api = new cloud.Api();
+let api = new cloud.Api(
+  cors: true,
+  corsOptions: cloud.ApiCorsOptions {
+    allowOrigin: ["*"],
+  }
+);
 
 let captureUnhandledErrors = inflight (handler: inflight (): cloud.ApiResponse): cloud.ApiResponse => {
   try {
@@ -40,6 +45,24 @@ let GITHUB_APP_CLIENT_SECRET = new cloud.Secret(name: "wing.cloud/GITHUB_APP_CLI
 let APP_SECRET = new cloud.Secret(name: "wing.cloud/APP_SECRET") as "APP_SECRET";
 
 let AUTH_COOKIE_NAME = "auth";
+
+let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
+  if let cookies = request.headers?.get("Cookie") {
+    let jwt = Cookie.Cookie.parse(cookies).get(AUTH_COOKIE_NAME);
+    log("jwt = ${jwt}");
+
+    return JWT.JWT.verify(
+      jwt: jwt,
+      secret: APP_SECRET.value(),
+    );
+  }
+
+};
+
+let getUserFromCookie = inflight (request: cloud.ApiRequest) => {
+  let payload = getJWTPayloadFromCookie(request);
+  return payload?.userId;
+};
 
 // https://github.com/login/oauth/authorize?client_id=Iv1.29ba054d6e919d9c
 api.get("/github.callback", inflight (request) => {
@@ -83,23 +106,19 @@ api.get("/github.callback", inflight (request) => {
   });
 });
 
-let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
-  if let cookies = request.headers?.get("Cookie") {
-    let jwt = Cookie.Cookie.parse(cookies).get(AUTH_COOKIE_NAME);
-    log("jwt = ${jwt}");
+api.get("/github.listInstallations", inflight (request) => {
+  return captureUnhandledErrors(inflight () => {
+    let userId = getUserFromCookie(request);
+    log("userId = ${userId}");
 
-    return JWT.JWT.verify(
-      jwt: jwt,
-      secret: APP_SECRET.value(),
-    );
-  }
-
-};
-
-let getUserFromCookie = inflight (request: cloud.ApiRequest) => {
-  let payload = getJWTPayloadFromCookie(request);
-  return payload?.userId;
-};
+    return {
+      status: 200,
+      body: Json.stringify({
+        installations: [],
+      }),
+    };
+  });
+});
 
 api.get("/project.get", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
@@ -246,3 +265,11 @@ test "Rename project" {
   });
   log(renameResponse.body ?? "");
 }
+
+let website = new ex.ReactApp(
+  projectPath: "../website",
+  startCommand: "pnpm dev --port 5174",
+  buildCommand: "pnpm build",
+ ) as "WingCloud";
+
+ website.addEnvironment("API_URL", api.url);

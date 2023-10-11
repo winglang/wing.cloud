@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { SpinnerLoader } from "../../components/spinner-loader.js";
-import { trpc } from "../../utils/trpc.js";
+import { useClient } from "../../utils/use-client.js";
 
 export const Component = () => {
   const [searchParams] = useSearchParams();
@@ -10,15 +10,25 @@ export const Component = () => {
   const [error, setError] = useState("");
   const initialized = useRef(false);
 
-  const callback = trpc["github.callback"].useMutation({
-    onSuccess: () => {
-      navigate("/dashboard/projects");
+  // @ts-ignore-next-line
+  const apiUrl = window.wingEnv.API_URL;
+  const client = useClient(apiUrl);
+
+  client.query(
+    "github.callback",
+    { code: searchParams.get("code") },
+    {
+      onSuccess: () => {
+        navigate("/dashboard/projects");
+      },
+      onError: (error) => {
+        console.error(error);
+        if (error instanceof Error) {
+          setError(error.message);
+        }
+      },
     },
-    onError: (error) => {
-      console.error(error);
-      setError(error.message);
-    },
-  });
+  );
   useEffect(() => {
     const code = searchParams.get("code") || "";
     if (!code) {
@@ -27,9 +37,6 @@ export const Component = () => {
 
     if (!initialized.current) {
       initialized.current = true;
-      callback.mutate({
-        code,
-      });
     }
   }, []);
 

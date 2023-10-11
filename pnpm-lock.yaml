@@ -39,9 +39,6 @@ importers:
       '@aws-sdk/util-dynamodb':
         specifier: ^3.427.0
         version: 3.427.0(@aws-sdk/client-dynamodb@3.427.0)
-      '@trpc/server':
-        specifier: ^10.40.0
-        version: 10.40.0
       '@wingcloud/express-cookies':
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/express-cookies
@@ -78,9 +75,6 @@ importers:
       octokit:
         specifier: ^3.1.1
         version: 3.1.1
-      zod:
-        specifier: ^3.22.4
-        version: 3.22.4
     devDependencies:
       '@cloudy-ts/eslint-plugin':
         specifier: ^0.0.299
@@ -336,15 +330,6 @@ importers:
       '@tanstack/react-query':
         specifier: ^4.36.1
         version: 4.36.1(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/client':
-        specifier: ^10.40.0
-        version: 10.40.0(@trpc/server@10.40.0)
-      '@trpc/react-query':
-        specifier: ^10.40.0
-        version: 10.40.0(@tanstack/react-query@4.36.1)(@trpc/client@10.40.0)(@trpc/server@10.40.0)(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/server':
-        specifier: ^10.40.0
-        version: 10.40.0
       clsx:
         specifier: ^2.0.0
         version: 2.0.0
@@ -363,9 +348,6 @@ importers:
       vite:
         specifier: ^4.4.11
         version: 4.4.11(@types/node@18.18.4)
-      zod:
-        specifier: ^3.22.4
-        version: 3.22.4
     devDependencies:
       '@aws-sdk/client-dynamodb':
         specifier: ^3.427.0
@@ -439,6 +421,9 @@ importers:
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
 
   packages/@wingcloud/express-cookies:
     dependencies:
@@ -4154,34 +4139,6 @@ packages:
     engines: {node: '>= 10'}
     dev: false
 
-  /@trpc/client@10.40.0(@trpc/server@10.40.0):
-    resolution: {integrity: sha512-bT6BcdWjj0KzGQiimE6rB2tIaRYX0Ear4Gthb5szN/c01wrP0yC1Fbz2uCcm/QTVAwu4Lve5M+YjPoEaTHG6lg==}
-    peerDependencies:
-      '@trpc/server': 10.40.0
-    dependencies:
-      '@trpc/server': 10.40.0
-    dev: false
-
-  /@trpc/react-query@10.40.0(@tanstack/react-query@4.36.1)(@trpc/client@10.40.0)(@trpc/server@10.40.0)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-DpJrV3lmYNo9xtPtcg49lfh9CUFap3ZivjhlSmfe4QPf7H6xBjAE+ml4OdJ0RmKvSTFvbLSOiNdB1k5O8zIdzQ==}
-    peerDependencies:
-      '@tanstack/react-query': ^4.18.0
-      '@trpc/client': 10.40.0
-      '@trpc/server': 10.40.0
-      react: '>=16.8.0'
-      react-dom: '>=16.8.0'
-    dependencies:
-      '@tanstack/react-query': 4.36.1(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/client': 10.40.0(@trpc/server@10.40.0)
-      '@trpc/server': 10.40.0
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-    dev: false
-
-  /@trpc/server@10.40.0:
-    resolution: {integrity: sha512-49SUOMWzSZtu5+OdrADmJD+u+sjSE0qj1cWgYk2FY4jLkPJunLuNRuhzM7aOeBhiUjyfhg2YTfur8FN1WBmvEw==}
-    dev: false
-
   /@types/aws-lambda@8.10.123:
     resolution: {integrity: sha512-YBxxrA5fZzt1UFslJFBXH4AJUjkxu5ePv9RPjrpq5Tif5Xi2YhG3P8RAJfXXWL5/M6wPrlzlAMqaMM5ysci/EQ==}
     dev: false
@@ -5338,7 +5295,10 @@ packages:
     peerDependencies:
       constructs: ^10.0.25
     dependencies:
+      archiver: 5.3.1
       constructs: 10.2.70
+      json-stable-stringify: 1.0.2
+      semver: 7.5.4
     dev: false
     bundledDependencies:
       - archiver
@@ -5350,7 +5310,10 @@ packages:
     peerDependencies:
       constructs: ^10.0.25
     dependencies:
+      archiver: 5.3.1
       constructs: 10.3.0
+      json-stable-stringify: 1.0.2
+      semver: 7.5.4
     dev: false
     bundledDependencies:
       - archiver
@@ -5878,7 +5841,7 @@ packages:
     dependencies:
       semver: 7.5.4
       shelljs: 0.8.5
-      typescript: 5.3.0-dev.20231010
+      typescript: 5.3.0-dev.20231011
     dev: true
 
   /dset@3.1.2:
@@ -9838,8 +9801,8 @@ packages:
     hasBin: true
     dev: true
 
-  /typescript@5.3.0-dev.20231010:
-    resolution: {integrity: sha512-oSO2cE/D2+ju7rRavL4A/j6tP/s3Y4W7lDK81PaW3MEi1HpeXbRLObHcxA7Y9s2QuES/1P/81i/YKdB0kssg6w==}
+  /typescript@5.3.0-dev.20231011:
+    resolution: {integrity: sha512-qpyUI7J37X3Xj7/bPWSNPUvmJ8yDGVnkQ8665xD4+LVWKUX7vwO7n2E1CUuQzeQIF4y369iPaz1d396rTW5LfA==}
     engines: {node: '>=14.17'}
     hasBin: true
     dev: true
@@ -10399,4 +10362,3 @@ packages:
 
   /zod@3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
-    dev: false

@@ -137,7 +137,6 @@ api.addDevDeps("@types/express");
 
 api.addDeps("dotenv");
 
-api.addDeps("@trpc/server", "zod");
 api.addDeps("nanoid");
 api.addDeps("@aws-sdk/client-dynamodb");
 api.addDeps("@aws-sdk/util-dynamodb");
@@ -177,20 +176,13 @@ website.addDeps("react-router-dom");
 website.addDevDeps(vite.name);
 
 website.addDevDeps(api.name, "tsx", "get-port", "zod");
-website.addDeps(
-  "@trpc/client",
-  "@trpc/server",
-  "@trpc/react-query",
-  "@tanstack/react-query",
-);
+website.addDeps("@tanstack/react-query");
 website.addDeps("clsx");
 website.addDeps("@headlessui/react");
 website.addDeps("@heroicons/react");
 website.addDeps("react-popper");
 
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
-
-website.addDeps("@trpc/server", "zod");
 
 website.addDevDeps("@aws-sdk/client-dynamodb");
 website.addGitIgnore("/.wingcloud/");
@@ -232,7 +224,14 @@ infrastructure.addDevDeps("@types/express");
 
 infrastructure.addDeps("glob");
 
-infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-aws", "@cdktf/provider-dnsimple", "@cdktf/provider-docker", "@cdktf/provider-null");
+infrastructure.addDeps(
+  "constructs",
+  "cdktf",
+  "@cdktf/provider-aws",
+  "@cdktf/provider-dnsimple",
+  "@cdktf/provider-docker",
+  "@cdktf/provider-null",
+);
 
 infrastructure.addDevDeps("@types/cookie");
 infrastructure.addDeps("cookie");

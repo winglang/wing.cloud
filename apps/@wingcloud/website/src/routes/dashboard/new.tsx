@@ -1,11 +1,11 @@
-import { LockClosedIcon, LockOpenIcon } from "@heroicons/react/20/solid";
+import { LockClosedIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Select } from "../../components/select.js";
 import { openPopupWindow } from "../../utils/popup-window.js";
-import { trpc } from "../../utils/trpc.js";
+import { useClient } from "../../utils/use-client.js";
 
 const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
 
@@ -15,16 +15,21 @@ export const Component = () => {
   const [projectName, setProjectName] = useState("");
   const [installationId, setInstallationId] = useState("");
 
-  const installations = trpc["github.listInstallations"].useQuery();
+  // @ts-ignore-next-line
+  const apiUrl = window.wingEnv.API_URL;
+  const client = useClient(apiUrl);
+
+  const installations = client.query("github.listInstallations");
   const selectedInstallation = useMemo(
     () =>
-      installations.data?.find(
+      installations.data?.installations.find(
         (installation) => installation.id.toString() === installationId,
       ),
     [installations.data, installationId],
   );
 
-  const repos = trpc["github. listRepositories"].useQuery(
+  const repos = client.query(
+    "github.listRepositories",
     {
       installationId: installationId || "",
     },
@@ -33,7 +38,7 @@ export const Component = () => {
     },
   );
 
-  const createProjectMutation = trpc["user.createProject"].useMutation();
+  const createProjectMutation = client.mutation("user.createProject");
 
   const createProject = useCallback(
     async (repositoryId: string) => {
@@ -65,10 +70,12 @@ export const Component = () => {
               />
 
               <Select
-                items={(installations.data || []).map((installation) => ({
-                  value: installation.id.toString(),
-                  label: installation.name || "",
-                }))}
+                items={(installations.data?.installations || []).map(
+                  (installation) => ({
+                    value: installation.id.toString(),
+                    label: installation.name || "",
+                  }),
+                )}
                 placeholder="Select a GitHub namespace"
                 onChange={(value) => {
                   setInstallationId(value);
