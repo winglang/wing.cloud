@@ -166,6 +166,7 @@ website.addDeps("vite");
 website.addScript("dev", "vite dev --open");
 website.addScript("compile", "vite build");
 website.addGitIgnore("/dist/");
+website.addGitIgnore("/public/wing.js");
 
 website.addDevDeps("@vitejs/plugin-react-swc");
 website.addDeps("react", "react-dom");
