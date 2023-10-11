@@ -44,9 +44,12 @@ export const createWRPCReact = <
       get: (_target, route: any) => {
         return {
           useQuery: (input: any, options: any) => {
-            const url = new URL(useContext(WRPCContext).url);
-            for (const [key, value] of Object.entries(input)) {
-              url.searchParams.append(key, `${value}`);
+            const url = new URL(`${useContext(WRPCContext).url}/${route}`);
+
+            if (input) {
+              for (const [key, value] of Object.entries(input)) {
+                url.searchParams.append(key, `${value}`);
+              }
             }
             return useQuery({
               queryKey: [route, input],
@@ -66,7 +69,7 @@ export const createWRPCReact = <
             const url = new URL(useContext(WRPCContext).url);
             return useMutation({
               mutationFn: async (input: any) => {
-                const response = await fetch(`${url}/${route}`, {
+                const response = await fetch(url, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
