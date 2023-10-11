@@ -77,8 +77,8 @@ importers:
         version: 3.1.1
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.300
-        version: 0.0.300(eslint@8.51.0)
+        specifier: ^0.0.299
+        version: 0.0.299(eslint@8.51.0)
       '@types/express':
         specifier: ^4.17.19
         version: 4.17.19
@@ -174,8 +174,8 @@ importers:
         version: 0.36.10(constructs@10.3.0)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.300
-        version: 0.0.300(eslint@8.51.0)
+        specifier: ^0.0.299
+        version: 0.0.299(eslint@8.51.0)
       '@types/cookie':
         specifier: ^0.5.2
         version: 0.5.2
@@ -262,8 +262,8 @@ importers:
         version: 0.36.10(constructs@10.2.70)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.300
-        version: 0.0.300(eslint@8.51.0)
+        specifier: ^0.0.299
+        version: 0.0.299(eslint@8.51.0)
       '@types/express':
         specifier: ^4.17.19
         version: 4.17.19
@@ -356,8 +356,8 @@ importers:
         specifier: ^3.427.0
         version: 3.427.0
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.300
-        version: 0.0.300(eslint@8.51.0)
+        specifier: ^0.0.299
+        version: 0.0.299(eslint@8.51.0)
       '@types/node':
         specifier: '18'
         version: 18.18.4
@@ -435,8 +435,8 @@ importers:
         version: 0.5.0
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.300
-        version: 0.0.300(eslint@8.51.0)
+        specifier: ^0.0.299
+        version: 0.0.299(eslint@8.51.0)
       '@types/cookie':
         specifier: ^0.5.2
         version: 0.5.2
@@ -490,8 +490,8 @@ importers:
         version: 2.7.0
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.300
-        version: 0.0.300(eslint@8.51.0)
+        specifier: ^0.0.299
+        version: 0.0.299(eslint@8.51.0)
       '@types/node':
         specifier: '18'
         version: 18.18.4
@@ -541,8 +541,8 @@ importers:
   packages/@wingcloud/get-environment-variable:
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.300
-        version: 0.0.300(eslint@8.51.0)
+        specifier: ^0.0.299
+        version: 0.0.299(eslint@8.51.0)
       '@types/node':
         specifier: '18'
         version: 18.18.4
@@ -587,8 +587,8 @@ importers:
         version: 5.0.1
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.300
-        version: 0.0.300(eslint@8.51.0)
+        specifier: ^0.0.299
+        version: 0.0.299(eslint@8.51.0)
       '@types/node':
         specifier: '18'
         version: 18.18.4
@@ -629,8 +629,8 @@ importers:
   packages/@wingcloud/type-opaque:
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.300
-        version: 0.0.300(eslint@8.51.0)
+        specifier: ^0.0.299
+        version: 0.0.299(eslint@8.51.0)
       '@types/node':
         specifier: '18'
         version: 18.18.4
@@ -678,8 +678,8 @@ importers:
         version: 3.22.4
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.300
-        version: 0.0.300(eslint@8.51.0)
+        specifier: ^0.0.299
+        version: 0.0.299(eslint@8.51.0)
       '@types/node':
         specifier: '18'
         version: 18.18.4
@@ -2446,6 +2446,15 @@ packages:
       constructs: 10.3.0
     dev: false
 
+  /@cloudy-ts/eslint-plugin@0.0.299(eslint@8.51.0):
+    resolution: {integrity: sha512-u3mQOwxPweuaz66umJ/hl72Slu0nZTV1osaBGAwIXuRosxya7N087rTRXBIIxowGA6sonUIOHyVsjo0sZl1siw==}
+    engines: {node: '>= 18.16.0'}
+    peerDependencies:
+      eslint: ^8.51.0
+    dependencies:
+      eslint: 8.51.0
+    dev: true
+
   /@cloudy-ts/eslint-plugin@0.0.300(eslint@8.51.0):
     resolution: {integrity: sha512-PQyfremQsmvn4XvmnGWyqjqFNBcrOjcLUduGS5lbu8ddA81TJaHD0pTmti05IFDhOyj3w53sjsNwwv/pyVh/ug==}
     engines: {node: '>= 18.16.0'}
@@ -3627,7 +3636,7 @@ packages:
       '@octokit/core': '>=3'
     dependencies:
       '@octokit/core': 3.6.0
-      '@types/js-yaml': 4.0.6
+      '@types/js-yaml': 4.0.7
       js-yaml: 4.1.0
     dev: false
 
@@ -4477,8 +4486,8 @@ packages:
     resolution: {integrity: sha512-qC4bCqYGy1y/NP7dDVr7KJarn+PbX1nSpwA7JXdu0HxT3QYjO8MJ+cntENtHFVy2dRAyBV23OZ6MxsW1AM1L8g==}
     dev: true
 
-  /@types/js-yaml@4.0.6:
-    resolution: {integrity: sha512-ACTuifTSIIbyksx2HTon3aFtCKWcID7/h3XEmRpDYdMCXxPbl+m9GteOJeaAkiAta/NJaSFuA7ahZ0NkwajDSw==}
+  /@types/js-yaml@4.0.7:
+    resolution: {integrity: sha512-RJZP9WAMMr1514KbdSXkLRrKvYQacjr1+HWnY8pui/uBTBoSgD9ZGR17u/d4nb9NpERp0FkdLBe7hq8NIPBgkg==}
     dev: false
 
   /@types/json-schema@7.0.13:

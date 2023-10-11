@@ -47,6 +47,5 @@ class Exchange {
   }
 
   extern "./github.ts" pub static inflight getLoginFromAccessToken(accessToken: str): str;
-
   extern "./github.ts" pub static inflight listUserInstallations(token: str): str;
 }
