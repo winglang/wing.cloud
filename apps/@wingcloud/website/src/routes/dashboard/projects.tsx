@@ -1,16 +1,12 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
 import { Link, useNavigate } from "react-router-dom";
 
-import { useClient } from "../../utils/use-client.js";
+import { wrpc } from "../../utils/wrpc.js";
 
 export const Component = () => {
-  // @ts-ignore-next-line
-  const apiUrl = window.wingEnv.API_URL;
-  const client = useClient(apiUrl);
-
   const navigate = useNavigate();
 
-  const projectsList = client.query("user.listProjects");
+  const projectsList = wrpc["user.listProjects"].useQuery();
 
   console.log(projectsList);
 
@@ -24,15 +20,15 @@ export const Component = () => {
 
           <div className="flex flex-wrap gap-4 pt-4">
             {projectsList.data &&
-              projectsList.data.projects.map((project, key) => (
+              projectsList.data.projects.map((project) => (
                 <button
                   onClick={() => {
-                    navigate(`/dashboard/projects/${project?.projectId}`);
+                    navigate(`/dashboard/projects/${project.projectId}`);
                   }}
-                  key={project?.projectId || key}
+                  key={project.projectId}
                   className="flex flex-col justify-center items-center w-32 h-32 rounded-lg border border-gray-300 p-4 hover:bg-gray-100 transition duration-300"
                 >
-                  <div className="text-center">{project?.name}</div>
+                  <div className="text-center">{project.name}</div>
                 </button>
               ))}
             <button

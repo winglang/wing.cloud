@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { SpinnerLoader } from "../../components/spinner-loader.js";
-import { useClient } from "../../utils/use-client.js";
+import { wrpc } from "../../utils/wrpc.js";
 
 export const Component = () => {
   const [searchParams] = useSearchParams();
@@ -10,13 +10,11 @@ export const Component = () => {
   const [error, setError] = useState("");
   const initialized = useRef(false);
 
-  // @ts-ignore-next-line
-  const apiUrl = window.wingEnv.API_URL;
-  const client = useClient(apiUrl);
-
-  client.query(
-    "github.callback",
-    { code: searchParams.get("code") },
+  const code = searchParams.get("code")!;
+  wrpc["github.callback"].useQuery(
+    {
+      code,
+    },
     {
       onSuccess: () => {
         navigate("/dashboard/projects");
@@ -29,6 +27,7 @@ export const Component = () => {
       },
     },
   );
+
   useEffect(() => {
     const code = searchParams.get("code") || "";
     if (!code) {

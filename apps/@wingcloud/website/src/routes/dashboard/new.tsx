@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { Select } from "../../components/select.js";
 import { openPopupWindow } from "../../utils/popup-window.js";
-import { useClient } from "../../utils/use-client.js";
+import { useClient } from "../../utils/wrpc.js";
 
 const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
 

@@ -6,7 +6,7 @@ import {
   TypescriptConfig,
   Eslint,
 } from "@skyrpex/wingen";
-import { JsonFile } from "projen";
+import { JsonFile, web } from "projen";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -110,6 +110,17 @@ const env = new TypescriptProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const wrpc = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/wrpc",
+  devDeps: ["react", "@types/react", "@tanstack/react-query"],
+  peerDeps: ["react", "@tanstack/react-query"],
+});
+wrpc
+  .tryFindObjectFile("tsconfig.json")!
+  .addToArray("compilerOptions.lib", "DOM", "DOM.Iterable");
+
+///////////////////////////////////////////////////////////////////////////////
 const vite = new NodeEsmProject({
   monorepo,
   name: "@wingcloud/vite",
@@ -177,6 +188,7 @@ website.addDeps("react-router-dom");
 website.addDevDeps(vite.name);
 
 website.addDevDeps(api.name, "tsx", "get-port", "zod");
+website.addDeps(wrpc.name);
 website.addDeps("@tanstack/react-query");
 website.addDeps("clsx");
 website.addDeps("@headlessui/react");
