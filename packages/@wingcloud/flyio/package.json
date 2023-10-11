@@ -7,8 +7,8 @@
     "node-fetch": "2"
   },
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.300",
-    "@types/node": "18",
+    "@cloudy-ts/eslint-plugin": "^0.0.299",
+    "@types/node": "^18.18.4",
     "@types/node-fetch": "2",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
