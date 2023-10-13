@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { Select } from "../../components/select.js";
 import { openPopupWindow } from "../../utils/popup-window.js";
-import { useClient } from "../../utils/wrpc.js";
+import { wrpc } from "../../utils/wrpc.js";
 
 const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
 
@@ -15,11 +15,8 @@ export const Component = () => {
   const [projectName, setProjectName] = useState("");
   const [installationId, setInstallationId] = useState("");
 
-  // @ts-ignore-next-line
-  const apiUrl = window.wingEnv.API_URL;
-  const client = useClient(apiUrl);
+  const installations = wrpc["github.listInstallations"].useQuery();
 
-  const installations = client.query("github.listInstallations");
   const selectedInstallation = useMemo(
     () =>
       installations.data?.installations.find(
@@ -28,17 +25,13 @@ export const Component = () => {
     [installations.data, installationId],
   );
 
-  const repos = client.query(
-    "github.listRepositories",
-    {
-      installationId: installationId || "",
-    },
-    {
-      enabled: !!installationId,
-    },
-  );
+  const repos = installationId
+    ? wrpc["github.listRepositories"].useQuery({
+        installationId: installationId,
+      })
+    : { data: [] };
 
-  const createProjectMutation = client.mutation("user.createProject");
+  const createProjectMutation = wrpc["user.createProject"].useMutation();
 
   const createProject = useCallback(
     async (repositoryId: string) => {
@@ -85,43 +78,44 @@ export const Component = () => {
               />
 
               <div className="justify-end flex flex-col gap-1">
-                {repos.data?.map((repo) => (
-                  <div
-                    key={repo.id}
-                    className={clsx(
-                      "w-full p-2 rounded border text-left flex items-center",
-                    )}
-                  >
-                    <img
-                      src={repo.imgUrl}
-                      className="w-5 h-5 inline-block mr-2 rounded-full"
-                    />
-                    <span>
-                      {selectedInstallation ? selectedInstallation.name : ""}/
-                      {repo.name}
-                    </span>
-                    <div className="mx-1 items-center">
-                      {repo.private && (
-                        <LockClosedIcon className="w-3 h-3 inline-block" />
+                {repos.data &&
+                  repos.data.map((repo) => (
+                    <div
+                      key={repo.id}
+                      className={clsx(
+                        "w-full p-2 rounded border text-left flex items-center",
                       )}
-                    </div>
-
-                    <div className="flex grow justify-end text-slate-500 items-center">
-                      <button
-                        className={clsx(
-                          "mr-2 py-0.5 px-1 rounded border text-xs cursor-pointer",
-                          "hover:bg-sky-50 transition duration-300",
+                    >
+                      <img
+                        src={repo.imgUrl}
+                        className="w-5 h-5 inline-block mr-2 rounded-full"
+                      />
+                      <span>
+                        {selectedInstallation ? selectedInstallation.name : ""}/
+                        {repo.name}
+                      </span>
+                      <div className="mx-1 items-center">
+                        {repo.private && (
+                          <LockClosedIcon className="w-3 h-3 inline-block" />
                         )}
-                        onClick={() => {
-                          createProject(repo.id.toString());
-                        }}
-                        disabled={!installationId}
-                      >
-                        Import
-                      </button>
+                      </div>
+
+                      <div className="flex grow justify-end text-slate-500 items-center">
+                        <button
+                          className={clsx(
+                            "mr-2 py-0.5 px-1 rounded border text-xs cursor-pointer",
+                            "hover:bg-sky-50 transition duration-300",
+                          )}
+                          onClick={() => {
+                            createProject(repo.id.toString());
+                          }}
+                          disabled={!installationId}
+                        >
+                          Import
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
 
                 {!repos.data && (
                   <div className="w-full p-2 rounded border text-center text-slate-500">

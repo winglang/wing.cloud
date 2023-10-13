@@ -120,6 +120,20 @@ api.get("/github.listInstallations", inflight (request) => {
   });
 });
 
+api.get("/github.listRepositories", inflight (request) => {
+  return captureUnhandledErrors(inflight () => {
+    let userId = getUserFromCookie(request);
+    log("userId = ${userId}");
+
+    return {
+      status: 200,
+      body: Json.stringify({
+        repositories: [],
+      }),
+    };
+  });
+});
+
 api.get("/project.get", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
     let userId2 = getUserFromCookie(request);
@@ -193,7 +207,7 @@ api.post("/user.createProject", inflight (request) => {
     };
   });
 });
-api.get("/user.listProjects", inflight () => {
+api.get("/user.listProjects", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
     let input = Projects.ListProjectsOptions {
       // TODO: Parse authentication cookie.

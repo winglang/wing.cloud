@@ -43,7 +43,7 @@ export const createWRPCReact = <
     {
       get: (_target, route: any) => {
         return {
-          useQuery: (input: any, options: any) => {
+          useQuery: (input: any, options: UseQueryOptions) => {
             const url = new URL(`${useContext(WRPCContext).url}/${route}`);
 
             if (input) {
@@ -65,7 +65,7 @@ export const createWRPCReact = <
               ...options,
             });
           },
-          useMutation: (options: any) => {
+          useMutation: (options: UseMutationOptions) => {
             const url = new URL(useContext(WRPCContext).url);
             return useMutation({
               mutationFn: async (input: any) => {
