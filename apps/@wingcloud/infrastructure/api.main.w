@@ -64,6 +64,11 @@ let getUserFromCookie = inflight (request: cloud.ApiRequest) => {
   return payload?.userId;
 };
 
+let getAccessTokenFromCookie = inflight (request: cloud.ApiRequest) => {
+  let payload = getJWTPayloadFromCookie(request);
+  return payload?.tokens?.access_token;
+};
+
 // https://github.com/login/oauth/authorize?client_id=Iv1.29ba054d6e919d9c
 api.get("/github.callback", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
@@ -108,13 +113,21 @@ api.get("/github.callback", inflight (request) => {
 
 api.get("/github.listInstallations", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
-    let userId = getUserFromCookie(request);
-    log("userId = ${userId}");
+    let accessToken = getAccessTokenFromCookie(request);
+    log("accessToken = ${accessToken}");
+
+    if (!accessToken?) {
+      return {
+        status: 401,
+      };
+    }
+
+    let installations = GitHub.Exchange.listUserInstallations(accessToken ?? "");
 
     return {
       status: 200,
       body: Json.stringify({
-        installations: [],
+        installations,
       }),
     };
   });
@@ -122,13 +135,23 @@ api.get("/github.listInstallations", inflight (request) => {
 
 api.get("/github.listRepositories", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
-    let userId = getUserFromCookie(request);
-    log("userId = ${userId}");
+    let accessToken = getAccessTokenFromCookie(request);
+    log("accessToken = ${accessToken}");
+
+    if (!accessToken?) {
+      return {
+        status: 401,
+      };
+    }
+
+    let installationId = num.fromStr(request.query.get("installationId"));
+
+    let repositories = GitHub.Exchange.listInstallationRepos(accessToken ?? "", installationId);
 
     return {
       status: 200,
       body: Json.stringify({
-        repositories: [],
+        repositories,
       }),
     };
   });
@@ -191,8 +214,8 @@ api.post("/user.createProject", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
     let body = Json.parse(request.body ?? "");
     let input = Projects.CreateProjectOptions {
-      name: body.get("name").asStr(),
-      repository: body.get("repository").asStr(),
+      name: body.get("projectName").asStr(),
+      repository: body.get("repositoryId").asStr(),
       // TODO: Parse authentication cookie.
       userId: "user_1",
     };
@@ -207,6 +230,7 @@ api.post("/user.createProject", inflight (request) => {
     };
   });
 });
+
 api.get("/user.listProjects", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
     let input = Projects.ListProjectsOptions {
