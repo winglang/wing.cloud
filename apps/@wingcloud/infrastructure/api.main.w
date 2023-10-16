@@ -133,7 +133,16 @@ api.get("/wrpc/github.listInstallations", inflight (request) => {
     return {
       status: 200,
       body: Json.stringify({
-        installations,
+        installations: [
+          {
+            id: 1,
+            name: "skyrpex",
+          },
+          {
+            id: 2,
+            name: "starlight",
+          },
+        ],
       }),
     };
   });
@@ -157,7 +166,18 @@ api.get("/wrpc/github.listRepositories", inflight (request) => {
     return {
       status: 200,
       body: Json.stringify({
-        repositories,
+        repositories: [
+          {
+            id: "skyrpex/acme",
+            name: "acme",
+            private: false,
+          },
+          {
+            id: "starlight/starlight",
+            name: "starlight",
+            private: true,
+          },
+        ],
       }),
     };
   });

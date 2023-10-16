@@ -15,6 +15,15 @@ struct ExchangeCodeForTokensOptions {
   clientSecret: str;
 }
 
+struct UserInstallation {
+  id: num;
+  account: str;
+}
+
+struct InstallationRepository {
+  name: str;
+}
+
 class Exchange {
   pub static inflight codeForTokens(options: ExchangeCodeForTokensOptions): AuthTokens {
     // return AuthTokens {
@@ -47,6 +56,6 @@ class Exchange {
   }
 
   extern "./github.ts" pub static inflight getLoginFromAccessToken(accessToken: str): str;
-  extern "./github.ts" pub static inflight listUserInstallations(token: str): str;
-  extern "./github.ts" pub static inflight listInstallationRepos(token: str, installationId: num): str;
+  extern "./github.ts" pub static inflight listUserInstallations(token: str): Array<UserInstallation>;
+  extern "./github.ts" pub static inflight listInstallationRepos(token: str, installationId: num): Array<InstallationRepository>;
 }
