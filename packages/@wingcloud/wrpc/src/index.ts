@@ -45,6 +45,12 @@ export const createWRPCReact = <
         return {
           useQuery: (input: any, options: UseQueryOptions) => {
             const url = new URL(`${useContext(WRPCContext).url}/${route}`);
+            console.log(
+              useContext(WRPCContext).url,
+              route,
+              `${useContext(WRPCContext).url}/${route}`,
+              url,
+            );
 
             if (input) {
               for (const [key, value] of Object.entries(input)) {

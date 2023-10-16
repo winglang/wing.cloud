@@ -1,12 +1,15 @@
 bring cloud;
 bring http;
 bring ex;
+bring util;
 
 bring "./cookie.w" as Cookie;
 bring "./github.w" as GitHub;
 bring "./jwt.w" as JWT;
 bring "./projects.w" as Projects;
 bring "./users.w" as Users;
+bring "./reverse-proxy-sim.w" as ReverseProxy;
+// bring "./reverse-proxy.w" as ReverseProxy;
 
 let table = new ex.DynamodbTable(
   name: "data",
@@ -70,7 +73,7 @@ let getAccessTokenFromCookie = inflight (request: cloud.ApiRequest) => {
 };
 
 // https://github.com/login/oauth/authorize?client_id=Iv1.29ba054d6e919d9c
-api.get("/github.callback", inflight (request) => {
+api.get("/wrpc/github.callback", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
     let code = request.query.get("code");
 
@@ -111,7 +114,7 @@ api.get("/github.callback", inflight (request) => {
   });
 });
 
-api.get("/github.listInstallations", inflight (request) => {
+api.get("/wrpc/github.listInstallations", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
     let accessToken = getAccessTokenFromCookie(request);
     log("accessToken = ${accessToken}");
@@ -133,7 +136,7 @@ api.get("/github.listInstallations", inflight (request) => {
   });
 });
 
-api.get("/github.listRepositories", inflight (request) => {
+api.get("/wrpc/github.listRepositories", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
     let accessToken = getAccessTokenFromCookie(request);
     log("accessToken = ${accessToken}");
@@ -157,7 +160,7 @@ api.get("/github.listRepositories", inflight (request) => {
   });
 });
 
-api.get("/project.get", inflight (request) => {
+api.get("/wrpc/project.get", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
     let userId2 = getUserFromCookie(request);
     log("userId2 = ${userId2}");
@@ -176,8 +179,8 @@ api.get("/project.get", inflight (request) => {
     };
   });
 });
-// api.get("/project.listEnvironments", inflight () => {});
-api.post("/project.rename", inflight (request) => {
+// api.get("/wrpc/project.listEnvironments", inflight () => {});
+api.post("/wrpc/project.rename", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
     let input = Projects.RenameProjectOptions.fromJson(
       Json.parse(request.body ?? ""),
@@ -191,7 +194,7 @@ api.post("/project.rename", inflight (request) => {
     };
   });
 });
-api.post("/project.delete", inflight (request) => {
+api.post("/wrpc/project.delete", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
     let input = Projects.DeleteProjectOptions.fromJson(
       Json.parse(request.body ?? ""),
@@ -205,12 +208,12 @@ api.post("/project.delete", inflight (request) => {
     };
   });
 });
-// api.post("/project.changeBuildSettings", inflight () => {});
-// api.get("/project.listEnvironmentVariables", inflight () => {});
-// api.post("/project.updateEnvironmentVariables", inflight () => {});
+// api.post("/wrpc/project.changeBuildSettings", inflight () => {});
+// api.get("/wrpc/project.listEnvironmentVariables", inflight () => {});
+// api.post("/wrpc/project.updateEnvironmentVariables", inflight () => {});
 
 // {"name": "acme", "repository": "skyrpex/acme"}
-api.post("/user.createProject", inflight (request) => {
+api.post("/wrpc/user.createProject", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
     let body = Json.parse(request.body ?? "");
     let input = Projects.CreateProjectOptions {
@@ -231,7 +234,7 @@ api.post("/user.createProject", inflight (request) => {
   });
 });
 
-api.get("/user.listProjects", inflight (request) => {
+api.get("/wrpc/user.listProjects", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
     let input = Projects.ListProjectsOptions {
       // TODO: Parse authentication cookie.
@@ -248,13 +251,13 @@ api.get("/user.listProjects", inflight (request) => {
     };
   });
 });
-// api.get("/user.listRepositories", inflight () => {});
+// api.get("/wrpc/user.listRepositories", inflight () => {});
 
-// api.post("/signIn.callback", inflight () => {});
+// api.post("/wrpc/signIn.callback", inflight () => {});
 
-// api.get("/environment.get", inflight () => {});
-// api.post("/environment.updateStatus", inflight () => {});
-// api.post("/environment.generateLogsPresignedURL", inflight () => {});
+// api.get("/wrpc/environment.get", inflight () => {});
+// api.post("/wrpc/environment.updateStatus", inflight () => {});
+// api.post("/wrpc/environment.generateLogsPresignedURL", inflight () => {});
 
 test "Test API" {
   let response = http.post("${api.url}/user.createProject", {
@@ -308,6 +311,39 @@ let website = new ex.ReactApp(
   projectPath: "../website",
   startCommand: "pnpm dev --port 5174",
   buildCommand: "pnpm build",
- ) as "WingCloud";
+  localPort: 5174,
+);
 
- website.addEnvironment("API_URL", api.url);
+website.addEnvironment("API_URL", api.url);
+
+let proxy = new ReverseProxy.ReverseProxy(
+  origins: [
+    {
+      pathPattern: "/wrpc/*",
+      domainName: api.url,
+    },
+    {
+      pathPattern: "*",
+      domainName: website.url,
+    },
+  ],
+);
+
+// new cloud.Service(inflight () => {
+//   log("Proxy URL: ${proxy.url()}");
+// });
+
+bring "./ngrok2.w" as Ngrok;
+
+let ngrok = new Ngrok.Ngrok(
+  url: inflight () => {
+    return proxy.url();
+  },
+  // domain: "platypus-ready-lightly.ngrok-free.app",
+  domain: util.tryEnv("NGROK_DOMAIN"),
+);
+
+new cloud.Service(inflight () => {
+  log("Proxy URL: ${proxy.url()}");
+  log("Ngrok URL: ${ngrok.waitForUrl()}");
+});

@@ -174,7 +174,7 @@ new TypescriptConfig(website, {
 new Eslint(website);
 
 website.addDeps("vite");
-website.addScript("dev", "vite dev --open");
+website.addScript("dev", "vite dev");
 website.addScript("compile", "vite build");
 website.addGitIgnore("/dist/");
 website.addGitIgnore("/public/wing.js");

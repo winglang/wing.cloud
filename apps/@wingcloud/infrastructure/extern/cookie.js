@@ -1,3 +1,1 @@
-exports.cookie = function () {
-  return require("cookie");
-};
+export { parse, serialize } from "cookie";

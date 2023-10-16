@@ -4,7 +4,7 @@
   "type": "module",
   "sideEffects": false,
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.299",
+    "@cloudy-ts/eslint-plugin": "^0.0.305",
     "@types/node": "18",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
