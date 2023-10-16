@@ -45,13 +45,6 @@ export const createWRPCReact = <
         return {
           useQuery: (input: any, options: UseQueryOptions) => {
             const url = new URL(`${useContext(WRPCContext).url}/${route}`);
-            console.log(
-              useContext(WRPCContext).url,
-              route,
-              `${useContext(WRPCContext).url}/${route}`,
-              url,
-            );
-
             if (input) {
               for (const [key, value] of Object.entries(input)) {
                 url.searchParams.append(key, `${value}`);
@@ -66,6 +59,9 @@ export const createWRPCReact = <
                     "Content-Type": "application/json",
                   },
                 });
+                if (!response.ok) {
+                  throw new Error(await response.text());
+                }
                 return response.json();
               },
               ...options,
@@ -82,6 +78,9 @@ export const createWRPCReact = <
                   },
                   body: JSON.stringify(input),
                 });
+                if (!response.ok) {
+                  throw new Error(await response.text());
+                }
                 return response.json();
               },
               ...options,

@@ -50,7 +50,7 @@ let APP_SECRET = new cloud.Secret(name: "wing.cloud/APP_SECRET") as "APP_SECRET"
 let AUTH_COOKIE_NAME = "auth";
 
 let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
-  if let cookies = request.headers?.get("Cookie") {
+  if let cookies = request.headers?.get("cookie") {
     let jwt = Cookie.Cookie.parse(cookies).get(AUTH_COOKIE_NAME);
     log("jwt = ${jwt}");
 
@@ -59,7 +59,6 @@ let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPaylo
       secret: APP_SECRET.value(),
     );
   }
-
 };
 
 let getUserFromCookie = inflight (request: cloud.ApiRequest) => {
@@ -69,7 +68,7 @@ let getUserFromCookie = inflight (request: cloud.ApiRequest) => {
 
 let getAccessTokenFromCookie = inflight (request: cloud.ApiRequest) => {
   let payload = getJWTPayloadFromCookie(request);
-  return payload?.tokens?.access_token;
+  return payload?.accessToken;
 };
 
 // https://github.com/login/oauth/authorize?client_id=Iv1.29ba054d6e919d9c
@@ -90,9 +89,12 @@ api.get("/wrpc/github.callback", inflight (request) => {
     log("userId = ${userId}");
 
     let jwt = JWT.JWT.sign(
-      userId: userId,
-      tokens: tokens,
       secret: APP_SECRET.value(),
+      userId: userId,
+      accessToken: tokens.access_token,
+      accessTokenExpiresIn: tokens.expires_in,
+      refreshToken: tokens.refresh_token,
+      refreshTokenExpiresIn: tokens.refresh_token_expires_in,
     );
 
     let authCookie = Cookie.Cookie.serialize(
@@ -106,8 +108,9 @@ api.get("/wrpc/github.callback", inflight (request) => {
     );
 
     return {
-      status: 200,
+      status: 302,
       headers: {
+        Location: "/dashboard/projects",
         "Set-Cookie": authCookie,
       },
     };
@@ -314,8 +317,6 @@ let website = new ex.ReactApp(
   localPort: 5174,
 );
 
-website.addEnvironment("API_URL", api.url);
-
 let proxy = new ReverseProxy.ReverseProxy(
   origins: [
     {
@@ -329,17 +330,12 @@ let proxy = new ReverseProxy.ReverseProxy(
   ],
 );
 
-// new cloud.Service(inflight () => {
-//   log("Proxy URL: ${proxy.url()}");
-// });
-
 bring "./ngrok2.w" as Ngrok;
 
 let ngrok = new Ngrok.Ngrok(
   url: inflight () => {
     return proxy.url();
   },
-  // domain: "platypus-ready-lightly.ngrok-free.app",
   domain: util.tryEnv("NGROK_DOMAIN"),
 );
 
