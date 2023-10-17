@@ -131,37 +131,6 @@ vite.addDevDeps("vite");
 vite.addDeps("dotenv");
 
 ///////////////////////////////////////////////////////////////////////////////
-const api = new TypescriptProject({
-  monorepo,
-  name: "@wingcloud/api",
-  outdir: "apps/@wingcloud/api",
-});
-
-api.addGitIgnore("/.env");
-
-api.removeTask("dev");
-api.removeTask("build");
-api.removeTask("compile");
-
-api.addDeps("express");
-api.addDevDeps("@types/express");
-
-api.addDeps("dotenv");
-
-api.addDeps("nanoid");
-api.addDeps("@aws-sdk/client-dynamodb");
-api.addDeps("@aws-sdk/util-dynamodb");
-api.addDeps(`@winglang/sdk`);
-api.addDeps(opaqueType.name);
-api.addDeps(prefixedIdType.name);
-api.addDeps(nanoid62.name);
-api.addDeps("jose");
-api.addDeps("node-fetch");
-api.addDeps(cookies.name);
-api.addDeps(env.name);
-api.addDeps("octokit");
-
-///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
   parent: monorepo,
   name: "@wingcloud/website",
@@ -187,7 +156,7 @@ website.addDeps("react-router-dom");
 
 website.addDevDeps(vite.name);
 
-website.addDevDeps(api.name, "tsx", "get-port", "zod");
+website.addDevDeps("tsx", "get-port", "zod");
 website.addDeps(wrpc.name);
 website.addDeps("@tanstack/react-query");
 website.addDeps("clsx");

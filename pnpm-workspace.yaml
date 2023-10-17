@@ -9,7 +9,6 @@ packages:
   - packages/@wingcloud/get-environment-variable
   - packages/@wingcloud/wrpc
   - packages/@wingcloud/vite
-  - apps/@wingcloud/api
   - apps/@wingcloud/website
   - apps/@wingcloud/infrastructure
   - apps/@wingcloud/runtime

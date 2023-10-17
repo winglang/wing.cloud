@@ -24,7 +24,6 @@
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
     "@vitejs/plugin-react-swc": "^3.4.0",
-    "@wingcloud/api": "workspace:^",
     "@wingcloud/vite": "workspace:^",
     "autoprefixer": "^10.4.16",
     "eslint-config-prettier": "^9.0.0",

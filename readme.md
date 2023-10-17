@@ -21,19 +21,16 @@ projen
 
 ## Dev
 
-Copy the .env.example files as .env for the api and website packages:
+Copy the .env.example files as .env for the website package:
 
 ```sh
-cp apps/@wingcloud/api/.env.example apps/@wingcloud/api/.env
-
 cp apps/@wingcloud/website/.env.example apps/@wingcloud/website/.env
 ```
 
 Run the website:
 
 ```sh
-cd apps/@wingcloud/website
-nr dev
+NGROK_DOMAIN="your-domain" pnpm wing it apps/@wingcloud/infrastructure/api.main.w
 ```
 
 ## Update
