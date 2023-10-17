@@ -1,34 +1,48 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
+import clsx from "clsx";
 import { Link, useNavigate } from "react-router-dom";
 
-import { trpc } from "../../utils/trpc.js";
+import { SpinnerLoader } from "../../components/spinner-loader.js";
+import { wrpc } from "../../utils/wrpc.js";
 
 export const Component = () => {
-  const userId = trpc["self"].useQuery();
   const navigate = useNavigate();
 
-  const projectsList = trpc["user.listProjects"].useQuery();
+  const projectsList = wrpc["user.listProjects"].useQuery();
 
   return (
     <>
       <div className="space-y-4">
+        {projectsList.isLoading && (
+          <div
+            className={clsx(
+              "absolute h-full w-full bg-white/70 dark:bg-slate-600/70",
+              "transition-all",
+              "opacity-100 z-10",
+            )}
+          >
+            <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <SpinnerLoader />
+            </div>
+          </div>
+        )}
+
         <div className="gap-2 w-full">
           <h1 className="flex justify-between items-center">
             <span className="font-semibold text-xl">Projects</span>
-            <span className="text-gray-500">({userId.data?.userId})</span>
           </h1>
 
           <div className="flex flex-wrap gap-4 pt-4">
             {projectsList.data &&
-              projectsList.data.map((project, key) => (
+              projectsList.data.projects.map((project) => (
                 <button
                   onClick={() => {
-                    navigate(`/dashboard/projects/${project?.projectId}`);
+                    navigate(`/dashboard/projects/${project.id}`);
                   }}
-                  key={project?.projectId || key}
+                  key={project.id}
                   className="flex flex-col justify-center items-center w-32 h-32 rounded-lg border border-gray-300 p-4 hover:bg-gray-100 transition duration-300"
                 >
-                  <div className="text-center">{project?.name}</div>
+                  <div className="text-center">{project.name}</div>
                 </button>
               ))}
             <button

@@ -2,10 +2,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import { NoMatch } from "./components/no-match.js";
-import {
-  Component,
-  type ProjectProps,
-} from "./routes/dashboard/projects/project-id.js";
 
 export const router = createBrowserRouter([
   {
@@ -16,10 +12,6 @@ export const router = createBrowserRouter([
     path: "/dashboard",
     lazy: () => import("./routes/dashboard/index.jsx"),
     children: [
-      {
-        path: "team",
-        lazy: () => import("./routes/dashboard/team.js"),
-      },
       {
         path: "projects",
         lazy: () => import("./routes/dashboard/projects.js"),
@@ -33,10 +25,6 @@ export const router = createBrowserRouter([
         lazy: () => import("./routes/dashboard/new.js"),
       },
     ],
-  },
-  {
-    path: "/github/callback",
-    lazy: () => import("./routes/github/callback.jsx"),
   },
   {
     path: "*",

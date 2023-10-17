@@ -6,7 +6,10 @@ export interface NgrokResult {
   publicUrl?: string;
 }
 
-export const shell = async function (command: string, args: string[]): Promise<number | undefined> {
+export const shell = async function (
+  command: string,
+  args: string[],
+): Promise<number | undefined> {
   let pid = undefined;
   return new Promise((resolve, reject) => {
     console.log("execFile", command, args);
@@ -15,8 +18,15 @@ export const shell = async function (command: string, args: string[]): Promise<n
   });
 };
 
-export const startNgrok = async (port: string): Promise<NgrokResult> => {
-  const pid = await shell("ngrok", ["http", port]);
+export const startNgrok = async (
+  port: string,
+  domain?: string,
+): Promise<NgrokResult> => {
+  let options = ["http", port];
+  if (domain) {
+    options.push(`--domain=${domain}`);
+  }
+  const pid = await shell("ngrok", options);
 
   let i = 0;
   let publicUrl;
@@ -24,10 +34,12 @@ export const startNgrok = async (port: string): Promise<NgrokResult> => {
     try {
       const data = await fetch("http://127.0.0.1:4040/api/tunnels");
       const json: any = await data.json();
-      const tunnel = json.tunnels.find((t: any) => t.config.addr === `http://localhost:${port}`);
+      const tunnel = json.tunnels.find(
+        (t: any) => t.config.addr === `http://localhost:${port}`,
+      );
       publicUrl = tunnel.public_url;
       break;
-    } catch (e) {
+    } catch {
       if (i++ > 20) {
         throw new Error("failed to start ngrok");
       }
@@ -35,12 +47,12 @@ export const startNgrok = async (port: string): Promise<NgrokResult> => {
     }
   }
 
-  return { pid, publicUrl }
-}
+  return { pid, publicUrl };
+};
 
 export const killNgrok = async (pid: number) => {
   process.kill(pid);
-}
+};
 
 const sleep = (ms: number) => {
   return new Promise((res) => {

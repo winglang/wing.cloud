@@ -6,7 +6,7 @@ import {
   TypescriptConfig,
   Eslint,
 } from "@skyrpex/wingen";
-import { JsonFile } from "projen";
+import { JsonFile, web } from "projen";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -110,6 +110,17 @@ const env = new TypescriptProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const wrpc = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/wrpc",
+  devDeps: ["react", "@types/react", "@tanstack/react-query"],
+  peerDeps: ["react", "@tanstack/react-query"],
+});
+wrpc
+  .tryFindObjectFile("tsconfig.json")!
+  .addToArray("compilerOptions.lib", "DOM", "DOM.Iterable");
+
+///////////////////////////////////////////////////////////////////////////////
 const vite = new NodeEsmProject({
   monorepo,
   name: "@wingcloud/vite",
@@ -118,38 +129,6 @@ vite.addFields({ types: "./src/index.d.ts" });
 
 vite.addDevDeps("vite");
 vite.addDeps("dotenv");
-
-///////////////////////////////////////////////////////////////////////////////
-const api = new TypescriptProject({
-  monorepo,
-  name: "@wingcloud/api",
-  outdir: "apps/@wingcloud/api",
-});
-
-api.addGitIgnore("/.env");
-
-api.removeTask("dev");
-api.removeTask("build");
-api.removeTask("compile");
-
-api.addDeps("express");
-api.addDevDeps("@types/express");
-
-api.addDeps("dotenv");
-
-api.addDeps("@trpc/server", "zod");
-api.addDeps("nanoid");
-api.addDeps("@aws-sdk/client-dynamodb");
-api.addDeps("@aws-sdk/util-dynamodb");
-api.addDeps(`@winglang/sdk`);
-api.addDeps(opaqueType.name);
-api.addDeps(prefixedIdType.name);
-api.addDeps(nanoid62.name);
-api.addDeps("jose");
-api.addDeps("node-fetch");
-api.addDeps(cookies.name);
-api.addDeps(env.name);
-api.addDeps("octokit");
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
@@ -164,9 +143,10 @@ new TypescriptConfig(website, {
 new Eslint(website);
 
 website.addDeps("vite");
-website.addScript("dev", "vite dev --open");
+website.addScript("dev", "vite dev");
 website.addScript("compile", "vite build");
 website.addGitIgnore("/dist/");
+website.addGitIgnore("/public/wing.js");
 
 website.addDevDeps("@vitejs/plugin-react-swc");
 website.addDeps("react", "react-dom");
@@ -176,21 +156,15 @@ website.addDeps("react-router-dom");
 
 website.addDevDeps(vite.name);
 
-website.addDevDeps(api.name, "tsx", "get-port", "zod");
-website.addDeps(
-  "@trpc/client",
-  "@trpc/server",
-  "@trpc/react-query",
-  "@tanstack/react-query",
-);
+website.addDevDeps("tsx", "get-port", "zod");
+website.addDeps(wrpc.name);
+website.addDeps("@tanstack/react-query");
 website.addDeps("clsx");
 website.addDeps("@headlessui/react");
 website.addDeps("@heroicons/react");
 website.addDeps("react-popper");
 
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
-
-website.addDeps("@trpc/server", "zod");
 
 website.addDevDeps("@aws-sdk/client-dynamodb");
 website.addGitIgnore("/.wingcloud/");
@@ -232,7 +206,28 @@ infrastructure.addDevDeps("@types/express");
 
 infrastructure.addDeps("glob");
 
-infrastructure.addDeps("constructs", "cdktf", "@cdktf/provider-aws", "@cdktf/provider-dnsimple", "@cdktf/provider-docker", "@cdktf/provider-null");
+infrastructure.addDeps(
+  "constructs",
+  "cdktf",
+  "@cdktf/provider-aws",
+  "@cdktf/provider-dnsimple",
+  "@cdktf/provider-docker",
+  "@cdktf/provider-null",
+);
+
+infrastructure.addDevDeps("@types/cookie");
+infrastructure.addDeps("cookie");
+
+infrastructure.addDeps("jose");
+
+infrastructure.addDeps("octokit", "node-fetch");
+
+infrastructure.addDevDeps("@types/cookie");
+infrastructure.addDeps("cookie");
+
+infrastructure.addDeps("jose");
+
+infrastructure.addDeps("octokit", "node-fetch");
 
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(flyio.name);

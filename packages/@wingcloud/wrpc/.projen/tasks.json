@@ -1,5 +1,30 @@
 {
   "tasks": {
+    "build": {
+      "name": "build",
+      "description": "Full release build",
+      "steps": [
+        {
+          "spawn": "pre-compile"
+        },
+        {
+          "spawn": "compile"
+        },
+        {
+          "spawn": "post-compile"
+        },
+        {
+          "spawn": "test"
+        },
+        {
+          "spawn": "package"
+        }
+      ]
+    },
+    "compile": {
+      "name": "compile",
+      "description": "Only compile"
+    },
     "default": {
       "name": "default",
       "description": "Synthesize project files",
@@ -9,6 +34,10 @@
           "cwd": "../../.."
         }
       ]
+    },
+    "dev": {
+      "name": "dev",
+      "description": "Start the development task"
     },
     "install": {
       "name": "install",
