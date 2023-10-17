@@ -4,15 +4,15 @@
   "type": "module",
   "sideEffects": false,
   "dependencies": {
-    "@wingconsole/app": "^0.39.4",
-    "@winglang/compiler": "^0.39.4",
-    "@winglang/sdk": "^0.39.4",
+    "@wingconsole/app": "^0.39.11",
+    "@winglang/compiler": "^0.39.11",
+    "@winglang/sdk": "^0.39.11",
     "express": "^4.18.2",
     "jose": "^4.15.4",
     "jsonwebtoken": "^9.0.2",
     "jwk-to-pem": "^2.0.5",
     "node-fetch": "^3.3.2",
-    "winglang": "^0.39.4"
+    "winglang": "^0.39.11"
   },
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.305",
