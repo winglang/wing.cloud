@@ -347,4 +347,4 @@ let ngrok = new Ngrok.Ngrok(
 new cloud.Service(inflight () => {
   log("Proxy URL: ${proxy.url()}");
   log("Ngrok URL: ${ngrok.waitForUrl()}");
-});
+}) as "Log URLs Service";

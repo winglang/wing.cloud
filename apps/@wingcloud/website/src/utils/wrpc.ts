@@ -28,7 +28,12 @@ export const wrpc = createWRPCReact<{
   "user.listProjects": QueryProcedure<
     undefined,
     {
-      projects: Array<{ projectId: string; name: string }>;
+      projects: Array<{
+        id: string;
+        name: string;
+        repository: string;
+        userId: string;
+      }>;
     }
   >;
   "user.createProject": MutationProcedure<{
