@@ -1,6 +1,8 @@
 import { PlusIcon } from "@heroicons/react/20/solid";
+import clsx from "clsx";
 import { Link, useNavigate } from "react-router-dom";
 
+import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { wrpc } from "../../utils/wrpc.js";
 
 export const Component = () => {
@@ -8,11 +10,23 @@ export const Component = () => {
 
   const projectsList = wrpc["user.listProjects"].useQuery();
 
-  console.log(projectsList);
-
   return (
     <>
       <div className="space-y-4">
+        {projectsList.isFetching && (
+          <div
+            className={clsx(
+              "absolute h-full w-full bg-white/70 dark:bg-slate-600/70",
+              "transition-all",
+              "opacity-100 z-10",
+            )}
+          >
+            <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <SpinnerLoader />
+            </div>
+          </div>
+        )}
+
         <div className="gap-2 w-full">
           <h1 className="flex justify-between items-center">
             <span className="font-semibold text-xl">Projects</span>

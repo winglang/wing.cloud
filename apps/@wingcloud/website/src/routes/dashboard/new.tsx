@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Select } from "../../components/select.js";
+import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { openPopupWindow } from "../../utils/popup-window.js";
 import { wrpc } from "../../utils/wrpc.js";
 
@@ -14,6 +15,7 @@ export const Component = () => {
 
   const [projectName, setProjectName] = useState("");
   const [installationId, setInstallationId] = useState("");
+  const [selectedProjectId, setSelectedProjectId] = useState("");
 
   const installations = wrpc["github.listInstallations"].useQuery();
 
@@ -36,6 +38,7 @@ export const Component = () => {
       if (!repositoryId) {
         return;
       }
+      setSelectedProjectId(repositoryId);
       await createProjectMutation.mutateAsync({
         repositoryId,
         projectName,
@@ -60,20 +63,27 @@ export const Component = () => {
                 onChange={(event) => setProjectName(event.target.value)}
               />
 
-              <Select
-                items={(installations.data?.installations || []).map(
-                  (installation) => ({
-                    value: installation.id.toString(),
-                    label: installation.account.login || "",
-                  }),
-                )}
-                placeholder="Select a GitHub namespace"
-                onChange={(value) => {
-                  setInstallationId(value);
-                }}
-                value={installationId.toString()}
-                btnClassName="w-full bg-sky-50 py-2 rounded border"
-              />
+              {installations.isLoading && (
+                <div className="w-full bg-sky-50 py-2 rounded border flex justify-center">
+                  <SpinnerLoader size="xs" />
+                </div>
+              )}
+              {!installations.isLoading && (
+                <Select
+                  items={(installations.data?.installations || []).map(
+                    (installation) => ({
+                      value: installation.id.toString(),
+                      label: installation.account.login || "",
+                    }),
+                  )}
+                  placeholder="Select a GitHub namespace"
+                  onChange={(value) => {
+                    setInstallationId(value);
+                  }}
+                  value={installationId.toString()}
+                  btnClassName="w-full bg-sky-50 py-2 rounded border"
+                />
+              )}
 
               <div className="justify-end flex flex-col gap-1">
                 {repos.data?.repositories.map((repo) => (
@@ -102,19 +112,32 @@ export const Component = () => {
                         className={clsx(
                           "mr-2 py-0.5 px-1 rounded border text-xs cursor-pointer",
                           "hover:bg-sky-50 transition duration-300",
+                          "flex gap-1",
                         )}
                         onClick={() => {
                           createProject(repo.id.toString());
                         }}
                         disabled={!installationId}
                       >
-                        Import
+                        <div>Import</div>
+                        {createProjectMutation.isLoading &&
+                          selectedProjectId === repo.id.toString() && (
+                            <div className="flex justify-center">
+                              <SpinnerLoader size="xs" />
+                            </div>
+                          )}
                       </button>
                     </div>
                   </div>
                 ))}
 
-                {!repos.data && (
+                {installationId && repos.isLoading && (
+                  <div className="w-full p-2 rounded border text-slate-500 flex justify-center">
+                    <SpinnerLoader size="xs" />
+                  </div>
+                )}
+
+                {(!installationId || (!repos.data && !repos.isLoading)) && (
                   <div className="w-full p-2 rounded border text-center text-slate-500">
                     <span>No repositories found</span>
                   </div>

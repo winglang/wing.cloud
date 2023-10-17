@@ -222,12 +222,13 @@ api.post("/wrpc/project.delete", inflight (request) => {
 // {"name": "acme", "repository": "skyrpex/acme"}
 api.post("/wrpc/user.createProject", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
+    let userId = getUserFromCookie(request) ?? "";
     let body = Json.parse(request.body ?? "");
+
     let input = Projects.CreateProjectOptions {
       name: body.get("projectName").asStr(),
       repository: body.get("repositoryId").asStr(),
-      // TODO: Parse authentication cookie.
-      userId: "user_1",
+      userId: userId,
     };
 
     let project = projects.create(input);
@@ -243,9 +244,9 @@ api.post("/wrpc/user.createProject", inflight (request) => {
 
 api.get("/wrpc/user.listProjects", inflight (request) => {
   return captureUnhandledErrors(inflight () => {
+    let userId = getUserFromCookie(request) ?? "";
     let input = Projects.ListProjectsOptions {
-      // TODO: Parse authentication cookie.
-      userId: "user_1",
+      userId: userId,
     };
 
     let userProjects = projects.list(input);

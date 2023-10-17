@@ -68,7 +68,7 @@ export const createWRPCReact = <
             });
           },
           useMutation: (options: UseMutationOptions) => {
-            const url = new URL(useContext(WRPCContext).url);
+            const url = new URL(`${useContext(WRPCContext).url}/${route}`);
             return useMutation({
               mutationFn: async (input: any) => {
                 const response = await fetch(url, {
