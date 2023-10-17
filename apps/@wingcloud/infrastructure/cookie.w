@@ -12,6 +12,6 @@ struct SerializeOptions {
 }
 
 class Cookie {
-  extern "./extern/cookie.js" pub static inflight parse(value: str): Map<str>;
-  extern "./extern/cookie.js" pub static inflight serialize(name: str, value: str, options: SerializeOptions?): str;
+  extern "./src/cookie.js" pub static inflight parse(value: str): Map<str>;
+  extern "./src/cookie.js" pub static inflight serialize(name: str, value: str, options: SerializeOptions?): str;
 }

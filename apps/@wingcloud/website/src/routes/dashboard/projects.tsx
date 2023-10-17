@@ -13,7 +13,7 @@ export const Component = () => {
   return (
     <>
       <div className="space-y-4">
-        {projectsList.isFetching && (
+        {projectsList.isLoading && (
           <div
             className={clsx(
               "absolute h-full w-full bg-white/70 dark:bg-slate-600/70",

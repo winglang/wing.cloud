@@ -55,7 +55,7 @@ class Exchange {
     return AuthTokens.fromJson(Json.parse(response.body ?? ""));
   }
 
-  extern "./github.ts" pub static inflight getLoginFromAccessToken(accessToken: str): str;
-  extern "./github.ts" pub static inflight listUserInstallations(token: str): Array<UserInstallation>;
-  extern "./github.ts" pub static inflight listInstallationRepos(token: str, installationId: num): Array<InstallationRepository>;
+  extern "./src/github.ts" pub static inflight getLoginFromAccessToken(accessToken: str): str;
+  extern "./src/github.ts" pub static inflight listUserInstallations(token: str): Array<UserInstallation>;
+  extern "./src/github.ts" pub static inflight listInstallationRepos(token: str, installationId: num): Array<InstallationRepository>;
 }

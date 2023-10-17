@@ -24,6 +24,6 @@ struct JWTPayload {
 }
 
 class JWT {
-  extern "./jwt.ts" pub static inflight sign(options: SignOptions): str;
-  extern "./jwt.ts" pub static inflight verify(options: VerifyOptions): JWTPayload;
+  extern "./src/jwt.ts" pub static inflight sign(options: SignOptions): str;
+  extern "./src/jwt.ts" pub static inflight verify(options: VerifyOptions): JWTPayload;
 }
