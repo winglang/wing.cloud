@@ -35,10 +35,6 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/github/callback",
-    lazy: () => import("./routes/github/callback.jsx"),
-  },
-  {
     path: "*",
     element: <NoMatch />,
   },

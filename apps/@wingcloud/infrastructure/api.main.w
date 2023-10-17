@@ -130,19 +130,12 @@ api.get("/wrpc/github.listInstallations", inflight (request) => {
 
     let installations = GitHub.Exchange.listUserInstallations(accessToken ?? "");
 
+    log("installations = ${Json.stringify(installations)}");
+
     return {
       status: 200,
       body: Json.stringify({
-        installations: [
-          {
-            id: 1,
-            name: "skyrpex",
-          },
-          {
-            id: 2,
-            name: "starlight",
-          },
-        ],
+        installations: installations,
       }),
     };
   });
@@ -163,21 +156,12 @@ api.get("/wrpc/github.listRepositories", inflight (request) => {
 
     let repositories = GitHub.Exchange.listInstallationRepos(accessToken ?? "", installationId);
 
+    log("repositories = ${Json.stringify(repositories)}");
+
     return {
       status: 200,
       body: Json.stringify({
-        repositories: [
-          {
-            id: "skyrpex/acme",
-            name: "acme",
-            private: false,
-          },
-          {
-            id: "starlight/starlight",
-            name: "starlight",
-            private: true,
-          },
-        ],
+        repositories: repositories
       }),
     };
   });

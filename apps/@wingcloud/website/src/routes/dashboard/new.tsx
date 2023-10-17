@@ -25,11 +25,9 @@ export const Component = () => {
     [installations.data, installationId],
   );
 
-  const repos = installationId
-    ? wrpc["github.listRepositories"].useQuery({
-        installationId: installationId,
-      })
-    : { data: [] };
+  const repos = wrpc["github.listRepositories"].useQuery({
+    installationId: installationId,
+  });
 
   const createProjectMutation = wrpc["user.createProject"].useMutation();
 
@@ -66,7 +64,7 @@ export const Component = () => {
                 items={(installations.data?.installations || []).map(
                   (installation) => ({
                     value: installation.id.toString(),
-                    label: installation.name || "",
+                    label: installation.account.login || "",
                   }),
                 )}
                 placeholder="Select a GitHub namespace"
@@ -78,44 +76,43 @@ export const Component = () => {
               />
 
               <div className="justify-end flex flex-col gap-1">
-                {repos.data &&
-                  repos.data.map((repo) => (
-                    <div
-                      key={repo.id}
-                      className={clsx(
-                        "w-full p-2 rounded border text-left flex items-center",
+                {repos.data?.repositories.map((repo) => (
+                  <div
+                    key={repo.id}
+                    className={clsx(
+                      "w-full p-2 rounded border text-left flex items-center",
+                    )}
+                  >
+                    <img
+                      src={repo.owner?.avatar_url}
+                      className="w-5 h-5 inline-block mr-2 rounded-full"
+                    />
+                    <span>
+                      {selectedInstallation ? selectedInstallation.name : ""}/
+                      {repo.name}
+                    </span>
+                    <div className="mx-1 items-center">
+                      {repo.private && (
+                        <LockClosedIcon className="w-3 h-3 inline-block" />
                       )}
-                    >
-                      <img
-                        src={repo.imgUrl}
-                        className="w-5 h-5 inline-block mr-2 rounded-full"
-                      />
-                      <span>
-                        {selectedInstallation ? selectedInstallation.name : ""}/
-                        {repo.name}
-                      </span>
-                      <div className="mx-1 items-center">
-                        {repo.private && (
-                          <LockClosedIcon className="w-3 h-3 inline-block" />
-                        )}
-                      </div>
-
-                      <div className="flex grow justify-end text-slate-500 items-center">
-                        <button
-                          className={clsx(
-                            "mr-2 py-0.5 px-1 rounded border text-xs cursor-pointer",
-                            "hover:bg-sky-50 transition duration-300",
-                          )}
-                          onClick={() => {
-                            createProject(repo.id.toString());
-                          }}
-                          disabled={!installationId}
-                        >
-                          Import
-                        </button>
-                      </div>
                     </div>
-                  ))}
+
+                    <div className="flex grow justify-end text-slate-500 items-center">
+                      <button
+                        className={clsx(
+                          "mr-2 py-0.5 px-1 rounded border text-xs cursor-pointer",
+                          "hover:bg-sky-50 transition duration-300",
+                        )}
+                        onClick={() => {
+                          createProject(repo.id.toString());
+                        }}
+                        disabled={!installationId}
+                      >
+                        Import
+                      </button>
+                    </div>
+                  </div>
+                ))}
 
                 {!repos.data && (
                   <div className="w-full p-2 rounded border text-center text-slate-500">
