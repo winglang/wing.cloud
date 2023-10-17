@@ -56,33 +56,33 @@ class Container_sim impl IContainer {
     log("image: ${image}");
     if image.startsWith("./") || image.startsWith("../") || image.startsWith("/") {
       tag = this.containerName;
-      
+
       let shellArgs = MutArray<str>[];
       shellArgs.push("build");
       shellArgs.push("-t");
       shellArgs.push(tag);
-      
+
       if let args = this.opts.args {
         for arg in args.keys() {
           shellArgs.push("--build-arg");
           shellArgs.push("${arg}=${args.get(arg)}");
         }
       }
-      
+
       shellArgs.push(image);
-      
+
       log("building locally from ${image}, tagging ${tag} and args ${shellArgs}...");
       Container_sim.shell("docker", shellArgs.copy(), this.appDir);
     } else {
       Container_sim.shell("docker", ["pull", this.opts.image]);
     }
-    
+
     let args = MutArray<str>[];
     args.push("run");
-    
+
     if let privileged = this.opts.privileged {
       if privileged {
-        args.push("--privileged");    
+        args.push("--privileged");
       }
     }
 
@@ -155,7 +155,7 @@ class Container_sim impl IContainer {
   pub inflight url(): str? {
     return this.bucket.tryGet(this.urlKey);
   }
-  
+
   extern "./src/shell.js" static inflight shell(command: str, args: Array<str>, cwd: str?): str;
   extern "./src/shell.js" static entrypointDir(obj: std.IResource): str;
 }

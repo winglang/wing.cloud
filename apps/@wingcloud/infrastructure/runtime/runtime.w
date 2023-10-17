@@ -42,7 +42,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       volumes.set(repo.replace("file://", ""), "/source");
       repo = "file:///source";
     }
-    
+
     let env = MutMap<str>{
       "GIT_REPO" => repo,
       "GIT_SHA" => opts.gitSha,
@@ -98,7 +98,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     if let token = opts.gitToken {
       env.set("GIT_TOKEN", token);
     }
-    
+
     if exists {
       app.update(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024);
     } else {
@@ -111,7 +111,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
 
 // Previews environment runtime
 class RuntimeService {
-  extern "./src/get-bucket-name.mts" static inflight getBucketName(): str;
+  extern "../src/get-bucket-name.mts" static inflight getBucketName(): str;
 
   logs: cloud.Bucket;
   pub api: cloud.Api;
@@ -119,7 +119,7 @@ class RuntimeService {
 
   init(wingCloudUrl: str) {
     this.logs = new cloud.Bucket() as "deployment logs";
-    
+
     // TODO: use a function to generate the IAM role with the permissions to write to the bucket
     new cloud.Function(inflight () => {
       // permissions:
