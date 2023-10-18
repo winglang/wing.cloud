@@ -2,7 +2,7 @@ bring cloud;
 bring http;
 bring ex;
 
-bring "./reverse-proxy-sim.w" as ReverseProxy;
+bring "./reverse-proxy.w" as ReverseProxy;
 bring "./users.w" as Users;
 bring "./projects.w" as Projects;
 bring "./api.w" as wingcloud_api;
@@ -55,18 +55,24 @@ let website = new ex.ReactApp(
   projectPath: "../website",
   startCommand: "pnpm dev --port 5174",
   buildCommand: "pnpm build",
+  buildDir: "dist",
   localPort: 5174,
 );
 
 let proxy = new ReverseProxy.ReverseProxy(
+  subDomain: "dev",
+  zoneName: "wingcloud.io",
+  aliases: [],
   origins: [
     {
       pathPattern: "/wrpc/*",
       domainName: api.url,
+      originId: "wrpc",
     },
     {
       pathPattern: "*",
       domainName: website.url,
+      originId: "website",
     },
   ],
 );
