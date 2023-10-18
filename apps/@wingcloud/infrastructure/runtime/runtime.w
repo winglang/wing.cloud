@@ -25,7 +25,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
   init() {
     this.container = new containers.Container_sim(name: "previews-runtime", image: "../runtime", args: {
       "SETUP_DOCKER": "false",
-    },  port: 3000, privileged: true, readiness: "/");
+    },  port: 3000, privileged: true);
 
     new cloud.Service(inflight () => {
       return () => {
