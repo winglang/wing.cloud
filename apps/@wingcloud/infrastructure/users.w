@@ -33,9 +33,9 @@ class Users {
         {
           put: {
             item: {
-              pk: "login#${options.gitHubLogin}",
+              pk: "LOGIN#${options.gitHubLogin}",
               sk: "#",
-              userId: userId,
+              id: userId,
             },
             conditionExpression: "attribute_not_exists(pk)",
           },
@@ -43,9 +43,9 @@ class Users {
         {
           put: {
             item: {
-              pk: "user#${userId}",
+              pk: "USER#${userId}",
               sk: "#",
-              userId: userId,
+              id: userId,
               gitHubLogin: options.gitHubLogin,
             },
           }
@@ -64,7 +64,7 @@ class Users {
       },
     );
 
-    return result.item?.tryGet("userId")?.tryAsStr();
+    return result.item?.tryGet("id")?.tryAsStr();
   }
 
   pub inflight getOrCreate(options: GetOrCreateOptions): str {
