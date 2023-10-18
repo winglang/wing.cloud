@@ -4,6 +4,12 @@ struct JsonApiProps {
   api: cloud.Api;
 }
 
+struct JsonApiResponse {
+  status: num?;
+  headers: Map<str>?;
+  body: Json?;
+}
+
 class JsonApi {
   api: cloud.Api;
   pub url: str;
@@ -15,17 +21,24 @@ class JsonApi {
     this.handlerCount = 0;
   }
 
-  wrapHandler(handler: inflight (cloud.ApiRequest): cloud.ApiResponse): inflight (cloud.ApiRequest): cloud.ApiResponse {
+  wrapHandler(handler: inflight (cloud.ApiRequest): JsonApiResponse): inflight (cloud.ApiRequest): cloud.ApiResponse {
     class MyHandler {
       inflight handle(request: cloud.ApiRequest): cloud.ApiResponse {
         try {
           let response = handler(request);
+
           let headers = response.headers?.copyMut();
           headers?.set("content-type", "application/json");
+
+          let var bodyStr = "";
+          if let body = response.body {
+            bodyStr = Json.stringify(body);
+          }
+
           return {
-            status: response.status,
+            status: response.status ?? 200,
             headers: headers?.copy(),
-            body: response.body,
+            body: bodyStr,
           };
         } catch error {
           return {
@@ -44,15 +57,15 @@ class JsonApi {
     return new MyHandler() as "Handler${this.handlerCount}";
   }
 
-  pub get(path: str, handler: inflight (cloud.ApiRequest): cloud.ApiResponse) {
+  pub get(path: str, handler: inflight (cloud.ApiRequest): JsonApiResponse) {
     this.api.get(path, this.wrapHandler(handler));
   }
 
-  pub post(path: str, handler: inflight (cloud.ApiRequest): cloud.ApiResponse) {
+  pub post(path: str, handler: inflight (cloud.ApiRequest): JsonApiResponse) {
     this.api.post(path, this.wrapHandler(handler));
   }
 
-  pub put(path: str, handler: inflight (cloud.ApiRequest): cloud.ApiResponse) {
+  pub put(path: str, handler: inflight (cloud.ApiRequest): JsonApiResponse) {
     this.api.put(path, this.wrapHandler(handler));
   }
 }
