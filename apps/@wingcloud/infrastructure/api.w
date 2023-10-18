@@ -107,10 +107,9 @@ class Api {
         log("installations = ${Json.stringify(installations)}");
 
         return {
-          status: 200,
-          body: Json.stringify({
+          body: {
             installations: installations,
-          }),
+          },
         };
       } else {
         return {
@@ -130,10 +129,9 @@ class Api {
         log("repositories = ${Json.stringify(repositories)}");
 
         return {
-          status: 200,
-          body: Json.stringify({
+          body: {
             repositories: repositories
-          }),
+          },
         };
       } else {
         return {
@@ -152,17 +150,16 @@ class Api {
       if project.userId != userId {
         return {
           status: 403,
-          body: Json.stringify({
+          body: {
             error: "Forbidden",
-          }),
+          },
         };
       }
 
       return {
-          status: 200,
-          body: Json.stringify({
-              project: project,
-          }),
+        body: {
+            project: project,
+        },
       };
     });
     // api.get("/wrpc/project.listEnvironments", inflight () => {});
@@ -178,7 +175,6 @@ class Api {
       );
 
       return {
-        status: 200,
       };
     });
     api.post("/wrpc/project.delete", inflight (request) => {
@@ -190,10 +186,6 @@ class Api {
         id: input.get("id").asStr(),
         userId: userId,
       );
-
-      return {
-        status: 200,
-      };
     });
     // api.post("/wrpc/project.changeBuildSettings", inflight () => {});
     // api.get("/wrpc/project.listEnvironmentVariables", inflight () => {});
@@ -212,10 +204,9 @@ class Api {
       );
 
       return {
-        status: 200,
-        body: Json.stringify({
+        body: {
           project: project,
-        }),
+        },
       };
     });
 
@@ -227,10 +218,9 @@ class Api {
       );
 
       return {
-        status: 200,
-        body: Json.stringify({
+        body: {
           projects: userProjects,
-        }),
+        },
       };
     });
     // api.get("/wrpc/user.listRepositories", inflight () => {});
