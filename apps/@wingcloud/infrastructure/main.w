@@ -70,14 +70,7 @@ api.post("/report", inflight (req) => {
   };
 });
 
-let runtimeApi = new cloud.Api(
-  cors: true,
-  corsOptions: cloud.ApiCorsOptions {
-    allowOrigin: ["*"],
-  }
-) as "runtimeApi";
-
-let rntm = new runtime.RuntimeService(runtimeApi.url);
+let rntm = new runtime.RuntimeService(api.url);
 let probotApp = new probot.ProbotApp(rntm.api.url, runtimeCallbacks);
 
 let proxy = new ReverseProxy.ReverseProxy(
