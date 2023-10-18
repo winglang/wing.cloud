@@ -88,8 +88,9 @@ class Projects {
             sk: "#",
           },
           updateExpression: "SET #name = :name",
-          conditionExpression: "#userId = :userId",
+          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
           expressionAttributeNames: {
+            "#pk": "pk",
             "#name": "name",
             "#userId": "userId",
           },
@@ -126,7 +127,7 @@ class Projects {
     );
 
     if let item = result.item {
-      return Project {
+      return {
         id: item.get("id").asStr(),
         name: item.get("name").asStr(),
         repository: item.get("repository").asStr(),

@@ -33,6 +33,9 @@ class Api {
       } catch error {
         return {
           status: 500,
+          headers: {
+            "content-type": "application/json",
+          },
           body: Json.stringify({
             error: error,
           }),

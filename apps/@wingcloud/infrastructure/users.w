@@ -59,7 +59,7 @@ class Users {
   pub inflight fromLogin(options: FromLoginOptions): str? {
     let result = this.table.getItem(
       key: {
-        pk: "login#${options.gitHubLogin}",
+        pk: "LOGIN#${options.gitHubLogin}",
         sk: "#",
       },
     );
