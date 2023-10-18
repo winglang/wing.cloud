@@ -59,23 +59,6 @@ let website = new ex.ReactApp(
   localPort: 5174,
 );
 
-let proxy = new ReverseProxy.ReverseProxy(
-  subDomain: "dev",
-  zoneName: "wingcloud.io",
-  aliases: [],
-  origins: [
-    {
-      pathPattern: "/wrpc/*",
-      domainName: api.url,
-      originId: "wrpc",
-    },
-    {
-      pathPattern: "*",
-      domainName: website.url,
-      originId: "website",
-    },
-  ],
-);
 
 let runtimeCallbacks = new runtime_callbacks.RuntimeCallbacks();
 
@@ -87,5 +70,46 @@ api.post("/report", inflight (req) => {
   };
 });
 
-let rntm = new runtime.RuntimeService(api.url);
-new probot.ProbotApp(rntm.api.url, runtimeCallbacks);
+let runtimeApi = new cloud.Api(
+  cors: true,
+  corsOptions: cloud.ApiCorsOptions {
+    allowOrigin: ["*"],
+  }
+) as "runtimeApi";
+
+let rntm = new runtime.RuntimeService(runtimeApi.url);
+let probotApp = new probot.ProbotApp(rntm.api.url, runtimeCallbacks);
+
+let proxy = new ReverseProxy.ReverseProxy(
+  subDomain: "dev",
+  zoneName: "wingcloud.io",
+  port: 5180,
+  aliases: [],
+  origins: [
+    {
+      pathPattern: "/wrpc/*",
+      domainName: api.url,
+      originId: "wrpc",
+    },
+    {
+      pathPattern: "/webhook",
+      domainName: probotApp.githubApp.webhook.url,
+      originId: "webhook",
+    },
+    {
+      pathPattern: "*",
+      domainName: website.url,
+      originId: "website",
+    },
+  ],
+);
+
+bring "./ngrok.w" as ngrok;
+bring util;
+
+let devNgrok = new ngrok.Ngrok(
+  url: inflight () => {
+    return proxy.url();
+  },
+  domain: util.tryEnv("NGROK_DOMAIN")
+);

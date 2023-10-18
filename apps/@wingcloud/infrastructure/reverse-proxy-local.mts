@@ -12,6 +12,7 @@ export interface Origin {
 }
 export interface ReverseProxyServerProps {
   origins: Origin[];
+  port?: number;
 }
 export const startReverseProxyServer = (
   props: ReverseProxyServerProps,
@@ -28,7 +29,7 @@ export const startReverseProxyServer = (
 
   // Start the reverse proxy server
   // random port between 3000 and 3999 is needed since we are running the sim twice for some reason and the server is crashing with EADDRINUSE
-  const port = Math.floor(Math.random() * 1000 + 3000);
+  const port = props.port || Math.floor(Math.random() * 1000 + 3000);
   const server = app.listen(port, () => {
     console.log(`Reverse proxy server is running: http://localhost:${port}`);
     console.log(`Reverse proxy paths and targets:`, props.origins);

@@ -21,7 +21,7 @@ interface IProbotWebhooks {
 }
 
 interface IProbotAuth {
-  inflight call(ProbotInstance, installationId: num): octokit.OctoKit; 
+  inflight call(ProbotInstance, installationId: num): octokit.OctoKit;
 }
 
 struct ProbotInstance {
@@ -77,7 +77,7 @@ class ProbotApp {
   probotSecretKey: cloud.Secret;
   runtimeUrl: str;
   runtimeCallbacks: runtime_callbacks.RuntimeCallbacks;
-  githubApp: github.GithubApp;
+  pub githubApp: github.GithubApp;
   prDb: ex.Table;
   inflight var adapter: ProbotAdapter;
 
@@ -180,8 +180,8 @@ class ProbotApp {
         repo: repo,
         tree_sha: context.payload.pull_request.head.sha,
         recursive: "true"
-      };  
-      
+      };
+
       let resp = context.octokit.git.getTree(options);
       if resp.status != 200 {
         throw "getTree: failure: ${resp.status}, ${options}";
@@ -220,8 +220,8 @@ class ProbotApp {
         repo: repo,
         tree_sha: context.payload.pull_request.head.sha,
         recursive: "true"
-      };  
-      
+      };
+
       let resp = context.octokit.git.getTree(options);
       if resp.status != 200 {
         throw "getTree: failure: ${resp.status}, ${options}";

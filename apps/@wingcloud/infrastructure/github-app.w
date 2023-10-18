@@ -1,40 +1,27 @@
 bring cloud;
 bring util;
 bring http;
-bring "./ngrok.w" as ngrok;
 
 class GithubApp {
-  webhook: cloud.Api;
+  pub webhook: cloud.Api;
   appId: cloud.Secret;
   privateKey: cloud.Secret;
-  ngrok: ngrok.Ngrok?;
 
   extern "./src/create-github-app-jwt.mts" pub static inflight createGithubAppJwt(appId: str, privateKey: str): str;
 
   init(appId: cloud.Secret, privateKey: cloud.Secret, handler: inflight (cloud.ApiRequest): cloud.ApiResponse) {
     this.webhook = new cloud.Api();
-    this.webhook.post("/", handler);
+    this.webhook.post("/webhook", handler);
     this.appId = appId;
     this.privateKey = privateKey;
-
-    if util.tryEnv("WING_TARGET") == "sim" {
-      this.ngrok = new ngrok.Ngrok(this.webhook.url);
-    }
 
     let deploy = new cloud.OnDeploy(inflight () => {
       this.listen();
     });
-
-    if let ngrok = this.ngrok {
-      deploy.node.addDependency(ngrok);
-    }
   }
 
   inflight listen() {
     let var publicUrl = this.webhook.url;
-    if let ngrok = this.ngrok {
-      publicUrl = ngrok.waitForUrl();
-    }
 
     let jwt = GithubApp.createGithubAppJwt(this.appId.value(), this.privateKey.value());
 
