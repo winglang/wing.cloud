@@ -2,33 +2,35 @@ bring ex;
 bring "./nanoid62.w" as nanoid62;
 
 struct Project {
-    id: str;
-    name: str;
-    repository: str;
-    userId: str;
+  id: str;
+  name: str;
+  repository: str;
+  userId: str;
 }
 
 struct CreateProjectOptions {
-    name: str;
-    repository: str;
-    userId: str;
+  name: str;
+  repository: str;
+  userId: str;
 }
 
 struct RenameProjectOptions {
   id: str;
   name: str;
+  userId: str;
 }
 
 struct GetProjectOptions {
-    id: str;
+  id: str;
 }
 
 struct ListProjectsOptions {
-    userId: str;
+  userId: str;
 }
 
 struct DeleteProjectOptions {
-    id: str;
+  id: str;
+  userId: str;
 }
 
 class Projects {
@@ -47,7 +49,7 @@ class Projects {
     };
 
     this.table.transactWriteItems(transactItems: [
-      ex.DynamodbTransactWriteItem {
+      {
         put: {
           item: {
             pk: "PROJECT#${project.id}",
@@ -60,7 +62,7 @@ class Projects {
           conditionExpression: "attribute_not_exists(pk)"
         },
       },
-      ex.DynamodbTransactWriteItem {
+      {
         put: {
           item: {
             pk: "USER#${options.userId}",
@@ -78,37 +80,41 @@ class Projects {
   }
 
   pub inflight rename(options: RenameProjectOptions): void {
-    let project = this.get(id: options.id);
-
-    // TODO: Need a language feature to run in parallel (eg, Promise.all).
-    // See https://github.com/winglang/wing/issues/116.
-    this.table.updateItem(
-      key: {
-        pk: "PROJECT#${project.id}",
-        sk: "#",
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "PROJECT#${options.id}",
+            sk: "#",
+          },
+          updateExpression: "SET #name = :name",
+          conditionExpression: "#userId = :userId",
+          expressionAttributeNames: {
+            "#name": "name",
+            "#userId": "userId",
+          },
+          expressionAttributeValues: {
+            ":name": options.name,
+            ":userId": options.userId,
+          },
+        }
       },
-      updateExpression: "SET #name = :name",
-      expressionAttributeNames: {
-        "#name": "name",
+      {
+        update: {
+          key: {
+            pk: "USER#${options.userId}",
+            sk: "PROJECT#${options.id}",
+          },
+          updateExpression: "SET #name = :name",
+          expressionAttributeNames: {
+            "#name": "name",
+          },
+          expressionAttributeValues: {
+            ":name": options.name,
+          },
+        }
       },
-      expressionAttributeValues: {
-        ":name": options.name,
-      },
-    );
-
-    this.table.updateItem(
-      key: {
-        pk: "USER#${project.userId}",
-        sk: "PROJECT#${project.id}",
-      },
-      updateExpression: "SET #name = :name",
-      expressionAttributeNames: {
-        "#name": "name",
-      },
-      expressionAttributeValues: {
-        ":name": options.name,
-      },
-    );
+    ]);
   }
 
   pub inflight get(options: GetProjectOptions): Project {
@@ -152,22 +158,28 @@ class Projects {
   }
 
   pub inflight delete(options: DeleteProjectOptions): void {
-    let project = this.get(id: options.id);
-    this.table.batchWriteItem(
-      requestItems: [
+    this.table.transactWriteItems(
+      transactItems: [
         {
-          deleteRequest: {
+          delete: {
             key: {
-              pk: "PROJECT#${project.id}",
+              pk: "PROJECT#${options.id}",
               sk: "#",
+            },
+            conditionExpression: "#userId = :userId",
+            expressionAttributeNames: {
+              "#userId": "userId",
+            },
+            expressionAttributeValues: {
+              ":userId": options.userId,
             },
           },
         },
         {
-          deleteRequest: {
+          delete: {
             key: {
-              pk: "USER#${project.userId}",
-              sk: "PROJECT#${project.id}",
+              pk: "USER#${options.userId}",
+              sk: "PROJECT#${options.id}",
             },
           },
         },

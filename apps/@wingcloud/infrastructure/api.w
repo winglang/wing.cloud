@@ -55,8 +55,11 @@ class Api {
     };
 
     let getUserFromCookie = inflight (request: cloud.ApiRequest) => {
-      let payload = getJWTPayloadFromCookie(request);
-      return payload?.userId;
+      if let payload = getJWTPayloadFromCookie(request) {
+        return payload.userId;
+      } else {
+        throw "Unauthorized";
+      }
     };
 
     let getAccessTokenFromCookie = inflight (request: cloud.ApiRequest) => {
@@ -112,64 +115,68 @@ class Api {
 
     api.get("/wrpc/github.listInstallations", inflight (request) => {
       return captureUnhandledErrors(inflight () => {
-        let accessToken = getAccessTokenFromCookie(request);
-        log("accessToken = ${accessToken}");
+        if let accessToken = getAccessTokenFromCookie(request) {
+          log("accessToken = ${accessToken}");
 
-        if (!accessToken?) {
+          let installations = GitHub.Exchange.listUserInstallations(accessToken);
+
+          log("installations = ${Json.stringify(installations)}");
+
+          return {
+            status: 200,
+            body: Json.stringify({
+              installations: installations,
+            }),
+          };
+        } else {
           return {
             status: 401,
           };
         }
-
-        let installations = GitHub.Exchange.listUserInstallations(accessToken ?? "");
-
-        log("installations = ${Json.stringify(installations)}");
-
-        return {
-          status: 200,
-          body: Json.stringify({
-            installations: installations,
-          }),
-        };
       });
     });
 
     api.get("/wrpc/github.listRepositories", inflight (request) => {
       return captureUnhandledErrors(inflight () => {
-        let accessToken = getAccessTokenFromCookie(request);
-        log("accessToken = ${accessToken}");
+        if let accessToken = getAccessTokenFromCookie(request) {
+          log("accessToken = ${accessToken}");
 
-        if (!accessToken?) {
+          let installationId = num.fromStr(request.query.get("installationId"));
+
+          let repositories = GitHub.Exchange.listInstallationRepos(accessToken, installationId);
+
+          log("repositories = ${Json.stringify(repositories)}");
+
+          return {
+            status: 200,
+            body: Json.stringify({
+              repositories: repositories
+            }),
+          };
+        } else {
           return {
             status: 401,
           };
         }
-
-        let installationId = num.fromStr(request.query.get("installationId"));
-
-        let repositories = GitHub.Exchange.listInstallationRepos(accessToken ?? "", installationId);
-
-        log("repositories = ${Json.stringify(repositories)}");
-
-        return {
-          status: 200,
-          body: Json.stringify({
-            repositories: repositories
-          }),
-        };
       });
     });
 
     api.get("/wrpc/project.get", inflight (request) => {
       return captureUnhandledErrors(inflight () => {
-        let userId2 = getUserFromCookie(request);
-        log("userId2 = ${userId2}");
+        let userId = getUserFromCookie(request);
+
         let input = Projects.GetProjectOptions.fromJson(request.query);
 
-        // TODO: Authorize.
         let project = projects.get(input);
 
-        let userId = getUserFromCookie(request);
+        if project.userId != userId {
+          return {
+            status: 403,
+            body: Json.stringify({
+              error: "Forbidden",
+            }),
+          };
+        }
 
         return {
             status: 200,
@@ -182,12 +189,15 @@ class Api {
     // api.get("/wrpc/project.listEnvironments", inflight () => {});
     api.post("/wrpc/project.rename", inflight (request) => {
       return captureUnhandledErrors(inflight () => {
-        let input = Projects.RenameProjectOptions.fromJson(
-          Json.parse(request.body ?? ""),
-        );
+        let userId = getUserFromCookie(request);
 
-        // TODO: Authorize.
-        projects.rename(input);
+        let input = Json.parse(request.body ?? "");
+
+        projects.rename(
+          id: input.get("id").asStr(),
+          name: input.get("name").asStr(),
+          userId: userId,
+        );
 
         return {
           status: 200,
@@ -196,12 +206,14 @@ class Api {
     });
     api.post("/wrpc/project.delete", inflight (request) => {
       return captureUnhandledErrors(inflight () => {
-        let input = Projects.DeleteProjectOptions.fromJson(
-          Json.parse(request.body ?? ""),
-        );
+        let userId = getUserFromCookie(request);
 
-        // TODO: Authorize.
-        projects.delete(input);
+        let input = Json.parse(request.body ?? "");
+
+        projects.delete(
+          id: input.get("id").asStr(),
+          userId: userId,
+        );
 
         return {
           status: 200,
@@ -215,16 +227,15 @@ class Api {
     // {"name": "acme", "repository": "skyrpex/acme"}
     api.post("/wrpc/user.createProject", inflight (request) => {
       return captureUnhandledErrors(inflight () => {
-        let userId = getUserFromCookie(request) ?? "";
-        let body = Json.parse(request.body ?? "");
+        let userId = getUserFromCookie(request);
 
-        let input = Projects.CreateProjectOptions {
-          name: body.get("projectName").asStr(),
-          repository: body.get("repositoryId").asStr(),
+        let input = Json.parse(request.body ?? "");
+
+        let project = projects.create(
+          name: input.get("projectName").asStr(),
+          repository: input.get("repositoryId").asStr(),
           userId: userId,
-        };
-
-        let project = projects.create(input);
+        );
 
         return {
           status: 200,
@@ -237,12 +248,11 @@ class Api {
 
     api.get("/wrpc/user.listProjects", inflight (request) => {
       return captureUnhandledErrors(inflight () => {
-        let userId = getUserFromCookie(request) ?? "";
-        let input = Projects.ListProjectsOptions {
-          userId: userId,
-        };
+        let userId = getUserFromCookie(request);
 
-        let userProjects = projects.list(input);
+        let userProjects = projects.list(
+          userId: userId,
+        );
 
         return {
           status: 200,
