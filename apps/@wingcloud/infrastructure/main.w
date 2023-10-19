@@ -97,12 +97,14 @@ let proxy = new ReverseProxy.ReverseProxy(
   ],
 );
 
-bring "./ngrok.w" as ngrok;
 bring util;
+if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("NGROK_DOMAIN") != nil {
+  bring "./ngrok.w" as ngrok;
 
-let devNgrok = new ngrok.Ngrok(
-  url: inflight () => {
-    return proxy.url();
-  },
-  domain: util.tryEnv("NGROK_DOMAIN")
-);
+  let devNgrok = new ngrok.Ngrok(
+    url: inflight () => {
+      return proxy.url();
+    },
+    domain: util.tryEnv("NGROK_DOMAIN")
+  );
+}
