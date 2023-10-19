@@ -31,7 +31,7 @@ Run the website:
 
 ```sh
 cd apps/@wingcloud/infrastructure
-NGROK_DOMAIN="your-domain" nr dev
+nr dev
 ```
 
 ## Update
