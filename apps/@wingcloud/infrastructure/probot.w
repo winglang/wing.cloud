@@ -98,14 +98,17 @@ class ProbotApp {
       }
     }) as "environments prs";
 
-    this.githubApp = new github.GithubApp(this.probotAppId, this.probotSecretKey, inflight (req) => {
-      this.listen();
-      this.adapter.verifyAndReceive(this.getVerifyAndReceievePropsProps(req));
-
-      return {
-        status: 200
-      };
-    });
+    this.githubApp = new github.GithubApp(
+      this.probotAppId,
+      this.probotSecretKey,
+      inflight (req) => {
+        this.listen();
+        this.adapter.verifyAndReceive(this.getVerifyAndReceievePropsProps(req));
+        return {
+          status: 200
+        };
+      }
+    );
 
     let db = new ex.Table(ex.TableProps{
       name: "wing.cloud/probot/statuses",

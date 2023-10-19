@@ -3,15 +3,17 @@ bring util;
 bring http;
 
 class GithubApp {
-  pub webhook: cloud.Api;
+  api: cloud.Api;
   appId: cloud.Secret;
   privateKey: cloud.Secret;
+  pub webhookUrl: str;
 
   extern "./src/create-github-app-jwt.mts" pub static inflight createGithubAppJwt(appId: str, privateKey: str): str;
 
   init(appId: cloud.Secret, privateKey: cloud.Secret, handler: inflight (cloud.ApiRequest): cloud.ApiResponse) {
-    this.webhook = new cloud.Api();
-    this.webhook.post("/webhook", handler);
+    this.api = new cloud.Api();
+    this.webhookUrl = this.api.url;
+    this.api.post("/webhook", handler);
     this.appId = appId;
     this.privateKey = privateKey;
 
@@ -21,7 +23,7 @@ class GithubApp {
   }
 
   inflight listen() {
-    let var publicUrl = this.webhook.url;
+    let var publicUrl = this.api.url;
 
     let jwt = GithubApp.createGithubAppJwt(this.appId.value(), this.privateKey.value());
 

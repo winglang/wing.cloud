@@ -30,7 +30,8 @@ cp apps/@wingcloud/website/.env.example apps/@wingcloud/website/.env
 Run the website:
 
 ```sh
-NGROK_DOMAIN="your-domain" pnpm wing it apps/@wingcloud/infrastructure/api.main.w
+cd apps/@wingcloud/infrastructure
+NGROK_DOMAIN="your-domain" nr dev
 ```
 
 ## Update

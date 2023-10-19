@@ -86,7 +86,7 @@ let proxy = new ReverseProxy.ReverseProxy(
     },
     {
       pathPattern: "/webhook",
-      domainName: probotApp.githubApp.webhook.url,
+      domainName: probotApp.githubApp.webhookUrl,
       originId: "webhook",
     },
     {
