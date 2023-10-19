@@ -72,6 +72,7 @@ api.post("/report", inflight (req) => {
 
 let rntm = new runtime.RuntimeService(api.url);
 let probotApp = new probot.ProbotApp(rntm.api.url, runtimeCallbacks);
+let githubApp = probotApp.githubApp;
 
 let proxy = new ReverseProxy.ReverseProxy(
   subDomain: "dev",
@@ -86,7 +87,7 @@ let proxy = new ReverseProxy.ReverseProxy(
     },
     {
       pathPattern: "/webhook",
-      domainName: probotApp.githubApp.webhookUrl,
+      domainName: githubApp.webhookUrl,
       originId: "webhook",
     },
     {
@@ -97,14 +98,21 @@ let proxy = new ReverseProxy.ReverseProxy(
   ],
 );
 
-bring util;
-if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("NGROK_DOMAIN") != nil {
-  bring "./ngrok.w" as ngrok;
 
+bring util;
+if util.tryEnv("WING_TARGET") == "sim" {
+  bring "./ngrok.w" as ngrok;
   let devNgrok = new ngrok.Ngrok(
     url: inflight () => {
       return proxy.url();
-    },
-    domain: util.tryEnv("NGROK_DOMAIN")
+    }
   );
+
+  let deploy = new cloud.OnDeploy(inflight () => {
+    let url = devNgrok.waitForUrl();
+    log("Website URL: " + url);
+
+    //githubApp.updateCallbackUrl("${url}/wrpc/github.callback");
+    githubApp.updateWebhookUrl("${url}/webhook");
+  });
 }
