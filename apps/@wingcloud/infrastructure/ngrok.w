@@ -7,7 +7,7 @@ struct NgrokShellResult {
 }
 
 struct NgrokProps {
-  url: inflight (): str;
+  url: str;
   domain: str?;
 }
 
@@ -20,7 +20,7 @@ class Ngrok {
   init(props: NgrokProps) {
     this.b = new cloud.Bucket();
     new cloud.Service(inflight () => {
-      let url = props.url();
+      let url = props.url;
       let parts = url.split(":");
       let port = parts.at(parts.length - 1);
 
