@@ -18,18 +18,18 @@ class GithubApp {
     this.privateKey = privateKey;
   }
 
-  pub inflight updateCallbackUrl(url: str): str {
+  pub inflight updateCallbackUrl(url: str) {
     let jwt = GithubApp.createGithubAppJwt(this.appId.value(), this.privateKey.value());
 
     let res = http.patch(
-      "https://api.github.com/app",
+      "https://api.github.com/app/callback_url",
       headers: {
         "Accept" => "application/vnd.github+json",
         "Authorization" => "Bearer ${jwt}",
         "X-GitHub-Api-Version" => "2022-11-28"
       },
       body: Json.stringify({
-        webhook_url: url
+        callback_url: url
     }));
 
     if (res.status == 200) {
