@@ -24,6 +24,12 @@ export const wrpc = createWRPCReact<{
       }>;
     }
   >;
+  "project.get": QueryProcedure<
+    { id: string },
+    {
+      project: { id: string; name: string; repository: string; userId: string };
+    }
+  >;
   "project.rename": MutationProcedure<{ id: string; name: string }, {}>;
   "user.listProjects": QueryProcedure<
     undefined,
