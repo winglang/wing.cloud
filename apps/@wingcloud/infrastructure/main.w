@@ -1,4 +1,5 @@
 bring cloud;
+bring util;
 bring http;
 bring ex;
 
@@ -98,8 +99,6 @@ let proxy = new ReverseProxy.ReverseProxy(
   ],
 );
 
-
-bring util;
 if util.tryEnv("WING_TARGET") == "sim" {
   bring "./ngrok.w" as ngrok;
   let devNgrok = new ngrok.Ngrok(

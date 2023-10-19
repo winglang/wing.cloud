@@ -18,29 +18,6 @@ class GithubApp {
     this.privateKey = privateKey;
   }
 
-  pub inflight updateWebhookUrl(url: str) {
-    let jwt = GithubApp.createGithubAppJwt(this.appId.value(), this.privateKey.value());
-
-
-    let res = http.patch(
-      "https://api.github.com/app/hook/config",
-      headers: {
-        "Accept" => "application/vnd.github+json",
-        "Authorization" => "Bearer ${jwt}",
-        "X-GitHub-Api-Version" => "2022-11-28"
-      },
-      body: Json.stringify({
-      url: url
-    }));
-
-    if (res.status == 200) {
-      log("GitHub app: webhook url updated: ${url}");
-    }
-    else {
-      log("GitHub app: failed to update the  webhook url: ${res.body}");
-  }
-  }
-
   pub inflight updateCallbackUrl(url: str): str {
     let jwt = GithubApp.createGithubAppJwt(this.appId.value(), this.privateKey.value());
 
@@ -61,6 +38,27 @@ class GithubApp {
     else {
       log("GitHub app: failed to update the callback url: ${res.body}");
     }
+  }
 
+  pub inflight updateWebhookUrl(url: str) {
+    let jwt = GithubApp.createGithubAppJwt(this.appId.value(), this.privateKey.value());
+
+    let res = http.patch(
+      "https://api.github.com/app/hook/config",
+      headers: {
+        "Accept" => "application/vnd.github+json",
+        "Authorization" => "Bearer ${jwt}",
+        "X-GitHub-Api-Version" => "2022-11-28"
+      },
+      body: Json.stringify({
+      url: url
+    }));
+
+    if (res.status == 200) {
+      log("GitHub app: webhook url updated: ${url}");
+    }
+    else {
+      log("GitHub app: failed to update the  webhook url: ${res.body}");
+    }
   }
 }
