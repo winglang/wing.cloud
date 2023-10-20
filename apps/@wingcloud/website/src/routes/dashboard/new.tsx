@@ -27,9 +27,14 @@ export const Component = () => {
     [installations.data, installationId],
   );
 
-  const repos = wrpc["github.listRepositories"].useQuery({
-    installationId: installationId,
-  });
+  const repos = wrpc["github.listRepositories"].useQuery(
+    {
+      installationId: installationId,
+    },
+    {
+      enabled: installationId != "",
+    },
+  );
 
   const createProjectMutation = wrpc["user.createProject"].useMutation();
 

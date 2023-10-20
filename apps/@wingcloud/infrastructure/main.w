@@ -2,6 +2,7 @@ bring cloud;
 bring util;
 bring http;
 bring ex;
+bring util;
 
 bring "./reverse-proxy.w" as ReverseProxy;
 bring "./users.w" as Users;
@@ -11,7 +12,6 @@ bring "./api.w" as wingcloud_api;
 bring "./runtime/runtime-callbacks.w" as runtime_callbacks;
 bring "./runtime/runtime.w" as runtime;
 bring "./probot.w" as probot;
-
 
 // And the sun, and the moon, and the stars, and the flowers.
 
@@ -33,23 +33,14 @@ let table = new ex.DynamodbTable(
 );
 let projects = new Projects.Projects(table);
 let users = new Users.Users(table);
-let GITHUB_APP_CLIENT_ID = new cloud.Secret(name: "wing.cloud/GITHUB_APP_CLIENT_ID") as "GITHUB_APP_CLIENT_ID";
-let GITHUB_APP_CLIENT_SECRET = new cloud.Secret(name: "wing.cloud/GITHUB_APP_CLIENT_SECRET") as "GITHUB_APP_CLIENT_SECRET";
-let APP_SECRET = new cloud.Secret(name: "wing.cloud/APP_SECRET") as "APP_SECRET";
 
 let wingCloudApi = new wingcloud_api.Api(
   api: api,
   projects: projects,
   users: users,
-  githubAppClientId: inflight () => {
-    return GITHUB_APP_CLIENT_ID.value();
-  },
-  githubAppClientSecret: inflight () => {
-    return GITHUB_APP_CLIENT_SECRET.value();
-  },
-  appSecret: inflight () => {
-    return APP_SECRET.value();
-  },
+  githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
+  githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
+  appSecret: util.env("APP_SECRET"),
 );
 
 let website = new ex.ReactApp(
@@ -71,13 +62,22 @@ api.post("/report", inflight (req) => {
   };
 });
 
-let rntm = new runtime.RuntimeService(api.url);
-let probotApp = new probot.ProbotApp(rntm.api.url, runtimeCallbacks);
+let rntm = new runtime.RuntimeService(
+  wingCloudUrl: api.url,
+  flyToken: util.tryEnv("FLY_TOKEN"),
+  awsAccessKeyId: util.tryEnv("AWS_ACCESS_KEY_ID"),
+  awsSecretAccessKey: util.tryEnv("AWS_SECRET_ACCESS_KEY"),
+);
+let probotApp = new probot.ProbotApp(
+  probotAppId: util.env("BOT_GITHUB_APP_ID"),
+  probotSecretKey: util.env("BOT_GITHUB_PRIVATE_KEY"),
+  runtimeUrl: rntm.api.url,
+  runtimeCallbacks: runtimeCallbacks,
+);
 
 let proxy = new ReverseProxy.ReverseProxy(
   subDomain: "dev",
   zoneName: "wingcloud.io",
-  port: 5180,
   aliases: [],
   origins: [
     {
@@ -98,7 +98,8 @@ if util.tryEnv("WING_TARGET") == "sim" {
 
   let githubApp = probotApp.githubApp;
   let devNgrok = new ngrok.Ngrok(
-    url: githubApp.webhookUrl
+    url: githubApp.webhookUrl,
+    domain: util.tryEnv("NGROK_DOMAIN"),
   );
 
   let deploy = new cloud.OnDeploy(inflight () => {

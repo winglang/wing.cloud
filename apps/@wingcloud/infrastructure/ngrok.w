@@ -28,6 +28,7 @@ class Ngrok {
       if let pid = result.pid {
         this.b.put("pid", "${pid}");
         this.b.put("public_url", result.publicUrl);
+        log("ngrok url = ${result.publicUrl}");
       }
 
       return () => {
