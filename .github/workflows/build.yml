@@ -41,7 +41,7 @@ jobs:
         run: pnpm run compile
         env:
           APP_SECRET: ${{ secrets.APP_SECRET }}
-          BOT_GITHUB_CLIENT_ID: ${{ secrets.APP_SECRET }}
-          BOT_GITHUB_CLIENT_SECRET: ${{ secrets.APP_SECRET }}
-          BOT_GITHUB_APP_ID: ${{ secrets.APP_SECRET }}
-          BOT_GITHUB_PRIVATE_KEY: ${{ secrets.APP_SECRET }}
+          BOT_GITHUB_CLIENT_ID: ${{ secrets.BOT_GITHUB_CLIENT_ID }}
+          BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
+          BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
+          BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}
