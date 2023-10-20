@@ -4,12 +4,12 @@
   "type": "commonjs",
   "sideEffects": false,
   "dependencies": {
-    "node-fetch": "2"
+    "node-fetch": "^2.7.0"
   },
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.306",
-    "@types/node": "18",
-    "@types/node-fetch": "2",
+    "@types/node": "^18.18.6",
+    "@types/node-fetch": "^2.6.7",
     "@typescript-eslint/eslint-plugin": "^6.8.0",
     "@typescript-eslint/parser": "^6.8.0",
     "eslint-config-prettier": "^9.0.0",
@@ -20,7 +20,7 @@
     "eslint-plugin-unicorn": "^48.0.1",
     "jsii": "^5.2.17",
     "jsii-pacmak": "^1.90.0",
-    "tsx": "^3.13.0",
+    "tsx": "^3.14.0",
     "typescript": "^5.2.2",
     "vitest": "^0.34.6"
   },
