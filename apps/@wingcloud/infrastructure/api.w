@@ -14,9 +14,9 @@ struct ApiProps {
   api: cloud.Api;
   projects: Projects.Projects;
   users: Users.Users;
-  githubAppClientId: inflight (): str;
-  githubAppClientSecret: inflight (): str;
-  appSecret: inflight (): str;
+  githubAppClientId: str;
+  githubAppClientSecret: str;
+  appSecret: str;
 }
 
 class Api {
@@ -24,9 +24,6 @@ class Api {
     let api = new json_api.JsonApi(api: props.api);
     let projects = props.projects;
     let users = props.users;
-    let GITHUB_APP_CLIENT_ID = props.githubAppClientId;
-    let GITHUB_APP_CLIENT_SECRET = props.githubAppClientSecret;
-    let APP_SECRET = props.appSecret;
 
     let AUTH_COOKIE_NAME = "auth";
 
@@ -37,7 +34,7 @@ class Api {
 
         return JWT.JWT.verify(
           jwt: jwt,
-          secret: APP_SECRET(),
+          secret: props.appSecret,
         );
       }
     };
@@ -60,8 +57,8 @@ class Api {
 
       let tokens = GitHub.Exchange.codeForTokens(
         code: code,
-        clientId: GITHUB_APP_CLIENT_ID(),
-        clientSecret: GITHUB_APP_CLIENT_SECRET(),
+        clientId: props.githubAppClientId,
+        clientSecret: props.githubAppClientSecret,
       );
       log("tokens = ${Json.stringify(tokens)}");
 
@@ -71,7 +68,7 @@ class Api {
       log("userId = ${userId}");
 
       let jwt = JWT.JWT.sign(
-        secret: APP_SECRET(),
+        secret: props.appSecret,
         userId: userId,
         accessToken: tokens.access_token,
         accessTokenExpiresIn: tokens.expires_in,

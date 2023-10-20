@@ -72,20 +72,27 @@ inflight class ProbotAdapter {
   }
 }
 
+struct ProbotAppProps {
+  runtimeUrl: str;
+  runtimeCallbacks: runtime_callbacks.RuntimeCallbacks;
+  probotAppId: str;
+  probotSecretKey: str;
+}
+
 class ProbotApp {
-  probotAppId: cloud.Secret;
-  probotSecretKey: cloud.Secret;
+  probotAppId: str;
+  probotSecretKey: str;
   runtimeUrl: str;
   runtimeCallbacks: runtime_callbacks.RuntimeCallbacks;
   pub githubApp: github.GithubApp;
   prDb: ex.Table;
   inflight var adapter: ProbotAdapter;
 
-  init(runtimeUrl: str, runtimeCallbacks: runtime_callbacks.RuntimeCallbacks) {
-    this.probotAppId =  new cloud.Secret(name: "wing.cloud/probot/app_id") as "probotAppId";
-    this.probotSecretKey = new cloud.Secret(name: "wing.cloud/probot/secret_key") as "probotSecretKey";
-    this.runtimeUrl = runtimeUrl;
-    this.runtimeCallbacks = runtimeCallbacks;
+  init(props: ProbotAppProps) {
+    this.probotAppId =  props.probotAppId;
+    this.probotSecretKey = props.probotSecretKey;
+    this.runtimeUrl = props.runtimeUrl;
+    this.runtimeCallbacks = props.runtimeCallbacks;
 
     this.prDb = new ex.Table(ex.TableProps{
       name: "wing.cloud/probot/prs",
@@ -174,7 +181,7 @@ class ProbotApp {
 
   inflight listen() {
     this.adapter = new ProbotAdapter();
-    this.adapter.initialize(this.probotAppId.value(), this.probotSecretKey.value());
+    this.adapter.initialize(this.probotAppId, this.probotSecretKey);
     this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestOpenedContext): void => {
       let owner = context.payload.repository.owner.login;
       let repo = context.payload.repository.name;
@@ -258,7 +265,7 @@ class ProbotApp {
 
   inflight postComment(event: str) {
     this.adapter = new ProbotAdapter();
-    this.adapter.initialize(this.probotAppId.value(), this.probotSecretKey.value());
+    this.adapter.initialize(this.probotAppId, this.probotSecretKey);
 
     let data = Json.parse(event);
     if let item = this.prDb.tryGet(data.get("environmentId").asStr()) {

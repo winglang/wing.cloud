@@ -188,9 +188,13 @@ const infrastructure = new TypescriptProject({
   outdir: "apps/@wingcloud/infrastructure",
 });
 infrastructure.addFields({ type: "commonjs" });
+infrastructure.addGitIgnore("/.env");
 
 infrastructure.addDeps(`winglang`);
-infrastructure.devTask.exec("wing it main.w");
+// TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
+infrastructure.devTask.exec(
+  "source .env && export $(cut -d= -f1 < .env) && wing it main.w",
+);
 infrastructure.compileTask.exec("wing compile main.w --target sim");
 infrastructure.compileTask.exec("wing compile main.w --target tf-aws");
 infrastructure.addGitIgnore("/target/");
