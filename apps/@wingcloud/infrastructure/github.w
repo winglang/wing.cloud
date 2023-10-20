@@ -24,7 +24,7 @@ struct InstallationRepository {
   name: str;
 }
 
-class Exchange {
+pub class Exchange {
   pub static inflight codeForTokens(options: ExchangeCodeForTokensOptions): AuthTokens {
     // return AuthTokens {
     //   access_token: "at",

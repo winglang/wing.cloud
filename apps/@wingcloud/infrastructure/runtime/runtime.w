@@ -123,7 +123,7 @@ struct RuntimeServiceProps {
 }
 
 // Previews environment runtime
-class RuntimeService {
+pub class RuntimeService {
   extern "../src/get-bucket-name.mts" static inflight getBucketName(): str;
 
   logs: cloud.Bucket;

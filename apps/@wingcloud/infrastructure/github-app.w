@@ -2,7 +2,7 @@ bring cloud;
 bring util;
 bring http;
 
-class GithubApp {
+pub class GithubApp {
   api: cloud.Api;
   appId: str;
   privateKey: str;

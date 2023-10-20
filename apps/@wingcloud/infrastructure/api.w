@@ -19,7 +19,7 @@ struct ApiProps {
   appSecret: str;
 }
 
-class Api {
+pub class Api {
   init(props: ApiProps) {
     let api = new json_api.JsonApi(api: props.api);
     let projects = props.projects;
@@ -140,9 +140,9 @@ class Api {
     api.get("/wrpc/project.get", inflight (request) => {
       let userId = getUserFromCookie(request);
 
-      let input = Projects.GetProjectOptions.fromJson(request.query);
-
-      let project = projects.get(input);
+      let project = projects.get(
+        id: request.query.get("id"),
+      );
 
       if project.userId != userId {
         return {

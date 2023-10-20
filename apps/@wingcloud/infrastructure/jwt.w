@@ -15,7 +15,7 @@ struct VerifyOptions {
   jwt: str;
 }
 
-struct JWTPayload {
+pub struct JWTPayload {
   userId: str;
   accessToken: str;
   accessTokenExpiresIn: num;
@@ -23,7 +23,7 @@ struct JWTPayload {
   refreshTokenExpiresIn: num;
 }
 
-class JWT {
+pub class JWT {
   extern "./src/jwt.ts" pub static inflight sign(options: SignOptions): str;
   extern "./src/jwt.ts" pub static inflight verify(options: VerifyOptions): JWTPayload;
 }

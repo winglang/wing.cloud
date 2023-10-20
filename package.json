@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@skyrpex/wingen": "^0.6.1",
-    "@types/node": "^18.18.6",
+    "@types/node": "18",
     "prettier": "^3.0.3",
     "projen": "^0.75.3",
     "tsx": "^3.14.0",

@@ -11,7 +11,7 @@ struct NgrokProps {
   domain: str?;
 }
 
-class Ngrok {
+pub class Ngrok {
   extern "./src/ngrok.mts" static inflight startNgrok(port: str, domain: str?): NgrokShellResult;
   extern "./src/ngrok.mts" static inflight killNgrok(pid: num);
 

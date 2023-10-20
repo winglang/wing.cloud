@@ -10,7 +10,7 @@ struct JsonApiResponse {
   body: Json?;
 }
 
-class JsonApi {
+pub class JsonApi {
   api: cloud.Api;
   pub url: str;
   var handlerCount: num;

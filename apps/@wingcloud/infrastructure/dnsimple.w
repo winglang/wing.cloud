@@ -18,7 +18,7 @@ class Once {
   init(uid: str, block: (): void) {
     let root = std.Node.of(this).root;
     let exists = root.node.tryFindChild(uid);
-    if exists? { 
+    if exists? {
       return this;
     }
     new Dummy() as uid in Once.toResource(root);
@@ -42,7 +42,7 @@ class DNSimpleProvider {
   }
 }
 
-class DNSimpleZoneRecord {
+pub class DNSimpleZoneRecord {
   pub record: dnsimple.zoneRecord.ZoneRecord;
 
   init(props: DNSRecordProps) {
@@ -82,7 +82,7 @@ struct DNSimpleValidateCertificateProps {
 
 // this class introduces some strange workarounds for validating a certificate
 // see https://github.com/hashicorp/terraform-cdk/issues/2178
-class DNSimpleValidatedCertificate {
+pub class DNSimpleValidatedCertificate {
   pub certificate: Certificate;
 
   init(props: DNSimpleValidateCertificateProps) {

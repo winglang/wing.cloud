@@ -1,6 +1,6 @@
 bring "../public-ecr-repository.w" as publicEcrRepository;
 
-class RuntimeDockerImage {
+pub class RuntimeDockerImage {
   extern "../src/get-runtime-project-path.cjs" static getRuntimeProjectPath(obj: std.IResource): str;
 
   pub image: publicEcrRepository.DockerImage;

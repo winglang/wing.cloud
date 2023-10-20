@@ -22,7 +22,7 @@ struct ReverseProxyProps {
   port: num?;
 }
 
-class ReverseProxy impl IReverseProxy {
+pub class ReverseProxy impl IReverseProxy {
   inner: IReverseProxy?;
 
   init(props: ReverseProxyProps) {

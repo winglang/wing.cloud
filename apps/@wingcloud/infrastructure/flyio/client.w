@@ -10,7 +10,7 @@ struct IClientCreateMachineProps {
   env: Map<str>?;
 }
 
-struct IMachineNode {
+pub struct IMachineNode {
   id: str;
   instanceId: str;
   state: str;
@@ -57,7 +57,7 @@ struct IRuntimeCreateMachineResult {
   instance_id: str;
 }
 
-struct ICreateMachineResult {
+pub struct ICreateMachineResult {
   id: str;
   instanceId: str;
 }
@@ -70,7 +70,7 @@ struct IGetAppResult {
   data: IGetAppResultDataApp;
 }
 
-inflight class Client {
+pub inflight class Client {
   var token: str;
   var graphqlUrl: str;
   var apiUrl: str;

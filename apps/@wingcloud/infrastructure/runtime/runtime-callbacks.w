@@ -1,6 +1,6 @@
 bring cloud;
 
-class RuntimeCallbacks {
+pub class RuntimeCallbacks {
   pub topic: cloud.Topic;
 
   init() {

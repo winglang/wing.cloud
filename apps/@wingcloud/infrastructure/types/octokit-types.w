@@ -101,7 +101,7 @@ interface OctoKitIssues {
   inflight listComments(options: ListCommentsOptions): ListCommentsResponse;
 }
 
-struct OctoKit {
+pub struct OctoKit {
   pulls: OctoKitPulls;
   apps: OctoKitApps;
   git: OctoKitGit;

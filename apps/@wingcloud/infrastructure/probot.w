@@ -79,7 +79,7 @@ struct ProbotAppProps {
   probotSecretKey: str;
 }
 
-class ProbotApp {
+pub class ProbotApp {
   probotAppId: str;
   probotSecretKey: str;
   runtimeUrl: str;

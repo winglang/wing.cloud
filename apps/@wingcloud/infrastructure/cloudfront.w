@@ -34,7 +34,7 @@ class CachePolicy {
   }
 }
 
-struct Origin {
+pub struct Origin {
   domainName: str;
   originId: str;
   pathPattern: str;
@@ -59,7 +59,7 @@ struct CloudFrontDistributionProps {
   origins: Array<Origin>;
 }
 
-class CloudFrontDistribution {
+pub class CloudFrontDistribution {
   pub distribution: aws.cloudfrontDistribution.CloudfrontDistribution;
 
   getDefaultOriginId (origins: Array<Origin>): str {
