@@ -90,6 +90,7 @@ let proxy = new ReverseProxy.ReverseProxy(
       originId: "website",
     },
   ],
+  port: 3900
 );
 
 if util.tryEnv("WING_TARGET") == "sim" {
