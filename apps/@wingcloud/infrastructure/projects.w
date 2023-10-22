@@ -33,7 +33,7 @@ struct DeleteProjectOptions {
   userId: str;
 }
 
-class Projects {
+pub class Projects {
   table: ex.DynamodbTable;
 
   init(table: ex.DynamodbTable) {

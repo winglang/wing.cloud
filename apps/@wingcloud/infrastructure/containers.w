@@ -25,7 +25,7 @@ interface IContainer {
   inflight url(): str?;
 }
 
-class Container_sim impl IContainer {
+pub class Container_sim impl IContainer {
   containerName: str;
   appDir: str;
   opts: ContainerOpts;

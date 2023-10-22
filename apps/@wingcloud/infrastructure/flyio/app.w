@@ -137,7 +137,7 @@ inflight class App {
 /**
  * Fly.io apps managment.
  */
- inflight class Fly {
+ pub inflight class Fly {
   client: client.Client;
   init(client: client.Client) {
     this.client = client;

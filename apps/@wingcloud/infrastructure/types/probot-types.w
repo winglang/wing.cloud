@@ -30,13 +30,13 @@ struct IPullRequestPayload {
   installation: IPullRequestInstallation?;
 }
 
-struct IPullRequestSyncContext {
+pub struct IPullRequestSyncContext {
   id: str;
   payload: IPullRequestPayload;
   octokit: octokit.OctoKit;
 }
 
-struct IPullRequestOpenedContext {
+pub struct IPullRequestOpenedContext {
   id: str;
   payload: IPullRequestPayload;
   octokit: octokit.OctoKit;

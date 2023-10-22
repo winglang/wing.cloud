@@ -10,11 +10,10 @@ on:
 env:
   NODE_VERSION: "18.16.0"
   PNPM_VERSION: "8.6.3"
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -40,3 +39,9 @@ jobs:
 
       - name: Compile Project
         run: pnpm run compile
+        env:
+          APP_SECRET: ${{ secrets.APP_SECRET }}
+          BOT_GITHUB_CLIENT_ID: ${{ secrets.BOT_GITHUB_CLIENT_ID }}
+          BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
+          BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
+          BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}

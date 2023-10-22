@@ -25,7 +25,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
   init() {
     this.container = new containers.Container_sim(name: "previews-runtime", image: "../runtime", args: {
       "SETUP_DOCKER": "false",
-    },  port: 3000, privileged: true, readiness: "/");
+    },  port: 3000, privileged: true);
 
     new cloud.Service(inflight () => {
       return () => {
@@ -65,21 +65,27 @@ class RuntimeHandler_sim impl IRuntimeHandler {
   }
 }
 
+struct FlyRuntimeHandlerProps {
+  flyToken: str;
+  awsAccessKeyId: str;
+  awsSecretAccessKey: str;
+}
+
 class RuntimeHandler_flyio impl IRuntimeHandler {
-  flyToken: cloud.Secret;
-  awsAccessKeyId: cloud.Secret;
-  awsSecretAccessKey: cloud.Secret;
+  flyToken: str;
+  awsAccessKeyId: str;
+  awsSecretAccessKey: str;
   image: runtimeDocker.RuntimeDockerImage;
-  init() {
-    this.flyToken = new cloud.Secret(name: "wing.cloud/runtime/flyToken") as "flyToken";
-    this.awsAccessKeyId = new cloud.Secret(name: "wing.cloud/runtime/awsAccessKeyId") as "awsAccessKeyId";
-    this.awsSecretAccessKey = new cloud.Secret(name: "wing.cloud/runtime/awsSecretAccessKey") as "awsSecretAccessKey";
+  init(props: FlyRuntimeHandlerProps) {
+    this.flyToken = props.flyToken;
+    this.awsAccessKeyId = props.awsAccessKeyId;
+    this.awsSecretAccessKey = props.awsSecretAccessKey;
     this.image = new runtimeDocker.RuntimeDockerImage();
   }
 
   pub inflight handleRequest(opts: RuntimeHandleOptions): str {
-    let flyClient = new flyio.Client(this.flyToken.value());
-    flyClient._init(this.flyToken.value());
+    let flyClient = new flyio.Client(this.flyToken);
+    flyClient._init(this.flyToken);
     let fly = new flyio.Fly(flyClient);
     let app = fly.app("wing-preview-${util.nanoid(alphabet: "0123456789abcdefghijklmnopqrstuvwxyz", size: 10)}");
     let exists = app.exists();
@@ -109,15 +115,22 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   }
 }
 
+struct RuntimeServiceProps {
+  wingCloudUrl: str;
+  flyToken: str?;
+  awsAccessKeyId: str?;
+  awsSecretAccessKey: str?;
+}
+
 // Previews environment runtime
-class RuntimeService {
+pub class RuntimeService {
   extern "../src/get-bucket-name.mts" static inflight getBucketName(): str;
 
   logs: cloud.Bucket;
   pub api: cloud.Api;
   runtimeHandler: IRuntimeHandler;
 
-  init(wingCloudUrl: str) {
+  init(props: RuntimeServiceProps) {
     this.logs = new cloud.Bucket() as "deployment logs";
 
     // TODO: use a function to generate the IAM role with the permissions to write to the bucket
@@ -129,7 +142,12 @@ class RuntimeService {
     if util.tryEnv("WING_TARGET") == "sim" {
       this.runtimeHandler = new RuntimeHandler_sim();
     } else {
-      this.runtimeHandler = new RuntimeHandler_flyio();
+      // TODO: We need better type guards for this.
+      this.runtimeHandler = new RuntimeHandler_flyio(
+        flyToken: props.flyToken ?? "",
+        awsAccessKeyId: props.awsAccessKeyId ?? "",
+        awsSecretAccessKey: props.awsSecretAccessKey ?? ""
+      );
     }
 
     this.api = new cloud.Api();
@@ -144,14 +162,14 @@ class RuntimeService {
       let token = body.tryGet("token")?.tryAsStr();
       let logsBucketName = RuntimeService.getBucketName();
 
-      log("wing url: ${wingCloudUrl}");
+      log("wing url: ${props.wingCloudUrl}");
 
       this.runtimeHandler.handleRequest(
         gitToken: token,
         gitRepo: repo,
         gitSha: sha,
         entryfile: entryfile,
-        wingCloudUrl: wingCloudUrl,
+        wingCloudUrl: props.wingCloudUrl,
         logsBucketName: logsBucketName
       );
 

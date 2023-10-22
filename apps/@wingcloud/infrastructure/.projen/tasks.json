@@ -48,7 +48,7 @@
       "description": "Start the development task",
       "steps": [
         {
-          "exec": "wing it main.w"
+          "exec": "source .env && export $(cut -d= -f1 < .env) && wing it main.w"
         }
       ]
     },

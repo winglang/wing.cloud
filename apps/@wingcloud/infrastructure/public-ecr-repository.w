@@ -20,7 +20,7 @@ struct PublicECRRepositoryProps {
   name: str;
 }
 
-class PublicECRRepository {
+pub class PublicECRRepository {
   pub ecrRepo: aws.ecrpublicRepository.EcrpublicRepository;
   pub authToken: aws.dataAwsEcrpublicAuthorizationToken.DataAwsEcrpublicAuthorizationToken;
   init(props: PublicECRRepositoryProps) {
@@ -37,7 +37,7 @@ struct DockerImageProps {
   build: docker.image.ImageBuild;
 }
 
-class DockerImage {
+pub class DockerImage {
   pub imageName: str;
   init(props: DockerImageProps) {
     new DockerProvider(registryAuth: {
@@ -51,7 +51,7 @@ class DockerImage {
       name: "${props.repo.ecrRepo.repositoryUri}:${util.nanoid(alphabet: "0123456789abcdefghijklmnopqrstuvwxyz", size: 10)}",
       buildAttribute: props.build,
     );
-    
+
     let resource = new nullProvider.resource.Resource(triggers: { "changed": util.nanoid() });
     resource.addOverride("provisioner.local-exec.command", "
 echo ${props.repo.authToken.password} | docker login --username AWS --password-stdin public.ecr.aws

@@ -1,4 +1,5 @@
 bring cloud;
+bring util;
 bring http;
 bring ex;
 
@@ -10,7 +11,6 @@ bring "./api.w" as wingcloud_api;
 bring "./runtime/runtime-callbacks.w" as runtime_callbacks;
 bring "./runtime/runtime.w" as runtime;
 bring "./probot.w" as probot;
-
 
 // And the sun, and the moon, and the stars, and the flowers.
 
@@ -32,23 +32,14 @@ let table = new ex.DynamodbTable(
 );
 let projects = new Projects.Projects(table);
 let users = new Users.Users(table);
-let GITHUB_APP_CLIENT_ID = new cloud.Secret(name: "wing.cloud/GITHUB_APP_CLIENT_ID") as "GITHUB_APP_CLIENT_ID";
-let GITHUB_APP_CLIENT_SECRET = new cloud.Secret(name: "wing.cloud/GITHUB_APP_CLIENT_SECRET") as "GITHUB_APP_CLIENT_SECRET";
-let APP_SECRET = new cloud.Secret(name: "wing.cloud/APP_SECRET") as "APP_SECRET";
 
 let wingCloudApi = new wingcloud_api.Api(
   api: api,
   projects: projects,
   users: users,
-  githubAppClientId: inflight () => {
-    return GITHUB_APP_CLIENT_ID.value();
-  },
-  githubAppClientSecret: inflight () => {
-    return GITHUB_APP_CLIENT_SECRET.value();
-  },
-  appSecret: inflight () => {
-    return APP_SECRET.value();
-  },
+  githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
+  githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
+  appSecret: util.env("APP_SECRET"),
 );
 
 let website = new ex.ReactApp(
@@ -57,6 +48,30 @@ let website = new ex.ReactApp(
   buildCommand: "pnpm build",
   buildDir: "dist",
   localPort: 5174,
+);
+
+
+let runtimeCallbacks = new runtime_callbacks.RuntimeCallbacks();
+
+api.post("/report", inflight (req) => {
+  runtimeCallbacks.topic.publish(req.body ?? "");
+
+  return {
+    status: 200
+  };
+});
+
+let rntm = new runtime.RuntimeService(
+  wingCloudUrl: api.url,
+  flyToken: util.tryEnv("FLY_TOKEN"),
+  awsAccessKeyId: util.tryEnv("AWS_ACCESS_KEY_ID"),
+  awsSecretAccessKey: util.tryEnv("AWS_SECRET_ACCESS_KEY"),
+);
+let probotApp = new probot.ProbotApp(
+  probotAppId: util.env("BOT_GITHUB_APP_ID"),
+  probotSecretKey: util.env("BOT_GITHUB_PRIVATE_KEY"),
+  runtimeUrl: rntm.api.url,
+  runtimeCallbacks: runtimeCallbacks,
 );
 
 let proxy = new ReverseProxy.ReverseProxy(
@@ -75,17 +90,22 @@ let proxy = new ReverseProxy.ReverseProxy(
       originId: "website",
     },
   ],
+  port: 3900
 );
 
-let runtimeCallbacks = new runtime_callbacks.RuntimeCallbacks();
+if util.tryEnv("WING_TARGET") == "sim" {
+  bring "./ngrok.w" as ngrok;
 
-api.post("/report", inflight (req) => {
-  runtimeCallbacks.topic.publish(req.body ?? "");
+  let githubApp = probotApp.githubApp;
+  let devNgrok = new ngrok.Ngrok(
+    url: githubApp.webhookUrl,
+    domain: util.tryEnv("NGROK_DOMAIN"),
+  );
 
-  return {
-    status: 200
-  };
-});
-
-let rntm = new runtime.RuntimeService(api.url);
-new probot.ProbotApp(rntm.api.url, runtimeCallbacks);
+  let deploy = new cloud.OnDeploy(inflight () => {
+    let url = devNgrok.waitForUrl();
+    githubApp.updateWebhookUrl("${url}/webhook");
+    log("Update your GitHub callback url to: ${proxy.url()}/wrpc/github.callback");
+    log("Website URL: ${proxy.url()}");
+  });
+}

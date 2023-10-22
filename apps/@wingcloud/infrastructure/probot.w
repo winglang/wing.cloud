@@ -21,7 +21,7 @@ interface IProbotWebhooks {
 }
 
 interface IProbotAuth {
-  inflight call(ProbotInstance, installationId: num): octokit.OctoKit; 
+  inflight call(ProbotInstance, installationId: num): octokit.OctoKit;
 }
 
 struct ProbotInstance {
@@ -72,20 +72,27 @@ inflight class ProbotAdapter {
   }
 }
 
-class ProbotApp {
-  probotAppId: cloud.Secret;
-  probotSecretKey: cloud.Secret;
+struct ProbotAppProps {
   runtimeUrl: str;
   runtimeCallbacks: runtime_callbacks.RuntimeCallbacks;
-  githubApp: github.GithubApp;
+  probotAppId: str;
+  probotSecretKey: str;
+}
+
+pub class ProbotApp {
+  probotAppId: str;
+  probotSecretKey: str;
+  runtimeUrl: str;
+  runtimeCallbacks: runtime_callbacks.RuntimeCallbacks;
+  pub githubApp: github.GithubApp;
   prDb: ex.Table;
   inflight var adapter: ProbotAdapter;
 
-  init(runtimeUrl: str, runtimeCallbacks: runtime_callbacks.RuntimeCallbacks) {
-    this.probotAppId =  new cloud.Secret(name: "wing.cloud/probot/app_id") as "probotAppId";
-    this.probotSecretKey = new cloud.Secret(name: "wing.cloud/probot/secret_key") as "probotSecretKey";
-    this.runtimeUrl = runtimeUrl;
-    this.runtimeCallbacks = runtimeCallbacks;
+  init(props: ProbotAppProps) {
+    this.probotAppId =  props.probotAppId;
+    this.probotSecretKey = props.probotSecretKey;
+    this.runtimeUrl = props.runtimeUrl;
+    this.runtimeCallbacks = props.runtimeCallbacks;
 
     this.prDb = new ex.Table(ex.TableProps{
       name: "wing.cloud/probot/prs",
@@ -98,14 +105,17 @@ class ProbotApp {
       }
     }) as "environments prs";
 
-    this.githubApp = new github.GithubApp(this.probotAppId, this.probotSecretKey, inflight (req) => {
-      this.listen();
-      this.adapter.verifyAndReceive(this.getVerifyAndReceievePropsProps(req));
-
-      return {
-        status: 200
-      };
-    });
+    this.githubApp = new github.GithubApp(
+      this.probotAppId,
+      this.probotSecretKey,
+      inflight (req) => {
+        this.listen();
+        this.adapter.verifyAndReceive(this.getVerifyAndReceievePropsProps(req));
+        return {
+          status: 200
+        };
+      }
+    );
 
     let db = new ex.Table(ex.TableProps{
       name: "wing.cloud/probot/statuses",
@@ -171,7 +181,7 @@ class ProbotApp {
 
   inflight listen() {
     this.adapter = new ProbotAdapter();
-    this.adapter.initialize(this.probotAppId.value(), this.probotSecretKey.value());
+    this.adapter.initialize(this.probotAppId, this.probotSecretKey);
     this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestOpenedContext): void => {
       let owner = context.payload.repository.owner.login;
       let repo = context.payload.repository.name;
@@ -180,8 +190,8 @@ class ProbotApp {
         repo: repo,
         tree_sha: context.payload.pull_request.head.sha,
         recursive: "true"
-      };  
-      
+      };
+
       let resp = context.octokit.git.getTree(options);
       if resp.status != 200 {
         throw "getTree: failure: ${resp.status}, ${options}";
@@ -220,8 +230,8 @@ class ProbotApp {
         repo: repo,
         tree_sha: context.payload.pull_request.head.sha,
         recursive: "true"
-      };  
-      
+      };
+
       let resp = context.octokit.git.getTree(options);
       if resp.status != 200 {
         throw "getTree: failure: ${resp.status}, ${options}";
@@ -255,7 +265,7 @@ class ProbotApp {
 
   inflight postComment(event: str) {
     this.adapter = new ProbotAdapter();
-    this.adapter.initialize(this.probotAppId.value(), this.probotSecretKey.value());
+    this.adapter.initialize(this.probotAppId, this.probotSecretKey);
 
     let data = Json.parse(event);
     if let item = this.prDb.tryGet(data.get("environmentId").asStr()) {

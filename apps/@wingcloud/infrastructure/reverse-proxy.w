@@ -6,6 +6,7 @@ bring "./cloudfront.w" as CloudFront;
 
 struct ReverseProxyServerProps{
   origins: Array<CloudFront.Origin>;
+  port: num?;
 }
 
 interface IReverseProxy {
@@ -18,9 +19,10 @@ struct ReverseProxyProps {
   subDomain: str;
   aliases: Array<str>;
   origins: Array<CloudFront.Origin>;
+  port: num?;
 }
 
-class ReverseProxy impl IReverseProxy {
+pub class ReverseProxy impl IReverseProxy {
   inner: IReverseProxy?;
 
   init(props: ReverseProxyProps) {
@@ -99,7 +101,7 @@ class ReverseProxy_sim impl IReverseProxy {
     this.bucket = new cloud.Bucket() as "Reverse Proxy Bucket";
     this.origins = props.origins;
     new cloud.Service(inflight () => {
-      let port = ReverseProxy_sim.startReverseProxyServer(origins: props.origins);
+      let port = ReverseProxy_sim.startReverseProxyServer(origins: props.origins, port: props.port);
       this.bucket.put(this.urlkey, "http://localhost:${port}");
 
       return () => {

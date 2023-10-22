@@ -17,7 +17,7 @@ struct GetOrCreateOptions {
   gitHubLogin: str;
 }
 
-class Users {
+pub class Users {
   table: ex.DynamodbTable;
 
   init(table: ex.DynamodbTable) {

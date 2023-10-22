@@ -6,23 +6,29 @@ struct NgrokShellResult {
   publicUrl: str;
 }
 
-class Ngrok {
-  extern "./src/ngrok.mts" static inflight startNgrok(port: str): NgrokShellResult;
+struct NgrokProps {
+  url: str;
+  domain: str?;
+}
+
+pub class Ngrok {
+  extern "./src/ngrok.mts" static inflight startNgrok(port: str, domain: str?): NgrokShellResult;
   extern "./src/ngrok.mts" static inflight killNgrok(pid: num);
 
   b: cloud.Bucket;
 
-  init(url: str) {
+  init(props: NgrokProps) {
     this.b = new cloud.Bucket();
     new cloud.Service(inflight () => {
-      let u = url;
-      let parts = u.split(":");
+      let url = props.url;
+      let parts = url.split(":");
       let port = parts.at(parts.length - 1);
 
-      let result = Ngrok.startNgrok(port);
+      let result = Ngrok.startNgrok(port, props.domain);
       if let pid = result.pid {
         this.b.put("pid", "${pid}");
         this.b.put("public_url", result.publicUrl);
+        log("ngrok url = ${result.publicUrl}");
       }
 
       return () => {
@@ -37,7 +43,7 @@ class Ngrok {
     util.waitUntil(inflight () => {
       return this.b.exists("public_url");
     }, timeout: 10s);
-    
+
     return this.b.get("public_url");
   }
 }
