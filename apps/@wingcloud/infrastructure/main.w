@@ -42,14 +42,14 @@ let wingCloudApi = new wingcloud_api.Api(
   appSecret: util.env("APP_SECRET"),
 );
 
+let websitePort = 5174;
 let website = new ex.ReactApp(
   projectPath: "../website",
-  startCommand: "pnpm dev --port 5174",
-  buildCommand: "pnpm build",
+  startCommand: "pnpm vite --port ${websitePort}",
+  buildCommand: "pnpm vite build",
   buildDir: "dist",
-  localPort: 5174,
+  localPort: websitePort,
 );
-
 
 let runtimeCallbacks = new runtime_callbacks.RuntimeCallbacks();
 
@@ -103,9 +103,8 @@ if util.tryEnv("WING_TARGET") == "sim" {
   );
 
   let deploy = new cloud.OnDeploy(inflight () => {
-    let url = devNgrok.waitForUrl();
-    githubApp.updateWebhookUrl("${url}/webhook");
-    log("Update your GitHub callback url to: ${proxy.url()}/wrpc/github.callback");
-    log("Website URL: ${proxy.url()}");
+    githubApp.updateWebhookUrl("${devNgrok.url}/webhook");
+    log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
+    log("Website URL: ${proxy.url}");
   });
 }

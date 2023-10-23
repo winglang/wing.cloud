@@ -1,5 +1,6 @@
 bring cloud;
 bring util;
+bring sim;
 
 struct NgrokShellResult {
   pid: num?;
@@ -15,10 +16,11 @@ pub class Ngrok {
   extern "./src/ngrok.mts" static inflight startNgrok(port: str, domain: str?): NgrokShellResult;
   extern "./src/ngrok.mts" static inflight killNgrok(pid: num);
 
-  b: cloud.Bucket;
+  pub url: str;
 
   init(props: NgrokProps) {
-    this.b = new cloud.Bucket();
+    let state = new sim.State();
+    this.url = state.token("url");
     new cloud.Service(inflight () => {
       let url = props.url;
       let parts = url.split(":");
@@ -26,24 +28,16 @@ pub class Ngrok {
 
       let result = Ngrok.startNgrok(port, props.domain);
       if let pid = result.pid {
-        this.b.put("pid", "${pid}");
-        this.b.put("public_url", result.publicUrl);
+        state.set("pid", "${pid}");
+        state.set("url", result.publicUrl);
         log("ngrok url = ${result.publicUrl}");
       }
 
       return () => {
-        if let pid = this.b.tryGet("pid") {
+        if let pid = state.tryGet("pid")?.tryAsStr() {
           Ngrok.killNgrok(num.fromStr(pid));
         }
       };
     });
-  }
-
-  pub inflight waitForUrl(): str {
-    util.waitUntil(inflight () => {
-      return this.b.exists("public_url");
-    }, timeout: 10s);
-
-    return this.b.get("public_url");
   }
 }

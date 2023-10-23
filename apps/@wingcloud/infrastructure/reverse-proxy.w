@@ -1,17 +1,13 @@
 bring cloud;
 bring util;
 bring http;
+bring sim;
 bring "./dnsimple.w" as DNSimple;
 bring "./cloudfront.w" as CloudFront;
 
 struct ReverseProxyServerProps{
   origins: Array<CloudFront.Origin>;
   port: num?;
-}
-
-interface IReverseProxy {
-  inflight url(): str;
-  inflight paths(): MutArray<str>;
 }
 
 struct ReverseProxyProps {
@@ -22,33 +18,28 @@ struct ReverseProxyProps {
   port: num?;
 }
 
-pub class ReverseProxy impl IReverseProxy {
-  inner: IReverseProxy?;
+pub class ReverseProxy {
+  pub url: str;
+  pub paths: Array<str>;
 
   init(props: ReverseProxyProps) {
     if util.env("WING_TARGET") == "sim" {
-      this.inner = new ReverseProxy_sim(props);
+      let inner = new ReverseProxy_sim(props);
+      this.url = inner.url;
+      this.paths = inner.paths;
     } elif util.env("WING_TARGET") == "tf-aws" {
-      this.inner = new ReverseProxy_tfaws(props);
+      let inner = new ReverseProxy_tfaws(props);
+      this.url = inner.url;
+      this.paths = inner.paths;
+    } else {
+      throw "ReverseProxy is not implemented for ${util.env("WING_TARGET")}";
     }
-  }
-
-  pub inflight url(): str {
-    if let inner = this.inner {
-      return inner.url();
-    }
-    throw "not implemented";
-  }
-
-  pub inflight paths(): MutArray<str> {
-    if let inner = this.inner {
-      return inner.paths();
-    }
-    throw "not implemented";
   }
 }
 
-class ReverseProxy_tfaws impl IReverseProxy {
+class ReverseProxy_tfaws {
+  pub url: str;
+  pub paths: Array<str>;
   aliases: Array<str>;
   origins: Array<CloudFront.Origin>;
   init(props: ReverseProxyProps) {
@@ -73,56 +64,47 @@ class ReverseProxy_tfaws impl IReverseProxy {
       ttl: 60,
       distributionUrl: cloudFrontDist.distribution.domainName
     );
-  }
 
-  pub inflight url(): str {
-    return this.aliases.at(0);
-  }
+    this.url = props.aliases.tryAt(0) ?? cloudFrontDist.distribution.domainName;
 
-  pub inflight paths(): MutArray<str> {
-    // do we have array.map?
     let paths = MutArray<str>[];
     for origin in this.origins {
       paths.push(origin.pathPattern);
     }
-    return paths;
+    this.paths = paths.copy();
   }
 }
 
-class ReverseProxy_sim impl IReverseProxy {
-  urlkey: str;
-  bucket: cloud.Bucket;
+struct SimReverseProxyResult {
+  port: num;
+  close: inflight (): void;
+}
+
+class ReverseProxy_sim {
+  pub url: str;
+  pub paths: Array<str>;
+  state: sim.State;
   origins: Array<CloudFront.Origin>;
 
-  extern "./reverse-proxy-local.mts" pub static inflight startReverseProxyServer(props: ReverseProxyServerProps): num ;
+  extern "./reverse-proxy-local.mts" pub static inflight startReverseProxyServer(props: ReverseProxyServerProps): SimReverseProxyResult;
 
   init(props: ReverseProxyProps) {
-    this.urlkey = "url.txt";
-    this.bucket = new cloud.Bucket() as "Reverse Proxy Bucket";
+    this.state = new sim.State();
     this.origins = props.origins;
     new cloud.Service(inflight () => {
-      let port = ReverseProxy_sim.startReverseProxyServer(origins: props.origins, port: props.port);
-      this.bucket.put(this.urlkey, "http://localhost:${port}");
-
-      return () => {
-        log("stop!");
+      let result = ReverseProxy_sim.startReverseProxyServer(origins: props.origins, port: props.port);
+      this.state.set("url", "http://localhost:${result.port}");
+      return inflight () => {
+        result.close();
       };
     });
-  }
 
-  pub inflight url(): str {
-    util.waitUntil(() => {
-      return this.bucket.exists(this.urlkey);
-    });
-    return this.bucket.get(this.urlkey);
-  }
+    this.url = this.state.token("url");
 
-  pub inflight paths(): MutArray<str> {
-    // do we have array.map??
     let paths = MutArray<str>[];
     for origin in this.origins {
       paths.push(origin.pathPattern);
     }
-    return paths;
+    this.paths = paths.copy();
   }
 }

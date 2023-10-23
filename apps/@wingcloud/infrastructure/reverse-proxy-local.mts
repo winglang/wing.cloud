@@ -14,9 +14,7 @@ export interface ReverseProxyServerProps {
   origins: Origin[];
   port?: number;
 }
-export const startReverseProxyServer = (
-  props: ReverseProxyServerProps,
-): number => {
+export const startReverseProxyServer = (props: ReverseProxyServerProps) => {
   for (const origin of props.origins) {
     app.all(origin.pathPattern, (req, res) => {
       proxy.web(req, res, {
@@ -35,5 +33,12 @@ export const startReverseProxyServer = (
     console.log(`Reverse proxy paths and targets:`, props.origins);
   });
   const address = server.address();
-  return (address as AddressInfo).port;
+  return {
+    port: (address as AddressInfo).port,
+    async close() {
+      await new Promise((resolve) => {
+        server.close(resolve);
+      });
+    },
+  };
 };
