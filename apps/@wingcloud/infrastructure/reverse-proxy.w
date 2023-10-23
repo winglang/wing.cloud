@@ -75,20 +75,28 @@ class ReverseProxy_tfaws {
   }
 }
 
+struct SimReverseProxyResult {
+  port: num;
+  close: inflight (): void;
+}
+
 class ReverseProxy_sim {
   pub url: str;
   pub paths: Array<str>;
   state: sim.State;
   origins: Array<CloudFront.Origin>;
 
-  extern "./reverse-proxy-local.mts" pub static inflight startReverseProxyServer(props: ReverseProxyServerProps): num ;
+  extern "./reverse-proxy-local.mts" pub static inflight startReverseProxyServer(props: ReverseProxyServerProps): SimReverseProxyResult;
 
   init(props: ReverseProxyProps) {
     this.state = new sim.State();
     this.origins = props.origins;
     new cloud.Service(inflight () => {
-      let port = ReverseProxy_sim.startReverseProxyServer(origins: props.origins, port: props.port);
-      this.state.set("url", "http://localhost:${port}");
+      let result = ReverseProxy_sim.startReverseProxyServer(origins: props.origins, port: props.port);
+      this.state.set("url", "http://localhost:${result.port}");
+      return inflight () => {
+        result.close();
+      };
     });
 
     this.url = this.state.token("url");
