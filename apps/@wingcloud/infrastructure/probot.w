@@ -39,7 +39,7 @@ struct TestResults {
 }
 
 inflight class ProbotAdapter {
-  extern "./src/probot.mts" pub static inflight createProbot(appId: str, privateKey: str): ProbotInstance;
+  extern "./src/probot.mts" pub static inflight createProbot(appId: str, privateKey: str, webhookSecret: str): ProbotInstance;
 
   inflight var instance: ProbotInstance?;
 
@@ -47,8 +47,8 @@ inflight class ProbotAdapter {
     this.instance = nil;
   }
 
-  pub initialize(appId: str, privateKey: str) {
-    this.instance = ProbotAdapter.createProbot(appId, privateKey);
+  pub initialize(appId: str, privateKey: str, webhookSecret: str) {
+    this.instance = ProbotAdapter.createProbot(appId, privateKey, webhookSecret);
   }
 
   pub handlePullRequstOpened(handler: inflight (probot.IPullRequestOpenedContext): void) {
@@ -77,11 +77,13 @@ struct ProbotAppProps {
   runtimeCallbacks: runtime_callbacks.RuntimeCallbacks;
   probotAppId: str;
   probotSecretKey: str;
+  webhookSecret: str;
 }
 
 pub class ProbotApp {
   probotAppId: str;
   probotSecretKey: str;
+  webhookSecret: str;
   runtimeUrl: str;
   runtimeCallbacks: runtime_callbacks.RuntimeCallbacks;
   pub githubApp: github.GithubApp;
@@ -91,6 +93,7 @@ pub class ProbotApp {
   init(props: ProbotAppProps) {
     this.probotAppId =  props.probotAppId;
     this.probotSecretKey = props.probotSecretKey;
+    this.webhookSecret = props.webhookSecret;
     this.runtimeUrl = props.runtimeUrl;
     this.runtimeCallbacks = props.runtimeCallbacks;
 
@@ -152,14 +155,15 @@ pub class ProbotApp {
 
     let name = lowkeysHeaders.get("x-github-event");
 
-    let var sig: str? = nil;
-    if lowkeysHeaders.has("x-hub-signature-256") {
-      sig = lowkeysHeaders.get("x-hub-signature-256");
-    } elif lowkeysHeaders.has("x-hub-signature") {
-      sig = lowkeysHeaders.get("x-hub-signature");
-    } else {
-      throw "getVerifyProps: missing sig header";
-    }
+    // let var sig: str? = nil;
+    // if lowkeysHeaders.has("x-hub-signature-256") {
+    //   sig = lowkeysHeaders.get("x-hub-signature-256");
+    // } elif lowkeysHeaders.has("x-hub-signature") {
+    //   sig = lowkeysHeaders.get("x-hub-signature");
+    // } else {
+    //   throw "getVerifyProps: missing sig header";
+    // }
+    let sig = lowkeysHeaders.tryGet("x-hub-signature-256");
 
     if req.body == nil {
       throw "getVerifyProps: missing body";
@@ -181,7 +185,7 @@ pub class ProbotApp {
 
   inflight listen() {
     this.adapter = new ProbotAdapter();
-    this.adapter.initialize(this.probotAppId, this.probotSecretKey);
+    this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
     this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestOpenedContext): void => {
       let owner = context.payload.repository.owner.login;
       let repo = context.payload.repository.name;
@@ -265,7 +269,7 @@ pub class ProbotApp {
 
   inflight postComment(event: str) {
     this.adapter = new ProbotAdapter();
-    this.adapter.initialize(this.probotAppId, this.probotSecretKey);
+    this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
 
     let data = Json.parse(event);
     if let item = this.prDb.tryGet(data.get("environmentId").asStr()) {

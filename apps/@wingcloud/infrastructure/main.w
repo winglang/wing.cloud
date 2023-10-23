@@ -70,6 +70,7 @@ let rntm = new runtime.RuntimeService(
 let probotApp = new probot.ProbotApp(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
   probotSecretKey: util.env("BOT_GITHUB_PRIVATE_KEY"),
+  webhookSecret: util.env("BOT_GITHUB_WEBHOOK_SECRET"),
   runtimeUrl: rntm.api.url,
   runtimeCallbacks: runtimeCallbacks,
 );
