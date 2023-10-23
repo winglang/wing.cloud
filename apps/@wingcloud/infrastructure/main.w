@@ -103,8 +103,7 @@ if util.tryEnv("WING_TARGET") == "sim" {
   );
 
   let deploy = new cloud.OnDeploy(inflight () => {
-    let url = devNgrok.waitForUrl();
-    githubApp.updateWebhookUrl("${url}/webhook");
+    githubApp.updateWebhookUrl("${devNgrok.url}/webhook");
     log("Update your GitHub callback url to: ${proxy.url()}/wrpc/github.callback");
     log("Website URL: ${proxy.url()}");
   });
