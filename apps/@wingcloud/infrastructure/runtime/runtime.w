@@ -67,19 +67,16 @@ class RuntimeHandler_sim impl IRuntimeHandler {
 
 struct FlyRuntimeHandlerProps {
   flyToken: str;
-  awsAccessKeyId: str;
-  awsSecretAccessKey: str;
+  awsEncryptedSecret: str;
 }
 
 class RuntimeHandler_flyio impl IRuntimeHandler {
   flyToken: str;
-  awsAccessKeyId: str;
-  awsSecretAccessKey: str;
+  awsEncryptedSecret: str;
   image: runtimeDocker.RuntimeDockerImage;
   init(props: FlyRuntimeHandlerProps) {
     this.flyToken = props.flyToken;
-    this.awsAccessKeyId = props.awsAccessKeyId;
-    this.awsSecretAccessKey = props.awsSecretAccessKey;
+    this.awsEncryptedSecret = props.awsEncryptedSecret;
     this.image = new runtimeDocker.RuntimeDockerImage();
   }
 
@@ -118,14 +115,12 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
 struct RuntimeServiceProps {
   wingCloudUrl: str;
   flyToken: str?;
-  awsAccessKeyId: str?;
-  awsSecretAccessKey: str?;
 }
+
+bring "@cdktf/provider-aws" as aws;
 
 // Previews environment runtime
 pub class RuntimeService {
-  extern "../src/get-bucket-name.mts" static inflight getBucketName(): str;
-
   logs: cloud.Bucket;
   pub api: cloud.Api;
   runtimeHandler: IRuntimeHandler;
@@ -142,12 +137,31 @@ pub class RuntimeService {
     if util.tryEnv("WING_TARGET") == "sim" {
       this.runtimeHandler = new RuntimeHandler_sim();
     } else {
-      // TODO: We need better type guards for this.
-      this.runtimeHandler = new RuntimeHandler_flyio(
-        flyToken: props.flyToken ?? "",
-        awsAccessKeyId: props.awsAccessKeyId ?? "",
-        awsSecretAccessKey: props.awsSecretAccessKey ?? ""
+      let awsUser = new aws.iamUser.IamUser(name: "user");
+      let bucketName: str = unsafeCast(this.logs).bucket.bucket;
+      let awsPolicy = new aws.iamUserPolicy.IamUserPolicy(
+        user: awsUser.name,
+        policy: Json.stringify({
+          Version: "2012-10-17",
+          Statement: [
+            {
+              Action: ["s3:*"],
+              Effect: "Allow",
+              // Resource: "*",
+              Resource: bucketName,
+            },
+          ],
+        }),
       );
+      let awsAccessKey = new aws.iamAccessKey.IamAccessKey(user: awsUser.name);
+      if let flyToken = props.flyToken {
+        this.runtimeHandler = new RuntimeHandler_flyio(
+          flyToken: flyToken,
+          awsEncryptedSecret: awsAccessKey.encryptedSecret,
+        );
+      } else {
+        throw "Fly token is missing";
+      }
     }
 
     this.api = new cloud.Api();
@@ -160,7 +174,8 @@ pub class RuntimeService {
       let sha = body.get("sha").asStr();
       let entryfile = body.get("entryfile").asStr();
       let token = body.tryGet("token")?.tryAsStr();
-      let logsBucketName = RuntimeService.getBucketName();
+      // let logsBucketName = bucketName;
+      let logsBucketName = "";
 
       log("wing url: ${props.wingCloudUrl}");
 

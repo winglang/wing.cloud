@@ -64,8 +64,6 @@ api.post("/report", inflight (req) => {
 let rntm = new runtime.RuntimeService(
   wingCloudUrl: api.url,
   flyToken: util.tryEnv("FLY_TOKEN"),
-  awsAccessKeyId: util.tryEnv("AWS_ACCESS_KEY_ID"),
-  awsSecretAccessKey: util.tryEnv("AWS_SECRET_ACCESS_KEY"),
 );
 let probotApp = new probot.ProbotApp(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
