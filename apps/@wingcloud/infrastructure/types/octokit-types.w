@@ -62,14 +62,26 @@ interface OctoKitGit {
   inflight getTree(options: GetTreeOptions): GetTreeOptionsResponse;
 }
 
+struct CommentResposeData {
+  id: num;
+}
+
 struct CommentResponse {
   status: num;
+  data: CommentResposeData;
 }
 
 struct CreateCommentOptions {
   owner: str;
   repo: str;
   issue_number: num;
+  body: str?;
+}
+
+struct UpdateCommentOptions {
+  owner: str;
+  repo: str;
+  comment_id: num;
   body: str?;
 }
 
@@ -97,6 +109,7 @@ struct ListCommentsOptions {
 
 interface OctoKitIssues {
   inflight createComment(options: CreateCommentOptions): CommentResponse;
+  inflight updateComment(options: UpdateCommentOptions): CommentResponse;
   inflight deleteComment(options: DeleteCommentOptions): CommentResponse;
   inflight listComments(options: ListCommentsOptions): ListCommentsResponse;
 }
