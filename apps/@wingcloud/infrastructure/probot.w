@@ -176,105 +176,61 @@ pub class ProbotApp {
     this.adapter = new ProbotAdapter();
   }
 
+  inflight handlePullRequestUpdate(context: probot.IPullRequestContext): void {
+    let owner = context.payload.repository.owner.login;
+    let repo = context.payload.repository.name;
+    let options = {
+      owner: owner,
+      repo: repo,
+      tree_sha: context.payload.pull_request.head.sha,
+      recursive: "true",
+    };
+
+    let resp = context.octokit.git.getTree(options);
+    if resp.status != 200 {
+      throw "getTree: failure: ${resp.status}, ${options}";
+    }
+    log("resp ${Json.stringify(resp.data.tree)}, ${Json.stringify(options)}");
+
+    let entrypoints: MutArray<str> = MutArray<str>[];
+    for file in resp.data.tree {
+      if let path = file.path {
+        if path.endsWith("main.w") {
+          log("-- owner: ${owner}, repo: ${repo}, entryfile: ${path}");
+
+          let res = http.post(this.runtimeUrl, body: Json.stringify({
+            repo: "${owner}/${repo}",
+            sha: context.payload.pull_request.head.sha,
+            entryfile: path
+          }));
+
+          if res.status != 200 {
+            throw "runtime: failure: ${res.status}, ${res.body}";
+          }
+
+          let data = Json.parse(res.body ?? "{}");
+  
+          this.prDb.upsert(path, {
+            owner: owner,
+            repo: repo,
+            issue_number: context.payload.pull_request.number,
+            installation_id: context.payload.installation?.id,
+            preview_url: data.tryGet("preview_url")?.tryAsStr() ?? ""
+          });
+
+          break;
+        }
+      }
+    }
+  }
+
   inflight listen() {
     this.adapter = new ProbotAdapter();
     this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
 
-    this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestContext): void => {
-      let owner = context.payload.repository.owner.login;
-      let repo = context.payload.repository.name;
-      let options = {
-        owner: owner,
-        repo: repo,
-        tree_sha: context.payload.pull_request.head.sha,
-        recursive: "true",
-      };
-  
-      let resp = context.octokit.git.getTree(options);
-      if resp.status != 200 {
-        throw "getTree: failure: ${resp.status}, ${options}";
-      }
-      log("resp ${Json.stringify(resp.data.tree)}, ${Json.stringify(options)}");
-  
-      let entrypoints: MutArray<str> = MutArray<str>[];
-      for file in resp.data.tree {
-        if let path = file.path {
-          if path.endsWith("main.w") {
-            log("-- owner: ${owner}, repo: ${repo}, entryfile: ${path}");
-  
-            let res = http.post(this.runtimeUrl, body: Json.stringify({
-              repo: "${owner}/${repo}",
-              sha: context.payload.pull_request.head.sha,
-              entryfile: path
-            }));
-  
-            if res.status != 200 {
-              throw "runtime: failure: ${res.status}, ${res.body}";
-            }
-  
-            let data = Json.parse(res.body ?? "{}");
-  
-            this.prDb.upsert(path, {
-              owner: owner,
-              repo: repo,
-              issue_number: context.payload.pull_request.number,
-              installation_id: context.payload.installation?.id,
-              preview_url: data.tryGet("preview_url")?.tryAsStr() ?? ""
-            });
-  
-            break;
-          }
-        }
-      }
-    });
+    this.adapter.handlePullRequstOpened(this.handlePullRequestUpdate);
 
-    this.adapter.handlePullRequstSync(inflight (context: probot.IPullRequestContext): void => {
-      let owner = context.payload.repository.owner.login;
-      let repo = context.payload.repository.name;
-      let options = {
-        owner: owner,
-        repo: repo,
-        tree_sha: context.payload.pull_request.head.sha,
-        recursive: "true",
-      };
-  
-      let resp = context.octokit.git.getTree(options);
-      if resp.status != 200 {
-        throw "getTree: failure: ${resp.status}, ${options}";
-      }
-      log("resp ${Json.stringify(resp.data.tree)}, ${Json.stringify(options)}");
-  
-      let entrypoints: MutArray<str> = MutArray<str>[];
-      for file in resp.data.tree {
-        if let path = file.path {
-          if path.endsWith("main.w") {
-            log("-- owner: ${owner}, repo: ${repo}, entryfile: ${path}");
-  
-            let res = http.post(this.runtimeUrl, body: Json.stringify({
-              repo: "${owner}/${repo}",
-              sha: context.payload.pull_request.head.sha,
-              entryfile: path
-            }));
-  
-            if res.status != 200 {
-              throw "runtime: failure: ${res.status}, ${res.body}";
-            }
-  
-            let data = Json.parse(res.body ?? "{}");
-  
-            this.prDb.upsert(path, {
-              owner: owner,
-              repo: repo,
-              issue_number: context.payload.pull_request.number,
-              installation_id: context.payload.installation?.id,
-              preview_url: data.tryGet("preview_url")?.tryAsStr() ?? ""
-            });
-  
-            break;
-          }
-        }
-      }
-    });
+    this.adapter.handlePullRequstSync(this.handlePullRequestUpdate);
   }
 
   inflight postComment(event: str) {
