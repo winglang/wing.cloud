@@ -155,28 +155,18 @@ pub class ProbotApp {
 
     let name = lowkeysHeaders.get("x-github-event");
 
-    // let var sig: str? = nil;
-    // if lowkeysHeaders.has("x-hub-signature-256") {
-    //   sig = lowkeysHeaders.get("x-hub-signature-256");
-    // } elif lowkeysHeaders.has("x-hub-signature") {
-    //   sig = lowkeysHeaders.get("x-hub-signature");
-    // } else {
-    //   throw "getVerifyProps: missing sig header";
-    // }
-    let sig = lowkeysHeaders.tryGet("x-hub-signature-256");
+    let signature = lowkeysHeaders.get("x-hub-signature-256");
 
-    if req.body == nil {
-      throw "getVerifyProps: missing body";
+    if let payload = req.body {
+      return {
+        id: id,
+        name: name,
+        signature: signature,
+        payload: payload,
+      };
     }
 
-    let body = req.body;
-
-    return {
-      id: id,
-      name: name,
-      signature: sig ?? "",
-      payload: body ?? ""
-    };
+    throw "getVerifyProps: missing body";
   }
 
   inflight init() {
@@ -193,7 +183,7 @@ pub class ProbotApp {
         owner: owner,
         repo: repo,
         tree_sha: context.payload.pull_request.head.sha,
-        recursive: "true"
+        recursive: "true",
       };
 
       let resp = context.octokit.git.getTree(options);
