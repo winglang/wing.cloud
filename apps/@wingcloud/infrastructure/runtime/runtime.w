@@ -14,6 +14,7 @@ struct RuntimeHandleOptions {
   entryfile: str;
   logsBucketName: str;
   wingCloudUrl: str;
+  environmentId: str;
 }
 
 interface IRuntimeHandler {
@@ -48,7 +49,8 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "GIT_SHA" => opts.gitSha,
       "ENTRYFILE" => opts.entryfile,
       "LOGS_BUCKET_NAME" => "stam", // opts.logsBucketName,
-      "WING_CLOUD_URL" => opts.wingCloudUrl
+      "WING_CLOUD_URL" => opts.wingCloudUrl,
+      "ENVIRONMENT_ID" => opts.environmentId,
     };
 
     if let token = opts.gitToken {
@@ -98,7 +100,8 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "GIT_SHA" => opts.gitSha,
       "ENTRYFILE" => opts.entryfile,
       "LOGS_BUCKET_NAME" => opts.logsBucketName,
-      "WING_CLOUD_URL" => opts.wingCloudUrl
+      "WING_CLOUD_URL" => opts.wingCloudUrl,
+      "ENVIRONMENT_ID" => opts.environmentId,
     };
 
     if let token = opts.gitToken {
@@ -159,24 +162,26 @@ pub class RuntimeService {
       let repo = body.get("repo").asStr();
       let sha = body.get("sha").asStr();
       let entryfile = body.get("entryfile").asStr();
+      let environmentId = body.get("environmentId").asStr();
       let token = body.tryGet("token")?.tryAsStr();
       let logsBucketName = RuntimeService.getBucketName();
 
       log("wing url: ${props.wingCloudUrl}");
 
-      this.runtimeHandler.handleRequest(
+      let url = this.runtimeHandler.handleRequest(
         gitToken: token,
         gitRepo: repo,
         gitSha: sha,
         entryfile: entryfile,
         wingCloudUrl: props.wingCloudUrl,
-        logsBucketName: logsBucketName
+        logsBucketName: logsBucketName,
+        environmentId: environmentId,
       );
 
       return {
         status: 200,
         body: Json.stringify({
-          // url
+          url: url
         })
       };
     });

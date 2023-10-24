@@ -26,7 +26,7 @@ export function useReportStatus(
   ) {
     console.log("updating status", status);
     const data: ReportEnvironmentStatusInput = {
-      environmentId: context.environment.entryfile,
+      environmentId: context.environment.id,
       status,
       data: payload,
     };

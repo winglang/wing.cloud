@@ -20,7 +20,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
   const logfile = join(tmpdir(), "log-" + randomBytes(8).toString("hex"));
   console.log(`Setup preview runtime. logfile ${logfile}`);
 
-  const keyStore = await createKeyStore(context.environment.entryfile);
+  const keyStore = await createKeyStore(context.environment.id);
   const report = useReportStatus(context, keyStore);
 
   const e = new Executer(logfile);
@@ -38,7 +38,12 @@ export const run = async function ({ context, requestedPort }: RunProps) {
       e,
       context,
     }).setup();
-    await report("tests", { testResults });
+    
+    if (testResults) {
+      await report("tests", { testResults });
+    } else {
+      await report("error", { message: "failed to run tests" });
+    }
 
     const { port, close } = await startServer({
       consolePath: paths["@wingconsole/app"],
@@ -59,13 +64,13 @@ export const run = async function ({ context, requestedPort }: RunProps) {
         await close();
       },
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error(
       "preview runtime error",
       error,
       readFileSync(logfile, "utf8"),
     );
-    await report("error");
+    await report("error", { message: error.toString() });
     throw error;
   }
 };
