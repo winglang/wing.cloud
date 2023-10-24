@@ -138,7 +138,7 @@ pub class RuntimeService {
       this.runtimeHandler = new RuntimeHandler_sim();
     } else {
       let awsUser = new aws.iamUser.IamUser(name: "user");
-      let bucketName: str = unsafeCast(this.logs).bucket.bucket;
+      let bucketArn: str = unsafeCast(this.logs).bucket.arn;
       let awsPolicy = new aws.iamUserPolicy.IamUserPolicy(
         user: awsUser.name,
         policy: Json.stringify({
@@ -147,8 +147,7 @@ pub class RuntimeService {
             {
               Action: ["s3:*"],
               Effect: "Allow",
-              // Resource: "*",
-              Resource: bucketName,
+              Resource: bucketArn,
             },
           ],
         }),

@@ -16,13 +16,16 @@ export interface ReverseProxyServerProps {
 }
 export const startReverseProxyServer = (props: ReverseProxyServerProps) => {
   for (const origin of props.origins) {
-    app.all(origin.pathPattern, (req, res) => {
-      proxy.web(req, res, {
-        target: /^https?:\/\//i.test(origin.domainName)
-          ? origin.domainName
-          : "https://" + origin.domainName,
-      });
-    });
+    app.all(
+      origin.pathPattern === "" ? "*" : origin.pathPattern,
+      (req, res) => {
+        proxy.web(req, res, {
+          target: /^https?:\/\//i.test(origin.domainName)
+            ? origin.domainName
+            : "https://" + origin.domainName,
+        });
+      },
+    );
   }
 
   // Start the reverse proxy server

@@ -73,19 +73,31 @@ let probotApp = new probot.ProbotApp(
   runtimeCallbacks: runtimeCallbacks,
 );
 
+bring "cdktf" as cdktf;
+
+// log(api.url);
+// log(website.url.replace("https://", ""));
+
+new cdktf.TerraformOutput(value: api.url);
+new cdktf.TerraformOutput(value: cdktf.Token.asString(cdktf.Fn.element(cdktf.Fn.split("://", api.url), 1))) as "other url";
+
 let proxy = new ReverseProxy.ReverseProxy(
   subDomain: "dev",
   zoneName: "wingcloud.io",
-  aliases: [],
+  aliases: ["dev.wingcloud.io"],
   origins: [
+    // {
+    //   pathPattern: "/wrpc/*",
+    //   // domainName: api.url,
+    //   // domainName: api.url.replace("https://", ""),
+    //   domainName: cdktf.Token.asString(cdktf.Fn.element(cdktf.Fn.split("://", api.url), 1)),
+    //   originId: "wrpc",
+    // },
     {
-      pathPattern: "/wrpc/*",
-      domainName: api.url,
-      originId: "wrpc",
-    },
-    {
-      pathPattern: "*",
-      domainName: website.url,
+      pathPattern: "",
+      // domainName: website.url,
+      domainName: website.url.replace("https://", ""),
+      // domainName: cdktf.Token.asString(cdktf.Fn.element(cdktf.Fn.split("://", website.url), 1)),
       originId: "website",
     },
   ],
@@ -107,3 +119,70 @@ if util.tryEnv("WING_TARGET") == "sim" {
     log("Website URL: ${proxy.url}");
   });
 }
+
+
+// bring "@cdktf/provider-aws" as aws;
+
+// let proxy = new aws.cloudfrontDistribution.CloudfrontDistribution(
+//   enabled: true,
+//   isIpv6Enabled: true,
+
+//   viewerCertificate: {
+//     cloudfrontDefaultCertificate: true,
+//   },
+
+//   restrictions: {
+//     geoRestriction: {
+//       restrictionType: "none",
+//     },
+//   },
+
+//   origin: [
+//     {
+//       originId: "website",
+//       domainName: website.url,
+//       customOriginConfig: {
+//         httpPort: 80,
+//         httpsPort: 443,
+//         originProtocolPolicy: "http-only",
+//         originSslProtocols: ["TLSv1.2", "TLSv1.1"],
+//       },
+//     },
+//   ],
+
+//   aliases: ["dev.wingcloud.io"],
+
+//   defaultCacheBehavior: {
+//     minTtl: 0,
+//     defaultTtl: 60,
+//     maxTtl: 86400,
+//     allowedMethods: [
+//       "DELETE",
+//       "GET",
+//       "HEAD",
+//       "OPTIONS",
+//       "PATCH",
+//       "POST",
+//       "PUT",
+//     ],
+//     cachedMethods: ["GET", "HEAD"],
+//     targetOriginId: "website",
+//     viewerProtocolPolicy: "redirect-to-https",
+//     forwardedValues: {
+//       cookies: {
+//         forward: "all",
+//       },
+//       headers: [
+//         "Host",
+//         "Accept-Datetime",
+//         "Accept-Encoding",
+//         "Accept-Language",
+//         "User-Agent",
+//         "Referer",
+//         "Origin",
+//         "X-Forwarded-Host",
+//       ],
+//       queryString: true,
+//     },
+//   },
+// );

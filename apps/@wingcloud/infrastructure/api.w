@@ -25,6 +25,14 @@ pub class Api {
     let projects = props.projects;
     let users = props.users;
 
+    api.get("/", inflight () => {
+      return {
+        body: {
+          message: "Status: OK",
+        },
+      };
+    });
+
     let AUTH_COOKIE_NAME = "auth";
 
     let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
