@@ -104,7 +104,8 @@ pub class ProbotApp {
         issue_number: ex.ColumnType.NUMBER,
         owner: ex.ColumnType.STRING,
         repo: ex.ColumnType.STRING,
-        installation_id: ex.ColumnType.NUMBER
+        installation_id: ex.ColumnType.NUMBER,
+        comment_id: ex.ColumnType.NUMBER
       }
     }) as "environments prs";
 
@@ -281,18 +282,39 @@ pub class ProbotApp {
           }
         }
       }
-      let tableRows = "| ${data.get("environmentId").asStr()} | ${data.get("status").asStr()} | --- | ${testsString} | ${std.Datetime.utcNow()} |";
+      let date = std.Datetime.utcNow();
+      let dateStr = "${date.year}-${date.month}-${date.dayOfMonth} ${date.hours}:${date.min}:${date.sec}";
+      let tableRows = "| ${data.get("environmentId").asStr()} | ${data.get("status").asStr()} | --- | ${testsString} | ${dateStr} |";
       let commentBody = "
 | Entry Point     | Status | Preview | Tests | Updated (UTC) |
 | --------------- | ------ | ------- | ----- | -------------- |
 ${tableRows}
 ";
-      this.adapter.auth(item.get("installation_id").asNum()).issues.createComment(
-        owner: item.get("owner").asStr(),
-        repo: item.get("repo").asStr(),
-        issue_number: item.get("issue_number").asNum(),
-        body: commentBody
-      );
+      if let commentId = item.tryGet("comment_id")?.tryAsNum() {
+        log("updating existing preview comment: ${commentId}");
+        this.adapter.auth(item.get("installation_id").asNum()).issues.updateComment(
+          owner: item.get("owner").asStr(),
+          repo: item.get("repo").asStr(),
+          comment_id: commentId,
+          body: commentBody
+        );
+      } else {
+        log("creating a new preview comment");
+        let res = this.adapter.auth(item.get("installation_id").asNum()).issues.createComment(
+          owner: item.get("owner").asStr(),
+          repo: item.get("repo").asStr(),
+          issue_number: item.get("issue_number").asNum(),
+          body: commentBody
+        );
+        log("created preview comment id: ${res.data.id}");
+        this.prDb.upsert(data.get("environmentId").asStr(), {
+          owner: item.get("owner").asStr(),
+          repo: item.get("repo").asStr(),
+          issue_number: item.get("issue_number").asNum(),
+          installation_id: item.get("installation_id").asNum(),
+          comment_id: res.data.id
+        });
+      }
     }
   }
 }
