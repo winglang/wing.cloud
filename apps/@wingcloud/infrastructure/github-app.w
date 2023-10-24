@@ -37,7 +37,8 @@ pub class GithubApp {
       log("GitHub app: webhook url updated: ${url}");
     }
     else {
-      log("GitHub app: failed to update the  webhook url: ${res.body}");
+      log("GitHub app: failed to update the webhook url: ${res.body}");
+      log("You have to manually update your webhook URL to ${url}");
     }
   }
 }
