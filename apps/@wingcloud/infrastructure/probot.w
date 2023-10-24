@@ -282,9 +282,8 @@ pub class ProbotApp {
           }
         }
       }
-      let date = std.Datetime.utcNow();
-      let dateStr = "${date.year}-${date.month}-${date.dayOfMonth} ${date.hours}:${date.min}:${date.sec}";
-      let tableRows = "| ${data.get("environmentId").asStr()} | ${data.get("status").asStr()} | --- | ${testsString} | ${dateStr} |";
+      let date = std.Datetime.utcNow().toIso();
+      let tableRows = "| ${data.get("environmentId").asStr()} | ${data.get("status").asStr()} | --- | ${testsString} | ${date} |";
       let commentBody = "
 | Entry Point     | Status | Preview | Tests | Updated (UTC) |
 | --------------- | ------ | ------- | ----- | -------------- |
