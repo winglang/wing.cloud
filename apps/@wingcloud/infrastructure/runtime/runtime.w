@@ -67,22 +67,24 @@ class RuntimeHandler_sim impl IRuntimeHandler {
 
 struct FlyRuntimeHandlerProps {
   flyToken: str;
+  flyOrgSlug: str;
   awsEncryptedSecret: str;
 }
 
 class RuntimeHandler_flyio impl IRuntimeHandler {
   flyToken: str;
+  flyOrgSlug: str;
   awsEncryptedSecret: str;
   image: runtimeDocker.RuntimeDockerImage;
   init(props: FlyRuntimeHandlerProps) {
     this.flyToken = props.flyToken;
+    this.flyOrgSlug = props.flyOrgSlug;
     this.awsEncryptedSecret = props.awsEncryptedSecret;
     this.image = new runtimeDocker.RuntimeDockerImage();
   }
 
   pub inflight handleRequest(opts: RuntimeHandleOptions): str {
-    let flyClient = new flyio.Client(this.flyToken);
-    flyClient._init(this.flyToken);
+    let flyClient = new flyio.Client(token: this.flyToken, orgSlug: this.flyOrgSlug);
     let fly = new flyio.Fly(flyClient);
     let app = fly.app("wing-preview-${util.nanoid(alphabet: "0123456789abcdefghijklmnopqrstuvwxyz", size: 10)}");
     let exists = app.exists();
@@ -115,6 +117,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
 struct RuntimeServiceProps {
   wingCloudUrl: str;
   flyToken: str?;
+  flyOrgSlug: str?;
 }
 
 bring "@cdktf/provider-aws" as aws;
@@ -154,10 +157,15 @@ pub class RuntimeService {
       );
       let awsAccessKey = new aws.iamAccessKey.IamAccessKey(user: awsUser.name);
       if let flyToken = props.flyToken {
-        this.runtimeHandler = new RuntimeHandler_flyio(
-          flyToken: flyToken,
-          awsEncryptedSecret: awsAccessKey.encryptedSecret,
-        );
+        if let flyOrgSlug = props.flyOrgSlug {
+          this.runtimeHandler = new RuntimeHandler_flyio(
+            flyToken: flyToken,
+            flyOrgSlug: flyOrgSlug,
+            awsEncryptedSecret: awsAccessKey.encryptedSecret,
+          );
+        } else {
+          throw "Fly org is missing";
+        }
       } else {
         throw "Fly token is missing";
       }

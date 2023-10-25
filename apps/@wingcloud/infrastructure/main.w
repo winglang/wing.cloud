@@ -64,6 +64,7 @@ api.post("/report", inflight (req) => {
 let rntm = new runtime.RuntimeService(
   wingCloudUrl: api.url,
   flyToken: util.tryEnv("FLY_TOKEN"),
+  flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
 );
 let probotApp = new probot.ProbotApp(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
