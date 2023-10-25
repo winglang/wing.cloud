@@ -1,5 +1,41 @@
 import * as aws from "@cdktf/provider-aws";
 
+let cachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
+  undefined as any,
+  "",
+  {
+    name: "",
+    defaultTtl: 0,
+    minTtl: 0,
+    maxTtl: 0,
+    parametersInCacheKeyAndForwardedToOrigin: {
+      enableAcceptEncodingBrotli: true,
+      enableAcceptEncodingGzip: true,
+      cookiesConfig: {
+        cookieBehavior: "all",
+        // cookieBehavior: "whitelist",
+        // cookies: {
+        //   items: ["auth"],
+        // },
+      },
+      headersConfig: {
+        headerBehavior: "none",
+        // headerBehavior: "whitelist",
+        // headers: {
+        //   items: [],
+        // },
+      },
+      queryStringsConfig: {
+        queryStringBehavior: "all",
+        // queryStringBehavior: "whitelist",
+        // queryStrings: {
+        //   items: [],
+        // },
+      },
+    },
+  },
+);
+
 const x = new aws.cloudfrontDistribution.CloudfrontDistribution(
   undefined as any,
   "",
@@ -12,15 +48,17 @@ const x = new aws.cloudfrontDistribution.CloudfrontDistribution(
       // targetOriginId: "S3-${b.bucket.id}",
       targetOriginId: "",
       viewerProtocolPolicy: "redirect-to-https",
-      forwardedValues: {
-        cookies: {
-          forward: "none",
-        },
-        queryString: false,
-      },
-      minTtl: 0,
-      defaultTtl: 86_400,
-      maxTtl: 31_536_000,
+      cachePolicyId: cachePolicy.id,
+      // // forwardedValues: {
+      // //   cookies: {
+      // //     // forward: "none",
+      // //     forward: "",
+      // //   },
+      // //   queryString: false,
+      // // },
+      // minTtl: 0,
+      // defaultTtl: 86_400,
+      // maxTtl: 31_536_000,
     },
     origin: [],
     restrictions: {
@@ -31,6 +69,21 @@ const x = new aws.cloudfrontDistribution.CloudfrontDistribution(
     viewerCertificate: {
       cloudfrontDefaultCertificate: true,
     },
-    orderedCacheBehavior: [],
+    orderedCacheBehavior: [
+      {
+        pathPattern: "/wrpc/*",
+        allowedMethods: ["GET", "POST"],
+        cachedMethods: [],
+        viewerProtocolPolicy: "",
+        targetOriginId: "",
+        compress: true,
+        forwardedValues: {
+          queryString: true,
+          cookies: { forward: "all" },
+          headers: ["cookie"],
+        },
+        // targetOriginId
+      },
+    ],
   },
 );

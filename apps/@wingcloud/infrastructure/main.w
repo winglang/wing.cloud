@@ -75,29 +75,29 @@ let probotApp = new probot.ProbotApp(
 
 bring "cdktf" as cdktf;
 
-// log(api.url);
-// log(website.url.replace("https://", ""));
-
-new cdktf.TerraformOutput(value: api.url);
-new cdktf.TerraformOutput(value: cdktf.Token.asString(cdktf.Fn.element(cdktf.Fn.split("://", api.url), 1))) as "other url";
-
+let apiDomainName = cdktf.Fn.trimprefix(cdktf.Fn.trimsuffix(api.url, "/prod"), "https://");
+new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
+// let probotApiDomainName = cdktf.Fn.trimprefix(cdktf.Fn.trimsuffix(probotApp.githubApp.webhookUrl, "/prod"), "https://");
+// new cdktf.TerraformOutput(value: probotApiDomainName) as "Probot API URL 2";
 let proxy = new ReverseProxy.ReverseProxy(
   subDomain: "dev",
   zoneName: "wingcloud.io",
   aliases: ["dev.wingcloud.io"],
   origins: [
+    {
+      pathPattern: "/wrpc/*",
+      domainName: apiDomainName,
+      originId: "wrpc",
+      originPath: "/prod",
+    },
     // {
-    //   pathPattern: "/wrpc/*",
-    //   // domainName: api.url,
-    //   // domainName: api.url.replace("https://", ""),
-    //   domainName: cdktf.Token.asString(cdktf.Fn.element(cdktf.Fn.split("://", api.url), 1)),
-    //   originId: "wrpc",
+    //   pathPattern: "/webhook",
+    //   domainName: probotApiDomainName,
+    //   originId: "webhook",
     // },
     {
       pathPattern: "",
-      // domainName: website.url,
       domainName: website.url.replace("https://", ""),
-      // domainName: cdktf.Token.asString(cdktf.Fn.element(cdktf.Fn.split("://", website.url), 1)),
       originId: "website",
     },
   ],
