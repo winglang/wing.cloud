@@ -39,17 +39,17 @@ struct TestsResults {
 }
 
 test "get reverse proxy url and paths" {
-  log("Domain name: ${reverseProxy.url()}");
-  log("Urls: ${Json.stringify(reverseProxy.paths())}");
+  log("Domain name: ${reverseProxy.url}");
+  log("Urls: ${Json.stringify(reverseProxy.paths)}");
   let results = MutArray<TestsResults>[];
   let var failure = false;
-  for path in reverseProxy.paths() {
-    let response = http.get(reverseProxy.url() + path);
+  for path in reverseProxy.paths {
+    let response = http.get(reverseProxy.url + path);
     if response.status != 200 {
       failure = true;
     }
     results.push({
-      url: reverseProxy.url() + path,
+      url: reverseProxy.url + path,
       status: response.status,
     });
   }

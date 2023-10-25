@@ -178,6 +178,8 @@ pub class RuntimeService {
         environmentId: environmentId,
       );
 
+      log("preview environment url: ${url}");
+
       return {
         status: 200,
         body: Json.stringify({

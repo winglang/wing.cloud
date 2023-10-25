@@ -32,14 +32,12 @@ struct IPullRequestPayload {
   installation: IPullRequestInstallation?;
 }
 
-pub struct IPullRequestSyncContext {
+pub struct IPullRequestContext {
   id: str;
   payload: IPullRequestPayload;
   octokit: octokit.OctoKit;
 }
 
-pub struct IPullRequestOpenedContext {
-  id: str;
-  payload: IPullRequestPayload;
-  octokit: octokit.OctoKit;
-}
+pub struct IPullRequestSyncContext extends IPullRequestContext {}
+
+pub struct IPullRequestOpenedContext extends IPullRequestContext {}

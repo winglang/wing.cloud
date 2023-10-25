@@ -111,7 +111,6 @@ pub class ProbotApp {
   runtimeUrl: str;
   runtimeCallbacks: runtime_callbacks.RuntimeCallbacks;
   pub githubApp: github.GithubApp;
-  prDb: ex.Table;
   inflight var adapter: ProbotAdapter;
   environments: environments.Environments;
   projects: projects.Projects;
@@ -124,18 +123,6 @@ pub class ProbotApp {
     this.runtimeCallbacks = props.runtimeCallbacks;
     this.environments = props.environments;
     this.projects = props.projects;
-
-    this.prDb = new ex.Table(ex.TableProps{
-      name: "wing.cloud/probot/prs",
-      primaryKey: "environmentId",
-      columns: {
-        issue_number: ex.ColumnType.NUMBER,
-        owner: ex.ColumnType.STRING,
-        repo: ex.ColumnType.STRING,
-        installation_id: ex.ColumnType.NUMBER,
-        comment_id: ex.ColumnType.NUMBER
-      }
-    }) as "environments prs";
 
     this.githubApp = new github.GithubApp(
       this.probotAppId,
@@ -241,10 +228,12 @@ pub class ProbotApp {
     };
 
     this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestOpenedContext): void => {
+      // TODO [sa] open a bug for this workaround
       onPullRequestOpen(context);
     });
 
     this.adapter.handlePullRequstReopened(inflight (context: probot.IPullRequestOpenedContext): void => {
+      // TODO [sa] open a bug for this workaround
       onPullRequestOpen(context);
     });
 
@@ -308,8 +297,15 @@ pub class ProbotApp {
         i += 1;
       }
     }
+
+    let var previewUrl = "";
+    let shouldDisplayUrl = status == "running";
+    if(shouldDisplayUrl) {
+      previewUrl = props.environment.url ?? "";
+    }
+
     let date = std.Datetime.utcNow().toIso();
-    let tableRows = "| ${props.project.entryfile} | ${status} | ${props.environment.url} | ${testsString} | ${date} |";
+    let tableRows = "| ${props.project.entryfile} | ${status} | ${previewUrl} | ${testsString} | ${date} |";
     let commentBody = "
 | Entry Point     | Status | Preview | Tests | Updated (UTC) |
 | --------------- | ------ | ------- | ----- | -------------- |
