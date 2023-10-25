@@ -209,7 +209,7 @@ pub class ProbotApp {
           }
 
           let data = Json.parse(res.body ?? "{}");
-  
+
           this.prDb.upsert(path, {
             owner: owner,
             repo: repo,
@@ -228,9 +228,15 @@ pub class ProbotApp {
     this.adapter = new ProbotAdapter();
     this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
 
-    this.adapter.handlePullRequstOpened(this.handlePullRequestUpdate);
+    this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestContext): void => {
+      // TODO [sa] open a bug for this workaround
+      this.handlePullRequestUpdate(context);
+    });
 
-    this.adapter.handlePullRequstSync(this.handlePullRequestUpdate);
+    this.adapter.handlePullRequstSync(inflight (context: probot.IPullRequestContext): void => {
+      // TODO [sa] open a bug for this workaround
+      this.handlePullRequestUpdate(context);
+    });
   }
 
   inflight postComment(event: str) {
