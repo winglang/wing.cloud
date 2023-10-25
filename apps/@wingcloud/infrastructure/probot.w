@@ -81,6 +81,10 @@ inflight class ProbotAdapter {
     this.instance?.webhooks?.on("pull_request.synchronize", handler);
   }
 
+  pub handlePullRequstClosed(handler: inflight (probot.IPullRequestClosedContext): void) {
+    this.instance?.webhooks?.on("pull_request.closed", handler);
+  }
+
   pub verifyAndReceive(props: VerifyAndReceieveProps) {
     this.instance?.webhooks?.verifyAndReceive(props);
   }
@@ -237,6 +241,31 @@ pub class ProbotApp {
       onPullRequestOpen(context);
     });
 
+    this.adapter.handlePullRequstClosed(inflight (context: probot.IPullRequestClosedContext): void => {
+      let owner = context.payload.repository.owner.login;
+      let repo = context.payload.repository.name;
+      let branch = context.payload.pull_request.head.ref;
+
+      let projects = this.projects.listByRepository(repository: context.payload.repository.id);
+      for project in projects {
+        for environment in this.environments.list(projectId: project.id) {
+          if environment.branch != branch || environment.status == "stopped" {
+            continue;
+          }
+
+          this.environments.updateStatus(id: environment.id, projectId: project.id, status: "stopped");
+
+          let res = http.delete(this.runtimeUrl, body: Json.stringify({
+            environmentId: environment.id,
+          }));
+
+          if !res.ok {
+            throw "handlePullRequstClosed: runtime service error ${res.body}";
+          }
+        }
+      }
+    });
+
     this.adapter.handlePullRequstSync(inflight (context: probot.IPullRequestSyncContext): void => {
       let owner = context.payload.repository.owner.login;
       let repo = context.payload.repository.name;
@@ -245,7 +274,7 @@ pub class ProbotApp {
       let projects = this.projects.listByRepository(repository: context.payload.repository.id);
       for project in projects {
         for environment in this.environments.list(projectId: project.id) {
-          if environment.branch != branch {
+          if environment.branch != branch || environment.status == "stopped" {
             continue;
           }
 

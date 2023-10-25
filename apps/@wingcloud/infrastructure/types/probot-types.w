@@ -41,3 +41,5 @@ pub struct IPullRequestContext {
 pub struct IPullRequestSyncContext extends IPullRequestContext {}
 
 pub struct IPullRequestOpenedContext extends IPullRequestContext {}
+
+pub struct IPullRequestClosedContext extends IPullRequestContext {}
