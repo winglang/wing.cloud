@@ -1,5 +1,8 @@
 import * as aws from "@cdktf/provider-aws";
 
+// const bucket = new aws.s3Bucket.S3Bucket();
+// bucket.region
+
 let cachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
   undefined as any,
   "",
