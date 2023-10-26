@@ -10,4 +10,6 @@ node_modules/
 !/.eslintrc.json
 !/.eslintignore
 /.env
+/.env.*
+!/.env.example
 /target/

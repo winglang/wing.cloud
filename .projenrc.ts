@@ -170,6 +170,8 @@ website.addDevDeps("@aws-sdk/client-dynamodb");
 website.addGitIgnore("/.wingcloud/");
 
 website.addGitIgnore("/.env");
+website.addGitIgnore("/.env.*");
+website.addGitIgnore("!/.env.example");
 
 {
   const tsconfig = website.tryFindObjectFile("tsconfig.json")!;
@@ -189,6 +191,8 @@ const infrastructure = new TypescriptProject({
 });
 infrastructure.addFields({ type: "commonjs" });
 infrastructure.addGitIgnore("/.env");
+infrastructure.addGitIgnore("/.env.*");
+infrastructure.addGitIgnore("!/.env.example");
 
 infrastructure.addDeps(`winglang`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.

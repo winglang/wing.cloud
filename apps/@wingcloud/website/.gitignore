@@ -13,3 +13,5 @@ node_modules/
 /public/wing.js
 /.wingcloud/
 /.env
+/.env.*
+!/.env.example

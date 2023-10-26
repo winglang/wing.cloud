@@ -137,11 +137,13 @@ pub class RuntimeService {
       this.logs.put;
     }) as "runtime function";
 
+    let var bucketName: str = "";
     if util.tryEnv("WING_TARGET") == "sim" {
       this.runtimeHandler = new RuntimeHandler_sim();
     } else {
       let awsUser = new aws.iamUser.IamUser(name: "user");
       let bucketArn: str = unsafeCast(this.logs).bucket.arn;
+      bucketName = unsafeCast(this.logs).bucket.bucket;
       let awsPolicy = new aws.iamUserPolicy.IamUserPolicy(
         user: awsUser.name,
         policy: Json.stringify({
@@ -181,8 +183,7 @@ pub class RuntimeService {
       let sha = body.get("sha").asStr();
       let entryfile = body.get("entryfile").asStr();
       let token = body.tryGet("token")?.tryAsStr();
-      // let logsBucketName = bucketName;
-      let logsBucketName = "";
+      let logsBucketName = bucketName;
 
       log("wing url: ${props.wingCloudUrl}");
 
