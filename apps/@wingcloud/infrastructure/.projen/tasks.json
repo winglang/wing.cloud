@@ -26,10 +26,10 @@
       "description": "Only compile",
       "steps": [
         {
-          "exec": "wing compile main.w --target sim"
+          "exec": "node ./bin/wing.mjs compile main.w --target sim"
         },
         {
-          "exec": "wing compile main.w --target tf-aws"
+          "exec": "node ./bin/wing.mjs compile --target tf-aws"
         }
       ]
     },
@@ -47,13 +47,13 @@
       "name": "deploy",
       "steps": [
         {
-          "exec": "source .env && export $(cut -d= -f1 < .env) && wing compile main.w --target tf-aws"
+          "exec": "node ./bin/wing.mjs compile --target tf-aws"
         },
         {
-          "exec": "cd target/main.tfaws && terraform init"
+          "exec": "node ./bin/terraform.mjs -chdir=target/main.tfaws init"
         },
         {
-          "exec": "source .env && export $(cut -d= -f1 < .env) && cd target/main.tfaws && terraform apply -auto-approve"
+          "exec": "node ./bin/terraform.mjs -chdir=target/main.tfaws apply -auto-approve"
         }
       ]
     },
@@ -62,7 +62,7 @@
       "description": "Start the development task",
       "steps": [
         {
-          "exec": "source .env && export $(cut -d= -f1 < .env) && wing it main.w"
+          "exec": "node ./bin/wing.mjs it main.w"
         }
       ]
     },

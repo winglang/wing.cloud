@@ -115,6 +115,12 @@ importers:
       '@wingcloud/website':
         specifier: workspace:^
         version: link:../website
+      dotenv:
+        specifier: ^16.3.1
+        version: 16.3.1
+      dotenv-expand:
+        specifier: ^10.0.0
+        version: 10.0.0
       eslint-config-prettier:
         specifier: ^9.0.0
         version: 9.0.0(eslint@8.51.0)
@@ -5523,7 +5529,10 @@ packages:
     peerDependencies:
       constructs: ^10.0.25
     dependencies:
+      archiver: 5.3.1
       constructs: 10.2.70
+      json-stable-stringify: 1.0.2
+      semver: 7.5.4
     dev: false
     bundledDependencies:
       - archiver
@@ -5535,7 +5544,10 @@ packages:
     peerDependencies:
       constructs: ^10.0.25
     dependencies:
+      archiver: 5.3.1
       constructs: 10.3.0
+      json-stable-stringify: 1.0.2
+      semver: 7.5.4
     dev: false
     bundledDependencies:
       - archiver
@@ -6072,10 +6084,14 @@ packages:
       esutils: 2.0.3
     dev: true
 
+  /dotenv-expand@10.0.0:
+    resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
+    engines: {node: '>=12'}
+    dev: true
+
   /dotenv@16.3.1:
     resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
     engines: {node: '>=12'}
-    dev: false
 
   /dotenv@8.6.0:
     resolution: {integrity: sha512-IrPdXQsk2BbzvCBGBOTmmSH5SodmqZNt4ERAZDmW4CT+tL8VtvinqywuANaFu4bOMWki16nqf0e4oC0QIaDr/g==}
@@ -6088,7 +6104,7 @@ packages:
     dependencies:
       semver: 7.5.4
       shelljs: 0.8.5
-      typescript: 5.3.0-dev.20231020
+      typescript: 5.3.0-dev.20231026
     dev: true
 
   /dset@3.1.2:
@@ -10639,8 +10655,8 @@ packages:
     hasBin: true
     dev: true
 
-  /typescript@5.3.0-dev.20231020:
-    resolution: {integrity: sha512-7C4VN/XIuL4MDSf06bSrCHUL4bZq8RMt58jZ5DdwoGZmBlnPE2YEm1gxygeUws72yvvlJJzU3BL89RMQjg7R9Q==}
+  /typescript@5.3.0-dev.20231026:
+    resolution: {integrity: sha512-TPCRnvIO1nKy3PLJwVyXwZJAQ3silk51ktcvvk1NzYoPtS9p3xX7LNodMA6DDDndhbeMkjMlxb/PmPur2Z+zUQ==}
     engines: {node: '>=14.17'}
     hasBin: true
     dev: true

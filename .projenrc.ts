@@ -190,26 +190,26 @@ const infrastructure = new TypescriptProject({
   outdir: "apps/@wingcloud/infrastructure",
 });
 infrastructure.addFields({ type: "commonjs" });
+
+infrastructure.addDevDeps("dotenv", "dotenv-expand");
 infrastructure.addGitIgnore("/.env");
 infrastructure.addGitIgnore("/.env.*");
 infrastructure.addGitIgnore("!/.env.example");
-infrastructure.addGitIgnore("/target/");
 
+infrastructure.addGitIgnore("/target/");
 infrastructure.addDeps(`winglang`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
-infrastructure.devTask.exec(
-  "source .env && export $(cut -d= -f1 < .env) && wing it main.w",
+infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
+infrastructure.compileTask.exec(
+  "node ./bin/wing.mjs compile main.w --target sim",
 );
-infrastructure.compileTask.exec("wing compile main.w --target sim");
-infrastructure.compileTask.exec("wing compile main.w --target tf-aws");
+infrastructure.compileTask.exec("node ./bin/wing.mjs compile --target tf-aws");
 
 const deployTask = infrastructure.addTask("deploy");
+deployTask.exec("node ./bin/wing.mjs compile --target tf-aws");
+deployTask.exec("node ./bin/terraform.mjs -chdir=target/main.tfaws init");
 deployTask.exec(
-  "source .env && export $(cut -d= -f1 < .env) && wing compile main.w --target tf-aws",
-);
-deployTask.exec("cd target/main.tfaws && terraform init");
-deployTask.exec(
-  "source .env && export $(cut -d= -f1 < .env) && cd target/main.tfaws && terraform apply -auto-approve",
+  "node ./bin/terraform.mjs -chdir=target/main.tfaws apply -auto-approve",
 );
 
 infrastructure.addDeps("express", "@vendia/serverless-express");
