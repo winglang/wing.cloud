@@ -39,22 +39,6 @@ pub class Api {
           AUTH_COOKIE_NAME: AUTH_COOKIE_NAME,
         },
       };
-      // if let cookies = request.headers?.tryGet("cookie") {
-      //   let jwt = Cookie.Cookie.parse(cookies).get(AUTH_COOKIE_NAME);
-      //   return {
-      //     body: {
-      //       message: "Status: OK",
-      //       jwt: jwt,
-      //     },
-      //   };
-      // }
-
-      // return {
-      //   body: {
-      //     message: "Status: KO",
-      //     jwt: "<empty>",
-      //   }
-      // };
     });
 
     let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {

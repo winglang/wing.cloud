@@ -12,22 +12,22 @@ class CachePolicy {
 
   init(props: CachePolicyProps) {
     this.policy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
-      // defaultTtl: 60,
+      // Since we currently use the same cache policy for website files and API endpoints,
+      // we need to get rid of the default cache TTL, otherwise our API endpoints will
+      // get cached.
       defaultTtl: 0,
       minTtl: 0,
       maxTtl: 86400,
       name: props.name,
       parametersInCacheKeyAndForwardedToOrigin: {
+        // Needed to authenticate the API calls.
         cookiesConfig: {
           cookieBehavior: "all"
         },
         headersConfig: {
           headerBehavior: "none",
-          // headers: {
-          //   // items: ["Accept-Datetime", "Accept-Encoding", "Accept-Language", "User-Agent", "Referer", "Origin", "X-Forwarded-Host"]
-          //   items: [],
-          // }
         },
+        // Needed for many API endpoints.
         queryStringsConfig: {
           queryStringBehavior: "all"
         }
@@ -109,11 +109,6 @@ pub class CloudFrontDistribution {
         viewerProtocolPolicy: "redirect-to-https",
         cachePolicyId: cachePolicyId,
         compress: true,
-        // forwardedValues: {
-        //   queryString: true,
-        //   cookies: { forward: "all" },
-        //   headers: ["cookie", "location"],
-        // },
       });
     }
 
@@ -154,12 +149,6 @@ pub class CloudFrontDistribution {
         viewerProtocolPolicy: "redirect-to-https",
         cachePolicyId: cachePolicy.policy.id,
         compress: true,
-        // forwardedValues: {
-        //   queryString: true,
-        //   cookies: {
-        //     forward: "all"
-        //   },
-        // },
       },
       orderedCacheBehavior: this.getOrderedCacheBehaviorForOrigins(props.origins, cachePolicy.policy.id),
       viewerCertificate: {

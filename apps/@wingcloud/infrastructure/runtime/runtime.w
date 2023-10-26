@@ -137,12 +137,6 @@ pub class RuntimeService {
   init(props: RuntimeServiceProps) {
     this.logs = new cloud.Bucket() as "deployment logs";
 
-    // TODO: use a function to generate the IAM role with the permissions to write to the bucket
-    new cloud.Function(inflight () => {
-      // permissions:
-      this.logs.put;
-    }) as "runtime function";
-
     let var bucketName: str = "";
     let var bucketRegion: str = "";
     let var awsAccessKeyId: str = "";
@@ -170,8 +164,6 @@ pub class RuntimeService {
       let awsAccessKey = new aws.iamAccessKey.IamAccessKey(user: awsUser.name);
       awsAccessKeyId = awsAccessKey.id;
       awsSecretAccessKey = awsAccessKey.secret;
-      // new cdktf.TerraformOutput(value: awsAccessKey.id) as "LogsBucketAwsAccessKeyId";
-      // new cdktf.TerraformOutput(value: awsAccessKey.secret, sensitive: true) as "LogsBucketAwsSecretAccessKey";
       if let flyToken = props.flyToken {
         if let flyOrgSlug = props.flyOrgSlug {
           this.runtimeHandler = new RuntimeHandler_flyio(

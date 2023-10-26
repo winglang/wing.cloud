@@ -78,8 +78,6 @@ bring "cdktf" as cdktf;
 
 let apiDomainName = cdktf.Fn.trimprefix(cdktf.Fn.trimsuffix(api.url, "/prod"), "https://");
 new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
-// let probotApiDomainName = cdktf.Fn.trimprefix(cdktf.Fn.trimsuffix(probotApp.githubApp.webhookUrl, "/prod"), "https://");
-// new cdktf.TerraformOutput(value: probotApiDomainName) as "Probot API URL 2";
 let proxy = new ReverseProxy.ReverseProxy(
   subDomain: "dev",
   zoneName: "wingcloud.io",
@@ -91,11 +89,6 @@ let proxy = new ReverseProxy.ReverseProxy(
       originId: "wrpc",
       originPath: "/prod",
     },
-    // {
-    //   pathPattern: "/webhook",
-    //   domainName: probotApiDomainName,
-    //   originId: "webhook",
-    // },
     {
       pathPattern: "",
       domainName: website.url.replace("https://", ""),
