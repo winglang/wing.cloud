@@ -262,6 +262,8 @@ pub class ProbotApp {
     this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
 
     let data = Json.parse(event);
+    // TODO: This is a hack to add get permissions. tryGet doesn't add permissions right now. Remove when fixed.
+    this.prDb.get;
     if let item = this.prDb.tryGet(data.get("environmentId").asStr()) {
       let var testsString = "---";
       if data.get("status").asStr() == "tests" {
