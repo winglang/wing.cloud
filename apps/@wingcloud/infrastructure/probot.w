@@ -104,7 +104,9 @@ pub class ProbotApp {
         issue_number: ex.ColumnType.NUMBER,
         owner: ex.ColumnType.STRING,
         repo: ex.ColumnType.STRING,
-        installation_id: ex.ColumnType.NUMBER
+        installation_id: ex.ColumnType.NUMBER,
+        comment_id: ex.ColumnType.NUMBER,
+        preview_url: ex.ColumnType.STRING,
       }
     }) as "environments prs";
 
@@ -131,6 +133,7 @@ pub class ProbotApp {
     }) as "environments status";
 
     this.runtimeCallbacks.onStatus(inflight (event) => {
+      log("onStatus: ${event}");
       let data = Json.deepCopyMut(Json.parse(event));
       if let d = data.tryGet("data") {
         data.set("data", Json.stringify(d));
@@ -173,87 +176,66 @@ pub class ProbotApp {
     this.adapter = new ProbotAdapter();
   }
 
+  inflight handlePullRequestUpdate(context: probot.IPullRequestContext): void {
+    let owner = context.payload.repository.owner.login;
+    let repo = context.payload.repository.name;
+    let options = {
+      owner: owner,
+      repo: repo,
+      tree_sha: context.payload.pull_request.head.sha,
+      recursive: "true",
+    };
+
+    let resp = context.octokit.git.getTree(options);
+    if resp.status != 200 {
+      throw "getTree: failure: ${resp.status}, ${options}";
+    }
+    log("resp ${Json.stringify(resp.data.tree)}, ${Json.stringify(options)}");
+
+    let entrypoints: MutArray<str> = MutArray<str>[];
+    for file in resp.data.tree {
+      if let path = file.path {
+        if path.endsWith("main.w") {
+          log("-- owner: ${owner}, repo: ${repo}, entryfile: ${path}");
+
+          let res = http.post(this.runtimeUrl, body: Json.stringify({
+            repo: "${owner}/${repo}",
+            sha: context.payload.pull_request.head.sha,
+            entryfile: path
+          }));
+
+          if res.status != 200 {
+            throw "runtime: failure: ${res.status}, ${res.body}";
+          }
+
+          let data = Json.parse(res.body ?? "{}");
+
+          this.prDb.upsert(path, {
+            owner: owner,
+            repo: repo,
+            issue_number: context.payload.pull_request.number,
+            installation_id: context.payload.installation?.id,
+            preview_url: data.tryGet("preview_url")?.tryAsStr() ?? ""
+          });
+
+          break;
+        }
+      }
+    }
+  }
+
   inflight listen() {
     this.adapter = new ProbotAdapter();
     this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
-    this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestOpenedContext): void => {
-      let owner = context.payload.repository.owner.login;
-      let repo = context.payload.repository.name;
-      let options = {
-        owner: owner,
-        repo: repo,
-        tree_sha: context.payload.pull_request.head.sha,
-        recursive: "true",
-      };
 
-      let resp = context.octokit.git.getTree(options);
-      if resp.status != 200 {
-        throw "getTree: failure: ${resp.status}, ${options}";
-      }
-      log("resp ${Json.stringify(resp.data.tree)}, ${Json.stringify(options)}");
-
-      let entrypoints: MutArray<str> = MutArray<str>[];
-      for file in resp.data.tree {
-        if let path = file.path {
-          if path.endsWith("main.w") {
-            log("-- owner: ${owner}, repo: ${repo}, entryfile: ${path}");
-            this.prDb.upsert(path, {
-              owner: owner,
-              repo: repo,
-              issue_number: context.payload.pull_request.number,
-              installation_id: context.payload.installation?.id
-            });
-
-            http.post(this.runtimeUrl, body: Json.stringify({
-              repo: "${owner}/${repo}",
-              sha: context.payload.pull_request.head.sha,
-              entryfile: path
-            }));
-
-            break;
-          }
-        }
-      }
+    this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestContext): void => {
+      // TODO [sa] open a bug for this workaround
+      this.handlePullRequestUpdate(context);
     });
 
-    this.adapter.handlePullRequstSync(inflight (context: probot.IPullRequestSyncContext): void => {
-      let owner = context.payload.repository.owner.login;
-      let repo = context.payload.repository.name;
-      let options = {
-        owner: owner,
-        repo: repo,
-        tree_sha: context.payload.pull_request.head.sha,
-        recursive: "true"
-      };
-
-      let resp = context.octokit.git.getTree(options);
-      if resp.status != 200 {
-        throw "getTree: failure: ${resp.status}, ${options}";
-      }
-      log("resp ${Json.stringify(resp.data.tree)}, ${Json.stringify(options)}");
-
-      let entrypoints: MutArray<str> = MutArray<str>[];
-      for file in resp.data.tree {
-        if let path = file.path {
-          if path.endsWith("main.w") {
-            log("owner: ${owner}, repo: ${repo}, entryfile: ${path}");
-            this.prDb.upsert(path, {
-              owner: owner,
-              repo: repo,
-              issue_number: context.payload.pull_request.number,
-              installation_id: context.payload.installation?.id
-            });
-
-            http.post(this.runtimeUrl, body: Json.stringify({
-              repo: "${owner}/${repo}",
-              sha: context.payload.pull_request.head.sha,
-              entryfile: path
-            }));
-
-            break;
-          }
-        }
-      }
+    this.adapter.handlePullRequstSync(inflight (context: probot.IPullRequestContext): void => {
+      // TODO [sa] open a bug for this workaround
+      this.handlePullRequestUpdate(context);
     });
   }
 
@@ -283,18 +265,44 @@ pub class ProbotApp {
           }
         }
       }
-      let tableRows = "| ${data.get("environmentId").asStr()} | ${data.get("status").asStr()} | --- | ${testsString} | ${std.Datetime.utcNow()} |";
+      let date = std.Datetime.utcNow().toIso();
+      let shouldDisplayUrl = data.get("status").asStr() == "running";
+      let var previewUrl = "";
+      if(shouldDisplayUrl) {
+        previewUrl = item.tryGet("preview_url")?.tryAsStr() ?? "";
+      }
+      let tableRows = "| ${data.get("environmentId").asStr()} | ${data.get("status").asStr()} | ${previewUrl} | ${testsString} | ${date} |";
       let commentBody = "
 | Entry Point     | Status | Preview | Tests | Updated (UTC) |
 | --------------- | ------ | ------- | ----- | -------------- |
 ${tableRows}
 ";
-      this.adapter.auth(item.get("installation_id").asNum()).issues.createComment(
-        owner: item.get("owner").asStr(),
-        repo: item.get("repo").asStr(),
-        issue_number: item.get("issue_number").asNum(),
-        body: commentBody
-      );
+      if let commentId = item.tryGet("comment_id")?.tryAsNum() {
+        log("updating existing preview comment: ${commentId}");
+        this.adapter.auth(item.get("installation_id").asNum()).issues.updateComment(
+          owner: item.get("owner").asStr(),
+          repo: item.get("repo").asStr(),
+          comment_id: commentId,
+          body: commentBody
+        );
+      } else {
+        log("creating a new preview comment");
+        let res = this.adapter.auth(item.get("installation_id").asNum()).issues.createComment(
+          owner: item.get("owner").asStr(),
+          repo: item.get("repo").asStr(),
+          issue_number: item.get("issue_number").asNum(),
+          body: commentBody
+        );
+        log("created preview comment id: ${res.data.id}");
+        this.prDb.upsert(data.get("environmentId").asStr(), {
+          owner: item.get("owner").asStr(),
+          repo: item.get("repo").asStr(),
+          issue_number: item.get("issue_number").asNum(),
+          installation_id: item.get("installation_id").asNum(),
+          comment_id: res.data.id,
+          preview_url: item.tryGet("preview_url")?.tryAsStr() ?? ""
+        });
+      }
     }
   }
 }

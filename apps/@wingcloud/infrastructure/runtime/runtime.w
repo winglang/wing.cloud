@@ -196,7 +196,7 @@ pub class RuntimeService {
 
       log("wing url: ${props.wingCloudUrl}");
 
-      this.runtimeHandler.handleRequest(
+      let url = this.runtimeHandler.handleRequest(
         gitToken: token,
         gitRepo: repo,
         gitSha: sha,
@@ -208,10 +208,12 @@ pub class RuntimeService {
         awsSecretAccessKey: awsSecretAccessKey,
       );
 
+      log("preview environment url: ${url}");
+
       return {
         status: 200,
         body: Json.stringify({
-          // url
+          preview_url: url
         })
       };
     });
