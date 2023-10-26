@@ -43,6 +43,20 @@
         }
       ]
     },
+    "deploy": {
+      "name": "deploy",
+      "steps": [
+        {
+          "exec": "source .env && export $(cut -d= -f1 < .env) && wing compile main.w --target tf-aws"
+        },
+        {
+          "exec": "cd target/main.tfaws && terraform init"
+        },
+        {
+          "exec": "source .env && export $(cut -d= -f1 < .env) && cd target/main.tfaws && terraform apply -auto-approve"
+        }
+      ]
+    },
     "dev": {
       "name": "dev",
       "description": "Start the development task",

@@ -193,6 +193,7 @@ infrastructure.addFields({ type: "commonjs" });
 infrastructure.addGitIgnore("/.env");
 infrastructure.addGitIgnore("/.env.*");
 infrastructure.addGitIgnore("!/.env.example");
+infrastructure.addGitIgnore("/target/");
 
 infrastructure.addDeps(`winglang`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
@@ -201,7 +202,15 @@ infrastructure.devTask.exec(
 );
 infrastructure.compileTask.exec("wing compile main.w --target sim");
 infrastructure.compileTask.exec("wing compile main.w --target tf-aws");
-infrastructure.addGitIgnore("/target/");
+
+const deployTask = infrastructure.addTask("deploy");
+deployTask.exec(
+  "source .env && export $(cut -d= -f1 < .env) && wing compile main.w --target tf-aws",
+);
+deployTask.exec("cd target/main.tfaws && terraform init");
+deployTask.exec(
+  "source .env && export $(cut -d= -f1 < .env) && cd target/main.tfaws && terraform apply -auto-approve",
+);
 
 infrastructure.addDeps("express", "@vendia/serverless-express");
 infrastructure.addDeps("@probot/adapter-aws-lambda-serverless");

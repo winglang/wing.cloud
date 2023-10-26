@@ -50,7 +50,8 @@
     "compile": "projen compile",
     "build": "projen build",
     "dev": "projen dev",
-    "lint": "projen lint"
+    "lint": "projen lint",
+    "deploy": "projen deploy"
   },
   "exports": {
     ".": "./src/index.ts"
