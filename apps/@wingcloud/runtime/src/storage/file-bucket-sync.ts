@@ -17,9 +17,7 @@ export function fileBucketSync({ file, key, bucket }: FileBucketSyncProps) {
   let clear: NodeJS.Timeout;
   const sync = async () => {
     try {
-      console.log("syncing logs", { file });
       const contents = readFileSync(file, "utf8");
-      console.log("contents to sync", { contents });
       await bucket.put(key, contents);
     } catch (error) {
       console.error("failed to sync logs, retrying...", error);
