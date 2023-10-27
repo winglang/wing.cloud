@@ -144,7 +144,7 @@ pub class RuntimeService {
     if util.tryEnv("WING_TARGET") == "sim" {
       this.runtimeHandler = new RuntimeHandler_sim();
     } else {
-      let awsUser = new aws.iamUser.IamUser(name: "user");
+      let awsUser = new aws.iamUser.IamUser(name: "${this.node.addr}-user");
       let bucketArn: str = unsafeCast(this.logs).bucket.arn;
       bucketName = unsafeCast(this.logs).bucket.bucket;
       bucketRegion = unsafeCast(this.logs).bucket.region;

@@ -142,6 +142,22 @@ new TypescriptConfig(website, {
 });
 new Eslint(website);
 
+new JsonFile(website, "turbo.json", {
+  marker: false,
+  obj: {
+    $schema: "https://turbo.build/schema.json",
+    extends: ["//"],
+    pipeline: {
+      compile: {
+        inputs: [".env"],
+      },
+      dev: {
+        dependsOn: ["^compile"],
+      },
+    },
+  },
+});
+
 website.addDeps("vite");
 website.addScript("dev", "vite dev");
 website.addScript("compile", "vite build");
@@ -233,8 +249,22 @@ new JsonFile(infrastructure, "turbo.json", {
     $schema: "https://turbo.build/schema.json",
     extends: ["//"],
     pipeline: {
+      compile: {
+        inputs: [".env"],
+        outputs: [
+          "target/main.tfaws/**",
+          "!target/main.tfaws/.terraform.lock.hcl",
+          "!target/main.tfaws/.terraform",
+          "!target/main.tfaws/terraform.tfstate",
+          "!target/main.tfaws/terraform.tfstate.backup",
+        ],
+      },
       dev: {
         dependsOn: ["^compile"],
+      },
+      deploy: {
+        dependsOn: ["^compile"],
+        cache: false,
       },
     },
   },
@@ -249,13 +279,9 @@ infrastructure.addGitIgnore("/target/");
 infrastructure.addDeps(`winglang`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
-infrastructure.compileTask.exec(
-  "node ./bin/wing.mjs compile main.w --target sim",
-);
 infrastructure.compileTask.exec("node ./bin/wing.mjs compile --target tf-aws");
 
 const deployTask = infrastructure.addTask("deploy");
-deployTask.exec("node ./bin/wing.mjs compile --target tf-aws");
 deployTask.exec("node ./bin/terraform.mjs -chdir=target/main.tfaws init");
 deployTask.exec(
   "node ./bin/terraform.mjs -chdir=target/main.tfaws apply -auto-approve",

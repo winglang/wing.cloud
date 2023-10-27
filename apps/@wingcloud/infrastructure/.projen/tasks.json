@@ -26,9 +26,6 @@
       "description": "Only compile",
       "steps": [
         {
-          "exec": "node ./bin/wing.mjs compile main.w --target sim"
-        },
-        {
           "exec": "node ./bin/wing.mjs compile --target tf-aws"
         }
       ]
@@ -46,9 +43,6 @@
     "deploy": {
       "name": "deploy",
       "steps": [
-        {
-          "exec": "node ./bin/wing.mjs compile --target tf-aws"
-        },
         {
           "exec": "node ./bin/terraform.mjs -chdir=target/main.tfaws init"
         },
