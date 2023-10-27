@@ -92,9 +92,6 @@ class ReverseProxy_sim {
     this.state = new sim.State();
     this.origins = props.origins;
     new cloud.Service(inflight () => {
-      for origin in props.origins {
-        log("origin domainName=${origin.domainName} originPath=${origin.originPath}");
-      }
       let result = ReverseProxy_sim.startReverseProxyServer(origins: props.origins, port: props.port);
       this.state.set("url", "http://localhost:${result.port}");
       return inflight () => {
