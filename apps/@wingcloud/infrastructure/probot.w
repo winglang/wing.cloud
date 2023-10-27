@@ -240,13 +240,16 @@ pub class ProbotApp {
   }
 
   inflight postComment(event: str) {
-    this.adapter = new ProbotAdapter();
+      log("postComment");
+      this.adapter = new ProbotAdapter();
     this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
 
     let data = Json.parse(event);
     // TODO: This is a hack to add get permissions. tryGet doesn't add permissions right now. Remove when fixed.
     this.prDb.get;
-    if let item = this.prDb.tryGet(data.get("environmentId").asStr()) {
+    let environmentId = data.get("environmentId").asStr();
+    if let item = this.prDb.tryGet(environmentId) {
+      log("environmentId = ${environmentId}");
       let var testsString = "---";
       if data.get("status").asStr() == "tests" {
         let testResults = data.get("data").get("testResults");
@@ -271,7 +274,7 @@ pub class ProbotApp {
       if(shouldDisplayUrl) {
         previewUrl = item.tryGet("preview_url")?.tryAsStr() ?? "";
       }
-      let tableRows = "| ${data.get("environmentId").asStr()} | ${data.get("status").asStr()} | ${previewUrl} | ${testsString} | ${date} |";
+      let tableRows = "| ${environmentId} | ${data.get("status").asStr()} | ${previewUrl} | ${testsString} | ${date} |";
       let commentBody = "
 | Entry Point     | Status | Preview | Tests | Updated (UTC) |
 | --------------- | ------ | ------- | ----- | -------------- |
@@ -294,7 +297,7 @@ ${tableRows}
           body: commentBody
         );
         log("created preview comment id: ${res.data.id}");
-        this.prDb.upsert(data.get("environmentId").asStr(), {
+        this.prDb.upsert(environmentId, {
           owner: item.get("owner").asStr(),
           repo: item.get("repo").asStr(),
           issue_number: item.get("issue_number").asNum(),
@@ -303,6 +306,8 @@ ${tableRows}
           preview_url: item.tryGet("preview_url")?.tryAsStr() ?? ""
         });
       }
+    } else {
+      log("Error? There's no entry with environmentId = ${environmentId}");
     }
   }
 }

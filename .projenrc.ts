@@ -234,15 +234,36 @@ const infrastructure = new TypescriptProject({
 });
 infrastructure.addFields({ type: "commonjs" });
 
+infrastructure.addDevDeps("dotenv", "dotenv-expand");
+infrastructure.addGitIgnore("/.env");
+infrastructure.addGitIgnore("/.env.*");
+infrastructure.addGitIgnore("!/.env.example");
+
+infrastructure.addGitIgnore("/target/");
+infrastructure.addDeps(`winglang`);
+// TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
+infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
+infrastructure.compileTask.exec("node ./bin/wing.mjs compile --target tf-aws");
+
 const terraformInitTask = infrastructure.addTask("terraformInit");
 terraformInitTask.exec(
-  "node ./bin/terraform.mjs -chdir=target/main.tfaws init",
+  "node ./bin/terraform.mjs -chdir=target/main.tfaws init -input=false",
+);
+
+const planTask = infrastructure.addTask("plan");
+planTask.exec(
+  "node ./bin/terraform.mjs -chdir=target/main.tfaws plan -input=false -out=tfplan",
+);
+
+const deployTask = infrastructure.addTask("deploy");
+deployTask.exec(
+  "node ./bin/terraform.mjs -chdir=target/main.tfaws apply -input=false -auto-approve tfplan",
 );
 
 new Turbo(infrastructure, {
   pipeline: {
     [terraformInitTask.name]: {
-      dependsOn: ["package.json"],
+      inputs: ["package.json"],
       outputs: [
         "target/main.tfaws/.terraform",
         "target/main.tfaws/.terraform.lock.hcl",
@@ -257,33 +278,24 @@ new Turbo(infrastructure, {
         "!target/main.tfaws/.terraform",
         "!target/main.tfaws/terraform.tfstate",
         "!target/main.tfaws/terraform.tfstate.backup",
+        "!target/main.tfaws/tfplan",
       ],
+    },
+    [planTask.name]: {
+      dependsOn: ["compile"],
+      // outputs: ["target/main.tfaws/tfplan"],
+      cache: false,
+    },
+    deploy: {
+      // dependsOn: ["^compile"],
+      dependsOn: [planTask.name],
+      cache: false,
     },
     dev: {
       dependsOn: ["^compile"],
     },
-    deploy: {
-      dependsOn: ["^compile"],
-      cache: false,
-    },
   },
 });
-
-infrastructure.addDevDeps("dotenv", "dotenv-expand");
-infrastructure.addGitIgnore("/.env");
-infrastructure.addGitIgnore("/.env.*");
-infrastructure.addGitIgnore("!/.env.example");
-
-infrastructure.addGitIgnore("/target/");
-infrastructure.addDeps(`winglang`);
-// TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
-infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
-infrastructure.compileTask.exec("node ./bin/wing.mjs compile --target tf-aws");
-
-const deployTask = infrastructure.addTask("deploy");
-deployTask.exec(
-  "node ./bin/terraform.mjs -chdir=target/main.tfaws apply -auto-approve",
-);
 
 infrastructure.addDeps("express", "@vendia/serverless-express");
 infrastructure.addDeps("@probot/adapter-aws-lambda-serverless");

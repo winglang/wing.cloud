@@ -44,10 +44,7 @@
       "name": "deploy",
       "steps": [
         {
-          "exec": "node ./bin/terraform.mjs -chdir=target/main.tfaws init"
-        },
-        {
-          "exec": "node ./bin/terraform.mjs -chdir=target/main.tfaws apply -auto-approve"
+          "exec": "node ./bin/terraform.mjs -chdir=target/main.tfaws apply -input=false -auto-approve tfplan"
         }
       ]
     },
@@ -91,6 +88,14 @@
       "name": "package",
       "description": "Creates the distribution package"
     },
+    "plan": {
+      "name": "plan",
+      "steps": [
+        {
+          "exec": "node ./bin/terraform.mjs -chdir=target/main.tfaws plan -input=false -out=tfplan"
+        }
+      ]
+    },
     "post-compile": {
       "name": "post-compile",
       "description": "Runs after successful compilation"
@@ -107,7 +112,7 @@
       "name": "terraformInit",
       "steps": [
         {
-          "exec": "node ./bin/terraform.mjs -chdir=target/main.tfaws init"
+          "exec": "node ./bin/terraform.mjs -chdir=target/main.tfaws init -input=false"
         }
       ]
     },
