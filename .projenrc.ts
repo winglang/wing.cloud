@@ -184,12 +184,61 @@ website.addDevDeps("node-fetch");
 website.addDevDeps("nanoid");
 
 ///////////////////////////////////////////////////////////////////////////////
+const runtime = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/runtime",
+  outdir: "apps/@wingcloud/runtime",
+  tsup: {
+    entry: ["src/**/*.ts"],
+    outDir: "lib",
+    format: ["esm"],
+    target: "node18",
+    dts: true,
+    bundle: false,
+    clean: true,
+  },
+});
+
+runtime.addDeps(`winglang`);
+runtime.addDeps(`@winglang/sdk`);
+runtime.addDeps(`@winglang/compiler`);
+runtime.addDeps(`@wingconsole/app`);
+runtime.addDeps("express");
+runtime.addDeps("jsonwebtoken");
+runtime.addDeps("jwk-to-pem");
+runtime.addDeps("jose");
+runtime.addDeps("node-fetch");
+
+runtime.addDevDeps("@types/express");
+runtime.addDevDeps("@types/jsonwebtoken");
+runtime.addDevDeps("@types/jwk-to-pem");
+runtime.addDevDeps("simple-git");
+runtime.addDevDeps("msw");
+
+runtime.addGitIgnore("target/");
+
+runtime.devTask.exec("tsup --watch --onSuccess 'node lib/entrypoint-local.js'");
+
+///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
   monorepo,
   name: "@wingcloud/infrastructure",
   outdir: "apps/@wingcloud/infrastructure",
 });
 infrastructure.addFields({ type: "commonjs" });
+
+new JsonFile(infrastructure, "turbo.json", {
+  marker: false,
+  obj: {
+    $schema: "https://turbo.build/schema.json",
+    extends: ["//"],
+    pipeline: {
+      dev: {
+        dependsOn: ["^compile"],
+      },
+    },
+  },
+});
 
 infrastructure.addDevDeps("dotenv", "dotenv-expand");
 infrastructure.addGitIgnore("/.env");
@@ -248,42 +297,7 @@ infrastructure.addDeps("octokit", "node-fetch");
 
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(flyio.name);
-
-///////////////////////////////////////////////////////////////////////////////
-const runtime = new TypescriptProject({
-  monorepo,
-  name: "@wingcloud/runtime",
-  outdir: "apps/@wingcloud/runtime",
-  tsup: {
-    entry: ["src/**/*.ts"],
-    outDir: "lib",
-    format: ["esm"],
-    target: "node18",
-    dts: true,
-    bundle: false,
-    clean: true,
-  },
-});
-
-runtime.addDeps(`winglang`);
-runtime.addDeps(`@winglang/sdk`);
-runtime.addDeps(`@winglang/compiler`);
-runtime.addDeps(`@wingconsole/app`);
-runtime.addDeps("express");
-runtime.addDeps("jsonwebtoken");
-runtime.addDeps("jwk-to-pem");
-runtime.addDeps("jose");
-runtime.addDeps("node-fetch");
-
-runtime.addDevDeps("@types/express");
-runtime.addDevDeps("@types/jsonwebtoken");
-runtime.addDevDeps("@types/jwk-to-pem");
-runtime.addDevDeps("simple-git");
-runtime.addDevDeps("msw");
-
-runtime.addGitIgnore("target/");
-
-runtime.devTask.exec("tsup --watch --onSuccess 'node lib/entrypoint-local.js'");
+infrastructure.addDevDeps(runtime.name);
 
 ///////////////////////////////////////////////////////////////////////////////
 monorepo.synth();

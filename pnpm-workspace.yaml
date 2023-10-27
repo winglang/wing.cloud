@@ -10,5 +10,5 @@ packages:
   - packages/@wingcloud/wrpc
   - packages/@wingcloud/vite
   - apps/@wingcloud/website
-  - apps/@wingcloud/infrastructure
   - apps/@wingcloud/runtime
+  - apps/@wingcloud/infrastructure

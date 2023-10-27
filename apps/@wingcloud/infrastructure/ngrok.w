@@ -28,16 +28,13 @@ pub class Ngrok {
 
       let result = Ngrok.startNgrok(port, props.domain);
       if let pid = result.pid {
-        state.set("pid", "${pid}");
         state.set("url", result.publicUrl);
         log("ngrok url = ${result.publicUrl}");
-      }
 
-      return () => {
-        if let pid = state.tryGet("pid")?.tryAsStr() {
-          Ngrok.killNgrok(num.fromStr(pid));
-        }
-      };
+        return () => {
+          Ngrok.killNgrok(pid);
+        };
+      }
     });
   }
 }

@@ -112,6 +112,9 @@ importers:
       '@wingcloud/flyio':
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/flyio
+      '@wingcloud/runtime':
+        specifier: workspace:^
+        version: link:../runtime
       '@wingcloud/website':
         specifier: workspace:^
         version: link:../website
