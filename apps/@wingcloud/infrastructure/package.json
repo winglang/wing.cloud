@@ -54,6 +54,7 @@
     "build": "projen build",
     "dev": "projen dev",
     "lint": "projen lint",
+    "terraformInit": "projen terraformInit",
     "deploy": "projen deploy"
   },
   "exports": {

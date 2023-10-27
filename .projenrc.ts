@@ -234,9 +234,22 @@ const infrastructure = new TypescriptProject({
 });
 infrastructure.addFields({ type: "commonjs" });
 
+const terraformInitTask = infrastructure.addTask("terraformInit");
+terraformInitTask.exec(
+  "node ./bin/terraform.mjs -chdir=target/main.tfaws init",
+);
+
 new Turbo(infrastructure, {
   pipeline: {
+    [terraformInitTask.name]: {
+      dependsOn: ["package.json"],
+      outputs: [
+        "target/main.tfaws/.terraform",
+        "target/main.tfaws/.terraform.lock.hcl",
+      ],
+    },
     compile: {
+      dependsOn: [terraformInitTask.name],
       dotEnv: [".env"],
       outputs: [
         "target/main.tfaws/**",
@@ -268,7 +281,6 @@ infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.compileTask.exec("node ./bin/wing.mjs compile --target tf-aws");
 
 const deployTask = infrastructure.addTask("deploy");
-deployTask.exec("node ./bin/terraform.mjs -chdir=target/main.tfaws init");
 deployTask.exec(
   "node ./bin/terraform.mjs -chdir=target/main.tfaws apply -auto-approve",
 );

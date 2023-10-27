@@ -103,6 +103,14 @@
       "name": "pre-compile",
       "description": "Prepare the project for compilation"
     },
+    "terraformInit": {
+      "name": "terraformInit",
+      "steps": [
+        {
+          "exec": "node ./bin/terraform.mjs -chdir=target/main.tfaws init"
+        }
+      ]
+    },
     "test": {
       "name": "test",
       "description": "Run tests"
