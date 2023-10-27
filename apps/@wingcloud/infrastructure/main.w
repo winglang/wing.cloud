@@ -50,7 +50,6 @@ let website = new ex.ReactApp(
   buildDir: "dist",
   localPort: websitePort,
 );
-log("Website URL = ${website.url}");
 
 let runtimeCallbacks = new runtime_callbacks.RuntimeCallbacks();
 
@@ -84,13 +83,13 @@ let apiDomainName = (() => {
   }
   return api.url;
 })();
-log(api.url);
-log(apiDomainName);
 new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
+let subDomain = util.env("PROXY_SUBDOMAIN");
+let zoneName = util.env("PROXY_ZONE_NAME");
 let proxy = new ReverseProxy.ReverseProxy(
-  subDomain: "dev",
-  zoneName: "wingcloud.io",
-  aliases: ["dev.wingcloud.io"],
+  subDomain: subDomain,
+  zoneName: zoneName,
+  aliases: ["${subDomain}.${zoneName}"],
   origins: [
     {
       pathPattern: "/wrpc/*",
@@ -119,6 +118,5 @@ if util.tryEnv("WING_TARGET") == "sim" {
   let deploy = new cloud.OnDeploy(inflight () => {
     githubApp.updateWebhookUrl("${devNgrok.url}/webhook");
     log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
-    log("Proxy URL: ${proxy.url}");
   });
 }
