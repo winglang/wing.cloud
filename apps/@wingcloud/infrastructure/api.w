@@ -28,19 +28,6 @@ pub class Api {
 
     let AUTH_COOKIE_NAME = "auth";
 
-    api.get("/wrpc/cookies", inflight (request) => {
-      let headers = lowkeys.LowkeysMap.fromMap(request.headers ?? {});
-      let cookies = headers.tryGet("cookie");
-      return {
-        body: {
-          message: "Status: OK",
-          cookie: cookies,
-          Cookie: request.headers?.tryGet("Cookie"),
-          AUTH_COOKIE_NAME: AUTH_COOKIE_NAME,
-        },
-      };
-    });
-
     let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
       let headers = lowkeys.LowkeysMap.fromMap(request.headers ?? {});
       if let cookies = headers.tryGet("cookie") {
