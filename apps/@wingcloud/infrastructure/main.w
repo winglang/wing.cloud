@@ -50,6 +50,7 @@ let website = new ex.ReactApp(
   buildDir: "dist",
   localPort: websitePort,
 );
+log("Website URL = ${website.url}");
 
 let runtimeCallbacks = new runtime_callbacks.RuntimeCallbacks();
 
@@ -76,7 +77,15 @@ let probotApp = new probot.ProbotApp(
 
 bring "cdktf" as cdktf;
 
-let apiDomainName = cdktf.Fn.trimprefix(cdktf.Fn.trimsuffix(api.url, "/prod"), "https://");
+let apiDomainName = (() => {
+  if util.env("WING_TARGET") == "tf-aws" {
+    // See https://github.com/winglang/wing/issues/4688.
+    return cdktf.Fn.trimprefix(cdktf.Fn.trimsuffix(api.url, "/prod"), "https://");
+  }
+  return api.url;
+})();
+log(api.url);
+log(apiDomainName);
 new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
 let proxy = new ReverseProxy.ReverseProxy(
   subDomain: "dev",
@@ -110,6 +119,6 @@ if util.tryEnv("WING_TARGET") == "sim" {
   let deploy = new cloud.OnDeploy(inflight () => {
     githubApp.updateWebhookUrl("${devNgrok.url}/webhook");
     log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
-    log("Website URL: ${proxy.url}");
+    log("Proxy URL: ${proxy.url}");
   });
 }
