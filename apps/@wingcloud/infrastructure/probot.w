@@ -259,6 +259,10 @@ pub class ProbotApp {
             environmentId: environment.id,
           }));
 
+          if !res.ok {
+            throw "handlePullRequstClosed: runtime service error ${res.body}";
+          }
+
           this.postComment(
             data: {}, 
             environment:
@@ -266,10 +270,6 @@ pub class ProbotApp {
             project: project, 
             statusReport: {environmentId: environment.id, status: "stopped"}
           );
-
-          if !res.ok {
-            throw "handlePullRequstClosed: runtime service error ${res.body}";
-          }
         }
       }
     });
