@@ -259,6 +259,14 @@ pub class ProbotApp {
             environmentId: environment.id,
           }));
 
+          this.postComment(
+            data: {}, 
+            environment:
+            environment,
+            project: project, 
+            statusReport: {environmentId: environment.id, status: "stopped"}
+          );
+
           if !res.ok {
             throw "handlePullRequstClosed: runtime service error ${res.body}";
           }
