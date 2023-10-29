@@ -243,7 +243,9 @@ infrastructure.addGitIgnore("/target/");
 infrastructure.addDeps(`winglang`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
-infrastructure.compileTask.exec("node ./bin/wing.mjs compile --target tf-aws");
+infrastructure.compileTask.exec(
+  "node ./bin/wing.mjs compile --target tf-aws --plugins override-function-memory.js",
+);
 
 const terraformInitTask = infrastructure.addTask("terraformInit");
 terraformInitTask.exec(

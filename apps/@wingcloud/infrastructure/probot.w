@@ -240,8 +240,7 @@ pub class ProbotApp {
   }
 
   inflight postComment(event: str) {
-      log("postComment");
-      this.adapter = new ProbotAdapter();
+    this.adapter = new ProbotAdapter();
     this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
 
     let data = Json.parse(event);
