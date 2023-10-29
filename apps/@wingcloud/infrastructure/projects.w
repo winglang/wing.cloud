@@ -1,23 +1,26 @@
 bring ex;
 bring "./nanoid62.w" as nanoid62;
 
-struct Project {
+pub struct Project {
   id: str;
   name: str;
   repository: str;
   userId: str;
+  entryfile: str;
 }
 
 struct CreateProjectOptions {
   name: str;
   repository: str;
   userId: str;
+  entryfile: str;
 }
 
 struct RenameProjectOptions {
   id: str;
   name: str;
   userId: str;
+  repository: str;
 }
 
 struct GetProjectOptions {
@@ -31,6 +34,11 @@ struct ListProjectsOptions {
 struct DeleteProjectOptions {
   id: str;
   userId: str;
+  repository: str;
+}
+
+struct ListProjectByRepositoryOptions {
+  repository: str;
 }
 
 pub class Projects {
@@ -46,6 +54,7 @@ pub class Projects {
       name: options.name,
       repository: options.repository,
       userId: options.userId,
+      entryfile: options.entryfile,
     };
 
     this.table.transactWriteItems(transactItems: [
@@ -58,6 +67,7 @@ pub class Projects {
             name: project.name,
             repository: project.repository,
             userId: project.userId,
+            entryfile: project.entryfile,
           },
           conditionExpression: "attribute_not_exists(pk)"
         },
@@ -71,6 +81,20 @@ pub class Projects {
             name: project.name,
             repository: project.repository,
             userId: project.userId,
+            entryfile: project.entryfile,
+          },
+        },
+      },
+      {
+        put: {
+          item: {
+            pk: "REPOSITORY#${options.repository}",
+            sk: "PROJECT#${project.id}",
+            id: project.id,
+            name: project.name,
+            repository: project.repository,
+            userId: project.userId,
+            entryfile: project.entryfile,
           },
         },
       },
@@ -115,6 +139,21 @@ pub class Projects {
           },
         }
       },
+      {
+        update: {
+          key: {
+            pk: "REPOSITORY#${options.repository}",
+            sk: "PROJECT#${options.id}",
+          },
+          updateExpression: "SET #name = :name",
+          expressionAttributeNames: {
+            "#name": "name",
+          },
+          expressionAttributeValues: {
+            ":name": options.name,
+          },
+        }
+      },
     ]);
   }
 
@@ -132,6 +171,7 @@ pub class Projects {
         name: item.get("name").asStr(),
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
+        entryfile: item.get("entryfile").asStr(),
       };
     }
 
@@ -153,6 +193,7 @@ pub class Projects {
         name: item.get("name").asStr(),
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
+        entryfile: item.get("entryfile").asStr(),
       }]);
     }
     return projects;
@@ -184,7 +225,36 @@ pub class Projects {
             },
           },
         },
+        {
+          delete: {
+            key: {
+              pk: "REPOSITORY#${options.repository}",
+              sk: "PROJECT#${options.id}",
+            },
+          },
+        },
       ],
     );
+  }
+
+  pub inflight listByRepository(options: ListProjectByRepositoryOptions): Array<Project> {
+    let result = this.table.query(
+      keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+      expressionAttributeValues: {
+        ":pk": "REPOSITORY#${options.repository}",
+        ":sk": "PROJECT#",
+      },
+    );
+    let var projects: Array<Project> = [];
+    for item in result.items {
+      projects = projects.concat([Project {
+        id: item.get("id").asStr(),
+        name: item.get("name").asStr(),
+        repository: item.get("repository").asStr(),
+        userId: item.get("userId").asStr(),
+        entryfile: item.get("entryfile").asStr(),
+      }]);
+    }
+    return projects;
   }
 }

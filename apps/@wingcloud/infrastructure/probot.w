@@ -7,6 +7,8 @@ bring "./types/octokit-types.w" as octokit;
 bring "./lowkeys-map.w" as lowkeys;
 bring "./github-app.w" as github;
 bring "./runtime/runtime-callbacks.w" as runtime_callbacks;
+bring "./environments.w" as environments;
+bring "./projects.w" as projects;
 
 struct VerifyAndReceieveProps {
   id: str;
@@ -38,6 +40,22 @@ struct TestResults {
   testResults: Array<TestResult>;
 }
 
+struct StatusReport {
+  environmentId: str;
+  status: str;
+}
+
+struct TestStatusReport extends StatusReport {
+  data: TestResults;
+}
+
+struct PostCommentProps {
+  data: Json;
+  statusReport: StatusReport;
+  environment: environments.Environment;
+  project: projects.Project;
+}
+
 inflight class ProbotAdapter {
   extern "./src/probot.mts" pub static inflight createProbot(appId: str, privateKey: str, webhookSecret: str): ProbotInstance;
 
@@ -55,8 +73,16 @@ inflight class ProbotAdapter {
     this.instance?.webhooks?.on("pull_request.opened", handler);
   }
 
+  pub handlePullRequstReopened(handler: inflight (probot.IPullRequestOpenedContext): void) {
+    this.instance?.webhooks?.on("pull_request.reopened", handler);
+  }
+
   pub handlePullRequstSync(handler: inflight (probot.IPullRequestSyncContext): void) {
     this.instance?.webhooks?.on("pull_request.synchronize", handler);
+  }
+
+  pub handlePullRequstClosed(handler: inflight (probot.IPullRequestClosedContext): void) {
+    this.instance?.webhooks?.on("pull_request.closed", handler);
   }
 
   pub verifyAndReceive(props: VerifyAndReceieveProps) {
@@ -78,6 +104,8 @@ struct ProbotAppProps {
   probotAppId: str;
   probotSecretKey: str;
   webhookSecret: str;
+  environments: environments.Environments;
+  projects: projects.Projects;
 }
 
 pub class ProbotApp {
@@ -87,8 +115,9 @@ pub class ProbotApp {
   runtimeUrl: str;
   runtimeCallbacks: runtime_callbacks.RuntimeCallbacks;
   pub githubApp: github.GithubApp;
-  prDb: ex.Table;
   inflight var adapter: ProbotAdapter;
+  environments: environments.Environments;
+  projects: projects.Projects;
 
   init(props: ProbotAppProps) {
     this.probotAppId =  props.probotAppId;
@@ -96,19 +125,8 @@ pub class ProbotApp {
     this.webhookSecret = props.webhookSecret;
     this.runtimeUrl = props.runtimeUrl;
     this.runtimeCallbacks = props.runtimeCallbacks;
-
-    this.prDb = new ex.Table(ex.TableProps{
-      name: "wing.cloud/probot/prs",
-      primaryKey: "environmentId",
-      columns: {
-        issue_number: ex.ColumnType.NUMBER,
-        owner: ex.ColumnType.STRING,
-        repo: ex.ColumnType.STRING,
-        installation_id: ex.ColumnType.NUMBER,
-        comment_id: ex.ColumnType.NUMBER,
-        preview_url: ex.ColumnType.STRING,
-      }
-    }) as "environments prs";
+    this.environments = props.environments;
+    this.projects = props.projects;
 
     this.githubApp = new github.GithubApp(
       this.probotAppId,
@@ -122,25 +140,17 @@ pub class ProbotApp {
       }
     );
 
-    let db = new ex.Table(ex.TableProps{
-      name: "wing.cloud/probot/statuses",
-      primaryKey: "id",
-      columns: {
-        environmentId: ex.ColumnType.STRING,
-        status: ex.ColumnType.STRING,
-        data: ex.ColumnType.STRING,
-      }
-    }) as "environments status";
-
     this.runtimeCallbacks.onStatus(inflight (event) => {
-      log("onStatus: ${event}");
-      let data = Json.deepCopyMut(Json.parse(event));
-      if let d = data.tryGet("data") {
-        data.set("data", Json.stringify(d));
-      }
-      db.insert(util.nanoid(), data);
+      log("report status: ${event}");
+      let data = Json.parse(event);
 
-      this.postComment(event);
+      let statusReport = StatusReport.fromJson(data);
+      let environment = this.environments.get(id: statusReport.environmentId);
+      let project = this.projects.get(id: environment.projectId);
+      let status = statusReport.status;
+      this.environments.updateStatus(id: environment.id, projectId: environment.projectId, status: status);
+      
+      this.postComment(data: data, statusReport: statusReport, environment: environment, project: project);
     });
   }
 
@@ -176,131 +186,186 @@ pub class ProbotApp {
     this.adapter = new ProbotAdapter();
   }
 
-  inflight handlePullRequestUpdate(context: probot.IPullRequestContext): void {
-    let owner = context.payload.repository.owner.login;
-    let repo = context.payload.repository.name;
-    let options = {
-      owner: owner,
-      repo: repo,
-      tree_sha: context.payload.pull_request.head.sha,
-      recursive: "true",
-    };
+  inflight listen() {
+    this.adapter = new ProbotAdapter();
+    this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
+    let onPullRequestOpen = inflight (context: probot.IPullRequestOpenedContext): void => {
+      let owner = context.payload.repository.owner.login;
+      let repo = context.payload.repository.name;
+      let branch = context.payload.pull_request.head.ref;
 
-    let resp = context.octokit.git.getTree(options);
-    if resp.status != 200 {
-      throw "getTree: failure: ${resp.status}, ${options}";
-    }
-    log("resp ${Json.stringify(resp.data.tree)}, ${Json.stringify(options)}");
-
-    let entrypoints: MutArray<str> = MutArray<str>[];
-    for file in resp.data.tree {
-      if let path = file.path {
-        if path.endsWith("main.w") {
-          log("-- owner: ${owner}, repo: ${repo}, entryfile: ${path}");
+      let projects = this.projects.listByRepository(repository: context.payload.repository.id);
+      for project in projects {
+        if let installation = context.payload.installation {
+          let environment = this.environments.create(
+            branch: branch,
+            projectId: project.id, 
+            repo: "${owner}/${repo}",
+            status: "initializing",
+            installationId: installation.id,
+            prNumber: context.payload.pull_request.number,
+          );
 
           let res = http.post(this.runtimeUrl, body: Json.stringify({
             repo: "${owner}/${repo}",
             sha: context.payload.pull_request.head.sha,
-            entryfile: path
+            entryfile: project.entryfile,
+            environmentId: environment.id,
+          }));
+          
+          if !res.ok {
+            throw "handlePullRequstOpened: runtime service error ${res.body}";
+          }
+
+          if let body = res.body {
+            if let url = Json.tryParse(body)?.get("url")?.tryAsStr() {
+              this.environments.updateUrl(id: environment.id, projectId: project.id, url: url);
+              return;
+            }
+          }
+
+          throw "handlePullRequstOpened: invalid runtime service response ${res.body}";
+        } else {
+          throw "handlePullRequstOpened: missing installation id";
+        }
+      }
+    };
+
+    this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestOpenedContext): void => {
+      // TODO [sa] open a bug for this workaround
+      onPullRequestOpen(context);
+    });
+
+    this.adapter.handlePullRequstReopened(inflight (context: probot.IPullRequestOpenedContext): void => {
+      // TODO [sa] open a bug for this workaround
+      onPullRequestOpen(context);
+    });
+
+    this.adapter.handlePullRequstClosed(inflight (context: probot.IPullRequestClosedContext): void => {
+      let owner = context.payload.repository.owner.login;
+      let repo = context.payload.repository.name;
+      let branch = context.payload.pull_request.head.ref;
+
+      let projects = this.projects.listByRepository(repository: context.payload.repository.id);
+      for project in projects {
+        for environment in this.environments.list(projectId: project.id) {
+          if environment.branch != branch || environment.status == "stopped" {
+            continue;
+          }
+
+          this.environments.updateStatus(id: environment.id, projectId: project.id, status: "stopped");
+
+          let res = http.delete(this.runtimeUrl, body: Json.stringify({
+            environmentId: environment.id,
           }));
 
-          if res.status != 200 {
-            throw "runtime: failure: ${res.status}, ${res.body}";
+          if !res.ok {
+            throw "handlePullRequstClosed: runtime service error ${res.body}";
           }
 
-          let data = Json.parse(res.body ?? "{}");
-
-          this.prDb.upsert(path, {
-            owner: owner,
-            repo: repo,
-            issue_number: context.payload.pull_request.number,
-            installation_id: context.payload.installation?.id,
-            preview_url: data.tryGet("preview_url")?.tryAsStr() ?? ""
-          });
-
-          break;
+          this.postComment(
+            data: {}, 
+            environment:
+            environment,
+            project: project, 
+            statusReport: {environmentId: environment.id, status: "stopped"}
+          );
         }
+      }
+    });
+
+    this.adapter.handlePullRequstSync(inflight (context: probot.IPullRequestSyncContext): void => {
+      let owner = context.payload.repository.owner.login;
+      let repo = context.payload.repository.name;
+      let branch = context.payload.pull_request.head.ref;
+
+      let projects = this.projects.listByRepository(repository: context.payload.repository.id);
+      for project in projects {
+        for environment in this.environments.list(projectId: project.id) {
+          if environment.branch != branch || environment.status == "stopped" {
+            continue;
+          }
+
+          this.environments.updateStatus(id: environment.id, projectId: project.id, status: "initializing");
+
+          let res = http.post(this.runtimeUrl, body: Json.stringify({
+            repo: "${owner}/${repo}",
+            sha: context.payload.pull_request.head.sha,
+            entryfile: project.entryfile,
+            environmentId: environment.id,
+          }));
+
+          if !res.ok {
+            throw "handlePullRequstSync: runtime service error ${res.body}";
+          }
+  
+          if let body = res.body {
+            if let url = Json.tryParse(body)?.get("url")?.tryAsStr() {
+              this.environments.updateUrl(id: environment.id, projectId: project.id, url: url);
+              return;
+            }
+          }
+  
+          throw "handlePullRequstSync: invalid runtime service response ${res.body}";
+        }
+      }
+    });
+  }
+
+  inflight postComment(props: PostCommentProps) {
+    this.adapter = new ProbotAdapter();
+    this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
+
+    let owner = props.environment.repo.split("/").at(0);
+    let repo = props.environment.repo.split("/").at(1);
+    let status = props.statusReport.status;
+
+    let var testsString = "---";
+    if status == "tests" {
+      let testStatusReport = TestStatusReport.fromJson(props.data);
+      testsString = "";
+      let var i = 0;
+      for testResult in testStatusReport.data.testResults {
+        let var icon = "✅";
+        if !testResult.pass {
+          icon = "❌";
+        }
+        testsString = "${icon} ${testResult.path}<br> ${testsString}";
+        i += 1;
       }
     }
-  }
 
-  inflight listen() {
-    this.adapter = new ProbotAdapter();
-    this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
+    let var previewUrl = "";
+    let shouldDisplayUrl = status == "running";
+    if(shouldDisplayUrl) {
+      previewUrl = props.environment.url ?? "";
+    }
 
-    this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestContext): void => {
-      // TODO [sa] open a bug for this workaround
-      this.handlePullRequestUpdate(context);
-    });
-
-    this.adapter.handlePullRequstSync(inflight (context: probot.IPullRequestContext): void => {
-      // TODO [sa] open a bug for this workaround
-      this.handlePullRequestUpdate(context);
-    });
-  }
-
-  inflight postComment(event: str) {
-    this.adapter = new ProbotAdapter();
-    this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
-
-    let data = Json.parse(event);
-    if let item = this.prDb.tryGet(data.get("environmentId").asStr()) {
-      let var testsString = "---";
-      if data.get("status").asStr() == "tests" {
-        let testResults = data.get("data").get("testResults");
-        testsString = "";
-        let var i = 0;
-        while true {
-          if let testResult = testResults.tryGetAt(i) {
-            let var icon = "✅";
-            if !testResult.get("pass").asBool() {
-              icon = "❌";
-            }
-            testsString = "${icon} ${testResult.get("path").asStr()}<br> ${testsString}";
-            i += 1;
-          } else {
-            break;
-          }
-        }
-      }
-      let date = std.Datetime.utcNow().toIso();
-      let shouldDisplayUrl = data.get("status").asStr() == "running";
-      let var previewUrl = "";
-      if(shouldDisplayUrl) {
-        previewUrl = item.tryGet("preview_url")?.tryAsStr() ?? "";
-      }
-      let tableRows = "| ${data.get("environmentId").asStr()} | ${data.get("status").asStr()} | ${previewUrl} | ${testsString} | ${date} |";
-      let commentBody = "
+    let date = std.Datetime.utcNow().toIso();
+    let tableRows = "| ${props.project.entryfile} | ${status} | ${previewUrl} | ${testsString} | ${date} |";
+    let commentBody = "
 | Entry Point     | Status | Preview | Tests | Updated (UTC) |
 | --------------- | ------ | ------- | ----- | -------------- |
 ${tableRows}
 ";
-      if let commentId = item.tryGet("comment_id")?.tryAsNum() {
-        log("updating existing preview comment: ${commentId}");
-        this.adapter.auth(item.get("installation_id").asNum()).issues.updateComment(
-          owner: item.get("owner").asStr(),
-          repo: item.get("repo").asStr(),
-          comment_id: commentId,
-          body: commentBody
-        );
-      } else {
-        log("creating a new preview comment");
-        let res = this.adapter.auth(item.get("installation_id").asNum()).issues.createComment(
-          owner: item.get("owner").asStr(),
-          repo: item.get("repo").asStr(),
-          issue_number: item.get("issue_number").asNum(),
-          body: commentBody
-        );
-        log("created preview comment id: ${res.data.id}");
-        this.prDb.upsert(data.get("environmentId").asStr(), {
-          owner: item.get("owner").asStr(),
-          repo: item.get("repo").asStr(),
-          issue_number: item.get("issue_number").asNum(),
-          installation_id: item.get("installation_id").asNum(),
-          comment_id: res.data.id,
-          preview_url: item.tryGet("preview_url")?.tryAsStr() ?? ""
-        });
-      }
+    if let commentId = props.environment.commentId {
+      log("updating existing preview comment: ${commentId}");
+      this.adapter.auth(props.environment.installationId).issues.updateComment(
+        owner: owner,
+        repo: repo,
+        comment_id: commentId,
+        body: commentBody
+      );
+    } else {
+      log("creating a new preview comment");
+      let res = this.adapter.auth(props.environment.installationId).issues.createComment(
+        owner: owner,
+        repo: repo,
+        issue_number: props.environment.prNumber,
+        body: commentBody
+      );
+      log("created preview comment id: ${res.data.id}");
+      this.environments.updateCommentId(id: props.environment.id, projectId: props.environment.projectId, commentId: res.data.id);
     }
   }
 }

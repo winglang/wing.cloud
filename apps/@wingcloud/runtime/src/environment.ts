@@ -6,6 +6,7 @@ import { type GitCommit, GitProvider } from "./git/provider.js";
 
 export class Environment {
   constructor(
+    public id: string,
     public entryfile: string,
     public commit: GitCommit,
   ) {}
@@ -21,7 +22,7 @@ export class Environment {
   }
 
   private bucketKey(key: string) {
-    return `${this.commit.repo}/${this.commit.sha}/${this.entryfile}/${key}.log`;
+    return `${this.id}/${key}.log`;
   }
 
   private hashKey(key: string): string {

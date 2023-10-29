@@ -6,12 +6,14 @@ struct IProbotRepositoryOwner {
 }
 
 struct IProbotRepository {
+  id: str;
   name: str;
   owner: IProbotRepositoryOwner;
 }
 
 struct IPullRequestHead {
   sha: str;
+  ref: str;
 }
 
 struct IPullRequestPR {
@@ -39,3 +41,5 @@ pub struct IPullRequestContext {
 pub struct IPullRequestSyncContext extends IPullRequestContext {}
 
 pub struct IPullRequestOpenedContext extends IPullRequestContext {}
+
+pub struct IPullRequestClosedContext extends IPullRequestContext {}

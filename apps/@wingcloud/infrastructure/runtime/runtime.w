@@ -7,17 +7,23 @@ bring "../containers.w" as containers;
 bring "../flyio" as flyio;
 bring "./runtime-docker.w" as runtimeDocker;
 
-struct RuntimeHandleOptions {
+struct RuntimeStartOptions {
   gitToken: str?;
   gitRepo: str;
   gitSha: str;
   entryfile: str;
   logsBucketName: str;
   wingCloudUrl: str;
+  environmentId: str;
+}
+
+struct RuntimeStopOptions {
+  environmentId: str;
 }
 
 interface IRuntimeHandler {
-  inflight handleRequest(opts: RuntimeHandleOptions): str;
+  inflight start(opts: RuntimeStartOptions): str;
+  inflight stop(opts: RuntimeStopOptions);
 }
 
 class RuntimeHandler_sim impl IRuntimeHandler {
@@ -34,7 +40,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
     });
   }
 
-  pub inflight handleRequest(opts: RuntimeHandleOptions): str {
+  pub inflight start(opts: RuntimeStartOptions): str {
     let var repo = opts.gitRepo;
 
     let volumes = MutMap<str>{};
@@ -48,7 +54,8 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "GIT_SHA" => opts.gitSha,
       "ENTRYFILE" => opts.entryfile,
       "LOGS_BUCKET_NAME" => "stam", // opts.logsBucketName,
-      "WING_CLOUD_URL" => opts.wingCloudUrl
+      "WING_CLOUD_URL" => opts.wingCloudUrl,
+      "ENVIRONMENT_ID" => opts.environmentId,
     };
 
     if let token = opts.gitToken {
@@ -62,6 +69,10 @@ class RuntimeHandler_sim impl IRuntimeHandler {
     } else {
       throw "handleRequest: unable to get container url";
     }
+  }
+
+  pub inflight stop(opts: RuntimeStopOptions) {
+    this.container.stop();
   }
 }
 
@@ -83,11 +94,11 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     this.image = new runtimeDocker.RuntimeDockerImage();
   }
 
-  pub inflight handleRequest(opts: RuntimeHandleOptions): str {
+  pub inflight start(opts: RuntimeStartOptions): str {
     let flyClient = new flyio.Client(this.flyToken);
     flyClient._init(this.flyToken);
     let fly = new flyio.Fly(flyClient);
-    let app = fly.app("wing-preview-${util.nanoid(alphabet: "0123456789abcdefghijklmnopqrstuvwxyz", size: 10)}");
+    let app = fly.app("wing-preview-${util.sha256(opts.environmentId)}");
     let exists = app.exists();
     if !exists {
       app.create();
@@ -98,7 +109,8 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "GIT_SHA" => opts.gitSha,
       "ENTRYFILE" => opts.entryfile,
       "LOGS_BUCKET_NAME" => opts.logsBucketName,
-      "WING_CLOUD_URL" => opts.wingCloudUrl
+      "WING_CLOUD_URL" => opts.wingCloudUrl,
+      "ENVIRONMENT_ID" => opts.environmentId,
     };
 
     if let token = opts.gitToken {
@@ -112,6 +124,17 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     }
 
     return app.url();
+  }
+
+  pub inflight stop(opts: RuntimeStopOptions) {
+    let flyClient = new flyio.Client(this.flyToken);
+    flyClient._init(this.flyToken);
+    let fly = new flyio.Fly(flyClient);
+    let app = fly.app("wing-preview-${util.sha256(opts.environmentId)}");
+    let exists = app.exists();
+    if exists {
+      app.destroy();
+    }
   }
 }
 
@@ -159,18 +182,20 @@ pub class RuntimeService {
       let repo = body.get("repo").asStr();
       let sha = body.get("sha").asStr();
       let entryfile = body.get("entryfile").asStr();
+      let environmentId = body.get("environmentId").asStr();
       let token = body.tryGet("token")?.tryAsStr();
       let logsBucketName = RuntimeService.getBucketName();
 
       log("wing url: ${props.wingCloudUrl}");
 
-      let url = this.runtimeHandler.handleRequest(
+      let url = this.runtimeHandler.start(
         gitToken: token,
         gitRepo: repo,
         gitSha: sha,
         entryfile: entryfile,
         wingCloudUrl: props.wingCloudUrl,
-        logsBucketName: logsBucketName
+        logsBucketName: logsBucketName,
+        environmentId: environmentId,
       );
 
       log("preview environment url: ${url}");
@@ -178,8 +203,23 @@ pub class RuntimeService {
       return {
         status: 200,
         body: Json.stringify({
-          preview_url: url
+          url: url
         })
+      };
+    });
+
+    this.api.delete("/", inflight (req) => {
+      let body = Json.parse(req.body ?? "");
+      let environmentId = body.get("environmentId").asStr();
+      
+      this.runtimeHandler.stop(
+        environmentId: environmentId,
+      );
+
+      log("preview environment deleted: ${environmentId}");
+
+      return {
+        status: 200,
       };
     });
 
