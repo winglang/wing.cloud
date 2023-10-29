@@ -43,6 +43,7 @@ export const Component = () => {
                   className="flex flex-col justify-center items-center w-32 h-32 rounded-lg border border-gray-300 p-4 hover:bg-gray-100 transition duration-300"
                 >
                   <div className="text-center">{project.name}</div>
+                  <div className="text-center">{project.entryfile}</div>
                 </button>
               ))}
             <button

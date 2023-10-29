@@ -6,6 +6,7 @@ bring ex;
 bring "./reverse-proxy.w" as ReverseProxy;
 bring "./users.w" as Users;
 bring "./projects.w" as Projects;
+bring "./environments.w" as Environments;
 bring "./api.w" as wingcloud_api;
 
 bring "./runtime/runtime-callbacks.w" as runtime_callbacks;
@@ -32,6 +33,7 @@ let table = new ex.DynamodbTable(
 );
 let projects = new Projects.Projects(table);
 let users = new Users.Users(table);
+let environments = new Environments.Environments(table);
 
 let wingCloudApi = new wingcloud_api.Api(
   api: api,
@@ -72,6 +74,8 @@ let probotApp = new probot.ProbotApp(
   webhookSecret: util.env("BOT_GITHUB_WEBHOOK_SECRET"),
   runtimeUrl: rntm.api.url,
   runtimeCallbacks: runtimeCallbacks,
+  environments: environments,
+  projects: projects,
 );
 
 bring "cdktf" as cdktf;

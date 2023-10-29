@@ -14,9 +14,10 @@ export async function handler({ logsBucket, wingApiUrl }: HandlerProps) {
   const repo = process.env["GIT_REPO"] || "eladcon/examples";
   const sha = process.env["GIT_SHA"] || "main";
   const entryfile = process.env["ENTRYFILE"] || "examples/redis/main.w";
+  const environmentId = process.env["ENVIRONMENT_ID"] || "test_environment_id";
 
   const gitProvider = getGitProvider(repo, gitToken);
-  const environment = new Environment(entryfile, { repo, sha });
+  const environment = new Environment(environmentId, entryfile, { repo, sha });
 
   await run({
     context: { environment, gitProvider, logsBucket, wingApiUrl },

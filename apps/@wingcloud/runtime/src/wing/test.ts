@@ -1,5 +1,5 @@
 import { compile as compileFn, Target } from "@winglang/compiler";
-import { simulator, std } from "@winglang/sdk";
+import { type simulator, type std } from "@winglang/sdk";
 
 import { Environment } from "../environment.js";
 

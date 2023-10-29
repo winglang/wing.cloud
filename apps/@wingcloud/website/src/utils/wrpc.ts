@@ -30,7 +30,7 @@ export const wrpc = createWRPCReact<{
       project: { id: string; name: string; repository: string; userId: string };
     }
   >;
-  "project.rename": MutationProcedure<{ id: string; name: string }, {}>;
+  "project.rename": MutationProcedure<{ id: string; name: string, repository: string }, {}>;
   "user.listProjects": QueryProcedure<
     undefined,
     {
@@ -39,11 +39,13 @@ export const wrpc = createWRPCReact<{
         name: string;
         repository: string;
         userId: string;
+        entryfile: string;
       }>;
     }
   >;
   "user.createProject": MutationProcedure<{
     repositoryId: string;
     projectName: string;
+    entryfile: string;
   }>;
 }>();

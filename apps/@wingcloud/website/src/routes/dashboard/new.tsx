@@ -14,6 +14,7 @@ export const Component = () => {
   const navigate = useNavigate();
 
   const [projectName, setProjectName] = useState("");
+  const [entryfile, setEntryfile] = useState("");
   const [installationId, setInstallationId] = useState("");
   const [selectedProjectId, setSelectedProjectId] = useState("");
 
@@ -47,6 +48,7 @@ export const Component = () => {
       await createProjectMutation.mutateAsync({
         repositoryId,
         projectName,
+        entryfile,
       });
       navigate("/dashboard/projects");
     },
@@ -66,6 +68,13 @@ export const Component = () => {
                 placeholder="Project Name"
                 value={projectName}
                 onChange={(event) => setProjectName(event.target.value)}
+              />
+
+              <input
+                className="w-full p-2 rounded border focus:outline-none mb-4 bg-sky-50"
+                placeholder="Wing Entryfile"
+                value={entryfile}
+                onChange={(event) => setEntryfile(event.target.value)}
               />
 
               {installations.isLoading && (

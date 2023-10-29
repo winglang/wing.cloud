@@ -171,6 +171,7 @@ pub class Api {
         id: input.get("id").asStr(),
         name: input.get("name").asStr(),
         userId: userId,
+        repository: input.get("repository").asStr(),
       );
 
       return {
@@ -184,6 +185,7 @@ pub class Api {
       projects.delete(
         id: input.get("id").asStr(),
         userId: userId,
+        repository: input.get("repository").asStr(),
       );
     });
     // api.post("/wrpc/project.changeBuildSettings", inflight () => {});
@@ -200,6 +202,7 @@ pub class Api {
         name: input.get("projectName").asStr(),
         repository: input.get("repositoryId").asStr(),
         userId: userId,
+        entryfile: input.get("entryfile").asStr(),
       );
 
       return {
