@@ -254,6 +254,9 @@ pub class RuntimeService {
       log("message parsed");
       queue.push(Json.stringify(message));
       log("message pushed");
+      return {
+        status: 200,
+      };
     });
 
     this.api.delete("/", inflight (req) => {
