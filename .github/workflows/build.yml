@@ -10,6 +10,8 @@ on:
 env:
   NODE_VERSION: "18.16.0"
   PNPM_VERSION: "8.6.3"
+  PROXY_SUBDOMAIN: "dev"
+  PROXY_ZONE_NAME: "wingcloud.io"
 
 jobs:
   build:
