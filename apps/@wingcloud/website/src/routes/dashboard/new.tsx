@@ -102,7 +102,7 @@ export const Component = () => {
               <div className="justify-end flex flex-col gap-1">
                 {repos.data?.repositories.map((repo) => (
                   <div
-                    key={repo.id}
+                    key={repo.full_name}
                     className={clsx(
                       "w-full p-2 rounded border text-left flex items-center",
                     )}
@@ -129,13 +129,13 @@ export const Component = () => {
                           "flex gap-1",
                         )}
                         onClick={() => {
-                          createProject(repo.id.toString());
+                          createProject(repo.full_name);
                         }}
                         disabled={!installationId}
                       >
                         <div>Import</div>
                         {createProjectMutation.isLoading &&
-                          selectedProjectId === repo.id.toString() && (
+                          selectedProjectId === repo.full_name && (
                             <div className="flex justify-center">
                               <SpinnerLoader size="xs" />
                             </div>
