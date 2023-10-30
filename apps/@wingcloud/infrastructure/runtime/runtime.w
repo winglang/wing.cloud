@@ -142,6 +142,15 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   }
 }
 
+struct Message {
+  repo: str;
+  sha: str;
+  entryfile: str;
+  projectId: str;
+  environmentId: str;
+  token: str?;
+}
+
 struct RuntimeServiceProps {
   wingCloudUrl: str;
   flyToken: str?;
@@ -202,28 +211,20 @@ pub class RuntimeService {
       }
     }
 
-    let queue = new cloud.Queue() as "proxy queue";
+    let queue = new cloud.Queue();
     queue.setConsumer(inflight (message) => {
       try {
-        log(message);
-        let json = Json.parse(message);
-        let body = Json.stringify(json.get("body"));
-        let repo = json.get("repo").asStr();
-        let sha = json.get("sha").asStr();
-        let entryfile = json.get("entryfile").asStr();
-        let projectId = json.get("projectId").asStr();
-        let environmentId = json.get("environmentId").asStr();
-        let token = json.tryGet("token")?.tryAsStr();
+        let msg = Message.fromJson(Json.parse(message));
 
         log("wing url: ${props.wingCloudUrl}");
 
         let url = this.runtimeHandler.start(
-          gitToken: token,
-          gitRepo: repo,
-          gitSha: sha,
-          entryfile: entryfile,
+          gitToken: msg.token,
+          gitRepo: msg.repo,
+          gitSha: msg.sha,
+          entryfile: msg.entryfile,
           wingCloudUrl: props.wingCloudUrl,
-          environmentId: environmentId,
+          environmentId: msg.environmentId,
           logsBucketName: bucketName,
           logsBucketRegion: bucketRegion,
           awsAccessKeyId: awsAccessKeyId,
@@ -233,8 +234,8 @@ pub class RuntimeService {
         log("preview environment url: ${url}");
 
         props.environments.updateUrl(
-          id: environmentId,
-          projectId: projectId,
+          id: msg.environmentId,
+          projectId: msg.projectId,
           url: url,
         );
       } catch error {
@@ -245,22 +246,8 @@ pub class RuntimeService {
     this.api = new cloud.Api();
     this.api.post("/", inflight (req) => {
       let body = Json.parse(req.body ?? "");
-      let repo = body.get("repo").asStr();
-      let sha = body.get("sha").asStr();
-      let entryfile = body.get("entryfile").asStr();
-      let projectId = body.get("projectId").asStr();
-      let environmentId = body.get("environmentId").asStr();
-      let token = body.tryGet("token")?.tryAsStr();
-
-      queue.push(Json.stringify({
-        body: body,
-        repo: repo,
-        sha: sha,
-        entryfile: entryfile,
-        projectId: projectId,
-        environmentId: environmentId,
-        token: token,
-      }));
+      let message = Message.fromJson(body);
+      queue.push(Json.stringify(message));
     });
 
     this.api.delete("/", inflight (req) => {
