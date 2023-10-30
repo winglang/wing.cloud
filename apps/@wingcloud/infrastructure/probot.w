@@ -142,13 +142,9 @@ pub class ProbotApp {
       }
     );
     queue.setConsumer(inflight (message) => {
-      log("new message = ${message}");
       let props = VerifyAndReceieveProps.fromJson(Json.parse(message));
-      log("before listen");
       this.listen();
-      log("after listen");
       this.adapter.verifyAndReceive(props);
-      log("after verifyAndReceive");
       }, { timeout: 1m });
 
     this.runtimeCallbacks.onStatus(inflight (event) => {
