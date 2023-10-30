@@ -5,6 +5,7 @@ import {
   NodeProject,
   TypescriptConfig,
   Eslint,
+  Turbo,
 } from "@skyrpex/wingen";
 import { JsonFile, web } from "projen";
 
@@ -46,15 +47,10 @@ flyio.addDevDeps("jsii-pacmak");
 
 flyio.tryRemoveFile("./tsconfig.json");
 
-new JsonFile(flyio, "turbo.json", {
-  marker: false,
-  obj: {
-    $schema: "https://turbo.build/schema.json",
-    extends: ["//"],
-    pipeline: {
-      compile: {
-        outputs: ["./src/**/*.js", "./src/**/*.d.ts"],
-      },
+new Turbo(flyio, {
+  pipeline: {
+    compile: {
+      outputs: ["./src/**/*.js", "./src/**/*.d.ts"],
     },
   },
 });
@@ -142,6 +138,17 @@ new TypescriptConfig(website, {
 });
 new Eslint(website);
 
+new Turbo(website, {
+  pipeline: {
+    compile: {
+      dotEnv: [".env"],
+    },
+    dev: {
+      dependsOn: ["^compile"],
+    },
+  },
+});
+
 website.addDeps("vite");
 website.addScript("dev", "vite dev");
 website.addScript("compile", "vite build");
@@ -170,6 +177,8 @@ website.addDevDeps("@aws-sdk/client-dynamodb");
 website.addGitIgnore("/.wingcloud/");
 
 website.addGitIgnore("/.env");
+website.addGitIgnore("/.env.*");
+website.addGitIgnore("!/.env.example");
 
 {
   const tsconfig = website.tryFindObjectFile("tsconfig.json")!;
@@ -182,22 +191,113 @@ website.addDevDeps("node-fetch");
 website.addDevDeps("nanoid");
 
 ///////////////////////////////////////////////////////////////////////////////
+const runtime = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/runtime",
+  outdir: "apps/@wingcloud/runtime",
+  tsup: {
+    entry: ["src/**/*.ts"],
+    outDir: "lib",
+    format: ["esm"],
+    target: "node18",
+    dts: true,
+    bundle: false,
+    clean: true,
+  },
+});
+
+runtime.addDeps(`winglang`);
+runtime.addDeps(`@winglang/sdk`);
+runtime.addDeps(`@winglang/compiler`);
+runtime.addDeps(`@wingconsole/app`);
+runtime.addDeps("express");
+runtime.addDeps("jsonwebtoken");
+runtime.addDeps("jwk-to-pem");
+runtime.addDeps("jose");
+runtime.addDeps("node-fetch");
+
+runtime.addDevDeps("@types/express");
+runtime.addDevDeps("@types/jsonwebtoken");
+runtime.addDevDeps("@types/jwk-to-pem");
+runtime.addDevDeps("simple-git");
+runtime.addDevDeps("msw");
+
+runtime.addGitIgnore("target/");
+
+runtime.devTask.exec("tsup --watch --onSuccess 'node lib/entrypoint-local.js'");
+
+///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
   monorepo,
   name: "@wingcloud/infrastructure",
   outdir: "apps/@wingcloud/infrastructure",
 });
 infrastructure.addFields({ type: "commonjs" });
-infrastructure.addGitIgnore("/.env");
 
+infrastructure.addDevDeps("dotenv", "dotenv-expand");
+infrastructure.addGitIgnore("/.env");
+infrastructure.addGitIgnore("/.env.*");
+infrastructure.addGitIgnore("!/.env.example");
+
+infrastructure.addGitIgnore("/target/");
 infrastructure.addDeps(`winglang`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
-infrastructure.devTask.exec(
-  "source .env && export $(cut -d= -f1 < .env) && wing it main.w",
+infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
+infrastructure.compileTask.exec(
+  "node ./bin/wing.mjs compile --target tf-aws --plugins override-function-memory.js",
 );
-infrastructure.compileTask.exec("wing compile main.w --target sim");
-infrastructure.compileTask.exec("wing compile main.w --target tf-aws");
-infrastructure.addGitIgnore("/target/");
+
+const terraformInitTask = infrastructure.addTask("terraformInit");
+terraformInitTask.exec(
+  "node ./bin/terraform.mjs -chdir=target/main.tfaws init -input=false",
+);
+
+const planTask = infrastructure.addTask("plan");
+planTask.exec(
+  "node ./bin/terraform.mjs -chdir=target/main.tfaws plan -input=false -out=tfplan",
+);
+
+const deployTask = infrastructure.addTask("deploy");
+deployTask.exec(
+  "node ./bin/terraform.mjs -chdir=target/main.tfaws apply -input=false -auto-approve tfplan",
+);
+
+new Turbo(infrastructure, {
+  pipeline: {
+    [terraformInitTask.name]: {
+      inputs: ["package.json"],
+      outputs: [
+        "target/main.tfaws/.terraform",
+        "target/main.tfaws/.terraform.lock.hcl",
+      ],
+    },
+    compile: {
+      dependsOn: [terraformInitTask.name],
+      dotEnv: [".env"],
+      outputs: [
+        "target/main.tfaws/**",
+        "!target/main.tfaws/.terraform.lock.hcl",
+        "!target/main.tfaws/.terraform",
+        "!target/main.tfaws/terraform.tfstate",
+        "!target/main.tfaws/terraform.tfstate.backup",
+        "!target/main.tfaws/tfplan",
+      ],
+    },
+    [planTask.name]: {
+      dependsOn: ["compile"],
+      // outputs: ["target/main.tfaws/tfplan"],
+      cache: false,
+    },
+    deploy: {
+      // dependsOn: ["^compile"],
+      dependsOn: [planTask.name],
+      cache: false,
+    },
+    dev: {
+      dependsOn: ["^compile"],
+    },
+  },
+});
 
 infrastructure.addDeps("express", "@vendia/serverless-express");
 infrastructure.addDeps("@probot/adapter-aws-lambda-serverless");
@@ -235,42 +335,7 @@ infrastructure.addDeps("octokit", "node-fetch");
 
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(flyio.name);
-
-///////////////////////////////////////////////////////////////////////////////
-const runtime = new TypescriptProject({
-  monorepo,
-  name: "@wingcloud/runtime",
-  outdir: "apps/@wingcloud/runtime",
-  tsup: {
-    entry: ["src/**/*.ts"],
-    outDir: "lib",
-    format: ["esm"],
-    target: "node18",
-    dts: true,
-    bundle: false,
-    clean: true,
-  },
-});
-
-runtime.addDeps(`winglang`);
-runtime.addDeps(`@winglang/sdk`);
-runtime.addDeps(`@winglang/compiler`);
-runtime.addDeps(`@wingconsole/app`);
-runtime.addDeps("express");
-runtime.addDeps("jsonwebtoken");
-runtime.addDeps("jwk-to-pem");
-runtime.addDeps("jose");
-runtime.addDeps("node-fetch");
-
-runtime.addDevDeps("@types/express");
-runtime.addDevDeps("@types/jsonwebtoken");
-runtime.addDevDeps("@types/jwk-to-pem");
-runtime.addDevDeps("simple-git");
-runtime.addDevDeps("msw");
-
-runtime.addGitIgnore("target/");
-
-runtime.devTask.exec("tsup --watch --onSuccess 'node lib/entrypoint-local.js'");
+infrastructure.addDevDeps(runtime.name);
 
 ///////////////////////////////////////////////////////////////////////////////
 monorepo.synth();
