@@ -145,7 +145,7 @@ pub class ProbotApp {
       let props = VerifyAndReceieveProps.fromJson(Json.parse(message));
       this.listen();
       this.adapter.verifyAndReceive(props);
-    });
+      }, { timeout: 1m });
 
     this.runtimeCallbacks.onStatus(inflight (event) => {
       log("report status: ${event}");
@@ -217,21 +217,13 @@ pub class ProbotApp {
             repo: "${owner}/${repo}",
             sha: context.payload.pull_request.head.sha,
             entryfile: project.entryfile,
+            projectId: project.id,
             environmentId: environment.id,
           }));
 
           if !res.ok {
             throw "handlePullRequstOpened: runtime service error ${res.body}";
           }
-
-          if let body = res.body {
-            if let url = Json.tryParse(body)?.get("url")?.tryAsStr() {
-              this.environments.updateUrl(id: environment.id, projectId: project.id, url: url);
-              return;
-            }
-          }
-
-          throw "handlePullRequstOpened: invalid runtime service response ${res.body}";
         } else {
           throw "handlePullRequstOpened: missing installation id";
         }

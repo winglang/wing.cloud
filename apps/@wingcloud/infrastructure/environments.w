@@ -263,7 +263,8 @@ pub class Environments {
         status: item.get("status").asStr(),
         prNumber: item.get("prNumber").asNum(),
         installationId: item.get("installationId").asNum(),
-        url: item.tryGet("url")?.asStr(),
+        // https://github.com/winglang/wing/issues/4470
+        url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
       }]);
     }

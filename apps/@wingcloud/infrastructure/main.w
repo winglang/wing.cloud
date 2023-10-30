@@ -67,6 +67,7 @@ let rntm = new runtime.RuntimeService(
   wingCloudUrl: api.url,
   flyToken: util.tryEnv("FLY_TOKEN"),
   flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
+  environments: environments,
 );
 let probotApp = new probot.ProbotApp(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
@@ -77,8 +78,8 @@ let probotApp = new probot.ProbotApp(
   environments: environments,
   projects: projects,
 );
-
 bring "cdktf" as cdktf;
+new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
 
 let apiDomainName = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
@@ -87,7 +88,6 @@ let apiDomainName = (() => {
   }
   return api.url;
 })();
-new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
 let subDomain = util.env("PROXY_SUBDOMAIN");
 let zoneName = util.env("PROXY_ZONE_NAME");
 let proxy = new ReverseProxy.ReverseProxy(
@@ -124,3 +124,4 @@ if util.tryEnv("WING_TARGET") == "sim" {
     log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
   });
 }
+

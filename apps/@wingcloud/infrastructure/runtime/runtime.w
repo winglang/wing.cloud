@@ -6,6 +6,7 @@ bring "constructs" as constructs;
 bring "../containers.w" as containers;
 bring "../flyio" as flyio;
 bring "./runtime-docker.w" as runtimeDocker;
+bring "../environments.w" as environments;
 
 struct RuntimeStartOptions {
   gitToken: str?;
@@ -141,10 +142,20 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   }
 }
 
+struct Message {
+  repo: str;
+  sha: str;
+  entryfile: str;
+  projectId: str;
+  environmentId: str;
+  token: str?;
+}
+
 struct RuntimeServiceProps {
   wingCloudUrl: str;
   flyToken: str?;
   flyOrgSlug: str?;
+  environments: environments.Environments;
 }
 
 bring "@cdktf/provider-aws" as aws;
@@ -200,37 +211,45 @@ pub class RuntimeService {
       }
     }
 
+    let queue = new cloud.Queue();
+    queue.setConsumer(inflight (message) => {
+      try {
+        let msg = Message.fromJson(Json.parse(message));
+
+        log("wing url: ${props.wingCloudUrl}");
+
+        let url = this.runtimeHandler.start(
+          gitToken: msg.token,
+          gitRepo: msg.repo,
+          gitSha: msg.sha,
+          entryfile: msg.entryfile,
+          wingCloudUrl: props.wingCloudUrl,
+          environmentId: msg.environmentId,
+          logsBucketName: bucketName,
+          logsBucketRegion: bucketRegion,
+          awsAccessKeyId: awsAccessKeyId,
+          awsSecretAccessKey: awsSecretAccessKey,
+        );
+
+        log("preview environment url: ${url}");
+
+        props.environments.updateUrl(
+          id: msg.environmentId,
+          projectId: msg.projectId,
+          url: url,
+        );
+      } catch error {
+        log(error);
+      }
+    }, { timeout: 1m });
+
     this.api = new cloud.Api();
     this.api.post("/", inflight (req) => {
       let body = Json.parse(req.body ?? "");
-      let repo = body.get("repo").asStr();
-      let sha = body.get("sha").asStr();
-      let entryfile = body.get("entryfile").asStr();
-      let environmentId = body.get("environmentId").asStr();
-      let token = body.tryGet("token")?.tryAsStr();
-
-      log("wing url: ${props.wingCloudUrl}");
-
-      let url = this.runtimeHandler.start(
-        gitToken: token,
-        gitRepo: repo,
-        gitSha: sha,
-        entryfile: entryfile,
-        wingCloudUrl: props.wingCloudUrl,
-        environmentId: environmentId,
-        logsBucketName: bucketName,
-        logsBucketRegion: bucketRegion,
-        awsAccessKeyId: awsAccessKeyId,
-        awsSecretAccessKey: awsSecretAccessKey,
-      );
-
-      log("preview environment url: ${url}");
-
+      let message = Message.fromJson(body);
+      queue.push(Json.stringify(message));
       return {
         status: 200,
-        body: Json.stringify({
-          url: url
-        })
       };
     });
 
