@@ -214,7 +214,9 @@ pub class RuntimeService {
     let queue = new cloud.Queue();
     queue.setConsumer(inflight (message) => {
       try {
+        log("runtime message = ${message}");
         let msg = Message.fromJson(Json.parse(message));
+        log("msg parsed");
 
         log("wing url: ${props.wingCloudUrl}");
 
@@ -241,13 +243,17 @@ pub class RuntimeService {
       } catch error {
         log(error);
       }
-    });
+    }, { timeout: 1m });
 
     this.api = new cloud.Api();
     this.api.post("/", inflight (req) => {
+      log("runtime POST / == req.body = ...");
       let body = Json.parse(req.body ?? "");
+      log("runtime POST / == body = ...");
       let message = Message.fromJson(body);
+      log("message parsed");
       queue.push(Json.stringify(message));
+      log("message pushed");
     });
 
     this.api.delete("/", inflight (req) => {

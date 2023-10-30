@@ -142,10 +142,14 @@ pub class ProbotApp {
       }
     );
     queue.setConsumer(inflight (message) => {
+      log("new message = ${message}");
       let props = VerifyAndReceieveProps.fromJson(Json.parse(message));
+      log("before listen");
       this.listen();
+      log("after listen");
       this.adapter.verifyAndReceive(props);
-    });
+      log("after verifyAndReceive");
+      }, { timeout: 1m });
 
     this.runtimeCallbacks.onStatus(inflight (event) => {
       log("report status: ${event}");
@@ -197,6 +201,7 @@ pub class ProbotApp {
     this.adapter = new ProbotAdapter();
     this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
     let onPullRequestOpen = inflight (context: probot.IPullRequestOpenedContext): void => {
+      log("onPullRequestOpen");
       let owner = context.payload.repository.owner.login;
       let repo = context.payload.repository.name;
       let branch = context.payload.pull_request.head.ref;
