@@ -14,7 +14,7 @@ importers:
     devDependencies:
       '@skyrpex/wingen':
         specifier: ^0.6.4
-        version: 0.6.4(projen@0.76.12)
+        version: 0.6.4(projen@0.76.13)
       '@types/node':
         specifier: '18'
         version: 18.18.7
@@ -22,8 +22,8 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3
       projen:
-        specifier: ^0.76.12
-        version: 0.76.12(constructs@10.3.0)
+        specifier: ^0.76.13
+        version: 0.76.13(constructs@10.3.0)
       tsx:
         specifier: ^3.14.0
         version: 3.14.0
@@ -34,8 +34,8 @@ importers:
   apps/@wingcloud/infrastructure:
     dependencies:
       '@cdktf/provider-aws':
-        specifier: ^18.0.2
-        version: 18.0.2(cdktf@0.19.0)(constructs@10.3.0)
+        specifier: ^18.0.3
+        version: 18.0.3(cdktf@0.19.0)(constructs@10.3.0)
       '@cdktf/provider-dnsimple':
         specifier: ^8.0.0
         version: 8.0.0(cdktf@0.19.0)(constructs@10.3.0)
@@ -82,12 +82,12 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1
       winglang:
-        specifier: ^0.41.28
-        version: 0.41.28(constructs@10.3.0)
+        specifier: ^0.41.35
+        version: 0.41.35(constructs@10.3.0)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.315
-        version: 0.0.315(eslint@8.52.0)
+        specifier: ^0.0.317
+        version: 0.0.317(eslint@8.52.0)
       '@types/cookie':
         specifier: ^0.5.3
         version: 0.5.3
@@ -140,8 +140,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.52.0)(prettier@3.0.3)
       eslint-plugin-unicorn:
-        specifier: ^48.0.1
-        version: 48.0.1(eslint@8.52.0)
+        specifier: ^49.0.0
+        version: 49.0.0(eslint@8.52.0)
       tsx:
         specifier: ^3.14.0
         version: 3.14.0
@@ -155,14 +155,14 @@ importers:
   apps/@wingcloud/runtime:
     dependencies:
       '@wingconsole/app':
-        specifier: ^0.41.28
-        version: 0.41.28(constructs@10.2.70)
+        specifier: ^0.41.35
+        version: 0.41.35(constructs@10.2.70)
       '@winglang/compiler':
-        specifier: ^0.41.28
-        version: 0.41.28(constructs@10.2.70)
+        specifier: ^0.41.35
+        version: 0.41.35(constructs@10.2.70)
       '@winglang/sdk':
-        specifier: ^0.41.28
-        version: 0.41.28(constructs@10.2.70)
+        specifier: ^0.41.35
+        version: 0.41.35(constructs@10.2.70)
       express:
         specifier: ^4.18.2
         version: 4.18.2
@@ -179,12 +179,12 @@ importers:
         specifier: ^3.3.2
         version: 3.3.2
       winglang:
-        specifier: ^0.41.28
-        version: 0.41.28(constructs@10.2.70)
+        specifier: ^0.41.35
+        version: 0.41.35(constructs@10.2.70)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.315
-        version: 0.0.315(eslint@8.52.0)
+        specifier: ^0.0.317
+        version: 0.0.317(eslint@8.52.0)
       '@types/express':
         specifier: ^4.17.20
         version: 4.17.20
@@ -219,8 +219,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.52.0)(prettier@3.0.3)
       eslint-plugin-unicorn:
-        specifier: ^48.0.1
-        version: 48.0.1(eslint@8.52.0)
+        specifier: ^49.0.0
+        version: 49.0.0(eslint@8.52.0)
       msw:
         specifier: ^1.3.2
         version: 1.3.2(typescript@5.2.2)
@@ -249,8 +249,8 @@ importers:
         specifier: ^2.0.18
         version: 2.0.18(react@18.2.0)
       '@tanstack/react-query':
-        specifier: ^5.0.5
-        version: 5.0.5(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^5.4.3
+        version: 5.4.3(react-dom@18.2.0)(react@18.2.0)
       '@wingcloud/wrpc':
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/wrpc
@@ -274,11 +274,11 @@ importers:
         version: 4.5.0(@types/node@18.18.7)
     devDependencies:
       '@aws-sdk/client-dynamodb':
-        specifier: ^3.437.0
-        version: 3.437.0
+        specifier: ^3.438.0
+        version: 3.438.0
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.315
-        version: 0.0.315(eslint@8.52.0)
+        specifier: ^0.0.317
+        version: 0.0.317(eslint@8.52.0)
       '@types/node':
         specifier: '18'
         version: 18.18.7
@@ -319,8 +319,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.52.0)(prettier@3.0.3)
       eslint-plugin-unicorn:
-        specifier: ^48.0.1
-        version: 48.0.1(eslint@8.52.0)
+        specifier: ^49.0.0
+        version: 49.0.0(eslint@8.52.0)
       get-port:
         specifier: ^7.0.0
         version: 7.0.0
@@ -353,8 +353,8 @@ importers:
         version: 0.5.0
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.315
-        version: 0.0.315(eslint@8.52.0)
+        specifier: ^0.0.317
+        version: 0.0.317(eslint@8.52.0)
       '@types/cookie':
         specifier: ^0.5.3
         version: 0.5.3
@@ -386,8 +386,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.52.0)(prettier@3.0.3)
       eslint-plugin-unicorn:
-        specifier: ^48.0.1
-        version: 48.0.1(eslint@8.52.0)
+        specifier: ^49.0.0
+        version: 49.0.0(eslint@8.52.0)
       express:
         specifier: ^4.18.2
         version: 4.18.2
@@ -408,8 +408,8 @@ importers:
         version: 2.7.0
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.315
-        version: 0.0.315(eslint@8.52.0)
+        specifier: ^0.0.317
+        version: 0.0.317(eslint@8.52.0)
       '@types/node':
         specifier: '18'
         version: 18.18.7
@@ -438,11 +438,11 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.52.0)(prettier@3.0.3)
       eslint-plugin-unicorn:
-        specifier: ^48.0.1
-        version: 48.0.1(eslint@8.52.0)
+        specifier: ^49.0.0
+        version: 49.0.0(eslint@8.52.0)
       jsii:
-        specifier: ^5.2.20
-        version: 5.2.20
+        specifier: ^5.2.22
+        version: 5.2.22
       jsii-pacmak:
         specifier: ^1.91.0
         version: 1.91.0
@@ -459,8 +459,8 @@ importers:
   packages/@wingcloud/get-environment-variable:
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.315
-        version: 0.0.315(eslint@8.52.0)
+        specifier: ^0.0.317
+        version: 0.0.317(eslint@8.52.0)
       '@types/node':
         specifier: '18'
         version: 18.18.7
@@ -486,8 +486,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.52.0)(prettier@3.0.3)
       eslint-plugin-unicorn:
-        specifier: ^48.0.1
-        version: 48.0.1(eslint@8.52.0)
+        specifier: ^49.0.0
+        version: 49.0.0(eslint@8.52.0)
       tsx:
         specifier: ^3.14.0
         version: 3.14.0
@@ -505,8 +505,8 @@ importers:
         version: 5.0.2
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.315
-        version: 0.0.315(eslint@8.52.0)
+        specifier: ^0.0.317
+        version: 0.0.317(eslint@8.52.0)
       '@types/node':
         specifier: '18'
         version: 18.18.7
@@ -532,8 +532,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.52.0)(prettier@3.0.3)
       eslint-plugin-unicorn:
-        specifier: ^48.0.1
-        version: 48.0.1(eslint@8.52.0)
+        specifier: ^49.0.0
+        version: 49.0.0(eslint@8.52.0)
       tsx:
         specifier: ^3.14.0
         version: 3.14.0
@@ -547,8 +547,8 @@ importers:
   packages/@wingcloud/type-opaque:
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.315
-        version: 0.0.315(eslint@8.52.0)
+        specifier: ^0.0.317
+        version: 0.0.317(eslint@8.52.0)
       '@types/node':
         specifier: '18'
         version: 18.18.7
@@ -574,8 +574,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.52.0)(prettier@3.0.3)
       eslint-plugin-unicorn:
-        specifier: ^48.0.1
-        version: 48.0.1(eslint@8.52.0)
+        specifier: ^49.0.0
+        version: 49.0.0(eslint@8.52.0)
       tsx:
         specifier: ^3.14.0
         version: 3.14.0
@@ -596,8 +596,8 @@ importers:
         version: 3.22.4
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.315
-        version: 0.0.315(eslint@8.52.0)
+        specifier: ^0.0.317
+        version: 0.0.317(eslint@8.52.0)
       '@types/node':
         specifier: '18'
         version: 18.18.7
@@ -623,8 +623,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.52.0)(prettier@3.0.3)
       eslint-plugin-unicorn:
-        specifier: ^48.0.1
-        version: 48.0.1(eslint@8.52.0)
+        specifier: ^49.0.0
+        version: 49.0.0(eslint@8.52.0)
       tsx:
         specifier: ^3.14.0
         version: 3.14.0
@@ -648,11 +648,11 @@ importers:
   packages/@wingcloud/wrpc:
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.315
-        version: 0.0.315(eslint@8.52.0)
+        specifier: ^0.0.317
+        version: 0.0.317(eslint@8.52.0)
       '@tanstack/react-query':
-        specifier: ^5.0.5
-        version: 5.0.5(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^5.4.3
+        version: 5.4.3(react-dom@18.2.0)(react@18.2.0)
       '@types/node':
         specifier: '18'
         version: 18.18.7
@@ -681,8 +681,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.52.0)(prettier@3.0.3)
       eslint-plugin-unicorn:
-        specifier: ^48.0.1
-        version: 48.0.1(eslint@8.52.0)
+        specifier: ^49.0.0
+        version: 49.0.0(eslint@8.52.0)
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -757,24 +757,24 @@ packages:
       tslib: 1.14.1
     dev: true
 
-  /@aws-sdk/client-dynamodb@3.437.0:
-    resolution: {integrity: sha512-z7gnSKVhX2FxAA+jlCQHABrL6xE3jKupUrP9xXOi1Hp7GGXajh71gCAI6l2ay0YTnnu8dlIH4gd+p95g52CQTw==}
+  /@aws-sdk/client-dynamodb@3.438.0:
+    resolution: {integrity: sha512-LBKYjMezMRsxXP1BDnav/rUpwTOXrnD8OQKeYMbVfH0mmCDwd7Ac0cMyRM1c14sdm6Rr0gOCHIZ3Mjbup9r27Q==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sts': 3.437.0
+      '@aws-sdk/client-sts': 3.438.0
       '@aws-sdk/core': 3.436.0
-      '@aws-sdk/credential-provider-node': 3.437.0
+      '@aws-sdk/credential-provider-node': 3.438.0
       '@aws-sdk/middleware-endpoint-discovery': 3.433.0
       '@aws-sdk/middleware-host-header': 3.433.0
       '@aws-sdk/middleware-logger': 3.433.0
       '@aws-sdk/middleware-recursion-detection': 3.433.0
       '@aws-sdk/middleware-signing': 3.433.0
-      '@aws-sdk/middleware-user-agent': 3.433.0
+      '@aws-sdk/middleware-user-agent': 3.438.0
       '@aws-sdk/region-config-resolver': 3.433.0
       '@aws-sdk/types': 3.433.0
-      '@aws-sdk/util-endpoints': 3.433.0
+      '@aws-sdk/util-endpoints': 3.438.0
       '@aws-sdk/util-user-agent-browser': 3.433.0
       '@aws-sdk/util-user-agent-node': 3.437.0
       '@smithy/config-resolver': 2.0.16
@@ -797,6 +797,7 @@ packages:
       '@smithy/util-body-length-node': 2.1.0
       '@smithy/util-defaults-mode-browser': 2.0.16
       '@smithy/util-defaults-mode-node': 2.0.21
+      '@smithy/util-endpoints': 1.0.2
       '@smithy/util-retry': 2.0.5
       '@smithy/util-utf8': 2.0.0
       '@smithy/util-waiter': 2.0.12
@@ -806,8 +807,8 @@ packages:
       - aws-crt
     dev: true
 
-  /@aws-sdk/client-sso@3.437.0:
-    resolution: {integrity: sha512-AxlLWz9ec3b8Bt+RqRb2Q1ucGQtKrLdKDna+UTjz7AouB/jpoMiegV9NHXVX64N6YFnQnvB0UEGigXiOQE+y/g==}
+  /@aws-sdk/client-sso@3.438.0:
+    resolution: {integrity: sha512-L/xKq+K78PShLku8x5gM6lZDUp7LhFJ2ksKH7Vll+exSZq+QUaxuzjp4gqdzh6B0oIshv2jssQlUa0ScOmVRMg==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
@@ -816,10 +817,10 @@ packages:
       '@aws-sdk/middleware-host-header': 3.433.0
       '@aws-sdk/middleware-logger': 3.433.0
       '@aws-sdk/middleware-recursion-detection': 3.433.0
-      '@aws-sdk/middleware-user-agent': 3.433.0
+      '@aws-sdk/middleware-user-agent': 3.438.0
       '@aws-sdk/region-config-resolver': 3.433.0
       '@aws-sdk/types': 3.433.0
-      '@aws-sdk/util-endpoints': 3.433.0
+      '@aws-sdk/util-endpoints': 3.438.0
       '@aws-sdk/util-user-agent-browser': 3.433.0
       '@aws-sdk/util-user-agent-node': 3.437.0
       '@smithy/config-resolver': 2.0.16
@@ -842,6 +843,7 @@ packages:
       '@smithy/util-body-length-node': 2.1.0
       '@smithy/util-defaults-mode-browser': 2.0.16
       '@smithy/util-defaults-mode-node': 2.0.21
+      '@smithy/util-endpoints': 1.0.2
       '@smithy/util-retry': 2.0.5
       '@smithy/util-utf8': 2.0.0
       tslib: 2.6.2
@@ -849,23 +851,23 @@ packages:
       - aws-crt
     dev: true
 
-  /@aws-sdk/client-sts@3.437.0:
-    resolution: {integrity: sha512-ilLcrCVwH81UbKNpB9Vax1Fw/mNx2d/bWXkCNXPvrExO+K39VFGS/VijOuSrru2iBq844NlG3uQV8DL/nbiKdA==}
+  /@aws-sdk/client-sts@3.438.0:
+    resolution: {integrity: sha512-UBxLZKVVvbR4LHwSNSqaKx22YBSOGkavrh4SyDP8o8XOlXeRxTCllfSfjL9K5Mktp+ZwQ2NiubNcwmvUcGKbbg==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
       '@aws-sdk/core': 3.436.0
-      '@aws-sdk/credential-provider-node': 3.437.0
+      '@aws-sdk/credential-provider-node': 3.438.0
       '@aws-sdk/middleware-host-header': 3.433.0
       '@aws-sdk/middleware-logger': 3.433.0
       '@aws-sdk/middleware-recursion-detection': 3.433.0
       '@aws-sdk/middleware-sdk-sts': 3.433.0
       '@aws-sdk/middleware-signing': 3.433.0
-      '@aws-sdk/middleware-user-agent': 3.433.0
+      '@aws-sdk/middleware-user-agent': 3.438.0
       '@aws-sdk/region-config-resolver': 3.433.0
       '@aws-sdk/types': 3.433.0
-      '@aws-sdk/util-endpoints': 3.433.0
+      '@aws-sdk/util-endpoints': 3.438.0
       '@aws-sdk/util-user-agent-browser': 3.433.0
       '@aws-sdk/util-user-agent-node': 3.437.0
       '@smithy/config-resolver': 2.0.16
@@ -888,6 +890,7 @@ packages:
       '@smithy/util-body-length-node': 2.1.0
       '@smithy/util-defaults-mode-browser': 2.0.16
       '@smithy/util-defaults-mode-node': 2.0.21
+      '@smithy/util-endpoints': 1.0.2
       '@smithy/util-retry': 2.0.5
       '@smithy/util-utf8': 2.0.0
       fast-xml-parser: 4.2.5
@@ -913,13 +916,13 @@ packages:
       tslib: 2.6.2
     dev: true
 
-  /@aws-sdk/credential-provider-ini@3.437.0:
-    resolution: {integrity: sha512-UybiJxYPvdwok5OcI9LakaHmaWZBdkX0gY8yU2n7TomYgWOwDJ88MpQgjXUJJ249PH+9/+How5H3vnFp0xJ0uQ==}
+  /@aws-sdk/credential-provider-ini@3.438.0:
+    resolution: {integrity: sha512-WYPQR3pXoHJjn9/RMWipUhsUNFy6zhOiII6u8LJ5w84aNqIjV4+BdRYztRNGJD98jdtekhbkX0YKoSuZqP+unQ==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@aws-sdk/credential-provider-env': 3.433.0
       '@aws-sdk/credential-provider-process': 3.433.0
-      '@aws-sdk/credential-provider-sso': 3.437.0
+      '@aws-sdk/credential-provider-sso': 3.438.0
       '@aws-sdk/credential-provider-web-identity': 3.433.0
       '@aws-sdk/types': 3.433.0
       '@smithy/credential-provider-imds': 2.0.18
@@ -931,14 +934,14 @@ packages:
       - aws-crt
     dev: true
 
-  /@aws-sdk/credential-provider-node@3.437.0:
-    resolution: {integrity: sha512-FMtgEe/me68xZQsymEpMcw7OuuiHaHx/Tp5EqZP5FC0Yv1yX3qr/ncIWU2zY3a9K0iLERmzQI1g3CMd8r4sy8A==}
+  /@aws-sdk/credential-provider-node@3.438.0:
+    resolution: {integrity: sha512-uaw3D2R0svyrC32qyZ2aOv/l0AT9eClh+eQsZJTQD3Kz9q+2VdeOBThQ8fsMfRtm26nUbZo6A/CRwxkm6okI+w==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@aws-sdk/credential-provider-env': 3.433.0
-      '@aws-sdk/credential-provider-ini': 3.437.0
+      '@aws-sdk/credential-provider-ini': 3.438.0
       '@aws-sdk/credential-provider-process': 3.433.0
-      '@aws-sdk/credential-provider-sso': 3.437.0
+      '@aws-sdk/credential-provider-sso': 3.438.0
       '@aws-sdk/credential-provider-web-identity': 3.433.0
       '@aws-sdk/types': 3.433.0
       '@smithy/credential-provider-imds': 2.0.18
@@ -961,12 +964,12 @@ packages:
       tslib: 2.6.2
     dev: true
 
-  /@aws-sdk/credential-provider-sso@3.437.0:
-    resolution: {integrity: sha512-kijtnyyA6/+ipOef4KACsLDUTFWDZ97DSWKU0hJFyGEfelaon6o7NNVufuVOWrBNyklNWZqvPLuwWWQCxb6fuQ==}
+  /@aws-sdk/credential-provider-sso@3.438.0:
+    resolution: {integrity: sha512-Xykli/64xR18cBV5P0XFxcH120omtfAjC/cFy/9nFU/+dPvbk0uu1yEOZYteWHyGGkPN4PkHmbh60GiUCLQkWQ==}
     engines: {node: '>=14.0.0'}
     dependencies:
-      '@aws-sdk/client-sso': 3.437.0
-      '@aws-sdk/token-providers': 3.437.0
+      '@aws-sdk/client-sso': 3.438.0
+      '@aws-sdk/token-providers': 3.438.0
       '@aws-sdk/types': 3.433.0
       '@smithy/property-provider': 2.0.13
       '@smithy/shared-ini-file-loader': 2.2.2
@@ -1058,12 +1061,12 @@ packages:
       tslib: 2.6.2
     dev: true
 
-  /@aws-sdk/middleware-user-agent@3.433.0:
-    resolution: {integrity: sha512-jMgA1jHfisBK4oSjMKrtKEZf0sl2vzADivkFmyZFzORpSZxBnF6hC21RjaI+70LJLcc9rSCzLgcoz5lHb9LLDg==}
+  /@aws-sdk/middleware-user-agent@3.438.0:
+    resolution: {integrity: sha512-a+xHT1wOxT6EA6YyLmrfaroKWOkwwyiktUfXKM0FsUutGzNi4fKhb5NZ2al58NsXzHgHFrasSDp+Lqbd/X2cEw==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@aws-sdk/types': 3.433.0
-      '@aws-sdk/util-endpoints': 3.433.0
+      '@aws-sdk/util-endpoints': 3.438.0
       '@smithy/protocol-http': 3.0.8
       '@smithy/types': 2.4.0
       tslib: 2.6.2
@@ -1080,8 +1083,8 @@ packages:
       tslib: 2.6.2
     dev: true
 
-  /@aws-sdk/token-providers@3.437.0:
-    resolution: {integrity: sha512-nV9qIuG0+6XJb7hWpCC+/K7RoY3PZUWndP8BRQv7PQhhpd8tG/I5Kxb0V83h2XFBXyyjnv0aOHO8ehz3Kfcv2Q==}
+  /@aws-sdk/token-providers@3.438.0:
+    resolution: {integrity: sha512-G2fUfTtU6/1ayYRMu0Pd9Ln4qYSvwJOWCqJMdkDgvXSwdgcOSOLsnAIk1AHGJDAvgLikdCzuyOsdJiexr9Vnww==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
@@ -1089,10 +1092,10 @@ packages:
       '@aws-sdk/middleware-host-header': 3.433.0
       '@aws-sdk/middleware-logger': 3.433.0
       '@aws-sdk/middleware-recursion-detection': 3.433.0
-      '@aws-sdk/middleware-user-agent': 3.433.0
+      '@aws-sdk/middleware-user-agent': 3.438.0
       '@aws-sdk/region-config-resolver': 3.433.0
       '@aws-sdk/types': 3.433.0
-      '@aws-sdk/util-endpoints': 3.433.0
+      '@aws-sdk/util-endpoints': 3.438.0
       '@aws-sdk/util-user-agent-browser': 3.433.0
       '@aws-sdk/util-user-agent-node': 3.437.0
       '@smithy/config-resolver': 2.0.16
@@ -1117,6 +1120,7 @@ packages:
       '@smithy/util-body-length-node': 2.1.0
       '@smithy/util-defaults-mode-browser': 2.0.16
       '@smithy/util-defaults-mode-node': 2.0.21
+      '@smithy/util-endpoints': 1.0.2
       '@smithy/util-retry': 2.0.5
       '@smithy/util-utf8': 2.0.0
       tslib: 2.6.2
@@ -1132,11 +1136,12 @@ packages:
       tslib: 2.6.2
     dev: true
 
-  /@aws-sdk/util-endpoints@3.433.0:
-    resolution: {integrity: sha512-LFNUh9FH7RMtYjSjPGz9lAJQMzmJ3RcXISzc5X5k2R/9mNwMK7y1k2VAfvx+RbuDbll6xwsXlgv6QHcxVdF2zw==}
+  /@aws-sdk/util-endpoints@3.438.0:
+    resolution: {integrity: sha512-6VyPTq1kN3GWxwFt5DdZfOsr6cJZPLjWh0troY/0uUv3hK74C9o3Y0Xf/z8UAUvQFkVqZse12O0/BgPVMImvfA==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@aws-sdk/types': 3.433.0
+      '@smithy/util-endpoints': 1.0.2
       tslib: 2.6.2
     dev: true
 
@@ -1199,8 +1204,8 @@ packages:
       js-tokens: 4.0.0
     dev: true
 
-  /@cdktf/provider-aws@18.0.2(cdktf@0.19.0)(constructs@10.3.0):
-    resolution: {integrity: sha512-jhuuNP5PE8TY894ohs7pPRtfOwu+2AecpLOGZL289qvW8sZ1XIqtkbnsIAdVjeLo999ispuvJCsO22nHmOMdsQ==}
+  /@cdktf/provider-aws@18.0.3(cdktf@0.19.0)(constructs@10.3.0):
+    resolution: {integrity: sha512-TvWZhPjq7ecLK1umlyPPCfazwqK3qeetYDVrdHJ7eMo3KRmjYEFZnZLtMFFYzhOyr3kmTHPUqbp6UWE41LD+jA==}
     engines: {node: '>= 18.12.0'}
     peerDependencies:
       cdktf: ^0.19.0
@@ -1243,8 +1248,8 @@ packages:
       constructs: 10.3.0
     dev: false
 
-  /@cloudy-ts/eslint-plugin@0.0.315(eslint@8.52.0):
-    resolution: {integrity: sha512-frY36qQ9f6WlivmM8iXgP+Fi7rJMNl7ctGI6662VYUbaJjVQ6J83PI2S2/Udbo7N3qU04E168UH91Wz/EvNjEQ==}
+  /@cloudy-ts/eslint-plugin@0.0.317(eslint@8.52.0):
+    resolution: {integrity: sha512-GfZUZMW2SCzSbNYobqbk8quUZPtxr3yelKwnZlRqCEHOuOHw5P9uQKPecCcOlK6n7eyhKnSBzPZtZHbdiTYyVg==}
     engines: {node: '>= 18.16.0'}
     peerDependencies:
       eslint: ^8.52.0
@@ -1568,14 +1573,6 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
-    dev: true
-
-  /@jsii/check-node@1.90.0:
-    resolution: {integrity: sha512-bHrSs/X0mX6rVgBySk6JB/VYiqIV0HkznthZ4lpLabrgTEistwBYXxTf1kgNzfmUbIt0EeETwxdLAY0sqHE/+A==}
-    engines: {node: '>= 14.17.0'}
-    dependencies:
-      chalk: 4.1.2
-      semver: 7.5.4
     dev: true
 
   /@jsii/check-node@1.91.0:
@@ -2581,13 +2578,14 @@ packages:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
     dev: true
 
-  /@skyrpex/wingen@0.6.4(projen@0.76.12):
+  /@skyrpex/wingen@0.6.4(projen@0.76.13):
     resolution: {integrity: sha512-VMgxyBO0dopFVH+uznisDS2rBwf5HV9P5CQ1iZcdB1D+f1SgJQyfjW1jTQ79yr3f4CTzdWfwTCxQJC5Ep5SIfw==}
     engines: {node: '>= 18.17.1'}
     peerDependencies:
       projen: ^0.72.1
     dependencies:
-      projen: 0.76.12(constructs@10.3.0)
+      case: 1.6.3
+      projen: 0.76.13(constructs@10.3.0)
     dev: true
     bundledDependencies:
       - case
@@ -2885,6 +2883,15 @@ packages:
       tslib: 2.6.2
     dev: true
 
+  /@smithy/util-endpoints@1.0.2:
+    resolution: {integrity: sha512-QEdq+sP68IJHAMVB2ugKVVZEWeKQtZLuf+akHzc8eTVElsZ2ZdVLWC6Cp+uKjJ/t4yOj1qu6ZzyxJQEQ8jdEjg==}
+    engines: {node: '>= 14.0.0'}
+    dependencies:
+      '@smithy/node-config-provider': 2.1.3
+      '@smithy/types': 2.4.0
+      tslib: 2.6.2
+    dev: true
+
   /@smithy/util-hex-encoding@2.0.0:
     resolution: {integrity: sha512-c5xY+NUnFqG6d7HFh1IFfrm3mGl29lC+vF+geHv4ToiuJCBmIfzx6IeHLg+OgRdPFKDXIw6pvi+p3CsscaMcMA==}
     engines: {node: '>=14.0.0'}
@@ -3070,11 +3077,11 @@ packages:
     resolution: {integrity: sha512-myfUej5naTBWnqOCc/MdVOLVjXUXtIA+NpDrDBKJtLLg2shUjBu3cZmB/85RyitKc55+lUUyl7oRfLOvkr2hsw==}
     dev: true
 
-  /@tanstack/query-core@5.0.5:
-    resolution: {integrity: sha512-MThCETMkHDHTnFZHp71L+SqTtD5d6XHftFCVR1xRJdWM3qGrlQ2VCXaj0SKVcyJej2e1Opa2c7iknu1llxCDNQ==}
+  /@tanstack/query-core@5.4.3:
+    resolution: {integrity: sha512-fnI9ORjcuLGm1sNrKatKIosRQUpuqcD4SV7RqRSVmj8JSicX2aoMyKryHEBpVQvf6N4PaBVgBxQomjsbsGPssQ==}
 
-  /@tanstack/react-query@5.0.5(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-ZG0Q4HZ0iuI8mWiZ2/MdVYPHbrmAVhMn7+gLOkxJh6zLIgCL4luSZlohzN5Xt4MjxfxxWioO1nemwpudaTsmQg==}
+  /@tanstack/react-query@5.4.3(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-4aSOrRNa6yEmf7mws5QPTVMn8Lp7L38tFoTZ0c1ZmhIvbr8GIA0WT7X5N3yz/nuK8hUtjw9cAzBr4BPDZZ+tzA==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
@@ -3085,7 +3092,7 @@ packages:
       react-native:
         optional: true
     dependencies:
-      '@tanstack/query-core': 5.0.5
+      '@tanstack/query-core': 5.4.3
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
@@ -3505,11 +3512,11 @@ packages:
       pretty-format: 29.7.0
     dev: true
 
-  /@wingconsole/app@0.41.28(constructs@10.2.70):
-    resolution: {integrity: sha512-QtSv3vgYSDP6AtbERaDg3vMRSuioe+RU2bfDg05SzFdhAGDJaxdVD4K9ArcbGjcHvE1eB4d/soksjlgGzTJdzg==}
+  /@wingconsole/app@0.41.35(constructs@10.2.70):
+    resolution: {integrity: sha512-k9ebr2uf95S0zYd7CQDiYcjdzWnX3gTzjEPkf3Q7qmKlT4pj2L8W4jEpc6oR9B0NVFtLQ1Sg2yXL9HEFB10WWw==}
     dependencies:
       '@segment/analytics-node': 1.1.3
-      '@wingconsole/server': 0.41.28(constructs@10.2.70)
+      '@wingconsole/server': 0.41.35(constructs@10.2.70)
       express: 4.18.2
     transitivePeerDependencies:
       - constructs
@@ -3517,11 +3524,11 @@ packages:
       - supports-color
     dev: false
 
-  /@wingconsole/app@0.41.28(constructs@10.3.0):
-    resolution: {integrity: sha512-QtSv3vgYSDP6AtbERaDg3vMRSuioe+RU2bfDg05SzFdhAGDJaxdVD4K9ArcbGjcHvE1eB4d/soksjlgGzTJdzg==}
+  /@wingconsole/app@0.41.35(constructs@10.3.0):
+    resolution: {integrity: sha512-k9ebr2uf95S0zYd7CQDiYcjdzWnX3gTzjEPkf3Q7qmKlT4pj2L8W4jEpc6oR9B0NVFtLQ1Sg2yXL9HEFB10WWw==}
     dependencies:
       '@segment/analytics-node': 1.1.3
-      '@wingconsole/server': 0.41.28(constructs@10.3.0)
+      '@wingconsole/server': 0.41.35(constructs@10.3.0)
       express: 4.18.2
     transitivePeerDependencies:
       - constructs
@@ -3529,11 +3536,11 @@ packages:
       - supports-color
     dev: false
 
-  /@wingconsole/server@0.41.28(constructs@10.2.70):
-    resolution: {integrity: sha512-0txdDFKvV89qH0jNe7DuTwpxMnb6SBlnhhjqsZ2GiA57zLZMKonhlifSylRTTDdkgjJQApybRV+a16CiTkTd7g==}
+  /@wingconsole/server@0.41.35(constructs@10.2.70):
+    resolution: {integrity: sha512-8YFy5xujCL0OeduUsDD8NY4XVTP5eeoVUv7NBdtCbNPRVNLNs++m0a0id3+kf1XIHjnniLZDkgAfLKcdAFk3Xg==}
     dependencies:
-      '@winglang/compiler': 0.41.28(constructs@10.2.70)
-      '@winglang/sdk': 0.41.28(constructs@10.2.70)
+      '@winglang/compiler': 0.41.35(constructs@10.2.70)
+      '@winglang/sdk': 0.41.35(constructs@10.2.70)
       codespan-wasm: 0.4.0
       debug: 4.3.4
       launch-editor: 2.6.1
@@ -3543,11 +3550,11 @@ packages:
       - supports-color
     dev: false
 
-  /@wingconsole/server@0.41.28(constructs@10.3.0):
-    resolution: {integrity: sha512-0txdDFKvV89qH0jNe7DuTwpxMnb6SBlnhhjqsZ2GiA57zLZMKonhlifSylRTTDdkgjJQApybRV+a16CiTkTd7g==}
+  /@wingconsole/server@0.41.35(constructs@10.3.0):
+    resolution: {integrity: sha512-8YFy5xujCL0OeduUsDD8NY4XVTP5eeoVUv7NBdtCbNPRVNLNs++m0a0id3+kf1XIHjnniLZDkgAfLKcdAFk3Xg==}
     dependencies:
-      '@winglang/compiler': 0.41.28(constructs@10.3.0)
-      '@winglang/sdk': 0.41.28(constructs@10.3.0)
+      '@winglang/compiler': 0.41.35(constructs@10.3.0)
+      '@winglang/sdk': 0.41.35(constructs@10.3.0)
       codespan-wasm: 0.4.0
       debug: 4.3.4
       launch-editor: 2.6.1
@@ -3557,30 +3564,30 @@ packages:
       - supports-color
     dev: false
 
-  /@winglang/compiler@0.41.28(constructs@10.2.70):
-    resolution: {integrity: sha512-B5YF6A4f9hT0HQpUBU/lNt45Ikt73EwtyzFHWJIy8ts/tR0Zp7uoSv5dX2rE3tOw68+Fbix6ZYD2Z3eq8CvZGA==}
+  /@winglang/compiler@0.41.35(constructs@10.2.70):
+    resolution: {integrity: sha512-f5bseQ2rQjhhKSFRfGG7ELqjtwKlBZ1Qw7BMlJJWN1xnFsvb6ZFTaeGyGkIc4kqd2UUZlE4iZVOaI1Dxc6HuNQ==}
     engines: {node: '>=v18.0.0'}
     dependencies:
-      '@winglang/sdk': 0.41.28(constructs@10.2.70)
+      '@winglang/sdk': 0.41.35(constructs@10.2.70)
     transitivePeerDependencies:
       - constructs
     dev: false
     bundledDependencies:
       - wasi-js
 
-  /@winglang/compiler@0.41.28(constructs@10.3.0):
-    resolution: {integrity: sha512-B5YF6A4f9hT0HQpUBU/lNt45Ikt73EwtyzFHWJIy8ts/tR0Zp7uoSv5dX2rE3tOw68+Fbix6ZYD2Z3eq8CvZGA==}
+  /@winglang/compiler@0.41.35(constructs@10.3.0):
+    resolution: {integrity: sha512-f5bseQ2rQjhhKSFRfGG7ELqjtwKlBZ1Qw7BMlJJWN1xnFsvb6ZFTaeGyGkIc4kqd2UUZlE4iZVOaI1Dxc6HuNQ==}
     engines: {node: '>=v18.0.0'}
     dependencies:
-      '@winglang/sdk': 0.41.28(constructs@10.3.0)
+      '@winglang/sdk': 0.41.35(constructs@10.3.0)
     transitivePeerDependencies:
       - constructs
     dev: false
     bundledDependencies:
       - wasi-js
 
-  /@winglang/sdk@0.41.28(constructs@10.2.70):
-    resolution: {integrity: sha512-ArW06xG1/8shITlocodMYwfHorWgS6Okp9KYfEgPYummFb+SPZgfIz/Cj4ih6WZRygGTZRFHhCiQqfyL1fpHFA==}
+  /@winglang/sdk@0.41.35(constructs@10.2.70):
+    resolution: {integrity: sha512-zBw6Cok45ic4qDu3Tak7pQKyVqEUnWyaP/0dwZ6CFsHv3APEPKzGWdMJ1AOpCWuI/CeGlXojIQsUoqhWpp4nug==}
     engines: {node: '>= 18.13.0'}
     peerDependencies:
       constructs: ~10.2.69
@@ -3621,8 +3628,8 @@ packages:
       - uuid
       - yaml
 
-  /@winglang/sdk@0.41.28(constructs@10.3.0):
-    resolution: {integrity: sha512-ArW06xG1/8shITlocodMYwfHorWgS6Okp9KYfEgPYummFb+SPZgfIz/Cj4ih6WZRygGTZRFHhCiQqfyL1fpHFA==}
+  /@winglang/sdk@0.41.35(constructs@10.3.0):
+    resolution: {integrity: sha512-zBw6Cok45ic4qDu3Tak7pQKyVqEUnWyaP/0dwZ6CFsHv3APEPKzGWdMJ1AOpCWuI/CeGlXojIQsUoqhWpp4nug==}
     engines: {node: '>= 18.13.0'}
     peerDependencies:
       constructs: ~10.2.69
@@ -4824,7 +4831,7 @@ packages:
     dependencies:
       semver: 7.5.4
       shelljs: 0.8.5
-      typescript: 5.3.0-dev.20231027
+      typescript: 5.3.0-dev.20231030
     dev: true
 
   /dset@3.1.3:
@@ -5155,11 +5162,11 @@ packages:
       synckit: 0.8.5
     dev: true
 
-  /eslint-plugin-unicorn@48.0.1(eslint@8.52.0):
-    resolution: {integrity: sha512-FW+4r20myG/DqFcCSzoumaddKBicIPeFnTrifon2mWIzlfyvzwyqZjqVP7m4Cqr/ZYisS2aiLghkUWaPg6vtCw==}
+  /eslint-plugin-unicorn@49.0.0(eslint@8.52.0):
+    resolution: {integrity: sha512-0fHEa/8Pih5cmzFW5L7xMEfUTvI9WKeQtjmKpTUmY+BiFCDxkxrTdnURJOHKykhtwIeyYsxnecbGvDCml++z4Q==}
     engines: {node: '>=16'}
     peerDependencies:
-      eslint: '>=8.44.0'
+      eslint: '>=8.52.0'
     dependencies:
       '@babel/helper-validator-identifier': 7.22.20
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.52.0)
@@ -5170,7 +5177,6 @@ packages:
       indent-string: 4.0.0
       is-builtin-module: 3.2.1
       jsesc: 3.0.2
-      lodash: 4.17.21
       pluralize: 8.0.0
       read-pkg-up: 7.0.1
       regexp-tree: 0.1.27
@@ -6490,12 +6496,12 @@ packages:
       - supports-color
     dev: true
 
-  /jsii@5.2.20:
-    resolution: {integrity: sha512-iXfSgEHGuE1OJBefZ7P3x+FwlEVaAV8M2blR6HWfg/IAmvBoCc1qbMPkQgUXRaXxH36HKR+BOFZ4n8QX0S2BXA==}
+  /jsii@5.2.22:
+    resolution: {integrity: sha512-u6FpTmi2TerO1cyFWN9uMLHDNMnfVXfMntephVOwpDap2hbLKrQgjsNg/rV+aUFLuFBXj7zrv+hH65phzA3yrA==}
     engines: {node: '>= 16.14.0'}
     hasBin: true
     dependencies:
-      '@jsii/check-node': 1.90.0
+      '@jsii/check-node': 1.91.0
       '@jsii/spec': 1.91.0
       case: 1.6.3
       chalk: 4.1.2
@@ -7852,22 +7858,6 @@ packages:
       postcss: 8.4.31
     dev: true
 
-  /postcss-load-config@4.0.1:
-    resolution: {integrity: sha512-vEJIc8RdiBRu3oRAI0ymerOn+7rPuMvRXslTvZUKZonDHFIczxztIyJ1urxM1x9JXEikvpWWTUUqal5j/8QgvA==}
-    engines: {node: '>= 14'}
-    peerDependencies:
-      postcss: '>=8.0.9'
-      ts-node: '>=9.0.0'
-    peerDependenciesMeta:
-      postcss:
-        optional: true
-      ts-node:
-        optional: true
-    dependencies:
-      lilconfig: 2.1.0
-      yaml: 2.3.3
-    dev: true
-
   /postcss-load-config@4.0.1(postcss@8.4.31):
     resolution: {integrity: sha512-vEJIc8RdiBRu3oRAI0ymerOn+7rPuMvRXslTvZUKZonDHFIczxztIyJ1urxM1x9JXEikvpWWTUUqal5j/8QgvA==}
     engines: {node: '>= 14'}
@@ -8002,8 +7992,8 @@ packages:
     engines: {node: '>= 0.6.0'}
     dev: false
 
-  /projen@0.76.12(constructs@10.3.0):
-    resolution: {integrity: sha512-n2Y5so+t72GqQUC4F2q1Lm0YzWlvdfz0JdWsj8OnlQRALbqpDnJRAavktauyw0+nzurTiJEiJViF9uCtSSJjpg==}
+  /projen@0.76.13(constructs@10.3.0):
+    resolution: {integrity: sha512-byTkBifydNtkYHKtG+INh5KjgyM7bZBp+jqQX9gt5Zl3OFSBnl520Hi4Kownt/2C03UDBH0nHxLm+60+wN+zDA==}
     engines: {node: '>= 16.0.0'}
     hasBin: true
     peerDependencies:
@@ -9133,7 +9123,7 @@ packages:
       execa: 5.1.1
       globby: 11.1.0
       joycon: 3.1.1
-      postcss-load-config: 4.0.1
+      postcss-load-config: 4.0.1(postcss@8.4.31)
       resolve-from: 5.0.0
       rollup: 3.29.4
       source-map: 0.8.0-beta.0
@@ -9326,8 +9316,8 @@ packages:
     hasBin: true
     dev: true
 
-  /typescript@5.3.0-dev.20231027:
-    resolution: {integrity: sha512-YFAOvfXqPu/aZg27Xc6/Ftvbm5YmjgGEsVocBYbh3iZWRoYTcN3kF29ZZIdgRhoqSIN89+W29p4bBChsfVor2g==}
+  /typescript@5.3.0-dev.20231030:
+    resolution: {integrity: sha512-azWrF0lAiu8cBHNr6yq3RDkU/DtQScvT48ea3Ngq6oXJ/GPO0n96wCFSRQA5UbZlVVf3fAAqsUfvOdohRbrPVg==}
     engines: {node: '>=14.17'}
     hasBin: true
     dev: true
@@ -9725,17 +9715,17 @@ packages:
       string-width: 4.2.3
     dev: false
 
-  /winglang@0.41.28(constructs@10.2.70):
-    resolution: {integrity: sha512-lilPgGO/rUzk18ALwD5xr3Eavf8QfcZK5/fUAUzVdeYY4iZVNEmanbc21is5F+Cq2jwvS9L6p9MoMdknlzCF6A==}
+  /winglang@0.41.35(constructs@10.2.70):
+    resolution: {integrity: sha512-e2TdMyEDjc01ID310oiBseHpo/fOSl6Q5xPw1nAX470KG9DMWW3Qa7Xzcnd3qy4fj5ZqBRFDW0fhJVdKIRaV6w==}
     engines: {node: '>=v18.0.0'}
     hasBin: true
     dependencies:
       '@npmcli/arborist': 7.2.0
       '@segment/analytics-node': 1.1.3
-      '@wingconsole/app': 0.41.28(constructs@10.2.70)
-      '@wingconsole/server': 0.41.28(constructs@10.2.70)
-      '@winglang/compiler': 0.41.28(constructs@10.2.70)
-      '@winglang/sdk': 0.41.28(constructs@10.2.70)
+      '@wingconsole/app': 0.41.35(constructs@10.2.70)
+      '@wingconsole/server': 0.41.35(constructs@10.2.70)
+      '@winglang/compiler': 0.41.35(constructs@10.2.70)
+      '@winglang/sdk': 0.41.35(constructs@10.2.70)
       chalk: 4.1.2
       codespan-wasm: 0.4.0
       commander: 10.0.1
@@ -9758,17 +9748,17 @@ packages:
       - supports-color
     dev: false
 
-  /winglang@0.41.28(constructs@10.3.0):
-    resolution: {integrity: sha512-lilPgGO/rUzk18ALwD5xr3Eavf8QfcZK5/fUAUzVdeYY4iZVNEmanbc21is5F+Cq2jwvS9L6p9MoMdknlzCF6A==}
+  /winglang@0.41.35(constructs@10.3.0):
+    resolution: {integrity: sha512-e2TdMyEDjc01ID310oiBseHpo/fOSl6Q5xPw1nAX470KG9DMWW3Qa7Xzcnd3qy4fj5ZqBRFDW0fhJVdKIRaV6w==}
     engines: {node: '>=v18.0.0'}
     hasBin: true
     dependencies:
       '@npmcli/arborist': 7.2.0
       '@segment/analytics-node': 1.1.3
-      '@wingconsole/app': 0.41.28(constructs@10.3.0)
-      '@wingconsole/server': 0.41.28(constructs@10.3.0)
-      '@winglang/compiler': 0.41.28(constructs@10.3.0)
-      '@winglang/sdk': 0.41.28(constructs@10.3.0)
+      '@wingconsole/app': 0.41.35(constructs@10.3.0)
+      '@wingconsole/server': 0.41.35(constructs@10.3.0)
+      '@winglang/compiler': 0.41.35(constructs@10.3.0)
+      '@winglang/sdk': 0.41.35(constructs@10.3.0)
       chalk: 4.1.2
       codespan-wasm: 0.4.0
       commander: 10.0.1

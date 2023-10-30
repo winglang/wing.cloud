@@ -272,7 +272,7 @@ new Turbo(infrastructure, {
       ],
     },
     compile: {
-      dependsOn: [terraformInitTask.name],
+      dependsOn: ["^compile", terraformInitTask.name],
       dotEnv: [".env"],
       outputs: [
         "target/main.tfaws/**",

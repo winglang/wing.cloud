@@ -4,7 +4,7 @@
   "type": "commonjs",
   "sideEffects": false,
   "dependencies": {
-    "@cdktf/provider-aws": "^18.0.2",
+    "@cdktf/provider-aws": "^18.0.3",
     "@cdktf/provider-dnsimple": "^8.0.0",
     "@cdktf/provider-docker": "^10.0.0",
     "@cdktf/provider-null": "^9.0.0",
@@ -20,10 +20,10 @@
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^3.3.2",
     "octokit": "^3.1.1",
-    "winglang": "^0.41.28"
+    "winglang": "^0.41.35"
   },
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.315",
+    "@cloudy-ts/eslint-plugin": "^0.0.317",
     "@types/cookie": "^0.5.3",
     "@types/express": "^4.17.20",
     "@types/http-proxy": "^1.17.13",
@@ -41,7 +41,7 @@
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prettier": "^5.0.1",
-    "eslint-plugin-unicorn": "^48.0.1",
+    "eslint-plugin-unicorn": "^49.0.0",
     "tsx": "^3.14.0",
     "typescript": "^5.2.2",
     "vitest": "^0.34.6"
