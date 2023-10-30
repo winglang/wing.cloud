@@ -128,17 +128,24 @@ pub class ProbotApp {
     this.environments = props.environments;
     this.projects = props.projects;
 
+    let queue = new cloud.Queue();
     this.githubApp = new github.GithubApp(
       this.probotAppId,
       this.probotSecretKey,
       inflight (req) => {
-        this.listen();
-        this.adapter.verifyAndReceive(this.getVerifyAndReceievePropsProps(req));
+        queue.push(
+          Json.stringify(this.getVerifyAndReceievePropsProps(req)),
+        );
         return {
           status: 200
         };
       }
     );
+    queue.setConsumer(inflight (message) => {
+      let props = VerifyAndReceieveProps.fromJson(Json.parse(message));
+      this.listen();
+      this.adapter.verifyAndReceive(props);
+    });
 
     this.runtimeCallbacks.onStatus(inflight (event) => {
       log("report status: ${event}");
@@ -149,7 +156,7 @@ pub class ProbotApp {
       let project = this.projects.get(id: environment.projectId);
       let status = statusReport.status;
       this.environments.updateStatus(id: environment.id, projectId: environment.projectId, status: status);
-      
+
       this.postComment(data: data, statusReport: statusReport, environment: environment, project: project);
     });
   }
@@ -199,7 +206,7 @@ pub class ProbotApp {
         if let installation = context.payload.installation {
           let environment = this.environments.create(
             branch: branch,
-            projectId: project.id, 
+            projectId: project.id,
             repo: "${owner}/${repo}",
             status: "initializing",
             installationId: installation.id,
@@ -212,7 +219,7 @@ pub class ProbotApp {
             entryfile: project.entryfile,
             environmentId: environment.id,
           }));
-          
+
           if !res.ok {
             throw "handlePullRequstOpened: runtime service error ${res.body}";
           }
@@ -264,10 +271,10 @@ pub class ProbotApp {
           }
 
           this.postComment(
-            data: {}, 
+            data: {},
             environment:
             environment,
-            project: project, 
+            project: project,
             statusReport: {environmentId: environment.id, status: "stopped"}
           );
         }
@@ -298,14 +305,14 @@ pub class ProbotApp {
           if !res.ok {
             throw "handlePullRequstSync: runtime service error ${res.body}";
           }
-  
+
           if let body = res.body {
             if let url = Json.tryParse(body)?.get("url")?.tryAsStr() {
               this.environments.updateUrl(id: environment.id, projectId: project.id, url: url);
               return;
             }
           }
-  
+
           throw "handlePullRequstSync: invalid runtime service response ${res.body}";
         }
       }
