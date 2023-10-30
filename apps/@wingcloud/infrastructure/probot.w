@@ -197,7 +197,6 @@ pub class ProbotApp {
     this.adapter = new ProbotAdapter();
     this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
     let onPullRequestOpen = inflight (context: probot.IPullRequestOpenedContext): void => {
-      log("onPullRequestOpen");
       let owner = context.payload.repository.owner.login;
       let repo = context.payload.repository.name;
       let branch = context.payload.pull_request.head.ref;
