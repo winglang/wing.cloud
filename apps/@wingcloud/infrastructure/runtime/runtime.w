@@ -131,8 +131,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   }
 
   pub inflight stop(opts: RuntimeStopOptions) {
-    let flyClient = new flyio.Client(this.flyToken);
-    flyClient._init(this.flyToken);
+    let flyClient = new flyio.Client(token: this.flyToken, orgSlug: this.flyOrgSlug);
     let fly = new flyio.Fly(flyClient);
     let app = fly.app("wing-preview-${util.sha256(opts.environmentId)}");
     let exists = app.exists();
@@ -238,7 +237,6 @@ pub class RuntimeService {
     this.api.delete("/", inflight (req) => {
       let body = Json.parse(req.body ?? "");
       let environmentId = body.get("environmentId").asStr();
-      
       this.runtimeHandler.stop(
         environmentId: environmentId,
       );
