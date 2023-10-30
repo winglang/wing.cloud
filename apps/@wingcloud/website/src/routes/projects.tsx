@@ -2,8 +2,8 @@ import { PlusIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { Link, useNavigate } from "react-router-dom";
 
-import { SpinnerLoader } from "../../components/spinner-loader.js";
-import { wrpc } from "../../utils/wrpc.js";
+import { SpinnerLoader } from "../components/spinner-loader.js";
+import { wrpc } from "../utils/wrpc.js";
 
 export const Component = () => {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ export const Component = () => {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="p-6 space-y-4">
         {projectsList.isLoading && (
           <div
             className={clsx(
@@ -37,7 +37,7 @@ export const Component = () => {
               projectsList.data.projects.map((project) => (
                 <button
                   onClick={() => {
-                    navigate(`/dashboard/projects/${project.id}`);
+                    navigate(`/projects/${project.id}`);
                   }}
                   key={project.id}
                   className="flex flex-col justify-center items-center w-32 h-32 rounded-lg border border-gray-300 p-4 hover:bg-gray-100 transition duration-300"
@@ -48,7 +48,7 @@ export const Component = () => {
               ))}
             <button
               onClick={() => {
-                navigate("/dashboard/new");
+                navigate("/new");
               }}
               className="flex flex-col justify-center items-center w-32 h-32 rounded-lg border border-gray-300 p-4 bg-sky-50 transition duration-300"
             >

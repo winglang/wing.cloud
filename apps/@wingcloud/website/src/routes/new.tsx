@@ -3,10 +3,10 @@ import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { Select } from "../../components/select.js";
-import { SpinnerLoader } from "../../components/spinner-loader.js";
-import { openPopupWindow } from "../../utils/popup-window.js";
-import { wrpc } from "../../utils/wrpc.js";
+import { Select } from "../components/select.js";
+import { SpinnerLoader } from "../components/spinner-loader.js";
+import { openPopupWindow } from "../utils/popup-window.js";
+import { wrpc } from "../utils/wrpc.js";
 
 const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
 
@@ -56,7 +56,7 @@ export const Component = () => {
   );
 
   return (
-    <>
+    <div className="p-6 ">
       <div className="flex justify-center pt-10">
         <div className="space-y-6 w-[25rem] bg-white rounded-lg  shadow-xl border p-6">
           <h1 className="text-xl font-bold">New Project</h1>
@@ -176,8 +176,8 @@ export const Component = () => {
         </div>
       </div>
       <p>
-        <Link to="/dashboard/projects">Go to the home page</Link>
+        <Link to="/projects">Go to the home page</Link>
       </p>
-    </>
+    </div>
   );
 };

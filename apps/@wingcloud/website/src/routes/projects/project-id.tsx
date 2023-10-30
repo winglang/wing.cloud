@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 
-import { wrpc } from "../../../utils/wrpc.js";
+import { wrpc } from "../../utils/wrpc.js";
 
 export interface ProjectProps {
   projectId: string;

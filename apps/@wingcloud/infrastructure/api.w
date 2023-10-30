@@ -91,7 +91,7 @@ pub class Api {
       return {
         status: 302,
         headers: {
-          Location: "/dashboard/projects",
+          Location: "/projects",
           "Set-Cookie": authCookie,
         },
       };
