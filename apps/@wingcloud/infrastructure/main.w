@@ -110,17 +110,19 @@ let proxy = new ReverseProxy.ReverseProxy(
   port: 3900
 );
 
+let var webhookUrl = probotApp.githubApp.webhookUrl;
 if util.tryEnv("WING_TARGET") == "sim" {
   bring "./ngrok.w" as ngrok;
 
-  let githubApp = probotApp.githubApp;
   let devNgrok = new ngrok.Ngrok(
-    url: githubApp.webhookUrl,
+    url: webhookUrl,
     domain: util.tryEnv("NGROK_DOMAIN"),
   );
 
-  let deploy = new cloud.OnDeploy(inflight () => {
-    githubApp.updateWebhookUrl("${devNgrok.url}/webhook");
-    log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
-  });
+  webhookUrl = devNgrok.url;
 }
+
+let deploy = new cloud.OnDeploy(inflight () => {
+  probotApp.githubApp.updateWebhookUrl("${webhookUrl}/webhook");
+  log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
+});

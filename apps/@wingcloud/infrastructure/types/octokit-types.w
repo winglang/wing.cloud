@@ -92,6 +92,7 @@ struct DeleteCommentOptions {
 }
 
 struct ListCommentsResponseObject {
+  id: num;
   body: str?;
 }
 

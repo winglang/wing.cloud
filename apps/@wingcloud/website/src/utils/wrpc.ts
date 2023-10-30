@@ -21,6 +21,7 @@ export const wrpc = createWRPCReact<{
       repositories: Array<{
         id: number;
         name: string;
+        full_name: string;
       }>;
     }
   >;
