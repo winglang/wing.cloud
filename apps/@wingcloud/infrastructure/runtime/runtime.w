@@ -96,10 +96,14 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     this.image = new runtimeDocker.RuntimeDockerImage();
   }
 
+  inflight appNameFromEnvironment(environmentId: str): str {
+    return "wing-preview-${util.sha256(environmentId).substring(0, 8)}";
+  }
+
   pub inflight start(opts: RuntimeStartOptions): str {
     let flyClient = new flyio.Client(token: this.flyToken, orgSlug: this.flyOrgSlug);
     let fly = new flyio.Fly(flyClient);
-    let app = fly.app("wing-preview-${util.sha256(opts.environmentId)}");
+    let app = fly.app(this.appNameFromEnvironment(opts.environmentId));
     let exists = app.exists();
     if !exists {
       app.create();
@@ -134,7 +138,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   pub inflight stop(opts: RuntimeStopOptions) {
     let flyClient = new flyio.Client(token: this.flyToken, orgSlug: this.flyOrgSlug);
     let fly = new flyio.Fly(flyClient);
-    let app = fly.app("wing-preview-${util.sha256(opts.environmentId)}");
+    let app = fly.app(this.appNameFromEnvironment(opts.environmentId));
     let exists = app.exists();
     if exists {
       app.destroy();

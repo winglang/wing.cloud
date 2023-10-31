@@ -184,8 +184,7 @@ pub inflight class Client {
       },
     });
     let machineRes = http.post("${this.apiUrl}/apps/${props.appName}/machines", headers: this._headers(), body: Json.stringify({
-      // region: props.region,
-      region: "mad",
+      region: props.region,
       config: {
         guest: {
           cpus: 1,
