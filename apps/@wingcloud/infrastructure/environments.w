@@ -311,6 +311,7 @@ pub class Environments {
         status: item.get("status").asStr(),
         prNumber: item.get("prNumber").asNum(),
         installationId: item.get("installationId").asNum(),
+        // https://github.com/winglang/wing/issues/4470
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
         testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),

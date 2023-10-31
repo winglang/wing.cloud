@@ -15,6 +15,7 @@
     },
     "compile": {
       "dependsOn": [
+        "^compile",
         "terraformInit"
       ],
       "dotEnv": [
