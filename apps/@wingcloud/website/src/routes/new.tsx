@@ -50,7 +50,7 @@ export const Component = () => {
         projectName,
         entryfile,
       });
-      navigate("/dashboard/projects");
+      navigate("/projects");
     },
     [projectName, createProjectMutation],
   );

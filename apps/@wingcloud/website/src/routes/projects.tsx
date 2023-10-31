@@ -1,67 +1,140 @@
-import { PlusIcon } from "@heroicons/react/20/solid";
+import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
-import { Link, useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
+import { Header } from "../components/header.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { wrpc } from "../utils/wrpc.js";
+
+const SearchBar = ({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) => {
+  return (
+    <div className="w-full">
+      <div className="relative flex items-center">
+        <div className="absolute inset-y-0 left-0 flex py-2.5 pl-2.5">
+          <MagnifyingGlassIcon className="w-4 h-4 text-slate-400" />
+        </div>
+        <input
+          type="text"
+          name="search"
+          id="search"
+          placeholder="Search..."
+          value={value}
+          onChange={(e) => {
+            onChange(e.target.value);
+          }}
+          className={clsx(
+            "block w-full rounded-md shadow border-0 py-1.5 pl-10",
+            "text-slate-700",
+            "placeholder:text-slate-300 placeholder:font-light",
+            "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
+          )}
+        />
+      </div>
+    </div>
+  );
+};
+
+const NewProjectButton = ({ onClick }: { onClick: () => void }) => {
+  return (
+    <button
+      onClick={onClick}
+      className={clsx(
+        "justify-center items-center rounded-md border-0 px-2",
+        " transition duration-300",
+        "bg-emerald-400 text-slate-700",
+        "hover:bg-emerald-500 hover:text-white",
+        "flex gap-x-1 text-xs",
+      )}
+    >
+      <PlusIcon className="w-4 h-4 " />
+      Project
+    </button>
+  );
+};
+
+const ProjectItem = ({
+  name,
+  entryfile,
+  onClick,
+}: {
+  name: string;
+  entryfile: string;
+  onClick: () => void;
+}) => {
+  return (
+    <button
+      onClick={onClick}
+      className={clsx(
+        "w-full h-40",
+        "flex flex-col justify-center items-center rounded-lg",
+        "border border-gray-300 p-4 transition duration-300",
+        "bg-white hover:bg-gray-100",
+      )}
+    >
+      <div className="text-center">{name}</div>
+      <div className="text-center">{entryfile}</div>
+    </button>
+  );
+};
 
 export const Component = () => {
   const navigate = useNavigate();
 
+  const [search, setSearch] = useState("");
   const projectsList = wrpc["user.listProjects"].useQuery();
+
+  const projects = useMemo(() => {
+    if (!projectsList.data) {
+      return [];
+    }
+    return projectsList.data.projects.filter((project) =>
+      project.name.includes(search),
+    );
+  }, [projectsList.data, search]);
 
   return (
     <>
-      <div className="p-6 space-y-4">
+      <Header title="Projects" />
+      <div className="px-6 space-y-4">
+        <div className="flex gap-x-2">
+          <SearchBar value={search} onChange={setSearch} />
+          <NewProjectButton
+            onClick={() => {
+              navigate("/new");
+            }}
+          />
+        </div>
+
         {projectsList.isLoading && (
-          <div
-            className={clsx(
-              "absolute h-full w-full bg-white/70 dark:bg-slate-600/70",
-              "transition-all",
-              "opacity-100 z-10",
-            )}
-          >
-            <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <SpinnerLoader />
-            </div>
+          <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <SpinnerLoader />
           </div>
         )}
 
-        <div className="gap-2 w-full">
-          <h1 className="flex justify-between items-center">
-            <span className="font-semibold text-xl">Projects</span>
-          </h1>
-
-          <div className="flex flex-wrap gap-4 pt-4">
-            {projectsList.data &&
-              projectsList.data.projects.map((project) => (
-                <button
-                  onClick={() => {
-                    navigate(`/projects/${project.id}`);
-                  }}
-                  key={project.id}
-                  className="flex flex-col justify-center items-center w-32 h-32 rounded-lg border border-gray-300 p-4 hover:bg-gray-100 transition duration-300"
-                >
-                  <div className="text-center">{project.name}</div>
-                  <div className="text-center">{project.entryfile}</div>
-                </button>
-              ))}
-            <button
-              onClick={() => {
-                navigate("/new");
-              }}
-              className="flex flex-col justify-center items-center w-32 h-32 rounded-lg border border-gray-300 p-4 bg-sky-50 transition duration-300"
+        <div className="flex flex-wrap gap-2 w-full">
+          {projects.map((project) => (
+            <div
+              key={project.id}
+              className={clsx("w-1/4 flex justify-center items-center")}
             >
-              <div className="text-center">
-                <PlusIcon className="w-8 h-8 text-sky-600" />
-              </div>
-            </button>
-          </div>
+              <ProjectItem
+                key={project.id}
+                onClick={() => {
+                  navigate(`/projects/${project.id}`);
+                }}
+                name={project.name}
+                entryfile={project.entryfile}
+              />
+            </div>
+          ))}
         </div>
-
-        <p>
-          <Link to="/">Go to the home page</Link>
-        </p>
       </div>
     </>
   );

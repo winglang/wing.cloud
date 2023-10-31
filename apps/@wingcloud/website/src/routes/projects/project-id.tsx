@@ -20,7 +20,7 @@ export const Component = () => {
         <code>{JSON.stringify(project.data, undefined, 2)}</code>
       </pre>
 
-      <Link to="/dashboard/projects">Back to Projects</Link>
+      <Link to="/projects">Back to Projects</Link>
     </div>
   );
 };
