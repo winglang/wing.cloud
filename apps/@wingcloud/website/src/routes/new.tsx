@@ -1,8 +1,9 @@
-import { LockClosedIcon } from "@heroicons/react/20/solid";
+import { LockClosedIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
+import { Header } from "../components/header.js";
 import { Select } from "../components/select.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { openPopupWindow } from "../utils/popup-window.js";
@@ -13,8 +14,7 @@ const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
 export const Component = () => {
   const navigate = useNavigate();
 
-  const [projectName, setProjectName] = useState("");
-  const [entryfile, setEntryfile] = useState("");
+  const [entryfile, setEntryfile] = useState("main.w");
   const [installationId, setInstallationId] = useState("");
   const [selectedProjectId, setSelectedProjectId] = useState("");
 
@@ -38,9 +38,8 @@ export const Component = () => {
   );
 
   const createProjectMutation = wrpc["user.createProject"].useMutation();
-
   const createProject = useCallback(
-    async (repositoryId: string) => {
+    async (repositoryId: string, projectName: string) => {
       if (!repositoryId) {
         return;
       }
@@ -52,132 +51,132 @@ export const Component = () => {
       });
       navigate("/projects");
     },
-    [projectName, createProjectMutation],
+    [createProjectMutation],
   );
 
   return (
-    <div className="p-6 ">
-      <div className="flex justify-center pt-10">
-        <div className="space-y-6 w-[25rem] bg-white rounded-lg  shadow-xl border p-6">
-          <h1 className="text-xl font-bold">New Project</h1>
+    <>
+      <Header
+        breadcrumbs={[
+          { label: "Projects", to: "/projects" },
+          {
+            label: "New",
+            to: "/new",
+          },
+        ]}
+      />
+      <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">
+        <div className="text-2xl">Create a new project</div>
 
-          <div className="text-sm">
-            <div className="gap-4 mb-4 flex flex-col text-sm">
-              <input
-                className="w-full p-2 rounded border focus:outline-none mb-4 bg-sky-50"
-                placeholder="Project Name"
-                value={projectName}
-                onChange={(event) => setProjectName(event.target.value)}
-              />
+        {installations.isLoading && (
+          <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <SpinnerLoader />
+          </div>
+        )}
 
-              <input
-                className="w-full p-2 rounded border focus:outline-none mb-4 bg-sky-50"
-                placeholder="Wing Entryfile"
-                value={entryfile}
-                onChange={(event) => setEntryfile(event.target.value)}
-              />
+        {!installations.isLoading && (
+          <div className="flex justify-center pt-10">
+            <div className="space-y-6 w-[25rem] bg-white rounded-lg  shadow-xl border p-6">
+              <h1 className="text-xl font-bold">New Project</h1>
 
-              {installations.isLoading && (
-                <div className="w-full bg-sky-50 py-2 rounded border flex justify-center">
-                  <SpinnerLoader size="xs" />
-                </div>
-              )}
-              {!installations.isLoading && (
-                <Select
-                  items={(installations.data?.installations || []).map(
-                    (installation) => ({
-                      value: installation.id.toString(),
-                      label: installation.account.login || "",
-                    }),
+              <div className="text-sm">
+                <div className="gap-4 mb-4 flex flex-col text-sm">
+                  {installations.isLoading && (
+                    <div className="w-full bg-sky-50 py-2 rounded border flex justify-center">
+                      <SpinnerLoader size="xs" />
+                    </div>
                   )}
-                  placeholder="Select a GitHub namespace"
-                  onChange={(value) => {
-                    setInstallationId(value);
-                  }}
-                  value={installationId.toString()}
-                  btnClassName="w-full bg-sky-50 py-2 rounded border"
-                />
-              )}
-
-              <div className="justify-end flex flex-col gap-1">
-                {repos.data?.repositories.map((repo) => (
-                  <div
-                    key={repo.id}
-                    className={clsx(
-                      "w-full p-2 rounded border text-left flex items-center",
-                    )}
-                  >
-                    <img
-                      src={repo.owner?.avatar_url}
-                      className="w-5 h-5 inline-block mr-2 rounded-full"
-                    />
-                    <span>
-                      {selectedInstallation ? selectedInstallation.name : ""}/
-                      {repo.name}
-                    </span>
-                    <div className="mx-1 items-center">
-                      {repo.private && (
-                        <LockClosedIcon className="w-3 h-3 inline-block" />
+                  {!installations.isLoading && (
+                    <Select
+                      items={(installations.data?.installations || []).map(
+                        (installation) => ({
+                          value: installation.id.toString(),
+                          label: installation.account.login || "",
+                        }),
                       )}
-                    </div>
+                      placeholder="Select a GitHub namespace"
+                      onChange={(value) => {
+                        setInstallationId(value);
+                      }}
+                      value={installationId.toString()}
+                      btnClassName="w-full bg-sky-50 py-2 rounded border"
+                    />
+                  )}
 
-                    <div className="flex grow justify-end text-slate-500 items-center">
-                      <button
+                  <div className="justify-end flex flex-col gap-1">
+                    {repos.data?.repositories.map((repo) => (
+                      <div
+                        key={repo.id}
                         className={clsx(
-                          "mr-2 py-0.5 px-1 rounded border text-xs cursor-pointer",
-                          "hover:bg-sky-50 transition duration-300",
-                          "flex gap-1",
+                          "w-full p-2 rounded border text-left flex items-center",
                         )}
-                        onClick={() => {
-                          createProject(repo.id.toString());
-                        }}
-                        disabled={!installationId}
                       >
-                        <div>Import</div>
-                        {createProjectMutation.isLoading &&
-                          selectedProjectId === repo.id.toString() && (
-                            <div className="flex justify-center">
-                              <SpinnerLoader size="xs" />
-                            </div>
+                        <img
+                          src={repo.owner?.avatar_url}
+                          className="w-5 h-5 inline-block mr-2 rounded-full"
+                        />
+                        <span>{repo.name}</span>
+                        <div className="mx-1 items-center">
+                          {repo.private && (
+                            <LockClosedIcon className="w-3 h-3 inline-block text-slate-600" />
                           )}
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                        </div>
 
-                {installationId && repos.isLoading && (
-                  <div className="w-full p-2 rounded border text-slate-500 flex justify-center">
-                    <SpinnerLoader size="xs" />
-                  </div>
-                )}
+                        <div className="flex grow justify-end text-slate-500 items-center">
+                          <button
+                            className={clsx(
+                              "mr-2 py-0.5 px-1 rounded border text-xs cursor-pointer",
+                              "hover:bg-sky-50 transition duration-300",
+                              "flex gap-1",
+                            )}
+                            onClick={() => {
+                              createProject(repo.id.toString(), repo.name);
+                            }}
+                            disabled={!installationId}
+                          >
+                            <div>Import</div>
+                            {selectedProjectId === repo.id.toString() && (
+                              <div className="flex justify-center">
+                                <SpinnerLoader size="xs" />
+                              </div>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
 
-                {(!installationId || (!repos.data && !repos.isLoading)) && (
-                  <div className="w-full p-2 rounded border text-center text-slate-500">
-                    <span>No repositories found</span>
+                    {installationId && repos.isLoading && (
+                      <div className="w-full p-2 rounded border text-slate-500 flex justify-center">
+                        <SpinnerLoader size="xs" />
+                      </div>
+                    )}
+
+                    {(!installationId || (!repos.data && !repos.isLoading)) && (
+                      <div className="w-full p-2 rounded border text-center text-slate-500">
+                        <span>No repositories found</span>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+              </div>
+
+              <div className="text-xs space-y-2 text-center">
+                <p className="">Missing Git repository?</p>
+                <button
+                  className="text-blue-600"
+                  onClick={() =>
+                    openPopupWindow({
+                      url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
+                    })
+                  }
+                >
+                  Adjust GitHub App Permissions →
+                </button>
               </div>
             </div>
           </div>
-
-          <div className="text-xs space-y-2 text-center">
-            <p className="">Missing Git repository?</p>
-            <button
-              className="text-blue-600"
-              onClick={() =>
-                openPopupWindow({
-                  url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
-                })
-              }
-            >
-              Adjust GitHub App Permissions →
-            </button>
-          </div>
-        </div>
+        )}
       </div>
-      <p>
-        <Link to="/projects">Go to the home page</Link>
-      </p>
-    </div>
+    </>
   );
 };

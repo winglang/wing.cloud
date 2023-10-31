@@ -1,4 +1,5 @@
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/20/solid";
+import { FaceSmileIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +7,39 @@ import { useNavigate } from "react-router-dom";
 import { Header } from "../components/header.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { wrpc } from "../utils/wrpc.js";
+
+const getDateTime = (datetime: string) => {
+  const date = new Date(datetime);
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  });
+};
+
+const getTimeFromNow = (datetime: string) => {
+  const date = new Date(datetime);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  if (hours > 24) {
+    return getDateTime(datetime);
+  }
+
+  if (hours > 0) {
+    return `${hours} hours ago`;
+  }
+
+  if (minutes > 0) {
+    return `${minutes} minutes ago`;
+  }
+
+  return `${seconds} seconds ago`;
+};
 
 const SearchBar = ({
   value,
@@ -30,7 +64,7 @@ const SearchBar = ({
             onChange(e.target.value);
           }}
           className={clsx(
-            "block w-full rounded-md shadow border-0 py-1.5 pl-10",
+            "block w-full rounded-lg shadow border-0 py-1.5 pl-10",
             "text-slate-700",
             "placeholder:text-slate-300 placeholder:font-light",
             "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
@@ -46,10 +80,10 @@ const NewProjectButton = ({ onClick }: { onClick: () => void }) => {
     <button
       onClick={onClick}
       className={clsx(
-        "justify-center items-center rounded-md border-0 px-2",
+        "justify-center items-center rounded-lg border-0 px-2",
         " transition duration-300",
-        "bg-emerald-400 text-slate-700",
-        "hover:bg-emerald-500 hover:text-white",
+        "bg-sky-600 text-white",
+        "hover:bg-sky-500",
         "flex gap-x-1 text-xs",
       )}
     >
@@ -62,24 +96,39 @@ const NewProjectButton = ({ onClick }: { onClick: () => void }) => {
 const ProjectItem = ({
   name,
   entryfile,
+  updatedAt,
+  updatedBy,
   onClick,
 }: {
   name: string;
   entryfile: string;
+  updatedAt: string;
+  updatedBy: string;
   onClick: () => void;
 }) => {
   return (
     <button
       onClick={onClick}
       className={clsx(
-        "w-full h-40",
-        "flex flex-col justify-center items-center rounded-lg",
-        "border border-gray-300 p-4 transition duration-300",
-        "bg-white hover:bg-gray-100",
+        "flex flex-col",
+        "w-full h-full p-4 bg-white rounded-lg",
+        "shadow hover:shadow-md transition-all",
       )}
     >
-      <div className="text-center">{name}</div>
-      <div className="text-center">{entryfile}</div>
+      <div className="flex gap-x-2">
+        <FaceSmileIcon className="w-10 h-10 text-slate-400" />
+      </div>
+
+      <div className="text-left mt-4">
+        <div className="text-lg text-slate-800">{name}</div>
+        <div className="text-xs text-slate-600">{entryfile}</div>
+      </div>
+
+      <div className="text-xs mt-2">
+        <div className="text-slate-600">
+          Updated {getTimeFromNow(updatedAt)} {updatedBy && `by ${updatedBy}`}
+        </div>
+      </div>
     </button>
   );
 };
@@ -101,16 +150,19 @@ export const Component = () => {
 
   return (
     <>
-      <Header title="Projects" />
-      <div className="px-6 space-y-4">
-        <div className="flex gap-x-2">
-          <SearchBar value={search} onChange={setSearch} />
-          <NewProjectButton
-            onClick={() => {
-              navigate("/new");
-            }}
-          />
-        </div>
+      <Header breadcrumbs={[{ label: "Projects", to: "/projects" }]} />
+
+      <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">
+        {projects.length > 0 && (
+          <div className="flex gap-x-2">
+            <SearchBar value={search} onChange={setSearch} />
+            <NewProjectButton
+              onClick={() => {
+                navigate("/new");
+              }}
+            />
+          </div>
+        )}
 
         {projectsList.isLoading && (
           <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -118,21 +170,72 @@ export const Component = () => {
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2 w-full">
-          {projects.map((project) => (
-            <div
-              key={project.id}
-              className={clsx("w-1/4 flex justify-center items-center")}
+        {!projectsList.isLoading && projects.length === 0 && (
+          <div className="text-center">
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
             >
-              <ProjectItem
-                key={project.id}
-                onClick={() => {
-                  navigate(`/projects/${project.id}`);
-                }}
-                name={project.name}
-                entryfile={project.entryfile}
+              <path
+                vector-effect="non-scaling-stroke"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
               />
+            </svg>
+            <h3 className="mt-2 text-sm font-semibold text-gray-900">
+              No projects
+            </h3>
+            <p className="mt-1 text-sm text-gray-500">
+              Get started by creating a new project.
+            </p>
+            <div className="mt-6">
+              <button
+                type="button"
+                className={clsx(
+                  "inline-flex items-center rounded-md bg-sky-600 px-3 py-2",
+                  "text-sm font-semibold text-white shadow-sm hover:bg-sky-500 ",
+                  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600",
+                )}
+                onClick={() => {
+                  navigate("/new");
+                }}
+              >
+                <svg
+                  className="-ml-0.5 mr-1.5 h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                </svg>
+                New Project
+              </button>
             </div>
+          </div>
+        )}
+
+        <div
+          className={clsx(
+            "flex flex-wrap gap-6 w-full",
+            "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
+          )}
+        >
+          {projects.map((project) => (
+            <ProjectItem
+              key={project.id}
+              onClick={() => {
+                navigate(`/projects/${project.id}`);
+              }}
+              name={project.name}
+              entryfile={project.entryfile}
+              updatedAt={project.updatedAt}
+              updatedBy={project.updatedBy}
+            />
           ))}
         </div>
       </div>

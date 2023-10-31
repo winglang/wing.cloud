@@ -21,6 +21,8 @@ export const wrpc = createWRPCReact<{
       repositories: Array<{
         id: number;
         name: string;
+        private: boolean;
+        owner: { login: string; avatar_url: string };
       }>;
     }
   >;
@@ -30,7 +32,10 @@ export const wrpc = createWRPCReact<{
       project: { id: string; name: string; repository: string; userId: string };
     }
   >;
-  "project.rename": MutationProcedure<{ id: string; name: string, repository: string }, {}>;
+  "project.rename": MutationProcedure<
+    { id: string; name: string; repository: string },
+    {}
+  >;
   "user.listProjects": QueryProcedure<
     undefined,
     {
@@ -40,6 +45,9 @@ export const wrpc = createWRPCReact<{
         repository: string;
         userId: string;
         entryfile: string;
+        createdAt: string;
+        updatedAt: string;
+        updatedBy: string;
       }>;
     }
   >;
@@ -47,5 +55,6 @@ export const wrpc = createWRPCReact<{
     repositoryId: string;
     projectName: string;
     entryfile: string;
+    imageUrl?: string;
   }>;
 }>();

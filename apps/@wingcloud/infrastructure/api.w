@@ -192,17 +192,20 @@ pub class Api {
     // api.get("/wrpc/project.listEnvironmentVariables", inflight () => {});
     // api.post("/wrpc/project.updateEnvironmentVariables", inflight () => {});
 
-    // {"name": "acme", "repository": "skyrpex/acme"}
     api.post("/wrpc/user.createProject", inflight (request) => {
       let userId = getUserFromCookie(request);
 
       let input = Json.parse(request.body ?? "");
+
+      let gitHubLogin = users.getUsername(userId: userId);
 
       let project = projects.create(
         name: input.get("projectName").asStr(),
         repository: input.get("repositoryId").asStr(),
         userId: userId,
         entryfile: input.get("entryfile").asStr(),
+        createdAt: "${datetime.utcNow().toIso()}",
+        createdBy: gitHubLogin,
       );
 
       return {

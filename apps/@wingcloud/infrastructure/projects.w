@@ -1,5 +1,6 @@
 bring ex;
 bring "./nanoid62.w" as nanoid62;
+bring util;
 
 pub struct Project {
   id: str;
@@ -7,6 +8,11 @@ pub struct Project {
   repository: str;
   userId: str;
   entryfile: str;
+  createdAt: str?;
+  createdBy: str?;
+  updatedAt: str?;
+  updatedBy: str?;
+  imageUrl: str?;
 }
 
 struct CreateProjectOptions {
@@ -14,6 +20,9 @@ struct CreateProjectOptions {
   repository: str;
   userId: str;
   entryfile: str;
+  createdAt: str;
+  createdBy: str;
+  imageUrl: str?;
 }
 
 struct RenameProjectOptions {
@@ -55,6 +64,10 @@ pub class Projects {
       repository: options.repository,
       userId: options.userId,
       entryfile: options.entryfile,
+      updatedAt: options.createdAt,
+      updatedBy: options.createdBy,
+      createdAt: options.createdAt,
+      createdBy: options.createdBy,
     };
 
     this.table.transactWriteItems(transactItems: [
@@ -82,6 +95,10 @@ pub class Projects {
             repository: project.repository,
             userId: project.userId,
             entryfile: project.entryfile,
+            createdAt: project.createdAt,
+            createdBy: project.createdBy,
+            updatedAt: project.updatedAt,
+            updatedBy: project.createdBy,
           },
         },
       },
@@ -194,6 +211,8 @@ pub class Projects {
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
+        updatedAt: item.get("updatedAt").asStr(),
+        updatedBy: item.get("updatedBy").asStr(),
       }]);
     }
     return projects;
