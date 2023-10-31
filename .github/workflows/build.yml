@@ -10,6 +10,8 @@ on:
 env:
   NODE_VERSION: "18.16.0"
   PNPM_VERSION: "8.6.3"
+  PROXY_SUBDOMAIN: "dev"
+  PROXY_ZONE_NAME: "wingcloud.io"
 
 jobs:
   build:
@@ -46,3 +48,7 @@ jobs:
           BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
           BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}
           BOT_GITHUB_WEBHOOK_SECRET: ${{ secrets.BOT_GITHUB_WEBHOOK_SECRET }}
+          FLY_TOKEN: ${{ secrets.FLY_TOKEN }}
+          FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
+          PROXY_SUBDOMAIN: ${{ env.PROXY_SUBDOMAIN }}
+          PROXY_ZONE_NAME: ${{ env.PROXY_ZONE_NAME }}

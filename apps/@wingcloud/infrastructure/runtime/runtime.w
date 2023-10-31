@@ -6,6 +6,7 @@ bring "constructs" as constructs;
 bring "../containers.w" as containers;
 bring "../flyio" as flyio;
 bring "./runtime-docker.w" as runtimeDocker;
+bring "../environments.w" as environments;
 
 struct RuntimeStartOptions {
   gitToken: str?;
@@ -13,6 +14,9 @@ struct RuntimeStartOptions {
   gitSha: str;
   entryfile: str;
   logsBucketName: str;
+  logsBucketRegion: str;
+  awsAccessKeyId: str;
+  awsSecretAccessKey: str;
   wingCloudUrl: str;
   environmentId: str;
 }
@@ -53,6 +57,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "GIT_REPO" => repo,
       "GIT_SHA" => opts.gitSha,
       "ENTRYFILE" => opts.entryfile,
+      "WING_TARGET" => util.env("WING_TARGET"),
       "LOGS_BUCKET_NAME" => "stam", // opts.logsBucketName,
       "WING_CLOUD_URL" => opts.wingCloudUrl,
       "ENVIRONMENT_ID" => opts.environmentId,
@@ -78,25 +83,21 @@ class RuntimeHandler_sim impl IRuntimeHandler {
 
 struct FlyRuntimeHandlerProps {
   flyToken: str;
-  awsAccessKeyId: str;
-  awsSecretAccessKey: str;
+  flyOrgSlug: str;
 }
 
 class RuntimeHandler_flyio impl IRuntimeHandler {
   flyToken: str;
-  awsAccessKeyId: str;
-  awsSecretAccessKey: str;
+  flyOrgSlug: str;
   image: runtimeDocker.RuntimeDockerImage;
   init(props: FlyRuntimeHandlerProps) {
     this.flyToken = props.flyToken;
-    this.awsAccessKeyId = props.awsAccessKeyId;
-    this.awsSecretAccessKey = props.awsSecretAccessKey;
+    this.flyOrgSlug = props.flyOrgSlug;
     this.image = new runtimeDocker.RuntimeDockerImage();
   }
 
   pub inflight start(opts: RuntimeStartOptions): str {
-    let flyClient = new flyio.Client(this.flyToken);
-    flyClient._init(this.flyToken);
+    let flyClient = new flyio.Client(token: this.flyToken, orgSlug: this.flyOrgSlug);
     let fly = new flyio.Fly(flyClient);
     let app = fly.app("wing-preview-${util.sha256(opts.environmentId)}");
     let exists = app.exists();
@@ -108,9 +109,13 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "GIT_REPO" => opts.gitRepo,
       "GIT_SHA" => opts.gitSha,
       "ENTRYFILE" => opts.entryfile,
-      "LOGS_BUCKET_NAME" => opts.logsBucketName,
+      "WING_TARGET" => util.env("WING_TARGET"),
       "WING_CLOUD_URL" => opts.wingCloudUrl,
+      "LOGS_BUCKET_NAME" => opts.logsBucketName,
       "ENVIRONMENT_ID" => opts.environmentId,
+      "AWS_ACCESS_KEY_ID" => opts.awsAccessKeyId,
+      "AWS_SECRET_ACCESS_KEY" => opts.awsSecretAccessKey,
+      "AWS_REGION" => opts.logsBucketRegion,
     };
 
     if let token = opts.gitToken {
@@ -127,8 +132,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   }
 
   pub inflight stop(opts: RuntimeStopOptions) {
-    let flyClient = new flyio.Client(this.flyToken);
-    flyClient._init(this.flyToken);
+    let flyClient = new flyio.Client(token: this.flyToken, orgSlug: this.flyOrgSlug);
     let fly = new flyio.Fly(flyClient);
     let app = fly.app("wing-preview-${util.sha256(opts.environmentId)}");
     let exists = app.exists();
@@ -138,17 +142,27 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   }
 }
 
+struct Message {
+  repo: str;
+  sha: str;
+  entryfile: str;
+  projectId: str;
+  environmentId: str;
+  token: str?;
+}
+
 struct RuntimeServiceProps {
   wingCloudUrl: str;
   flyToken: str?;
-  awsAccessKeyId: str?;
-  awsSecretAccessKey: str?;
+  flyOrgSlug: str?;
+  environments: environments.Environments;
 }
+
+bring "@cdktf/provider-aws" as aws;
+bring "cdktf" as cdktf;
 
 // Previews environment runtime
 pub class RuntimeService {
-  extern "../src/get-bucket-name.mts" static inflight getBucketName(): str;
-
   logs: cloud.Bucket;
   pub api: cloud.Api;
   runtimeHandler: IRuntimeHandler;
@@ -156,62 +170,92 @@ pub class RuntimeService {
   init(props: RuntimeServiceProps) {
     this.logs = new cloud.Bucket() as "deployment logs";
 
-    // TODO: use a function to generate the IAM role with the permissions to write to the bucket
-    new cloud.Function(inflight () => {
-      // permissions:
-      this.logs.put;
-    }) as "runtime function";
-
+    let var bucketName: str = "";
+    let var bucketRegion: str = "";
+    let var awsAccessKeyId: str = "";
+    let var awsSecretAccessKey: str = "";
     if util.tryEnv("WING_TARGET") == "sim" {
       this.runtimeHandler = new RuntimeHandler_sim();
     } else {
-      // TODO: We need better type guards for this.
-      this.runtimeHandler = new RuntimeHandler_flyio(
-        flyToken: props.flyToken ?? "",
-        awsAccessKeyId: props.awsAccessKeyId ?? "",
-        awsSecretAccessKey: props.awsSecretAccessKey ?? ""
+      let awsUser = new aws.iamUser.IamUser(name: "${this.node.addr}-user");
+      let bucketArn: str = unsafeCast(this.logs).bucket.arn;
+      bucketName = unsafeCast(this.logs).bucket.bucket;
+      bucketRegion = unsafeCast(this.logs).bucket.region;
+      let awsPolicy = new aws.iamUserPolicy.IamUserPolicy(
+        user: awsUser.name,
+        policy: Json.stringify({
+          Version: "2012-10-17",
+          Statement: [
+            {
+              Action: ["s3:*"],
+              Effect: "Allow",
+              Resource: "${bucketArn}/*",
+            },
+          ],
+        }),
       );
+      let awsAccessKey = new aws.iamAccessKey.IamAccessKey(user: awsUser.name);
+      awsAccessKeyId = awsAccessKey.id;
+      awsSecretAccessKey = awsAccessKey.secret;
+      if let flyToken = props.flyToken {
+        if let flyOrgSlug = props.flyOrgSlug {
+          this.runtimeHandler = new RuntimeHandler_flyio(
+            flyToken: flyToken,
+            flyOrgSlug: flyOrgSlug,
+          );
+        } else {
+          throw "Fly org is missing";
+        }
+      } else {
+        throw "Fly token is missing";
+      }
     }
+
+    let queue = new cloud.Queue();
+    queue.setConsumer(inflight (message) => {
+      try {
+        let msg = Message.fromJson(Json.parse(message));
+
+        log("wing url: ${props.wingCloudUrl}");
+
+        let url = this.runtimeHandler.start(
+          gitToken: msg.token,
+          gitRepo: msg.repo,
+          gitSha: msg.sha,
+          entryfile: msg.entryfile,
+          wingCloudUrl: props.wingCloudUrl,
+          environmentId: msg.environmentId,
+          logsBucketName: bucketName,
+          logsBucketRegion: bucketRegion,
+          awsAccessKeyId: awsAccessKeyId,
+          awsSecretAccessKey: awsSecretAccessKey,
+        );
+
+        log("preview environment url: ${url}");
+
+        props.environments.updateUrl(
+          id: msg.environmentId,
+          projectId: msg.projectId,
+          url: url,
+        );
+      } catch error {
+        log(error);
+      }
+    }, { timeout: 1m });
 
     this.api = new cloud.Api();
     this.api.post("/", inflight (req) => {
-      // hack to get bucket name in extern files
-      this.logs.put("t", "t");
-
       let body = Json.parse(req.body ?? "");
-      let repo = body.get("repo").asStr();
-      let sha = body.get("sha").asStr();
-      let entryfile = body.get("entryfile").asStr();
-      let environmentId = body.get("environmentId").asStr();
-      let token = body.tryGet("token")?.tryAsStr();
-      let logsBucketName = RuntimeService.getBucketName();
-
-      log("wing url: ${props.wingCloudUrl}");
-
-      let url = this.runtimeHandler.start(
-        gitToken: token,
-        gitRepo: repo,
-        gitSha: sha,
-        entryfile: entryfile,
-        wingCloudUrl: props.wingCloudUrl,
-        logsBucketName: logsBucketName,
-        environmentId: environmentId,
-      );
-
-      log("preview environment url: ${url}");
-
+      let message = Message.fromJson(body);
+      queue.push(Json.stringify(message));
       return {
         status: 200,
-        body: Json.stringify({
-          url: url
-        })
       };
     });
 
     this.api.delete("/", inflight (req) => {
       let body = Json.parse(req.body ?? "");
       let environmentId = body.get("environmentId").asStr();
-      
       this.runtimeHandler.stop(
         environmentId: environmentId,
       );

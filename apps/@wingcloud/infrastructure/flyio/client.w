@@ -70,36 +70,20 @@ struct IGetAppResult {
   data: IGetAppResultDataApp;
 }
 
+struct ClientProps {
+  token: str;
+  orgSlug: str;
+}
+
 pub inflight class Client {
   var token: str;
+  var orgSlug: str;
   var graphqlUrl: str;
   var apiUrl: str;
 
-  /**
-   *
-   * @param token Fly.io api token. Optional.
-   * By default will use the `FLY_API_TOKEN` env var.
-   */
-
-  // use _init because cannt call functions in inflight init
-  // TODO: https://github.com/winglang/wing/issues/4290
-  init(token: str?) {
-    this.token = "";
-    this.graphqlUrl = "";
-    this.apiUrl = "";
-  }
-
-  pub _init(token: str?) {
-    if let t = token {
-      this.token = t;
-    } else {
-      if let envToken = util.tryEnv("FLY_API_TOKEN") {
-        this.token = envToken;
-      } else {
-        throw "environment variable FLY_API_TOKEN not set";
-      }
-    }
-
+  init(props: ClientProps) {
+    this.token = props.token;
+    this.orgSlug = props.orgSlug;
     this.graphqlUrl = "https://api.fly.io/graphql";
     this.apiUrl = "https://api.machines.dev/v1";
   }
@@ -140,7 +124,7 @@ pub inflight class Client {
   pub createApp(appName: str) {
     let appRes = http.post("${this.apiUrl}/apps", headers: this._headers(), body: Json.stringify({
       app_name: appName,
-      org_slug: "personal",
+      org_slug: this.orgSlug,
     }));
     if (!appRes.ok) {
       throw "failed to create app ${appName}: ${appRes.body}" + appName;
@@ -200,7 +184,8 @@ pub inflight class Client {
       },
     });
     let machineRes = http.post("${this.apiUrl}/apps/${props.appName}/machines", headers: this._headers(), body: Json.stringify({
-      region: props.region,
+      // region: props.region,
+      region: "mad",
       config: {
         guest: {
           cpus: 1,

@@ -12,20 +12,22 @@ class CachePolicy {
 
   init(props: CachePolicyProps) {
     this.policy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
-      defaultTtl: 60,
-      maxTtl: 86400,
+      // Since we currently use the same cache policy for website files and API endpoints,
+      // we need to get rid of the default cache TTL, otherwise our API endpoints will
+      // get cached.
+      defaultTtl: 0,
       minTtl: 0,
+      maxTtl: 86400,
       name: props.name,
       parametersInCacheKeyAndForwardedToOrigin: {
+        // Needed to authenticate the API calls.
         cookiesConfig: {
           cookieBehavior: "all"
         },
         headersConfig: {
-          headerBehavior: "whitelist",
-          headers: {
-            items: ["Accept-Datetime", "Accept-Encoding", "Accept-Language", "User-Agent", "Referer", "Origin", "X-Forwarded-Host"]
-          }
+          headerBehavior: "none",
         },
+        // Needed for many API endpoints.
         queryStringsConfig: {
           queryStringBehavior: "all"
         }
@@ -37,6 +39,7 @@ class CachePolicy {
 pub struct Origin {
   domainName: str;
   originId: str;
+  originPath: str?;
   pathPattern: str;
 }
 
@@ -50,6 +53,7 @@ struct OriginCustomConfig {
 struct HttpOrigin {
   domainName: str;
   originId: str;
+  originPath: str?;
   customOriginConfig: OriginCustomConfig;
 }
 
@@ -71,49 +75,51 @@ pub class CloudFrontDistribution {
     return "";
   }
 
-  getHttpOrigins (origins: Array<Origin>): MutArray<HttpOrigin> {
+  getHttpOrigins (origins: Array<Origin>): Array<HttpOrigin> {
     let enhancedOrigins = MutArray<HttpOrigin>[];
     for origin in origins {
-      let enhancedOrigin = {
+      let enhancedOrigin = HttpOrigin {
         domainName: origin.domainName,
         originId: origin.originId,
+        originPath: origin.originPath,
         customOriginConfig: {
           httpPort: 80,
           httpsPort: 443,
           originProtocolPolicy: "https-only",
-          originSslProtocols: ["SSLv3", "TLSv1.2", "TLSv1.1"]
+          originSslProtocols: ["SSLv3", "TLSv1.2", "TLSv1.1"],
         }
       };
       enhancedOrigins.push(enhancedOrigin);
     }
 
-    return enhancedOrigins;
+    return enhancedOrigins.copy();
   }
 
-  getOrderedCacheBehaviorForOrigins (origins: Array<Origin>, cachePolicyId: str): MutArray<Json> {
+  getOrderedCacheBehaviorForOrigins (origins: Array<Origin>, cachePolicyId: str): Array<Json> {
     let cacheBehaviors = MutArray<Json>[];
     for origin in origins {
       if origin.pathPattern == "" {
         continue;
       }
-      cacheBehaviors.push(
-        {
-          pathPattern: origin.pathPattern,
-          allowedMethods: ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"],
-          cachedMethods: ["GET", "HEAD"],
-          targetOriginId: origin.originId,
-          viewerProtocolPolicy: "redirect-to-https",
-          cachePolicyId: cachePolicyId
-        }
-      );
+      cacheBehaviors.push({
+        pathPattern: origin.pathPattern,
+        allowedMethods: ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"],
+        cachedMethods: ["GET", "HEAD"],
+        targetOriginId: origin.originId,
+        viewerProtocolPolicy: "redirect-to-https",
+        cachePolicyId: cachePolicyId,
+        compress: true,
+      });
     }
 
-    return cacheBehaviors;
+    return cacheBehaviors.copy();
   }
 
   init(props: CloudFrontDistributionProps) {
+    let cachePolicy = new CachePolicy(
+      name: "cache-policy-for-${this.getDefaultOriginId(props.origins)}",
 
-    let cachePolicy = new CachePolicy(name: "cache-policy-for-${this.getDefaultOriginId(props.origins)}");
+    );
 
     this.distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
       enabled: true,
@@ -123,12 +129,26 @@ pub class CloudFrontDistribution {
           restrictionType: "none"
         }
       },
+      defaultRootObject: "index.html",
+      customErrorResponse: [
+        {
+          errorCode: 404,
+          responseCode: 200,
+          responsePagePath: "/index.html",
+        },
+        {
+          errorCode: 403,
+          responseCode: 200,
+          responsePagePath: "/index.html",
+        },
+      ],
       defaultCacheBehavior: {
         allowedMethods: ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"],
         cachedMethods: ["GET", "HEAD"],
         targetOriginId: this.getDefaultOriginId(props.origins),
         viewerProtocolPolicy: "redirect-to-https",
-        cachePolicyId: cachePolicy.policy.id
+        cachePolicyId: cachePolicy.policy.id,
+        compress: true,
       },
       orderedCacheBehavior: this.getOrderedCacheBehaviorForOrigins(props.origins, cachePolicy.policy.id),
       viewerCertificate: {
@@ -136,7 +156,7 @@ pub class CloudFrontDistribution {
         sslSupportMethod: "sni-only"
       },
       origin: this.getHttpOrigins(props.origins),
-      aliases: props.aliases
+      aliases: props.aliases,
     );
   }
 }

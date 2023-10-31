@@ -2,7 +2,6 @@ bring util;
 
 struct SerializeOptions {
   domain: str?;
-  // encode: inflight (str): str?;
   expires: num?;
   httpOnly: bool?;
   maxAge: num?;

@@ -5,9 +5,13 @@
   ],
   "pipeline": {
     "compile": {
-      "outputs": [
-        "./src/**/*.js",
-        "./src/**/*.d.ts"
+      "dotEnv": [
+        ".env"
+      ]
+    },
+    "dev": {
+      "dependsOn": [
+        "^compile"
       ]
     }
   }

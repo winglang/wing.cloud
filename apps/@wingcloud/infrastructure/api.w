@@ -9,6 +9,7 @@ bring "./github.w" as GitHub;
 bring "./jwt.w" as JWT;
 bring "./projects.w" as Projects;
 bring "./users.w" as Users;
+bring "./lowkeys-map.w" as lowkeys;
 
 struct ApiProps {
   api: cloud.Api;
@@ -28,7 +29,8 @@ pub class Api {
     let AUTH_COOKIE_NAME = "auth";
 
     let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
-      if let cookies = request.headers?.tryGet("cookie") {
+      let headers = lowkeys.LowkeysMap.fromMap(request.headers ?? {});
+      if let cookies = headers.tryGet("cookie") {
         let jwt = Cookie.Cookie.parse(cookies).get(AUTH_COOKIE_NAME);
         log("jwt = ${jwt}");
 

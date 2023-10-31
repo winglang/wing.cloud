@@ -1,5 +1,6 @@
 bring ex;
 bring "./nanoid62.w" as nanoid62;
+bring "./status-reports.w" as status_report;
 
 pub struct Environment {
   id: str;
@@ -11,6 +12,7 @@ pub struct Environment {
   installationId: num;
   url: str?;
   commentId: num?;
+  testResults: status_report.TestStatusReport?;
 }
 
 struct CreateEnvironmentOptions {
@@ -38,6 +40,12 @@ struct UpdateEnvironmentCommentIdOptions {
   id: str;
   projectId: str;
   commentId: num;
+}
+
+struct UpdateEnvironmentTestResultsOptions {
+  id: str;
+  projectId: str;
+  testResults: status_report.TestStatusReport;
 }
 
 struct GetEnvironmentOptions {
@@ -220,6 +228,45 @@ pub class Environments {
     ]);
   }
 
+  pub inflight updateTestResults(options: UpdateEnvironmentTestResultsOptions) {
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "ENVIRONMENT#${options.id}",
+            sk: "#",
+          },
+          updateExpression: "SET #testResults = :testResults",
+          conditionExpression: "attribute_exists(#pk) and #projectId = :projectId",
+          expressionAttributeNames: {
+            "#pk": "pk",
+            "#testResults": "testResults",
+            "#projectId": "projectId",
+          },
+          expressionAttributeValues: {
+            ":testResults": options.testResults,
+            ":projectId": options.projectId,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "PROJECT#${options.projectId}",
+            sk: "ENVIRONMENT#${options.id}",
+          },
+          updateExpression: "SET #testResults = :testResults",
+          expressionAttributeNames: {
+            "#testResults": "testResults",
+          },
+          expressionAttributeValues: {
+            ":testResults": options.testResults,
+          },
+        }
+      },
+    ]);
+  }
+
   pub inflight get(options: GetEnvironmentOptions): Environment {
     let result = this.table.getItem(
       key: {
@@ -237,8 +284,9 @@ pub class Environments {
         status: item.get("status").asStr(),
         prNumber: item.get("prNumber").asNum(),
         installationId: item.get("installationId").asNum(),
-        url: item.tryGet("url")?.asStr(),
+        url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
+        testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
       };
     }
 
@@ -263,8 +311,10 @@ pub class Environments {
         status: item.get("status").asStr(),
         prNumber: item.get("prNumber").asNum(),
         installationId: item.get("installationId").asNum(),
-        url: item.tryGet("url")?.asStr(),
+        // https://github.com/winglang/wing/issues/4470
+        url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
+        testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
       }]);
     }
     return environments;
