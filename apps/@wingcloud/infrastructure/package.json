@@ -32,7 +32,10 @@
     "@typescript-eslint/eslint-plugin": "^6.8.0",
     "@typescript-eslint/parser": "^6.8.0",
     "@wingcloud/flyio": "workspace:^",
+    "@wingcloud/runtime": "workspace:^",
     "@wingcloud/website": "workspace:^",
+    "dotenv": "^16.3.1",
+    "dotenv-expand": "^10.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-import-resolver-node": "^0.3.9",
     "eslint-import-resolver-typescript": "^3.6.1",
@@ -50,7 +53,10 @@
     "compile": "projen compile",
     "build": "projen build",
     "dev": "projen dev",
-    "lint": "projen lint"
+    "lint": "projen lint",
+    "terraformInit": "projen terraformInit",
+    "plan": "projen plan",
+    "deploy": "projen deploy"
   },
   "exports": {
     ".": "./src/index.ts"
