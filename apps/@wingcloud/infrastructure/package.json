@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.315",
+    "@octokit/rest": "^20.0.2",
     "@types/cookie": "^0.5.3",
     "@types/express": "^4.17.20",
     "@types/http-proxy": "^1.17.13",
@@ -48,12 +49,13 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "test": "vitest run",
+    "test": "projen test",
     "default": "projen default",
     "compile": "projen compile",
     "build": "projen build",
     "dev": "projen dev",
     "lint": "projen lint",
+    "test-aws": "projen test-aws",
     "terraformInit": "projen terraformInit",
     "plan": "projen plan",
     "deploy": "projen deploy"
