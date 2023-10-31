@@ -4,6 +4,25 @@ import {
   type QueryProcedure,
 } from "@wingcloud/wrpc";
 
+export interface Repository {
+  id: number;
+  name: string;
+  private: boolean;
+  owner: { login: string; avatar_url: string };
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  repository: string;
+  userId: string;
+  entryfile: string;
+  createdAt: string;
+  updatedAt: string;
+  updatedBy: string;
+}
+
 export const wrpc = createWRPCReact<{
   "github.callback": QueryProcedure<{ code: string }, {}>;
   "github.listInstallations": QueryProcedure<
@@ -18,12 +37,7 @@ export const wrpc = createWRPCReact<{
   "github.listRepositories": QueryProcedure<
     { installationId: string },
     {
-      repositories: Array<{
-        id: number;
-        name: string;
-        private: boolean;
-        owner: { login: string; avatar_url: string };
-      }>;
+      repositories: Array<Repository>;
     }
   >;
   "project.get": QueryProcedure<
@@ -39,16 +53,7 @@ export const wrpc = createWRPCReact<{
   "user.listProjects": QueryProcedure<
     undefined,
     {
-      projects: Array<{
-        id: string;
-        name: string;
-        repository: string;
-        userId: string;
-        entryfile: string;
-        createdAt: string;
-        updatedAt: string;
-        updatedBy: string;
-      }>;
+      projects: Array<Project>;
     }
   >;
   "user.createProject": MutationProcedure<{

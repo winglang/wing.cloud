@@ -1,12 +1,11 @@
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/20/solid";
-import { FaceSmileIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Header } from "../components/header.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
-import { wrpc } from "../utils/wrpc.js";
+import { wrpc, type Project } from "../utils/wrpc.js";
 
 const getDateTime = (datetime: string) => {
   const date = new Date(datetime);
@@ -80,30 +79,24 @@ const NewProjectButton = ({ onClick }: { onClick: () => void }) => {
     <button
       onClick={onClick}
       className={clsx(
-        "justify-center items-center rounded-lg border-0 px-2",
+        "justify-center items-center rounded-lg shadow border-0 pl-2 pr-3",
         " transition duration-300",
         "bg-sky-600 text-white",
         "hover:bg-sky-500",
         "flex gap-x-1 text-xs",
       )}
     >
-      <PlusIcon className="w-4 h-4 " />
+      <PlusIcon className="w-4 h-4" />
       Project
     </button>
   );
 };
 
 const ProjectItem = ({
-  name,
-  entryfile,
-  updatedAt,
-  updatedBy,
+  project,
   onClick,
 }: {
-  name: string;
-  entryfile: string;
-  updatedAt: string;
-  updatedBy: string;
+  project: Project;
   onClick: () => void;
 }) => {
   return (
@@ -116,17 +109,25 @@ const ProjectItem = ({
       )}
     >
       <div className="flex gap-x-2">
-        <FaceSmileIcon className="w-10 h-10 text-slate-400" />
+        {project.imageUrl && (
+          <img src={project.imageUrl} className="w-10 h-10 rounded-full" />
+        )}
+        {!project.imageUrl && (
+          <div className="w-10 h-10 rounded-full bg-sky-50 flex justify-center items-center">
+            <div className="text-sky-600">{project.name[0]}</div>
+          </div>
+        )}
       </div>
 
       <div className="text-left mt-4">
-        <div className="text-lg text-slate-800">{name}</div>
-        <div className="text-xs text-slate-600">{entryfile}</div>
+        <div className="text-lg text-slate-800">{project.name}</div>
+        <div className="text-xs text-slate-600">{project.entryfile}</div>
       </div>
 
       <div className="text-xs mt-2">
         <div className="text-slate-600">
-          Updated {getTimeFromNow(updatedAt)} {updatedBy && `by ${updatedBy}`}
+          Updated {getTimeFromNow(project.updatedAt)}{" "}
+          {project.updatedBy && `by ${project.updatedBy}`}
         </div>
       </div>
     </button>
@@ -231,10 +232,7 @@ export const Component = () => {
               onClick={() => {
                 navigate(`/projects/${project.id}`);
               }}
-              name={project.name}
-              entryfile={project.entryfile}
-              updatedAt={project.updatedAt}
-              updatedBy={project.updatedBy}
+              project={project}
             />
           ))}
         </div>

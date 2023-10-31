@@ -7,7 +7,7 @@ import { Header } from "../components/header.js";
 import { Select } from "../components/select.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { openPopupWindow } from "../utils/popup-window.js";
-import { wrpc } from "../utils/wrpc.js";
+import { wrpc, type Repository } from "../utils/wrpc.js";
 
 const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
 
@@ -16,7 +16,7 @@ export const Component = () => {
 
   const [entryfile, setEntryfile] = useState("main.w");
   const [installationId, setInstallationId] = useState("");
-  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [repositoryId, setRepositoryId] = useState("");
 
   const installations = wrpc["github.listInstallations"].useQuery();
 
@@ -39,15 +39,16 @@ export const Component = () => {
 
   const createProjectMutation = wrpc["user.createProject"].useMutation();
   const createProject = useCallback(
-    async (repositoryId: string, projectName: string) => {
-      if (!repositoryId) {
+    async (repo: Repository) => {
+      if (!repo.id) {
         return;
       }
-      setSelectedProjectId(repositoryId);
+      setRepositoryId(repo.id.toString());
       await createProjectMutation.mutateAsync({
         repositoryId,
-        projectName,
         entryfile,
+        projectName: repo.name,
+        imageUrl: repo.owner?.avatar_url || "",
       });
       navigate("/projects");
     },
@@ -130,12 +131,12 @@ export const Component = () => {
                               "flex gap-1",
                             )}
                             onClick={() => {
-                              createProject(repo.id.toString(), repo.name);
+                              createProject(repo);
                             }}
                             disabled={!installationId}
                           >
                             <div>Import</div>
-                            {selectedProjectId === repo.id.toString() && (
+                            {repositoryId === repo.id.toString() && (
                               <div className="flex justify-center">
                                 <SpinnerLoader size="xs" />
                               </div>

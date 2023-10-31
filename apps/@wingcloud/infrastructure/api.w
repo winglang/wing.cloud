@@ -201,6 +201,7 @@ pub class Api {
 
       let project = projects.create(
         name: input.get("projectName").asStr(),
+        imageUrl: input.get("imageUrl").asStr(),
         repository: input.get("repositoryId").asStr(),
         userId: userId,
         entryfile: input.get("entryfile").asStr(),

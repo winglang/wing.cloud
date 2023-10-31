@@ -61,6 +61,7 @@ pub class Projects {
     let project = Project {
       id: "project_${nanoid62.Nanoid62.generate()}",
       name: options.name,
+      imageUrl: options.imageUrl,
       repository: options.repository,
       userId: options.userId,
       entryfile: options.entryfile,
@@ -92,6 +93,7 @@ pub class Projects {
             sk: "PROJECT#${project.id}",
             id: project.id,
             name: project.name,
+            imageUrl: project.imageUrl,
             repository: project.repository,
             userId: project.userId,
             entryfile: project.entryfile,
@@ -208,6 +210,7 @@ pub class Projects {
       projects = projects.concat([Project {
         id: item.get("id").asStr(),
         name: item.get("name").asStr(),
+        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
