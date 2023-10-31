@@ -1,5 +1,4 @@
-**/node_modules
-**/target
-**/lib
-**/test
 **/.turbo
+**/node_modules
+**/src
+**/test
