@@ -83,7 +83,6 @@ pub class Users {
         pk: "USER#${options.userId}",
         sk: "#",
       },
-      projectionExpression: "gitHubLogin",
     );
 
     return result.item?.tryGet("gitHubLogin")?.tryAsStr() ?? "";

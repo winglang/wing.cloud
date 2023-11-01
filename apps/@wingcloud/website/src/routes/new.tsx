@@ -1,6 +1,6 @@
 import { LockClosedIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Header } from "../components/header.js";
@@ -19,14 +19,13 @@ export const Component = () => {
   const [repositoryId, setRepositoryId] = useState("");
 
   const installations = wrpc["github.listInstallations"].useQuery();
-
-  const selectedInstallation = useMemo(
-    () =>
-      installations.data?.installations.find(
-        (installation) => installation.id.toString() === installationId,
-      ),
-    [installations.data, installationId],
-  );
+  useEffect(() => {
+    if (installationId === "") {
+      setInstallationId(
+        installations.data?.installations[0]?.id.toString() || "",
+      );
+    }
+  }, [installations.data]);
 
   const repos = wrpc["github.listRepositories"].useQuery(
     {
@@ -77,32 +76,28 @@ export const Component = () => {
 
         {!installations.isLoading && (
           <div className="flex justify-center pt-10">
-            <div className="space-y-6 w-[25rem] bg-white rounded-lg  shadow-xl border p-6">
-              <h1 className="text-xl font-bold">New Project</h1>
-
+            <div
+              className={clsx(
+                "space-y-6",
+                "w-[25rem] bg-white rounded-lg shadow-xl border p-6",
+              )}
+            >
               <div className="text-sm">
                 <div className="gap-4 mb-4 flex flex-col text-sm">
-                  {installations.isLoading && (
-                    <div className="w-full bg-sky-50 py-2 rounded border flex justify-center">
-                      <SpinnerLoader size="xs" />
-                    </div>
-                  )}
-                  {!installations.isLoading && (
-                    <Select
-                      items={(installations.data?.installations || []).map(
-                        (installation) => ({
-                          value: installation.id.toString(),
-                          label: installation.account.login || "",
-                        }),
-                      )}
-                      placeholder="Select a GitHub namespace"
-                      onChange={(value) => {
-                        setInstallationId(value);
-                      }}
-                      value={installationId.toString()}
-                      btnClassName="w-full bg-sky-50 py-2 rounded border"
-                    />
-                  )}
+                  <Select
+                    items={(installations.data?.installations || []).map(
+                      (installation) => ({
+                        value: installation.id.toString(),
+                        label: installation.account.login || "",
+                      }),
+                    )}
+                    placeholder="Select a GitHub namespace"
+                    onChange={(value) => {
+                      setInstallationId(value);
+                    }}
+                    value={installationId.toString()}
+                    btnClassName="w-full bg-sky-50 py-2 rounded border"
+                  />
 
                   <div className="justify-end flex flex-col gap-1">
                     {repos.data?.repositories.map((repo) => (
@@ -110,6 +105,7 @@ export const Component = () => {
                         key={repo.id}
                         className={clsx(
                           "w-full p-2 rounded border text-left flex items-center",
+                          "bg-white",
                         )}
                       >
                         <img

@@ -194,6 +194,7 @@ pub class Api {
 
     api.post("/wrpc/user.createProject", inflight (request) => {
       let userId = getUserFromCookie(request);
+      log("create Project userId = ${userId}");
 
       let input = Json.parse(request.body ?? "");
 
