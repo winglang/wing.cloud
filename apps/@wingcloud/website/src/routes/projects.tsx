@@ -158,16 +158,14 @@ export const Component = () => {
       <Header breadcrumbs={[{ label: "Projects", to: "/projects" }]} />
 
       <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">
-        {projects.length > 0 && (
-          <div className="flex gap-x-2">
-            <SearchBar value={search} onChange={setSearch} />
-            <NewProjectButton
-              onClick={() => {
-                navigate("/new");
-              }}
-            />
-          </div>
-        )}
+        <div className="flex gap-x-2">
+          <SearchBar value={search} onChange={setSearch} />
+          <NewProjectButton
+            onClick={() => {
+              navigate("/new");
+            }}
+          />
+        </div>
 
         {projectsList.isLoading && (
           <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -193,34 +191,39 @@ export const Component = () => {
               />
             </svg>
             <h3 className="mt-2 text-sm font-semibold text-gray-900">
-              No projects
+              No projects found.
             </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Get started by creating a new project.
-            </p>
-            <div className="mt-6">
-              <button
-                type="button"
-                className={clsx(
-                  "inline-flex items-center rounded-md bg-sky-600 px-3 py-2",
-                  "text-sm font-semibold text-white shadow-sm hover:bg-sky-500 ",
-                  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600",
-                )}
-                onClick={() => {
-                  navigate("/new");
-                }}
-              >
-                <svg
-                  className="-ml-0.5 mr-1.5 h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-                </svg>
-                New Project
-              </button>
-            </div>
+
+            {projectsList.data?.projects.length === 0 && (
+              <>
+                <p className="mt-1 text-sm text-gray-500">
+                  Get started by creating a new project.
+                </p>
+                <div className="mt-6">
+                  <button
+                    type="button"
+                    className={clsx(
+                      "inline-flex items-center rounded-md bg-sky-600 px-3 py-2",
+                      "text-sm font-semibold text-white shadow-sm hover:bg-sky-500 ",
+                      "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600",
+                    )}
+                    onClick={() => {
+                      navigate("/new");
+                    }}
+                  >
+                    <svg
+                      className="-ml-0.5 mr-1.5 h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                    </svg>
+                    New Project
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 
