@@ -36,32 +36,32 @@ export const Component = () => {
     },
   );
 
-  const createProjectMutation = wrpc["user.createProject"].useMutation();
-  const createProject = useCallback(
+  const createAppMutation = wrpc["user.createApp"].useMutation();
+  const createApp = useCallback(
     async (repo: Repository) => {
       if (!repo.id) {
         return;
       }
       setRepositoryId(repo.id.toString());
-      await createProjectMutation.mutateAsync({
+      await createAppMutation.mutateAsync({
         repositoryId: repo.id.toString(),
         repositoryName: repo.name,
         owner: repo.owner?.login || "",
         default_branch: repo.default_branch || "",
         entryfile,
-        projectName: repo.name,
+        appName: repo.name,
         imageUrl: repo.owner?.avatar_url || "",
       });
-      navigate("/projects");
+      navigate("/apps");
     },
-    [createProjectMutation],
+    [createAppMutation],
   );
 
   return (
     <>
       <Header
         breadcrumbs={[
-          { label: "Projects", to: "/projects" },
+          { label: "Apps", to: "/apps" },
           {
             label: "New",
             to: "/new",
@@ -69,7 +69,7 @@ export const Component = () => {
         ]}
       />
       <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">
-        <div className="text-2xl">Create a new project</div>
+        <div className="text-2xl">Create a new app</div>
 
         {installations.isLoading && (
           <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -133,7 +133,7 @@ export const Component = () => {
                               "flex gap-1",
                             )}
                             onClick={() => {
-                              createProject(repo);
+                              createApp(repo);
                             }}
                             disabled={!installationId}
                           >

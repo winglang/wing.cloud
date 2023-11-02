@@ -12,7 +12,7 @@ export interface Repository {
   default_branch: string;
 }
 
-export interface Project {
+export interface App {
   id: string;
   name: string;
   description?: string;
@@ -42,28 +42,28 @@ export const wrpc = createWRPCReact<{
       repositories: Array<Repository>;
     }
   >;
-  "project.get": QueryProcedure<
+  "app.get": QueryProcedure<
     { id: string },
     {
-      project: { id: string; name: string; repository: string; userId: string };
+      app: { id: string; name: string; repository: string; userId: string };
     }
   >;
-  "project.rename": MutationProcedure<
+  "app.rename": MutationProcedure<
     { id: string; name: string; repository: string },
     {}
   >;
-  "user.listProjects": QueryProcedure<
+  "user.listApps": QueryProcedure<
     undefined,
     {
-      projects: Array<Project>;
+      apps: Array<App>;
     }
   >;
-  "user.createProject": MutationProcedure<{
+  "user.createApp": MutationProcedure<{
     repositoryId: string;
     repositoryName: string;
     owner: string;
     default_branch: string;
-    projectName: string;
+    appName: string;
     entryfile: string;
     imageUrl?: string;
   }>;

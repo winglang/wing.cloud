@@ -2,7 +2,7 @@ bring ex;
 bring "./nanoid62.w" as nanoid62;
 bring util;
 
-pub struct Project {
+pub struct App {
   id: str;
   name: str;
   description: str?;
@@ -16,7 +16,7 @@ pub struct Project {
   imageUrl: str?;
 }
 
-struct CreateProjectOptions {
+struct CreateAppOptions {
   name: str;
   description: str?;
   repository: str;
@@ -27,41 +27,41 @@ struct CreateProjectOptions {
   imageUrl: str?;
 }
 
-struct RenameProjectOptions {
+struct RenameAppOptions {
   id: str;
   name: str;
   userId: str;
   repository: str;
 }
 
-struct GetProjectOptions {
+struct GetAppOptions {
   id: str;
 }
 
-struct ListProjectsOptions {
+struct ListAppsOptions {
   userId: str;
 }
 
-struct DeleteProjectOptions {
+struct DeleteAppOptions {
   id: str;
   userId: str;
   repository: str;
 }
 
-struct ListProjectByRepositoryOptions {
+struct ListAppByRepositoryOptions {
   repository: str;
 }
 
-pub class Projects {
+pub class Apps {
   table: ex.DynamodbTable;
 
   init(table: ex.DynamodbTable) {
     this.table = table;
   }
 
-  pub inflight create(options: CreateProjectOptions): Project {
-    let project = Project {
-      id: "project_${nanoid62.Nanoid62.generate()}",
+  pub inflight create(options: CreateAppOptions): App {
+    let app = App {
+      id: "app_${nanoid62.Nanoid62.generate()}",
       name: options.name,
       description: options.description,
       imageUrl: options.imageUrl,
@@ -78,13 +78,13 @@ pub class Projects {
       {
         put: {
           item: {
-            pk: "PROJECT#${project.id}",
+            pk: "App#${app.id}",
             sk: "#",
-            id: project.id,
-            name: project.name,
-            repository: project.repository,
-            userId: project.userId,
-            entryfile: project.entryfile,
+            id: app.id,
+            name: app.name,
+            repository: app.repository,
+            userId: app.userId,
+            entryfile: app.entryfile,
           },
           conditionExpression: "attribute_not_exists(pk)"
         },
@@ -93,18 +93,18 @@ pub class Projects {
         put: {
           item: {
             pk: "USER#${options.userId}",
-            sk: "PROJECT#${project.id}",
-            id: project.id,
-            name: project.name,
-            description: project.description,
-            imageUrl: project.imageUrl,
-            repository: project.repository,
-            userId: project.userId,
-            entryfile: project.entryfile,
-            createdAt: project.createdAt,
-            createdBy: project.createdBy,
-            updatedAt: project.updatedAt,
-            updatedBy: project.createdBy,
+            sk: "App#${app.id}",
+            id: app.id,
+            name: app.name,
+            description: app.description,
+            imageUrl: app.imageUrl,
+            repository: app.repository,
+            userId: app.userId,
+            entryfile: app.entryfile,
+            createdAt: app.createdAt,
+            createdBy: app.createdBy,
+            updatedAt: app.updatedAt,
+            updatedBy: app.createdBy,
           },
         },
       },
@@ -112,26 +112,26 @@ pub class Projects {
         put: {
           item: {
             pk: "REPOSITORY#${options.repository}",
-            sk: "PROJECT#${project.id}",
-            id: project.id,
-            name: project.name,
-            repository: project.repository,
-            userId: project.userId,
-            entryfile: project.entryfile,
+            sk: "App#${app.id}",
+            id: app.id,
+            name: app.name,
+            repository: app.repository,
+            userId: app.userId,
+            entryfile: app.entryfile,
           },
         },
       },
     ]);
 
-    return project;
+    return app;
   }
 
-  pub inflight rename(options: RenameProjectOptions): void {
+  pub inflight rename(options: RenameAppOptions): void {
     this.table.transactWriteItems(transactItems: [
       {
         update: {
           key: {
-            pk: "PROJECT#${options.id}",
+            pk: "App#${options.id}",
             sk: "#",
           },
           updateExpression: "SET #name = :name",
@@ -151,7 +151,7 @@ pub class Projects {
         update: {
           key: {
             pk: "USER#${options.userId}",
-            sk: "PROJECT#${options.id}",
+            sk: "App#${options.id}",
           },
           updateExpression: "SET #name = :name",
           expressionAttributeNames: {
@@ -166,7 +166,7 @@ pub class Projects {
         update: {
           key: {
             pk: "REPOSITORY#${options.repository}",
-            sk: "PROJECT#${options.id}",
+            sk: "App#${options.id}",
           },
           updateExpression: "SET #name = :name",
           expressionAttributeNames: {
@@ -180,10 +180,10 @@ pub class Projects {
     ]);
   }
 
-  pub inflight get(options: GetProjectOptions): Project {
+  pub inflight get(options: GetAppOptions): App {
     let result = this.table.getItem(
       key: {
-        pk: "PROJECT#${options.id}",
+        pk: "App#${options.id}",
         sk: "#",
       },
     );
@@ -199,20 +199,20 @@ pub class Projects {
       };
     }
 
-    throw "Project [${options.id}] not found";
+    throw "App [${options.id}] not found";
   }
 
-  pub inflight list(options: ListProjectsOptions): Array<Project> {
+  pub inflight list(options: ListAppsOptions): Array<App> {
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
         ":pk": "USER#${options.userId}",
-        ":sk": "PROJECT#",
+        ":sk": "App#",
       },
     );
-    let var projects: Array<Project> = [];
+    let var apps: Array<App> = [];
     for item in result.items {
-      projects = projects.concat([Project {
+      apps = apps.concat([App {
         id: item.get("id").asStr(),
         name: item.get("name").asStr(),
         description: item.tryGet("description")?.tryAsStr(),
@@ -224,16 +224,16 @@ pub class Projects {
         updatedBy: item.get("updatedBy").asStr(),
       }]);
     }
-    return projects;
+    return apps;
   }
 
-  pub inflight delete(options: DeleteProjectOptions): void {
+  pub inflight delete(options: DeleteAppOptions): void {
     this.table.transactWriteItems(
       transactItems: [
         {
           delete: {
             key: {
-              pk: "PROJECT#${options.id}",
+              pk: "App#${options.id}",
               sk: "#",
             },
             conditionExpression: "#userId = :userId",
@@ -249,7 +249,7 @@ pub class Projects {
           delete: {
             key: {
               pk: "USER#${options.userId}",
-              sk: "PROJECT#${options.id}",
+              sk: "App#${options.id}",
             },
           },
         },
@@ -257,7 +257,7 @@ pub class Projects {
           delete: {
             key: {
               pk: "REPOSITORY#${options.repository}",
-              sk: "PROJECT#${options.id}",
+              sk: "App#${options.id}",
             },
           },
         },
@@ -265,17 +265,17 @@ pub class Projects {
     );
   }
 
-  pub inflight listByRepository(options: ListProjectByRepositoryOptions): Array<Project> {
+  pub inflight listByRepository(options: ListAppByRepositoryOptions): Array<App> {
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
         ":pk": "REPOSITORY#${options.repository}",
-        ":sk": "PROJECT#",
+        ":sk": "App#",
       },
     );
-    let var projects: Array<Project> = [];
+    let var apps: Array<App> = [];
     for item in result.items {
-      projects = projects.concat([Project {
+      apps = apps.concat([App {
         id: item.get("id").asStr(),
         name: item.get("name").asStr(),
         description: item.tryGet("description")?.tryAsStr(),
@@ -284,6 +284,6 @@ pub class Projects {
         entryfile: item.get("entryfile").asStr(),
       }]);
     }
-    return projects;
+    return apps;
   }
 }

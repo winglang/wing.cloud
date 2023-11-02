@@ -7,13 +7,13 @@ bring "./json-api.w" as json_api;
 bring "./cookie.w" as Cookie;
 bring "./github.w" as GitHub;
 bring "./jwt.w" as JWT;
-bring "./projects.w" as Projects;
+bring "./apps.w" as Apps;
 bring "./users.w" as Users;
 bring "./lowkeys-map.w" as lowkeys;
 
 struct ApiProps {
   api: cloud.Api;
-  projects: Projects.Projects;
+  apps: Apps.Apps;
   users: Users.Users;
   githubAppClientId: str;
   githubAppClientSecret: str;
@@ -23,7 +23,7 @@ struct ApiProps {
 pub class Api {
   init(props: ApiProps) {
     let api = new json_api.JsonApi(api: props.api);
-    let projects = props.projects;
+    let apps = props.apps;
     let users = props.users;
 
     let AUTH_COOKIE_NAME = "auth";
@@ -91,7 +91,7 @@ pub class Api {
       return {
         status: 302,
         headers: {
-          Location: "/projects",
+          Location: "/apps",
           "Set-Cookie": authCookie,
         },
       };
@@ -139,14 +139,14 @@ pub class Api {
       }
     });
 
-    api.get("/wrpc/project.get", inflight (request) => {
+    api.get("/wrpc/app.get", inflight (request) => {
       let userId = getUserFromCookie(request);
 
-      let project = projects.get(
+      let app = apps.get(
         id: request.query.get("id"),
       );
 
-      if project.userId != userId {
+      if app.userId != userId {
         return {
           status: 403,
           body: {
@@ -157,17 +157,17 @@ pub class Api {
 
       return {
         body: {
-            project: project,
+            app: app,
         },
       };
     });
-    // api.get("/wrpc/project.listEnvironments", inflight () => {});
-    api.post("/wrpc/project.rename", inflight (request) => {
+    // api.get("/wrpc/app.listEnvironments", inflight () => {});
+    api.post("/wrpc/app.rename", inflight (request) => {
       let userId = getUserFromCookie(request);
 
       let input = Json.parse(request.body ?? "");
 
-      projects.rename(
+      apps.rename(
         id: input.get("id").asStr(),
         name: input.get("name").asStr(),
         userId: userId,
@@ -177,26 +177,26 @@ pub class Api {
       return {
       };
     });
-    api.post("/wrpc/project.delete", inflight (request) => {
+    api.post("/wrpc/app.delete", inflight (request) => {
       let userId = getUserFromCookie(request);
 
       let input = Json.parse(request.body ?? "");
 
-      projects.delete(
+      apps.delete(
         id: input.get("id").asStr(),
         userId: userId,
         repository: input.get("repository").asStr(),
       );
     });
-    // api.post("/wrpc/project.changeBuildSettings", inflight () => {});
-    // api.get("/wrpc/project.listEnvironmentVariables", inflight () => {});
-    // api.post("/wrpc/project.updateEnvironmentVariables", inflight () => {});
+    // api.post("/wrpc/app.changeBuildSettings", inflight () => {});
+    // api.get("/wrpc/app.listEnvironmentVariables", inflight () => {});
+    // api.post("/wrpc/app.updateEnvironmentVariables", inflight () => {});
 
-    api.post("/wrpc/user.createProject", inflight (request) => {
+    api.post("/wrpc/user.createApp", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
         let userId = getUserFromCookie(request);
 
-        log("create Project userId = ${userId}");
+        log("create App userId = ${userId}");
 
         let input = Json.parse(request.body ?? "");
 
@@ -209,8 +209,8 @@ pub class Api {
           default_branch: input.get("default_branch").asStr(),
         );
 
-        let project = projects.create(
-          name: input.get("projectName").asStr(),
+        let app = apps.create(
+          name: input.get("appName").asStr(),
           description: commitData?.commit?.message ?? "",
           imageUrl: input.get("imageUrl").asStr(),
           repository: input.get("repositoryId").asStr(),
@@ -222,7 +222,7 @@ pub class Api {
 
         return {
           body: {
-            project: project,
+            app: app,
           },
         };
       } else {
@@ -232,16 +232,16 @@ pub class Api {
       }
     });
 
-    api.get("/wrpc/user.listProjects", inflight (request) => {
+    api.get("/wrpc/user.listApps", inflight (request) => {
       let userId = getUserFromCookie(request);
 
-      let userProjects = projects.list(
+      let userApps = apps.list(
         userId: userId,
       );
 
       return {
         body: {
-          projects: userProjects,
+          apps: userApps,
         },
       };
     });

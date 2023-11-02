@@ -8,7 +8,7 @@ bring "./lowkeys-map.w" as lowkeys;
 bring "./github-app.w" as github;
 bring "./runtime/runtime-callbacks.w" as runtime_callbacks;
 bring "./environments.w" as environments;
-bring "./projects.w" as projects;
+bring "./apps.w" as apps;
 
 struct VerifyAndReceieveProps {
   id: str;
@@ -53,7 +53,7 @@ struct PostCommentProps {
   data: Json;
   statusReport: StatusReport;
   environment: environments.Environment;
-  project: projects.Project;
+  app: apps.App;
 }
 
 inflight class ProbotAdapter {
@@ -105,7 +105,7 @@ struct ProbotAppProps {
   probotSecretKey: str;
   webhookSecret: str;
   environments: environments.Environments;
-  projects: projects.Projects;
+  apps: apps.Apps;
 }
 
 pub class ProbotApp {
@@ -117,7 +117,7 @@ pub class ProbotApp {
   pub githubApp: github.GithubApp;
   inflight var adapter: ProbotAdapter;
   environments: environments.Environments;
-  projects: projects.Projects;
+  apps: apps.Apps;
 
   init(props: ProbotAppProps) {
     this.probotAppId =  props.probotAppId;
@@ -126,7 +126,7 @@ pub class ProbotApp {
     this.runtimeUrl = props.runtimeUrl;
     this.runtimeCallbacks = props.runtimeCallbacks;
     this.environments = props.environments;
-    this.projects = props.projects;
+    this.apps = props.apps;
 
     this.githubApp = new github.GithubApp(
       this.probotAppId,
@@ -146,11 +146,11 @@ pub class ProbotApp {
 
       let statusReport = StatusReport.fromJson(data);
       let environment = this.environments.get(id: statusReport.environmentId);
-      let project = this.projects.get(id: environment.projectId);
+      let app = this.apps.get(id: environment.appId);
       let status = statusReport.status;
-      this.environments.updateStatus(id: environment.id, projectId: environment.projectId, status: status);
-      
-      this.postComment(data: data, statusReport: statusReport, environment: environment, project: project);
+      this.environments.updateStatus(id: environment.id, appId: environment.appId, status: status);
+
+      this.postComment(data: data, statusReport: statusReport, environment: environment, app: app);
     });
   }
 
@@ -194,12 +194,12 @@ pub class ProbotApp {
       let repo = context.payload.repository.name;
       let branch = context.payload.pull_request.head.ref;
 
-      let projects = this.projects.listByRepository(repository: context.payload.repository.id);
-      for project in projects {
+      let apps = this.apps.listByRepository(repository: context.payload.repository.id);
+      for app in apps {
         if let installation = context.payload.installation {
           let environment = this.environments.create(
             branch: branch,
-            projectId: project.id, 
+            appId: app.id,
             repo: "${owner}/${repo}",
             status: "initializing",
             installationId: installation.id,
@@ -209,17 +209,17 @@ pub class ProbotApp {
           let res = http.post(this.runtimeUrl, body: Json.stringify({
             repo: "${owner}/${repo}",
             sha: context.payload.pull_request.head.sha,
-            entryfile: project.entryfile,
+            entryfile: app.entryfile,
             environmentId: environment.id,
           }));
-          
+
           if !res.ok {
             throw "handlePullRequstOpened: runtime service error ${res.body}";
           }
 
           if let body = res.body {
             if let url = Json.tryParse(body)?.get("url")?.tryAsStr() {
-              this.environments.updateUrl(id: environment.id, projectId: project.id, url: url);
+              this.environments.updateUrl(id: environment.id, appId: app.id, url: url);
               return;
             }
           }
@@ -246,14 +246,14 @@ pub class ProbotApp {
       let repo = context.payload.repository.name;
       let branch = context.payload.pull_request.head.ref;
 
-      let projects = this.projects.listByRepository(repository: context.payload.repository.id);
-      for project in projects {
-        for environment in this.environments.list(projectId: project.id) {
+      let apps = this.apps.listByRepository(repository: context.payload.repository.id);
+      for app in apps {
+        for environment in this.environments.list(appId: app.id) {
           if environment.branch != branch || environment.status == "stopped" {
             continue;
           }
 
-          this.environments.updateStatus(id: environment.id, projectId: project.id, status: "stopped");
+          this.environments.updateStatus(id: environment.id, appId: app.id, status: "stopped");
 
           let res = http.delete(this.runtimeUrl, body: Json.stringify({
             environmentId: environment.id,
@@ -264,10 +264,10 @@ pub class ProbotApp {
           }
 
           this.postComment(
-            data: {}, 
+            data: {},
             environment:
             environment,
-            project: project, 
+            app: app,
             statusReport: {environmentId: environment.id, status: "stopped"}
           );
         }
@@ -279,33 +279,33 @@ pub class ProbotApp {
       let repo = context.payload.repository.name;
       let branch = context.payload.pull_request.head.ref;
 
-      let projects = this.projects.listByRepository(repository: context.payload.repository.id);
-      for project in projects {
-        for environment in this.environments.list(projectId: project.id) {
+      let apps = this.apps.listByRepository(repository: context.payload.repository.id);
+      for app in apps {
+        for environment in this.environments.list(appId: app.id) {
           if environment.branch != branch || environment.status == "stopped" {
             continue;
           }
 
-          this.environments.updateStatus(id: environment.id, projectId: project.id, status: "initializing");
+          this.environments.updateStatus(id: environment.id, appId: app.id, status: "initializing");
 
           let res = http.post(this.runtimeUrl, body: Json.stringify({
             repo: "${owner}/${repo}",
             sha: context.payload.pull_request.head.sha,
-            entryfile: project.entryfile,
+            entryfile: app.entryfile,
             environmentId: environment.id,
           }));
 
           if !res.ok {
             throw "handlePullRequstSync: runtime service error ${res.body}";
           }
-  
+
           if let body = res.body {
             if let url = Json.tryParse(body)?.get("url")?.tryAsStr() {
-              this.environments.updateUrl(id: environment.id, projectId: project.id, url: url);
+              this.environments.updateUrl(id: environment.id, appId: app.id, url: url);
               return;
             }
           }
-  
+
           throw "handlePullRequstSync: invalid runtime service response ${res.body}";
         }
       }
@@ -342,7 +342,7 @@ pub class ProbotApp {
     }
 
     let date = std.Datetime.utcNow().toIso();
-    let tableRows = "| ${props.project.entryfile} | ${status} | ${previewUrl} | ${testsString} | ${date} |";
+    let tableRows = "| ${props.app.entryfile} | ${status} | ${previewUrl} | ${testsString} | ${date} |";
     let commentBody = "
 | Entry Point     | Status | Preview | Tests | Updated (UTC) |
 | --------------- | ------ | ------- | ----- | -------------- |
@@ -365,7 +365,7 @@ ${tableRows}
         body: commentBody
       );
       log("created preview comment id: ${res.data.id}");
-      this.environments.updateCommentId(id: props.environment.id, projectId: props.environment.projectId, commentId: res.data.id);
+      this.environments.updateCommentId(id: props.environment.id, appId: props.environment.appId, commentId: res.data.id);
     }
   }
 }

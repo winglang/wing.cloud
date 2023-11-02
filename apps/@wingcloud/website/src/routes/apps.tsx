@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Header } from "../components/header.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { GithubIcon } from "../icons/github-icon.js";
-import { wrpc, type Project } from "../utils/wrpc.js";
+import { wrpc, type App } from "../utils/wrpc.js";
 
 const getDateTime = (datetime: string) => {
   const date = new Date(datetime);
@@ -75,31 +75,25 @@ const SearchBar = ({
   );
 };
 
-const NewProjectButton = ({ onClick }: { onClick: () => void }) => {
+const NewAppButton = ({ onClick }: { onClick: () => void }) => {
   return (
     <button
       onClick={onClick}
       className={clsx(
         "justify-center items-center rounded-lg shadow border-0 pl-2 pr-3",
-        " transition duration-300",
+        "transition duration-300",
         "bg-sky-600 text-white",
         "hover:bg-sky-500",
-        "flex gap-x-1 text-xs",
+        "flex gap-x-1 text-xs break-keep",
       )}
     >
       <PlusIcon className="w-4 h-4" />
-      Project
+      new
     </button>
   );
 };
 
-const ProjectItem = ({
-  project,
-  onClick,
-}: {
-  project: Project;
-  onClick: () => void;
-}) => {
+const AppItem = ({ app, onClick }: { app: App; onClick: () => void }) => {
   return (
     <button
       onClick={onClick}
@@ -111,31 +105,29 @@ const ProjectItem = ({
     >
       <div className="space-y-4">
         <div className="flex gap-x-2">
-          {project.imageUrl && (
-            <img src={project.imageUrl} className="w-10 h-10 rounded-full" />
+          {app.imageUrl && (
+            <img src={app.imageUrl} className="w-10 h-10 rounded-full" />
           )}
-          {!project.imageUrl && (
+          {!app.imageUrl && (
             <div className="w-10 h-10 rounded-full bg-sky-50 flex justify-center items-center">
-              <div className="text-sky-600">{project.name[0]}</div>
+              <div className="text-sky-600">{app.name[0]}</div>
             </div>
           )}
         </div>
 
         <div className="text-left w-full truncate space-y-1">
-          <div className="text-lg text-slate-800">{project.name}</div>
+          <div className="text-lg text-slate-800">{app.name}</div>
           <div className="text-xs text-slate-600 truncate flex gap-x-1">
-            {project.description && (
-              <GithubIcon className="w-4 text-slate-700" />
-            )}{" "}
-            {project.description || project.entryfile}
+            {app.description && <GithubIcon className="w-4 text-slate-700" />}{" "}
+            {app.description || app.entryfile}
           </div>
         </div>
       </div>
 
       <div className="text-xs mt-3 h-full flex items-end">
         <div className="text-slate-600">
-          Updated {getTimeFromNow(project.updatedAt)}{" "}
-          {project.updatedBy && `by ${project.updatedBy}`}
+          Updated {getTimeFromNow(app.updatedAt)}{" "}
+          {app.updatedBy && `by ${app.updatedBy}`}
         </div>
       </div>
     </button>
@@ -146,38 +138,36 @@ export const Component = () => {
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-  const projectsList = wrpc["user.listProjects"].useQuery();
+  const appsList = wrpc["user.listApps"].useQuery();
 
-  const projects = useMemo(() => {
-    if (!projectsList.data) {
+  const apps = useMemo(() => {
+    if (!appsList.data) {
       return [];
     }
-    return projectsList.data.projects.filter((project) =>
-      project.name.includes(search),
-    );
-  }, [projectsList.data, search]);
+    return appsList.data.apps.filter((app) => app.name.includes(search));
+  }, [appsList.data, search]);
 
   return (
     <>
-      <Header breadcrumbs={[{ label: "Projects", to: "/projects" }]} />
+      <Header breadcrumbs={[{ label: "Apps", to: "/apps" }]} />
 
       <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">
         <div className="flex gap-x-2">
           <SearchBar value={search} onChange={setSearch} />
-          <NewProjectButton
+          <NewAppButton
             onClick={() => {
               navigate("/new");
             }}
           />
         </div>
 
-        {projectsList.isLoading && (
+        {appsList.isLoading && (
           <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <SpinnerLoader />
           </div>
         )}
 
-        {!projectsList.isLoading && projects.length === 0 && (
+        {!appsList.isLoading && apps.length === 0 && (
           <div className="text-center">
             <svg
               className="mx-auto h-12 w-12 text-gray-400"
@@ -195,13 +185,13 @@ export const Component = () => {
               />
             </svg>
             <h3 className="mt-2 text-sm font-semibold text-gray-900">
-              No projects found.
+              No apps found.
             </h3>
 
-            {projectsList.data?.projects.length === 0 && (
+            {appsList.data?.apps.length === 0 && (
               <>
                 <p className="mt-1 text-sm text-gray-500">
-                  Get started by creating a new project.
+                  Get started by creating a new app.
                 </p>
                 <div className="mt-6">
                   <button
@@ -223,7 +213,7 @@ export const Component = () => {
                     >
                       <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
                     </svg>
-                    New Project
+                    New App
                   </button>
                 </div>
               </>
@@ -237,13 +227,13 @@ export const Component = () => {
             "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
           )}
         >
-          {projects.map((project) => (
-            <ProjectItem
-              key={project.id}
+          {apps.map((app) => (
+            <AppItem
+              key={app.id}
               onClick={() => {
-                navigate(`/projects/${project.id}`);
+                navigate(`/apps/${app.id}`);
               }}
-              project={project}
+              app={app}
             />
           ))}
         </div>

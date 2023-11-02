@@ -3,7 +3,7 @@ bring "./nanoid62.w" as nanoid62;
 
 pub struct Environment {
   id: str;
-  projectId: str;
+  appId: str;
   repo: str;
   branch: str;
   status: str;
@@ -14,7 +14,7 @@ pub struct Environment {
 }
 
 struct CreateEnvironmentOptions {
-  projectId: str;
+  appId: str;
   repo: str;
   branch: str;
   status: str;
@@ -24,19 +24,19 @@ struct CreateEnvironmentOptions {
 
 struct UpdateEnvironmentStatusOptions {
   id: str;
-  projectId: str;
+  appId: str;
   status: str;
 }
 
 struct UpdateEnvironmentUrlOptions {
   id: str;
-  projectId: str;
+  appId: str;
   url: str;
 }
 
 struct UpdateEnvironmentCommentIdOptions {
   id: str;
-  projectId: str;
+  appId: str;
   commentId: num;
 }
 
@@ -45,7 +45,7 @@ struct GetEnvironmentOptions {
 }
 
 struct ListEnvironmentOptions {
-  projectId: str;
+  appId: str;
 }
 
 pub class Environments {
@@ -58,7 +58,7 @@ pub class Environments {
   pub inflight create(options: CreateEnvironmentOptions): Environment {
     let environment = Environment {
       id: "environment_${nanoid62.Nanoid62.generate()}",
-      projectId: options.projectId,
+      appId: options.appId,
       repo: options.repo,
       branch: options.branch,
       status: options.status,
@@ -73,7 +73,7 @@ pub class Environments {
             pk: "ENVIRONMENT#${environment.id}",
             sk: "#",
             id: environment.id,
-            projectId: environment.projectId,
+            appId: environment.appId,
             repo: environment.repo,
             branch: environment.branch,
             status: environment.status,
@@ -86,10 +86,10 @@ pub class Environments {
       {
         put: {
           item: {
-            pk: "PROJECT#${environment.projectId}",
+            pk: "APP#${environment.appId}",
             sk: "ENVIRONMENT#${environment.id}",
             id: environment.id,
-            projectId: environment.projectId,
+            appId: environment.appId,
             repo: environment.repo,
             branch: environment.branch,
             status: environment.status,
@@ -112,22 +112,22 @@ pub class Environments {
             sk: "#",
           },
           updateExpression: "SET #status = :status",
-          conditionExpression: "attribute_exists(#pk) and #projectId = :projectId",
+          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
           expressionAttributeNames: {
             "#pk": "pk",
             "#status": "status",
-            "#projectId": "projectId",
+            "#appId": "appId",
           },
           expressionAttributeValues: {
             ":status": options.status,
-            ":projectId": options.projectId,
+            ":appId": options.appId,
           },
         }
       },
       {
         update: {
           key: {
-            pk: "PROJECT#${options.projectId}",
+            pk: "APP#${options.appId}",
             sk: "ENVIRONMENT#${options.id}",
           },
           updateExpression: "SET #status = :status",
@@ -151,22 +151,22 @@ pub class Environments {
             sk: "#",
           },
           updateExpression: "SET #url = :url",
-          conditionExpression: "attribute_exists(#pk) and #projectId = :projectId",
+          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
           expressionAttributeNames: {
             "#pk": "pk",
             "#url": "url",
-            "#projectId": "projectId",
+            "#appId": "appId",
           },
           expressionAttributeValues: {
             ":url": options.url,
-            ":projectId": options.projectId,
+            ":appId": options.appId,
           },
         }
       },
       {
         update: {
           key: {
-            pk: "PROJECT#${options.projectId}",
+            pk: "APP#${options.appId}",
             sk: "ENVIRONMENT#${options.id}",
           },
           updateExpression: "SET #url = :url",
@@ -190,22 +190,22 @@ pub class Environments {
             sk: "#",
           },
           updateExpression: "SET #commentId = :commentId",
-          conditionExpression: "attribute_exists(#pk) and #projectId = :projectId",
+          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
           expressionAttributeNames: {
             "#pk": "pk",
             "#commentId": "commentId",
-            "#projectId": "projectId",
+            "#appId": "appId",
           },
           expressionAttributeValues: {
             ":commentId": options.commentId,
-            ":projectId": options.projectId,
+            ":appId": options.appId,
           },
         }
       },
       {
         update: {
           key: {
-            pk: "PROJECT#${options.projectId}",
+            pk: "APP#${options.appId}",
             sk: "ENVIRONMENT#${options.id}",
           },
           updateExpression: "SET #commentId = :commentId",
@@ -231,7 +231,7 @@ pub class Environments {
     if let item = result.item {
       return {
         id: item.get("id").asStr(),
-        projectId: item.get("projectId").asStr(),
+        appId: item.get("appId").asStr(),
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),
         status: item.get("status").asStr(),
@@ -249,7 +249,7 @@ pub class Environments {
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
-        ":pk": "PROJECT#${options.projectId}",
+        ":pk": "APP#${options.appId}",
         ":sk": "ENVIRONMENT#",
       },
     );
@@ -257,7 +257,7 @@ pub class Environments {
     for item in result.items {
       environments = environments.concat([{
         id: item.get("id").asStr(),
-        projectId: item.get("projectId").asStr(),
+        appId: item.get("appId").asStr(),
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),
         status: item.get("status").asStr(),
