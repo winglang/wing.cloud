@@ -2,6 +2,8 @@ import { ChevronRightIcon, UserCircleIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { Link } from "react-router-dom";
 
+import { WingIcon } from "../icons/wing-icon.js";
+
 export interface Breadcrumb {
   label: string;
   to: string;
@@ -18,12 +20,8 @@ export const Header = ({ breadcrumbs }: HeaderProps) => {
         <ol role="list" className="flex items-center space-x-2">
           <li>
             <div>
-              <Link to="/" className="text-gray-400 hover:text-gray-500">
-                <img
-                  className="h-8 w-auto"
-                  src="../assets/icon-light.svg"
-                  alt=""
-                />
+              <Link to="/" className="text-[#212627] hover:text-slate-800">
+                <WingIcon className="h-5 w-auto" />
               </Link>
             </div>
           </li>
@@ -31,9 +29,9 @@ export const Header = ({ breadcrumbs }: HeaderProps) => {
             return (
               <li key={index}>
                 <div className="flex items-center">
-                  <ChevronRightIcon className="h-5 w-5 flex-shrink-0 text-gray-400" />
+                  <ChevronRightIcon className="h-5 w-5 flex-shrink-0 text-slate-700" />
                   <Link
-                    className="ml-2 text-sm font-medium text-gray-500 hover:text-gray-700"
+                    className="ml-2 text-sm font-medium text-slate-700 hover:text-slate-600"
                     to={breadcrumb.to}
                   >
                     {breadcrumb.label}
@@ -45,7 +43,7 @@ export const Header = ({ breadcrumbs }: HeaderProps) => {
         </ol>
         <div className="flex grow justify-end items-center gap-x-12">
           <button>
-            <UserCircleIcon className="w-8 h-8 text-gray-400" />
+            <UserCircleIcon className="w-8 h-8 text-slate-400" />
           </button>
         </div>
       </nav>

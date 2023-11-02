@@ -101,7 +101,7 @@ pub class Api {
       if let accessToken = getAccessTokenFromCookie(request) {
         log("accessToken = ${accessToken}");
 
-        let installations = GitHub.Exchange.listUserInstallations(accessToken);
+        let installations = GitHub.Client.listUserInstallations(accessToken);
 
         log("installations = ${Json.stringify(installations)}");
 
@@ -123,7 +123,7 @@ pub class Api {
 
         let installationId = num.fromStr(request.query.get("installationId"));
 
-        let repositories = GitHub.Exchange.listInstallationRepos(accessToken, installationId);
+        let repositories = GitHub.Client.listInstallationRepos(accessToken, installationId);
 
         log("repositories = ${Json.stringify(repositories)}");
 
@@ -193,28 +193,45 @@ pub class Api {
     // api.post("/wrpc/project.updateEnvironmentVariables", inflight () => {});
 
     api.post("/wrpc/user.createProject", inflight (request) => {
-      let userId = getUserFromCookie(request);
-      log("create Project userId = ${userId}");
+      if let accessToken = getAccessTokenFromCookie(request) {
+        let userId = getUserFromCookie(request);
 
-      let input = Json.parse(request.body ?? "");
+        log("create Project userId = ${userId}");
 
-      let gitHubLogin = users.getUsername(userId: userId);
+        let input = Json.parse(request.body ?? "");
 
-      let project = projects.create(
-        name: input.get("projectName").asStr(),
-        imageUrl: input.get("imageUrl").asStr(),
-        repository: input.get("repositoryId").asStr(),
-        userId: userId,
-        entryfile: input.get("entryfile").asStr(),
-        createdAt: "${datetime.utcNow().toIso()}",
-        createdBy: gitHubLogin,
-      );
+        let gitHubLogin = users.getUsername(userId: userId);
 
-      return {
-        body: {
-          project: project,
-        },
-      };
+        let data = GitHub.Client.getLastCommit(
+          token: accessToken,
+          owner:  input.get("owner").asStr(),
+          repo: input.get("repositoryName").asStr(),
+          default_branch: input.get("default_branch").asStr(),
+        );
+        let description = data.commit.message;
+        log("description = ${description}");
+
+        let project = projects.create(
+          name: input.get("projectName").asStr(),
+          description: description,
+          imageUrl: input.get("imageUrl").asStr(),
+          repository: input.get("repositoryId").asStr(),
+          userId: userId,
+          entryfile: input.get("entryfile").asStr(),
+          createdAt: "${datetime.utcNow().toIso()}",
+          createdBy: gitHubLogin,
+        );
+
+        return {
+          body: {
+            project: project,
+          },
+        };
+      } else {
+        return {
+          status: 401,
+        };
+      }
     });
 
     api.get("/wrpc/user.listProjects", inflight (request) => {

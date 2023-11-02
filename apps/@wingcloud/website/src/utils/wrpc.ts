@@ -9,11 +9,13 @@ export interface Repository {
   name: string;
   private: boolean;
   owner: { login: string; avatar_url: string };
+  default_branch: string;
 }
 
 export interface Project {
   id: string;
   name: string;
+  description?: string;
   imageUrl?: string;
   repository: string;
   userId: string;
@@ -58,6 +60,9 @@ export const wrpc = createWRPCReact<{
   >;
   "user.createProject": MutationProcedure<{
     repositoryId: string;
+    repositoryName: string;
+    owner: string;
+    default_branch: string;
     projectName: string;
     entryfile: string;
     imageUrl?: string;

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Header } from "../components/header.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
+import { GithubIcon } from "../icons/github-icon.js";
 import { wrpc, type Project } from "../utils/wrpc.js";
 
 const getDateTime = (datetime: string) => {
@@ -106,6 +107,7 @@ const ProjectItem = ({
         "flex flex-col",
         "w-full h-full p-4 bg-white rounded-lg",
         "shadow hover:shadow-md transition-all",
+        "space-y-4",
       )}
     >
       <div className="flex gap-x-2">
@@ -119,12 +121,14 @@ const ProjectItem = ({
         )}
       </div>
 
-      <div className="text-left mt-4">
+      <div className="text-left w-full truncate">
         <div className="text-lg text-slate-800">{project.name}</div>
-        <div className="text-xs text-slate-600">{project.entryfile}</div>
+        <div className="text-xs text-slate-600 truncate flex gap-x-1 mt-1">
+          <GithubIcon className="w-4 text-slate-700" /> {project.description}
+        </div>
       </div>
 
-      <div className="text-xs mt-2">
+      <div className="text-xs">
         <div className="text-slate-600">
           Updated {getTimeFromNow(project.updatedAt)}{" "}
           {project.updatedBy && `by ${project.updatedBy}`}

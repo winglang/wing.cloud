@@ -44,7 +44,10 @@ export const Component = () => {
       }
       setRepositoryId(repo.id.toString());
       await createProjectMutation.mutateAsync({
-        repositoryId,
+        repositoryId: repo.id.toString(),
+        repositoryName: repo.name,
+        owner: repo.owner?.login || "",
+        default_branch: repo.default_branch || "",
         entryfile,
         projectName: repo.name,
         imageUrl: repo.owner?.avatar_url || "",

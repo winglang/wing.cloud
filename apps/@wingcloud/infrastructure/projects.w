@@ -5,6 +5,7 @@ bring util;
 pub struct Project {
   id: str;
   name: str;
+  description: str?;
   repository: str;
   userId: str;
   entryfile: str;
@@ -17,6 +18,7 @@ pub struct Project {
 
 struct CreateProjectOptions {
   name: str;
+  description: str?;
   repository: str;
   userId: str;
   entryfile: str;
@@ -61,6 +63,7 @@ pub class Projects {
     let project = Project {
       id: "project_${nanoid62.Nanoid62.generate()}",
       name: options.name,
+      description: options.description,
       imageUrl: options.imageUrl,
       repository: options.repository,
       userId: options.userId,
@@ -93,6 +96,7 @@ pub class Projects {
             sk: "PROJECT#${project.id}",
             id: project.id,
             name: project.name,
+            description: project.description,
             imageUrl: project.imageUrl,
             repository: project.repository,
             userId: project.userId,
@@ -187,6 +191,7 @@ pub class Projects {
     if let item = result.item {
       return {
         id: item.get("id").asStr(),
+        description: item.get("description").asStr(),
         name: item.get("name").asStr(),
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
@@ -210,6 +215,7 @@ pub class Projects {
       projects = projects.concat([Project {
         id: item.get("id").asStr(),
         name: item.get("name").asStr(),
+        description: item.get("description").asStr(),
         imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
@@ -272,6 +278,7 @@ pub class Projects {
       projects = projects.concat([Project {
         id: item.get("id").asStr(),
         name: item.get("name").asStr(),
+        description: item.get("description").asStr(),
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
