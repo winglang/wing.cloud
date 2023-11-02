@@ -196,8 +196,6 @@ pub class Api {
       if let accessToken = getAccessTokenFromCookie(request) {
         let userId = getUserFromCookie(request);
 
-        log("create App userId = ${userId}");
-
         let input = Json.parse(request.body ?? "");
 
         let gitHubLogin = users.getUsername(userId: userId);
