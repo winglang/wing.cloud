@@ -35,6 +35,23 @@ export type MutationProcedure<Input = unknown, Output = unknown> = {
   ): UseMutationResult<Output, unknown, Input>;
 };
 
+const fetcher = async (method: string, url: URL, input?: any) => {
+  const response = await fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: input ? JSON.stringify(input) : undefined,
+  });
+  if (!response.ok) {
+    if (response.status === 401) {
+      window.location.href = "/";
+    }
+    throw new Error(await response.text());
+  }
+  return response.json();
+};
+
 export const createWRPCReact = <
   Router extends Record<string, any>,
 >(): Router => {
@@ -51,39 +68,16 @@ export const createWRPCReact = <
               }
             }
             return useQuery({
-              queryKey: [route, input],
-              queryFn: async () => {
-                const response = await fetch(url, {
-                  method: "GET",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                });
-                if (!response.ok) {
-                  throw new Error(await response.text());
-                }
-                return response.json();
-              },
               ...options,
+              queryKey: [route, input],
+              queryFn: async () => await fetcher("GET", url),
             });
           },
           useMutation: (options: UseMutationOptions) => {
             const url = new URL(`${useContext(WRPCContext).url}/${route}`);
             return useMutation({
-              mutationFn: async (input: any) => {
-                const response = await fetch(url, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(input),
-                });
-                if (!response.ok) {
-                  throw new Error(await response.text());
-                }
-                return response.json();
-              },
               ...options,
+              mutationFn: async (input) => await fetcher("POST", url, input),
             });
           },
         };

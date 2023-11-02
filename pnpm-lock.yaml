@@ -248,6 +248,9 @@ importers:
       '@heroicons/react':
         specifier: ^2.0.18
         version: 2.0.18(react@18.2.0)
+      '@ibm/plex':
+        specifier: ^6.3.0
+        version: 6.3.0
       '@tanstack/react-query':
         specifier: ^5.0.5
         version: 5.0.5(react-dom@18.2.0)(react@18.2.0)
@@ -279,9 +282,6 @@ importers:
       '@cloudy-ts/eslint-plugin':
         specifier: ^0.0.315
         version: 0.0.315(eslint@8.52.0)
-      '@ibm/plex':
-        specifier: ^6.3.0
-        version: 6.3.0
       '@types/node':
         specifier: '18'
         version: 18.18.7
@@ -2715,7 +2715,7 @@ packages:
 
   /@ibm/plex@6.3.0:
     resolution: {integrity: sha512-kb1ATGXrFu/gF2NZY40OlRUAEWCcrq9mIEYkuWqXUPaC6Zrb7iA9wQYTkJdAPP+V6ySfp7NLAyzAnK9c5k90Sg==}
-    dev: true
+    dev: false
 
   /@ioredis/commands@1.2.0:
     resolution: {integrity: sha512-Sx1pU8EM64o2BrqNpEO1CNLtKQwyhuXuqyfH7oGKCk+1a33d2r5saW8zNwm3j6BTExtjrv2BxTgzzkMwts6vGg==}
@@ -5661,7 +5661,10 @@ packages:
     peerDependencies:
       constructs: ^10.0.25
     dependencies:
+      archiver: 5.3.1
       constructs: 10.2.70
+      json-stable-stringify: 1.0.2
+      semver: 7.5.4
     dev: false
     bundledDependencies:
       - archiver
@@ -5673,7 +5676,10 @@ packages:
     peerDependencies:
       constructs: ^10.0.25
     dependencies:
+      archiver: 5.3.1
       constructs: 10.3.0
+      json-stable-stringify: 1.0.2
+      semver: 7.5.4
     dev: false
     bundledDependencies:
       - archiver
@@ -6236,7 +6242,7 @@ packages:
     dependencies:
       semver: 7.5.4
       shelljs: 0.8.5
-      typescript: 5.3.0-dev.20231031
+      typescript: 5.3.0-dev.20231102
     dev: true
 
   /dset@3.1.3:
@@ -10953,8 +10959,8 @@ packages:
     hasBin: true
     dev: true
 
-  /typescript@5.3.0-dev.20231031:
-    resolution: {integrity: sha512-+w6szmOFr7GSWj/eNFgHdYqubMux9B5ao5LFoGdn712gbDYMpLwqLNkPLpJHD9chl/2wc/W96iSfALkZs7sVXQ==}
+  /typescript@5.3.0-dev.20231102:
+    resolution: {integrity: sha512-M1maLdHyAvE+y4w27IBplkqekR5Lzf2B7XualvF3lXJUC2165swvSmpThFdfHcXxP/+/SYmLI9z2CVvN7pEK+g==}
     engines: {node: '>=14.17'}
     hasBin: true
     dev: true

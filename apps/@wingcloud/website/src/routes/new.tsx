@@ -93,6 +93,9 @@ export const Component = () => {
                     )}
                     placeholder="Select a GitHub namespace"
                     onChange={(value) => {
+                      if (!value) {
+                        return;
+                      }
                       setInstallationId(value);
                     }}
                     value={installationId.toString()}
