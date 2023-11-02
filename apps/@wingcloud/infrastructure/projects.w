@@ -191,7 +191,7 @@ pub class Projects {
     if let item = result.item {
       return {
         id: item.get("id").asStr(),
-        description: item.get("description").asStr(),
+        description: item.tryGet("description")?.tryAsStr(),
         name: item.get("name").asStr(),
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
@@ -215,7 +215,7 @@ pub class Projects {
       projects = projects.concat([Project {
         id: item.get("id").asStr(),
         name: item.get("name").asStr(),
-        description: item.get("description").asStr(),
+        description: item.tryGet("description")?.tryAsStr(),
         imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
@@ -278,7 +278,6 @@ pub class Projects {
       projects = projects.concat([Project {
         id: item.get("id").asStr(),
         name: item.get("name").asStr(),
-        description: item.get("description").asStr(),
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
