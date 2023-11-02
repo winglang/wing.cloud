@@ -48,7 +48,7 @@ const fetcher = async (method: string, url: URL, input?: any) => {
     if (response.status === 401 || error === "Unauthorized") {
       window.location.href = "/";
     }
-    throw new Error(await response.text());
+    throw new Error(error);
   }
   return response.json();
 };

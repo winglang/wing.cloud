@@ -68,12 +68,9 @@ pub class Api {
       throw "Unauthorized";
     });
 
-    api.get("/wrpc/auth.signOut", inflight (request) => {
-
+    api.post("/wrpc/auth.signout", inflight (request) => {
       return {
-        status: 302,
         headers: {
-          Location: "/",
           "Set-Cookie": Cookie.Cookie.serialize(
             AUTH_COOKIE_NAME,
             "",
@@ -84,6 +81,8 @@ pub class Api {
               expires: 0,
             },
           ),
+        },
+        body: {
         },
       };
     });

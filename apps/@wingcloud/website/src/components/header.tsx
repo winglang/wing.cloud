@@ -1,9 +1,10 @@
 import { ChevronRightIcon, UserCircleIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { WingIcon } from "../icons/wing-icon.js";
+import { wrpc } from "../utils/wrpc.js";
 
 export interface Breadcrumb {
   label: string;
@@ -17,8 +18,13 @@ export interface HeaderProps {
 export const UserMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const navigate = useNavigate();
+  const signOutMutation = wrpc["auth.signout"].useMutation();
+
   const signOut = () => {
-    window.location.href = "/wrpc/auth.signOut";
+    signOutMutation.mutateAsync({}).then(() => {
+      navigate("/");
+    });
   };
 
   return (
