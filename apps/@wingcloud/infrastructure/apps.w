@@ -78,7 +78,7 @@ pub class Apps {
       {
         put: {
           item: {
-            pk: "App#${app.id}",
+            pk: "APP#${app.id}",
             sk: "#",
             id: app.id,
             name: app.name,
@@ -93,7 +93,7 @@ pub class Apps {
         put: {
           item: {
             pk: "USER#${options.userId}",
-            sk: "App#${app.id}",
+            sk: "APP#${app.id}",
             id: app.id,
             name: app.name,
             description: app.description,
@@ -112,7 +112,7 @@ pub class Apps {
         put: {
           item: {
             pk: "REPOSITORY#${options.repository}",
-            sk: "App#${app.id}",
+            sk: "APP#${app.id}",
             id: app.id,
             name: app.name,
             repository: app.repository,
@@ -131,7 +131,7 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "App#${options.id}",
+            pk: "APP#${options.id}",
             sk: "#",
           },
           updateExpression: "SET #name = :name",
@@ -151,7 +151,7 @@ pub class Apps {
         update: {
           key: {
             pk: "USER#${options.userId}",
-            sk: "App#${options.id}",
+            sk: "APP#${options.id}",
           },
           updateExpression: "SET #name = :name",
           expressionAttributeNames: {
@@ -166,7 +166,7 @@ pub class Apps {
         update: {
           key: {
             pk: "REPOSITORY#${options.repository}",
-            sk: "App#${options.id}",
+            sk: "APP#${options.id}",
           },
           updateExpression: "SET #name = :name",
           expressionAttributeNames: {
@@ -183,7 +183,7 @@ pub class Apps {
   pub inflight get(options: GetAppOptions): App {
     let result = this.table.getItem(
       key: {
-        pk: "App#${options.id}",
+        pk: "APP#${options.id}",
         sk: "#",
       },
     );
@@ -207,7 +207,7 @@ pub class Apps {
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
         ":pk": "USER#${options.userId}",
-        ":sk": "App#",
+        ":sk": "APP#",
       },
     );
     let var apps: Array<App> = [];
@@ -233,7 +233,7 @@ pub class Apps {
         {
           delete: {
             key: {
-              pk: "App#${options.id}",
+              pk: "APP#${options.id}",
               sk: "#",
             },
             conditionExpression: "#userId = :userId",
@@ -249,7 +249,7 @@ pub class Apps {
           delete: {
             key: {
               pk: "USER#${options.userId}",
-              sk: "App#${options.id}",
+              sk: "APP#${options.id}",
             },
           },
         },
@@ -257,7 +257,7 @@ pub class Apps {
           delete: {
             key: {
               pk: "REPOSITORY#${options.repository}",
-              sk: "App#${options.id}",
+              sk: "APP#${options.id}",
             },
           },
         },
@@ -270,7 +270,7 @@ pub class Apps {
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
         ":pk": "REPOSITORY#${options.repository}",
-        ":sk": "App#",
+        ":sk": "APP#",
       },
     );
     let var apps: Array<App> = [];
