@@ -26,6 +26,7 @@ export interface App {
 }
 
 export const wrpc = createWRPCReact<{
+  "auth.check": QueryProcedure<{}>;
   "github.callback": QueryProcedure<{ code: string }, {}>;
   "github.listInstallations": QueryProcedure<
     undefined,

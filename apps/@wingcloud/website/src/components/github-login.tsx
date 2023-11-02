@@ -2,9 +2,9 @@
 const GITHUB_APP_CLIENT_ID = import.meta.env.VITE_GITHUB_APP_CLIENT_ID;
 let AUTHORIZE_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_APP_CLIENT_ID}`;
 
-const local_redirect_url = "http://localhost:3900/wrpc/github.callback";
+const localRedirectUrl = "http://localhost:3900/wrpc/github.callback";
 if (import.meta.env.DEV) {
-  AUTHORIZE_URL = AUTHORIZE_URL + `&redirect_uri=${local_redirect_url}`;
+  AUTHORIZE_URL = AUTHORIZE_URL + `&redirect_uri=${localRedirectUrl}`;
 }
 
 export const GithubLogin = () => {

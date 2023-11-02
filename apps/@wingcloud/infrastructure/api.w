@@ -31,7 +31,10 @@ pub class Api {
     let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
       let headers = lowkeys.LowkeysMap.fromMap(request.headers ?? {});
       if let cookies = headers.tryGet("cookie") {
-        let jwt = Cookie.Cookie.parse(cookies).get(AUTH_COOKIE_NAME);
+        let jwt = Cookie.Cookie.parse(cookies).tryGet(AUTH_COOKIE_NAME) ?? "";
+        if jwt == "" {
+          return nil;
+        }
         log("jwt = ${jwt}");
 
         return JWT.JWT.verify(
@@ -53,6 +56,37 @@ pub class Api {
       let payload = getJWTPayloadFromCookie(request);
       return payload?.accessToken;
     };
+
+    api.get("/wrpc/auth.check", inflight (request) => {
+      if let payload = getJWTPayloadFromCookie(request) {
+        return {
+          body: {
+            userId: payload.userId,
+          },
+        };
+      }
+      throw "Unauthorized";
+    });
+
+    api.get("/wrpc/auth.signOut", inflight (request) => {
+
+      return {
+        status: 302,
+        headers: {
+          Location: "/",
+          "Set-Cookie": Cookie.Cookie.serialize(
+            AUTH_COOKIE_NAME,
+            "",
+            {
+              httpOnly: true,
+              secure: true,
+              sameSite: "strict",
+              expires: 0,
+            },
+          ),
+        },
+      };
+    });
 
     api.get("/wrpc/github.callback", inflight (request) => {
       let code = request.query.get("code");
