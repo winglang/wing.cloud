@@ -1,6 +1,5 @@
 bring ex;
 bring "./nanoid62.w" as nanoid62;
-bring util;
 
 pub struct App {
   id: str;
