@@ -103,7 +103,7 @@ const AppItem = ({ app, onClick }: { app: App; onClick: () => void }) => {
         "shadow hover:shadow-md transition-all",
       )}
     >
-      <div className="space-y-4">
+      <div className="space-y-4 w-full">
         <div className="flex gap-x-2">
           {app.imageUrl && (
             <img src={app.imageUrl} className="w-10 h-10 rounded-full" />
@@ -117,9 +117,9 @@ const AppItem = ({ app, onClick }: { app: App; onClick: () => void }) => {
 
         <div className="text-left w-full truncate space-y-1">
           <div className="text-lg text-slate-800">{app.name}</div>
-          <div className="text-xs text-slate-600 truncate flex gap-x-1">
-            {app.description && <GithubIcon className="w-4 text-slate-700" />}{" "}
-            {app.description || app.entryfile}
+          <div className="text-xs text-slate-600 flex gap-x-1">
+            {app.description && <GithubIcon className="w-4 text-slate-700" />}
+            <div className="truncate">{app.description || app.entryfile}</div>
           </div>
         </div>
       </div>
