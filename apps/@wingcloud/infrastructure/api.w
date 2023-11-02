@@ -202,18 +202,16 @@ pub class Api {
 
         let gitHubLogin = users.getUsername(userId: userId);
 
-        let data = GitHub.Client.getLastCommit(
+        let commitData = GitHub.Client.getLastCommit(
           token: accessToken,
           owner:  input.get("owner").asStr(),
           repo: input.get("repositoryName").asStr(),
           default_branch: input.get("default_branch").asStr(),
         );
-        let description = data.commit.message;
-        log("description = ${description}");
 
         let project = projects.create(
           name: input.get("projectName").asStr(),
-          description: description,
+          description: commitData?.commit?.message ?? "",
           imageUrl: input.get("imageUrl").asStr(),
           repository: input.get("repositoryId").asStr(),
           userId: userId,

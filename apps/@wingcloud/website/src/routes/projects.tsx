@@ -107,28 +107,32 @@ const ProjectItem = ({
         "flex flex-col",
         "w-full h-full p-4 bg-white rounded-lg",
         "shadow hover:shadow-md transition-all",
-        "space-y-4",
       )}
     >
-      <div className="flex gap-x-2">
-        {project.imageUrl && (
-          <img src={project.imageUrl} className="w-10 h-10 rounded-full" />
-        )}
-        {!project.imageUrl && (
-          <div className="w-10 h-10 rounded-full bg-sky-50 flex justify-center items-center">
-            <div className="text-sky-600">{project.name[0]}</div>
-          </div>
-        )}
-      </div>
+      <div className="space-y-4">
+        <div className="flex gap-x-2">
+          {project.imageUrl && (
+            <img src={project.imageUrl} className="w-10 h-10 rounded-full" />
+          )}
+          {!project.imageUrl && (
+            <div className="w-10 h-10 rounded-full bg-sky-50 flex justify-center items-center">
+              <div className="text-sky-600">{project.name[0]}</div>
+            </div>
+          )}
+        </div>
 
-      <div className="text-left w-full truncate">
-        <div className="text-lg text-slate-800">{project.name}</div>
-        <div className="text-xs text-slate-600 truncate flex gap-x-1 mt-1">
-          <GithubIcon className="w-4 text-slate-700" /> {project.description}
+        <div className="text-left w-full truncate space-y-1">
+          <div className="text-lg text-slate-800">{project.name}</div>
+          <div className="text-xs text-slate-600 truncate flex gap-x-1">
+            {project.description && (
+              <GithubIcon className="w-4 text-slate-700" />
+            )}{" "}
+            {project.description || project.entryfile}
+          </div>
         </div>
       </div>
 
-      <div className="text-xs">
+      <div className="text-xs mt-3 h-full flex items-end">
         <div className="text-slate-600">
           Updated {getTimeFromNow(project.updatedAt)}{" "}
           {project.updatedBy && `by ${project.updatedBy}`}
