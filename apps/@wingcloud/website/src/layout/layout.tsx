@@ -1,9 +1,12 @@
 import { type PropsWithChildren } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { wrpc } from "../utils/wrpc.js";
 
 export const Layout = ({ children }: PropsWithChildren) => {
+  const naviage = useNavigate();
+
   if (location.pathname !== "/") {
     const authCheck = wrpc["auth.check"].useQuery({});
 
@@ -16,7 +19,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
     }
 
     if (authCheck.isError) {
-      window.location.href = "/";
+      naviage("/");
     }
   }
 
