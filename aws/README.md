@@ -2,8 +2,8 @@
 
 This is configuring
 
-- A versioned S3 Bucket for Terraform state and a Dynamodb table for Terraform state locking to be used in a [S3 Backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3) [./tfstate](./tfstate/)
-- [Github OIDC](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services) access for Github Actions from the `wing.cloud` repository [./oidc](./oidc/)
+- [./tfstate](./tfstate/): A versioned S3 Bucket for Terraform state and a Dynamodb table for Terraform state locking to be used in a [S3 Backend](https://developer.hashicorp.com/terraform/language/settings/backends/s3) 
+- [./oidc](./oidc/): [Github OIDC](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services) access for Github Actions from the `wing.cloud` repository
 
 for the following AWS Accounts
 
@@ -95,10 +95,27 @@ The actual deployment is pretty straightforward and wrapped in a [shell script](
 
 Make sure to have a valid AWS session for the AWS Account on your machine. This assumes an AWS config setup as described above with the aws profiles `wing-cloud-staging` / `wing-cloud-production` being available and authenticated.
 
+### Plan 
+
+Performs a dry run in all accounts
+
+```
+./bin/plan-all
+```
+
+### Deploy
+
+Performs a deployment in all accounts
+
 ```
 ./bin/deploy-all
 ```
 
 ## Dev
 
-Find the [main.w](./main.w) file and edit the code. The [policy.json](./policy.json) can be changed to trim down the permissions for the Github Action Role. It allows full access right now.
+The actual wing code lives in these two folders
+
+ - [./oidc](./oidc/)
+ - [./tfstate](./tfstate/)
+
+ The binaries are in [./bin](./bin/)

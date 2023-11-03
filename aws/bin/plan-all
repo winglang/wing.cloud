@@ -1,0 +1,25 @@
+#! /usr/bin/env bash
+
+set -e
+
+CURRENT_DIR=$(pwd)
+BIN_DIR=$(pwd)/bin
+
+plan_env() {
+  local name=$1
+  local env=$3
+  echo "=============================================="
+  echo "==== Planning $name in environment: $env ===="
+  echo "=============================================="
+  cd $name
+  export AWS_PROFILE=$2
+  $BIN_DIR/deploy $env dry-run
+  cd $CURRENT_DIR
+}
+
+plan_env "tfstate" "wing-cloud-staging" "staging"
+plan_env "tfstate" "wing-cloud-production" "production"
+plan_env "oidc" "wing-cloud-staging" "staging"
+plan_env "oidc" "wing-cloud-production" "production"
+
+echo "Planned all services successfully"

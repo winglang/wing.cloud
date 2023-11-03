@@ -5,8 +5,8 @@ set -e
 TF_IN_AUTOMATION=true
 CURRENT_DIR=$(pwd)
 
-if [ "$#" -ne 1 ]; then
-    echo "Illegal number of parameters. Please provide environment as an argument."
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+    echo "Illegal number of parameters. Please provide environment and optionally a 'dry-run' flag as arguments."
     exit 1
 fi
 
@@ -42,4 +42,10 @@ wing compile --platform tf-aws --platform ./s3.backend.js $ENVIRONMENT.main.w
 echo "Deploying to $ENVIRONMENT environment in AWS account $ACCOUNT_ID"
 cd ./target/$ENVIRONMENT.main.tfaws
 terraform init
-terraform apply -auto-approve
+
+if [ "$2" == "dry-run" ]; then
+    echo "Executing a dry run..."
+    terraform plan
+else
+    terraform apply -auto-approve
+fi
