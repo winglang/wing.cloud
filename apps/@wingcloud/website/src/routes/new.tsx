@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Header } from "../components/header.js";
-import { Select } from "../components/select.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
+import { Select } from "../design-system/select.js";
 import { openPopupWindow } from "../utils/popup-window.js";
 import { wrpc, type Repository } from "../utils/wrpc.js";
 

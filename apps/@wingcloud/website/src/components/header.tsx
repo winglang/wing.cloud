@@ -1,4 +1,4 @@
-import { ChevronRightIcon, UserCircleIcon } from "@heroicons/react/20/solid";
+import { ChevronRightIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -15,7 +15,7 @@ export interface HeaderProps {
   breadcrumbs: Breadcrumb[];
 }
 
-export const UserMenu = () => {
+const UserMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -32,11 +32,7 @@ export const UserMenu = () => {
       <div>
         <button
           type="button"
-          className={clsx(
-            "flex items-center rounded-full bg-gray-100 ",
-            "text-gray-400 hover:text-gray-600",
-            "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
-          )}
+          className={clsx("group", "flex items-center rounded-full")}
           aria-expanded="true"
           aria-haspopup="true"
           onClick={() => {
@@ -44,14 +40,20 @@ export const UserMenu = () => {
           }}
         >
           <span className="sr-only">Open options</span>
-          <UserCircleIcon className="w-8 h-8 text-slate-400" />
+          <UserCircleIcon
+            className={clsx(
+              "w-8 h-8 text-slate-400",
+              "group-hover:text-slate-500 transition-all",
+              "group-focus:text-slate-500",
+            )}
+          />
         </button>
       </div>
 
       <div
         className={clsx(
           "absolute right-0 z-10 mt-2 w-56 origin-top-right",
-          "rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none",
+          "rounded bg-white shadow-lg",
           isOpen ? "block" : "hidden",
         )}
         role="menu"
@@ -63,6 +65,8 @@ export const UserMenu = () => {
             className={clsx(
               "text-gray-700 block w-full px-4 py-2 text-left text-sm",
               "hover:bg-gray-100 hover:text-gray-900",
+              "rounded",
+              "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
             )}
             role="menuitem"
             onClick={signOut}
