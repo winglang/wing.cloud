@@ -248,6 +248,9 @@ importers:
       '@heroicons/react':
         specifier: ^2.0.18
         version: 2.0.18(react@18.2.0)
+      '@ibm/plex':
+        specifier: ^6.3.0
+        version: 6.3.0
       '@tanstack/react-query':
         specifier: ^5.0.5
         version: 5.0.5(react-dom@18.2.0)(react@18.2.0)
@@ -279,9 +282,6 @@ importers:
       '@cloudy-ts/eslint-plugin':
         specifier: ^0.0.315
         version: 0.0.315(eslint@8.52.0)
-      '@ibm/plex':
-        specifier: ^6.3.0
-        version: 6.3.0
       '@types/node':
         specifier: '18'
         version: 18.18.7
@@ -2715,7 +2715,7 @@ packages:
 
   /@ibm/plex@6.3.0:
     resolution: {integrity: sha512-kb1ATGXrFu/gF2NZY40OlRUAEWCcrq9mIEYkuWqXUPaC6Zrb7iA9wQYTkJdAPP+V6ySfp7NLAyzAnK9c5k90Sg==}
-    dev: true
+    dev: false
 
   /@ioredis/commands@1.2.0:
     resolution: {integrity: sha512-Sx1pU8EM64o2BrqNpEO1CNLtKQwyhuXuqyfH7oGKCk+1a33d2r5saW8zNwm3j6BTExtjrv2BxTgzzkMwts6vGg==}
