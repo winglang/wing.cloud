@@ -1,0 +1,45 @@
+#! /usr/bin/env bash
+
+set -e
+
+TF_IN_AUTOMATION=true
+CURRENT_DIR=$(pwd)
+
+if [ "$#" -ne 1 ]; then
+    echo "Illegal number of parameters. Please provide environment as an argument."
+    exit 1
+fi
+
+export ENVIRONMENT=$(echo $1 | tr '[:upper:]' '[:lower:]')
+
+if [ "$ENVIRONMENT" != "staging" ] && [ "$ENVIRONMENT" != "production" ]; then
+    echo "Invalid ENVIRONMENT. Please provide either 'staging' or 'production' as an argument."
+    exit 1
+fi
+
+if [ ! -f "$CURRENT_DIR/$ENVIRONMENT.main.w" ]; then
+    echo "No $ENVIRONMENT.main.w file found. Please ensure a $ENVIRONMENT.main.w file exists."
+    exit 1
+fi
+
+if [ "$ENVIRONMENT" == "staging" ]; then
+    ACCOUNT_ID="891197207596"
+else
+    ACCOUNT_ID="108269615366"
+fi
+
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
+if [ "$AWS_ACCOUNT_ID" != "$ACCOUNT_ID" ]; then
+    echo "AWS account ID does not match the expected account ID for the provided environment."
+    exit 1
+fi
+
+echo "Building the wing application for $ENVIRONMENT environment"
+
+wing compile --platform tf-aws --platform ./s3.backend.js $ENVIRONMENT.main.w
+
+echo "Deploying to $ENVIRONMENT environment in AWS account $ACCOUNT_ID"
+cd ./target/$ENVIRONMENT.main.tfaws
+terraform init
+terraform apply -auto-approve
