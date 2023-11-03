@@ -44,7 +44,7 @@ struct UpdateEnvironmentCommentIdOptions {
 
 struct UpdateEnvironmentTestResultsOptions {
   id: str;
-  projectId: str;
+  appId: str;
   testResults: status_report.TestStatusReport;
 }
 
@@ -237,22 +237,22 @@ pub class Environments {
             sk: "#",
           },
           updateExpression: "SET #testResults = :testResults",
-          conditionExpression: "attribute_exists(#pk) and #projectId = :projectId",
+          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
           expressionAttributeNames: {
             "#pk": "pk",
             "#testResults": "testResults",
-            "#projectId": "projectId",
+            "#appId": "appId",
           },
           expressionAttributeValues: {
             ":testResults": options.testResults,
-            ":projectId": options.projectId,
+            ":appId": options.appId,
           },
         }
       },
       {
         update: {
           key: {
-            pk: "PROJECT#${options.projectId}",
+            pk: "PROJECT#${options.appId}",
             sk: "ENVIRONMENT#${options.id}",
           },
           updateExpression: "SET #testResults = :testResults",
