@@ -67,6 +67,7 @@ let rntm = new runtime.RuntimeService(
   wingCloudUrl: api.url,
   flyToken: util.tryEnv("FLY_TOKEN"),
   flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
+  environments: environments,
 );
 let probotApp = new probot.ProbotApp(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
@@ -77,8 +78,8 @@ let probotApp = new probot.ProbotApp(
   environments: environments,
   apps: apps,
 );
-
 bring "cdktf" as cdktf;
+new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
 
 let apiDomainName = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
@@ -87,7 +88,6 @@ let apiDomainName = (() => {
   }
   return api.url;
 })();
-new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
 let subDomain = util.env("PROXY_SUBDOMAIN");
 let zoneName = util.env("PROXY_ZONE_NAME");
 let proxy = new ReverseProxy.ReverseProxy(
@@ -110,17 +110,19 @@ let proxy = new ReverseProxy.ReverseProxy(
   port: 3900
 );
 
+let var webhookUrl = probotApp.githubApp.webhookUrl;
 if util.tryEnv("WING_TARGET") == "sim" {
   bring "./ngrok.w" as ngrok;
 
-  let githubApp = probotApp.githubApp;
   let devNgrok = new ngrok.Ngrok(
-    url: githubApp.webhookUrl,
+    url: webhookUrl,
     domain: util.tryEnv("NGROK_DOMAIN"),
   );
 
-  let deploy = new cloud.OnDeploy(inflight () => {
-    githubApp.updateWebhookUrl("${devNgrok.url}/webhook");
-    log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
-  });
+  webhookUrl = devNgrok.url;
 }
+
+let deploy = new cloud.OnDeploy(inflight () => {
+  probotApp.githubApp.updateWebhookUrl("${webhookUrl}/webhook");
+  log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
+});

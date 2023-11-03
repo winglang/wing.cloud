@@ -9,6 +9,7 @@ struct IProbotRepository {
   id: str;
   name: str;
   owner: IProbotRepositoryOwner;
+  full_name: str;
 }
 
 struct IPullRequestHead {

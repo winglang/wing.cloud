@@ -4,7 +4,7 @@
   "type": "commonjs",
   "sideEffects": false,
   "dependencies": {
-    "@cdktf/provider-aws": "^18.0.2",
+    "@cdktf/provider-aws": "^18.0.3",
     "@cdktf/provider-dnsimple": "^8.0.0",
     "@cdktf/provider-docker": "^10.0.0",
     "@cdktf/provider-null": "^9.0.0",
@@ -20,7 +20,7 @@
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^3.3.2",
     "octokit": "^3.1.1",
-    "winglang": "^0.41.28"
+    "winglang": "^0.41.39"
   },
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.315",
@@ -29,8 +29,8 @@
     "@types/http-proxy": "^1.17.13",
     "@types/jsonwebtoken": "^9.0.4",
     "@types/node": "18",
-    "@typescript-eslint/eslint-plugin": "^6.9.0",
-    "@typescript-eslint/parser": "^6.9.0",
+    "@typescript-eslint/eslint-plugin": "^6.9.1",
+    "@typescript-eslint/parser": "^6.9.1",
     "@wingcloud/flyio": "workspace:^",
     "@wingcloud/runtime": "workspace:^",
     "@wingcloud/website": "workspace:^",

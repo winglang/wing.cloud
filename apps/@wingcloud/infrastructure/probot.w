@@ -9,6 +9,8 @@ bring "./github-app.w" as github;
 bring "./runtime/runtime-callbacks.w" as runtime_callbacks;
 bring "./environments.w" as environments;
 bring "./apps.w" as apps;
+bring "./status-reports.w" as status_reports;
+bring "./github-comment.w" as comment;
 
 struct VerifyAndReceieveProps {
   id: str;
@@ -31,29 +33,8 @@ struct ProbotInstance {
   auth: IProbotAuth;
 }
 
-struct TestResult {
-  path: str;
-  pass: bool;
-}
-
-struct TestResults {
-  testResults: Array<TestResult>;
-}
-
-struct StatusReport {
-  environmentId: str;
-  status: str;
-}
-
-struct TestStatusReport extends StatusReport {
-  data: TestResults;
-}
-
 struct PostCommentProps {
-  data: Json;
-  statusReport: StatusReport;
-  environment: environments.Environment;
-  app: apps.App;
+  environmentId: str;
 }
 
 inflight class ProbotAdapter {
@@ -105,7 +86,7 @@ struct ProbotAppProps {
   probotSecretKey: str;
   webhookSecret: str;
   environments: environments.Environments;
-  apps: apps.Apps;
+  apps: apps.Projects;
 }
 
 pub class ProbotApp {
@@ -118,6 +99,7 @@ pub class ProbotApp {
   inflight var adapter: ProbotAdapter;
   environments: environments.Environments;
   apps: apps.Apps;
+  githubComment: comment.GithubComment;
 
   init(props: ProbotAppProps) {
     this.probotAppId =  props.probotAppId;
@@ -127,30 +109,45 @@ pub class ProbotApp {
     this.runtimeCallbacks = props.runtimeCallbacks;
     this.environments = props.environments;
     this.apps = props.apps;
+    this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps);
 
+    let queue = new cloud.Queue();
     this.githubApp = new github.GithubApp(
       this.probotAppId,
       this.probotSecretKey,
       inflight (req) => {
-        this.listen();
-        this.adapter.verifyAndReceive(this.getVerifyAndReceievePropsProps(req));
+        queue.push(
+          Json.stringify(this.getVerifyAndReceievePropsProps(req)),
+        );
         return {
           status: 200
         };
       }
     );
+    queue.setConsumer(inflight (message) => {
+      let props = VerifyAndReceieveProps.fromJson(Json.parse(message));
+      this.listen();
+      this.adapter.verifyAndReceive(props);
+      }, { timeout: 1m });
 
     this.runtimeCallbacks.onStatus(inflight (event) => {
       log("report status: ${event}");
       let data = Json.parse(event);
 
-      let statusReport = StatusReport.fromJson(data);
+      let statusReport = status_reports.StatusReport.fromJson(data);
       let environment = this.environments.get(id: statusReport.environmentId);
-      let app = this.apps.get(id: environment.appId);
+      let project = this.apps.get(id: environment.projectId);
       let status = statusReport.status;
-      this.environments.updateStatus(id: environment.id, appId: environment.appId, status: status);
+      this.environments.updateStatus(id: environment.id, projectId: environment.projectId, status: status);
+      if status == "tests" {
+        this.environments.updateTestResults(
+          id: environment.id,
+          projectId: project.id,
+          testResults: status_reports.TestStatusReport.fromJson(data)
+        );
+      }
 
-      this.postComment(data: data, statusReport: statusReport, environment: environment, app: app);
+      this.postComment(environmentId: environment.id);
     });
   }
 
@@ -190,41 +187,33 @@ pub class ProbotApp {
     this.adapter = new ProbotAdapter();
     this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
     let onPullRequestOpen = inflight (context: probot.IPullRequestOpenedContext): void => {
-      let owner = context.payload.repository.owner.login;
-      let repo = context.payload.repository.name;
       let branch = context.payload.pull_request.head.ref;
 
-      let apps = this.apps.listByRepository(repository: context.payload.repository.id);
-      for app in apps {
+      let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
+      for project in apps {
         if let installation = context.payload.installation {
           let environment = this.environments.create(
             branch: branch,
-            appId: app.id,
-            repo: "${owner}/${repo}",
+            projectId: project.id,
+            repo: context.payload.repository.full_name,
             status: "initializing",
             installationId: installation.id,
             prNumber: context.payload.pull_request.number,
           );
 
+          this.postComment(environmentId: environment.id);
+
           let res = http.post(this.runtimeUrl, body: Json.stringify({
-            repo: "${owner}/${repo}",
+            repo: context.payload.repository.full_name,
             sha: context.payload.pull_request.head.sha,
-            entryfile: app.entryfile,
+            entryfile: project.entryfile,
+            projectId: project.id,
             environmentId: environment.id,
           }));
 
           if !res.ok {
             throw "handlePullRequstOpened: runtime service error ${res.body}";
           }
-
-          if let body = res.body {
-            if let url = Json.tryParse(body)?.get("url")?.tryAsStr() {
-              this.environments.updateUrl(id: environment.id, appId: app.id, url: url);
-              return;
-            }
-          }
-
-          throw "handlePullRequstOpened: invalid runtime service response ${res.body}";
         } else {
           throw "handlePullRequstOpened: missing installation id";
         }
@@ -242,18 +231,16 @@ pub class ProbotApp {
     });
 
     this.adapter.handlePullRequstClosed(inflight (context: probot.IPullRequestClosedContext): void => {
-      let owner = context.payload.repository.owner.login;
-      let repo = context.payload.repository.name;
       let branch = context.payload.pull_request.head.ref;
 
-      let apps = this.apps.listByRepository(repository: context.payload.repository.id);
-      for app in apps {
-        for environment in this.environments.list(appId: app.id) {
+      let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
+      for project in apps {
+        for environment in this.environments.list(projectId: project.id) {
           if environment.branch != branch || environment.status == "stopped" {
             continue;
           }
 
-          this.environments.updateStatus(id: environment.id, appId: app.id, status: "stopped");
+          this.environments.updateStatus(id: environment.id, projectId: project.id, status: "stopped");
 
           let res = http.delete(this.runtimeUrl, body: Json.stringify({
             environmentId: environment.id,
@@ -263,35 +250,29 @@ pub class ProbotApp {
             throw "handlePullRequstClosed: runtime service error ${res.body}";
           }
 
-          this.postComment(
-            data: {},
-            environment:
-            environment,
-            app: app,
-            statusReport: {environmentId: environment.id, status: "stopped"}
-          );
+          this.postComment(environmentId: environment.id);
         }
       }
     });
 
     this.adapter.handlePullRequstSync(inflight (context: probot.IPullRequestSyncContext): void => {
-      let owner = context.payload.repository.owner.login;
-      let repo = context.payload.repository.name;
       let branch = context.payload.pull_request.head.ref;
 
-      let apps = this.apps.listByRepository(repository: context.payload.repository.id);
-      for app in apps {
-        for environment in this.environments.list(appId: app.id) {
+      let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
+      for project in apps {
+        for environment in this.environments.list(projectId: project.id) {
           if environment.branch != branch || environment.status == "stopped" {
             continue;
           }
 
-          this.environments.updateStatus(id: environment.id, appId: app.id, status: "initializing");
+          this.environments.updateStatus(id: environment.id, projectId: project.id, status: "initializing");
+
+          this.postComment(environmentId: environment.id);
 
           let res = http.post(this.runtimeUrl, body: Json.stringify({
-            repo: "${owner}/${repo}",
+            repo: context.payload.repository.full_name,
             sha: context.payload.pull_request.head.sha,
-            entryfile: app.entryfile,
+            entryfile: project.entryfile,
             environmentId: environment.id,
           }));
 
@@ -301,7 +282,7 @@ pub class ProbotApp {
 
           if let body = res.body {
             if let url = Json.tryParse(body)?.get("url")?.tryAsStr() {
-              this.environments.updateUrl(id: environment.id, appId: app.id, url: url);
+              this.environments.updateUrl(id: environment.id, projectId: project.id, url: url);
               return;
             }
           }
@@ -315,57 +296,15 @@ pub class ProbotApp {
   inflight postComment(props: PostCommentProps) {
     this.adapter = new ProbotAdapter();
     this.adapter.initialize(this.probotAppId, this.probotSecretKey, this.webhookSecret);
+    let environment = this.environments.get(id: props.environmentId);
+    let commentId = this.githubComment.createOrUpdate(
+      octokit: this.adapter.auth(environment.installationId),
+      prNumber: environment.prNumber,
+      repo: environment.repo
+    );
 
-    let owner = props.environment.repo.split("/").at(0);
-    let repo = props.environment.repo.split("/").at(1);
-    let status = props.statusReport.status;
-
-    let var testsString = "---";
-    if status == "tests" {
-      let testStatusReport = TestStatusReport.fromJson(props.data);
-      testsString = "";
-      let var i = 0;
-      for testResult in testStatusReport.data.testResults {
-        let var icon = "✅";
-        if !testResult.pass {
-          icon = "❌";
-        }
-        testsString = "${icon} ${testResult.path}<br> ${testsString}";
-        i += 1;
-      }
-    }
-
-    let var previewUrl = "";
-    let shouldDisplayUrl = status == "running";
-    if(shouldDisplayUrl) {
-      previewUrl = props.environment.url ?? "";
-    }
-
-    let date = std.Datetime.utcNow().toIso();
-    let tableRows = "| ${props.app.entryfile} | ${status} | ${previewUrl} | ${testsString} | ${date} |";
-    let commentBody = "
-| Entry Point     | Status | Preview | Tests | Updated (UTC) |
-| --------------- | ------ | ------- | ----- | -------------- |
-${tableRows}
-";
-    if let commentId = props.environment.commentId {
-      log("updating existing preview comment: ${commentId}");
-      this.adapter.auth(props.environment.installationId).issues.updateComment(
-        owner: owner,
-        repo: repo,
-        comment_id: commentId,
-        body: commentBody
-      );
-    } else {
-      log("creating a new preview comment");
-      let res = this.adapter.auth(props.environment.installationId).issues.createComment(
-        owner: owner,
-        repo: repo,
-        issue_number: props.environment.prNumber,
-        body: commentBody
-      );
-      log("created preview comment id: ${res.data.id}");
-      this.environments.updateCommentId(id: props.environment.id, appId: props.environment.appId, commentId: res.data.id);
+    if !environment.commentId? {
+      this.environments.updateCommentId(id: environment.id, projectId: environment.projectId, commentId: commentId);
     }
   }
 }

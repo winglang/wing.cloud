@@ -7,6 +7,7 @@ import {
 export interface Repository {
   id: number;
   name: string;
+  full_name: string;
   private: boolean;
   owner: { login: string; avatar_url: string };
   default_branch: string;
