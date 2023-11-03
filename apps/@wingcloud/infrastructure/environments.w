@@ -252,7 +252,7 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "PROJECT#${options.appId}",
+            pk: "APP#${options.appId}",
             sk: "ENVIRONMENT#${options.id}",
           },
           updateExpression: "SET #testResults = :testResults",

@@ -189,7 +189,7 @@ website.addGitIgnore("!/.env.example");
 
 website.addDevDeps("node-fetch");
 website.addDevDeps("nanoid");
-website.addDeps("@ibm/plex");
+website.addDevDeps("@ibm/plex");
 
 ///////////////////////////////////////////////////////////////////////////////
 const runtime = new TypescriptProject({

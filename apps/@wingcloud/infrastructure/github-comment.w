@@ -28,7 +28,7 @@ pub class GithubComment {
     let var commentId: num? = nil;
     let var commentBody = "${wingIdentifier}
 
-| Project         | Status | Preview | Tests | Updated (UTC) |
+| App         | Status | Preview | Tests | Updated (UTC) |
 | --------------- | ------ | ------- | ----- | -------------- |";
     for app in this.apps.listByRepository(repository: props.repo) {
       for environment in this.environments.list(appId: app.id) {
