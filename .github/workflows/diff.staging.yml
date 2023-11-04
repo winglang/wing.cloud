@@ -107,7 +107,9 @@ jobs:
             const plan = plan_file.length > 65000 ? plan_file.toString().substring(0, 65000) + " ..." : plan_file
             const truncated_message = plan_file.length > 65000 ? "Output is too long and was truncated. You can read full Plan in " + run_link + "<br /><br />" : ""
           
-            const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            const output = `#### Environment 🌎\`staging\`
+            
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
 
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
       
