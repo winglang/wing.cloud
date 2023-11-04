@@ -32,8 +32,19 @@ jobs:
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: "1.5.7"
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
       - name: Install Dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
       - name: Compile Wing Cloud          
         env: 
           DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
