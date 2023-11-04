@@ -47,16 +47,14 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Compile Wing Cloud          
         env: 
-          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
-          DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
           APP_SECRET: ${{ secrets.APP_SECRET }}
+          FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
+          FLY_TOKEN: ${{ secrets.FLY_TOKEN }}       
           BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
           BOT_GITHUB_CLIENT_ID: ${{ secrets.BOT_GITHUB_CLIENT_ID }}
           BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
           BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}
           BOT_GITHUB_WEBHOOK_SECRET: ${{ secrets.BOT_GITHUB_WEBHOOK_SECRET }}
-          FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
-          FLY_TOKEN: ${{ secrets.FLY_TOKEN }}
           PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
           PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
           VITE_GITHUB_APP_CLIENT_ID: ${{ secrets.VITE_GITHUB_APP_CLIENT_ID }}
@@ -79,6 +77,9 @@ jobs:
         working-directory: 'apps/@wingcloud/infrastructure/target/main.tfaws'
       - name: Terraform Plan
         id: plan
+        env:
+          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
+          DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
         run: |
           terraform plan -out=plan.tmp
           terraform show -no-color plan.tmp >${GITHUB_WORKSPACE}/plan.out
