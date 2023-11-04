@@ -14,7 +14,7 @@ exports.postSynth = function(config) {
       bucket: process.env.TF_BACKEND_BUCKET,
       region: process.env.TF_BACKEND_BUCKET_REGION,
       key: process.env.TF_BACKEND_STATE_FILE,
-      table_name: process.env.TF_BACKEND_LOCK_TABLE,
+      dynamodb_table: process.env.TF_BACKEND_LOCK_TABLE,
     }
   }
   return config;
