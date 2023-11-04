@@ -82,6 +82,8 @@ jobs:
         run: |
           terraform plan -out=plan.tmp
           terraform show -no-color plan.tmp >${GITHUB_WORKSPACE}/plan.out
+          echo "${GITHUB_WORKSPACE}/plan.out"
+          pwd
         continue-on-error: true
         working-directory: 'apps/@wingcloud/infrastructure/target/main.tfaws'
       
