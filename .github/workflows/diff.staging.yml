@@ -81,7 +81,7 @@ jobs:
           DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
           DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
         run: |
-          terraform plan -out=plan.tmp
+          terraform plan -lock=false -out=plan.tmp
           terraform show -no-color plan.tmp >${GITHUB_WORKSPACE}/plan.out
         working-directory: 'apps/@wingcloud/infrastructure/target/main.tfaws'
       
