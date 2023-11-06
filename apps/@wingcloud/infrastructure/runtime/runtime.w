@@ -58,9 +58,10 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "GIT_SHA" => opts.gitSha,
       "ENTRYFILE" => opts.entryfile,
       "WING_TARGET" => util.env("WING_TARGET"),
-      "LOGS_BUCKET_NAME" => "stam", // opts.logsBucketName,
+      "LOGS_BUCKET_NAME" => util.env(opts.logsBucketName), // get simulator handle for the bucket
       "WING_CLOUD_URL" => opts.wingCloudUrl,
       "ENVIRONMENT_ID" => opts.environmentId,
+      "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
     };
 
     if let token = opts.gitToken {
@@ -180,6 +181,8 @@ pub class RuntimeService {
     let var awsSecretAccessKey: str = "";
     if util.tryEnv("WING_TARGET") == "sim" {
       this.runtimeHandler = new RuntimeHandler_sim();
+      let bucketAddr = this.logs.node.addr;
+      bucketName = "BUCKET_HANDLE_${bucketAddr.substring(bucketAddr.length - 8, bucketAddr.length)}";
     } else {
       let awsUser = new aws.iamUser.IamUser(name: "${this.node.addr}-user");
       let bucketArn: str = unsafeCast(this.logs).bucket.arn;
@@ -218,6 +221,9 @@ pub class RuntimeService {
     let queue = new cloud.Queue();
     queue.setConsumer(inflight (message) => {
       try {
+        // hack to get bucket in this environment
+        this.logs.put;
+
         let msg = Message.fromJson(Json.parse(message));
 
         log("wing url: ${props.wingCloudUrl}");
@@ -245,7 +251,7 @@ pub class RuntimeService {
       } catch error {
         log(error);
       }
-    }, { timeout: 1m });
+    }, { timeout: 5m });
 
     this.api = new cloud.Api();
     this.api.post("/", inflight (req) => {
