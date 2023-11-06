@@ -338,4 +338,21 @@ infrastructure.addDevDeps(flyio.name);
 infrastructure.addDevDeps(runtime.name);
 
 ///////////////////////////////////////////////////////////////////////////////
+
+const aws = new NodeProject({
+  parent: monorepo,
+  name: "@wingcloud/aws-cicd",
+  outdir: "aws",
+});
+
+aws.addDeps("@cdktf/provider-aws");
+aws.addDeps("cdktf");
+aws.addDeps("constructs");
+aws.addGitIgnore("**/target/");
+aws.addFields({
+  type: "commonjs",
+})
+
+///////////////////////////////////////////////////////////////////////////////
+
 monorepo.synth();
