@@ -1,3 +1,7 @@
+struct BaseResponse {
+  status: num;
+}
+
 struct OctoKitListFilesObject {
   filename: str;
 }
@@ -13,7 +17,25 @@ struct OctoKitPullsOptions {
   pull_number: num;
 }
 
+struct CreatePullResponseData {
+  id: num;
+}
+
+struct CreatePullResponse extends BaseResponse {
+  status: num;
+  data:CreatePullResponseData;
+}
+
+struct CreatePullOptions {
+  owner: str;
+  repo: str;
+  title: str;
+  head: str;
+  base: str;
+}
+
 interface OctoKitPulls {
+  inflight create(options: CreatePullOptions): CreatePullResponse;
   inflight listFiles(options: OctoKitPullsOptions): OctoKitListFilesResponse;
 }
 
@@ -58,8 +80,35 @@ struct GetTreeOptions {
   recursive: str?;
 }
 
+struct GetRefOptionsResponseDataObject {
+  sha: str;
+}
+
+struct GetRefOptionsResponseData {
+  object: GetRefOptionsResponseDataObject;
+}
+
+struct GetRefOptionsResponse extends BaseResponse {
+  data: GetRefOptionsResponseData;
+}
+
+struct GetRefOptions {
+  owner: str;
+  repo: str;
+  ref: str;
+}
+
+struct CreateRefOptions {
+  owner: str;
+  repo: str;
+  ref: str;
+  sha: str;
+}
+
 interface OctoKitGit {
   inflight getTree(options: GetTreeOptions): GetTreeOptionsResponse;
+  inflight getRef(options: GetRefOptions): GetRefOptionsResponse;
+  inflight createRef(options: CreateRefOptions): BaseResponse;
 }
 
 struct CommentResposeData {
@@ -115,9 +164,59 @@ interface OctoKitIssues {
   inflight listComments(options: ListCommentsOptions): ListCommentsResponse;
 }
 
+struct CreateRepoProps {
+  name: str;
+  private: bool?;
+  auto_init: bool?;
+}
+
+struct CreateOrgRepoProps extends CreateRepoProps {
+  org: str;
+}
+
+struct DeleteRepoProps {
+  owner: str;
+  repo: str;
+}
+
+struct CreateOrUpdateFileContentsProps {
+  owner: str;
+  repo: str;
+  path: str;
+  message: str;
+  content: str;
+  branch: str;
+}
+
+struct ListReposResponseData {
+  full_name: str;
+}
+
+pub struct ListReposResponse extends BaseResponse {
+  data: Array<ListReposResponseData>;
+}
+
+struct ListForAuthenticatedUserProps {
+  type: str;
+}
+
+struct ListForOrgProps {
+  org: str;
+}
+
+interface OctoKitRepos {
+  inflight createOrUpdateFileContents(options: CreateOrUpdateFileContentsProps): BaseResponse;
+  inflight createForAuthenticatedUser(options: CreateRepoProps): BaseResponse;
+  inflight createInOrg(options: CreateOrgRepoProps): BaseResponse;
+  inflight delete(options: DeleteRepoProps): BaseResponse;
+  inflight listForAuthenticatedUser(options: ListForAuthenticatedUserProps): ListReposResponse;
+  inflight listForOrg(options: ListForOrgProps): ListReposResponse;
+}
+
 pub struct OctoKit {
   pulls: OctoKitPulls;
   apps: OctoKitApps;
   git: OctoKitGit;
   issues: OctoKitIssues;
+  repos: OctoKitRepos;
 }
