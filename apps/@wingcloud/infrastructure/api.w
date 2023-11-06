@@ -244,7 +244,7 @@ pub class Api {
           repository: input.get("repositoryId").asStr(),
           userId: userId,
           entryfile: input.get("entryfile").asStr(),
-          createdAt: "${datetime.utcNow().toIso()}",
+          createdAt: datetime.utcNow().toIso(),
           createdBy: gitHubLogin,
         );
 
