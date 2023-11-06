@@ -1,6 +1,7 @@
 import { ChevronRightIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useState } from "react";
+import { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { WingIcon } from "../icons/wing-icon.js";
@@ -21,11 +22,11 @@ const UserMenu = () => {
   const navigate = useNavigate();
   const signOutMutation = wrpc["auth.signout"].useMutation();
 
-  const signOut = () => {
+  const signOut = useCallback(() => {
     signOutMutation.mutateAsync({}).then(() => {
       navigate("/");
     });
-  };
+  }, [navigate, signOutMutation]);
 
   return (
     <div className="relative inline-block text-left">
