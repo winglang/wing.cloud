@@ -345,16 +345,10 @@ const aws = new NodeProject({
   outdir: "aws",
 });
 
-new Turbo(aws, {
-  pipeline: {
-    compile: {},    
-  },
-});
-
 aws.addDeps("@cdktf/provider-aws");
 aws.addDeps("cdktf");
 aws.addDeps("constructs");
-aws.addGitIgnore("target");
+aws.addGitIgnore("**/target/");
 aws.addFields({
   type: "commonjs",
 })

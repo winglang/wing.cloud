@@ -6,5 +6,4 @@ node_modules/
 !/.projen/files.json
 /.turbo
 !/package.json
-!/turbo.json
-target
+**/target/
