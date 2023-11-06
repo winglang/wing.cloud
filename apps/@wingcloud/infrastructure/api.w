@@ -267,7 +267,7 @@ pub class Api {
 
       return {
         body: {
-          environments: [
+          environments_test: [
             {
               id: "1",
               status: "running",
@@ -277,6 +277,7 @@ pub class Api {
               url: "https://example.com",
             }
           ],
+          environments: environments,
         },
       };
     });

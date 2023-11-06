@@ -67,6 +67,8 @@ export const Component = () => {
               {app.data?.app.name}
             </div>
           </div>
+
+          <pre>{JSON.stringify(environments.data, undefined, 2)}</pre>
         </div>
       )}
     </>
