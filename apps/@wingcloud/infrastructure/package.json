@@ -8,6 +8,7 @@
     "@cdktf/provider-dnsimple": "^8.0.0",
     "@cdktf/provider-docker": "^10.0.0",
     "@cdktf/provider-null": "^9.0.0",
+    "@cdktf/provider-random": "^10.0.0",
     "@probot/adapter-aws-lambda-serverless": "^3.0.4",
     "@vendia/serverless-express": "^4.10.4",
     "cdktf": "^0.19.0",
