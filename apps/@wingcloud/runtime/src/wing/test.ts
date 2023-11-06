@@ -58,7 +58,6 @@ export async function wingTest(props: WingTestProps) {
     for (let test of await client.listTests()) {
       const testResult = await wingTestOne(client, test, props);
       testResults.push(testResult);
-      await simulator.reload();
     }
 
     await simulator.stop();
