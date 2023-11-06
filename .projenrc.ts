@@ -327,6 +327,7 @@ infrastructure.addDeps(
   "@cdktf/provider-dnsimple",
   "@cdktf/provider-docker",
   "@cdktf/provider-null",
+  "@cdktf/provider-random",
 );
 
 infrastructure.addDevDeps("@types/cookie");
