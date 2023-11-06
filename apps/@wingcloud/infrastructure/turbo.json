@@ -49,13 +49,15 @@
     },
     "test": {
       "dependsOn": [
-        "compile"
-      ]
+        "^compile"
+      ],
+      "cache": false
     },
     "test-aws": {
       "dependsOn": [
-        "compile"
-      ]
+        "^compile"
+      ],
+      "cache": false
     }
   }
 }
