@@ -21,14 +21,14 @@ pub class DockerImage {
 
     let resource = new nullProvider.resource.Resource(triggers: { "changed": util.nanoid() }) as "create image";
     resource.addOverride("provisioner.local-exec.command", "
-fly status -a wing-cloud-image-${props.name} || flyctl launch --copy-config --no-deploy --name wing-cloud-image-${props.name} -o ${props.org} -r iad -y
-fly auth docker
+flyctl status -a wing-cloud-image-${props.name} || flyctl launch --copy-config --no-deploy --name wing-cloud-image-${props.name} -o ${props.org} -r iad -y
+flyctl auth docker
 docker push ${image.name}
     ");
     let destroy = new nullProvider.resource.Resource() as "delete image";
     destroy.addOverride("provisioner.local-exec.when", "destroy");
     destroy.addOverride("provisioner.local-exec.command", "
-fly status -a wing-cloud-image-${props.name} && flyctl apps destroy wing-cloud-image-${props.name} -y
+flyctl status -a wing-cloud-image-${props.name} && flyctl apps destroy wing-cloud-image-${props.name} -y
 ");
 
     this.imageName = image.name;
