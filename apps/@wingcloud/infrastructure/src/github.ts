@@ -64,3 +64,24 @@ export const getLastCommit = async ({
 
   return "commit not found";
 };
+
+export const getRepository = async ({
+  token,
+  owner,
+  repo,
+}: {
+  token: string;
+  owner: string;
+  repo: string;
+}) => {
+  const octokit = new Octokit({
+    auth: token,
+  });
+
+  const { data: repository } = await octokit.rest.repos.get({
+    owner,
+    repo,
+  });
+
+  return repository;
+};

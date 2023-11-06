@@ -7,10 +7,12 @@ import {
 export interface Repository {
   id: number;
   name: string;
+  description?: string;
   full_name: string;
   private: boolean;
   owner: { login: string; avatar_url: string };
   default_branch: string;
+  html_url: string;
 }
 
 export interface App {
@@ -18,7 +20,9 @@ export interface App {
   name: string;
   description?: string;
   imageUrl?: string;
-  repository: string;
+  repoId: string;
+  repoName: string;
+  repoOwner: string;
   userId: string;
   entryfile: string;
   createdBy: string;
@@ -28,7 +32,36 @@ export interface App {
   lastCommitMessage?: string;
 }
 
-export interface Environment {}
+interface TestResult {
+  path: string;
+  pass: boolean;
+}
+
+interface TestResults {
+  testResults: Array<TestResult>;
+}
+
+interface StatusReport {
+  environmentId: string;
+  status: string;
+}
+
+interface TestStatusReport extends StatusReport {
+  data: TestResults;
+}
+
+export interface Environment {
+  id: string;
+  appId: string;
+  repo: string;
+  branch: string;
+  status: string;
+  prNumber: number;
+  installationId: number;
+  url?: string;
+  commentId?: number;
+  testResults?: TestStatusReport;
+}
 
 export const wrpc = createWRPCReact<{
   "auth.check": QueryProcedure<{}>;
@@ -49,10 +82,16 @@ export const wrpc = createWRPCReact<{
       repositories: Array<Repository>;
     }
   >;
+  "github.getRepository": QueryProcedure<
+    { owner: string; repo: string },
+    {
+      repository: Repository;
+    }
+  >;
   "app.get": QueryProcedure<
     { id: string },
     {
-      app: { id: string; name: string; repository: string; userId: string };
+      app: App;
     }
   >;
   "app.environments": QueryProcedure<
@@ -73,9 +112,9 @@ export const wrpc = createWRPCReact<{
   >;
   "user.createApp": MutationProcedure<
     {
-      repositoryId: string;
-      repositoryName: string;
-      owner: string;
+      repoId: string;
+      repoName: string;
+      repoOwner: string;
       default_branch: string;
       appName: string;
       entryfile: string;

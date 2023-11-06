@@ -5,7 +5,9 @@ pub struct App {
   id: str;
   name: str;
   description: str?;
-  repository: str;
+  repoOwner: str;
+  repoName: str;
+  repoId: str;
   userId: str;
   entryfile: str;
   createdAt: str?;
@@ -24,7 +26,9 @@ struct Item extends App {
 struct CreateAppOptions {
   name: str;
   description: str?;
-  repository: str;
+  repoOwner: str;
+  repoName: str;
+  repoId: str;
   userId: str;
   entryfile: str;
   createdAt: str;
@@ -79,7 +83,9 @@ pub class Apps {
         name: options.name,
         description: options.description,
         imageUrl: options.imageUrl,
-        repository: options.repository,
+        repoId: options.repoId,
+        repoOwner: options.repoOwner,
+        repoName: options.repoName,
         userId: options.userId,
         entryfile: options.entryfile,
         createdAt: options.createdAt,
@@ -114,7 +120,7 @@ pub class Apps {
         put: {
           item: makeItem(
             appId,
-            "REPOSITORY#${options.repository}",
+            "REPOSITORY#${options.repoId}",
             "APP#${appId}",
           ),
         },
@@ -189,11 +195,19 @@ pub class Apps {
     if let item = result.item {
       return {
         id: item.get("id").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
         name: item.get("name").asStr(),
-        repository: item.get("repository").asStr(),
+        description: item.tryGet("description")?.tryAsStr(),
+        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
+        repoId: item.get("repoId").asStr(),
+        repoOwner: item.get("repoOwner").asStr(),
+        repoName: item.get("repoName").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
+        createdAt: item.get("createdAt").asStr(),
+        createdBy: item.get("createdBy").asStr(),
+        updatedAt: item.get("updatedAt").asStr(),
+        updatedBy: item.get("updatedBy").asStr(),
+        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       };
     }
 
@@ -215,7 +229,9 @@ pub class Apps {
         name: item.get("name").asStr(),
         description: item.tryGet("description")?.tryAsStr(),
         imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
-        repository: item.get("repository").asStr(),
+        repoId: item.get("repoId").asStr(),
+        repoOwner: item.get("repoOwner").asStr(),
+        repoName: item.get("repoName").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
         createdAt: item.get("createdAt").asStr(),
@@ -280,7 +296,9 @@ pub class Apps {
         id: item.get("id").asStr(),
         name: item.get("name").asStr(),
         description: item.tryGet("description")?.tryAsStr(),
-        repository: item.get("repository").asStr(),
+        repoId: item.get("repoId").asStr(),
+        repoOwner: item.get("repoOwner").asStr(),
+        repoName: item.get("repoName").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
       }]);

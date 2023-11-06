@@ -174,6 +174,39 @@ pub class Api {
       }
     });
 
+    api.get("/wrpc/github.getRepository", inflight (request) => {
+      if let accessToken = getAccessTokenFromCookie(request) {
+        log("accessToken = ${accessToken}");
+
+        let owner = request.query.get("owner");
+        let repo = request.query.get("repo");
+
+        if owner == "" || repo == "" {
+          return {
+            status: 400,
+          };
+        }
+
+        let repository = GitHub.Client.getRepository({
+          token: accessToken,
+          owner: owner,
+          repo: repo,
+        });
+
+        log("repository = ${Json.stringify(repository)}");
+
+        return {
+          body: {
+            repository: repository
+          },
+        };
+      } else {
+        return {
+          status: 401,
+        };
+      }
+    });
+
     api.get("/wrpc/app.get", inflight (request) => {
       let userId = getUserFromCookie(request);
 
@@ -234,7 +267,16 @@ pub class Api {
 
       return {
         body: {
-          environments: environments,
+          environments: [
+            {
+              id: "1",
+              status: "running",
+              appId: "1",
+              repo: "repo",
+              branch: "my-branch",
+              url: "https://example.com",
+            }
+          ],
         },
       };
     });
@@ -249,16 +291,18 @@ pub class Api {
 
         let commitData = GitHub.Client.getLastCommit(
           token: accessToken,
-          owner:  input.get("owner").asStr(),
-          repo: input.get("repositoryName").asStr(),
+          owner:  input.get("repoOwner").asStr(),
+          repo: input.get("repoName").asStr(),
           default_branch: input.get("default_branch").asStr(),
         );
 
         let appId = apps.create(
+          repoId: input.get("repoId").asStr(),
+          repoName: input.get("repoName").asStr(),
+          repoOwner: input.get("repoOwner").asStr(),
           name: input.get("appName").asStr(),
           lastCommitMessage: commitData?.commit?.message ?? "",
           imageUrl: input.get("imageUrl").asStr(),
-          repository: input.get("repositoryId").asStr(),
           userId: userId,
           entryfile: input.get("entryfile").asStr(),
           createdAt: datetime.utcNow().toIso(),

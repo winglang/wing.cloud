@@ -332,8 +332,6 @@ infrastructure.addDeps("cookie");
 
 infrastructure.addDeps("jose");
 
-infrastructure.addDeps("octokit", "node-fetch");
-
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(flyio.name);
 infrastructure.addDevDeps(runtime.name);
@@ -352,7 +350,7 @@ aws.addDeps("constructs");
 aws.addGitIgnore("**/target/");
 aws.addFields({
   type: "commonjs",
-})
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 

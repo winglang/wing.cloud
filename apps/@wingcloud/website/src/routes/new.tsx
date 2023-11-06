@@ -45,9 +45,9 @@ export const Component = () => {
       }
       setRepositoryId(repo.id.toString());
       await createAppMutation.mutateAsync({
-        repositoryId: repo.id.toString(),
-        repositoryName: repo.name,
-        owner: repo.owner.login,
+        repoId: repo.id.toString(),
+        repoName: repo.name,
+        repoOwner: repo.owner.login,
         default_branch: repo.default_branch,
         entryfile,
         appName: repo.name,
