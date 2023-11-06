@@ -1,4 +1,4 @@
-import { compile as compileFn, Target } from "@winglang/compiler";
+import { compile as compileFn, BuiltinPlatform } from "@winglang/compiler";
 import { type simulator, type std } from "@winglang/sdk";
 
 import { Environment } from "../environment.js";
@@ -14,7 +14,7 @@ export interface WingTestProps {
 async function wingCompile(wingCompilerPath: string, entryfilePath: string) {
   const wingCompiler = await import(wingCompilerPath);
   const compile: typeof compileFn = wingCompiler.compile;
-  const simfile = await compile(entryfilePath, { target: Target.SIM });
+  const simfile = await compile(entryfilePath, { platform: [BuiltinPlatform.SIM] });
   return simfile;
 }
 

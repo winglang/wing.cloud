@@ -302,9 +302,11 @@ new Turbo(infrastructure, {
     },
     test: {
       dependsOn: ["^compile"],
+      cache: false,
     },
     "test-aws": {
       dependsOn: ["^compile"],
+      cache: false,
     }
   },
 });

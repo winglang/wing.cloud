@@ -6,6 +6,7 @@ bring "./dir.w" as dir;
 bring "../users.w" as users;
 bring "../projects.w" as projects;
 bring "../environments.w" as environments;
+bring "../types/octokit-types.w" as octokit;
 
 struct EnvironmentsTestProps {
   users: users.Users;
@@ -29,18 +30,27 @@ pub class EnvironmentsTest {
     let githubUser = util.tryEnv("TESTS_GITHUB_USER");
       
     let redisExample = readdirContents(fs.join(dir.dirname(), "../../../../examples/redis"));
+
+    let deleteRepo = inflight (octokit: octokit.OctoKit, repo: str, owner: str) => {
+      try {
+        octokit.repos.delete(owner: owner, repo: repo);
+      } catch {}
+    };
     
     new std.Test(inflight () => {
       let octokit = gits.octokit(githubToken);
 
       // create a new repo
-      let repoName = util.nanoid(alphabet: "abcdefghijk0123456789", size: 8);
+      let repoName = "wing-test-env-creation-pr";
+
       let var owner = "";
       if let org = githubOrg {
+        deleteRepo(octokit, repoName, org);
         let res = octokit.repos.createInOrg(name: repoName, org: org, private: true, auto_init: true);
         assert(res.status >= 200 && res.status < 300);
         owner = org;
       } elif let user = githubUser {
+        deleteRepo(octokit, repoName, githubUser ?? "");
         let res = octokit.repos.createForAuthenticatedUser(name: repoName, private: true, auto_init: true);
         assert(res.status >= 200 && res.status < 300);
         owner = githubUser ?? "";
@@ -125,7 +135,7 @@ pub class EnvironmentsTest {
         assert(env.testResults?.data?.testResults?.at(0)?.path == "root/Default/test:Hello, world!");
         assert(env.testResults?.data?.testResults?.at(0)?.pass == true);
       } finally {
-        octokit.repos.delete(owner: owner, repo: repoName);
+        deleteRepo(octokit, repoName, owner);
       }
     }, timeout: 10m) as "create environment from PR";
   }
