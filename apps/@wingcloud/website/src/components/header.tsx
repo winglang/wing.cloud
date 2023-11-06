@@ -1,4 +1,4 @@
-import { ChevronRightIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -95,9 +95,9 @@ export const Header = ({ breadcrumbs }: HeaderProps) => {
             return (
               <li key={index}>
                 <div className="flex items-center">
-                  <ChevronRightIcon className="h-5 w-5 flex-shrink-0 text-slate-700" />
+                  <ChevronRightIcon className="h-4 w-4 flex-shrink-0 text-slate-600" />
                   <Link
-                    className="ml-2 text-sm font-medium text-slate-700 hover:text-slate-600"
+                    className="ml-2 text-sm font-medium text-slate-600 hover:text-slate-700"
                     to={breadcrumb.to}
                   >
                     {breadcrumb.label}
