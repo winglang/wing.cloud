@@ -30,7 +30,7 @@ pub class Github {
 
     // ~~~ Repo winglang/wing.cloud ~~~
 
-    let base = new Policy("github-action", "policy.json");
+    let admin = new Policy("github-action", "policy.admin.json");
 
     let repo = new cdktf.TerraformHclModule(
       source: "philips-labs/github-oidc/aws",
@@ -39,20 +39,40 @@ pub class Github {
         "openid_connect_provider_arn" => provider.get("openid_connect_provider.arn"),
         "repo" => "winglang/wing.cloud",
         "role_name" => "wing-cloud-repo-${environment}",
-        "default_conditions" => ["allow_environment"],
-        "github_environments" => [environment],
-        "role_policy_arns" => [base.policy.arn],
-        "conditions" => [{
-          "test" => "StringLike",
-          "variable" => "token.actions.githubusercontent.com:sub",
-          "values" => cdktf.Token.asString(["repo:winglang/wing.cloud:pull_request"])
-        }]
-      }
+        "default_conditions" => ["allow_main"],
+        "role_policy_arns" => [admin.policy.arn]        
+      },
+      
     ) as "wing-cloud-repo";
 
     // get the role arn for the github action
     new cdktf.TerraformOutput(
       value: repo.get("role.arn")
     ) as "role-arn";
+
+
+    // Readonly Role 
+
+    let readOnly = new aws.dataAwsIamPolicy.DataAwsIamPolicy(
+      arn: "arn:aws:iam::aws:policy/ReadOnlyAccess"
+    );
+
+    let repoReadOnly = new cdktf.TerraformHclModule(
+      source: "philips-labs/github-oidc/aws",
+      version: "0.7.1",
+      variables: {
+        "openid_connect_provider_arn" => provider.get("openid_connect_provider.arn"),
+        "repo" => "winglang/wing.cloud",
+        "role_name" => "wing-cloud-repo-${environment}-read-only",
+        "default_conditions" => ["allow_environment"],
+        "github_environments" => [environment],
+        "role_policy_arns" => [readOnly.arn]
+      }
+    ) as "wing-cloud-repo-read-only";
+
+    // get the role arn for the github action
+    new cdktf.TerraformOutput(
+      value: repoReadOnly.get("role.arn")
+    ) as "role-arn-read-only";
   }
 }
