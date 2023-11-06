@@ -45,6 +45,8 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+      - name: Compile Wing Cloud dependencies
+        run: npx turbo compile --filter=!@wingcloud/infrastructure
       - name: Compile Wing Cloud          
         env: 
           APP_SECRET: ${{ secrets.APP_SECRET }}
