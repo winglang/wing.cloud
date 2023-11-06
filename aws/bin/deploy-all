@@ -1,0 +1,25 @@
+#! /usr/bin/env bash
+
+set -e
+
+CURRENT_DIR=$(pwd)
+BIN_DIR=$(pwd)/bin
+
+deploy_env() {
+  local name=$1
+  local env=$3
+  echo "=============================================="
+  echo "==== Deploying $name in environment: $env ===="
+  echo "=============================================="
+  cd $name
+  export AWS_PROFILE=$2
+  $BIN_DIR/deploy $env
+  cd $CURRENT_DIR
+}
+
+deploy_env "tfstate" "wing-cloud-staging" "staging"
+deploy_env "tfstate" "wing-cloud-production" "production"
+deploy_env "oidc" "wing-cloud-staging" "staging"
+deploy_env "oidc" "wing-cloud-production" "production"
+
+echo "Deployed all services successfully"
