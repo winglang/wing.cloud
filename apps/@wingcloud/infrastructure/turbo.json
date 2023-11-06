@@ -46,6 +46,16 @@
       "dependsOn": [
         "^compile"
       ]
+    },
+    "test": {
+      "dependsOn": [
+        "compile"
+      ]
+    },
+    "test-aws": {
+      "dependsOn": [
+        "compile"
+      ]
     }
   }
 }

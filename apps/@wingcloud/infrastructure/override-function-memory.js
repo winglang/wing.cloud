@@ -11,6 +11,8 @@ class OverrideFunctionMemory {
   }
 }
 
-exports.preSynth = function (app) {
-  cdktf.Aspects.of(app).add(new OverrideFunctionMemory());
-};
+exports.Platform = class BackendS3 {
+  preSynth(app) {
+    cdktf.Aspects.of(app).add(new OverrideFunctionMemory());
+  }
+}

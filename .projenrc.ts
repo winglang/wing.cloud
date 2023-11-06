@@ -244,8 +244,12 @@ infrastructure.addGitIgnore("/target/");
 infrastructure.addDeps(`winglang`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
+infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
+infrastructure.addTask("test-aws", {
+  exec: "node ./bin/wing.mjs test -t tf-aws main.w --platform override-function-memory.js"
+})
 infrastructure.compileTask.exec(
-  "node ./bin/wing.mjs compile --target tf-aws --plugins override-function-memory.js",
+  "node ./bin/wing.mjs compile -t tf-aws --platform override-function-memory.js",
 );
 
 const terraformInitTask = infrastructure.addTask("terraformInit");
@@ -297,6 +301,12 @@ new Turbo(infrastructure, {
     dev: {
       dependsOn: ["^compile"],
     },
+    test: {
+      dependsOn: ["compile"],
+    },
+    "test-aws": {
+      dependsOn: ["compile"],
+    }
   },
 });
 
@@ -327,12 +337,7 @@ infrastructure.addDeps("jose");
 
 infrastructure.addDeps("octokit", "node-fetch");
 
-infrastructure.addDevDeps("@types/cookie");
-infrastructure.addDeps("cookie");
-
-infrastructure.addDeps("jose");
-
-infrastructure.addDeps("octokit", "node-fetch");
+infrastructure.addDevDeps("@octokit/rest");
 
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(flyio.name);
