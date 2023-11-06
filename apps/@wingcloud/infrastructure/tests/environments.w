@@ -29,20 +29,16 @@ pub class EnvironmentsTest {
       return dirContents;
     };
       
-    let githubToken = util.env("TESTS_GITHUB_TOKEN");
-    let githubOrg = util.tryEnv("TESTS_GITHUB_ORG");
-    let githubUser = util.tryEnv("TESTS_GITHUB_USER");
-      
     let redisExample = readdirContents(fs.join(dir.dirname(), "../../../../examples/redis"));
 
     new cloud.Function(inflight () => {
-      let octo = ok.octokit(githubToken);
+      let octo = ok.octokit(props.githubToken);
       let var owner = "";
       let var response: octokit.ListReposResponse? = nil;
-      if let org = githubOrg {
+      if let org = props.githubOrg {
         owner = org;
         response = octo.repos.listForOrg(org: owner);
-      } elif let user = githubUser {
+      } elif let user = props.githubUser {
         owner = user;
         response = octo.repos.listForAuthenticatedUser(type: "owner");
       } else {
@@ -62,18 +58,18 @@ pub class EnvironmentsTest {
     }) as "delete test repos";
     
     new std.Test(inflight () => {
-      let octokit = ok.octokit(githubToken);
+      let octokit = ok.octokit(props.githubToken);
 
       // create a new repo
       let repoName = "wing-test-${util.nanoid(alphabet: "abcdefghijk0123456789", size: 8)}";
 
       let var owner = "";
       let var isOrg = true;
-      if let org = githubOrg {
+      if let org = props.githubOrg {
         let res = octokit.repos.createInOrg(name: repoName, org: org, private: true, auto_init: true);
         assert(res.status >= 200 && res.status < 300);
         owner = org;
-      } elif let user = githubUser {
+      } elif let user = props.githubUser {
         let res = octokit.repos.createForAuthenticatedUser(name: repoName, private: true, auto_init: true);
         assert(res.status >= 200 && res.status < 300);
         owner = user;
