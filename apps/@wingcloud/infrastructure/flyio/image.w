@@ -33,16 +33,14 @@ pub class DockerImage {
     let resource = new nullProvider.resource.Resource(triggers: { "changed": util.nanoid() }) as "create image";
     resource.addOverride("provisioner.local-exec.environment", {"FLY_APP_NAME": appName});
     resource.addOverride("provisioner.local-exec.command", "
-flyctl status -a \${FLY_APP_NAME} || flyctl launch --copy-config --no-deploy --name \${FLY_APP_NAME} -o ${props.org} -r iad -y
+flyctl status -a \$FLY_APP_NAME || flyctl launch --copy-config --no-deploy --name \$FLY_APP_NAME -o ${props.org} -r iad -y
 flyctl auth docker
 docker push ${image.name}
     ");
     let destroy = new nullProvider.resource.Resource() as "delete image";
     destroy.addOverride("provisioner.local-exec.when", "destroy");
     destroy.addOverride("provisioner.local-exec.environment", {"FLY_APP_NAME": appName});
-    destroy.addOverride("provisioner.local-exec.command", "
-flyctl status -a \${FLY_APP_NAME} && flyctl apps destroy \${FLY_APP_NAME} -y
-");
+    destroy.addOverride("provisioner.local-exec.command", "flyctl status -a \$FLY_APP_NAME && flyctl apps destroy \$FLY_APP_NAME -y");
 
     this.imageName = image.name;
   }
