@@ -133,7 +133,7 @@ let githubOrg = util.tryEnv("TESTS_GITHUB_ORG");
 let githubUser = util.tryEnv("TESTS_GITHUB_USER");
 new tests.EnvironmentsTest(
   users: users,
-  projects: projects,
+  apps: apps,
   environments: environments,
   githubToken: githubToken,
   githubOrg: githubOrg,
