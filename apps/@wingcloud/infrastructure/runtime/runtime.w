@@ -93,7 +93,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   init(props: FlyRuntimeHandlerProps) {
     this.flyToken = props.flyToken;
     this.flyOrgSlug = props.flyOrgSlug;
-    this.image = new runtimeDocker.RuntimeDockerImage();
+    this.image = new runtimeDocker.RuntimeDockerImage(flyOrgSlug: props.flyOrgSlug);
   }
 
   inflight appNameFromEnvironment(environmentId: str): str {

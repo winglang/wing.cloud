@@ -245,10 +245,10 @@ infrastructure.addDeps(`winglang`);
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
 infrastructure.addTask("test-aws", {
-  exec: "node ./bin/wing.mjs test -t tf-aws main.w --plugins override-function-memory.js"
+  exec: "node ./bin/wing.mjs test -t tf-aws main.w --platform override-function-memory.js"
 })
 infrastructure.compileTask.exec(
-  "node ./bin/wing.mjs compile --target tf-aws --plugins override-function-memory.js",
+  "node ./bin/wing.mjs compile -t tf-aws --platform override-function-memory.js",
 );
 
 const terraformInitTask = infrastructure.addTask("terraformInit");
@@ -301,12 +301,10 @@ new Turbo(infrastructure, {
       dependsOn: ["^compile"],
     },
     test: {
-      dependsOn: ["^compile"],
-      cache: false,
+      dependsOn: ["compile"],
     },
     "test-aws": {
-      dependsOn: ["^compile"],
-      cache: false,
+      dependsOn: ["compile"],
     }
   },
 });

@@ -2,7 +2,7 @@ bring cloud;
 bring util;
 bring fs;
 bring http;
-bring "./git.w" as gits;
+bring "./octokit.w" as ok;
 bring "./dir.w" as dir;
 bring "../users.w" as users;
 bring "../projects.w" as projects;
@@ -13,6 +13,9 @@ struct EnvironmentsTestProps {
   users: users.Users;
   projects: projects.Projects;
   environments: environments.Environments;
+  githubToken: str;
+  githubOrg: str?;
+  githubUser: str?;
 }
 
 pub class EnvironmentsTest {
@@ -33,7 +36,7 @@ pub class EnvironmentsTest {
     let redisExample = readdirContents(fs.join(dir.dirname(), "../../../../examples/redis"));
 
     new cloud.Function(inflight () => {
-      let octo = gits.octokit(githubToken);
+      let octo = ok.octokit(githubToken);
       let var owner = "";
       let var response: octokit.ListReposResponse? = nil;
       if let org = githubOrg {
@@ -59,7 +62,7 @@ pub class EnvironmentsTest {
     }) as "delete test repos";
     
     new std.Test(inflight () => {
-      let octokit = gits.octokit(githubToken);
+      let octokit = ok.octokit(githubToken);
 
       // create a new repo
       let repoName = "wing-test-${util.nanoid(alphabet: "abcdefghijk0123456789", size: 8)}";

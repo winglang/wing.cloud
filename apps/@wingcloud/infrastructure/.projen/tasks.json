@@ -26,7 +26,7 @@
       "description": "Only compile",
       "steps": [
         {
-          "exec": "node ./bin/wing.mjs compile --target tf-aws --plugins override-function-memory.js"
+          "exec": "node ./bin/wing.mjs compile -t tf-aws --platform override-function-memory.js"
         }
       ]
     },
@@ -129,7 +129,7 @@
       "name": "test-aws",
       "steps": [
         {
-          "exec": "node ./bin/wing.mjs test -t tf-aws main.w --plugins override-function-memory.js"
+          "exec": "node ./bin/wing.mjs test -t tf-aws main.w --platform override-function-memory.js"
         }
       ]
     }

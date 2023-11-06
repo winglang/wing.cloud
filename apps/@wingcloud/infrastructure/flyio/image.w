@@ -5,6 +5,7 @@ bring "@cdktf/provider-null" as nullProvider;
 struct DockerImageProps {
   build: docker.image.ImageBuild;
   name: str;
+  org: str;
 }
 
 pub class DockerImage {
@@ -20,7 +21,7 @@ pub class DockerImage {
 
     let resource = new nullProvider.resource.Resource(triggers: { "changed": util.nanoid() }) as "create image";
     resource.addOverride("provisioner.local-exec.command", "
-fly status -a wing-cloud-image-${props.name} || flyctl launch --copy-config --no-deploy --name wing-cloud-image-${props.name} -o personal -r iad -y
+fly status -a wing-cloud-image-${props.name} || flyctl launch --copy-config --no-deploy --name wing-cloud-image-${props.name} -o ${props.org} -r iad -y
 fly auth docker
 docker push ${image.name}
     ");
