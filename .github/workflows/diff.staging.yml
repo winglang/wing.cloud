@@ -1,0 +1,144 @@
+name: Pull Request Diff
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+  pull-requests: write # This is required for commenting on PRs
+
+env:
+  AWS_REGION: "us-east-1"
+  
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.5.7"
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Compile Wing Cloud          
+        env: 
+          APP_SECRET: ${{ secrets.APP_SECRET }}
+          FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
+          FLY_TOKEN: ${{ secrets.FLY_TOKEN }}       
+          BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
+          BOT_GITHUB_CLIENT_ID: ${{ secrets.BOT_GITHUB_CLIENT_ID }}
+          BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
+          BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}
+          BOT_GITHUB_WEBHOOK_SECRET: ${{ secrets.BOT_GITHUB_WEBHOOK_SECRET }}
+          PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
+          PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
+          VITE_GITHUB_APP_CLIENT_ID: ${{ secrets.VITE_GITHUB_APP_CLIENT_ID }}
+          VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}  
+          TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}
+          TF_BACKEND_BUCKET_REGION: ${{ vars.TF_BACKEND_BUCKET_REGION }}
+          TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
+          TF_BACKEND_STATE_FILE: "${{ github.repository }}/${{ github.ref_name }}/infrastructure/main.tfstate"        
+        run: pnpm wing compile --plugins s3.backend.js -t tf-aws main.w
+        working-directory: 'apps/@wingcloud/infrastructure'        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN_READ_ONLY }}
+          role-session-name: gh-actions-wingcloud-staging
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: 'apps/@wingcloud/infrastructure/target/main.tfaws'
+      - name: Terraform Plan
+        id: plan
+        env:
+          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
+          DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
+        run: |
+          terraform plan -lock=false -out=plan.tmp
+          terraform show -no-color plan.tmp >${GITHUB_WORKSPACE}/plan.out
+        working-directory: 'apps/@wingcloud/infrastructure/target/main.tfaws'
+      
+      - uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // 1. Retrieve existing bot comments for the PR
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
+            const botComment = comments.find(comment => {
+              return comment.user.type === 'Bot' && comment.body.includes('Terraform Plan')
+            })
+
+            const run_url = process.env.GITHUB_SERVER_URL + '/' + process.env.GITHUB_REPOSITORY + '/actions/runs/' + process.env.GITHUB_RUN_ID
+            const run_link = '<a href="' + run_url + '">Actions</a>.'
+            const fs = require('fs')
+            const plan_file = fs.readFileSync('plan.out', 'utf8')
+            const plan = plan_file.length > 65000 ? plan_file.toString().substring(0, 65000) + " ..." : plan_file
+            const truncated_message = plan_file.length > 65000 ? "Output is too long and was truncated. You can read full Plan in " + run_link + "<br /><br />" : ""
+          
+            const output = `#### Environment 🌎\`staging\`
+            
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+      
+            <details><summary>Show Plan</summary>
+      
+            \`\`\`\n
+            ${plan}
+            \`\`\`
+
+            </details>
+
+            ${truncated_message}
+      
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+      
+            // 3. If we have a comment, update it, otherwise create a new one
+            if (botComment) {
+              github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: output
+              })
+            } else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              })
+            }
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1

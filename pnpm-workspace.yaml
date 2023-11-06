@@ -12,3 +12,4 @@ packages:
   - apps/@wingcloud/website
   - apps/@wingcloud/runtime
   - apps/@wingcloud/infrastructure
+  - aws
