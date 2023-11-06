@@ -85,8 +85,11 @@ jobs:
         id: plan
         env:
           TF_IN_AUTOMATION: true
+          # dnsimple provider
           DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
           DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
+          # for `flyctl auth docker` in terraform
+          FLY_TOKEN: ${{ secrets.FLY_TOKEN }}
         run: |
           terraform apply -auto-approve          
         working-directory: 'apps/@wingcloud/infrastructure/target/main.tfaws'
