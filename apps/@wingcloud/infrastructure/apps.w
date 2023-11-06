@@ -68,6 +68,7 @@ pub class Apps {
   pub inflight create(options: CreateAppOptions): str {
     let appId = "app_${nanoid62.Nanoid62.generate()}";
 
+    // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
     let makeItem = (id:str, pk: str, sk: str): Item => {
       return {
         pk: pk,
