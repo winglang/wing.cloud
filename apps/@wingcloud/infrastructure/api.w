@@ -31,16 +31,16 @@ pub class Api {
     let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
       let headers = lowkeys.LowkeysMap.fromMap(request.headers ?? {});
       if let cookies = headers.tryGet("cookie") {
-        let jwt = Cookie.Cookie.parse(cookies).tryGet(AUTH_COOKIE_NAME) ?? "";
-        if jwt == "" {
-          return nil;
+        if let jwt = Cookie.Cookie.parse(cookies).tryGet(AUTH_COOKIE_NAME) {
+          try {
+            return JWT.JWT.verify(
+              jwt: jwt,
+              secret: props.appSecret,
+            );
+          } catch {
+            return nil;
+          }
         }
-        log("jwt = ${jwt}");
-
-        return JWT.JWT.verify(
-          jwt: jwt,
-          secret: props.appSecret,
-        );
       }
     };
 
@@ -194,7 +194,7 @@ pub class Api {
         },
       };
     });
-    // api.get("/wrpc/app.listEnvironments", inflight () => {});
+
     api.post("/wrpc/app.rename", inflight (request) => {
       let userId = getUserFromCookie(request);
 
@@ -221,9 +221,6 @@ pub class Api {
         repository: input.get("repository").asStr(),
       );
     });
-    // api.post("/wrpc/app.changeBuildSettings", inflight () => {});
-    // api.get("/wrpc/app.listEnvironmentVariables", inflight () => {});
-    // api.post("/wrpc/app.updateEnvironmentVariables", inflight () => {});
 
     api.post("/wrpc/user.createApp", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
@@ -276,12 +273,5 @@ pub class Api {
         },
       };
     });
-    // api.get("/wrpc/user.listRepositories", inflight () => {});
-
-    // api.post("/wrpc/signIn.callback", inflight () => {});
-
-    // api.get("/wrpc/environment.get", inflight () => {});
-    // api.post("/wrpc/environment.updateStatus", inflight () => {});
-    // api.post("/wrpc/environment.generateLogsPresignedURL", inflight () => {});
   }
 }
