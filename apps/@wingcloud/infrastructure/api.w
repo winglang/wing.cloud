@@ -237,7 +237,7 @@ pub class Api {
           default_branch: input.get("default_branch").asStr(),
         );
 
-        let app = apps.create(
+        let appId = apps.create(
           name: input.get("appName").asStr(),
           lastCommitMessage: commitData?.commit?.message ?? "",
           imageUrl: input.get("imageUrl").asStr(),
@@ -250,7 +250,7 @@ pub class Api {
 
         return {
           body: {
-            app: app,
+            appId: appId,
           },
         };
       } else {

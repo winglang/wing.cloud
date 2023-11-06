@@ -63,13 +63,18 @@ export const wrpc = createWRPCReact<{
       apps: Array<App>;
     }
   >;
-  "user.createApp": MutationProcedure<{
-    repositoryId: string;
-    repositoryName: string;
-    owner: string;
-    default_branch: string;
-    appName: string;
-    entryfile: string;
-    imageUrl?: string;
-  }>;
+  "user.createApp": MutationProcedure<
+    {
+      repositoryId: string;
+      repositoryName: string;
+      owner: string;
+      default_branch: string;
+      appName: string;
+      entryfile: string;
+      imageUrl?: string;
+    },
+    {
+      appId: string;
+    }
+  >;
 }>();
