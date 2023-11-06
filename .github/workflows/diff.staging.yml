@@ -65,7 +65,7 @@ jobs:
         run: pnpm wing compile -t tf-aws main.w --platform s3.backend.js
         working-directory: 'apps/@wingcloud/infrastructure'        
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN_READ_ONLY }}
           role-session-name: gh-actions-wingcloud-staging

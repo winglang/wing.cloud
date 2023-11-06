@@ -45,6 +45,8 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+      - name: Compile Wing Cloud dependencies
+        run: npx turbo compile --filter=!@wingcloud/infrastructure
       - name: Compile Wing Cloud          
         env: 
           APP_SECRET: ${{ secrets.APP_SECRET }}
@@ -67,7 +69,7 @@ jobs:
         run: pnpm wing compile -t tf-aws main.w --platform s3.backend.js
         working-directory: 'apps/@wingcloud/infrastructure'        
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           role-session-name: gh-actions-wingcloud-staging
