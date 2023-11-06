@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: staging
-      url: https://staging.winglang.io
+      url: https://staging.wingcloud.io
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
