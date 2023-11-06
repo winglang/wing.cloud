@@ -179,7 +179,7 @@ struct DeleteRepoProps {
   repo: str;
 }
 
-struct CreateOrUpdateFileContents {
+struct CreateOrUpdateFileContentsProps {
   owner: str;
   repo: str;
   path: str;
@@ -188,11 +188,29 @@ struct CreateOrUpdateFileContents {
   branch: str;
 }
 
+struct ListReposResponseData {
+  full_name: str;
+}
+
+pub struct ListReposResponse extends BaseResponse {
+  data: Array<ListReposResponseData>;
+}
+
+struct ListForAuthenticatedUserProps {
+  type: str;
+}
+
+struct ListForOrgProps {
+  org: str;
+}
+
 interface OctoKitRepos {
-  inflight createOrUpdateFileContents(options: CreateOrUpdateFileContents): BaseResponse;
+  inflight createOrUpdateFileContents(options: CreateOrUpdateFileContentsProps): BaseResponse;
   inflight createForAuthenticatedUser(options: CreateRepoProps): BaseResponse;
   inflight createInOrg(options: CreateOrgRepoProps): BaseResponse;
   inflight delete(options: DeleteRepoProps): BaseResponse;
+  inflight listForAuthenticatedUser(options: ListForAuthenticatedUserProps): ListReposResponse;
+  inflight listForOrg(options: ListForOrgProps): ListReposResponse;
 }
 
 pub struct OctoKit {

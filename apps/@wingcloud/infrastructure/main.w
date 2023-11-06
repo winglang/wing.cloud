@@ -127,8 +127,6 @@ let deploy = new cloud.OnDeploy(inflight () => {
   log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
 });
 
-let isTest = util.tryEnv("WING_IS_TEST") == "true";
-if isTest || true {
-  bring "./tests/environments.w" as tests;
-  new tests.EnvironmentsTest(users: users, projects: projects, environments: environments);
-}
+bring "./tests/environments.w" as tests;
+new tests.EnvironmentsTest(users: users, projects: projects, environments: environments);
+

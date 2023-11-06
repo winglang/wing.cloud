@@ -1,3 +1,4 @@
+bring cloud;
 bring util;
 bring fs;
 bring http;
@@ -31,29 +32,49 @@ pub class EnvironmentsTest {
       
     let redisExample = readdirContents(fs.join(dir.dirname(), "../../../../examples/redis"));
 
-    let deleteRepo = inflight (octokit: octokit.OctoKit, repo: str, owner: str) => {
-      try {
-        octokit.repos.delete(owner: owner, repo: repo);
-      } catch {}
-    };
+    new cloud.Function(inflight () => {
+      let octo = gits.octokit(githubToken);
+      let var owner = "";
+      let var response: octokit.ListReposResponse? = nil;
+      if let org = githubOrg {
+        owner = org;
+        response = octo.repos.listForOrg(org: owner);
+      } elif let user = githubUser {
+        owner = user;
+        response = octo.repos.listForAuthenticatedUser(type: "owner");
+      } else {
+        throw "missing github owner";
+      }
+
+      if let res = response {
+        if res.status >= 200 && res.status < 300 {
+          for repo in res.data {
+            let repoName = repo.full_name.split("/").at(1);
+            if repoName.startsWith("wing-test-") {
+              octo.repos.delete(owner: owner, repo: repoName);
+            }
+          }
+        }
+      }
+    }) as "delete test repos";
     
     new std.Test(inflight () => {
       let octokit = gits.octokit(githubToken);
 
       // create a new repo
-      let repoName = "wing-test-env-creation-pr";
+      let repoName = "wing-test-${util.nanoid(alphabet: "abcdefghijk0123456789", size: 8)}";
 
       let var owner = "";
+      let var isOrg = true;
       if let org = githubOrg {
-        deleteRepo(octokit, repoName, org);
         let res = octokit.repos.createInOrg(name: repoName, org: org, private: true, auto_init: true);
         assert(res.status >= 200 && res.status < 300);
         owner = org;
       } elif let user = githubUser {
-        deleteRepo(octokit, repoName, githubUser ?? "");
         let res = octokit.repos.createForAuthenticatedUser(name: repoName, private: true, auto_init: true);
         assert(res.status >= 200 && res.status < 300);
-        owner = githubUser ?? "";
+        owner = user;
+        isOrg = false;
       } else {
         throw "missing github owner";
       }
@@ -135,7 +156,7 @@ pub class EnvironmentsTest {
         assert(env.testResults?.data?.testResults?.at(0)?.path == "root/Default/test:Hello, world!");
         assert(env.testResults?.data?.testResults?.at(0)?.pass == true);
       } finally {
-        deleteRepo(octokit, repoName, owner);
+        octokit.repos.delete(owner: owner, repo: repoName);
       }
     }, timeout: 10m) as "create environment from PR";
   }
