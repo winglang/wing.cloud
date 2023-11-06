@@ -31,16 +31,16 @@ pub class Api {
     let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
       let headers = lowkeys.LowkeysMap.fromMap(request.headers ?? {});
       if let cookies = headers.tryGet("cookie") {
-        let jwt = Cookie.Cookie.parse(cookies).tryGet(AUTH_COOKIE_NAME) ?? "";
-        if jwt == "" {
-          return nil;
+        if let jwt = Cookie.Cookie.parse(cookies).tryGet(AUTH_COOKIE_NAME) {
+          try {
+            return JWT.JWT.verify(
+              jwt: jwt,
+              secret: props.appSecret,
+            );
+          } catch {
+            return nil;
+          }
         }
-        log("jwt = ${jwt}");
-
-        return JWT.JWT.verify(
-          jwt: jwt,
-          secret: props.appSecret,
-        );
       }
     };
 
