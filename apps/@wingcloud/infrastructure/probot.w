@@ -203,12 +203,18 @@ pub class ProbotApp {
 
           this.postComment(environmentId: environment.id);
 
+          let tokenRes = context.octokit.apps.createInstallationAccessToken(installation_id: environment.installationId);
+          if tokenRes.status >= 300 || tokenRes.status < 200 {
+            throw "handlePullRequstOpened: unable to create installtion access token";
+          }
+
           let res = http.post(this.runtimeUrl, body: Json.stringify({
             repo: context.payload.repository.full_name,
             sha: context.payload.pull_request.head.sha,
             entryfile: project.entryfile,
             projectId: project.id,
             environmentId: environment.id,
+            token: tokenRes.data.token,
           }));
 
           if !res.ok {
@@ -269,11 +275,17 @@ pub class ProbotApp {
 
           this.postComment(environmentId: environment.id);
 
+          let tokenRes = context.octokit.apps.createInstallationAccessToken(installation_id: environment.installationId);
+          if tokenRes.status >= 300 || tokenRes.status < 200 {
+            throw "handlePullRequstSync: unable to create installtion access token";
+          }
+
           let res = http.post(this.runtimeUrl, body: Json.stringify({
             repo: context.payload.repository.full_name,
             sha: context.payload.pull_request.head.sha,
             entryfile: project.entryfile,
             environmentId: environment.id,
+            token: tokenRes.data.token,
           }));
 
           if !res.ok {

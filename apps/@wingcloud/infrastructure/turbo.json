@@ -46,6 +46,18 @@
       "dependsOn": [
         "^compile"
       ]
+    },
+    "test": {
+      "dependsOn": [
+        "^compile"
+      ],
+      "cache": false
+    },
+    "test-aws": {
+      "dependsOn": [
+        "^compile"
+      ],
+      "cache": false
     }
   }
 }

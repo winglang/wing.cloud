@@ -93,7 +93,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   init(props: FlyRuntimeHandlerProps) {
     this.flyToken = props.flyToken;
     this.flyOrgSlug = props.flyOrgSlug;
-    this.image = new runtimeDocker.RuntimeDockerImage();
+    this.image = new runtimeDocker.RuntimeDockerImage(flyOrgSlug: props.flyOrgSlug);
   }
 
   inflight appNameFromEnvironment(environmentId: str): str {
@@ -270,13 +270,5 @@ pub class RuntimeService {
         status: 200,
       };
     });
-
-    test "deploy preview environment" {
-      let res = http.post(this.api.url, body: Json.stringify({
-        repo: "eladcon/examples",
-        sha: "fix-api-basic-auth",
-        entryfile: "examples/api-basic-auth-middleware/basic-auth.w"
-      }));
-    }
   }
 }
