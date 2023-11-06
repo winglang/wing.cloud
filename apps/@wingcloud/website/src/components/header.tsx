@@ -18,6 +18,9 @@ export interface HeaderProps {
 
 const UserMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const toggleMenu = useCallback(() => {
+    setIsOpen(!isOpen);
+  }, [isOpen]);
 
   const navigate = useNavigate();
   const signOutMutation = wrpc["auth.signout"].useMutation();
@@ -36,9 +39,7 @@ const UserMenu = () => {
           className={clsx("group", "flex items-center rounded-full")}
           aria-expanded="true"
           aria-haspopup="true"
-          onClick={() => {
-            setIsOpen(!isOpen);
-          }}
+          onClick={toggleMenu}
         >
           <span className="sr-only">Open options</span>
           <UserCircleIcon
