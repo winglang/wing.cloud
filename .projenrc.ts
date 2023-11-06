@@ -338,7 +338,7 @@ infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(flyio.name);
 infrastructure.addDevDeps(runtime.name);
 
-infrastructure.addGitIgnore("/_terraform.tfstate");
+infrastructure.addGitIgnore("/terraform.tfstate");
 
 ///////////////////////////////////////////////////////////////////////////////
 monorepo.synth();

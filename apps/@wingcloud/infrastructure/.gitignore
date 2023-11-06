@@ -14,4 +14,4 @@ node_modules/
 !/.env.example
 /target/
 !/turbo.json
-/_terraform.tfstate
+/terraform.tfstate
