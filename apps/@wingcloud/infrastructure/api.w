@@ -9,12 +9,14 @@ bring "./github.w" as GitHub;
 bring "./jwt.w" as JWT;
 bring "./apps.w" as Apps;
 bring "./users.w" as Users;
+bring "./environments.w" as Environments;
 bring "./lowkeys-map.w" as lowkeys;
 
 struct ApiProps {
   api: cloud.Api;
   apps: Apps.Apps;
   users: Users.Users;
+  environments: Environments.Environments;
   githubAppClientId: str;
   githubAppClientSecret: str;
   appSecret: str;
@@ -210,6 +212,7 @@ pub class Api {
       return {
       };
     });
+
     api.post("/wrpc/app.delete", inflight (request) => {
       let userId = getUserFromCookie(request);
 
@@ -220,6 +223,20 @@ pub class Api {
         userId: userId,
         repository: input.get("repository").asStr(),
       );
+    });
+
+    api.get("/wrpc/app.environments", inflight (request) => {
+      let userId = getUserFromCookie(request);
+
+      let environments = props.environments.list(
+        appId: request.query.get("id"),
+      );
+
+      return {
+        body: {
+          environments: environments,
+        },
+      };
     });
 
     api.post("/wrpc/user.createApp", inflight (request) => {

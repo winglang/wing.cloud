@@ -28,6 +28,8 @@ export interface App {
   lastCommitMessage?: string;
 }
 
+export interface Environment {}
+
 export const wrpc = createWRPCReact<{
   "auth.check": QueryProcedure<{}>;
   "auth.signout": MutationProcedure<{}>;
@@ -51,6 +53,12 @@ export const wrpc = createWRPCReact<{
     { id: string },
     {
       app: { id: string; name: string; repository: string; userId: string };
+    }
+  >;
+  "app.environments": QueryProcedure<
+    { id: string },
+    {
+      environments: Array<Environment>;
     }
   >;
   "app.rename": MutationProcedure<

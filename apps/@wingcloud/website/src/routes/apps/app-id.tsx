@@ -19,6 +19,10 @@ export const Component = () => {
     // },
   );
 
+  const environments = wrpc["app.environments"].useQuery({ id: appId });
+
+  console.log(environments);
+
   return (
     <>
       <Header

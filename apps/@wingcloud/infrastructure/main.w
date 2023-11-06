@@ -39,6 +39,7 @@ let wingCloudApi = new wingcloud_api.Api(
   api: api,
   apps: apps,
   users: users,
+  environments: environments,
   githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
   appSecret: util.env("APP_SECRET"),
