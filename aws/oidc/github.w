@@ -30,7 +30,7 @@ pub class Github {
 
     // ~~~ Repo winglang/wing.cloud ~~~
 
-    let admin = new Policy("github-action", "policy.admin.json");
+    let admin = new Policy("github-action", "policy.admin.json") as "admin-policy";
 
     let repo = new cdktf.TerraformHclModule(
       source: "philips-labs/github-oidc/aws",
@@ -57,6 +57,8 @@ pub class Github {
       arn: "arn:aws:iam::aws:policy/ReadOnlyAccess"
     );
 
+    let readOnlyAdditional = new Policy("github-action", "policy.read-only.json") as "read-only-policy";
+
     let repoReadOnly = new cdktf.TerraformHclModule(
       source: "philips-labs/github-oidc/aws",
       version: "0.7.1",
@@ -66,7 +68,7 @@ pub class Github {
         "role_name" => "wing-cloud-repo-${environment}-read-only",
         "default_conditions" => ["allow_environment"],
         "github_environments" => [environment],
-        "role_policy_arns" => [readOnly.arn]
+        "role_policy_arns" => [readOnly.arn, readOnlyAdditional.policy.arn]
       }
     ) as "wing-cloud-repo-read-only";
 
