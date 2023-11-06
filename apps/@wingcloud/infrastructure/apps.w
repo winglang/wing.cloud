@@ -13,6 +13,12 @@ pub struct App {
   updatedAt: str?;
   updatedBy: str?;
   imageUrl: str?;
+  lastCommitMessage: str?;
+}
+
+struct Item extends App {
+  pk: str;
+  sk: str;
 }
 
 struct CreateAppOptions {
@@ -24,6 +30,7 @@ struct CreateAppOptions {
   createdAt: str;
   createdBy: str;
   imageUrl: str?;
+  lastCommitMessage: str?;
 }
 
 struct RenameAppOptions {
@@ -58,71 +65,61 @@ pub class Apps {
     this.table = table;
   }
 
-  pub inflight create(options: CreateAppOptions): App {
-    let app = App {
-      id: "app_${nanoid62.Nanoid62.generate()}",
-      name: options.name,
-      description: options.description,
-      imageUrl: options.imageUrl,
-      repository: options.repository,
-      userId: options.userId,
-      entryfile: options.entryfile,
-      updatedAt: options.createdAt,
-      updatedBy: options.createdBy,
-      createdAt: options.createdAt,
-      createdBy: options.createdBy,
+  pub inflight create(options: CreateAppOptions): str {
+    let appId = "app_${nanoid62.Nanoid62.generate()}";
+
+    // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
+    let makeItem = (id:str, pk: str, sk: str): Item => {
+      return {
+        pk: pk,
+        sk: sk,
+        id: id,
+        name: options.name,
+        description: options.description,
+        imageUrl: options.imageUrl,
+        repository: options.repository,
+        userId: options.userId,
+        entryfile: options.entryfile,
+        createdAt: options.createdAt,
+        createdBy: options.createdBy,
+        updatedAt: options.createdAt,
+        updatedBy: options.createdBy,
+        lastCommitMessage: options.lastCommitMessage,
+      };
     };
 
     this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: {
-            pk: "APP#${app.id}",
-            sk: "#",
-            id: app.id,
-            name: app.name,
-            repository: app.repository,
-            userId: app.userId,
-            entryfile: app.entryfile,
-          },
+          item: makeItem(
+            appId,
+            "APP#${appId}",
+            "#",
+          ),
           conditionExpression: "attribute_not_exists(pk)"
         },
       },
       {
         put: {
-          item: {
-            pk: "USER#${options.userId}",
-            sk: "APP#${app.id}",
-            id: app.id,
-            name: app.name,
-            description: app.description,
-            imageUrl: app.imageUrl,
-            repository: app.repository,
-            userId: app.userId,
-            entryfile: app.entryfile,
-            createdAt: app.createdAt,
-            createdBy: app.createdBy,
-            updatedAt: app.updatedAt,
-            updatedBy: app.createdBy,
-          },
+          item: makeItem(
+            appId,
+            "USER#${options.userId}",
+            "APP#${appId}",
+          ),
         },
       },
       {
         put: {
-          item: {
-            pk: "REPOSITORY#${options.repository}",
-            sk: "APP#${app.id}",
-            id: app.id,
-            name: app.name,
-            repository: app.repository,
-            userId: app.userId,
-            entryfile: app.entryfile,
-          },
+          item: makeItem(
+            appId,
+            "REPOSITORY#${options.repository}",
+            "APP#${appId}",
+          ),
         },
       },
     ]);
 
-    return app;
+    return appId;
   }
 
   pub inflight rename(options: RenameAppOptions): void {
@@ -219,8 +216,11 @@ pub class Apps {
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
+        createdAt: item.get("createdAt").asStr(),
+        createdBy: item.get("createdBy").asStr(),
         updatedAt: item.get("updatedAt").asStr(),
         updatedBy: item.get("updatedBy").asStr(),
+        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       }]);
     }
     return apps;

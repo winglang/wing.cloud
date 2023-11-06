@@ -237,20 +237,20 @@ pub class Api {
           default_branch: input.get("default_branch").asStr(),
         );
 
-        let app = apps.create(
+        let appId = apps.create(
           name: input.get("appName").asStr(),
-          description: commitData?.commit?.message ?? "",
+          lastCommitMessage: commitData?.commit?.message ?? "",
           imageUrl: input.get("imageUrl").asStr(),
           repository: input.get("repositoryId").asStr(),
           userId: userId,
           entryfile: input.get("entryfile").asStr(),
-          createdAt: "${datetime.utcNow().toIso()}",
+          createdAt: datetime.utcNow().toIso(),
           createdBy: gitHubLogin,
         );
 
         return {
           body: {
-            app: app,
+            appId: appId,
           },
         };
       } else {

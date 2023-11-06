@@ -20,6 +20,7 @@ jobs:
           scopes: |-
             website
             runtime
+            infra
             infrastructure
             repo
           types: |-
