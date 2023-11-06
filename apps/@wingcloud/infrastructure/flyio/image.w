@@ -16,11 +16,6 @@ pub class DockerImage {
     new nullProvider.provider.NullProvider();
     new randomProvider.provider.RandomProvider();
 
-    let image = new docker.image.Image(
-      name: "registry.fly.io/wing-cloud-image-${props.name}:${util.nanoid(alphabet: "0123456789abcdefghijklmnopqrstuvwxyz", size: 10)}",
-      buildAttribute: props.build,
-    );
-
     let randomString = new randomProvider.stringResource.StringResource(
       length: 10,
       special: false,
@@ -29,6 +24,11 @@ pub class DockerImage {
     );
 
     let appName = "wing-cloud-image-${props.name}-${randomString.result}";
+
+    let image = new docker.image.Image(
+      name: "registry.fly.io/${appName}:${util.nanoid(alphabet: "0123456789abcdefghijklmnopqrstuvwxyz", size: 10)}",
+      buildAttribute: props.build,
+    );
 
     let resource = new nullProvider.resource.Resource(triggers: { "changed": util.nanoid() }) as "create image";
     resource.addOverride("provisioner.local-exec.environment", {"FLY_APP_NAME": appName});
