@@ -239,7 +239,7 @@ pub class Api {
 
         let app = apps.create(
           name: input.get("appName").asStr(),
-          description: commitData?.commit?.message ?? "",
+          lastCommitMessage: commitData?.commit?.message ?? "",
           imageUrl: input.get("imageUrl").asStr(),
           repository: input.get("repositoryId").asStr(),
           userId: userId,

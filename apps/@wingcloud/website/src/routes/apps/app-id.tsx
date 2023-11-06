@@ -10,7 +10,13 @@ export const Component = () => {
   const { appId } = useParams();
   if (!appId) return;
 
-  const app = wrpc["app.get"].useQuery({ id: appId });
+  // TODO: useQuery should be able to use enabled: false as option
+  const app = wrpc["app.get"].useQuery(
+    { id: appId },
+    // {
+    //   enabled: false,
+    // },
+  );
 
   return (
     <div>

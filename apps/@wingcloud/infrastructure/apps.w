@@ -13,6 +13,7 @@ pub struct App {
   updatedAt: str?;
   updatedBy: str?;
   imageUrl: str?;
+  lastCommitMessage: str?;
 }
 
 struct CreateAppOptions {
@@ -24,6 +25,7 @@ struct CreateAppOptions {
   createdAt: str;
   createdBy: str;
   imageUrl: str?;
+  lastCommitMessage: str?;
 }
 
 struct RenameAppOptions {
@@ -67,10 +69,11 @@ pub class Apps {
       repository: options.repository,
       userId: options.userId,
       entryfile: options.entryfile,
-      updatedAt: options.createdAt,
-      updatedBy: options.createdBy,
       createdAt: options.createdAt,
       createdBy: options.createdBy,
+      updatedAt: options.createdAt,
+      updatedBy: options.createdBy,
+      lastCommitMessage: options.lastCommitMessage,
     };
 
     this.table.transactWriteItems(transactItems: [
@@ -81,9 +84,16 @@ pub class Apps {
             sk: "#",
             id: app.id,
             name: app.name,
+            description: app.description,
+            imageUrl: app.imageUrl,
             repository: app.repository,
             userId: app.userId,
             entryfile: app.entryfile,
+            createdAt: app.createdAt,
+            createdBy: app.createdBy,
+            updatedAt: app.updatedAt,
+            updatedBy: app.updatedBy,
+            lastCommitMessage: app.lastCommitMessage,
           },
           conditionExpression: "attribute_not_exists(pk)"
         },
@@ -103,7 +113,8 @@ pub class Apps {
             createdAt: app.createdAt,
             createdBy: app.createdBy,
             updatedAt: app.updatedAt,
-            updatedBy: app.createdBy,
+            updatedBy: app.updatedBy,
+            lastCommitMessage: app.lastCommitMessage,
           },
         },
       },
@@ -114,9 +125,16 @@ pub class Apps {
             sk: "APP#${app.id}",
             id: app.id,
             name: app.name,
+            description: app.description,
+            imageUrl: app.imageUrl,
             repository: app.repository,
             userId: app.userId,
             entryfile: app.entryfile,
+            createdAt: app.createdAt,
+            createdBy: app.createdBy,
+            updatedAt: app.updatedAt,
+            updatedBy: app.createdBy,
+            lastCommitMessage: app.lastCommitMessage,
           },
         },
       },
@@ -219,8 +237,11 @@ pub class Apps {
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
+        createdAt: item.get("createdAt").asStr(),
+        createdBy: item.get("createdBy").asStr(),
         updatedAt: item.get("updatedAt").asStr(),
         updatedBy: item.get("updatedBy").asStr(),
+        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       }]);
     }
     return apps;

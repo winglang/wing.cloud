@@ -67,8 +67,12 @@ export const AppCard = ({
         <div className="text-left w-full truncate space-y-1">
           <div className="text-lg text-slate-800">{app.name}</div>
           <div className="text-xs text-slate-600 flex gap-x-1">
-            {app.description && <GithubIcon className="w-4 text-slate-700" />}
-            <div className="truncate">{app.description || app.entryfile}</div>
+            {app.lastCommitMessage && (
+              <GithubIcon className="w-4 text-slate-700" />
+            )}
+            <div className="truncate">
+              {app.lastCommitMessage || app.entryfile}
+            </div>
           </div>
         </div>
       </div>

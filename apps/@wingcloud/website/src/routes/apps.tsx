@@ -25,7 +25,7 @@ export const Component = () => {
       return [];
     }
     return appsList.data.apps.filter((app) =>
-      `${app.name}${app.description}`
+      `${app.name}${app.lastCommitMessage}`
         .toLocaleLowerCase()
         .includes(search.toLocaleLowerCase()),
     );

@@ -21,9 +21,11 @@ export interface App {
   repository: string;
   userId: string;
   entryfile: string;
+  createdBy: string;
   createdAt: string;
-  updatedAt: string;
   updatedBy: string;
+  updatedAt: string;
+  lastCommitMessage?: string;
 }
 
 export const wrpc = createWRPCReact<{

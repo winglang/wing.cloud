@@ -27,13 +27,14 @@ export const Component = () => {
     }
   }, [installations.data]);
 
+  // TODO: useQuery should be able to use enabled as option
   const repos = wrpc["github.listRepositories"].useQuery(
     {
       installationId: installationId,
     },
-    {
-      enabled: installationId != "",
-    },
+    // {
+    //   enabled: installationId !== "",
+    // },
   );
 
   const createAppMutation = wrpc["user.createApp"].useMutation();
@@ -46,11 +47,11 @@ export const Component = () => {
       await createAppMutation.mutateAsync({
         repositoryId: repo.id.toString(),
         repositoryName: repo.name,
-        owner: repo.owner?.login || "",
-        default_branch: repo.default_branch || "",
+        owner: repo.owner.login,
+        default_branch: repo.default_branch,
         entryfile,
         appName: repo.name,
-        imageUrl: repo.owner?.avatar_url || "",
+        imageUrl: repo.owner.avatar_url,
       });
       navigate("/apps");
     },
