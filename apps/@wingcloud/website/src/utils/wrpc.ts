@@ -97,9 +97,15 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.environments": QueryProcedure<
-    { id: string },
+    { appId: string },
     {
       environments: Array<Environment>;
+    }
+  >;
+  "app.environment": QueryProcedure<
+    { environmentId: string },
+    {
+      environment: Environment;
     }
   >;
   "app.rename": MutationProcedure<

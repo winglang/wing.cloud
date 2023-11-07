@@ -1,7 +1,7 @@
-import { LinkIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { BuildingStorefrontIcon, LinkIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
@@ -16,7 +16,20 @@ const EnvironmentItem = ({ environment }: { environment: Environment }) => {
   return (
     <div className="flex justify-between items-center truncate">
       <div className="text-xs">
-        <div className="font-semibold truncate">{environment.branch}</div>
+        {(environment.url && status === "running" && (
+          <button
+            className="hover:underline font-semibold truncate"
+            rel="noopener noreferrer"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(environment.url, "_blank");
+            }}
+          >
+            {environment.branch}
+          </button>
+        )) || (
+          <div className="font-semibold truncate">{environment.branch}</div>
+        )}
 
         <div className="text-slate-500 text-[10px] truncate">
           updated {getTimeFromNow(environment.updatedAt)}
@@ -24,40 +37,30 @@ const EnvironmentItem = ({ environment }: { environment: Environment }) => {
       </div>
 
       <div className="flex items-center justify-end gap-x-4">
-        <span
-          className={clsx(
-            status === "initializing" && "bg-yellow-200 text-yellow-800",
-            status === "deploying" && "bg-blue-200 text-blue-800",
-            status === "running" && "bg-green-200 text-green-800",
-            "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
-          )}
-        >
-          {status}
-        </span>
-
         {testStatus && (
           <span
             className={clsx(
-              testStatus === "initializing" && "bg-yellow-200 text-yellow-800",
-              testStatus === "deploying" && "bg-blue-200 text-blue-800",
+              // testStatus === "initializing" && "bg-yellow-200 text-yellow-800",
+              // testStatus === "deploying" && "bg-blue-200 text-blue-800",
               testStatus === "running" && "bg-green-200 text-green-800",
+              testStatus !== "running" && "bg-slate-200 text-slate-800",
               "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
             )}
           >
             {testStatus}
           </span>
         )}
-
-        {environment.url && (
-          <a
-            href={environment.url}
-            className="text-blue-600 hover:underline text-xs"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Visit Preview
-          </a>
-        )}
+        <span
+          className={clsx(
+            // status === "initializing" && "bg-yellow-200 text-yellow-800",
+            // status === "deploying" && "bg-blue-200 text-blue-800",
+            status === "running" && "bg-green-200 text-green-800",
+            status !== "running" && "bg-slate-200 text-slate-800",
+            "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
+          )}
+        >
+          {status}
+        </span>
       </div>
     </div>
   );
@@ -70,6 +73,8 @@ export interface AppProps {
 export const Component = () => {
   const { appId } = useParams();
   if (!appId) return;
+
+  const navigate = useNavigate();
 
   // TODO: useQuery should be able to use enabled: false as option
   const app = wrpc["app.get"].useQuery(
@@ -89,7 +94,7 @@ export const Component = () => {
     // },
   );
 
-  const environments = wrpc["app.environments"].useQuery({ id: appId });
+  const environments = wrpc["app.environments"].useQuery({ appId: appId });
 
   const loading = useMemo(() => {
     return app.isLoading || environments.isLoading;
@@ -101,7 +106,7 @@ export const Component = () => {
         breadcrumbs={[
           { label: "Apps", to: "/apps" },
           {
-            label: app.data?.app.name || "",
+            label: appId,
             to: `/apps/${appId}`,
           },
         ]}
@@ -143,7 +148,7 @@ export const Component = () => {
               <div className="text-center bg-white p-6 w-full">
                 <LinkIcon className="w-8 h-8 mx-auto text-slate-400" />
                 <h3 className="mt-2 text-sm font-semibold text-slate-900">
-                  No environments found.
+                  No preview environments found.
                 </h3>
 
                 <div>
@@ -163,17 +168,31 @@ export const Component = () => {
               </div>
             )}
 
-          <div className="space-y-2">
-            <div className="text-slate-700 text-lg">Environments</div>
-            {environments.data?.environments.map((environment) => (
-              <div key={environment.id} className="bg-white rounded p-4 shadow">
-                <EnvironmentItem
-                  key={environment.id}
-                  environment={environment}
-                />
+          {environments.data?.environments &&
+            environments.data?.environments.length > 0 && (
+              <div className="space-y-2">
+                <div className="text-slate-700 text-lg">
+                  Preview Environments
+                </div>
+                {environments.data.environments.map((environment) => (
+                  <button
+                    key={environment.id}
+                    className={clsx(
+                      "bg-white rounded p-4 text-left w-full",
+                      "shadow hover:shadow-md transition-all",
+                    )}
+                    onClick={() => {
+                      navigate(`/apps/${environment.appId}/${environment.id}`);
+                    }}
+                  >
+                    <EnvironmentItem
+                      key={environment.id}
+                      environment={environment}
+                    />
+                  </button>
+                ))}
               </div>
-            ))}
-          </div>
+            )}
         </div>
       )}
     </>

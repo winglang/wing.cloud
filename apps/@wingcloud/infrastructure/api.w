@@ -260,12 +260,26 @@ pub class Api {
       let userId = getUserFromCookie(request);
 
       let environments = props.environments.list(
-        appId: request.query.get("id"),
+        appId: request.query.get("appId"),
       );
 
       return {
         body: {
           environments: environments,
+        },
+      };
+    });
+
+    api.get("/wrpc/app.environment", inflight (request) => {
+      let userId = getUserFromCookie(request);
+
+      let environment = props.environments.get(
+        id: request.query.get("environmentId"),
+      );
+
+      return {
+        body: {
+          environment: environment,
         },
       };
     });
