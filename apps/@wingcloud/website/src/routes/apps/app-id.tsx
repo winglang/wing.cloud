@@ -7,6 +7,7 @@ import { EnvironmentItem } from "../../components/environment-item.js";
 import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
+import { GithubIcon } from "../../icons/github-icon.js";
 import { wrpc } from "../../utils/wrpc.js";
 
 export interface AppProps {
@@ -63,17 +64,29 @@ export const Component = () => {
 
       {!loading && (
         <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">
-          <div className="flex gap-x-4 bg-white rounded p-2 shadow">
+          <div className="flex gap-x-2 bg-white rounded p-4 shadow">
             <img
               src={app.data?.app.imageUrl}
               alt=""
               className="w-14 h-14 rounded-full"
             />
-            <div className="text-slate-700 text-xl self-center truncate">
-              {app.data?.app.name}
+            <div className="space-y-1 pt-2 truncate ml-2">
+              <div className="text-slate-700 text-xl self-center truncate">
+                {app.data?.app.name}
+              </div>
+              <div className="text-slate-500 text-xs self-center truncate">
+                {app.data?.app.description === "" ? (
+                  <div className="space-x-1 flex items-center">
+                    <GithubIcon className="h-3" />
+                    <span>{app.data?.app.lastCommitMessage}</span>
+                  </div>
+                ) : (
+                  app.data?.app.description
+                )}
+              </div>
             </div>
 
-            <div className="flex grow justify-end items-end truncate">
+            <div className="flex grow justify-end items-end">
               <Button
                 className="truncate"
                 transparent
