@@ -1,4 +1,4 @@
-import { FolderPlusIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { Link, LinkIcon, PlusIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -145,7 +145,7 @@ export const Component = () => {
           {!environments.isLoading &&
             environments.data?.environments.length === 0 && (
               <div className="text-center">
-                <FolderPlusIcon className="w-12 h-12 mx-auto text-gray-400" />
+                <LinkIcon className="w-12 h-12 mx-auto text-gray-400" />
                 <h3 className="mt-2 text-sm font-semibold text-gray-900">
                   No environments found.
                 </h3>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { Popover } from "../design-system/popover.js";
 import { WingIcon } from "../icons/wing-icon.js";
 import { wrpc } from "../utils/wrpc.js";
 
@@ -17,11 +18,6 @@ export interface HeaderProps {
 }
 
 const UserMenu = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const toggleMenu = useCallback(() => {
-    setIsOpen(!isOpen);
-  }, [isOpen]);
-
   const navigate = useNavigate();
   const signOutMutation = wrpc["auth.signout"].useMutation();
 
@@ -32,52 +28,26 @@ const UserMenu = () => {
   }, [navigate, signOutMutation]);
 
   return (
-    <div className="relative inline-block text-left">
-      <div>
-        <button
-          type="button"
-          className={clsx("group", "flex items-center rounded-full")}
-          aria-expanded="true"
-          aria-haspopup="true"
-          onClick={toggleMenu}
-        >
-          <span className="sr-only">Open options</span>
-          <UserCircleIcon
-            className={clsx(
-              "w-8 h-8 text-slate-400",
-              "group-hover:text-slate-500 transition-all",
-              "group-focus:text-slate-500",
-            )}
-          />
-        </button>
-      </div>
-
-      <div
-        className={clsx(
-          "absolute right-0 z-10 mt-2 w-56 origin-top-right",
-          "rounded bg-white shadow-lg",
-          isOpen ? "block" : "hidden",
-        )}
-        role="menu"
-        aria-orientation="vertical"
-        aria-labelledby="menu-button"
-      >
-        <div className="py-1" role="none">
-          <button
-            className={clsx(
-              "text-gray-700 block w-full px-4 py-2 text-left text-sm",
-              "hover:bg-gray-100 hover:text-gray-900",
-              "rounded",
-              "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
-            )}
-            role="menuitem"
-            onClick={signOut}
-          >
-            Sign out
-          </button>
-        </div>
-      </div>
-    </div>
+    <Popover
+      btnClassName="flex items-center rounded-full"
+      items={[
+        {
+          label: "Sign out",
+          onClick: () => {
+            signOut();
+          },
+        },
+      ]}
+      icon={
+        <UserCircleIcon
+          className={clsx(
+            "w-8 h-8 text-slate-400",
+            "group-hover:text-slate-500 transition-all",
+            "group-focus:text-slate-500",
+          )}
+        />
+      }
+    />
   );
 };
 
@@ -109,7 +79,8 @@ export const Header = ({ breadcrumbs }: HeaderProps) => {
             );
           })}
         </ol>
-        <div className="flex grow justify-end items-center gap-x-12">
+
+        <div className="flex grow justify-end gap-x-12">
           <UserMenu />
         </div>
       </nav>
