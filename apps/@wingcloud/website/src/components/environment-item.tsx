@@ -1,12 +1,16 @@
 import clsx from "clsx";
 import { useMemo } from "react";
 
+import { GithubIcon } from "../icons/github-icon.js";
 import { getTimeFromNow } from "../utils/time.js";
 import type { Environment } from "../utils/wrpc.js";
 
 const getTestStatus = (environment: Environment) => {
   if (!environment.testResults) {
     return "pending";
+  }
+  if (environment.testResults.data.testResults.length === 0) {
+    return "";
   }
   if (
     environment.testResults.data.testResults.some(
@@ -22,6 +26,7 @@ const getTestStatus = (environment: Environment) => {
   ) {
     return "running";
   }
+
   return "passed";
 };
 
@@ -61,18 +66,30 @@ export const EnvironmentItem = ({
         </button>
 
         <div className="truncate flex gap-x-2">
-          <div className="text-slate-600 font-mono truncate">
-            {environment.branch}
+          <div className="text-slate-600 font-mono flex gap-x-1 items-center">
+            <GithubIcon className="w-3 h-3 inline-block" />
+            <button
+              className="truncate hover:underline"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(
+                  `https://github.com/${environment.repo}/tree/${environment.branch}`,
+                  "_blank",
+                );
+              }}
+            >
+              {environment.branch}
+            </button>
           </div>
-          <div className="text-slate-400 truncate">
+          <span className="text-slate-400 truncate">
             updated {getTimeFromNow(environment.updatedAt)}
-          </div>
+          </span>
         </div>
       </div>
 
       <div className="flex items-center justify-end gap-x-4">
-        {testStatus && (
-          <div className="flex gap-x-2 text-xs items-center">
+        <div className="flex gap-x-2 text-xs items-center">
+          {testStatus && (
             <span
               className={clsx(
                 testStatus === "failed" && "bg-red-200 text-red-800",
@@ -84,20 +101,20 @@ export const EnvironmentItem = ({
             >
               Tests {testStatus}
             </span>
+          )}
 
-            <span
-              className={clsx(
-                // status === "initializing" && "bg-yellow-200 text-yellow-800",
-                // status === "deploying" && "bg-blue-200 text-blue-800",
-                status === "running" && "bg-green-200 text-green-800",
-                status !== "running" && "bg-slate-200 text-slate-600",
-                "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
-              )}
-            >
-              {status}
-            </span>
-          </div>
-        )}
+          <span
+            className={clsx(
+              // status === "initializing" && "bg-yellow-200 text-yellow-800",
+              // status === "deploying" && "bg-blue-200 text-blue-800",
+              status === "running" && "bg-green-200 text-green-800",
+              status !== "running" && "bg-slate-200 text-slate-600",
+              "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
+            )}
+          >
+            {status}
+          </span>
+        </div>
       </div>
     </div>
   );
