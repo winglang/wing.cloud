@@ -43,25 +43,30 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
-      - name: Compile Wing Cloud          
+      - name: Compile Wing Cloud dependencies
+        env:
+          VITE_GITHUB_APP_CLIENT_ID: ${{ secrets.VITE_GITHUB_APP_CLIENT_ID }}
+          VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}
+        run: npx turbo compile --filter=!@wingcloud/infrastructure
+      - name: Compile Wing Cloud
         env: 
+          ## Inflight
           APP_SECRET: ${{ secrets.APP_SECRET }}
           FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
-          FLY_TOKEN: ${{ secrets.FLY_TOKEN }}       
+          FLY_TOKEN: ${{ secrets.FLY_TOKEN }}
           BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
           BOT_GITHUB_CLIENT_ID: ${{ secrets.BOT_GITHUB_CLIENT_ID }}
           BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
           BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}
           BOT_GITHUB_WEBHOOK_SECRET: ${{ secrets.BOT_GITHUB_WEBHOOK_SECRET }}
+          TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}
+          ## Preflight
           PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
           PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
-          VITE_GITHUB_APP_CLIENT_ID: ${{ secrets.VITE_GITHUB_APP_CLIENT_ID }}
-          VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}  
           TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}
           TF_BACKEND_BUCKET_REGION: ${{ vars.TF_BACKEND_BUCKET_REGION }}
           TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
           TF_BACKEND_STATE_FILE: "${{ github.repository }}/${{ github.base_ref }}/infrastructure/main.tfstate"
-          TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}  
         run: pnpm wing compile -t tf-aws main.w --platform s3.backend.js
         working-directory: 'apps/@wingcloud/infrastructure'        
       - name: Configure AWS credentials
