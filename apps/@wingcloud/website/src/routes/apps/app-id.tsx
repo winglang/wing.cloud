@@ -1,9 +1,72 @@
+import { FolderPlusIcon, PlusIcon } from "@heroicons/react/24/outline";
+import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
-import { wrpc } from "../../utils/wrpc.js";
+import { Button } from "../../design-system/button.js";
+import { getTimeFromNow } from "../../utils/time.js";
+import { wrpc, type Environment } from "../../utils/wrpc.js";
+
+const EnvironmentItem = ({ environment }: { environment: Environment }) => {
+  return (
+    <div className="flex justify-between items-center">
+      <div className="flex items-center">
+        <span
+          className={clsx(
+            environment.status === "initializing" &&
+              "bg-yellow-200 text-yellow-800",
+            environment.status === "running" && "bg-green-200 text-green-800",
+            "text-xs font-semibold mr-2 px-2.5 py-0.5 rounded",
+          )}
+        >
+          {environment.branch}
+        </span>
+        <span className="text-xs text-gray-500">
+          updated {getTimeFromNow(environment.updatedAt)}
+        </span>
+      </div>
+      <div className="flex items-center gap-x-4">
+        <span
+          className={clsx(
+            environment.status === "initializing" &&
+              "bg-yellow-200 text-yellow-800",
+            environment.status === "running" && "bg-green-200 text-green-800",
+            "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
+          )}
+        >
+          {environment.status}
+        </span>
+
+        {environment.testResults?.status && (
+          <span
+            className={clsx(
+              environment.testResults.status === "initializing" &&
+                "bg-yellow-200 text-yellow-800",
+              environment.testResults.status === "running" &&
+                "bg-green-200 text-green-800",
+              "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
+            )}
+          >
+            {environment.testResults.status}
+          </span>
+        )}
+
+        {environment.url && (
+          <a
+            href={environment.url}
+            className="text-blue-600 hover:underline text-xs"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Visit Preview
+          </a>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export interface AppProps {
   appId: string;
@@ -61,14 +124,63 @@ export const Component = () => {
             <img
               src={app.data?.app.imageUrl}
               alt=""
-              className="w-24 h-24 rounded-full"
+              className="w-14 h-14 rounded-full"
             />
-            <div className="text-slate-700 text-xl self-end">
+            <div className="text-slate-700 text-xl self-center">
               {app.data?.app.name}
+            </div>
+
+            <div className="flex grow justify-end items-end">
+              <Button
+                transparent
+                onClick={() => {
+                  window.open(repository.data?.repository.html_url, "_blank");
+                }}
+              >
+                Git Repository
+              </Button>
             </div>
           </div>
 
-          <pre>{JSON.stringify(environments.data, undefined, 2)}</pre>
+          {!environments.isLoading &&
+            environments.data?.environments.length === 0 && (
+              <div className="text-center">
+                <FolderPlusIcon className="w-12 h-12 mx-auto text-gray-400" />
+                <h3 className="mt-2 text-sm font-semibold text-gray-900">
+                  No environments found.
+                </h3>
+
+                <div>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Get started by opening a Pull Request.
+                  </p>
+
+                  <Button
+                    label="Open Pull Request"
+                    icon={PlusIcon}
+                    primary
+                    className="mt-6"
+                    onClick={() => {
+                      window.open(
+                        `${repository.data?.repository.html_url}/pulls`,
+                        "_blank",
+                      );
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+          <div className="space-y-2">
+            {environments.data?.environments.map((environment) => (
+              <div className="bg-white rounded p-4 shadow">
+                <EnvironmentItem
+                  key={environment.id}
+                  environment={environment}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </>

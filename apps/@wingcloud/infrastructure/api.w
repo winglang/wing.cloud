@@ -267,16 +267,6 @@ pub class Api {
 
       return {
         body: {
-          environments_test: [
-            {
-              id: "1",
-              status: "running",
-              appId: "1",
-              repo: "repo",
-              branch: "my-branch",
-              url: "https://example.com",
-            }
-          ],
           environments: environments,
         },
       };

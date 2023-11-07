@@ -60,6 +60,8 @@ export interface Environment {
   installationId: number;
   url?: string;
   commentId?: number;
+  createdAt: string;
+  updatedAt: string;
   testResults?: TestStatusReport;
 }
 

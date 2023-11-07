@@ -84,7 +84,9 @@ pub class EnvironmentsTest {
           name: "test-app",
           createdAt: "0",
           createdBy: userId,
-          repository: "${owner}/${repoName}",
+          repoId: "${owner}/${repoName}",
+          repoName: repoName,
+          repoOwner: owner,
           userId: userId,
           entryfile: "main.w"
         );
