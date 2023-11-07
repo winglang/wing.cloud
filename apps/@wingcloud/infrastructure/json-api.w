@@ -41,6 +41,19 @@ pub class JsonApi {
             body: bodyStr,
           };
         } catch error {
+          // TODO: This is a hack to get around the fact that errors are just strings
+          if error == "Bad credentials" {
+            return {
+              status: 401,
+              headers: {
+                "content-type": "application/json",
+              },
+              body: Json.stringify({
+                error: error,
+              }),
+            };
+          }
+
           return {
             status: 500,
             headers: {

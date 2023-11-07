@@ -150,7 +150,7 @@ struct Message {
   repo: str;
   sha: str;
   entryfile: str;
-  projectId: str;
+  appId: str;
   environmentId: str;
   token: str?;
 }
@@ -239,7 +239,7 @@ pub class RuntimeService {
 
         props.environments.updateUrl(
           id: msg.environmentId,
-          projectId: msg.projectId,
+          appId: msg.appId,
           url: url,
         );
       } catch error {

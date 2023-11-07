@@ -5,13 +5,13 @@ bring http;
 bring "./octokit.w" as ok;
 bring "./dir.w" as dir;
 bring "../users.w" as users;
-bring "../projects.w" as projects;
+bring "../apps.w" as apps;
 bring "../environments.w" as environments;
 bring "../types/octokit-types.w" as octokit;
 
 struct EnvironmentsTestProps {
   users: users.Users;
-  projects: projects.Projects;
+  apps: apps.Apps;
   environments: environments.Environments;
   githubToken: str;
   githubOrg: str?;
@@ -28,7 +28,7 @@ pub class EnvironmentsTest {
       }
       return dirContents;
     };
-      
+
     let redisExample = readdirContents(fs.join(dir.dirname(), "../../../../examples/redis"));
 
     new cloud.Function(inflight () => {
@@ -56,7 +56,7 @@ pub class EnvironmentsTest {
         }
       }
     }) as "delete test repos";
-    
+
     new std.Test(inflight () => {
       let octokit = ok.octokit(props.githubToken);
 
@@ -77,10 +77,17 @@ pub class EnvironmentsTest {
       } else {
         throw "missing github owner";
       }
-    
+
       try {
         let userId = props.users.create(gitHubLogin: "fake-login");
-        let project = props.projects.create(name: "test-project", repository: "${owner}/${repoName}", userId: userId, entryfile: "main.w");
+        let appId = props.apps.create(
+          name: "test-app",
+          createdAt: "0",
+          createdBy: userId,
+          repository: "${owner}/${repoName}",
+          userId: userId,
+          entryfile: "main.w"
+        );
 
         // create a PR
         let branchName = "branch-1";
@@ -119,10 +126,10 @@ pub class EnvironmentsTest {
           repo: repoName,
           title: "Test Changes"
         );
-        
+
         // verify environment created
         let isRunning = util.waitUntil(inflight () => {
-          let envs = props.environments.list(projectId: project.id);
+          let envs = props.environments.list(appId: appId);
           if let env = envs.tryAt(0) {
             if env.status == "running" {
               return true;
@@ -131,11 +138,11 @@ pub class EnvironmentsTest {
 
           return false;
         }, timeout: 10m);
-        
+
         assert(isRunning);
 
         // make sure its responding
-        let env = props.environments.list(projectId: project.id).at(0);
+        let env = props.environments.list(appId: appId).at(0);
         if let url = env.url {
           util.waitUntil(inflight () => {
             try {

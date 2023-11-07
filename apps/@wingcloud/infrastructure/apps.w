@@ -1,114 +1,133 @@
 bring ex;
 bring "./nanoid62.w" as nanoid62;
 
-pub struct Project {
+pub struct App {
   id: str;
   name: str;
+  description: str?;
   repository: str;
   userId: str;
   entryfile: str;
+  createdAt: str;
+  createdBy: str;
+  updatedAt: str;
+  updatedBy: str;
+  imageUrl: str?;
+  lastCommitMessage: str?;
 }
 
-struct CreateProjectOptions {
+struct Item extends App {
+  pk: str;
+  sk: str;
+}
+
+struct CreateAppOptions {
   name: str;
+  description: str?;
   repository: str;
   userId: str;
   entryfile: str;
+  createdAt: str;
+  createdBy: str;
+  imageUrl: str?;
+  lastCommitMessage: str?;
 }
 
-struct RenameProjectOptions {
+struct RenameAppOptions {
   id: str;
   name: str;
   userId: str;
   repository: str;
 }
 
-struct GetProjectOptions {
+struct GetAppOptions {
   id: str;
 }
 
-struct ListProjectsOptions {
+struct ListAppsOptions {
   userId: str;
 }
 
-struct DeleteProjectOptions {
+struct DeleteAppOptions {
   id: str;
   userId: str;
   repository: str;
 }
 
-struct ListProjectByRepositoryOptions {
+struct ListAppByRepositoryOptions {
   repository: str;
 }
 
-pub class Projects {
+pub class Apps {
   table: ex.DynamodbTable;
 
   init(table: ex.DynamodbTable) {
     this.table = table;
   }
 
-  pub inflight create(options: CreateProjectOptions): Project {
-    let project = Project {
-      id: "project_${nanoid62.Nanoid62.generate()}",
-      name: options.name,
-      repository: options.repository,
-      userId: options.userId,
-      entryfile: options.entryfile,
+  pub inflight create(options: CreateAppOptions): str {
+    let appId = "app_${nanoid62.Nanoid62.generate()}";
+
+    // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
+    let makeItem = (id:str, pk: str, sk: str): Item => {
+      return {
+        pk: pk,
+        sk: sk,
+        id: id,
+        name: options.name,
+        description: options.description,
+        imageUrl: options.imageUrl,
+        repository: options.repository,
+        userId: options.userId,
+        entryfile: options.entryfile,
+        createdAt: options.createdAt,
+        createdBy: options.createdBy,
+        updatedAt: options.createdAt,
+        updatedBy: options.createdBy,
+        lastCommitMessage: options.lastCommitMessage,
+      };
     };
 
     this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: {
-            pk: "PROJECT#${project.id}",
-            sk: "#",
-            id: project.id,
-            name: project.name,
-            repository: project.repository,
-            userId: project.userId,
-            entryfile: project.entryfile,
-          },
+          item: makeItem(
+            appId,
+            "APP#${appId}",
+            "#",
+          ),
           conditionExpression: "attribute_not_exists(pk)"
         },
       },
       {
         put: {
-          item: {
-            pk: "USER#${options.userId}",
-            sk: "PROJECT#${project.id}",
-            id: project.id,
-            name: project.name,
-            repository: project.repository,
-            userId: project.userId,
-            entryfile: project.entryfile,
-          },
+          item: makeItem(
+            appId,
+            "USER#${options.userId}",
+            "APP#${appId}",
+          ),
         },
       },
       {
         put: {
-          item: {
-            pk: "REPOSITORY#${options.repository}",
-            sk: "PROJECT#${project.id}",
-            id: project.id,
-            name: project.name,
-            repository: project.repository,
-            userId: project.userId,
-            entryfile: project.entryfile,
-          },
+          item: makeItem(
+            appId,
+            "REPOSITORY#${options.repository}",
+            "APP#${appId}",
+          ),
         },
       },
     ]);
 
-    return project;
+    return appId;
   }
 
-  pub inflight rename(options: RenameProjectOptions): void {
+  pub inflight rename(options: RenameAppOptions): void {
     this.table.transactWriteItems(transactItems: [
       {
         update: {
           key: {
-            pk: "PROJECT#${options.id}",
+            pk: "APP#${options.id}",
             sk: "#",
           },
           updateExpression: "SET #name = :name",
@@ -128,7 +147,7 @@ pub class Projects {
         update: {
           key: {
             pk: "USER#${options.userId}",
-            sk: "PROJECT#${options.id}",
+            sk: "APP#${options.id}",
           },
           updateExpression: "SET #name = :name",
           expressionAttributeNames: {
@@ -143,7 +162,7 @@ pub class Projects {
         update: {
           key: {
             pk: "REPOSITORY#${options.repository}",
-            sk: "PROJECT#${options.id}",
+            sk: "APP#${options.id}",
           },
           updateExpression: "SET #name = :name",
           expressionAttributeNames: {
@@ -157,10 +176,10 @@ pub class Projects {
     ]);
   }
 
-  pub inflight get(options: GetProjectOptions): Project {
+  pub inflight get(options: GetAppOptions): App {
     let result = this.table.getItem(
       key: {
-        pk: "PROJECT#${options.id}",
+        pk: "APP#${options.id}",
         sk: "#",
       },
     );
@@ -168,44 +187,57 @@ pub class Projects {
     if let item = result.item {
       return {
         id: item.get("id").asStr(),
+        description: item.tryGet("description")?.tryAsStr(),
         name: item.get("name").asStr(),
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
+        createdAt: item.get("createdAt").asStr(),
+        createdBy: item.get("createdBy").asStr(),
+        updatedAt: item.get("updatedAt").asStr(),
+        updatedBy: item.get("updatedBy").asStr(),
+        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       };
     }
 
-    throw "Project [${options.id}] not found";
+    throw "App [${options.id}] not found";
   }
 
-  pub inflight list(options: ListProjectsOptions): Array<Project> {
+  pub inflight list(options: ListAppsOptions): Array<App> {
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
         ":pk": "USER#${options.userId}",
-        ":sk": "PROJECT#",
+        ":sk": "APP#",
       },
     );
-    let var projects: Array<Project> = [];
+    let var apps: Array<App> = [];
     for item in result.items {
-      projects = projects.concat([Project {
+      apps = apps.concat([App {
         id: item.get("id").asStr(),
         name: item.get("name").asStr(),
+        description: item.tryGet("description")?.tryAsStr(),
+        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
+        createdAt: item.get("createdAt").asStr(),
+        createdBy: item.get("createdBy").asStr(),
+        updatedAt: item.get("updatedAt").asStr(),
+        updatedBy: item.get("updatedBy").asStr(),
+        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       }]);
     }
-    return projects;
+    return apps;
   }
 
-  pub inflight delete(options: DeleteProjectOptions): void {
+  pub inflight delete(options: DeleteAppOptions): void {
     this.table.transactWriteItems(
       transactItems: [
         {
           delete: {
             key: {
-              pk: "PROJECT#${options.id}",
+              pk: "APP#${options.id}",
               sk: "#",
             },
             conditionExpression: "#userId = :userId",
@@ -221,7 +253,7 @@ pub class Projects {
           delete: {
             key: {
               pk: "USER#${options.userId}",
-              sk: "PROJECT#${options.id}",
+              sk: "APP#${options.id}",
             },
           },
         },
@@ -229,7 +261,7 @@ pub class Projects {
           delete: {
             key: {
               pk: "REPOSITORY#${options.repository}",
-              sk: "PROJECT#${options.id}",
+              sk: "APP#${options.id}",
             },
           },
         },
@@ -237,24 +269,30 @@ pub class Projects {
     );
   }
 
-  pub inflight listByRepository(options: ListProjectByRepositoryOptions): Array<Project> {
+  pub inflight listByRepository(options: ListAppByRepositoryOptions): Array<App> {
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
         ":pk": "REPOSITORY#${options.repository}",
-        ":sk": "PROJECT#",
+        ":sk": "APP#",
       },
     );
-    let var projects: Array<Project> = [];
+    let var apps: Array<App> = [];
     for item in result.items {
-      projects = projects.concat([Project {
+      apps = apps.concat([App {
         id: item.get("id").asStr(),
         name: item.get("name").asStr(),
+        description: item.tryGet("description")?.tryAsStr(),
         repository: item.get("repository").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
+        createdAt: item.get("createdAt").asStr(),
+        createdBy: item.get("createdBy").asStr(),
+        updatedAt: item.get("updatedAt").asStr(),
+        updatedBy: item.get("updatedBy").asStr(),
+        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       }]);
     }
-    return projects;
+    return apps;
   }
 }
