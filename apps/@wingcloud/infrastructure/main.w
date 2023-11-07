@@ -96,7 +96,7 @@ let proxy = new ReverseProxy.ReverseProxy(
   aliases: ["${subDomain}.${zoneName}"],
   origins: [
     {
-      pathPattern: "/wrpc/*",
+      pathPattern: "/wrpc/foo/*",
       domainName: apiDomainName,
       originId: "wrpc",
       originPath: "/prod",
