@@ -193,8 +193,6 @@ pub class Api {
           repo: repo,
         });
 
-        log("repository = ${Json.stringify(repository)}");
-
         return {
           body: {
             repository: repository
