@@ -77,7 +77,7 @@ pub class Users {
     return userId ?? this.create(gitHubLogin: options.gitHubLogin);
   }
 
-  pub inflight getUsername(options: GetUsernameOptions) : str {
+  pub inflight getUsername(options: GetUsernameOptions): str {
     let result = this.table.getItem(
       key: {
         pk: "USER#${options.userId}",
@@ -85,6 +85,10 @@ pub class Users {
       },
     );
 
-    return result.item?.tryGet("gitHubLogin")?.tryAsStr() ?? "";
+    if let username = result.item?.tryGet("gitHubLogin")?.tryAsStr() {
+      return username;
+    } else {
+      throw "User not found";
+    }
   }
 }

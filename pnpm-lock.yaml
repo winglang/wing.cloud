@@ -5364,7 +5364,10 @@ packages:
     peerDependencies:
       constructs: ^10.0.25
     dependencies:
+      archiver: 5.3.1
       constructs: 10.2.70
+      json-stable-stringify: 1.0.2
+      semver: 7.5.4
     dev: false
     bundledDependencies:
       - archiver
@@ -5376,7 +5379,10 @@ packages:
     peerDependencies:
       constructs: ^10.0.25
     dependencies:
+      archiver: 5.3.1
       constructs: 10.3.0
+      json-stable-stringify: 1.0.2
+      semver: 7.5.4
     dev: false
     bundledDependencies:
       - archiver
