@@ -1,4 +1,4 @@
-import { Link, LinkIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { LinkIcon, PlusIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
