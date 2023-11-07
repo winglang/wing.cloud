@@ -44,9 +44,6 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
       - name: Compile Wing Cloud dependencies
-        env:
-          VITE_GITHUB_APP_CLIENT_ID: ${{ secrets.VITE_GITHUB_APP_CLIENT_ID }}
-          VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}
         run: npx turbo compile --filter=!@wingcloud/infrastructure
       - name: Compile Wing Cloud
         env: 
@@ -61,6 +58,8 @@ jobs:
           BOT_GITHUB_WEBHOOK_SECRET: ${{ secrets.BOT_GITHUB_WEBHOOK_SECRET }}
           TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}
           ## Preflight
+          VITE_GITHUB_APP_CLIENT_ID: ${{ secrets.VITE_GITHUB_APP_CLIENT_ID }}
+          VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}
           PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
           PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
           TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}
