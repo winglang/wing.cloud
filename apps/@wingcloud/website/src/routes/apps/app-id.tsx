@@ -10,46 +10,41 @@ import { getTimeFromNow } from "../../utils/time.js";
 import { wrpc, type Environment } from "../../utils/wrpc.js";
 
 const EnvironmentItem = ({ environment }: { environment: Environment }) => {
+  const status = environment.status;
+  const testStatus = environment.testResults?.status;
+
   return (
-    <div className="flex justify-between items-center">
-      <div className="flex items-center">
-        <span
-          className={clsx(
-            environment.status === "initializing" &&
-              "bg-yellow-200 text-yellow-800",
-            environment.status === "running" && "bg-green-200 text-green-800",
-            "text-xs font-semibold mr-2 px-2.5 py-0.5 rounded",
-          )}
-        >
-          {environment.branch}
-        </span>
-        <span className="text-xs text-gray-500">
+    <div className="flex justify-between items-center truncate">
+      <div className="text-xs">
+        <div className="font-semibold truncate">{environment.branch}</div>
+
+        <div className="text-slate-500 text-[10px] truncate">
           updated {getTimeFromNow(environment.updatedAt)}
-        </span>
+        </div>
       </div>
-      <div className="flex items-center gap-x-4">
+
+      <div className="flex items-center justify-end gap-x-4">
         <span
           className={clsx(
-            environment.status === "initializing" &&
-              "bg-yellow-200 text-yellow-800",
-            environment.status === "running" && "bg-green-200 text-green-800",
+            status === "initializing" && "bg-yellow-200 text-yellow-800",
+            status === "deploying" && "bg-blue-200 text-blue-800",
+            status === "running" && "bg-green-200 text-green-800",
             "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
           )}
         >
-          {environment.status}
+          {status}
         </span>
 
-        {environment.testResults?.status && (
+        {testStatus && (
           <span
             className={clsx(
-              environment.testResults.status === "initializing" &&
-                "bg-yellow-200 text-yellow-800",
-              environment.testResults.status === "running" &&
-                "bg-green-200 text-green-800",
+              testStatus === "initializing" && "bg-yellow-200 text-yellow-800",
+              testStatus === "deploying" && "bg-blue-200 text-blue-800",
+              testStatus === "running" && "bg-green-200 text-green-800",
               "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
             )}
           >
-            {environment.testResults.status}
+            {testStatus}
           </span>
         )}
 
@@ -120,18 +115,19 @@ export const Component = () => {
 
       {!loading && (
         <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">
-          <div className="flex gap-x-4 bg-white rounded p-4 shadow">
+          <div className="flex gap-x-4 bg-white rounded p-2 shadow">
             <img
               src={app.data?.app.imageUrl}
               alt=""
               className="w-14 h-14 rounded-full"
             />
-            <div className="text-slate-700 text-xl self-center">
+            <div className="text-slate-700 text-xl self-center truncate">
               {app.data?.app.name}
             </div>
 
-            <div className="flex grow justify-end items-end">
+            <div className="flex grow justify-end items-end truncate">
               <Button
+                className="truncate"
                 transparent
                 onClick={() => {
                   window.open(repository.data?.repository.html_url, "_blank");
@@ -144,36 +140,33 @@ export const Component = () => {
 
           {!environments.isLoading &&
             environments.data?.environments.length === 0 && (
-              <div className="text-center">
-                <LinkIcon className="w-12 h-12 mx-auto text-gray-400" />
-                <h3 className="mt-2 text-sm font-semibold text-gray-900">
+              <div className="text-center bg-white p-6 w-full">
+                <LinkIcon className="w-8 h-8 mx-auto text-slate-400" />
+                <h3 className="mt-2 text-sm font-semibold text-slate-900">
                   No environments found.
                 </h3>
 
                 <div>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Get started by opening a Pull Request.
+                  <p className="mt-1 text-sm text-slate-500">
+                    Get started by{" "}
+                    <a
+                      className="text-blue-600 hover:underline"
+                      href={`${repository.data?.repository.html_url}/compare/main...${app.data?.app.repoOwner}:${app.data?.app.repoBranch}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      opening a Pull Request
+                    </a>
+                    .
                   </p>
-
-                  <Button
-                    label="Open Pull Request"
-                    icon={PlusIcon}
-                    primary
-                    className="mt-6"
-                    onClick={() => {
-                      window.open(
-                        `${repository.data?.repository.html_url}/pulls`,
-                        "_blank",
-                      );
-                    }}
-                  />
                 </div>
               </div>
             )}
 
           <div className="space-y-2">
+            <div className="text-slate-700 text-lg">Environments</div>
             {environments.data?.environments.map((environment) => (
-              <div className="bg-white rounded p-4 shadow">
+              <div key={environment.id} className="bg-white rounded p-4 shadow">
                 <EnvironmentItem
                   key={environment.id}
                   environment={environment}
