@@ -290,7 +290,7 @@ pub class Api {
 
         let input = Json.parse(request.body ?? "");
 
-        //let gitHubLogin = users.getUsername(userId: userId);
+        let gitHubLogin = users.getUsername(userId: userId);
 
         let commitData = GitHub.Client.getLastCommit(
           token: accessToken,
@@ -309,7 +309,7 @@ pub class Api {
           userId: userId,
           entryfile: input.get("entryfile").asStr(),
           createdAt: datetime.utcNow().toIso(),
-          createdBy: "gitHubLogin",
+          createdBy: gitHubLogin,
         );
 
         return {
