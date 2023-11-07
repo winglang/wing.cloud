@@ -127,17 +127,13 @@ let deploy = new cloud.OnDeploy(inflight () => {
   log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
 });
 
-if let githubToken = util.tryEnv("TESTS_GITHUB_TOKEN") {
-  let githubOrg = util.tryEnv("TESTS_GITHUB_ORG");
-  let githubUser = util.tryEnv("TESTS_GITHUB_USER");
+bring "./tests/environments.w" as tests;
+new tests.EnvironmentsTest(
+  users: users,
+  apps: apps,
+  environments: environments,
+  githubToken: util.tryEnv("TESTS_GITHUB_TOKEN"),
+  githubOrg: util.tryEnv("TESTS_GITHUB_ORG"),
+  githubUser: util.tryEnv("TESTS_GITHUB_USER"),
+);
 
-  bring "./tests/environments.w" as tests;
-  new tests.EnvironmentsTest(
-    users: users,
-    apps: apps,
-    environments: environments,
-    githubToken: githubToken,
-    githubOrg: githubOrg,
-    githubUser: githubUser,
-  );
-}
