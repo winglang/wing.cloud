@@ -20,7 +20,7 @@ pub class DockerImage {
       length: 10,
       special: false,
       upper: false,
-      number: true,
+      numeric: true,
     );
 
     let appName = "wing-cloud-image-${props.name}-${randomString.result}";

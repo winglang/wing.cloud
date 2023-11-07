@@ -129,15 +129,12 @@ let deploy = new cloud.OnDeploy(inflight () => {
 });
 
 bring "./tests/environments.w" as tests;
-let githubToken = util.env("TESTS_GITHUB_TOKEN");
-let githubOrg = util.tryEnv("TESTS_GITHUB_ORG");
-let githubUser = util.tryEnv("TESTS_GITHUB_USER");
 new tests.EnvironmentsTest(
   users: users,
   apps: apps,
   environments: environments,
-  githubToken: githubToken,
-  githubOrg: githubOrg,
-  githubUser: githubUser,
+  githubToken: util.tryEnv("TESTS_GITHUB_TOKEN"),
+  githubOrg: util.tryEnv("TESTS_GITHUB_ORG"),
+  githubUser: util.tryEnv("TESTS_GITHUB_USER"),
 );
 
