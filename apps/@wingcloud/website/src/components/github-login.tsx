@@ -1,10 +1,11 @@
 // TODO: Use state to prevent man-in-the-middle attacks.
 const GITHUB_APP_CLIENT_ID = import.meta.env.VITE_GITHUB_APP_CLIENT_ID;
-const GITHUB_APP_REDIRECT_URI = import.meta.env.VITE_GITHUB_APP_REDIRECT_URI;
 let AUTHORIZE_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_APP_CLIENT_ID}`;
 
-if (GITHUB_APP_REDIRECT_URI) {
-  AUTHORIZE_URL = AUTHORIZE_URL + `&redirect_uri=${GITHUB_APP_REDIRECT_URI}`;
+if (import.meta.env.DEV) {
+  AUTHORIZE_URL =
+    AUTHORIZE_URL +
+    `&redirect_uri="http://localhost:3900/wrpc/github.callback"`;
 }
 
 export const GithubLogin = () => {
