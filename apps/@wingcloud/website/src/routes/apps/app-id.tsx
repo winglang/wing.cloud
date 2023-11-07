@@ -171,7 +171,7 @@ export const Component = () => {
           {environments.data?.environments &&
             environments.data?.environments.length > 0 && (
               <div className="space-y-2">
-                <div className="text-slate-700 text-lg">
+                <div className="text-slate-700 text-lg pt-2">
                   Preview Environments
                 </div>
                 {environments.data.environments.map((environment) => (
