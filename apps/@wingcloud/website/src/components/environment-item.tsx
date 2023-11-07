@@ -42,8 +42,8 @@ export const EnvironmentItem = ({
       <div className="relative">
         <BranchIcon
           className={clsx(
-            "w-7 h-7 text-slate-500",
-            "rounded-full border-slate-400 border",
+            "w-8 h-8 text-slate-500",
+            "rounded-full border-slate-300 border",
           )}
         />
         <div
