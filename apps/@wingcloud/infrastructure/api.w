@@ -300,10 +300,11 @@ pub class Api {
         );
 
         let appId = apps.create(
+          name: input.get("appName").asStr(),
+          description: input.get("description").asStr(),
           repoId: input.get("repoId").asStr(),
           repoName: input.get("repoName").asStr(),
           repoOwner: input.get("repoOwner").asStr(),
-          name: input.get("appName").asStr(),
           lastCommitMessage: commitData?.commit?.message ?? "",
           imageUrl: input.get("imageUrl").asStr(),
           userId: userId,
