@@ -27,6 +27,7 @@ export const Component = () => {
     }
   }, [installations.data]);
 
+  // TODO: Feels cleaner to separate in different components so we don't have to use the `enabled` option.
   const repos = wrpc["github.listRepositories"].useQuery(
     {
       installationId: installationId!,
