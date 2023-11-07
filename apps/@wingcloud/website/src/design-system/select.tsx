@@ -12,7 +12,7 @@ interface Item {
 
 export interface SelectProps {
   items: Item[];
-  value: string;
+  value?: string;
   onChange: (value: string) => void;
   disabled?: boolean;
   placeholder?: string;

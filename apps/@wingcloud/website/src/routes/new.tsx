@@ -15,26 +15,25 @@ export const Component = () => {
   const navigate = useNavigate();
 
   const [entryfile, setEntryfile] = useState("main.w");
-  const [installationId, setInstallationId] = useState("");
+  const [installationId, setInstallationId] = useState<string>();
   const [repositoryId, setRepositoryId] = useState("");
 
   const installations = wrpc["github.listInstallations"].useQuery();
   useEffect(() => {
-    if (installationId === "") {
-      setInstallationId(
-        installations.data?.installations[0]?.id.toString() || "",
-      );
+    const firstInstallationId =
+      installations.data?.installations[0]?.id.toString();
+    if (firstInstallationId) {
+      setInstallationId(firstInstallationId);
     }
   }, [installations.data]);
 
-  // TODO: useQuery should be able to use enabled as option
   const repos = wrpc["github.listRepositories"].useQuery(
     {
-      installationId: installationId,
+      installationId: installationId!,
     },
-    // {
-    //   enabled: installationId !== "",
-    // },
+    {
+      enabled: installationId != undefined,
+    },
   );
 
   const createAppMutation = wrpc["user.createApp"].useMutation();
@@ -88,23 +87,20 @@ export const Component = () => {
             >
               <div className="text-sm">
                 <div className="gap-4 mb-4 flex flex-col text-sm">
-                  <Select
-                    items={(installations.data?.installations || []).map(
-                      (installation) => ({
-                        value: installation.id.toString(),
-                        label: installation.account.login || "",
-                      }),
-                    )}
-                    placeholder="Select a GitHub namespace"
-                    onChange={(value) => {
-                      if (!value) {
-                        return;
-                      }
-                      setInstallationId(value);
-                    }}
-                    value={installationId.toString()}
-                    btnClassName="w-full bg-sky-50 py-2 rounded border"
-                  />
+                  {installations.data?.installations && (
+                    <Select
+                      items={installations.data.installations.map(
+                        (installation) => ({
+                          value: installation.id.toString(),
+                          label: installation.account.login,
+                        }),
+                      )}
+                      placeholder="Select a GitHub namespace"
+                      onChange={setInstallationId}
+                      value={installationId}
+                      btnClassName="w-full bg-sky-50 py-2 rounded border"
+                    />
+                  )}
 
                   <div className="justify-end flex flex-col gap-1">
                     {repos.data?.repositories.map((repo) => (
@@ -116,7 +112,7 @@ export const Component = () => {
                         )}
                       >
                         <img
-                          src={repo.owner?.avatar_url}
+                          src={repo.owner.avatar_url}
                           className="w-5 h-5 inline-block mr-2 rounded-full"
                         />
                         <span>{repo.name}</span>

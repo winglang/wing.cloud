@@ -13,25 +13,25 @@ const WRPCContext = createContext({ url: "" });
 export const WRPCProvider = WRPCContext.Provider;
 
 export type QueryProcedure<
-  Input = unknown,
+  Input = undefined,
   Output = unknown,
 > = undefined extends Input
   ? {
       useQuery(
         input?: Input,
-        options?: UseQueryOptions<unknown, unknown, Input>,
+        options?: Omit<UseQueryOptions<unknown, unknown, Input>, "queryKey">,
       ): UseQueryResult<Output>;
     }
   : {
       useQuery(
         input: Input,
-        options?: UseQueryOptions<unknown, unknown, Output>,
+        options?: Omit<UseQueryOptions<unknown, unknown, Output>, "queryKey">,
       ): UseQueryResult<Output>;
     };
 
-export type MutationProcedure<Input = unknown, Output = unknown> = {
+export type MutationProcedure<Input = undefined, Output = unknown> = {
   useMutation(
-    options?: UseMutationOptions<Output, unknown, Input>,
+    options?: Omit<UseMutationOptions<Output, unknown, Input>, "queryKey">,
   ): UseMutationResult<Output, unknown, Input>;
 };
 
