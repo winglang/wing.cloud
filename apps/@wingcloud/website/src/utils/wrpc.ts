@@ -4,7 +4,33 @@ import {
   type QueryProcedure,
 } from "@wingcloud/wrpc";
 
+export interface Repository {
+  id: number;
+  name: string;
+  full_name: string;
+  private: boolean;
+  owner: { login: string; avatar_url: string };
+  default_branch: string;
+}
+
+export interface App {
+  id: string;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  repository: string;
+  userId: string;
+  entryfile: string;
+  createdBy: string;
+  createdAt: string;
+  updatedBy: string;
+  updatedAt: string;
+  lastCommitMessage?: string;
+}
+
 export const wrpc = createWRPCReact<{
+  "auth.check": QueryProcedure<{}>;
+  "auth.signout": MutationProcedure<{}>;
   "github.callback": QueryProcedure<{ code: string }, {}>;
   "github.listInstallations": QueryProcedure<
     undefined,
@@ -18,35 +44,37 @@ export const wrpc = createWRPCReact<{
   "github.listRepositories": QueryProcedure<
     { installationId: string },
     {
-      repositories: Array<{
-        id: number;
-        name: string;
-        full_name: string;
-      }>;
+      repositories: Array<Repository>;
     }
   >;
-  "project.get": QueryProcedure<
+  "app.get": QueryProcedure<
     { id: string },
     {
-      project: { id: string; name: string; repository: string; userId: string };
+      app: { id: string; name: string; repository: string; userId: string };
     }
   >;
-  "project.rename": MutationProcedure<{ id: string; name: string, repository: string }, {}>;
-  "user.listProjects": QueryProcedure<
+  "app.rename": MutationProcedure<
+    { id: string; name: string; repository: string },
+    {}
+  >;
+  "user.listApps": QueryProcedure<
     undefined,
     {
-      projects: Array<{
-        id: string;
-        name: string;
-        repository: string;
-        userId: string;
-        entryfile: string;
-      }>;
+      apps: Array<App>;
     }
   >;
-  "user.createProject": MutationProcedure<{
-    repositoryId: string;
-    projectName: string;
-    entryfile: string;
-  }>;
+  "user.createApp": MutationProcedure<
+    {
+      repositoryId: string;
+      repositoryName: string;
+      owner: string;
+      default_branch: string;
+      appName: string;
+      entryfile: string;
+      imageUrl?: string;
+    },
+    {
+      appId: string;
+    }
+  >;
 }>();

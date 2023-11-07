@@ -24,6 +24,22 @@ struct InstallationRepository {
   name: str;
 }
 
+struct Commit {
+  message: str;
+}
+
+struct CommitResponse {
+  sha: str;
+  commit: Commit;
+}
+
+struct GetLastCommitOptions {
+  token: str;
+  owner: str;
+  repo: str;
+  default_branch: str;
+}
+
 pub class Exchange {
   pub static inflight codeForTokens(options: ExchangeCodeForTokensOptions): AuthTokens {
     // return AuthTokens {
@@ -56,6 +72,10 @@ pub class Exchange {
   }
 
   extern "./src/github.ts" pub static inflight getLoginFromAccessToken(accessToken: str): str;
+}
+
+pub class Client {
   extern "./src/github.ts" pub static inflight listUserInstallations(token: str): Array<UserInstallation>;
   extern "./src/github.ts" pub static inflight listInstallationRepos(token: str, installationId: num): Array<InstallationRepository>;
+  extern "./src/github.ts" pub static inflight getLastCommit(options: GetLastCommitOptions): CommitResponse;
 }

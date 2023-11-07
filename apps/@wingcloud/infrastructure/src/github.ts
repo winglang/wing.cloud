@@ -34,3 +34,33 @@ export const listInstallationRepos = async (
 
   return orgRepos.repositories;
 };
+
+export const getLastCommit = async ({
+  token,
+  owner,
+  repo,
+  default_branch,
+}: {
+  token: string;
+  owner: string;
+  repo: string;
+  default_branch: string;
+}) => {
+  const octokit = new Octokit({
+    auth: token,
+  });
+
+  try {
+    const { data: commit } = await octokit.rest.repos.getCommit({
+      owner,
+      repo,
+      ref: default_branch,
+    });
+
+    return commit;
+  } catch (error) {
+    console.log(error);
+  }
+
+  return "commit not found";
+};
