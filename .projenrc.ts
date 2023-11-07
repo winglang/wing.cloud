@@ -189,6 +189,7 @@ website.addGitIgnore("!/.env.example");
 
 website.addDevDeps("node-fetch");
 website.addDevDeps("nanoid");
+website.addDevDeps("@ibm/plex");
 
 ///////////////////////////////////////////////////////////////////////////////
 const runtime = new TypescriptProject({
@@ -245,8 +246,8 @@ infrastructure.addDeps(`winglang`);
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
 infrastructure.addTask("test-aws", {
-  exec: "node ./bin/wing.mjs test -t tf-aws main.w --platform override-function-memory.js"
-})
+  exec: "node ./bin/wing.mjs test -t tf-aws main.w --platform override-function-memory.js",
+});
 infrastructure.compileTask.exec(
   "node ./bin/wing.mjs compile -t tf-aws --platform override-function-memory.js",
 );
@@ -305,7 +306,7 @@ new Turbo(infrastructure, {
     },
     "test-aws": {
       dependsOn: ["compile"],
-    }
+    },
   },
 });
 
@@ -327,6 +328,7 @@ infrastructure.addDeps(
   "@cdktf/provider-dnsimple",
   "@cdktf/provider-docker",
   "@cdktf/provider-null",
+  "@cdktf/provider-random",
 );
 
 infrastructure.addDevDeps("@types/cookie");
@@ -356,7 +358,7 @@ aws.addDeps("constructs");
 aws.addGitIgnore("**/target/");
 aws.addFields({
   type: "commonjs",
-})
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 

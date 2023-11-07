@@ -1,11 +1,11 @@
 bring "./environments.w" as environments;
-bring "./projects.w" as projects;
+bring "./apps.w" as apps;
 bring "./status-reports.w" as status_reports;
 bring "./types/octokit-types.w" as octokit;
 
 struct GithubCommentProps {
   environments: environments.Environments;
-  projects: projects.Projects;
+  apps: apps.Apps;
 }
 
 struct GithubCommentCreateProps {
@@ -16,11 +16,11 @@ struct GithubCommentCreateProps {
 
 pub class GithubComment {
   environments: environments.Environments;
-  projects: projects.Projects;
+  apps: apps.Apps;
 
   init(props: GithubCommentProps) {
     this.environments = props.environments;
-    this.projects = props.projects;
+    this.apps = props.apps;
   }
 
   pub inflight createOrUpdate(props: GithubCommentCreateProps): num {
@@ -28,10 +28,10 @@ pub class GithubComment {
     let var commentId: num? = nil;
     let var commentBody = "${wingIdentifier}
 
-| Project         | Status | Preview | Tests | Updated (UTC) |
+| App         | Status | Preview | Tests | Updated (UTC) |
 | --------------- | ------ | ------- | ----- | -------------- |";
-    for project in this.projects.listByRepository(repository: props.repo) {
-      for environment in this.environments.list(projectId: project.id) {
+    for app in this.apps.listByRepository(repository: props.repo) {
+      for environment in this.environments.list(appId: app.id) {
         if environment.repo == props.repo && environment.prNumber == props.prNumber {
           let var testsString = "---";
           if let testResults = environment.testResults {
@@ -46,14 +46,14 @@ pub class GithubComment {
               i += 1;
             }
           }
-        
+
           let var previewUrl = "";
           let shouldDisplayUrl = environment.status == "running";
           if(shouldDisplayUrl) {
             previewUrl = "[Visit](${environment.url})";
           }
 
-          let entryfile = "[${project.name}](https://github.com/${environment.repo}/blob/${environment.branch}/${project.entryfile})";
+          let entryfile = "[${app.name}](https://github.com/${environment.repo}/blob/${environment.branch}/${app.entryfile})";
 
           let date = std.Datetime.utcNow().toIso();
           let tableRows = "| ${entryfile} | ${environment.status} | ${previewUrl} | ${testsString} | ${date} |";
