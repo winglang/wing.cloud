@@ -205,6 +205,39 @@ pub class Api {
       }
     });
 
+    api.get("/wrpc/github.getPullRequest", inflight (request) => {
+      if let accessToken = getAccessTokenFromCookie(request) {
+        log("accessToken = ${accessToken}");
+
+        let owner = request.query.get("owner");
+        let repo = request.query.get("repo");
+        let pullNumber = request.query.get("pullNumber");
+
+        if owner == "" || repo == "" || pullNumber == "" {
+          return {
+            status: 400,
+          };
+        }
+
+        let pullRequest = GitHub.Client.getPullRequest({
+          token: accessToken,
+          owner: owner,
+          repo: repo,
+          pull_number: pullNumber,
+        });
+
+        return {
+          body: {
+            pullRequest: pullRequest
+          },
+        };
+      } else {
+        return {
+          status: 401,
+        };
+      }
+    });
+
     api.get("/wrpc/app.get", inflight (request) => {
       let userId = getUserFromCookie(request);
 

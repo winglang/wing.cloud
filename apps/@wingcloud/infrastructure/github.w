@@ -61,6 +61,20 @@ struct GetRepositoryOptions {
   repo: str;
 }
 
+struct GetPullRequestOptions {
+  token: str;
+  owner: str;
+  repo: str;
+  pull_number: str;
+}
+
+struct PullRequest {
+  id: num;
+  number: num;
+  title: str;
+  body: str;
+}
+
 pub class Exchange {
   pub static inflight codeForTokens(options: ExchangeCodeForTokensOptions): AuthTokens {
     let response = http.post("https://github.com/login/oauth/access_token", {
@@ -91,4 +105,5 @@ pub class Client {
   extern "./src/github.ts" pub static inflight listInstallationRepos(token: str, installationId: num): Array<InstallationRepository>;
   extern "./src/github.ts" pub static inflight getLastCommit(options: GetLastCommitOptions): CommitResponse;
   extern "./src/github.ts" pub static inflight getRepository(options: GetRepositoryOptions): Repository;
+  extern "./src/github.ts" pub static inflight getPullRequest(options: GetPullRequestOptions): PullRequest;
 }

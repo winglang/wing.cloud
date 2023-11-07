@@ -200,6 +200,7 @@ pub class ProbotApp {
             status: "initializing",
             installationId: installation.id,
             prNumber: context.payload.pull_request.number,
+            prTitle: context.payload.pull_request.title,
           );
 
           this.postComment(environmentId: environment.id);

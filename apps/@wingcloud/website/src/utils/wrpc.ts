@@ -57,6 +57,7 @@ export interface Environment {
   branch: string;
   status: string;
   prNumber: number;
+  prTitle: string;
   installationId: number;
   url?: string;
   commentId?: number;

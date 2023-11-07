@@ -9,6 +9,7 @@ pub struct Environment {
   branch: str;
   status: str;
   prNumber: num;
+  prTitle: str;
   installationId: num;
   url: str?;
   commentId: num?;
@@ -28,6 +29,7 @@ struct CreateEnvironmentOptions {
   branch: str;
   status: str;
   prNumber: num;
+  prTitle: str;
   installationId: num;
 }
 
@@ -79,6 +81,7 @@ pub class Environments {
       branch: options.branch,
       status: options.status,
       prNumber: options.prNumber,
+      prTitle: options.prTitle,
       installationId: options.installationId,
       createdAt: createdAt,
       updatedAt: createdAt,
@@ -95,6 +98,7 @@ pub class Environments {
         branch: environment.branch,
         status: environment.status,
         prNumber: environment.prNumber,
+        prTitle: environment.prTitle,
         installationId: environment.installationId,
         createdAt: environment.createdAt,
         updatedAt: environment.updatedAt,
@@ -289,6 +293,7 @@ pub class Environments {
         branch: item.get("branch").asStr(),
         status: item.get("status").asStr(),
         prNumber: item.get("prNumber").asNum(),
+        prTitle: item.get("prTitle").asStr(),
         installationId: item.get("installationId").asNum(),
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
@@ -318,6 +323,7 @@ pub class Environments {
         branch: item.get("branch").asStr(),
         status: item.get("status").asStr(),
         prNumber: item.get("prNumber").asNum(),
+        prTitle: item.get("prTitle").asStr(),
         installationId: item.get("installationId").asNum(),
         // https://github.com/winglang/wing/issues/4470
         url: item.tryGet("url")?.tryAsStr(),

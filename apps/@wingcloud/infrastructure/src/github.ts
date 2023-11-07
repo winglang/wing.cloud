@@ -85,3 +85,27 @@ export const getRepository = async ({
 
   return repository;
 };
+
+export const getPullRequest = async ({
+  token,
+  owner,
+  repo,
+  pull_number,
+}: {
+  token: string;
+  owner: string;
+  repo: string;
+  pull_number: number;
+}) => {
+  const octokit = new Octokit({
+    auth: token,
+  });
+
+  const { data: pullRequest } = await octokit.rest.pulls.get({
+    owner,
+    repo,
+    pull_number,
+  });
+
+  return pullRequest;
+};
