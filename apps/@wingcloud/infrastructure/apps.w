@@ -196,6 +196,7 @@ pub class Apps {
         createdBy: item.get("createdBy").asStr(),
         updatedAt: item.get("updatedAt").asStr(),
         updatedBy: item.get("updatedBy").asStr(),
+        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       };
     }
 
@@ -289,6 +290,7 @@ pub class Apps {
         createdBy: item.get("createdBy").asStr(),
         updatedAt: item.get("updatedAt").asStr(),
         updatedBy: item.get("updatedBy").asStr(),
+        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       }]);
     }
     return apps;
