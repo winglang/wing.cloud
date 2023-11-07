@@ -43,9 +43,9 @@ export const Component = () => {
       if (!repo.id) {
         return;
       }
-      setRepositoryId(repo.id.toString());
+      setRepositoryId(repo.full_name.toString());
       await createAppMutation.mutateAsync({
-        repoId: repo.id.toString(),
+        repoId: repo.full_name.toString(),
         repoName: repo.name,
         repoOwner: repo.owner.login,
         default_branch: repo.default_branch,
@@ -139,7 +139,7 @@ export const Component = () => {
                             disabled={!installationId}
                           >
                             <div>Import</div>
-                            {repositoryId === repo.id.toString() && (
+                            {repositoryId === repo.full_name.toString() && (
                               <div className="flex justify-center">
                                 <SpinnerLoader size="xs" />
                               </div>

@@ -85,10 +85,6 @@ pub class Users {
       },
     );
 
-    let username = result.item?.tryGet("gitHubLogin")?.tryAsStr() ?? "";
-    if username != "" {
-      return username;
-    }
-    throw "User not found";
+    return result.item?.tryGet("gitHubLogin")?.tryAsStr() ?? "";
   }
 }

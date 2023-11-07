@@ -125,6 +125,7 @@ pub class ProbotApp {
       }
     );
     queue.setConsumer(inflight (message) => {
+      log("receive message: ${message}");
       let props = VerifyAndReceieveProps.fromJson(Json.parse(message));
       this.listen();
       this.adapter.verifyAndReceive(props);
