@@ -42,8 +42,7 @@ export const Component = () => {
 
       {!loading && (
         <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">
-          {appId}
-          {environmentId}
+          <pre>{JSON.stringify(environments.data, undefined, 2)}</pre>
         </div>
       )}
     </>
