@@ -45,13 +45,13 @@ export const Component = () => {
       }
       setRepositoryId(repo.full_name.toString());
       await createAppMutation.mutateAsync({
-        repoId: repo.full_name.toString(),
+        appName: repo.name,
         description: repo.description || "",
+        repoId: repo.full_name.toString(),
         repoName: repo.name,
         repoOwner: repo.owner.login,
-        default_branch: repo.default_branch,
         entryfile,
-        appName: repo.name,
+        default_branch: repo.default_branch,
         imageUrl: repo.owner.avatar_url,
       });
       navigate("/apps");

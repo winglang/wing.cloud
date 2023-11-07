@@ -305,12 +305,12 @@ pub class Api {
           repoId: input.get("repoId").asStr(),
           repoName: input.get("repoName").asStr(),
           repoOwner: input.get("repoOwner").asStr(),
-          lastCommitMessage: commitData?.commit?.message ?? "",
           imageUrl: input.get("imageUrl").asStr(),
-          userId: userId,
           entryfile: input.get("entryfile").asStr(),
           createdAt: datetime.utcNow().toIso(),
           createdBy: gitHubLogin,
+          userId: userId,
+          lastCommitMessage: commitData?.commit?.message ?? "",
         );
 
         return {
