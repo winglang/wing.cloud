@@ -17,9 +17,22 @@ plan_env() {
   cd $CURRENT_DIR
 }
 
-plan_env "tfstate" "wing-cloud-staging" "staging"
-plan_env "tfstate" "wing-cloud-production" "production"
-plan_env "oidc" "wing-cloud-staging" "staging"
-plan_env "oidc" "wing-cloud-production" "production"
+if [ "$#" -eq 1 ]; then
+  ENVIRONMENT=$(echo $1 | tr '[:upper:]' '[:lower:]')
+  if [ "$ENVIRONMENT" == "staging" ] || [ "$ENVIRONMENT" == "production" ] || [ "$ENVIRONMENT" == "testing" ]; then
+    plan_env "tfstate" "wing-cloud-$ENVIRONMENT" "$ENVIRONMENT"
+    plan_env "oidc" "wing-cloud-$ENVIRONMENT" "$ENVIRONMENT"
+  else
+    echo "Invalid ENVIRONMENT. Please provide either 'staging', 'production' or 'testing' as an argument."
+    exit 1
+  fi
+else
+  plan_env "tfstate" "wing-cloud-staging" "staging"
+  plan_env "tfstate" "wing-cloud-production" "production"
+  plan_env "tfstate" "wing-cloud-testing" "testing"
+  plan_env "oidc" "wing-cloud-staging" "staging"
+  plan_env "oidc" "wing-cloud-production" "production"
+  plan_env "oidc" "wing-cloud-testing" "testing"
+fi
 
 echo "Planned all services successfully"
