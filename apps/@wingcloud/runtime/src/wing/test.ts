@@ -30,7 +30,7 @@ async function wingTestOne(
     })
     .filter((t) => !!t)
     .join("\n");
-  const logs = result.error ? `${result.error}\n${traces}` : traces;
+  const logs = result.error ? `${result.error}\n${traces}` : (traces || "<no logs>");
   await props.bucketWrite(
     props.environment.testKey(result.pass, testResourcePath),
     logs,
