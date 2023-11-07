@@ -60,7 +60,7 @@ jobs:
           TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}
           TF_BACKEND_BUCKET_REGION: ${{ vars.TF_BACKEND_BUCKET_REGION }}
           TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
-          TF_BACKEND_STATE_FILE: "${{ github.repository }}/${{ github.ref_name }}/infrastructure/main.tfstate"      
+          TF_BACKEND_STATE_FILE: "${{ github.repository }}/${{ github.base_ref }}/infrastructure/main.tfstate"
           TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}  
         run: pnpm wing compile -t tf-aws main.w --platform s3.backend.js
         working-directory: 'apps/@wingcloud/infrastructure'        
