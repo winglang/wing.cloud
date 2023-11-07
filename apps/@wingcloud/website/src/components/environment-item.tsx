@@ -77,7 +77,8 @@ export const EnvironmentItem = ({
               className={clsx(
                 testStatus === "failed" && "bg-red-200 text-red-800",
                 testStatus === "passed" && "bg-green-200 text-green-800",
-                testStatus !== "running" && "bg-slate-200 text-slate-800",
+                ["running", "pending"].includes(testStatus) &&
+                  "bg-slate-200 text-slate-600",
                 "inline-block font-semibold px-2.5 py-0.5 rounded-full",
               )}
             >
@@ -89,7 +90,7 @@ export const EnvironmentItem = ({
                 // status === "initializing" && "bg-yellow-200 text-yellow-800",
                 // status === "deploying" && "bg-blue-200 text-blue-800",
                 status === "running" && "bg-green-200 text-green-800",
-                status !== "running" && "bg-slate-200 text-slate-800",
+                status !== "running" && "bg-slate-200 text-slate-600",
                 "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
               )}
             >
