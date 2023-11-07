@@ -10,7 +10,7 @@
     "@skyrpex/wingen": "^0.6.4",
     "@types/node": "18",
     "prettier": "^3.0.3",
-    "projen": "^0.76.25",
+    "projen": "^0.76.17",
     "tsx": "^3.14.0",
     "typescript": "^5.2.2"
   },
