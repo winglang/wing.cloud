@@ -2,6 +2,7 @@ import { FolderPlusIcon, PlusIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
@@ -184,5 +185,36 @@ export const Component = () => {
         </div>
       )}
     </>
+  );
+};
+
+import { wrpc } from "../../utils/wrpc.js";
+
+export interface AppProps {
+  appId: string;
+}
+
+export const Component = () => {
+  const { appId } = useParams();
+  if (!appId) return;
+
+  // TODO: useQuery should be able to use enabled: false as option
+  const app = wrpc["app.get"].useQuery(
+    { id: appId },
+    // {
+    //   enabled: false,
+    // },
+  );
+
+  return (
+    <div>
+      <h2>{appId}</h2>
+
+      <pre>
+        <code>{JSON.stringify(app.data, undefined, 2)}</code>
+      </pre>
+
+      <Link to="/apps">Back to Apps</Link>
+    </div>
   );
 };
