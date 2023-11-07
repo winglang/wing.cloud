@@ -47,7 +47,7 @@ export const EnvironmentItem = ({
           )}
         />
         <div
-          title={status.charAt(0).toUpperCase() + status.slice(1)}
+          title={status}
           className={clsx(
             "absolute -top-1.5 -right-1.5",
             "w-2.5 h-2.5",
