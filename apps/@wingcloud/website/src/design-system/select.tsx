@@ -51,7 +51,7 @@ export const Select = ({
 
   return (
     <Listbox
-      value={value}
+      value={value ?? ""}
       onChange={(item) => onChange(item)}
       disabled={disabled}
     >
