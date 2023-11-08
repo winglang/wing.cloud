@@ -1,8 +1,8 @@
 import { UserCircleIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useState } from "react";
+import { useMemo } from "react";
 import { useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { Popover } from "../design-system/popover.js";
 import { WingIcon } from "../icons/wing-icon.js";
@@ -11,10 +11,6 @@ import { wrpc } from "../utils/wrpc.js";
 export interface Breadcrumb {
   label: string;
   to: string;
-}
-
-export interface HeaderProps {
-  breadcrumbs: Breadcrumb[];
 }
 
 const UserMenu = () => {
@@ -51,7 +47,20 @@ const UserMenu = () => {
   );
 };
 
-export const Header = ({ breadcrumbs }: HeaderProps) => {
+export const Header = () => {
+  const location = useLocation();
+
+  const breadcrumbs = useMemo(() => {
+    const parts = location.pathname.split("/").filter((part) => part !== "");
+    return parts.map((part, index) => {
+      const to = `/${parts.slice(0, index + 1).join("/")}`;
+      return {
+        label: part,
+        to,
+      };
+    });
+  }, [location.pathname]);
+
   return (
     <header className={clsx("p-6", "bg-white", "shadow")}>
       <nav className="flex" aria-label="Breadcrumb">
