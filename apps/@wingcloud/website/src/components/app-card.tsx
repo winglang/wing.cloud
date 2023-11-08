@@ -18,6 +18,7 @@ export const AppCard = ({
         "flex flex-col",
         "w-full h-full p-4 bg-white rounded-lg",
         "shadow hover:shadow-md transition-all",
+        "text-left",
       )}
     >
       <div className="space-y-4 w-full">
@@ -32,24 +33,21 @@ export const AppCard = ({
           )}
         </div>
 
-        <div className="text-left w-full truncate space-y-1">
+        <div className="w-full truncate space-y-1">
           <div className="text-lg text-slate-800">{app.name}</div>
           <div className="text-xs text-slate-600 flex gap-x-1">
             {app.lastCommitMessage && (
-              <GithubIcon className="w-4 text-slate-700" />
+              <GithubIcon className="w-4 h-4 shrink-0 text-slate-700" />
             )}
-            <div className="truncate">
+            <div className="truncate" title={app.lastCommitMessage}>
               {app.lastCommitMessage?.split("\n")[0] || app.entryfile}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="text-xs mt-3 h-full flex items-end">
-        <div className="text-slate-600">
-          Updated {getTimeFromNow(app.updatedAt)}{" "}
-          {app.updatedBy && `by ${app.updatedBy}`}
-        </div>
+      <div className="w-full truncate text-xs mt-3 h-full items-end text-slate-600">
+        {`Updated ${getTimeFromNow(app.updatedAt)} by ${app.updatedBy}`}
       </div>
     </button>
   );
