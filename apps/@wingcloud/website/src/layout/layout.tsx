@@ -6,7 +6,10 @@ import { wrpc } from "../utils/wrpc.js";
 export const Layout = ({ children }: PropsWithChildren) => {
   if (location.pathname !== "/") {
     try {
-      const authCheck = wrpc["auth.check"].useQuery();
+      const authCheck = wrpc["auth.check"].useQuery(undefined, {
+        throwOnError: true,
+        retry: false,
+      });
 
       if (authCheck.isLoading) {
         return (
@@ -14,10 +17,6 @@ export const Layout = ({ children }: PropsWithChildren) => {
             <SpinnerLoader />
           </div>
         );
-      }
-
-      if (authCheck.isError) {
-        window.location.href = "/";
       }
     } catch (error) {
       console.log(error);

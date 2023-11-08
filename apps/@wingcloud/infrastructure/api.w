@@ -12,6 +12,11 @@ bring "./users.w" as Users;
 bring "./environments.w" as Environments;
 bring "./lowkeys-map.w" as lowkeys;
 
+// TODO: https://github.com/winglang/wing/issues/3644
+class Util {
+  extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
+}
+
 struct ApiProps {
   api: cloud.Api;
   apps: Apps.Apps;
@@ -324,8 +329,11 @@ pub class Api {
           default_branch: input.get("default_branch").asStr(),
         );
 
+        // TODO: https://github.com/winglang/wing/issues/3644
+        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9]+", "-");
+
         let appId = apps.create(
-          name: input.get("appName").asStr(),
+          name: appName,
           description: input.get("description").asStr(),
           repoId: input.get("repoId").asStr(),
           repoName: input.get("repoName").asStr(),
