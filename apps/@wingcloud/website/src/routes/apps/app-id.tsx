@@ -82,7 +82,9 @@ export const Component = () => {
                 {app.data?.app.description === "" ? (
                   <div className="space-x-1 flex items-center">
                     <GithubIcon className="h-3" />
-                    <span>{app.data?.app.lastCommitMessage}</span>
+                    <span className="truncate">
+                      {app.data?.app.lastCommitMessage}
+                    </span>
                   </div>
                 ) : (
                   app.data?.app.description
