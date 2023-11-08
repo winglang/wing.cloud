@@ -6,6 +6,8 @@ import { GithubIcon } from "../icons/github-icon.js";
 import { getTimeFromNow } from "../utils/time.js";
 import type { Environment } from "../utils/wrpc.js";
 
+type Status = "initializing" | "deploying" | "running" | "failed";
+
 const getTestStatus = (environment: Environment) => {
   if (!environment.testResults?.data?.testResults?.length) {
     return "";
@@ -20,13 +22,13 @@ const getTestStatus = (environment: Environment) => {
   return "passed";
 };
 
-export const EnvironmentItem = ({
+export const EnvironmentListItem = ({
   environment,
 }: {
   environment: Environment;
 }) => {
   const status = useMemo(() => {
-    return environment.status;
+    return environment.status as Status;
   }, [environment.status]);
 
   const testStatus = useMemo(() => {
@@ -52,8 +54,10 @@ export const EnvironmentItem = ({
             "absolute -top-1.5 -right-1.5",
             "w-2.5 h-2.5",
             "rounded-full",
-            status !== "running" && "bg-slate-400 animate-pulse",
+            status === "initializing" && "bg-slate-400 animate-pulse",
+            status === "deploying" && "bg-yellow-200 animate-pulse",
             status === "running" && "bg-green-300",
+            status === "failed" && "bg-red-300",
           )}
         />
       </div>
@@ -113,8 +117,10 @@ export const EnvironmentItem = ({
 
           <span
             className={clsx(
+              status === "initializing" && "bg-slate-200 text-slate-600",
+              status === "deploying" && "bg-yellow-100 text-yellow-800",
               status === "running" && "hidden",
-              "bg-slate-200 text-slate-600",
+              status === "failed" && "bg-red-200 text-red-800",
               "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
             )}
           >

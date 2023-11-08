@@ -39,7 +39,7 @@ export const AppCard = ({
               <GithubIcon className="w-4 text-slate-700" />
             )}
             <div className="truncate">
-              {app.lastCommitMessage || app.entryfile}
+              {app.lastCommitMessage?.split("\n")[0] || app.entryfile}
             </div>
           </div>
         </div>

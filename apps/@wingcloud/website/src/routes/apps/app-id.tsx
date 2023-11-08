@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-import { EnvironmentItem } from "../../components/environment-item.js";
+import { EnvironmentListItem } from "../../components/environment-list-item.js";
 import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
@@ -150,7 +150,7 @@ export const Component = () => {
                     )}
                     to={`/apps/${appId}/${environment.id}`}
                   >
-                    <EnvironmentItem
+                    <EnvironmentListItem
                       key={environment.id}
                       environment={environment}
                     />
