@@ -13,14 +13,6 @@ export const Layout = ({ children }: PropsWithChildren) => {
         throwOnError: true,
         retry: false,
       });
-
-      if (authCheck.isLoading) {
-        return (
-          <div className="fixed inset-0 flex items-center justify-center">
-            <SpinnerLoader />
-          </div>
-        );
-      }
     } catch (error) {
       console.log(error);
       window.location.href = "/";
@@ -28,9 +20,18 @@ export const Layout = ({ children }: PropsWithChildren) => {
   }
 
   return (
-    <div className="inse-0">
-      <Header showUserMenu={!!authCheck?.data?.userId} />
-      <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">{children}</div>
-    </div>
+    <>
+      {authCheck?.isLoading && (
+        <div className="fixed inset-0 flex items-center justify-center">
+          <SpinnerLoader />
+        </div>
+      )}
+
+      {authCheck?.data?.userId && <Header />}
+
+      {!authCheck?.isLoading && (
+        <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">{children}</div>
+      )}
+    </>
   );
 };
