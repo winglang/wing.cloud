@@ -27,20 +27,21 @@ export const Component = () => {
     },
   );
 
-  const repository = wrpc["github.getRepository"].useQuery(
-    {
-      owner: app.data?.app.repoOwner || "",
-      repo: app.data?.app.repoName || "",
-    },
-    {
-      enabled: app.data?.app.repoOwner != "" && app.data?.app.repoName != "",
-    },
-  );
-
   const environments = wrpc["app.environments"].useQuery(
     { appId: appId! },
     {
       enabled: appId != "",
+    },
+  );
+
+  const { repoOwner, repoName } = app.data?.app || {};
+  const repository = wrpc["github.getRepository"].useQuery(
+    {
+      owner: repoOwner || "",
+      repo: repoName || "",
+    },
+    {
+      enabled: !!repoOwner && !!repoName,
     },
   );
 
@@ -82,8 +83,11 @@ export const Component = () => {
                 {app.data?.app.description === "" ? (
                   <div className="space-x-1 flex items-center">
                     <GithubIcon className="h-3" />
-                    <span className="truncate">
-                      {app.data?.app.lastCommitMessage}
+                    <span
+                      className="truncate"
+                      title={app.data?.app.lastCommitMessage}
+                    >
+                      {app.data?.app.lastCommitMessage?.split("\n")[0]}
                     </span>
                   </div>
                 ) : (
