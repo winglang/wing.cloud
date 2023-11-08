@@ -22,7 +22,7 @@ const UserMenu = () => {
   const signOutMutation = wrpc["auth.signout"].useMutation();
 
   const signOut = useCallback(() => {
-    signOutMutation.mutateAsync({}).then(() => {
+    signOutMutation.mutateAsync(undefined!).then(() => {
       navigate("/");
     });
   }, [navigate, signOutMutation]);
@@ -55,7 +55,7 @@ export const Header = ({ breadcrumbs }: HeaderProps) => {
   return (
     <header className={clsx("p-6", "bg-white", "shadow")}>
       <nav className="flex" aria-label="Breadcrumb">
-        <ol role="list" className="flex items-center space-x-2">
+        <ol role="list" className="flex items-center space-x-2 truncate">
           <li>
             <div>
               <Link to="/" className="text-[#212627] hover:text-slate-800">
@@ -65,11 +65,11 @@ export const Header = ({ breadcrumbs }: HeaderProps) => {
           </li>
           {breadcrumbs.map((breadcrumb, index) => {
             return (
-              <li key={index}>
-                <div className="flex items-center">
+              <li key={index} className="truncate">
+                <div className="flex items-center truncate">
                   <ChevronRightIcon className="h-4 w-4 flex-shrink-0 text-slate-600" />
                   <Link
-                    className="ml-2 text-sm font-medium text-slate-600 hover:text-slate-700"
+                    className="ml-2 text-sm font-medium text-slate-600 hover:text-slate-700 truncate"
                     to={breadcrumb.to}
                   >
                     {breadcrumb.label}
