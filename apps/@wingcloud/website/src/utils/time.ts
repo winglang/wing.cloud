@@ -1,4 +1,6 @@
-export const getDateTime = (datetime: string) => {
+import { useEffect, useState } from "react";
+
+const getDateTime = (datetime: string) => {
   const date = new Date(datetime);
   return date.toLocaleDateString(undefined, {
     month: "short",
@@ -8,7 +10,7 @@ export const getDateTime = (datetime: string) => {
   });
 };
 
-export const getTimeFromNow = (datetime: string) => {
+const getTimeFromNow = (datetime: string) => {
   const date = new Date(datetime);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
@@ -28,5 +30,21 @@ export const getTimeFromNow = (datetime: string) => {
     return `${minutes} minutes ago`;
   }
 
-  return `${seconds} seconds ago`;
+  return "just now";
+};
+
+export const useTimeAgo = (datetime: string) => {
+  const [time, setTime] = useState(getTimeFromNow(datetime));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(getTimeFromNow(datetime));
+    }, 1000 * 60);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [datetime]);
+
+  return time;
 };

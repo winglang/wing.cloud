@@ -87,15 +87,12 @@ export const Component = () => {
 
             <div className="flex grow justify-end items-end">
               {repository.data.repository && (
-                <Button
-                  className="truncate"
-                  transparent
-                  onClick={() => {
-                    window.open(repository.data.repository.html_url, "_blank");
-                  }}
+                <a
+                  href={repository.data.repository.html_url + "/compare"}
+                  target="_blank"
                 >
-                  Git Repository
-                </Button>
+                  <Button className="truncate">Git Repository</Button>
+                </a>
               )}
             </div>
           </div>

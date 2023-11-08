@@ -1,7 +1,7 @@
 import clsx from "clsx";
 
 import { GithubIcon } from "../icons/github-icon.js";
-import { getTimeFromNow } from "../utils/time.js";
+import { useTimeAgo } from "../utils/time.js";
 import type { App } from "../utils/wrpc.js";
 
 export const AppCard = ({
@@ -11,6 +11,8 @@ export const AppCard = ({
   app: App;
   onClick: () => void;
 }) => {
+  const updatedAt = useTimeAgo(app.updatedAt);
+
   return (
     <button
       onClick={onClick}
@@ -47,7 +49,7 @@ export const AppCard = ({
       </div>
 
       <div className="w-full truncate text-xs mt-3 h-full items-end text-slate-600">
-        {`Updated ${getTimeFromNow(app.updatedAt)} by ${app.updatedBy}`}
+        {`Updated ${updatedAt} by ${app.updatedBy}`}
       </div>
     </button>
   );

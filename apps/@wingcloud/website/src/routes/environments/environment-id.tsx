@@ -13,19 +13,17 @@ export const Component = () => {
     environmentId: environmentId,
   });
 
-  const loading = useMemo(() => {
-    return environments.isLoading;
-  }, [environments.isLoading]);
-
   return (
     <>
-      {loading && (
+      {environments.isLoading && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
         </div>
       )}
 
-      {!loading && <pre>{JSON.stringify(environments.data, undefined, 2)}</pre>}
+      {!environments.isLoading && (
+        <pre>{JSON.stringify(environments.data, undefined, 2)}</pre>
+      )}
     </>
   );
 };

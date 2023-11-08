@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 import { BranchIcon } from "../icons/branch-icon.js";
 import { GithubIcon } from "../icons/github-icon.js";
-import { getTimeFromNow } from "../utils/time.js";
+import { useTimeAgo } from "../utils/time.js";
 import type { Environment } from "../utils/wrpc.js";
 
 type Status = "initializing" | "deploying" | "running" | "failed";
@@ -38,6 +38,8 @@ export const EnvironmentListItem = ({
   const linkEnabled = useMemo(() => {
     return environment?.url != "" && status === "running";
   }, [environment, status]);
+
+  const updatedAt = useTimeAgo(environment.updatedAt);
 
   return (
     <div className="flex items-center gap-x-4">
@@ -96,9 +98,7 @@ export const EnvironmentListItem = ({
                 {environment.branch}
               </button>
             </div>
-            <span className="text-slate-400 truncate">
-              updated {getTimeFromNow(environment.updatedAt)}
-            </span>
+            <span className="text-slate-400 truncate">updated {updatedAt}</span>
           </div>
         </div>
 
@@ -122,6 +122,7 @@ export const EnvironmentListItem = ({
               status === "running" && "bg-green-200 text-green-800",
               status === "failed" && "bg-red-200 text-red-800",
               "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
+              "capitalize",
             )}
           >
             {status}
