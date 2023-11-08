@@ -33,7 +33,9 @@ export const Layout = ({ children }: PropsWithChildren) => {
       {authCheck?.data?.userId && <Header />}
 
       {!authCheck?.isLoading && (
-        <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">{children}</div>
+        <div className="py-4 px-4 sm:px-6 sm:py-6 space-y-4 w-full max-w-5xl mx-auto transition-all">
+          {children}
+        </div>
       )}
     </>
   );
