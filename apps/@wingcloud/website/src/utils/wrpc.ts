@@ -67,7 +67,13 @@ export interface Environment {
 }
 
 export const wrpc = createWRPCReact<{
-  "auth.check": QueryProcedure;
+  "auth.check": QueryProcedure<
+    undefined,
+    {
+      userId: string;
+      username: string;
+    }
+  >;
   "auth.signout": MutationProcedure;
   "github.callback": QueryProcedure<{ code: string }, {}>;
   "github.listInstallations": QueryProcedure<

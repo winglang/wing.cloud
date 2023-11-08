@@ -47,7 +47,11 @@ const UserMenu = () => {
   );
 };
 
-export const Header = () => {
+export interface HeaderProps {
+  showUserMenu?: boolean;
+}
+
+export const Header = ({ showUserMenu = false }: HeaderProps) => {
   const location = useLocation();
 
   const breadcrumbs = useMemo(() => {
@@ -90,7 +94,7 @@ export const Header = () => {
         </ol>
 
         <div className="flex grow justify-end gap-x-12">
-          <UserMenu />
+          {showUserMenu && <UserMenu />}
         </div>
       </nav>
     </header>
