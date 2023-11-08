@@ -1,6 +1,5 @@
 import { type PropsWithChildren } from "react";
 
-import { Header } from "../components/header.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { wrpc } from "../utils/wrpc.js";
 
@@ -26,9 +25,8 @@ export const Layout = ({ children }: PropsWithChildren) => {
   }
 
   return (
-    <div className="inset-0">
-      <Header />
-      <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">{children}</div>
+    <div className="inset-0 p-6 space-y-4 w-full max-w-5xl mx-auto">
+      {children}
     </div>
   );
 };
