@@ -52,6 +52,7 @@ export const Component = () => {
         entryfile,
         appName: repo.name,
         imageUrl: repo.owner.avatar_url,
+        installationId,
       });
       navigate("/apps");
     },

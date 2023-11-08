@@ -9,12 +9,19 @@ bring "./github.w" as GitHub;
 bring "./jwt.w" as JWT;
 bring "./apps.w" as Apps;
 bring "./users.w" as Users;
+bring "./environments.w" as Environments;
 bring "./lowkeys-map.w" as lowkeys;
+bring "./environment-manager.w" as EnvironmentManager;
+bring "./status-reports.w" as status_reports;
+bring "./probot-adapter.w" as adapter;
 
 struct ApiProps {
   api: cloud.Api;
   apps: Apps.Apps;
   users: Users.Users;
+  environments: Environments.Environments;
+  environmentManager: EnvironmentManager.EnvironmentManager;
+  probotAdapter: adapter.ProbotAdapter;
   githubAppClientId: str;
   githubAppClientSecret: str;
   appSecret: str;
@@ -25,6 +32,7 @@ pub class Api {
     let api = new json_api.JsonApi(api: props.api);
     let apps = props.apps;
     let users = props.users;
+    let queue = new cloud.Queue();
 
     let AUTH_COOKIE_NAME = "auth";
 
@@ -230,27 +238,44 @@ pub class Api {
 
         let gitHubLogin = users.getUsername(userId: userId);
 
+        let defaultBranch = input.get("default_branch").asStr();
+        let repository = input.get("repositoryId").asStr();
+
         let commitData = GitHub.Client.getLastCommit(
           token: accessToken,
           owner:  input.get("owner").asStr(),
           repo: input.get("repositoryName").asStr(),
-          default_branch: input.get("default_branch").asStr(),
+          default_branch: defaultBranch,
         );
 
-        let appId = apps.create(
+        let app = apps.create(
           name: input.get("appName").asStr(),
           lastCommitMessage: commitData?.commit?.message ?? "",
           imageUrl: input.get("imageUrl").asStr(),
-          repository: input.get("repositoryId").asStr(),
+          repository: repository,
           userId: userId,
           entryfile: input.get("entryfile").asStr(),
           createdAt: datetime.utcNow().toIso(),
           createdBy: gitHubLogin,
         );
+        
+        let installationId = num.fromStr(input.get("installationId").asStr());
+        queue.push(Json.stringify(EnvironmentManager.CreateEnvironmentOptions {
+          createEnvironment: {
+            branch: defaultBranch,
+            appId: app.id,
+            type: "production",
+            repo: repository,
+            status: "initializing",
+            installationId: installationId,
+          },
+          app: app,
+          sha: commitData.sha,
+        }));
 
         return {
           body: {
-            appId: appId,
+            appId: app.id,
           },
         };
       } else {
@@ -272,6 +297,30 @@ pub class Api {
           apps: userApps,
         },
       };
+    });
+
+    api.post("/environment.report", inflight (req) => {
+      if let event = req.body {
+        log("report status: ${event}");
+        let data = Json.parse(event);
+        props.environmentManager.updateStatus(data: data);
+      }
+
+      return {
+        status: 200
+      };
+    });
+
+    // queue for new apps environment
+    queue.setConsumer(inflight (event) => {
+      try {
+        log("create new environment event: ${event}");
+        if let createOptions = EnvironmentManager.CreateEnvironmentOptions.tryFromJson(Json.tryParse(event)) {
+          props.environmentManager.create(createOptions);
+        }
+      } catch err {
+        log("failed to create new environment ${err}");
+      }
     });
   }
 }
