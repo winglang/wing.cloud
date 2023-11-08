@@ -67,70 +67,71 @@ export const Component = () => {
         </div>
       )}
 
-      {!loading && (
+      {!loading && app.data && (
         <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">
           <div className="flex gap-x-2 bg-white rounded p-4 shadow">
             <img
-              src={app.data?.app.imageUrl}
+              src={app.data.app.imageUrl}
               alt=""
               className="w-14 h-14 rounded-full"
             />
             <div className="space-y-1 pt-2 truncate ml-2">
               <div className="text-slate-700 text-xl self-center truncate">
-                {app.data?.app.name}
+                {app.data.app.name}
               </div>
               <div className="text-slate-500 text-xs self-center truncate">
-                {app.data?.app.description === "" ? (
+                {app.data.app.description === "" ? (
                   <div className="space-x-1 flex items-center">
                     <GithubIcon className="h-3" />
                     <span
                       className="truncate"
-                      title={app.data?.app.lastCommitMessage}
+                      title={app.data.app.lastCommitMessage}
                     >
-                      {app.data?.app.lastCommitMessage?.split("\n")[0]}
+                      {app.data.app.lastCommitMessage?.split("\n")[0]}
                     </span>
                   </div>
                 ) : (
-                  app.data?.app.description
+                  app.data.app.description
                 )}
               </div>
             </div>
 
             <div className="flex grow justify-end items-end">
-              <Button
-                className="truncate"
-                transparent
-                onClick={() => {
-                  window.open(repository.data?.repository.html_url, "_blank");
-                }}
-              >
-                Git Repository
-              </Button>
+              {repository.data?.repository && (
+                <Button
+                  className="truncate"
+                  transparent
+                  onClick={() => {
+                    window.open(repository.data.repository.html_url, "_blank");
+                  }}
+                >
+                  Git Repository
+                </Button>
+              )}
             </div>
           </div>
 
           {!environments.isLoading &&
-            environments.data?.environments.length === 0 && (
+            environments.data?.environments.length === 0 &&
+            repository.data && (
               <div className="text-center bg-white p-6 w-full">
                 <LinkIcon className="w-8 h-8 mx-auto text-slate-400" />
                 <h3 className="mt-2 text-sm font-semibold text-slate-900">
                   No preview environments found.
                 </h3>
 
-                <div>
-                  <p className="mt-1 text-sm text-slate-500">
-                    Get started by{" "}
-                    <a
-                      className="text-blue-600 hover:underline"
-                      href={`${repository.data?.repository.html_url}/compare/main...${app.data?.app.repoOwner}:${app.data?.app.repoBranch}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      opening a Pull Request
-                    </a>
-                    .
-                  </p>
-                </div>
+                <p className="mt-1 text-sm text-slate-500 flex gap-x-1 w-full justify-center">
+                  <span>Get started by</span>
+                  <a
+                    className="text-blue-600 hover:underline"
+                    href={`${repository.data.repository.html_url}/compare`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    opening a Pull Request
+                  </a>
+                  .
+                </p>
               </div>
             )}
 
