@@ -92,7 +92,7 @@ let apiDomainName = (() => {
   return api.url;
 })();
 let subDomain = util.env("PROXY_SUBDOMAIN");
-let zoneName = util.env("PROXY_ZONE_NAME");;
+let zoneName = util.env("PROXY_ZONE_NAME");
 //https://github.com/winglang/wing/issues/221
 let origins = (() => {
   let originsArray = MutArray<cloudFront.Origin>[
