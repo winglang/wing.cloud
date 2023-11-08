@@ -8,14 +8,13 @@ export interface AppProps {
 
 export const Component = () => {
   const { appId } = useParams();
-  if (!appId) return;
 
-  // TODO: useQuery should be able to use enabled: false as option
+  // TODO: Feels cleaner to separate in different components so we don't have to use the `enabled` option.
   const app = wrpc["app.get"].useQuery(
-    { id: appId },
-    // {
-    //   enabled: false,
-    // },
+    { id: appId! },
+    {
+      enabled: appId != "",
+    },
   );
 
   return (
