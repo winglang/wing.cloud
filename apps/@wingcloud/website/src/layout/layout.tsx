@@ -1,4 +1,5 @@
 import { type PropsWithChildren } from "react";
+import { useLocation } from "react-router-dom";
 
 import { Header } from "../components/header.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
@@ -6,6 +7,8 @@ import { wrpc } from "../utils/wrpc.js";
 
 export const Layout = ({ children }: PropsWithChildren) => {
   let authCheck;
+
+  const location = useLocation();
 
   if (location.pathname !== "/") {
     try {
