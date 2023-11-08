@@ -61,9 +61,13 @@ pub class Api {
 
     api.get("/wrpc/auth.check", inflight (request) => {
       if let payload = getJWTPayloadFromCookie(request) {
+        let userId = getUserFromCookie(request);
+        let username = users.getUsername(userId: userId);
+
         return {
           body: {
             userId: payload.userId,
+            username: username,
           },
         };
       }

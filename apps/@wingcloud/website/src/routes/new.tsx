@@ -47,8 +47,12 @@ export const Component = () => {
         return;
       }
       setRepositoryId(repo.full_name.toString());
+
+      // replace dots with - to avoid issues with the url
+      const appName = repo.name.replaceAll(".", "-");
+
       await createAppMutation.mutateAsync({
-        appName: repo.name,
+        appName: appName,
         description: repo.description || "",
         repoId: repo.full_name.toString(),
         repoName: repo.name,

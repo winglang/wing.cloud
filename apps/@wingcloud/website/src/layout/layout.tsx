@@ -5,17 +5,22 @@ import { wrpc } from "../utils/wrpc.js";
 
 export const Layout = ({ children }: PropsWithChildren) => {
   if (location.pathname !== "/") {
-    const authCheck = wrpc["auth.check"].useQuery();
+    try {
+      const authCheck = wrpc["auth.check"].useQuery();
 
-    if (authCheck.isLoading) {
-      return (
-        <div className="fixed inset-0 flex items-center justify-center">
-          <SpinnerLoader />
-        </div>
-      );
-    }
+      if (authCheck.isLoading) {
+        return (
+          <div className="fixed inset-0 flex items-center justify-center">
+            <SpinnerLoader />
+          </div>
+        );
+      }
 
-    if (authCheck.isError) {
+      if (authCheck.isError) {
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.log(error);
       window.location.href = "/";
     }
   }
