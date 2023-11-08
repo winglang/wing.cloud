@@ -79,10 +79,10 @@ export const Component = () => {
               <div className="text-slate-700 text-xl self-center truncate">
                 {app.data.app.name}
               </div>
-              <div className="text-slate-500 text-xs self-center truncate">
+              <div className="text-slate-500 text-xs self-center">
                 {app.data.app.description === "" ? (
                   <div className="space-x-1 flex items-center">
-                    <GithubIcon className="h-3" />
+                    <GithubIcon className="h-3 w-3 shrink-0" />
                     <span
                       className="truncate"
                       title={app.data.app.lastCommitMessage}
