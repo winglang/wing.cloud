@@ -119,7 +119,7 @@ export const EnvironmentListItem = ({
             className={clsx(
               status === "initializing" && "bg-slate-200 text-slate-600",
               status === "deploying" && "bg-yellow-100 text-yellow-800",
-              status === "running" && "hidden",
+              status === "running" && "bg-green-200 text-green-800",
               status === "failed" && "bg-red-200 text-red-800",
               "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
             )}
