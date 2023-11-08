@@ -1,7 +1,7 @@
 import { LinkIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { EnvironmentItem } from "../../components/environment-item.js";
 import { Header } from "../../components/header.js";
@@ -16,16 +16,15 @@ export interface AppProps {
 
 export const Component = () => {
   const { appId } = useParams();
-  if (!appId) return;
 
   const navigate = useNavigate();
 
-  // TODO: useQuery should be able to use enabled: false as option
+  // TODO: Feels cleaner to separate in different components so we don't have to use the `enabled` option.
   const app = wrpc["app.get"].useQuery(
-    { id: appId },
-    // {
-    //   enabled: false,
-    // },
+    { id: appId! },
+    {
+      enabled: appId != "",
+    },
   );
 
   const repository = wrpc["github.getRepository"].useQuery(
@@ -33,12 +32,17 @@ export const Component = () => {
       owner: app.data?.app.repoOwner || "",
       repo: app.data?.app.repoName || "",
     },
-    // {
-    //   enabled: app.data?.app.repoOwner && app.data?.app.repoName,
-    // },
+    {
+      enabled: app.data?.app.repoOwner != "" && app.data?.app.repoName != "",
+    },
   );
 
-  const environments = wrpc["app.environments"].useQuery({ appId: appId });
+  const environments = wrpc["app.environments"].useQuery(
+    { appId: appId! },
+    {
+      enabled: appId != "",
+    },
+  );
 
   const loading = useMemo(() => {
     return app.isLoading || environments.isLoading;
@@ -50,7 +54,7 @@ export const Component = () => {
         breadcrumbs={[
           { label: "Apps", to: "/apps" },
           {
-            label: appId,
+            label: appId || "",
             to: `/apps/${appId}`,
           },
         ]}
@@ -131,21 +135,19 @@ export const Component = () => {
                   Preview Environments
                 </div>
                 {environments.data.environments.map((environment) => (
-                  <button
+                  <Link
                     key={environment.id}
                     className={clsx(
-                      "bg-white rounded p-4 text-left w-full",
+                      "bg-white rounded p-4 text-left w-full block",
                       "shadow hover:shadow-md transition-all",
                     )}
-                    onClick={() => {
-                      navigate(`/apps/${environment.appId}/${environment.id}`);
-                    }}
+                    to={`/apps/${appId}/${environment.id}`}
                   >
                     <EnvironmentItem
                       key={environment.id}
                       environment={environment}
                     />
-                  </button>
+                  </Link>
                 ))}
               </div>
             )}

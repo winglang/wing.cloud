@@ -68,6 +68,7 @@ export const EnvironmentItem = ({
             rel="noopener noreferrer"
             disabled={!linkEnabled}
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
               window.open(environment.url, "_blank");
             }}

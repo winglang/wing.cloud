@@ -5,7 +5,7 @@ import { wrpc } from "../utils/wrpc.js";
 
 export const Layout = ({ children }: PropsWithChildren) => {
   if (location.pathname !== "/") {
-    const authCheck = wrpc["auth.check"].useQuery({});
+    const authCheck = wrpc["auth.check"].useQuery();
 
     if (authCheck.isLoading) {
       return (
