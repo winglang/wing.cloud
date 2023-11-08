@@ -181,12 +181,6 @@ pub class Api {
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
 
-        if owner == "" || repo == "" {
-          return {
-            status: 400,
-          };
-        }
-
         let repository = GitHub.Client.getRepository({
           token: accessToken,
           owner: owner,
@@ -212,12 +206,6 @@ pub class Api {
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
         let pullNumber = request.query.get("pullNumber");
-
-        if owner == "" || repo == "" || pullNumber == "" {
-          return {
-            status: 400,
-          };
-        }
 
         let pullRequest = GitHub.Client.getPullRequest({
           token: accessToken,
