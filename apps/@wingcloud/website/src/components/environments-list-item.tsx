@@ -72,7 +72,7 @@ export const EnvironmentsListItem = ({
               "w-2.5 h-2.5",
               "rounded-full",
               status === "initializing" && "bg-slate-400 animate-pulse",
-              status === "deploying" && "bg-yellow-200 animate-pulse",
+              status === "deploying" && "bg-yellow-300 animate-pulse",
               status === "running" && "bg-green-300",
               status === "failed" && "bg-red-300",
             )}
@@ -89,21 +89,21 @@ export const EnvironmentsListItem = ({
               {environment.prTitle}
             </Link>
 
-            <div className="truncate flex gap-x-2">
-              <div className="text-slate-600 font-mono flex gap-x-1 items-center">
+            <div className="truncate flex gap-x-5">
+              <div className="text-slate-600 flex gap-x-1 items-center">
                 <GithubIcon className="w-3 h-3 inline-block" />
                 <a
                   href={`https://github.com/${environment.repo}/tree/${environment.branch}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="truncate hover:underline items-end flex"
+                  className="truncate hover:underline items-end flex font-mono"
                 >
                   {environment.branch}
                 </a>
+                <span className="text-slate-400 truncate items-center flex">
+                  updated {updatedAt}
+                </span>
               </div>
-              <span className="text-slate-400 truncate items-center flex">
-                updated {updatedAt}
-              </span>
 
               {["passed", "failed"].includes(testStatus) && (
                 <div
@@ -136,6 +136,19 @@ export const EnvironmentsListItem = ({
               >
                 View Preview
               </a>
+            )}
+            {!linkEnabled && (
+              <div
+                className={clsx(
+                  status === "initializing" && "text-slate-700 bg-slate-100",
+                  status === "deploying" && "text-yellow-700 bg-yellow-100",
+                  status === "failed" && "text-red-700 bg-red-100",
+                  "text-xs rounded-xl px-2 py-0.5",
+                  "capitalize",
+                )}
+              >
+                {status}
+              </div>
             )}
           </div>
         </div>
