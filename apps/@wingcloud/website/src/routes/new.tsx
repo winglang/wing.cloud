@@ -56,7 +56,7 @@ export const Component = () => {
         entryfile,
         default_branch: repo.default_branch,
         imageUrl: repo.owner.avatar_url,
-        installationId,
+        installationId: installationId!,
       });
       navigate("/apps");
     },
@@ -71,8 +71,6 @@ export const Component = () => {
 
   return (
     <>
-      <div className="text-2xl">Create a new app</div>
-
       {installations.isFetching && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
