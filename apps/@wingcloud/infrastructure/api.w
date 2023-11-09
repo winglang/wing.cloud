@@ -25,7 +25,7 @@ struct ApiProps {
   apps: Apps.Apps;
   users: Users.Users;
   environments: Environments.Environments;
-  environmentManager: EnvironmentManager.EnvironmentManager;
+  // environmentManager: EnvironmentManager.EnvironmentManager;
   probotAdapter: adapter.ProbotAdapter;
   githubAppClientId: str;
   githubAppClientSecret: str;
@@ -427,28 +427,28 @@ pub class Api {
       };
     });
 
-    api.post("/environment.report", inflight (req) => {
-      if let event = req.body {
-        log("report status: ${event}");
-        let data = Json.parse(event);
-        let statusReport = status_reports.StatusReport.fromJson(data);
-        props.environmentManager.updateStatus(statusReport: statusReport);
-      }
+    // api.post("/environment.report", inflight (req) => {
+    //   if let event = req.body {
+    //     log("report status: ${event}");
+    //     let data = Json.parse(event);
+    //     let statusReport = status_reports.StatusReport.fromJson(data);
+    //     props.environmentManager.updateStatus(statusReport: statusReport);
+    //   }
 
-      return {
-        status: 200
-      };
-    });
+    //   return {
+    //     status: 200
+    //   };
+    // });
 
-    // queue for new apps environment
-    queue.setConsumer(inflight (event) => {
-      try {
-        log("create new environment event: ${event}");
-        let createOptions = EnvironmentManager.CreateEnvironmentOptions.fromJson(Json.parse(event));
-        props.environmentManager.create(createOptions);
-      } catch err {
-        log("failed to create new environment ${err}");
-      }
-    });
+    // // queue for new apps environment
+    // queue.setConsumer(inflight (event) => {
+    //   try {
+    //     log("create new environment event: ${event}");
+    //     let createOptions = EnvironmentManager.CreateEnvironmentOptions.fromJson(Json.parse(event));
+    //     props.environmentManager.create(createOptions);
+    //   } catch err {
+    //     log("failed to create new environment ${err}");
+    //   }
+    // });
   }
 }
