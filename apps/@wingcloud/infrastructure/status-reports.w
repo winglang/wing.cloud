@@ -10,8 +10,5 @@ pub struct TestResults {
 pub struct StatusReport {
   environmentId: str;
   status: str;
-}
-
-pub struct TestStatusReport extends StatusReport {
-  data: TestResults;
+  data: Json?;
 }

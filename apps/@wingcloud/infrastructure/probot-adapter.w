@@ -22,10 +22,6 @@ pub class ProbotAdapter {
   }
 
   inflight init() {
-    this.instance = nil;
-  }
-
-  pub inflight initialize() {
     this.instance = ProbotAdapter.createProbot(this.appId, this.secretKey, this.webhookSecret);
   }
 
@@ -54,10 +50,6 @@ pub class ProbotAdapter {
   }
 
   pub inflight auth(installationId: num): octokit.OctoKit {
-    if !this.instance? {
-      this.initialize();
-    }
-
     if let kit = this.instance?.auth?.call(this.instance, installationId) {
       return kit;
     } else {

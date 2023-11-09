@@ -92,7 +92,6 @@ pub class ProbotApp {
   }
 
   inflight listen(props: probot.VerifyAndReceieveProps) {
-    this.adapter.initialize();
     let onPullRequestOpen = inflight (context: probot.IPullRequestOpenedContext): void => {
       let branch = context.payload.pull_request.head.ref;
 

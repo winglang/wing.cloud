@@ -13,7 +13,7 @@ pub struct Environment {
   prNumber: num?;
   url: str?;
   commentId: num?;
-  testResults: status_report.TestStatusReport?;
+  testResults: status_report.TestResults?;
 }
 
 pub struct CreateEnvironmentOptions {
@@ -47,7 +47,7 @@ struct UpdateEnvironmentCommentIdOptions {
 struct UpdateEnvironmentTestResultsOptions {
   id: str;
   appId: str;
-  testResults: status_report.TestStatusReport;
+  testResults: status_report.TestResults;
 }
 
 struct GetEnvironmentOptions {
@@ -290,7 +290,7 @@ pub class Environments {
         prNumber: item.tryGet("prNumber")?.tryAsNum(),
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
-        testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
+        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
       };
     }
 
@@ -319,7 +319,7 @@ pub class Environments {
         // https://github.com/winglang/wing/issues/4470
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
-        testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
+        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
       }]);
     }
     return environments;

@@ -185,9 +185,9 @@ pub class EnvironmentsTest {
           assert(env.type == "preview");
 
           // verify tests passed
-          assert(env.testResults?.data?.testResults?.length == 1);
-          assert(env.testResults?.data?.testResults?.at(0)?.path == "root/Default/test:Hello, world!");
-          assert(env.testResults?.data?.testResults?.at(0)?.pass == true);
+          assert(env.testResults?.testResults?.length == 1);
+          assert(env.testResults?.testResults?.at(0)?.path == "root/Default/test:Hello, world!");
+          assert(env.testResults?.testResults?.at(0)?.pass == true);
         } finally {
           octokit.repos.delete(owner: repo.owner, repo: repo.repo);
         }

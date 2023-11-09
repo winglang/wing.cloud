@@ -303,7 +303,8 @@ pub class Api {
       if let event = req.body {
         log("report status: ${event}");
         let data = Json.parse(event);
-        props.environmentManager.updateStatus(data: data);
+        let statusReport = status_reports.StatusReport.fromJson(data);
+        props.environmentManager.updateStatus(statusReport: statusReport);
       }
 
       return {
@@ -315,9 +316,8 @@ pub class Api {
     queue.setConsumer(inflight (event) => {
       try {
         log("create new environment event: ${event}");
-        if let createOptions = EnvironmentManager.CreateEnvironmentOptions.tryFromJson(Json.tryParse(event)) {
-          props.environmentManager.create(createOptions);
-        }
+        let createOptions = EnvironmentManager.CreateEnvironmentOptions.fromJson(Json.parse(event));
+        props.environmentManager.create(createOptions);
       } catch err {
         log("failed to create new environment ${err}");
       }

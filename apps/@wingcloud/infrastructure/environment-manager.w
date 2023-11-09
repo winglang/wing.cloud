@@ -31,7 +31,7 @@ pub struct StopEnvironmentOptions {
 }
 
 pub struct UpdateEnvironmentStatusOptions {
-  data: Json;
+  statusReport: status_reports.StatusReport;
 }
 
 struct PostCommentOptions {
@@ -105,20 +105,19 @@ pub class EnvironmentManager {
   }
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
-    let statusReport = status_reports.StatusReport.fromJson(options.data);
-    let environment = this.environments.get(id: statusReport.environmentId);
+    let environment = this.environments.get(id: options.statusReport.environmentId);
     let app = this.apps.get(id: environment.appId);
-    let status = statusReport.status;
+    let status = options.statusReport.status;
     this.environments.updateStatus(id: environment.id, appId: environment.appId, status: status);
     if status == "tests" {
-      let testResults = status_reports.TestStatusReport.fromJson(options.data);
+      let testReport = status_reports.TestResults.fromJson(options.statusReport.data);
       this.environments.updateTestResults(
         id: environment.id,
         appId: app.id,
-        testResults: testResults
+        testResults: testReport
       );
 
-      if testResults.data.testResults.length == 0 {
+      if testReport.testResults.length == 0 {
         return;
       }
     }
