@@ -122,9 +122,10 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.rename": MutationProcedure<
-    { id: string; name: string; repository: string },
+    { appId: string; appName: string; repository: string },
     {}
   >;
+  "app.delete": MutationProcedure<{ appId: string }, {}>;
   "user.listApps": QueryProcedure<
     undefined,
     {

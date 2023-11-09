@@ -1,10 +1,12 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { EnvironmentsList } from "../../components/environments-list.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
+import { Popover } from "../../design-system/popover.js";
 import { GithubIcon } from "../../icons/github-icon.js";
+import { MenuIcon } from "../../icons/menu-icon.js";
 import { wrpc } from "../../utils/wrpc.js";
 
 export interface AppProps {
@@ -13,89 +15,101 @@ export interface AppProps {
 
 export const Component = () => {
   const { appName } = useParams();
+  const navigate = useNavigate();
 
-  // TODO: Feels cleaner to separate in different components so we don't have to use the `enabled` option.
-  const app = wrpc["app.getByName"].useQuery({ appName: appName! });
+  const appQuery = wrpc["app.getByName"].useQuery({ appName: appName! });
 
-  const appId = useMemo(() => {
-    return app.data?.app?.appId.toString();
-  }, [app.data]);
+  const app = useMemo(() => {
+    return appQuery.data?.app;
+  }, [appQuery.data]);
 
-  const environments = wrpc["app.environments"].useQuery(
-    { appId: appId! },
+  const environmentsQuery = wrpc["app.environments"].useQuery(
+    { appId: app?.appId! },
     {
-      enabled: appId != "",
+      enabled: app !== undefined,
     },
   );
+  const environments = useMemo(() => {
+    return environmentsQuery.data?.environments || [];
+  }, [environmentsQuery.data]);
 
-  const { repoOwner, repoName } = app.data?.app || {};
-  const repository = wrpc["github.getRepository"].useQuery(
+  const repositoryQuery = wrpc["github.getRepository"].useQuery(
     {
-      owner: repoOwner || "",
-      repo: repoName || "",
+      owner: app?.repoOwner || "",
+      repo: app?.repoName || "",
     },
     {
-      enabled: !!repoOwner && !!repoName,
+      enabled: app != undefined,
     },
   );
+  const repoUrl = useMemo(() => {
+    return repositoryQuery.data?.repository.html_url || "";
+  }, [repositoryQuery.data]);
 
-  const loading = useMemo(() => {
-    return app.isLoading || environments.isLoading || repository.isLoading;
-  }, [app.isLoading, environments.isLoading, repository.isLoading]);
+  const deleteAppMutation = wrpc["app.delete"].useMutation();
+  const deleteApp = useCallback(() => {
+    deleteAppMutation.mutateAsync({ appId: app?.appId! });
+  }, [app?.appId, deleteAppMutation]);
 
   return (
     <>
-      {loading && (
+      {!app && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
         </div>
       )}
 
-      {!loading && app.data && environments.data && repository.data && (
+      {app && (
         <>
           <div className="flex gap-x-2 bg-white rounded p-4 shadow">
-            <img
-              src={app.data.app.imageUrl}
-              alt=""
-              className="w-14 h-14 rounded-full"
-            />
+            <img src={app.imageUrl} alt="" className="w-14 h-14 rounded-full" />
             <div className="space-y-1 pt-2 truncate ml-2">
               <div className="text-slate-700 text-xl self-center truncate">
-                {app.data.app.appName}
+                {app.appName}
               </div>
               <div className="text-slate-500 text-xs self-center">
-                {app.data.app.description === "" ? (
+                {app.description === "" ? (
                   <div className="space-x-1 flex items-center">
                     <GithubIcon className="h-3 w-3 shrink-0" />
-                    <span
-                      className="truncate"
-                      title={app.data.app.lastCommitMessage}
-                    >
-                      {app.data.app.lastCommitMessage?.split("\n")[0]}
+                    <span className="truncate" title={app.lastCommitMessage}>
+                      {app.lastCommitMessage?.split("\n")[0]}
                     </span>
                   </div>
                 ) : (
-                  app.data.app.description
+                  app.description
                 )}
               </div>
             </div>
 
             <div className="flex grow justify-end items-end">
-              {repository.data.repository && (
-                <a
-                  href={repository.data.repository.html_url + "/compare"}
-                  target="_blank"
-                >
-                  <Button className="truncate">Git Repository</Button>
-                </a>
-              )}
+              <div className="flex flex-col justify-between gap-3 h-full items-end">
+                <Popover
+                  items={[
+                    {
+                      label: "Delete App",
+                      onClick: () => {
+                        deleteApp();
+                        navigate("/apps");
+                      },
+                    },
+                  ]}
+                  icon={<MenuIcon className="h-4 w-4 text-slate-700" />}
+                />
+
+                {repoUrl && (
+                  <a href={repoUrl + "/compare"} target="_blank">
+                    <Button className="truncate">Git Repository</Button>
+                  </a>
+                )}
+              </div>
             </div>
           </div>
 
           <EnvironmentsList
-            environments={environments.data.environments}
-            appName={app.data.app.appName}
-            repoUrl={repository.data.repository.html_url}
+            environments={environments}
+            loading={environmentsQuery.isLoading}
+            appName={app.appName}
+            repoUrl={repoUrl}
           />
         </>
       )}

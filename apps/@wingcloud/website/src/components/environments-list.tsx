@@ -5,21 +5,30 @@ import { Link } from "react-router-dom";
 import type { Environment } from "../utils/wrpc.js";
 
 import { EnvironmentsListItem } from "./environments-list-item.js";
+import { SpinnerLoader } from "./spinner-loader.js";
 
 export interface EnvironmentsListProps {
   environments: Environment[];
   appName: string;
   repoUrl: string;
+  loading?: boolean;
 }
 
 export const EnvironmentsList = ({
   environments,
   appName,
   repoUrl,
+  loading,
 }: EnvironmentsListProps) => {
   return (
     <>
-      {environments.length === 0 && (
+      {loading && (
+        <div className="bg-white p-6 w-full flex items-center justify-center">
+          <SpinnerLoader size="sm" />
+        </div>
+      )}
+
+      {!loading && environments.length === 0 && (
         <div className="text-center bg-white p-6 w-full">
           <LinkIcon className="w-8 h-8 mx-auto text-slate-400" />
           <h3 className="mt-2 text-sm font-semibold text-slate-900">
