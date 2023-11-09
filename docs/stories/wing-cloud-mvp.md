@@ -4,6 +4,7 @@ This document specifies the requirements for version 1.0 of the Wing Cloud.
 
 Wing Cloud is a service for delivering applications written using the *Wing Framework* to production. The *Wing Framework* is a programming environment for cloud applications. The framework is available for Winglang and for TypeScript and consists of an SDK, IDE tooling and the local version of the Wing Console.
 
+Key features that differentiate the Wing Framework:
 * Programmatic infrastructure definitions
 * Local cloud simulation
 * End to end testing capabilities
