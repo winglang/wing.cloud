@@ -30,13 +30,13 @@ export const AppCard = ({
           )}
           {!app.imageUrl && (
             <div className="w-10 h-10 rounded-full bg-sky-50 flex justify-center items-center">
-              <div className="text-sky-600">{app.name[0]}</div>
+              <div className="text-sky-600">{app.appName[0]}</div>
             </div>
           )}
         </div>
 
         <div className="w-full truncate space-y-1">
-          <div className="text-lg text-slate-800">{app.name}</div>
+          <div className="text-lg text-slate-800">{app.appName}</div>
           <div className="text-xs text-slate-600 flex gap-x-1">
             {app.lastCommitMessage && (
               <GithubIcon className="w-4 h-4 shrink-0 text-slate-700" />
