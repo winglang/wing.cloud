@@ -12,7 +12,7 @@ interface Item {
 
 export interface SelectProps {
   items: Item[];
-  value: string;
+  value?: string;
   onChange: (value: string) => void;
   disabled?: boolean;
   placeholder?: string;
@@ -51,7 +51,7 @@ export const Select = ({
 
   return (
     <Listbox
-      value={value}
+      value={value ?? ""}
       onChange={(item) => onChange(item)}
       disabled={disabled}
     >

@@ -14,8 +14,11 @@ bring "./runtime/runtime.w" as runtime;
 bring "./runtime/runtime-client.w" as runtime_client;
 bring "./probot.w" as probot;
 bring "./probot-adapter.w" as adapter;
+bring "./cloudfront.w" as cloudFront;
 
 // And the sun, and the moon, and the stars, and the flowers.
+
+let DEFAULT_STAGING_LANDING_DOMAIN = "wing-cloud-staging-dev-only.webflow.io";
 
 let api = new cloud.Api(
   cors: true,
@@ -99,23 +102,41 @@ let apiDomainName = (() => {
 })();
 let subDomain = util.env("PROXY_SUBDOMAIN");
 let zoneName = util.env("PROXY_ZONE_NAME");
-let proxy = new ReverseProxy.ReverseProxy(
-  subDomain: subDomain,
-  zoneName: zoneName,
-  aliases: ["${subDomain}.${zoneName}"],
-  origins: [
+//https://github.com/winglang/wing/issues/221
+let origins = (() => {
+  let originsArray = MutArray<cloudFront.Origin>[
     {
       pathPattern: "/wrpc/*",
       domainName: apiDomainName,
       originId: "wrpc",
       originPath: "/prod",
     },
-    {
+  ];
+  if util.env("WING_TARGET") == "sim" {
+    originsArray.push({
       pathPattern: "",
       domainName: website.url.replace("https://", ""),
       originId: "website",
-    },
-  ],
+    });
+  } else {
+    originsArray.push({
+      pathPattern: "",
+      domainName: util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN,
+      originId: "landingPage",
+    });
+    originsArray.push({
+      pathPattern: "/*",
+      domainName: website.url.replace("https://", ""),
+      originId: "website",
+    });
+  }
+  return originsArray.copy();
+})();
+let proxy = new ReverseProxy.ReverseProxy(
+  subDomain: subDomain,
+  zoneName: zoneName,
+  aliases: ["${subDomain}.${zoneName}"],
+  origins: origins,
   port: (): num? => {
     if util.tryEnv("WING_IS_TEST") == "true" {
       return nil;
