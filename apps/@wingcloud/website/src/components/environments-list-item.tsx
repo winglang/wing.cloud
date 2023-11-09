@@ -107,7 +107,11 @@ export const EnvironmentsListItem = ({
 
               {["passed", "failed"].includes(testStatus) && (
                 <div
-                  className="flex items-end gap-x-0.5 rounded-xl bg-slate-100 px-1 py-0.5"
+                  className={clsx(
+                    "flex items-end gap-x-0.5",
+                    "rounded-xl bg-slate-100 px-1 py-0.5",
+                    "border border-slate-200",
+                  )}
                   title={`tests ${testStatus}`}
                 >
                   <BeakerIcon className="w-4 h-4 text-slate-500" />
