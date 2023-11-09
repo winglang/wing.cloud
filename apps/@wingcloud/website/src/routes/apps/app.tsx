@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { EnvironmentsList } from "../../components/environments-list.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
-import { Popover } from "../../design-system/popover.js";
+import { Menu } from "../../design-system/menu.js";
 import { GithubIcon } from "../../icons/github-icon.js";
 import { MenuIcon } from "../../icons/menu-icon.js";
 import { wrpc } from "../../utils/wrpc.js";
@@ -83,7 +83,7 @@ export const Component = () => {
 
             <div className="flex grow justify-end items-end">
               <div className="flex flex-col justify-between gap-3 h-full items-end">
-                <Popover
+                <Menu
                   items={[
                     {
                       label: "Delete App",

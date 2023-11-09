@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-import { Popover } from "../design-system/popover.js";
+import { Menu } from "../design-system/menu.js";
 import { WingIcon } from "../icons/wing-icon.js";
 import { wrpc } from "../utils/wrpc.js";
 
@@ -25,7 +25,7 @@ const UserMenu = () => {
   }, [navigate, signOutMutation]);
 
   return (
-    <Popover
+    <Menu
       btnClassName="flex items-center rounded-full"
       items={[
         {
