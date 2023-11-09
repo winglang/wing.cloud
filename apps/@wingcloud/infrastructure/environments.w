@@ -9,9 +9,9 @@ pub struct Environment {
   repo: str;
   branch: str;
   status: str;
-  prTitle: str;
   installationId: num;
   prNumber: num?;
+  prTitle: str?;
   url: str?;
   commentId: num?;
   createdAt: str;
@@ -31,7 +31,7 @@ pub struct CreateEnvironmentOptions {
   branch: str;
   status: str;
   prNumber: num?;
-  prTitle: str;
+  prTitle: str?;
   installationId: num;
 }
 
@@ -90,36 +90,39 @@ pub class Environments {
       updatedAt: createdAt,
     };
 
+    let getItem = (pk: str, sk: str) => {
+      let item = MutJson {
+        pk: pk,
+        sk: sk,
+        id: environment.id,
+        appId: environment.appId,
+        type: environment.type,
+        repo: environment.repo,
+        branch: environment.branch,
+        prTitle: environment.prTitle,
+        status: environment.status,
+        installationId: environment.installationId,
+        createdAt: environment.createdAt,
+        updatedAt: environment.updatedAt,
+      };
+
+      if let prNumber = environment.prNumber {
+        item.set("prNumber", prNumber);
+      }
+
+      return item;
+    };
+
     this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: {
-            pk: "ENVIRONMENT#${environment.id}",
-            sk: "#",
-            id: environment.id,
-            appId: environment.appId,
-            repo: environment.repo,
-            branch: environment.branch,
-            status: environment.status,
-            prNumber: environment.prNumber,
-            installationId: environment.installationId,
-          },
+          item: getItem("ENVIRONMENT#${environment.id}", "#"),
           conditionExpression: "attribute_not_exists(pk)"
         },
       },
       {
         put: {
-          item: {
-            pk: "APP#${environment.appId}",
-            sk: "ENVIRONMENT#${environment.id}",
-            id: environment.id,
-            appId: environment.appId,
-            repo: environment.repo,
-            branch: environment.branch,
-            status: environment.status,
-            prNumber: environment.prNumber,
-            installationId: environment.installationId,
-          },
+          item: getItem("APP#${environment.appId}", "ENVIRONMENT#${environment.id}"),
         },
       },
     ]);
@@ -299,12 +302,12 @@ pub class Environments {
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),
         status: item.get("status").asStr(),
-        prTitle: item.get("prTitle").asStr(),
         installationId: item.get("installationId").asNum(),
         prNumber: item.tryGet("prNumber")?.tryAsNum(),
+        prTitle: item.tryGet("prTitle")?.tryAsStr(),
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
-        testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
+        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
         createdAt: item.get("createdAt").asStr(),
         updatedAt: item.get("updatedAt").asStr(),
       };
@@ -323,25 +326,23 @@ pub class Environments {
     );
     let var environments: Array<Environment> = [];
     for item in result.items {
-      environments = environments.concat([
-        {
-          id: item.get("id").asStr(),
-          appId: item.get("appId").asStr(),
-          type: item.get("type").asStr(),
-          repo: item.get("repo").asStr(),
-          branch: item.get("branch").asStr(),
-          status: item.get("status").asStr(),
-          prNumber: item.get("prNumber").asNum(),
-          prTitle: item.get("prTitle").asStr(),
-          installationId: item.get("installationId").asNum(),
-          // https://github.com/winglang/wing/issues/4470
-          url: item.tryGet("url")?.tryAsStr(),
-          commentId: item.tryGet("commentId")?.tryAsNum(),
-          testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
-          createdAt: item.get("createdAt").asStr(),
-          updatedAt: item.get("updatedAt").asStr(),
-        }
-      ]);
+      environments = environments.concat([{
+        id: item.get("id").asStr(),
+        appId: item.get("appId").asStr(),
+        type: item.get("type").asStr(),
+        repo: item.get("repo").asStr(),
+        branch: item.get("branch").asStr(),
+        status: item.get("status").asStr(),
+        prNumber: item.tryGet("prNumber")?.tryAsNum(),
+        prTitle: item.tryGet("prTitle")?.tryAsStr(),
+        installationId: item.get("installationId").asNum(),
+        // https://github.com/winglang/wing/issues/4470
+        url: item.tryGet("url")?.tryAsStr(),
+        commentId: item.tryGet("commentId")?.tryAsNum(),
+        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
+        createdAt: item.get("createdAt").asStr(),
+        updatedAt: item.get("updatedAt").asStr(),
+      }]);
     }
     return environments;
   }

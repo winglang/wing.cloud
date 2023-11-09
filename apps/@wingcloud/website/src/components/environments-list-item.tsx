@@ -1,5 +1,6 @@
 import {
   ArrowTopRightOnSquareIcon,
+  BeakerIcon,
   CheckCircleIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
@@ -106,7 +107,7 @@ export const EnvironmentsListItem = ({
 
               {["passed", "failed"].includes(testStatus) && (
                 <div className="flex items-center gap-x-1">
-                  <span className="text-slate-600">Tests:</span>
+                  <BeakerIcon className="w-4 h-4 text-slate-500" />
                   {testStatus === "passed" && (
                     <CheckCircleIcon className="w-4 h-4 text-green-500" />
                   )}

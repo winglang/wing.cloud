@@ -360,12 +360,12 @@ pub class Api {
         let gitHubLogin = users.getUsername(userId: userId);
 
         let defaultBranch = input.get("default_branch").asStr();
-        let repository = input.get("repositoryId").asStr();
+        let repoId = input.get("repoId").asStr();
 
         let commitData = GitHub.Client.getLastCommit(
           token: accessToken,
-          owner:  input.get("owner").asStr(),
-          repo: input.get("repositoryName").asStr(),
+          owner:  input.get("repoOwner").asStr(),
+          repo: input.get("repoName").asStr(),
           default_branch: input.get("default_branch").asStr(),
         );
 
@@ -392,8 +392,8 @@ pub class Api {
             branch: defaultBranch,
             appId: app.appId,
             type: "production",
-            prTitle: "",
-            repo: repository,
+            prTitle: defaultBranch,
+            repo: repoId,
             status: "initializing",
             installationId: installationId,
           },

@@ -17,18 +17,22 @@ export const Component = () => {
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-  const appsList = wrpc["user.listApps"].useQuery();
+  const listAppsQuery = wrpc["user.listApps"].useQuery();
 
   const apps = useMemo(() => {
-    if (!appsList.data) {
+    if (!listAppsQuery.data) {
       return [];
     }
-    return appsList.data.apps.filter((app) =>
+    return listAppsQuery.data.apps.filter((app) =>
       `${app.appName}${app.lastCommitMessage}`
         .toLocaleLowerCase()
         .includes(search.toLocaleLowerCase()),
     );
-  }, [appsList.data, search]);
+  }, [listAppsQuery.data, search]);
+
+  const loading = useMemo(() => {
+    return listAppsQuery.isLoading || listAppsQuery.isFetching;
+  }, [listAppsQuery.isLoading, listAppsQuery.isFetching]);
 
   return (
     <>
@@ -56,20 +60,20 @@ export const Component = () => {
         />
       </div>
 
-      {appsList.isLoading && (
+      {loading && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
         </div>
       )}
 
-      {!appsList.isLoading && apps.length === 0 && (
+      {!loading && apps.length === 0 && (
         <div className="text-center">
           <FolderPlusIcon className="w-12 h-12 mx-auto text-gray-400" />
           <h3 className="mt-2 text-sm font-semibold text-gray-900">
             No apps found.
           </h3>
 
-          {appsList.data?.apps.length === 0 && (
+          {listAppsQuery.data?.apps.length === 0 && (
             <div>
               <p className="mt-1 text-sm text-gray-500">
                 Get started by creating a new app.
@@ -88,22 +92,24 @@ export const Component = () => {
         </div>
       )}
 
-      <div
-        className={clsx(
-          "flex flex-wrap gap-6 w-full",
-          "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
-        )}
-      >
-        {apps.map((app) => (
-          <AppCard
-            key={app.appId}
-            onClick={() => {
-              navigate(`/apps/${app.appName}`);
-            }}
-            app={app}
-          />
-        ))}
-      </div>
+      {!loading && apps.length > 0 && (
+        <div
+          className={clsx(
+            "flex flex-wrap gap-6 w-full",
+            "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
+          )}
+        >
+          {apps.map((app) => (
+            <AppCard
+              key={app.appId}
+              onClick={() => {
+                navigate(`/apps/${app.appName}`);
+              }}
+              app={app}
+            />
+          ))}
+        </div>
+      )}
     </>
   );
 };

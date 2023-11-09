@@ -108,7 +108,7 @@ pub class EnvironmentsTest {
 
         try {
           let userId = props.users.create(gitHubLogin: "fake-login");
-          let appId = props.apps.create(
+          let app = props.apps.create(
             appName: "test-app",
             createdAt: "0",
             createdBy: userId,
@@ -159,7 +159,7 @@ pub class EnvironmentsTest {
 
           // verify environment created
           let isRunning = util.waitUntil(inflight () => {
-            let envs = props.environments.list(appId: app.id);
+            let envs = props.environments.list(appId: app.appId);
             if let env = envs.tryAt(0) {
               if env.status == "running" {
                 return true;
@@ -172,7 +172,7 @@ pub class EnvironmentsTest {
           assert(isRunning);
 
           // make sure its responding
-          let env = props.environments.list(appId: app.id).at(0);
+          let env = props.environments.list(appId: app.appId).at(0);
           if let url = env.url {
             util.waitUntil(inflight () => {
               try {
@@ -284,9 +284,9 @@ pub class EnvironmentsTest {
 
           if let appId = Json.tryParse(createRes.body)?.tryGet("appId")?.tryAsStr() {
             // verify environment created
-            let app = props.apps.get(id: appId);
+            let app = props.apps.get(appId: appId);
             let isRunning = util.waitUntil(inflight () => {
-              let envs = props.environments.list(appId: app.id);
+              let envs = props.environments.list(appId: app.appId);
               if let env = envs.tryAt(0) {
                 if env.status == "running" {
                   return true;
@@ -298,7 +298,7 @@ pub class EnvironmentsTest {
 
             assert(isRunning);
 
-            let env = props.environments.list(appId: app.id).at(0);
+            let env = props.environments.list(appId: app.appId).at(0);
             assert(env.type == "production");
           }
         } finally {

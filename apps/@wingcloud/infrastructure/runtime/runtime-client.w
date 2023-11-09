@@ -29,7 +29,7 @@ pub class RuntimeClient {
       repo: options.environment.repo,
       sha: options.sha,
       entryfile: options.app.entryfile,
-      appId: options.app.id,
+      appId: options.app.appId,
       environmentId: options.environment.id,
       token: options.token,
     }));
