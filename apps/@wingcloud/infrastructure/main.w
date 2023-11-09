@@ -46,32 +46,32 @@ let probotAdapter = new adapter.ProbotAdapter(
   webhookSecret: util.env("BOT_GITHUB_WEBHOOK_SECRET"),
 );
 
-let rntm = new runtime.RuntimeService(
-  // wingCloudUrl: api.url,
-  flyToken: util.tryEnv("FLY_TOKEN"),
-  flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
-  environments: environments,
-);
+// let rntm = new runtime.RuntimeService(
+//   // wingCloudUrl: api.url,
+//   flyToken: util.tryEnv("FLY_TOKEN"),
+//   flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
+//   environments: environments,
+// );
 
-let environmentManager = new EnvironmentManager.EnvironmentManager(
-  apps: apps,
-  environments: environments,
-  runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
-  probotAdapter: probotAdapter,
-);
+// let environmentManager = new EnvironmentManager.EnvironmentManager(
+//   apps: apps,
+//   environments: environments,
+//   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
+//   probotAdapter: probotAdapter,
+// );
 
-let appSecret = util.env("APP_SECRET");
-let wingCloudApi = new wingcloud_api.Api(
-  api: api,
-  apps: apps,
-  users: users,
-  environments: environments,
-  // environmentManager: environmentManager,
-  probotAdapter: probotAdapter,
-  githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
-  githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
-  appSecret: appSecret,
-);
+// let appSecret = util.env("APP_SECRET");
+// let wingCloudApi = new wingcloud_api.Api(
+//   api: api,
+//   apps: apps,
+//   users: users,
+//   environments: environments,
+//   // environmentManager: environmentManager,
+//   probotAdapter: probotAdapter,
+//   githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
+//   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
+//   appSecret: appSecret,
+// );
 
 let websitePort = 5174;
 let website = new ex.ReactApp(
@@ -82,16 +82,16 @@ let website = new ex.ReactApp(
   localPort: websitePort,
 );
 
-let probotApp = new probot.ProbotApp(
-  probotAdapter: probotAdapter,
-  runtimeUrl: rntm.api.url,
-  environments: environments,
-  apps: apps,
-  environmentManager: environmentManager,
-);
+// let probotApp = new probot.ProbotApp(
+//   probotAdapter: probotAdapter,
+//   runtimeUrl: rntm.api.url,
+//   environments: environments,
+//   apps: apps,
+//   environmentManager: environmentManager,
+// );
 
-bring "cdktf" as cdktf;
-new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
+// bring "cdktf" as cdktf;
+// new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
 
 let apiDomainName = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
@@ -146,36 +146,36 @@ let proxy = new ReverseProxy.ReverseProxy(
   }()
 );
 
-let var webhookUrl = probotApp.githubApp.webhookUrl;
-if util.tryEnv("WING_TARGET") == "sim" {
-  bring "./ngrok.w" as ngrok;
+// let var webhookUrl = probotApp.githubApp.webhookUrl;
+// if util.tryEnv("WING_TARGET") == "sim" {
+//   bring "./ngrok.w" as ngrok;
 
-  let devNgrok = new ngrok.Ngrok(
-    url: webhookUrl,
-    domain: util.tryEnv("NGROK_DOMAIN"),
-  );
+//   let devNgrok = new ngrok.Ngrok(
+//     url: webhookUrl,
+//     domain: util.tryEnv("NGROK_DOMAIN"),
+//   );
 
-  webhookUrl = devNgrok.url;
-}
+//   webhookUrl = devNgrok.url;
+// }
 
-let updateGithubWebhook = inflight () => {
-  probotApp.githubApp.updateWebhookUrl("${webhookUrl}/webhook");
-  log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
-};
+// let updateGithubWebhook = inflight () => {
+//   probotApp.githubApp.updateWebhookUrl("${webhookUrl}/webhook");
+//   log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
+// };
 
-let deploy = new cloud.OnDeploy(updateGithubWebhook);
+// let deploy = new cloud.OnDeploy(updateGithubWebhook);
 
-bring "./tests/environments.w" as tests;
-new tests.EnvironmentsTest(
-  users: users,
-  apps: apps,
-  environments: environments,
-  githubApp: probotApp.githubApp,
-  updateGithubWebhook: updateGithubWebhook,
-  appSecret: appSecret,
-  wingCloudUrl: api.url,
-  githubToken: util.tryEnv("TESTS_GITHUB_TOKEN"),
-  githubOrg: util.tryEnv("TESTS_GITHUB_ORG"),
-  githubUser: util.tryEnv("TESTS_GITHUB_USER"),
-);
+// bring "./tests/environments.w" as tests;
+// new tests.EnvironmentsTest(
+//   users: users,
+//   apps: apps,
+//   environments: environments,
+//   githubApp: probotApp.githubApp,
+//   updateGithubWebhook: updateGithubWebhook,
+//   appSecret: appSecret,
+//   wingCloudUrl: api.url,
+//   githubToken: util.tryEnv("TESTS_GITHUB_TOKEN"),
+//   githubOrg: util.tryEnv("TESTS_GITHUB_ORG"),
+//   githubUser: util.tryEnv("TESTS_GITHUB_USER"),
+// );
 
