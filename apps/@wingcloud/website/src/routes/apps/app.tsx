@@ -27,6 +27,7 @@ export const Component = () => {
     { appId: app?.appId! },
     {
       enabled: app !== undefined,
+      refetchInterval: 1000 * 10,
     },
   );
   const environments = useMemo(() => {
