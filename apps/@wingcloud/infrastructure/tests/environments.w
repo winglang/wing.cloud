@@ -103,18 +103,15 @@ pub class EnvironmentsTest {
         // create a new repo
         let repo = createRepo(octokit);
 
-        let var owner = "owner";
-        let var repoName = "repoName";
-
         try {
           let userId = props.users.create(gitHubLogin: "fake-login");
           let app = props.apps.create(
             appName: "test-app",
             createdAt: "0",
             createdBy: userId,
-            repoId: "${owner}/${repoName}",
-            repoName: repoName,
-            repoOwner: owner,
+            repoId: "${repo.owner}/${repo.repo}",
+            repoName: repo.repo,
+            repoOwner: repo.owner,
             userId: userId,
             entryfile: "main.w"
           );
