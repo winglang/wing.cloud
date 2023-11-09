@@ -140,11 +140,11 @@ export const EnvironmentsListItem = ({
             {!linkEnabled && (
               <div
                 className={clsx(
-                  status === "initializing" && "text-slate-700 bg-slate-100",
-                  status === "deploying" && "text-yellow-700 bg-yellow-100",
-                  status === "failed" && "text-red-700 bg-red-100",
+                  status === "initializing" && "text-slate-600 bg-slate-100",
+                  status === "deploying" && "text-yellow-600 bg-yellow-100",
+                  status === "failed" && "text-red-600 bg-red-100",
                   "text-xs rounded-xl px-2 py-0.5",
-                  "capitalize font-semibold",
+                  "capitalize font-[500]",
                 )}
               >
                 {status}
