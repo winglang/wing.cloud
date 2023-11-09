@@ -5,8 +5,8 @@ import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { wrpc } from "../../utils/wrpc.js";
 
 export const Component = () => {
-  const { appId, environmentId } = useParams();
-  if (!appId || !environmentId) {
+  const { appName, environmentId } = useParams();
+  if (!appName || !environmentId) {
     return;
   }
   const environments = wrpc["app.environment"].useQuery({

@@ -135,7 +135,7 @@ export const Component = () => {
                     "bg-white rounded p-4 text-left w-full block",
                     "shadow hover:shadow-md transition-all",
                   )}
-                  to={`/apps/${appId}/${environment.id}`}
+                  to={`/apps/${appName}/${environment.id}`}
                 >
                   <EnvironmentListItem
                     key={environment.id}
