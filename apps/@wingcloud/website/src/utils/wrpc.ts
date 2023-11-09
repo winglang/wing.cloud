@@ -7,18 +7,22 @@ import {
 export interface Repository {
   id: number;
   name: string;
+  description?: string;
   full_name: string;
   private: boolean;
   owner: { login: string; avatar_url: string };
   default_branch: string;
+  html_url: string;
 }
 
 export interface App {
-  id: string;
-  name: string;
+  appId: string;
+  appName: string;
   description?: string;
   imageUrl?: string;
-  repository: string;
+  repoId: string;
+  repoName: string;
+  repoOwner: string;
   userId: string;
   entryfile: string;
   createdBy: string;
@@ -28,8 +32,44 @@ export interface App {
   lastCommitMessage?: string;
 }
 
+interface TestResult {
+  path: string;
+  pass: boolean;
+}
+
+interface TestResults {
+  testResults: Array<TestResult>;
+}
+
+interface StatusReport {
+  environmentId: string;
+  status: string;
+}
+
+export interface Environment {
+  id: string;
+  appId: string;
+  repo: string;
+  branch: string;
+  status: string;
+  prNumber: number;
+  prTitle: string;
+  installationId: number;
+  url?: string;
+  commentId?: number;
+  createdAt: string;
+  updatedAt: string;
+  testResults?: TestResults;
+}
+
 export const wrpc = createWRPCReact<{
-  "auth.check": QueryProcedure;
+  "auth.check": QueryProcedure<
+    undefined,
+    {
+      userId: string;
+      username: string;
+    }
+  >;
   "auth.signout": MutationProcedure;
   "github.callback": QueryProcedure<{ code: string }, {}>;
   "github.listInstallations": QueryProcedure<
@@ -47,16 +87,41 @@ export const wrpc = createWRPCReact<{
       repositories: Array<Repository>;
     }
   >;
-  "app.get": QueryProcedure<
-    { id: string },
+  "github.getRepository": QueryProcedure<
+    { owner: string; repo: string },
     {
-      app: { id: string; name: string; repository: string; userId: string };
+      repository: Repository;
+    }
+  >;
+  "app.get": QueryProcedure<
+    { appId: string },
+    {
+      app: App;
+    }
+  >;
+  "app.getByName": QueryProcedure<
+    { appName: string },
+    {
+      app: App;
+    }
+  >;
+  "app.environments": QueryProcedure<
+    { appId: string },
+    {
+      environments: Array<Environment>;
+    }
+  >;
+  "app.environment": QueryProcedure<
+    { environmentId: string },
+    {
+      environment: Environment;
     }
   >;
   "app.rename": MutationProcedure<
-    { id: string; name: string; repository: string },
+    { appId: string; appName: string; repository: string },
     {}
   >;
+  "app.delete": MutationProcedure<{ appId: string }, {}>;
   "user.listApps": QueryProcedure<
     undefined,
     {
@@ -65,9 +130,10 @@ export const wrpc = createWRPCReact<{
   >;
   "user.createApp": MutationProcedure<
     {
-      repositoryId: string;
-      repositoryName: string;
-      owner: string;
+      repoId: string;
+      description?: string;
+      repoName: string;
+      repoOwner: string;
       default_branch: string;
       appName: string;
       entryfile: string;
