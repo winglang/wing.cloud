@@ -13,7 +13,7 @@ import { GithubIcon } from "../icons/github-icon.js";
 import { useTimeAgo } from "../utils/time.js";
 import type { Environment } from "../utils/wrpc.js";
 
-type Status = "initializing" | "deploying" | "running" | "failed";
+type Status = "initializing" | "tests" | "deploying" | "running" | "failed";
 
 const getTestStatus = (environment: Environment) => {
   if (!environment.testResults?.testResults?.length) {
@@ -141,6 +141,7 @@ export const EnvironmentsListItem = ({
               <div
                 className={clsx(
                   status === "initializing" && "text-slate-600 bg-slate-100",
+                  status === "tests" && "text-yellow-600 bg-yellow-100",
                   status === "deploying" && "text-yellow-600 bg-yellow-100",
                   status === "failed" && "text-red-600 bg-red-100",
                   "text-xs rounded-xl px-2 py-0.5",
