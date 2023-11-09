@@ -18,7 +18,7 @@ struct RuntimeStartOptions {
   logsBucketRegion: str;
   awsAccessKeyId: str;
   awsSecretAccessKey: str;
-  wingCloudUrl: str;
+  // wingCloudUrl: str;
   environmentId: str;
 }
 
@@ -60,7 +60,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "ENTRYFILE" => opts.entryfile,
       "WING_TARGET" => util.env("WING_TARGET"),
       "LOGS_BUCKET_NAME" => util.env(opts.logsBucketName), // get simulator handle for the bucket
-      "WING_CLOUD_URL" => opts.wingCloudUrl,
+      // "WING_CLOUD_URL" => opts.wingCloudUrl,
       "ENVIRONMENT_ID" => opts.environmentId,
       "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
     };
@@ -114,7 +114,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "GIT_SHA" => opts.gitSha,
       "ENTRYFILE" => opts.entryfile,
       "WING_TARGET" => util.env("WING_TARGET"),
-      "WING_CLOUD_URL" => opts.wingCloudUrl,
+      // "WING_CLOUD_URL" => opts.wingCloudUrl,
       "LOGS_BUCKET_NAME" => opts.logsBucketName,
       "ENVIRONMENT_ID" => opts.environmentId,
       "AWS_ACCESS_KEY_ID" => opts.awsAccessKeyId,
@@ -156,7 +156,7 @@ struct Message {
 }
 
 struct RuntimeServiceProps {
-  wingCloudUrl: str;
+  // wingCloudUrl: str;
   flyToken: str?;
   flyOrgSlug: str?;
   environments: environments.Environments;
@@ -227,14 +227,14 @@ pub class RuntimeService {
 
         let msg = Message.fromJson(Json.parse(message));
 
-        log("wing url: ${props.wingCloudUrl}");
+        // log("wing url: ${props.wingCloudUrl}");
 
         let url = this.runtimeHandler.start(
           gitToken: msg.token,
           gitRepo: msg.repo,
           gitSha: msg.sha,
           entryfile: msg.entryfile,
-          wingCloudUrl: props.wingCloudUrl,
+          // wingCloudUrl: props.wingCloudUrl,
           environmentId: msg.environmentId,
           logsBucketName: bucketName,
           logsBucketRegion: bucketRegion,

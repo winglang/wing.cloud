@@ -47,7 +47,7 @@ let probotAdapter = new adapter.ProbotAdapter(
 );
 
 let rntm = new runtime.RuntimeService(
-  wingCloudUrl: api.url,
+  // wingCloudUrl: api.url,
   flyToken: util.tryEnv("FLY_TOKEN"),
   flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
   environments: environments,
