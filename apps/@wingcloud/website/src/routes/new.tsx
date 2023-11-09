@@ -56,6 +56,7 @@ export const Component = () => {
         entryfile,
         default_branch: repo.default_branch,
         imageUrl: repo.owner.avatar_url,
+        installationId,
       });
       navigate("/apps");
     },

@@ -5,17 +5,18 @@ bring "./status-reports.w" as status_report;
 pub struct Environment {
   id: str;
   appId: str;
+  type: str;
   repo: str;
   branch: str;
   status: str;
-  prNumber: num;
   prTitle: str;
   installationId: num;
+  prNumber: num?;
   url: str?;
   commentId: num?;
   createdAt: str;
   updatedAt: str;
-  testResults: status_report.TestStatusReport?;
+  testResults: status_report.TestResults?;
 }
 
 struct Item extends Environment {
@@ -23,12 +24,18 @@ struct Item extends Environment {
   sk: str;
 }
 
-struct CreateEnvironmentOptions {
+struct Item extends Environment {
+  pk: str;
+  sk: str;
+}
+
+pub struct CreateEnvironmentOptions {
   appId: str;
+  type: str;
   repo: str;
   branch: str;
   status: str;
-  prNumber: num;
+  prNumber: num?;
   prTitle: str;
   installationId: num;
 }
@@ -54,7 +61,7 @@ struct UpdateEnvironmentCommentIdOptions {
 struct UpdateEnvironmentTestResultsOptions {
   id: str;
   appId: str;
-  testResults: status_report.TestStatusReport;
+  testResults: status_report.TestResults;
 }
 
 struct GetEnvironmentOptions {
@@ -77,43 +84,45 @@ pub class Environments {
     let environment = Environment {
       id: "environment_${nanoid62.Nanoid62.generate()}",
       appId: options.appId,
+      type: options.type,
       repo: options.repo,
       branch: options.branch,
       status: options.status,
       prNumber: options.prNumber,
       prTitle: options.prTitle,
       installationId: options.installationId,
-      createdAt: createdAt,
-      updatedAt: createdAt,
-    };
-
-    // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
-    let makeItem = (id:str, pk: str, sk: str): Item => {
-      return {
-        pk: pk,
-        sk: sk,
-        id: environment.id,
-        appId: environment.appId,
-        repo: environment.repo,
-        branch: environment.branch,
-        status: environment.status,
-        prNumber: environment.prNumber,
-        prTitle: environment.prTitle,
-        installationId: environment.installationId,
-        createdAt: environment.createdAt,
-        updatedAt: environment.updatedAt,
-      };
     };
 
     this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: makeItem(environment.id, "ENVIRONMENT#${environment.id}", "#"),
+          item: {
+            pk: "ENVIRONMENT#${environment.id}",
+            sk: "#",
+            id: environment.id,
+            appId: environment.appId,
+            repo: environment.repo,
+            branch: environment.branch,
+            status: environment.status,
+            prNumber: environment.prNumber,
+            installationId: environment.installationId,
+          },
+          conditionExpression: "attribute_not_exists(pk)"
         },
       },
       {
         put: {
-          item: makeItem(environment.id, "APP#${environment.appId}", "ENVIRONMENT#${environment.id}"),
+          item: {
+            pk: "APP#${environment.appId}",
+            sk: "ENVIRONMENT#${environment.id}",
+            id: environment.id,
+            appId: environment.appId,
+            repo: environment.repo,
+            branch: environment.branch,
+            status: environment.status,
+            prNumber: environment.prNumber,
+            installationId: environment.installationId,
+          },
         },
       },
     ]);
@@ -289,17 +298,18 @@ pub class Environments {
       return {
         id: item.get("id").asStr(),
         appId: item.get("appId").asStr(),
+        type: item.get("type").asStr(),
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),
         status: item.get("status").asStr(),
-        prNumber: item.get("prNumber").asNum(),
         prTitle: item.get("prTitle").asStr(),
         installationId: item.get("installationId").asNum(),
+        prNumber: item.tryGet("prNumber")?.tryAsNum(),
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
         createdAt: item.get("createdAt").asStr(),
         updatedAt: item.get("updatedAt").asStr(),
-        testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
+        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
       };
     }
 
@@ -319,10 +329,11 @@ pub class Environments {
       environments = environments.concat([{
         id: item.get("id").asStr(),
         appId: item.get("appId").asStr(),
+        type: item.get("type").asStr(),
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),
         status: item.get("status").asStr(),
-        prNumber: item.get("prNumber").asNum(),
+        prNumber: item.tryGet("prNumber")?.tryAsNum(),
         prTitle: item.get("prTitle").asStr(),
         installationId: item.get("installationId").asNum(),
         // https://github.com/winglang/wing/issues/4470
@@ -330,7 +341,7 @@ pub class Environments {
         commentId: item.tryGet("commentId")?.tryAsNum(),
         createdAt: item.get("createdAt").asStr(),
         updatedAt: item.get("updatedAt").asStr(),
-        testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
+        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
       }]);
     }
     return environments;

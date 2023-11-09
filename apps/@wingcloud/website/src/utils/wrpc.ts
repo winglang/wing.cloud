@@ -142,6 +142,7 @@ export const wrpc = createWRPCReact<{
       appName: string;
       entryfile: string;
       imageUrl?: string;
+      installationId: string;
     },
     {
       appId: string;

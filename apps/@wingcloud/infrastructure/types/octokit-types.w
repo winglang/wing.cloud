@@ -52,7 +52,21 @@ struct CreateInstallationAccessTokenOptions {
   installation_id: num;
 }
 
+struct ListInstallationsResponseAccount {
+  login: str;
+}
+
+struct ListInstallationsResponseInstallation {
+  id: num;
+  account: ListInstallationsResponseAccount;
+}
+
+struct ListInstallationsResponse extends BaseResponse {
+  data: Array<ListInstallationsResponseInstallation>;
+}
+
 interface OctoKitApps {
+  inflight listInstallations(): ListInstallationsResponse;
   inflight createInstallationAccessToken(options: CreateInstallationAccessTokenOptions): CreateInstallationAccessTokenResponse;
 }
 
