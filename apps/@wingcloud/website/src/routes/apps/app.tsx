@@ -30,7 +30,12 @@ export const Component = () => {
     },
   );
   const environments = useMemo(() => {
-    return environmentsQuery.data?.environments || [];
+    return (
+      environmentsQuery.data?.environments.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      ) || []
+    );
   }, [environmentsQuery.data]);
 
   const repositoryQuery = wrpc["github.getRepository"].useQuery(
