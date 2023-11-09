@@ -1,4 +1,8 @@
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowTopRightOnSquareIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
@@ -99,48 +103,32 @@ export const EnvironmentsListItem = ({
               <span className="text-slate-400 truncate">
                 updated {updatedAt}
               </span>
+
+              {["passed", "failed"].includes(testStatus) && (
+                <div className="flex items-center gap-x-1">
+                  <span className="text-slate-500">Tests:</span>
+                  {testStatus === "passed" && (
+                    <CheckCircleIcon className="w-4 h-4 text-green-500" />
+                  )}
+                  {testStatus === "failed" && (
+                    <XCircleIcon className="w-4 h-4 text-red-500" />
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="justify-end">
-            <div className="flex flex-col justify-between items-end gap-3">
-              {linkEnabled && (
-                <a
-                  href={environment.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs hover:underline -right-1 -top-1"
-                >
-                  <ArrowTopRightOnSquareIcon className="w-4 h-4 inline-block text-slate-600 hover:text-slate-700" />
-                </a>
-              )}
-              <div className="flex gap-x-4 text-xs items-center justify-end">
-                {testStatus && (
-                  <span
-                    className={clsx(
-                      testStatus === "failed" && "bg-red-200 text-red-800",
-                      testStatus === "passed" && "bg-green-200 text-green-800",
-                      "inline-block font-semibold px-2.5 py-0.5 rounded-full",
-                    )}
-                  >
-                    Tests {testStatus}
-                  </span>
-                )}
-
-                <span
-                  className={clsx(
-                    status === "initializing" && "bg-slate-200 text-slate-600",
-                    status === "deploying" && "bg-yellow-100 text-yellow-800",
-                    status === "running" && "bg-green-200 text-green-800",
-                    status === "failed" && "bg-red-200 text-red-800",
-                    "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
-                    "capitalize",
-                  )}
-                >
-                  {status}
-                </span>
-              </div>
-            </div>
+          <div className="flex gap-x-4 text-xs items-center justify-end">
+            {linkEnabled && (
+              <a
+                href={environment.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs hover:underline"
+              >
+                View Preview
+              </a>
+            )}
           </div>
         </div>
       </div>
