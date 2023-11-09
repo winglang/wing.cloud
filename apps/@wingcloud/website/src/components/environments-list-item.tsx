@@ -144,7 +144,7 @@ export const EnvironmentsListItem = ({
                   status === "deploying" && "text-yellow-700 bg-yellow-100",
                   status === "failed" && "text-red-700 bg-red-100",
                   "text-xs rounded-xl px-2 py-0.5",
-                  "capitalize",
+                  "capitalize font-semibold",
                 )}
               >
                 {status}
