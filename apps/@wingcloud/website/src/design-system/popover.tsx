@@ -37,6 +37,7 @@ export const Popover = ({
           className={clsx(
             "absolute right-0 z-10 mt-2 w-56 origin-top-right",
             "rounded bg-white shadow-lg",
+            "border border-slate-100",
           )}
         >
           {items.map((item) => (
