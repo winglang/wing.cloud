@@ -10,21 +10,25 @@ import { GithubIcon } from "../../icons/github-icon.js";
 import { wrpc } from "../../utils/wrpc.js";
 
 export interface AppProps {
-  appId: string;
+  appName: string;
 }
 
 export const Component = () => {
-  const { appId } = useParams();
+  const { appName } = useParams();
 
   const navigate = useNavigate();
 
   // TODO: Feels cleaner to separate in different components so we don't have to use the `enabled` option.
-  const app = wrpc["app.get"].useQuery(
-    { id: appId! },
+  const app = wrpc["app.getByName"].useQuery(
+    { appName: appName! },
     {
-      enabled: appId != "",
+      enabled: appName != "",
     },
   );
+
+  const appId = useMemo(() => {
+    return app.data?.app?.appId.toString();
+  }, [app.data]);
 
   const environments = wrpc["app.environments"].useQuery(
     { appId: appId! },
@@ -66,7 +70,7 @@ export const Component = () => {
             />
             <div className="space-y-1 pt-2 truncate ml-2">
               <div className="text-slate-700 text-xl self-center truncate">
-                {app.data.app.name}
+                {app.data.app.appName}
               </div>
               <div className="text-slate-500 text-xs self-center">
                 {app.data.app.description === "" ? (

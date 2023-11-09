@@ -31,7 +31,7 @@ pub class GithubComment {
 | App         | Status | Preview | Tests | Updated (UTC) |
 | --------------- | ------ | ------- | ----- | -------------- |";
     for app in this.apps.listByRepository(repository: props.repo) {
-      for environment in this.environments.list(appId: app.id) {
+      for environment in this.environments.list(appId: app.appId) {
         if environment.repo == props.repo && environment.prNumber == props.prNumber {
           let var testsString = "---";
           if let testResults = environment.testResults {
@@ -53,7 +53,7 @@ pub class GithubComment {
             previewUrl = "[Visit](${environment.url})";
           }
 
-          let entryfile = "[${app.name}](https://github.com/${environment.repo}/blob/${environment.branch}/${app.entryfile})";
+          let entryfile = "[${app.appName}](https://github.com/${environment.repo}/blob/${environment.branch}/${app.entryfile})";
 
           let date = std.Datetime.utcNow().toIso();
           let tableRows = "| ${entryfile} | ${environment.status} | ${previewUrl} | ${testsString} | ${date} |";

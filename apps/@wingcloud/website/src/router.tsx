@@ -13,12 +13,12 @@ export const router = createBrowserRouter([
         lazy: () => import("./routes/apps.js"),
       },
       {
-        path: "apps/:appId",
-        lazy: () => import("./routes/apps/app-id.js"),
+        path: "apps/:appName",
+        lazy: () => import("./routes/apps/app.js"),
       },
       {
-        path: "apps/:appId/:environmentId",
-        lazy: () => import("./routes/environments/environment-id.js"),
+        path: "apps/:appName/:environmentId",
+        lazy: () => import("./routes/environments/environment.js"),
       },
       {
         path: "new",

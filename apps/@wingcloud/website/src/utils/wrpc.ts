@@ -16,8 +16,8 @@ export interface Repository {
 }
 
 export interface App {
-  id: string;
-  name: string;
+  appId: string;
+  appName: string;
   description?: string;
   imageUrl?: string;
   repoId: string;
@@ -98,7 +98,13 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.get": QueryProcedure<
-    { id: string },
+    { appId: string },
+    {
+      app: App;
+    }
+  >;
+  "app.getByName": QueryProcedure<
+    { appName: string },
     {
       app: App;
     }

@@ -137,13 +137,13 @@ pub class ProbotApp {
 
       let statusReport = status_reports.StatusReport.fromJson(data);
       let environment = this.environments.get(id: statusReport.environmentId);
-      let app = this.apps.get(id: environment.appId);
+      let app = this.apps.get(appId: environment.appId);
       let status = statusReport.status;
       this.environments.updateStatus(id: environment.id, appId: environment.appId, status: status);
       if status == "tests" {
         this.environments.updateTestResults(
           id: environment.id,
-          appId: app.id,
+          appId: app.appId,
           testResults: status_reports.TestStatusReport.fromJson(data)
         );
       }
@@ -195,7 +195,7 @@ pub class ProbotApp {
         if let installation = context.payload.installation {
           let environment = this.environments.create(
             branch: branch,
-            appId: app.id,
+            appId: app.appId,
             repo: context.payload.repository.full_name,
             status: "initializing",
             installationId: installation.id,
@@ -214,7 +214,7 @@ pub class ProbotApp {
             repo: context.payload.repository.full_name,
             sha: context.payload.pull_request.head.sha,
             entryfile: app.entryfile,
-            appId: app.id,
+            appId: app.appId,
             environmentId: environment.id,
             token: tokenRes.data.token,
           }));
@@ -243,12 +243,12 @@ pub class ProbotApp {
 
       let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
       for app in apps {
-        for environment in this.environments.list(appId: app.id) {
+        for environment in this.environments.list(appId: app.appId) {
           if environment.branch != branch || environment.status == "stopped" {
             continue;
           }
 
-          this.environments.updateStatus(id: environment.id, appId: app.id, status: "stopped");
+          this.environments.updateStatus(id: environment.id, appId: app.appId, status: "stopped");
 
           let res = http.delete(this.runtimeUrl, body: Json.stringify({
             environmentId: environment.id,
@@ -268,12 +268,12 @@ pub class ProbotApp {
 
       let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
       for app in apps {
-        for environment in this.environments.list(appId: app.id) {
+        for environment in this.environments.list(appId: app.appId) {
           if environment.branch != branch || environment.status == "stopped" {
             continue;
           }
 
-          this.environments.updateStatus(id: environment.id, appId: app.id, status: "initializing");
+          this.environments.updateStatus(id: environment.id, appId: app.appId, status: "initializing");
 
           this.postComment(environmentId: environment.id);
 
@@ -296,7 +296,7 @@ pub class ProbotApp {
 
           if let body = res.body {
             if let url = Json.tryParse(body)?.get("url")?.tryAsStr() {
-              this.environments.updateUrl(id: environment.id, appId: app.id, url: url);
+              this.environments.updateUrl(id: environment.id, appId: app.appId, url: url);
               return;
             }
           }

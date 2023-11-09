@@ -241,8 +241,10 @@ pub class Api {
     api.get("/wrpc/app.get", inflight (request) => {
       let userId = getUserFromCookie(request);
 
+      let appId = request.query.get("appId");
+
       let app = apps.get(
-        id: request.query.get("id"),
+        appId: appId,
       );
 
       if app.userId != userId {
@@ -261,14 +263,41 @@ pub class Api {
       };
     });
 
+    api.get("/wrpc/app.getByName", inflight (request) => {
+      let userId = getUserFromCookie(request);
+
+      let appName = request.query.get("appName");
+
+      let app = apps.getByName(
+        userId: userId,
+        appName: appName,
+      );
+
+      if app.userId != userId {
+        return {
+          status: 403,
+          body: {
+            error: "Forbidden",
+          },
+        };
+      }
+
+      return {
+        body: {
+            app: app,
+        },
+      };
+    });
+
+
     api.post("/wrpc/app.rename", inflight (request) => {
       let userId = getUserFromCookie(request);
 
       let input = Json.parse(request.body ?? "");
 
       apps.rename(
-        id: input.get("id").asStr(),
-        name: input.get("name").asStr(),
+        appId: input.get("appId").asStr(),
+        appName: input.get("appName").asStr(),
         userId: userId,
         repository: input.get("repository").asStr(),
       );
@@ -283,9 +312,8 @@ pub class Api {
       let input = Json.parse(request.body ?? "");
 
       apps.delete(
-        id: input.get("id").asStr(),
+        appId: input.get("appId").asStr(),
         userId: userId,
-        repository: input.get("repository").asStr(),
       );
     });
 
@@ -336,7 +364,7 @@ pub class Api {
         let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9]+", "-");
 
         let appId = apps.create(
-          name: appName,
+          appName: appName,
           description: input.get("description").asStr(),
           repoId: input.get("repoId").asStr(),
           repoName: input.get("repoName").asStr(),

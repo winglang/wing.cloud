@@ -1,11 +1,17 @@
 // TODO: Use state to prevent man-in-the-middle attacks.
 const GITHUB_APP_CLIENT_ID = import.meta.env.VITE_GITHUB_APP_CLIENT_ID;
-let AUTHORIZE_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_APP_CLIENT_ID}`;
 
-const localRedirectUrl = "http://localhost:3900/wrpc/github.callback";
-if (import.meta.env.DEV) {
-  AUTHORIZE_URL = AUTHORIZE_URL + `&redirect_uri=${localRedirectUrl}`;
-}
+const AUTHORIZE_URL = (() => {
+  const url = new URL("https://github.com/login/oauth/authorize");
+  url.searchParams.append("client_id", GITHUB_APP_CLIENT_ID);
+  if (import.meta.env.DEV) {
+    url.searchParams.append(
+      "redirect_uri",
+      "http://localhost:3900/wrpc/github.callback",
+    );
+  }
+  return url.toString();
+})();
 
 export const GithubLogin = () => {
   return (

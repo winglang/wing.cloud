@@ -24,7 +24,7 @@ export const Component = () => {
       return [];
     }
     return appsList.data.apps.filter((app) =>
-      `${app.name}${app.lastCommitMessage}`
+      `${app.appName}${app.lastCommitMessage}`
         .toLocaleLowerCase()
         .includes(search.toLocaleLowerCase()),
     );
@@ -96,9 +96,9 @@ export const Component = () => {
       >
         {apps.map((app) => (
           <AppCard
-            key={app.id}
+            key={app.appId}
             onClick={() => {
-              navigate(`/apps/${app.id}`);
+              navigate(`/apps/${app.appName}`);
             }}
             app={app}
           />

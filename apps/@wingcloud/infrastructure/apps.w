@@ -2,8 +2,8 @@ bring ex;
 bring "./nanoid62.w" as nanoid62;
 
 pub struct App {
-  id: str;
-  name: str;
+  appId: str;
+  appName: str;
   description: str?;
   repoOwner: str;
   repoName: str;
@@ -24,7 +24,7 @@ struct Item extends App {
 }
 
 struct CreateAppOptions {
-  name: str;
+  appName: str;
   description: str?;
   repoOwner: str;
   repoName: str;
@@ -38,14 +38,19 @@ struct CreateAppOptions {
 }
 
 struct RenameAppOptions {
-  id: str;
-  name: str;
+  appId: str;
+  appName: str;
   userId: str;
   repository: str;
 }
 
 struct GetAppOptions {
-  id: str;
+  appId: str;
+}
+
+struct GetAppByNameOptions {
+  userId: str;
+  appName: str;
 }
 
 struct ListAppsOptions {
@@ -53,13 +58,18 @@ struct ListAppsOptions {
 }
 
 struct DeleteAppOptions {
-  id: str;
+  appId: str;
   userId: str;
-  repository: str;
 }
 
 struct ListAppByRepositoryOptions {
   repository: str;
+}
+
+struct MakeItemOptions {
+  appId:str;
+  pk: str;
+  sk: str;
 }
 
 pub class Apps {
@@ -70,17 +80,15 @@ pub class Apps {
   }
 
   pub inflight create(options: CreateAppOptions): str {
-    //let appId = "app_${nanoid62.Nanoid62.generate()}";
-    // TODO: We assume that app name is unique for now
-    let appId = options.name;
+    let appId = "app_${nanoid62.Nanoid62.generate()}";
 
     // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
-    let makeItem = (id:str, pk: str, sk: str): Item => {
+    let makeItem = (ops: MakeItemOptions): Item => {
       return {
-        pk: pk,
-        sk: sk,
-        id: id,
-        name: options.name,
+        pk: ops.pk,
+        sk: ops.sk,
+        appId: ops.appId,
+        appName: options.appName,
         description: options.description,
         imageUrl: options.imageUrl,
         repoId: options.repoId,
@@ -100,9 +108,9 @@ pub class Apps {
       {
         put: {
           item: makeItem(
-            appId,
-            "APP#${appId}",
-            "#",
+            appId: appId,
+            pk: "APP#${appId}",
+            sk: "#",
           ),
           conditionExpression: "attribute_not_exists(pk)"
         },
@@ -110,21 +118,32 @@ pub class Apps {
       {
         put: {
           item: makeItem(
-            appId,
-            "USER#${options.userId}",
-            "APP#${appId}",
+            appId: appId,
+            pk: "USER#${options.userId}",
+            sk: "APP_NAME#${options.appName}",
+          ),
+          conditionExpression: "attribute_not_exists(pk)"
+        },
+      },
+      {
+        put: {
+          item: makeItem(
+            appId: appId,
+            pk: "USER#${options.userId}",
+            sk: "APP#${appId}",
           ),
         },
       },
       {
         put: {
           item: makeItem(
-            appId,
-            "REPOSITORY#${options.repoId}",
-            "APP#${appId}",
+            appId: appId,
+            pk: "REPOSITORY#${options.repoId}",
+            sk: "APP#${appId}",
           ),
         },
       },
+
     ]);
 
     return appId;
@@ -135,18 +154,18 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "APP#${options.id}",
+            pk: "APP#${options.appId}",
             sk: "#",
           },
-          updateExpression: "SET #name = :name",
+          updateExpression: "SET #appName = :appName",
           conditionExpression: "attribute_exists(#pk) and #userId = :userId",
           expressionAttributeNames: {
             "#pk": "pk",
-            "#name": "name",
+            "#appName": "appName",
             "#userId": "userId",
           },
           expressionAttributeValues: {
-            ":name": options.name,
+            ":appName": options.appName,
             ":userId": options.userId,
           },
         }
@@ -155,14 +174,14 @@ pub class Apps {
         update: {
           key: {
             pk: "USER#${options.userId}",
-            sk: "APP#${options.id}",
+            sk: "APP#${options.appId}",
           },
-          updateExpression: "SET #name = :name",
+          updateExpression: "SET #appName = :appName",
           expressionAttributeNames: {
-            "#name": "name",
+            "#appName": "appName",
           },
           expressionAttributeValues: {
-            ":name": options.name,
+            ":appName": options.appName,
           },
         }
       },
@@ -170,14 +189,14 @@ pub class Apps {
         update: {
           key: {
             pk: "REPOSITORY#${options.repository}",
-            sk: "APP#${options.id}",
+            sk: "APP#${options.appId}",
           },
-          updateExpression: "SET #name = :name",
+          updateExpression: "SET #appName = :appName",
           expressionAttributeNames: {
-            "#name": "name",
+            "#appName": "appName",
           },
           expressionAttributeValues: {
-            ":name": options.name,
+            ":appName": options.appName,
           },
         }
       },
@@ -187,15 +206,15 @@ pub class Apps {
   pub inflight get(options: GetAppOptions): App {
     let result = this.table.getItem(
       key: {
-        pk: "APP#${options.id}",
+        pk: "APP#${options.appId}",
         sk: "#",
       },
     );
 
     if let item = result.item {
       return {
-        id: item.get("id").asStr(),
-        name: item.get("name").asStr(),
+        appId: item.get("appId").asStr(),
+        appName: item.get("appName").asStr(),
         description: item.tryGet("description")?.tryAsStr(),
         imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
         repoId: item.get("repoId").asStr(),
@@ -211,7 +230,37 @@ pub class Apps {
       };
     }
 
-    throw "App [${options.id}] not found";
+    throw "App [${options.appId}] not found";
+  }
+
+  pub inflight getByName(options: GetAppByNameOptions): App {
+    let result = this.table.getItem(
+      key: {
+        pk: "USER#${options.userId}",
+        sk: "APP_NAME#${options.appName}",
+      },
+    );
+
+    if let item = result.item {
+      return {
+        appId: item.get("appId").asStr(),
+        appName: item.get("appName").asStr(),
+        description: item.tryGet("description")?.tryAsStr(),
+        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
+        repoId: item.get("repoId").asStr(),
+        repoOwner: item.get("repoOwner").asStr(),
+        repoName: item.get("repoName").asStr(),
+        userId: item.get("userId").asStr(),
+        entryfile: item.get("entryfile").asStr(),
+        createdAt: item.get("createdAt").asStr(),
+        createdBy: item.get("createdBy").asStr(),
+        updatedAt: item.get("updatedAt").asStr(),
+        updatedBy: item.get("updatedBy").asStr(),
+        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
+      };
+    }
+
+    throw "App name [${options.appName}] not found";
   }
 
   pub inflight list(options: ListAppsOptions): Array<App> {
@@ -225,8 +274,8 @@ pub class Apps {
     let var apps: Array<App> = [];
     for item in result.items {
       apps = apps.concat([App {
-        id: item.get("id").asStr(),
-        name: item.get("name").asStr(),
+        appId: item.get("appId").asStr(),
+        appName: item.get("appName").asStr(),
         description: item.tryGet("description")?.tryAsStr(),
         imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
         repoId: item.get("repoId").asStr(),
@@ -245,41 +294,65 @@ pub class Apps {
   }
 
   pub inflight delete(options: DeleteAppOptions): void {
-    this.table.transactWriteItems(
-      transactItems: [
-        {
-          delete: {
-            key: {
-              pk: "APP#${options.id}",
-              sk: "#",
-            },
-            conditionExpression: "#userId = :userId",
-            expressionAttributeNames: {
-              "#userId": "userId",
-            },
-            expressionAttributeValues: {
-              ":userId": options.userId,
-            },
-          },
-        },
-        {
-          delete: {
-            key: {
-              pk: "USER#${options.userId}",
-              sk: "APP#${options.id}",
-            },
-          },
-        },
-        {
-          delete: {
-            key: {
-              pk: "REPOSITORY#${options.repository}",
-              sk: "APP#${options.id}",
-            },
-          },
-        },
-      ],
+
+    let result = this.table.getItem(
+      key: {
+        pk: "APP#${options.appId}",
+        sk: "#",
+      },
     );
+
+    if let app = result.item {
+      let appName = app.get("appName").asStr();
+      let repoId = app.get("repoId").asStr();
+
+      this.table.transactWriteItems(
+        transactItems: [
+          {
+            delete: {
+              key: {
+                pk: "APP#${options.appId}",
+                sk: "#",
+              },
+              conditionExpression: "#userId = :userId",
+              expressionAttributeNames: {
+                "#userId": "userId",
+              },
+              expressionAttributeValues: {
+                ":userId": options.userId,
+              },
+            },
+          },
+          {
+            delete: {
+              key: {
+                pk: "USER#${options.userId}",
+                sk: "APP#${options.appId}",
+              },
+            },
+          },
+          {
+            delete: {
+              key: {
+                pk: "USER#${options.userId}",
+                sk: "APP_NAME#${appName}",
+              },
+            },
+          },
+          {
+            delete: {
+              key: {
+                pk: "REPOSITORY#${repoId}",
+                sk: "APP#${options.appId}",
+              },
+            },
+          },
+        ],
+      );
+      return;
+    }
+
+    throw "App not found";
   }
 
   pub inflight listByRepository(options: ListAppByRepositoryOptions): Array<App> {
@@ -293,8 +366,8 @@ pub class Apps {
     let var apps: Array<App> = [];
     for item in result.items {
       apps = apps.concat([App {
-        id: item.get("id").asStr(),
-        name: item.get("name").asStr(),
+        appId: item.get("appId").asStr(),
+        appName: item.get("appName").asStr(),
         description: item.tryGet("description")?.tryAsStr(),
         repoId: item.get("repoId").asStr(),
         repoOwner: item.get("repoOwner").asStr(),
