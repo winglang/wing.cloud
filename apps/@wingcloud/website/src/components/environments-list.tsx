@@ -1,5 +1,13 @@
-import { LinkIcon } from "@heroicons/react/24/outline";
+import {
+  LinkIcon,
+  MagnifyingGlassIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
+import { useMemo, useState } from "react";
 
+import { Button } from "../design-system/button.js";
+import { Input } from "../design-system/input.js";
+import { BranchIcon } from "../icons/branch-icon.js";
 import type { Environment } from "../utils/wrpc.js";
 
 import { EnvironmentsListItem } from "./environments-list-item.js";
@@ -18,6 +26,19 @@ export const EnvironmentsList = ({
   repoUrl,
   loading,
 }: EnvironmentsListProps) => {
+  const [search, setSearch] = useState("");
+
+  const filteredEnvs = useMemo(() => {
+    if (!environments) {
+      return [];
+    }
+    return environments.filter((env) =>
+      `${env.prTitle}${env.branch}${env.status}`
+        .toLocaleLowerCase()
+        .includes(search.toLocaleLowerCase()),
+    );
+  }, [environments, search]);
+
   return (
     <>
       {loading && (
@@ -49,17 +70,43 @@ export const EnvironmentsList = ({
       )}
 
       {environments.length > 0 && (
-        <div className="space-y-2">
-          <div className="text-slate-700 text-lg pt-2">
-            Preview Environments
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <div className="text-slate-700 text-lg pt-2">
+              Preview Environments
+            </div>
+
+            <Input
+              type="text"
+              leftIcon={MagnifyingGlassIcon}
+              className="block w-full"
+              containerClassName="w-full"
+              name="search"
+              id="search"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+              }}
+            />
           </div>
-          {environments.map((environment) => (
+
+          {filteredEnvs.map((environment) => (
             <EnvironmentsListItem
               key={environment.id}
               appName={appName}
               environment={environment}
             />
           ))}
+
+          {filteredEnvs.length === 0 && (
+            <div className="text-center">
+              <BranchIcon className="w-12 h-12 mx-auto text-gray-400" />
+              <h3 className="mt-2 text-sm font-semibold text-gray-900">
+                No previews found.
+              </h3>
+            </div>
+          )}
         </div>
       )}
     </>
