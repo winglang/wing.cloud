@@ -16,9 +16,9 @@ const start = async () => {
   });
   await sim.start();
   const logsBucket = sim.getResource(
-    "root/Default/Runtime/deployment logs",
+    "root/Default/runtime.RuntimeService/deployment logs",
   ) as cloud.IBucketClient;
-  const wingApi = sim.getResource("root/Default/wing api") as cloud.Api; // TODO: should be cloud.IApiClient
+  const wingApi = sim.getResource("root/Default/cloud.Api") as cloud.Api; // TODO: should be cloud.IApiClient
 
   await handler({ logsBucket, wingApiUrl: wingApi.url });
 };

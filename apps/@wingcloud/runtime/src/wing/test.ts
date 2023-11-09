@@ -1,4 +1,4 @@
-import { compile as compileFn, Target } from "@winglang/compiler";
+import { compile as compileFn, BuiltinPlatform } from "@winglang/compiler";
 import { type simulator, type std } from "@winglang/sdk";
 
 import { Environment } from "../environment.js";
@@ -14,7 +14,7 @@ export interface WingTestProps {
 async function wingCompile(wingCompilerPath: string, entryfilePath: string) {
   const wingCompiler = await import(wingCompilerPath);
   const compile: typeof compileFn = wingCompiler.compile;
-  const simfile = await compile(entryfilePath, { target: Target.SIM });
+  const simfile = await compile(entryfilePath, { platform: [BuiltinPlatform.SIM] });
   return simfile;
 }
 
@@ -30,7 +30,7 @@ async function wingTestOne(
     })
     .filter((t) => !!t)
     .join("\n");
-  const logs = result.error ? `${result.error}\n${traces}` : traces;
+  const logs = result.error ? `${result.error}\n${traces}` : (traces || "<no logs>");
   await props.bucketWrite(
     props.environment.testKey(result.pass, testResourcePath),
     logs,
@@ -58,7 +58,6 @@ export async function wingTest(props: WingTestProps) {
     for (let test of await client.listTests()) {
       const testResult = await wingTestOne(client, test, props);
       testResults.push(testResult);
-      await simulator.reload();
     }
 
     await simulator.stop();

@@ -189,6 +189,7 @@ website.addGitIgnore("!/.env.example");
 
 website.addDevDeps("node-fetch");
 website.addDevDeps("nanoid");
+website.addDevDeps("@ibm/plex");
 
 ///////////////////////////////////////////////////////////////////////////////
 const runtime = new TypescriptProject({
@@ -243,8 +244,12 @@ infrastructure.addGitIgnore("/target/");
 infrastructure.addDeps(`winglang`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
+infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
+infrastructure.addTask("test-aws", {
+  exec: "node ./bin/wing.mjs test -t tf-aws main.w",
+});
 infrastructure.compileTask.exec(
-  "node ./bin/wing.mjs compile --target tf-aws --plugins override-function-memory.js",
+  "node ./bin/wing.mjs compile -t tf-aws",
 );
 
 const terraformInitTask = infrastructure.addTask("terraformInit");
@@ -296,6 +301,12 @@ new Turbo(infrastructure, {
     dev: {
       dependsOn: ["^compile"],
     },
+    test: {
+      dependsOn: ["compile"],
+    },
+    "test-aws": {
+      dependsOn: ["compile"],
+    },
   },
 });
 
@@ -317,6 +328,7 @@ infrastructure.addDeps(
   "@cdktf/provider-dnsimple",
   "@cdktf/provider-docker",
   "@cdktf/provider-null",
+  "@cdktf/provider-random",
 );
 
 infrastructure.addDevDeps("@types/cookie");
@@ -326,16 +338,28 @@ infrastructure.addDeps("jose");
 
 infrastructure.addDeps("octokit", "node-fetch");
 
-infrastructure.addDevDeps("@types/cookie");
-infrastructure.addDeps("cookie");
-
-infrastructure.addDeps("jose");
-
-infrastructure.addDeps("octokit", "node-fetch");
+infrastructure.addDevDeps("@octokit/rest");
 
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(flyio.name);
 infrastructure.addDevDeps(runtime.name);
 
 ///////////////////////////////////////////////////////////////////////////////
+
+const aws = new NodeProject({
+  parent: monorepo,
+  name: "@wingcloud/aws-cicd",
+  outdir: "aws",
+});
+
+aws.addDeps("@cdktf/provider-aws");
+aws.addDeps("cdktf");
+aws.addDeps("constructs");
+aws.addGitIgnore("**/target/");
+aws.addFields({
+  type: "commonjs",
+});
+
+///////////////////////////////////////////////////////////////////////////////
+
 monorepo.synth();

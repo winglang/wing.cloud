@@ -7,6 +7,7 @@ bring "../containers.w" as containers;
 bring "../flyio" as flyio;
 bring "./runtime-docker.w" as runtimeDocker;
 bring "../environments.w" as environments;
+bring "@cdktf/provider-aws" as awsprovider;
 
 struct RuntimeStartOptions {
   gitToken: str?;
@@ -39,7 +40,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
 
     new cloud.Service(inflight () => {
       return () => {
-        this.container.stop();
+        this.container.stopAll();
       };
     });
   }
@@ -58,18 +59,17 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "GIT_SHA" => opts.gitSha,
       "ENTRYFILE" => opts.entryfile,
       "WING_TARGET" => util.env("WING_TARGET"),
-      "LOGS_BUCKET_NAME" => "stam", // opts.logsBucketName,
+      "LOGS_BUCKET_NAME" => util.env(opts.logsBucketName), // get simulator handle for the bucket
       "WING_CLOUD_URL" => opts.wingCloudUrl,
       "ENVIRONMENT_ID" => opts.environmentId,
+      "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
     };
 
     if let token = opts.gitToken {
       env.set("GIT_TOKEN", token);
     }
 
-    this.container.start(env: env.copy(), volumes: volumes.copy());
-
-    if let url = this.container.url() {
+    if let url = this.container.start(name: opts.environmentId, env: env.copy(), volumes: volumes.copy()) {
       return url;
     } else {
       throw "handleRequest: unable to get container url";
@@ -77,7 +77,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
   }
 
   pub inflight stop(opts: RuntimeStopOptions) {
-    this.container.stop();
+    this.container.stop(name: opts.environmentId);
   }
 }
 
@@ -93,7 +93,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   init(props: FlyRuntimeHandlerProps) {
     this.flyToken = props.flyToken;
     this.flyOrgSlug = props.flyOrgSlug;
-    this.image = new runtimeDocker.RuntimeDockerImage();
+    this.image = new runtimeDocker.RuntimeDockerImage(flyOrgSlug: props.flyOrgSlug);
   }
 
   inflight appNameFromEnvironment(environmentId: str): str {
@@ -150,7 +150,7 @@ struct Message {
   repo: str;
   sha: str;
   entryfile: str;
-  projectId: str;
+  appId: str;
   environmentId: str;
   token: str?;
 }
@@ -180,11 +180,15 @@ pub class RuntimeService {
     let var awsSecretAccessKey: str = "";
     if util.tryEnv("WING_TARGET") == "sim" {
       this.runtimeHandler = new RuntimeHandler_sim();
+      let bucketAddr = this.logs.node.addr;
+      bucketName = "BUCKET_HANDLE_${bucketAddr.substring(bucketAddr.length - 8, bucketAddr.length)}";
     } else {
       let awsUser = new aws.iamUser.IamUser(name: "${this.node.addr}-user");
-      let bucketArn: str = unsafeCast(this.logs).bucket.arn;
-      bucketName = unsafeCast(this.logs).bucket.bucket;
-      bucketRegion = unsafeCast(this.logs).bucket.region;
+      let bucket: awsprovider.s3Bucket.S3Bucket = unsafeCast(this.logs).bucket;
+      let bucketArn: str = bucket.arn;
+      bucketName = bucket.bucket;
+      bucketRegion = bucket.region;
+      bucket.forceDestroy = true;
       let awsPolicy = new aws.iamUserPolicy.IamUserPolicy(
         user: awsUser.name,
         policy: Json.stringify({
@@ -218,6 +222,9 @@ pub class RuntimeService {
     let queue = new cloud.Queue();
     queue.setConsumer(inflight (message) => {
       try {
+        // hack to get bucket in this environment
+        this.logs.put;
+
         let msg = Message.fromJson(Json.parse(message));
 
         log("wing url: ${props.wingCloudUrl}");
@@ -239,13 +246,13 @@ pub class RuntimeService {
 
         props.environments.updateUrl(
           id: msg.environmentId,
-          projectId: msg.projectId,
+          appId: msg.appId,
           url: url,
         );
       } catch error {
         log(error);
       }
-    }, { timeout: 1m });
+    }, { timeout: 5m });
 
     this.api = new cloud.Api();
     this.api.post("/", inflight (req) => {
@@ -270,13 +277,5 @@ pub class RuntimeService {
         status: 200,
       };
     });
-
-    test "deploy preview environment" {
-      let res = http.post(this.api.url, body: Json.stringify({
-        repo: "eladcon/examples",
-        sha: "fix-api-basic-auth",
-        entryfile: "examples/api-basic-auth-middleware/basic-auth.w"
-      }));
-    }
   }
 }

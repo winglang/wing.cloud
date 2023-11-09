@@ -17,6 +17,10 @@ struct GetOrCreateOptions {
   gitHubLogin: str;
 }
 
+struct GetUsernameOptions {
+  userId: str;
+}
+
 pub class Users {
   table: ex.DynamodbTable;
 
@@ -71,5 +75,20 @@ pub class Users {
     let userId = this.fromLogin(gitHubLogin: options.gitHubLogin);
 
     return userId ?? this.create(gitHubLogin: options.gitHubLogin);
+  }
+
+  pub inflight getUsername(options: GetUsernameOptions): str {
+    let result = this.table.getItem(
+      key: {
+        pk: "USER#${options.userId}",
+        sk: "#",
+      },
+    );
+
+    if let username = result.item?.tryGet("gitHubLogin")?.tryAsStr() {
+      return username;
+    } else {
+      throw "User not found";
+    }
   }
 }

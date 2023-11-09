@@ -1,3 +1,5 @@
+name: Build
+
 on:
   pull_request:
     types:
@@ -52,3 +54,4 @@ jobs:
           FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
           PROXY_SUBDOMAIN: ${{ env.PROXY_SUBDOMAIN }}
           PROXY_ZONE_NAME: ${{ env.PROXY_ZONE_NAME }}
+          TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}
