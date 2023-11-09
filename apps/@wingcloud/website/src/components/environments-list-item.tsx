@@ -106,7 +106,10 @@ export const EnvironmentsListItem = ({
               </span>
 
               {["passed", "failed"].includes(testStatus) && (
-                <div className="flex items-center gap-x-1">
+                <div
+                  className="flex items-center gap-x-0.5"
+                  title={`tests ${testStatus}`}
+                >
                   <BeakerIcon className="w-4 h-4 text-slate-500" />
                   {testStatus === "passed" && (
                     <CheckCircleIcon className="w-4 h-4 text-green-500" />
