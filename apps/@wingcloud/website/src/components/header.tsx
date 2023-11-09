@@ -18,7 +18,8 @@ const UserMenu = () => {
   const signOutMutation = wrpc["auth.signout"].useMutation();
 
   const signOut = useCallback(() => {
-    signOutMutation.mutateAsync(undefined!).then(() => {
+    // eslint-disable-next-line unicorn/no-useless-undefined
+    signOutMutation.mutateAsync(undefined).then(() => {
       navigate("/");
     });
   }, [navigate, signOutMutation]);
