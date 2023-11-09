@@ -90,7 +90,7 @@ let website = new ex.ReactApp(
 //   environmentManager: environmentManager,
 // );
 
-// bring "cdktf" as cdktf;
+bring "cdktf" as cdktf;
 // new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
 
 let apiDomainName = (() => {
