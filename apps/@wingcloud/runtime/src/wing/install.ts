@@ -1,15 +1,15 @@
 import { randomBytes } from "node:crypto";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, realpathSync } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
-
+import { dirname, join } from "node:path";
+import which from "which";
 import { Executer } from "../executer.js";
 
 const require = createRequire(import.meta.url);
 
 export async function installWing(cwd: string, e: Executer) {
-  const getLocalWing = async (cwd: string) => {
+  const getWingPaths = async (cwd: string) => {
     try {
       // run in a different process to ignore caches
       const logfile = join(
@@ -46,20 +46,48 @@ export async function installWing(cwd: string, e: Executer) {
       return;
     }
   };
-
-  let paths = await getLocalWing(cwd);
+  
+  // try to find wing locally (if installed by package.json)
+  // otherwise try to find it globally
+  // otherwise install wing
+  let paths = await getWingPaths(cwd);
   if (!paths) {
-    const wingDir = mkdtempSync(join(tmpdir(), "wing-"));
-    await e.exec("npm", ["init", "-y"], { cwd: wingDir, throwOnFailure: true });
-    await e.exec("npm", ["install", "winglang"], {
-      cwd: wingDir,
-      throwOnFailure: true,
-    });
-    paths = await getLocalWing(wingDir);
+    const wingPath = await getGlobalWing();
+    if (wingPath) {
+      paths = await getWingPaths(dirname(wingPath));
+    }
+
     if (!paths) {
-      throw new Error("failed to install winglang");
+      const wingDir = mkdtempSync(join(tmpdir(), "wing-"));
+      await e.exec("npm", ["init", "-y"], { cwd: wingDir, throwOnFailure: true });
+      await e.exec("npm", ["install", "winglang"], {
+        cwd: wingDir,
+        throwOnFailure: true,
+      });
+      paths = await getWingPaths(wingDir);
+      if (!paths) {
+        throw new Error("failed to install winglang");
+      }
     }
   }
 
   return paths;
 }
+
+export async function getGlobalWing() {
+  const wingBin = process.env["WING_BIN"];
+  if (wingBin) {
+    return realpathSync(wingBin);
+  }
+
+  try {
+    const wing = await which("wing");
+    return realpathSync(wing);
+  } catch {
+    return undefined;
+  }
+}
+
+
+
+

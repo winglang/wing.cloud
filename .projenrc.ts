@@ -216,12 +216,14 @@ runtime.addDeps("jsonwebtoken");
 runtime.addDeps("jwk-to-pem");
 runtime.addDeps("jose");
 runtime.addDeps("node-fetch");
+runtime.addDeps("which");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/jsonwebtoken");
 runtime.addDevDeps("@types/jwk-to-pem");
 runtime.addDevDeps("simple-git");
 runtime.addDevDeps("msw");
+runtime.addDevDeps("@types/which");
 
 runtime.addGitIgnore("target/");
 

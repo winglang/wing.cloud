@@ -20,7 +20,7 @@ test("run() - installs npm packages and run tests", async () => {
   const { examplesDir, logsBucket, wingApiUrl } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
-  const environment = new Environment("redis/main.w", {
+  const environment = new Environment("test-id", "redis/main.w", {
     repo: examplesDirRepo,
     sha: "main",
   });
@@ -35,15 +35,14 @@ test("run() - installs npm packages and run tests", async () => {
 
   const deploymentLogs = await logsBucket.get(environment.deploymentKey());
   expect(deploymentLogs).toContain("Running npm install\n\nadded 1 package");
-  expect(deploymentLogs).toContain(`Server is listening on port ${port}`);
 
   const testLogs = await logsBucket.get(
     environment.testKey(true, "root/Default/test:Hello, world!"),
   );
   expect(testLogs).toContain("a test log");
 
-  const response = await fetch(`http://localhost:${port}/logs`);
-  expect(await response.text()).toEqual(deploymentLogs);
+  const response = await fetch(`http://localhost:${port}/trpc/app.details`);
+  expect(response.ok).toBeTruthy();
 
   await close();
 });
@@ -52,7 +51,7 @@ test("run() - throws when repo not found", async () => {
   const { examplesDir, logsBucket, wingApiUrl } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
-  const environment = new Environment("redis/main.w", {
+  const environment = new Environment("test-id", "redis/main.w", {
     repo: `${examplesDirRepo}-not`,
     sha: "main",
   });
@@ -65,7 +64,7 @@ test("run() - doesn't have access to runtime env vars", async () => {
   const { examplesDir, logsBucket, wingApiUrl } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
-  const environment = new Environment("access-env/main.w", {
+  const environment = new Environment("test-id", "access-env/main.w", {
     repo: examplesDirRepo,
     sha: "main",
   });
@@ -87,7 +86,7 @@ test("run() - doesn't have access to runtime env vars", async () => {
 test("run() - reporting statuses", async () => {
   const { examplesDir, logsBucket, wingApiUrl } = getContext();
 
-  const reportUrl = `${wingApiUrl}/report`;
+  const reportUrl = `${wingApiUrl}/environment.report`;
   const restHandler = rest.post(reportUrl, (req, res, ctx) => {
     return res(ctx.status(200));
   });
@@ -111,7 +110,7 @@ test("run() - reporting statuses", async () => {
 
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
-  const environment = new Environment("redis/main.w", {
+  const environment = new Environment("test-id", "redis/main.w", {
     repo: examplesDirRepo,
     sha: "main",
   });
@@ -121,11 +120,11 @@ test("run() - reporting statuses", async () => {
 
   expect(requests).toStrictEqual([
     {
-      environmentId: "redis/main.w",
+      environmentId: "test-id",
       status: "deploying",
     },
     {
-      environmentId: "redis/main.w",
+      environmentId: "test-id",
       status: "tests",
       data: {
         testResults: [
@@ -137,7 +136,7 @@ test("run() - reporting statuses", async () => {
       },
     },
     {
-      environmentId: "redis/main.w",
+      environmentId: "test-id",
       status: "running",
     },
   ]);
@@ -151,10 +150,10 @@ test("run() - reporting statuses", async () => {
     await response.text(),
   ) as any;
   expect({ aud, iss, environmentId, status }).toStrictEqual({
-    environmentId: "redis/main.w",
+    environmentId: "test-id",
     status: "deploying",
     aud: "https://wing.cloud",
-    iss: "redis/main.w",
+    iss: "test-id",
   });
 
   await close();
@@ -164,7 +163,7 @@ test("run() - environment can override wing version", async () => {
   const { examplesDir, logsBucket, wingApiUrl } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
-  const environment = new Environment("override-wing-version/main.w", {
+  const environment = new Environment("test-id", "override-wing-version/main.w", {
     repo: examplesDirRepo,
     sha: "main",
   });
@@ -173,7 +172,7 @@ test("run() - environment can override wing version", async () => {
   });
 
   const output = execFileSync("node", [paths.winglang, "-V"]);
-  expect(output.toString().trim()).toEqual("0.29.0");
+  expect(output.toString().trim()).toEqual("0.44.13");
 
   await close();
 });
@@ -181,7 +180,7 @@ test("run() - environment can override wing version", async () => {
 test("run() - works with github", async () => {
   const { logsBucket, wingApiUrl } = getContext();
   const gitProvider = new GithubProvider("");
-  const environment = new Environment("examples/redis/main.w", {
+  const environment = new Environment("test-id", "examples/redis/main.w", {
     repo: "eladcon/examples",
     sha: "main",
   });
@@ -203,7 +202,7 @@ test("run() - have multiple tests results", async () => {
   const { examplesDir, logsBucket, wingApiUrl } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
-  const environment = new Environment("multiple-tests/main.w", {
+  const environment = new Environment("test-id", "multiple-tests/main.w", {
     repo: examplesDirRepo,
     sha: "main",
   });

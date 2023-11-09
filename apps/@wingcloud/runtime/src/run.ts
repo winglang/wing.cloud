@@ -25,6 +25,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
 
   const e = new Executer(logfile);
 
+  let cancelFileSync;
   try {
     await report("deploying");
 
@@ -33,6 +34,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
       key: context.environment.deploymentKey(),
       bucket: context.logsBucket,
     });
+    cancelFileSync = cancelSync;
 
     const { paths, entryfilePath, testResults } = await new Setup({
       e,
@@ -71,6 +73,8 @@ export const run = async function ({ context, requestedPort }: RunProps) {
       readFileSync(logfile, "utf8"),
     );
     await report("error", { message: error.toString() });
+    cancelFileSync?.();
+    
     throw error;
   }
 };

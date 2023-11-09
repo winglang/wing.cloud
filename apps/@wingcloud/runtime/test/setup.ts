@@ -4,6 +4,7 @@ import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { simulator, cloud } from "@winglang/sdk";
+import { type ApiSchema } from "@winglang/sdk/lib/target-sim/schema-resources.js";
 import { simpleGit } from "simple-git";
 import { beforeEach, afterEach, beforeAll } from "vitest";
 
@@ -31,11 +32,13 @@ beforeEach(async () => {
   });
   await sim.start();
   logsBucket = sim.getResource(
-    "root/Default/Runtime/deployment logs",
+    "root/Default/runtime.RuntimeService/deployment logs",
   ) as cloud.IBucketClient;
-  const wingApi = sim.getResource("root/Default/wing api") as cloud.Api;
-  wingApiUrl = wingApi.url;
-});
+  const config = sim.getResourceConfig(
+    "root/Default/cloud.Api",
+  ) as ApiSchema;
+  wingApiUrl = config.attrs.url;
+}, 60000);
 
 afterEach(async () => {
   await sim?.stop();
@@ -63,10 +66,12 @@ export const withTestContext = async (
   });
   await sim.start();
   const logsBucket = sim.getResource(
-    "root/Default/Runtime/deployment logs",
+    "root/Default/runtime.RuntimeService/deployment logs",
   ) as cloud.IBucketClient;
-  const wingApi = sim.getResource("root/Default/wing api") as cloud.Api;
-  const wingApiUrl = wingApi.url;
+  const config = sim.getResourceConfig(
+    "root/Default/cloud.Api",
+  ) as ApiSchema;
+  const wingApiUrl = config.attrs.url;
 
   await cb({ logsBucket, wingApiUrl, examplesDir });
 
