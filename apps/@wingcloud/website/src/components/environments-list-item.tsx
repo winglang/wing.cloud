@@ -82,7 +82,7 @@ export const EnvironmentsListItem = ({
         <div className="flex justify-between items-center truncate grow">
           <div className="text-xs space-y-2 truncate">
             <Link
-              to={`/apps/${appName}/environments/${environment.id}`}
+              to={`/apps/${appName}/${environment.id}`}
               className="font-semibold truncate hover:underline text-slate-700"
               rel="noopener noreferrer"
             >
