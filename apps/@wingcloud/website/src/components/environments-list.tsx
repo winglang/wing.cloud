@@ -1,6 +1,4 @@
 import { LinkIcon } from "@heroicons/react/24/outline";
-import clsx from "clsx";
-import { Link } from "react-router-dom";
 
 import type { Environment } from "../utils/wrpc.js";
 
@@ -56,19 +54,11 @@ export const EnvironmentsList = ({
             Preview Environments
           </div>
           {environments.map((environment) => (
-            <Link
+            <EnvironmentsListItem
               key={environment.id}
-              className={clsx(
-                "bg-white rounded p-4 text-left w-full block",
-                "shadow hover:shadow-md transition-all",
-              )}
-              to={`/apps/${appName}/${environment.id}`}
-            >
-              <EnvironmentsListItem
-                key={environment.id}
-                environment={environment}
-              />
-            </Link>
+              appName={appName}
+              environment={environment}
+            />
           ))}
         </div>
       )}

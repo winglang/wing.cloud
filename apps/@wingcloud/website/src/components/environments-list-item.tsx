@@ -1,5 +1,7 @@
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
+import { Link } from "react-router-dom";
 
 import { BranchIcon } from "../icons/branch-icon.js";
 import { GithubIcon } from "../icons/github-icon.js";
@@ -23,8 +25,10 @@ const getTestStatus = (environment: Environment) => {
 };
 
 export const EnvironmentsListItem = ({
+  appName,
   environment,
 }: {
+  appName: string;
   environment: Environment;
 }) => {
   const status = useMemo(() => {
@@ -42,91 +46,102 @@ export const EnvironmentsListItem = ({
   const updatedAt = useTimeAgo(environment.updatedAt);
 
   return (
-    <div className="flex items-center gap-x-4">
-      <div className="relative">
-        <BranchIcon
-          className={clsx(
-            "w-8 h-8 text-slate-500",
-            "rounded-full border-slate-300 border",
-          )}
-        />
-        <div
-          title={status}
-          className={clsx(
-            "absolute -top-1.5 -right-1.5",
-            "w-2.5 h-2.5",
-            "rounded-full",
-            status === "initializing" && "bg-slate-400 animate-pulse",
-            status === "deploying" && "bg-yellow-200 animate-pulse",
-            status === "running" && "bg-green-300",
-            status === "failed" && "bg-red-300",
-          )}
-        />
-      </div>
-
-      <div className="flex justify-between items-center truncate grow">
-        <div className="text-xs space-y-2 truncate">
-          <button
+    <div
+      className={clsx(
+        "bg-white rounded p-4 text-left w-full block",
+        "shadow hover:shadow-md transition-all",
+      )}
+    >
+      <div className="flex items-center gap-x-4">
+        <div className="relative">
+          <BranchIcon
             className={clsx(
-              "font-semibold truncate",
-              linkEnabled && "hover:underline",
+              "w-8 h-8 text-slate-500",
+              "rounded-full border-slate-300 border",
             )}
-            rel="noopener noreferrer"
-            disabled={!linkEnabled}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              window.open(environment.url, "_blank");
-            }}
-          >
-            {environment.prTitle}
-          </button>
-
-          <div className="truncate flex gap-x-2">
-            <div className="text-slate-600 font-mono flex gap-x-1 items-center">
-              <GithubIcon className="w-3 h-3 inline-block" />
-              <button
-                className="truncate hover:underline"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.open(
-                    `https://github.com/${environment.repo}/tree/${environment.branch}`,
-                    "_blank",
-                  );
-                }}
-              >
-                {environment.branch}
-              </button>
-            </div>
-            <span className="text-slate-400 truncate">updated {updatedAt}</span>
-          </div>
+          />
+          <div
+            title={status}
+            className={clsx(
+              "absolute -top-1.5 -right-1.5",
+              "w-2.5 h-2.5",
+              "rounded-full",
+              status === "initializing" && "bg-slate-400 animate-pulse",
+              status === "deploying" && "bg-yellow-200 animate-pulse",
+              status === "running" && "bg-green-300",
+              status === "failed" && "bg-red-300",
+            )}
+          />
         </div>
 
-        <div className="flex gap-x-4 text-xs items-center justify-end">
-          {testStatus && (
-            <span
-              className={clsx(
-                testStatus === "failed" && "bg-red-200 text-red-800",
-                testStatus === "passed" && "bg-green-200 text-green-800",
-                "inline-block font-semibold px-2.5 py-0.5 rounded-full",
-              )}
+        <div className="flex justify-between items-center truncate grow">
+          <div className="text-xs space-y-2 truncate">
+            <Link
+              to={`/apps/${appName}/environments/${environment.id}`}
+              className="font-semibold truncate hover:underline"
+              rel="noopener noreferrer"
             >
-              Tests {testStatus}
-            </span>
-          )}
+              {environment.prTitle}
+            </Link>
 
-          <span
-            className={clsx(
-              status === "initializing" && "bg-slate-200 text-slate-600",
-              status === "deploying" && "bg-yellow-100 text-yellow-800",
-              status === "running" && "bg-green-200 text-green-800",
-              status === "failed" && "bg-red-200 text-red-800",
-              "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
-              "capitalize",
-            )}
-          >
-            {status}
-          </span>
+            <div className="truncate flex gap-x-2">
+              <div className="text-slate-600 font-mono flex gap-x-1 items-center">
+                <GithubIcon className="w-3 h-3 inline-block" />
+                <a
+                  href={`https://github.com/${environment.repo}/tree/${environment.branch}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="truncate hover:underline"
+                >
+                  {environment.branch}
+                </a>
+              </div>
+              <span className="text-slate-400 truncate">
+                updated {updatedAt}
+              </span>
+            </div>
+          </div>
+
+          <div className="justify-end">
+            <div className="flex flex-col justify-between items-end gap-3">
+              {linkEnabled && (
+                <a
+                  href={environment.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs hover:underline -right-1 -top-1"
+                >
+                  <ArrowTopRightOnSquareIcon className="w-4 h-4 inline-block text-slate-600 hover:text-slate-700" />
+                </a>
+              )}
+              <div className="flex gap-x-4 text-xs items-center justify-end">
+                {testStatus && (
+                  <span
+                    className={clsx(
+                      testStatus === "failed" && "bg-red-200 text-red-800",
+                      testStatus === "passed" && "bg-green-200 text-green-800",
+                      "inline-block font-semibold px-2.5 py-0.5 rounded-full",
+                    )}
+                  >
+                    Tests {testStatus}
+                  </span>
+                )}
+
+                <span
+                  className={clsx(
+                    status === "initializing" && "bg-slate-200 text-slate-600",
+                    status === "deploying" && "bg-yellow-100 text-yellow-800",
+                    status === "running" && "bg-green-200 text-green-800",
+                    status === "failed" && "bg-red-200 text-red-800",
+                    "inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full",
+                    "capitalize",
+                  )}
+                >
+                  {status}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
