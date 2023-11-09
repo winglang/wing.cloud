@@ -11,9 +11,17 @@ pub struct Environment {
   status: str;
   installationId: num;
   prNumber: num?;
+  prTitle: str?;
   url: str?;
   commentId: num?;
+  createdAt: str;
+  updatedAt: str;
   testResults: status_report.TestResults?;
+}
+
+struct Item extends Environment {
+  pk: str;
+  sk: str;
 }
 
 pub struct CreateEnvironmentOptions {
@@ -23,6 +31,7 @@ pub struct CreateEnvironmentOptions {
   branch: str;
   status: str;
   prNumber: num?;
+  prTitle: str?;
   installationId: num;
 }
 
@@ -66,6 +75,7 @@ pub class Environments {
   }
 
   pub inflight create(options: CreateEnvironmentOptions): Environment {
+    let createdAt = datetime.utcNow().toIso();
     let environment = Environment {
       id: "environment_${nanoid62.Nanoid62.generate()}",
       appId: options.appId,
@@ -74,7 +84,10 @@ pub class Environments {
       branch: options.branch,
       status: options.status,
       prNumber: options.prNumber,
+      prTitle: options.prTitle,
       installationId: options.installationId,
+      createdAt: createdAt,
+      updatedAt: createdAt,
     };
 
     let getItem = (pk: str, sk: str) => {
@@ -86,8 +99,11 @@ pub class Environments {
         type: environment.type,
         repo: environment.repo,
         branch: environment.branch,
+        prTitle: environment.prTitle,
         status: environment.status,
         installationId: environment.installationId,
+        createdAt: environment.createdAt,
+        updatedAt: environment.updatedAt,
       };
 
       if let prNumber = environment.prNumber {
@@ -288,9 +304,12 @@ pub class Environments {
         status: item.get("status").asStr(),
         installationId: item.get("installationId").asNum(),
         prNumber: item.tryGet("prNumber")?.tryAsNum(),
+        prTitle: item.tryGet("prTitle")?.tryAsStr(),
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
         testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
+        createdAt: item.get("createdAt").asStr(),
+        updatedAt: item.get("updatedAt").asStr(),
       };
     }
 
@@ -315,11 +334,14 @@ pub class Environments {
         branch: item.get("branch").asStr(),
         status: item.get("status").asStr(),
         prNumber: item.tryGet("prNumber")?.tryAsNum(),
+        prTitle: item.tryGet("prTitle")?.tryAsStr(),
         installationId: item.get("installationId").asNum(),
         // https://github.com/winglang/wing/issues/4470
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
         testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
+        createdAt: item.get("createdAt").asStr(),
+        updatedAt: item.get("updatedAt").asStr(),
       }]);
     }
     return environments;
