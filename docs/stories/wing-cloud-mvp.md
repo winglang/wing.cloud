@@ -21,6 +21,7 @@ While the *Wing Framework* covers the **development stage** in the application l
 ## Taxonomy
 
 * **App** - a unit of deployment.
+* **Library** - a reusable package published to an npm repository (private or public) and consumed by other libraries or apps. As far as Wing Cloud is concerned, libraries are simply npm modules installed using `npm install` during build.
 * **Repository** - where the source code of an application is managed (currently only GitHub is supported).
 * **Environment** - a space with a stable address where an instance of the application is deployed.
 * **Preview** - a special type of an ephemeral environment which can be deployed ad-hoc and cleaned up quickly.
@@ -48,31 +49,39 @@ The focus of v1.0 of Wing Cloud is to optimize "time to value". In our case, it'
 High-level requirements:
 
 * Wing Cloud 1.0 *should support* Winglang and TypeScript as source languages
-* Wing Cloud 1.0 *should support* all resources in the Wing SDK
+* Wing Cloud 1.0 *should support* all the resources in the Wing SDK (the `cloud` library). 
+* Wing Cloud 1.0 should support all trusted libraries (`@winglibs`)
 * Wing Cloud 1.0 *should support* containerized workloads (`cloud.Workload`)
-* Wing Cloud 1.0 *should support* accessing endpoints exposed by Wing applications (e.g. `cloud.Website`, `cloud.Api`)
+* Wing Cloud 1.0 *should support* accessing endpoints exposed by Wing applications from the outside world using unique URLs allocated for each environment (e.g. `cloud.Website`, `cloud.Api`)
 * Wing Cloud 1.0 *should support* external SSL terminated endpoints with custom domains
 * Wing Cloud 1.0 should automatically create preview environments for all PRs
-* Wing Cloud 1.0 should allow interacting with all preview and production environments via a Wing Console experience
-* Wing Cloud 1.0 *is not required* to support highly-available or highly-scalable applications
-* Wing Cloud 1.0 *is not required* to support arbitrary Terraform resources
-* Wing Cloud 1.0 *is not required* to support BYOA (bring your own account).
+* Wing Cloud 1.0 *should allow* interacting with all preview and production environments via a Wing Console experience
+* Wing Cloud 1.0 *will only support* a "free tier" designed for prototypes and simple apps.
+* Wing Cloud 1.0 *will allow* users to "join the waitlist" for a paid tier designed for production use cases.
+### Out of scope for v1.0
 
-This section is organized according to the following user flows:
+The following is a list of future capabilities that we plan to implement at a later release:
+
+* Wing Cloud 1.0 *is not required* to support arbitrary AWS/GCP/Azure Terraform resources
+* Wing Cloud 1.0 *is not required* to support highly-available or highly-scalable applications
+* Wing Cloud 1.0 *is not required* to support BYOA (bring your own account). Supporting this
+  requires implementing the Terraform deployment UX as well as Wing Console in production and those
+  are big features to implement.
+* Wing Cloud 1.0 *is not required* to deploy to AWS, GCP or Azure using Terraform
+* Wing Cloud 1.0 *is not required* to support a paid tier for production deployments
+* Wing Cloud 1.0 *is not required* to support multiple environments per app (e.g. staging/pre-production)
+* Wing Cloud 1.0 *is not required* to support project templates
+* Wing Cloud 1.0 *is not required* to support running tests against production (use `cloud.Function`s for now).
+* Wing Cloud 1.0 *is not required* to support customization of build process. It's always `npm i && wing compile -t TARGET`
+* Wing Cloud 1.0 *is not required* to support publishing/consuming libraries is not handled by Wing Console, but rather just uses standard npm repositories.
+* Wing Cloud 1.0 *is not required* to support multiple entrypoints. Every app has a single entrypoint.
+
+This next section is organized according to the following user flows:
 
 * Create: creation of new Wing Cloud applications
 * Preview: preview environments
 * Deploy: deployment to production
 * Operate: operating the app in production
-
-### Out of scope for v1.0
-
-* Bring your own account
-* Deploy to AWS, GCP or Azure using Terraform
-* Multiple environments per app (e.g. staging/pre-production)
-* Project templates
-* Running tests against production (use `cloud.Function`s for now).
-* Customization of build process. It's always `npm i && wing compile -t TARGET`
 
 ## Create
 
@@ -80,7 +89,9 @@ Every Wing Cloud app is connected to a GitHub repository and associated with an 
 
 When a user creates an app through the website they can choose whether they want to *create a new GitHub  repository* or *connect to an existing* one.
 
-If they create a new repository, they can select a template to populate the repository. It should be possible to add additional templates to the Wing Cloud service as we evolve our 
+> The reason we want to support both connecting an existing repository and creating a new one is in order to reduce the "time to value". We want people to be able to sign up and immediately see the value of this solution, so being able to create a new repository is important. It's totally fine to roll these out one by one, but I think repository creation is important for MVP.
+
+If they create a new repository, they can select a template to populate the repository. For the MVP, we will only have an "empty project" template.
 
 If they choose to connect to an existing repository, the UI will look for potential entrypoints (e.g. `main.w` files) and will give users the option to select the entrypoint (unless there's only one and then that's going to be the default selected option).
 
@@ -146,6 +157,7 @@ Each app has a settings page with the following fields:
 * `wing bootstrap -t tf-aws`
 * Centralized logs on AWS
 * Refactor tests view in the console
+* Migrate `ex` to `@winglibs`
 
 ## URL Scheme
 
