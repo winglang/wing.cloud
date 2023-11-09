@@ -82,7 +82,7 @@ export const EnvironmentsListItem = ({
           <div className="text-xs space-y-2 truncate">
             <Link
               to={`/apps/${appName}/environments/${environment.id}`}
-              className="font-semibold truncate hover:underline"
+              className="font-semibold truncate hover:underline text-slate-700"
               rel="noopener noreferrer"
             >
               {environment.prTitle}
@@ -106,7 +106,7 @@ export const EnvironmentsListItem = ({
 
               {["passed", "failed"].includes(testStatus) && (
                 <div className="flex items-center gap-x-1">
-                  <span className="text-slate-500">Tests:</span>
+                  <span className="text-slate-600">Tests:</span>
                   {testStatus === "passed" && (
                     <CheckCircleIcon className="w-4 h-4 text-green-500" />
                   )}
@@ -124,7 +124,7 @@ export const EnvironmentsListItem = ({
                 href={environment.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs hover:underline"
+                className="text-xs hover:underline text-slate-600"
               >
                 View Preview
               </a>
