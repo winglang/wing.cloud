@@ -63,7 +63,8 @@ export const Component = () => {
   );
 
   const onCloseRepositoryPopup = useCallback(() => {
-    setInstallationId(undefined!);
+    // eslint-disable-next-line unicorn/no-useless-undefined
+    setInstallationId(undefined);
     installations.refetch();
   }, [installations.refetch]);
 
