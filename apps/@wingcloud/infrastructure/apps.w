@@ -82,12 +82,14 @@ pub class Apps {
   pub inflight create(options: CreateAppOptions): App {
     let appId = "app_${nanoid62.Nanoid62.generate()}";
 
-    let app = App{
-      id: appId,
-      name: options.name,
+    let app = App {
+      appId: appId,
+      appName: options.appName,
       description: options.description,
       imageUrl: options.imageUrl,
-      repository: options.repository,
+      repoId: options.repoId,
+      repoOwner: options.repoOwner,
+      repoName: options.repoName,
       userId: options.userId,
       entryfile: options.entryfile,
       createdAt: options.createdAt,

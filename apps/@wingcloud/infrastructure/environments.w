@@ -24,11 +24,6 @@ struct Item extends Environment {
   sk: str;
 }
 
-struct Item extends Environment {
-  pk: str;
-  sk: str;
-}
-
 pub struct CreateEnvironmentOptions {
   appId: str;
   type: str;
@@ -310,6 +305,8 @@ pub class Environments {
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
         testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
+        createdAt: item.get("createdAt").asStr(),
+        updatedAt: item.get("updatedAt").asStr(),
       };
     }
 
@@ -326,20 +323,25 @@ pub class Environments {
     );
     let var environments: Array<Environment> = [];
     for item in result.items {
-      environments = environments.concat([{
-        id: item.get("id").asStr(),
-        appId: item.get("appId").asStr(),
-        type: item.get("type").asStr(),
-        repo: item.get("repo").asStr(),
-        branch: item.get("branch").asStr(),
-        status: item.get("status").asStr(),
-        prNumber: item.get("prNumber").asNum(),
-        installationId: item.get("installationId").asNum(),
-        // https://github.com/winglang/wing/issues/4470
-        url: item.tryGet("url")?.tryAsStr(),
-        commentId: item.tryGet("commentId")?.tryAsNum(),
-        testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
-      }]);
+      environments = environments.concat([
+        {
+          id: item.get("id").asStr(),
+          appId: item.get("appId").asStr(),
+          type: item.get("type").asStr(),
+          repo: item.get("repo").asStr(),
+          branch: item.get("branch").asStr(),
+          status: item.get("status").asStr(),
+          prNumber: item.get("prNumber").asNum(),
+          prTitle: item.get("prTitle").asStr(),
+          installationId: item.get("installationId").asNum(),
+          // https://github.com/winglang/wing/issues/4470
+          url: item.tryGet("url")?.tryAsStr(),
+          commentId: item.tryGet("commentId")?.tryAsNum(),
+          testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
+          createdAt: item.get("createdAt").asStr(),
+          updatedAt: item.get("updatedAt").asStr(),
+        }
+      ]);
     }
     return environments;
   }
