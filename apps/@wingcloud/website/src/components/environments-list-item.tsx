@@ -96,18 +96,18 @@ export const EnvironmentsListItem = ({
                   href={`https://github.com/${environment.repo}/tree/${environment.branch}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="truncate hover:underline"
+                  className="truncate hover:underline items-end flex"
                 >
                   {environment.branch}
                 </a>
               </div>
-              <span className="text-slate-400 truncate">
+              <span className="text-slate-400 truncate items-center flex">
                 updated {updatedAt}
               </span>
 
               {["passed", "failed"].includes(testStatus) && (
                 <div
-                  className="flex items-center gap-x-0.5"
+                  className="flex items-end gap-x-0.5 rounded-xl bg-slate-100 px-1 py-0.5"
                   title={`tests ${testStatus}`}
                 >
                   <BeakerIcon className="w-4 h-4 text-slate-500" />
