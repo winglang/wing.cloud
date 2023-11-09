@@ -46,10 +46,6 @@ interface StatusReport {
   status: string;
 }
 
-interface TestStatusReport extends StatusReport {
-  data: TestResults;
-}
-
 export interface Environment {
   id: string;
   appId: string;
@@ -63,7 +59,7 @@ export interface Environment {
   commentId?: number;
   createdAt: string;
   updatedAt: string;
-  testResults?: TestStatusReport;
+  testResults?: TestResults;
 }
 
 export const wrpc = createWRPCReact<{

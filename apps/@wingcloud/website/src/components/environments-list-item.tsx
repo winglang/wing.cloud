@@ -16,11 +16,11 @@ import type { Environment } from "../utils/wrpc.js";
 type Status = "initializing" | "deploying" | "running" | "failed";
 
 const getTestStatus = (environment: Environment) => {
-  if (!environment.testResults?.data?.testResults?.length) {
+  if (!environment.testResults?.testResults?.length) {
     return "";
   }
   if (
-    environment.testResults.data.testResults.some(
+    environment.testResults.testResults.some(
       (testResult) => testResult.pass === false,
     )
   ) {
