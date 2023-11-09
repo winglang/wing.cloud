@@ -1,9 +1,7 @@
-import { LinkIcon } from "@heroicons/react/24/outline";
-import clsx from "clsx";
 import { useMemo } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-import { EnvironmentListItem } from "../../components/environment-list-item.js";
+import { EnvironmentsList } from "../../components/environments-list.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { GithubIcon } from "../../icons/github-icon.js";
@@ -16,15 +14,8 @@ export interface AppProps {
 export const Component = () => {
   const { appName } = useParams();
 
-  const navigate = useNavigate();
-
   // TODO: Feels cleaner to separate in different components so we don't have to use the `enabled` option.
-  const app = wrpc["app.getByName"].useQuery(
-    { appName: appName! },
-    {
-      enabled: appName != "",
-    },
-  );
+  const app = wrpc["app.getByName"].useQuery({ appName: appName! });
 
   const appId = useMemo(() => {
     return app.data?.app?.appId.toString();
@@ -101,50 +92,11 @@ export const Component = () => {
             </div>
           </div>
 
-          {environments.data.environments.length === 0 && (
-            <div className="text-center bg-white p-6 w-full">
-              <LinkIcon className="w-8 h-8 mx-auto text-slate-400" />
-              <h3 className="mt-2 text-sm font-semibold text-slate-900">
-                No preview environments found.
-              </h3>
-
-              <p className="mt-1 text-sm text-slate-500 flex gap-x-1 w-full justify-center">
-                <span>Get started by</span>
-                <a
-                  className="text-blue-600 hover:underline"
-                  href={`${repository.data.repository.html_url}/compare`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  opening a Pull Request
-                </a>
-                .
-              </p>
-            </div>
-          )}
-
-          {environments.data.environments.length > 0 && (
-            <div className="space-y-2">
-              <div className="text-slate-700 text-lg pt-2">
-                Preview Environments
-              </div>
-              {environments.data.environments.map((environment) => (
-                <Link
-                  key={environment.id}
-                  className={clsx(
-                    "bg-white rounded p-4 text-left w-full block",
-                    "shadow hover:shadow-md transition-all",
-                  )}
-                  to={`/apps/${appName}/${environment.id}`}
-                >
-                  <EnvironmentListItem
-                    key={environment.id}
-                    environment={environment}
-                  />
-                </Link>
-              ))}
-            </div>
-          )}
+          <EnvironmentsList
+            environments={environments.data.environments}
+            appName={app.data.app.appName}
+            repoUrl={repository.data.repository.html_url}
+          />
         </>
       )}
     </>

@@ -22,7 +22,7 @@ const getTestStatus = (environment: Environment) => {
   return "passed";
 };
 
-export const EnvironmentListItem = ({
+export const EnvironmentsListItem = ({
   environment,
 }: {
   environment: Environment;
