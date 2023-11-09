@@ -10,7 +10,6 @@ bring "./jwt.w" as JWT;
 bring "./apps.w" as Apps;
 bring "./users.w" as Users;
 bring "./environments.w" as Environments;
-bring "./environments.w" as Environments;
 bring "./lowkeys-map.w" as lowkeys;
 
 // TODO: https://github.com/winglang/wing/issues/3644
@@ -380,12 +379,10 @@ pub class Api {
           repoName: input.get("repoName").asStr(),
           repoOwner: input.get("repoOwner").asStr(),
           imageUrl: input.get("imageUrl").asStr(),
-          repository: input.get("repositoryId").asStr(),
           userId: userId,
           entryfile: input.get("entryfile").asStr(),
           createdAt: datetime.utcNow().toIso(),
           createdBy: gitHubLogin,
-          userId: userId,
           lastCommitMessage: commitData?.commit?.message ?? "",
         );
 
@@ -393,8 +390,9 @@ pub class Api {
         queue.push(Json.stringify(EnvironmentManager.CreateEnvironmentOptions {
           createEnvironment: {
             branch: defaultBranch,
-            appId: app.id,
+            appId: app.appId,
             type: "production",
+            prTitle: "",
             repo: repository,
             status: "initializing",
             installationId: installationId,
@@ -405,7 +403,7 @@ pub class Api {
 
         return {
           body: {
-            appId: app.id,
+            appId: app.appId,
           },
         };
       } else {

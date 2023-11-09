@@ -91,6 +91,8 @@ pub class Environments {
       prNumber: options.prNumber,
       prTitle: options.prTitle,
       installationId: options.installationId,
+      createdAt: createdAt,
+      updatedAt: createdAt,
     };
 
     this.table.transactWriteItems(transactItems: [
@@ -307,9 +309,7 @@ pub class Environments {
         prNumber: item.tryGet("prNumber")?.tryAsNum(),
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
-        createdAt: item.get("createdAt").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
+        testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
       };
     }
 
@@ -333,15 +333,12 @@ pub class Environments {
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),
         status: item.get("status").asStr(),
-        prNumber: item.tryGet("prNumber")?.tryAsNum(),
-        prTitle: item.get("prTitle").asStr(),
+        prNumber: item.get("prNumber").asNum(),
         installationId: item.get("installationId").asNum(),
         // https://github.com/winglang/wing/issues/4470
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
-        createdAt: item.get("createdAt").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
+        testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
       }]);
     }
     return environments;
