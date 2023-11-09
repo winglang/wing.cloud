@@ -45,7 +45,7 @@ pub class EnvironmentManager {
   githubComment: comment.GithubComment;
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
-  
+
   init(props: EnvironmentsProps) {
     this.apps = props.apps;
     this.environments = props.environments;
@@ -58,7 +58,7 @@ pub class EnvironmentManager {
     let octokit = this.auth(options.createEnvironment.installationId);
 
     let environment = this.environments.create(options.createEnvironment);
-    
+
     this.postComment(environmentId: environment.id, octokit: octokit);
 
     let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: environment.installationId);
@@ -77,7 +77,7 @@ pub class EnvironmentManager {
   pub inflight restart(options: RestartEnvironmentOptions) {
     let octokit = this.auth(options.environment.installationId);
 
-    this.environments.updateStatus(id: options.environment.id, appId: options.app.id, status: "initializing");
+    this.environments.updateStatus(id: options.environment.id, appId: options.app.appId, status: "initializing");
 
     this.postComment(environmentId: options.environment.id, octokit: octokit);
 
@@ -97,23 +97,23 @@ pub class EnvironmentManager {
   pub inflight stop(options: StopEnvironmentOptions) {
     let octokit = this.auth(options.environment.installationId);
 
-    this.environments.updateStatus(id: options.environment.id, appId: options.app.id, status: "stopped");
+    this.environments.updateStatus(id: options.environment.id, appId: options.app.appId, status: "stopped");
 
     this.runtimeClient.delete(environment: options.environment);
-    
+
     this.postComment(environmentId: options.environment.id, octokit: octokit);
   }
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
     let environment = this.environments.get(id: options.statusReport.environmentId);
-    let app = this.apps.get(id: environment.appId);
+    let app = this.apps.get(appId: environment.appId);
     let status = options.statusReport.status;
     this.environments.updateStatus(id: environment.id, appId: environment.appId, status: status);
     if status == "tests" {
       let testReport = status_reports.TestResults.fromJson(options.statusReport.data);
       this.environments.updateTestResults(
         id: environment.id,
-        appId: app.id,
+        appId: app.appId,
         testResults: testReport
       );
 
@@ -134,7 +134,7 @@ pub class EnvironmentManager {
         prNumber: prNumber,
         repo: environment.repo
       );
-  
+
       if !environment.commentId? {
         this.environments.updateCommentId(id: environment.id, appId: environment.appId, commentId: commentId);
       }
