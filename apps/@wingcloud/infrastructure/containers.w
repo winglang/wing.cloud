@@ -1,4 +1,5 @@
 bring cloud;
+bring ex;
 bring http;
 bring util;
 
@@ -12,8 +13,13 @@ struct ContainerOpts {
 }
 
 struct ContainerStartOpts {
+  name: str;
   env: Map<str>?;
   volumes: Map<str>?;
+}
+
+struct ContainerStopOpts {
+  name: str;
 }
 
 struct BindOpts {
@@ -21,24 +27,22 @@ struct BindOpts {
   ops: Array<str>;
 }
 
-interface IContainer {
-  inflight url(): str?;
-}
-
-pub class Container_sim impl IContainer {
-  containerName: str;
+pub class Container_sim {
+  containerNameBase: str;
   appDir: str;
   opts: ContainerOpts;
-  bucket: cloud.Bucket;
+  table: ex.Table;
   urlKey: str;
 
   init(opts: ContainerOpts) {
-    this.containerName = "wing-${opts.name}-${this.node.addr}";
+    this.containerNameBase = "wing-${opts.name}-${this.node.addr}";
 
     this.appDir = Container_sim.entrypointDir(this);
     this.opts = opts;
     this.urlKey = "url.txt";
-    this.bucket = new cloud.Bucket() as "container-info";
+    this.table = new ex.Table(name: "containers", primaryKey: "name", columns: {
+      "name" => ex.ColumnType.STRING
+    }) as "container-info";
 
     // readiness probe is only allowed if we have a port (otherwise we don't know what to fetch)
     if opts.readiness? && !opts.port? {
@@ -46,7 +50,7 @@ pub class Container_sim impl IContainer {
     }
   }
 
-  pub inflight start(opts: ContainerStartOpts?) {
+  pub inflight start(opts: ContainerStartOpts): str? {
     log("starting container");
 
     let image = this.opts.image;
@@ -55,7 +59,7 @@ pub class Container_sim impl IContainer {
     // if this a reference to a local directory, build the image from a docker file
     log("image: ${image}");
     if image.startsWith("./") || image.startsWith("../") || image.startsWith("/") {
-      tag = this.containerName;
+      tag = this.containerNameBase;
 
       let shellArgs = MutArray<str>[];
       shellArgs.push("build");
@@ -86,9 +90,10 @@ pub class Container_sim impl IContainer {
       }
     }
 
+    let containerName = "${this.containerNameBase}-${util.sha256(opts.name).substring(0, 8)}";
     args.push("--detach");
     args.push("--name");
-    args.push(this.containerName);
+    args.push(containerName);
 
     if let port = this.opts.port {
       args.push("-p");
@@ -121,15 +126,15 @@ pub class Container_sim impl IContainer {
 
     args.push(tag);
 
-    Container_sim.shell("docker", ["rm", "-f", this.containerName]);
+    Container_sim.shell("docker", ["rm", "-f", containerName]);
     Container_sim.shell("docker", args.copy());
-    let out = Json.parse(Container_sim.shell("docker", ["inspect", this.containerName]));
+    let out = Json.parse(Container_sim.shell("docker", ["inspect", containerName]));
 
     if let port = this.opts.port {
       let hostPort = out.getAt(0).get("NetworkSettings").get("Ports").get("${port}/tcp").getAt(0).get("HostPort");
       let url = "http://localhost:${hostPort.asStr()}";
-      log("${this.opts.name}: ${url}");
-      this.bucket.put(this.urlKey, url);
+      log("container ${containerName}: ${url}");
+      this.table.upsert(containerName, { name: containerName });
 
       if let readiness = this.opts.readiness {
         let readinessUrl = "${url}${readiness}";
@@ -144,16 +149,29 @@ pub class Container_sim impl IContainer {
         }, interval: 0.5s, timeout: 2m);
         log("container ${this.opts.name}: status ${success}");
       }
+
+      return url;
+    } else {
+      return nil;
     }
   }
 
-  pub inflight stop() {
-    log("stopping container");
-    Container_sim.shell("docker", ["rm", "-f", this.containerName]);
+  pub inflight stop(options: ContainerStopOpts) {
+    let containerName = "${this.containerNameBase}-${util.sha256(options.name).substring(0, 8)}";
+    this.stopContainer(containerName);
   }
 
-  pub inflight url(): str? {
-    return this.bucket.tryGet(this.urlKey);
+  pub inflight stopAll() {
+    log("stopping all containers");
+    for container in this.table.list() {
+      this.stopContainer(container.get("name").asStr());
+    }
+  }
+
+  inflight stopContainer(containerName: str) {
+    log("stopping container ${containerName}");
+    Container_sim.shell("docker", ["rm", "-f", containerName]);
+    this.table.delete(containerName);
   }
 
   extern "./src/shell.js" static inflight shell(command: str, args: Array<str>, cwd: str?): str;

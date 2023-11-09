@@ -40,7 +40,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
 
     new cloud.Service(inflight () => {
       return () => {
-        this.container.stop();
+        this.container.stopAll();
       };
     });
   }
@@ -69,9 +69,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       env.set("GIT_TOKEN", token);
     }
 
-    this.container.start(env: env.copy(), volumes: volumes.copy());
-
-    if let url = this.container.url() {
+    if let url = this.container.start(name: opts.environmentId, env: env.copy(), volumes: volumes.copy()) {
       return url;
     } else {
       throw "handleRequest: unable to get container url";
@@ -79,7 +77,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
   }
 
   pub inflight stop(opts: RuntimeStopOptions) {
-    this.container.stop();
+    this.container.stop(name: opts.environmentId);
   }
 }
 
