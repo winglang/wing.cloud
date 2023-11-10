@@ -85,8 +85,8 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1
       winglang:
-        specifier: ^0.45
-        version: 0.45.2(constructs@10.3.0)
+        specifier: <=0.44
+        version: 0.44.17(constructs@10.3.0)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
         specifier: ^0.0.315
@@ -161,14 +161,14 @@ importers:
   apps/@wingcloud/runtime:
     dependencies:
       '@wingconsole/app':
-        specifier: ^0.45
-        version: 0.45.2(constructs@10.2.70)
+        specifier: <=0.44
+        version: 0.44.17(constructs@10.2.70)
       '@winglang/compiler':
-        specifier: ^0.45
-        version: 0.45.2(constructs@10.2.70)
+        specifier: <=0.44
+        version: 0.44.17(constructs@10.2.70)
       '@winglang/sdk':
-        specifier: ^0.45
-        version: 0.45.2(constructs@10.2.70)
+        specifier: <=0.44
+        version: 0.44.17(constructs@10.2.70)
       express:
         specifier: ^4.18.2
         version: 4.18.2
@@ -185,8 +185,8 @@ importers:
         specifier: ^3.3.2
         version: 3.3.2
       winglang:
-        specifier: ^0.45
-        version: 0.45.2(constructs@10.2.70)
+        specifier: <=0.44
+        version: 0.44.17(constructs@10.2.70)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
         specifier: ^0.0.318
@@ -3539,11 +3539,11 @@ packages:
       pretty-format: 29.7.0
     dev: true
 
-  /@wingconsole/app@0.45.2(constructs@10.2.70):
-    resolution: {integrity: sha512-ci0f5IxRUZEnhKPWUGXBg/U4NNloCbj0mXXzA9xxg9ZheXlkXr5P/h2VqkDRcaiETkx4ECC5rC0eLIekJIZYSw==}
+  /@wingconsole/app@0.44.17(constructs@10.2.70):
+    resolution: {integrity: sha512-ys9vmIivYSgMtmyPx8mq3w3mblVij7nR1HcDbfb2VpdZtxhs1JL/t+UM5qplci2dxhu+nOVgQ3RHVXZmmgwbGg==}
     dependencies:
       '@segment/analytics-node': 1.1.3
-      '@wingconsole/server': 0.45.2(constructs@10.2.70)
+      '@wingconsole/server': 0.44.17(constructs@10.2.70)
       express: 4.18.2
     transitivePeerDependencies:
       - constructs
@@ -3551,11 +3551,11 @@ packages:
       - supports-color
     dev: false
 
-  /@wingconsole/app@0.45.2(constructs@10.3.0):
-    resolution: {integrity: sha512-ci0f5IxRUZEnhKPWUGXBg/U4NNloCbj0mXXzA9xxg9ZheXlkXr5P/h2VqkDRcaiETkx4ECC5rC0eLIekJIZYSw==}
+  /@wingconsole/app@0.44.17(constructs@10.3.0):
+    resolution: {integrity: sha512-ys9vmIivYSgMtmyPx8mq3w3mblVij7nR1HcDbfb2VpdZtxhs1JL/t+UM5qplci2dxhu+nOVgQ3RHVXZmmgwbGg==}
     dependencies:
       '@segment/analytics-node': 1.1.3
-      '@wingconsole/server': 0.45.2(constructs@10.3.0)
+      '@wingconsole/server': 0.44.17(constructs@10.3.0)
       express: 4.18.2
     transitivePeerDependencies:
       - constructs
@@ -3563,11 +3563,11 @@ packages:
       - supports-color
     dev: false
 
-  /@wingconsole/server@0.45.2(constructs@10.2.70):
-    resolution: {integrity: sha512-JxmjPdFS55m6JJSRsG0x/GT5FpGLRHnhfGBPYTK02GHoI8tA0BhcA3hf1uL7c+kLHhiiYzFv8ctvtGwKh9+5VA==}
+  /@wingconsole/server@0.44.17(constructs@10.2.70):
+    resolution: {integrity: sha512-I6PcDJk7PWRmKGoyxchk7tbVmCiR1175fFZuKhJBGaECugL9IYNYfrYMRgG3P7na/JXLVphfSUwGuXewGcgVBA==}
     dependencies:
-      '@winglang/compiler': 0.45.2(constructs@10.2.70)
-      '@winglang/sdk': 0.45.2(constructs@10.2.70)
+      '@winglang/compiler': 0.44.17(constructs@10.2.70)
+      '@winglang/sdk': 0.44.17(constructs@10.2.70)
       codespan-wasm: 0.4.0
       debug: 4.3.4
       launch-editor: 2.6.1
@@ -3577,11 +3577,11 @@ packages:
       - supports-color
     dev: false
 
-  /@wingconsole/server@0.45.2(constructs@10.3.0):
-    resolution: {integrity: sha512-JxmjPdFS55m6JJSRsG0x/GT5FpGLRHnhfGBPYTK02GHoI8tA0BhcA3hf1uL7c+kLHhiiYzFv8ctvtGwKh9+5VA==}
+  /@wingconsole/server@0.44.17(constructs@10.3.0):
+    resolution: {integrity: sha512-I6PcDJk7PWRmKGoyxchk7tbVmCiR1175fFZuKhJBGaECugL9IYNYfrYMRgG3P7na/JXLVphfSUwGuXewGcgVBA==}
     dependencies:
-      '@winglang/compiler': 0.45.2(constructs@10.3.0)
-      '@winglang/sdk': 0.45.2(constructs@10.3.0)
+      '@winglang/compiler': 0.44.17(constructs@10.3.0)
+      '@winglang/sdk': 0.44.17(constructs@10.3.0)
       codespan-wasm: 0.4.0
       debug: 4.3.4
       launch-editor: 2.6.1
@@ -3591,30 +3591,30 @@ packages:
       - supports-color
     dev: false
 
-  /@winglang/compiler@0.45.2(constructs@10.2.70):
-    resolution: {integrity: sha512-fr7MRmi0gQmNXZ3NDRZCZlWXg+zgbaWtXIIsPLd0jpFjhhS9DqCVIx6OWZs7aQAUWcMFz3RTqTj6fBhqvXWQJw==}
+  /@winglang/compiler@0.44.17(constructs@10.2.70):
+    resolution: {integrity: sha512-jlwISs5rW2s0fqInC2R4M9V81/ERCq6tGX5DB/Htxa4cE9ZIROp5SlOsbmdYX/XrBAFdxa07xMFOlJV7LS59Mg==}
     engines: {node: '>=v18.0.0'}
     dependencies:
-      '@winglang/sdk': 0.45.2(constructs@10.2.70)
+      '@winglang/sdk': 0.44.17(constructs@10.2.70)
     transitivePeerDependencies:
       - constructs
     dev: false
     bundledDependencies:
       - wasi-js
 
-  /@winglang/compiler@0.45.2(constructs@10.3.0):
-    resolution: {integrity: sha512-fr7MRmi0gQmNXZ3NDRZCZlWXg+zgbaWtXIIsPLd0jpFjhhS9DqCVIx6OWZs7aQAUWcMFz3RTqTj6fBhqvXWQJw==}
+  /@winglang/compiler@0.44.17(constructs@10.3.0):
+    resolution: {integrity: sha512-jlwISs5rW2s0fqInC2R4M9V81/ERCq6tGX5DB/Htxa4cE9ZIROp5SlOsbmdYX/XrBAFdxa07xMFOlJV7LS59Mg==}
     engines: {node: '>=v18.0.0'}
     dependencies:
-      '@winglang/sdk': 0.45.2(constructs@10.3.0)
+      '@winglang/sdk': 0.44.17(constructs@10.3.0)
     transitivePeerDependencies:
       - constructs
     dev: false
     bundledDependencies:
       - wasi-js
 
-  /@winglang/sdk@0.45.2(constructs@10.2.70):
-    resolution: {integrity: sha512-qWeKeLRHLK7HeHXFChYh5L6P3eS0O30+7g8X+5G19fyWOftiEhpYFtEy2Ws0xMa8J8ZHjsm1Vhv1reD89IBjlw==}
+  /@winglang/sdk@0.44.17(constructs@10.2.70):
+    resolution: {integrity: sha512-A+JRn2Z+r+J6SQh3C76YG3MBZeX9ATxHgjSOIDsVFm5IITsiZZWjHH0arxSqlSoOWLezIv1hjBlXZCUvRpLW5A==}
     engines: {node: '>= 18.13.0'}
     peerDependencies:
       constructs: ~10.2.69
@@ -3654,8 +3654,8 @@ packages:
       - uuid
       - yaml
 
-  /@winglang/sdk@0.45.2(constructs@10.3.0):
-    resolution: {integrity: sha512-qWeKeLRHLK7HeHXFChYh5L6P3eS0O30+7g8X+5G19fyWOftiEhpYFtEy2Ws0xMa8J8ZHjsm1Vhv1reD89IBjlw==}
+  /@winglang/sdk@0.44.17(constructs@10.3.0):
+    resolution: {integrity: sha512-A+JRn2Z+r+J6SQh3C76YG3MBZeX9ATxHgjSOIDsVFm5IITsiZZWjHH0arxSqlSoOWLezIv1hjBlXZCUvRpLW5A==}
     engines: {node: '>= 18.13.0'}
     peerDependencies:
       constructs: ~10.2.69
@@ -9599,17 +9599,17 @@ packages:
       string-width: 4.2.3
     dev: false
 
-  /winglang@0.45.2(constructs@10.2.70):
-    resolution: {integrity: sha512-Jf6q7Q2SDvPskzB6+Kqxre3PO+zQ5yuFkOJ+ux00AFjRshegbvy9p6HSf2Zpf7VhHqGueKy272WsmqIve/6bDA==}
+  /winglang@0.44.17(constructs@10.2.70):
+    resolution: {integrity: sha512-onzloQMZdt6/Rq1iVOxsndKlzKOk66Fa0kmxGsb0YHPKLVVxmCmgrhfX6JHi25bIKED04cwRtak5gZOhM0cLZA==}
     engines: {node: '>=v18.0.0'}
     hasBin: true
     dependencies:
       '@npmcli/arborist': 7.2.1
       '@segment/analytics-node': 1.1.3
-      '@wingconsole/app': 0.45.2(constructs@10.2.70)
-      '@wingconsole/server': 0.45.2(constructs@10.2.70)
-      '@winglang/compiler': 0.45.2(constructs@10.2.70)
-      '@winglang/sdk': 0.45.2(constructs@10.2.70)
+      '@wingconsole/app': 0.44.17(constructs@10.2.70)
+      '@wingconsole/server': 0.44.17(constructs@10.2.70)
+      '@winglang/compiler': 0.44.17(constructs@10.2.70)
+      '@winglang/sdk': 0.44.17(constructs@10.2.70)
       chalk: 4.1.2
       codespan-wasm: 0.4.0
       commander: 10.0.1
@@ -9631,17 +9631,17 @@ packages:
       - supports-color
     dev: false
 
-  /winglang@0.45.2(constructs@10.3.0):
-    resolution: {integrity: sha512-Jf6q7Q2SDvPskzB6+Kqxre3PO+zQ5yuFkOJ+ux00AFjRshegbvy9p6HSf2Zpf7VhHqGueKy272WsmqIve/6bDA==}
+  /winglang@0.44.17(constructs@10.3.0):
+    resolution: {integrity: sha512-onzloQMZdt6/Rq1iVOxsndKlzKOk66Fa0kmxGsb0YHPKLVVxmCmgrhfX6JHi25bIKED04cwRtak5gZOhM0cLZA==}
     engines: {node: '>=v18.0.0'}
     hasBin: true
     dependencies:
       '@npmcli/arborist': 7.2.1
       '@segment/analytics-node': 1.1.3
-      '@wingconsole/app': 0.45.2(constructs@10.3.0)
-      '@wingconsole/server': 0.45.2(constructs@10.3.0)
-      '@winglang/compiler': 0.45.2(constructs@10.3.0)
-      '@winglang/sdk': 0.45.2(constructs@10.3.0)
+      '@wingconsole/app': 0.44.17(constructs@10.3.0)
+      '@wingconsole/server': 0.44.17(constructs@10.3.0)
+      '@winglang/compiler': 0.44.17(constructs@10.3.0)
+      '@winglang/sdk': 0.44.17(constructs@10.3.0)
       chalk: 4.1.2
       codespan-wasm: 0.4.0
       commander: 10.0.1

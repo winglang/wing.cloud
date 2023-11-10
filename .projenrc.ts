@@ -9,7 +9,7 @@ import {
 } from "@skyrpex/wingen";
 import { JsonFile, web } from "projen";
 
-const winglangVersion = "^0.45";
+const winglangVersion = "<=0.44";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
