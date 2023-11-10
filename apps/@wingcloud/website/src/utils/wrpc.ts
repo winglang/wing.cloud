@@ -4,6 +4,11 @@ import {
   type QueryProcedure,
 } from "@wingcloud/wrpc";
 
+export interface Installation {
+  id: number;
+  account: { login: string };
+}
+
 export interface Repository {
   id: number;
   name: string;
@@ -75,10 +80,7 @@ export const wrpc = createWRPCReact<{
   "github.listInstallations": QueryProcedure<
     undefined,
     {
-      installations: Array<{
-        id: number;
-        account: { login: string };
-      }>;
+      installations: Array<Installation>;
     }
   >;
   "github.listRepositories": QueryProcedure<
