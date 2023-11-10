@@ -29,61 +29,6 @@ const nanoid62 = new TypescriptProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-const flyio = new TypescriptProject({
-  monorepo,
-  name: "@wingcloud/flyio",
-  description: "Fly.io client library",
-});
-
-flyio.compileTask.reset();
-flyio.compileTask.exec("jsii");
-flyio.packageTask.exec("jsii-pacmak");
-flyio.devTask.exec("jsii --watch");
-
-flyio.addDeps("node-fetch@2");
-flyio.addDevDeps("@types/node-fetch@2");
-flyio.addDevDeps("jsii");
-flyio.addDevDeps("jsii-pacmak");
-
-flyio.tryRemoveFile("./tsconfig.json");
-
-new Turbo(flyio, {
-  pipeline: {
-    compile: {
-      outputs: ["./src/**/*.js", "./src/**/*.d.ts"],
-    },
-  },
-});
-
-flyio.addGitIgnore("**/*.js");
-flyio.addGitIgnore("**/*.d.ts");
-flyio.addGitIgnore(".jsii");
-flyio.addGitIgnore("tsconfig.tsbuildinfo");
-flyio.addFields({
-  type: "commonjs",
-  main: "./src/index.js",
-  exports: {
-    ".": "./src/index.js",
-  },
-  types: "./src/index.d.ts",
-  jsii: {
-    outdir: "dist",
-    targets: [],
-    versionFormat: "full",
-  },
-  bundledDependencies: ["node-fetch"],
-  author: {
-    name: "wing.cloud",
-    url: "https://wing.cloud",
-  },
-  repository: {
-    type: "git",
-    url: "https://github.com/winglang/wing.cloud",
-  },
-  license: "BSD-3-Clause",
-});
-
-///////////////////////////////////////////////////////////////////////////////
 const prefixedIdType = new TypescriptProject({
   monorepo,
   name: "@wingcloud/type-prefixed-id",
@@ -248,9 +193,7 @@ infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
 infrastructure.addTask("test-aws", {
   exec: "node ./bin/wing.mjs test -t tf-aws main.w",
 });
-infrastructure.compileTask.exec(
-  "node ./bin/wing.mjs compile -t tf-aws",
-);
+infrastructure.compileTask.exec("node ./bin/wing.mjs compile -t tf-aws");
 
 const terraformInitTask = infrastructure.addTask("terraformInit");
 terraformInitTask.exec(
@@ -341,7 +284,6 @@ infrastructure.addDeps("octokit", "node-fetch");
 infrastructure.addDevDeps("@octokit/rest");
 
 infrastructure.addDevDeps(website.name);
-infrastructure.addDevDeps(flyio.name);
 infrastructure.addDevDeps(runtime.name);
 
 ///////////////////////////////////////////////////////////////////////////////
