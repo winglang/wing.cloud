@@ -114,7 +114,7 @@ export const Component = () => {
       )}
 
       {!installationsQuery.isLoading && (
-        <div className="flex justify-center pt-10 max-w-3xl mx-auto">
+        <div className="flex justify-center pt-10 max-w-2xl mx-auto">
           <div
             className={clsx(
               "w-full rounded-lg shadow-xl border p-6 space-y-4",
