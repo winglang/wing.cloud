@@ -70,7 +70,9 @@ export const Combobox = ({
   }, [items, internalValue, filter]);
 
   useEffect(() => {
-    setInternalValue(value);
+    if (value === "") {
+      setInternalValue("");
+    }
   }, [value]);
 
   return (
