@@ -16,7 +16,7 @@ export interface MenuProps {
 
 export const Menu = ({ title, icon, items = [], btnClassName }: MenuProps) => {
   return (
-    <div className="relative">
+    <div className="relative items-center flex">
       <HeadlessMenu as="div" className="relative inline-block text-left">
         <div>
           <HeadlessMenu.Button

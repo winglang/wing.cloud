@@ -1,8 +1,10 @@
 import { Combobox as HeadlessCombobox, Transition } from "@headlessui/react";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useMemo, useRef } from "react";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+
+import { useTheme } from "./theme-provider.js";
 
 interface Item {
   label?: string;
@@ -14,6 +16,7 @@ export interface ComboboxProps {
   value: string;
   onChange: (selected: string) => void;
   disabled?: boolean;
+  readonly?: boolean;
   filter?: boolean;
   placeholder?: string;
   renderItem?: (item: Item) => JSX.Element;
@@ -25,15 +28,13 @@ export const Combobox = ({
   onChange,
   placeholder = "Select an option",
   disabled,
+  readonly,
   filter = true,
   renderItem,
 }: ComboboxProps) => {
+  const { theme } = useTheme();
   const [filtered, setFiltered] = useState<Item[]>(items ?? []);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const label = useMemo(() => {
-    return items?.find((item) => item.value === value)?.label;
-  }, [items, value]);
 
   useEffect(() => {
     if (items === undefined) {
@@ -64,12 +65,15 @@ export const Combobox = ({
       <div className="relative w-full">
         <HeadlessCombobox.Input
           className={clsx(
-            "w-full rounded-md bg-white py-1.5 pl-3 pr-10 text-slate-900",
-            "shadow-sm text-sm",
-            "border border-slate-300",
-            "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
+            "w-full rounded-md py-1.5 pl-3 pr-10",
+            "shadow-sm text-sm border",
+            theme.bgInput,
+            theme.textInput,
+            theme.borderInput,
+            theme.focusInput,
+            readonly && [theme.text1, "opacity-70 select-text"],
           )}
-          value={label}
+          value={value}
           placeholder={placeholder}
           onChange={(event) => onChange(event.target.value)}
         />
@@ -77,10 +81,15 @@ export const Combobox = ({
           aria-disabled={disabled}
           className={clsx(
             "absolute inset-0 flex items-center px-2 w-full",
-            "outline-none",
+            "rounded-md",
+            theme.borderInput,
+            theme.focusInput,
           )}
         >
-          <ChevronDownIcon className="h-4 w-4 text-slate-400 absolute right-2" />
+          <ChevronDownIcon
+            className={clsx("h-4 w-4 absolute right-2", theme.textInput)}
+            aria-hidden="true"
+          />
         </HeadlessCombobox.Button>
 
         {filtered.length > 0 && (
@@ -94,36 +103,17 @@ export const Combobox = ({
               <HeadlessCombobox.Option
                 key={item.value}
                 value={item.value}
-                className={({ active }) =>
+                className={({ active, selected }) =>
                   clsx(
                     "relative cursor-default select-none py-2 pl-3 pr-9",
                     active && "bg-slate-50",
+                    selected && "bg-slate-200",
                   )
                 }
               >
-                {({ active, selected }) => (
-                  <>
-                    <span
-                      className={clsx(
-                        "block truncate",
-                        selected && "font-semibold",
-                      )}
-                    >
-                      {renderItem ? renderItem(item) : item.label ?? item.value}
-                    </span>
-
-                    {selected && (
-                      <span
-                        className={clsx(
-                          "absolute inset-y-0 right-0 flex items-center pr-4",
-                          active ? "text-white" : "text-sky-600",
-                        )}
-                      >
-                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                      </span>
-                    )}
-                  </>
-                )}
+                <span className="block truncate">
+                  {renderItem ? renderItem(item) : item.label ?? item.value}
+                </span>
               </HeadlessCombobox.Option>
             ))}
           </HeadlessCombobox.Options>

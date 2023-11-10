@@ -2,25 +2,43 @@ import { LinkIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { set } from "zod";
 
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { Button } from "../design-system/button.js";
+import { Checkbox } from "../design-system/checkbox.js";
 import { Combobox } from "../design-system/combobox.js";
-import { Input } from "../design-system/input.js";
 import { Select } from "../design-system/select.js";
+import { useTheme } from "../design-system/theme-provider.js";
 import { usePopupWindow } from "../utils/popup-window.js";
-import { wrpc, type Repository } from "../utils/wrpc.js";
+import { wrpc } from "../utils/wrpc.js";
 
 const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
 
+export type ConfigurationType = "connect";
+
 export const Component = () => {
+  const { theme } = useTheme();
   const navigate = useNavigate();
   const openPopupWindow = usePopupWindow();
 
-  const [entryfile, setEntryfile] = useState("main.w");
   const [installationId, setInstallationId] = useState<string>();
   const [repositoryId, setRepositoryId] = useState("");
+
+  const [configurationType, setConfigurationType] = useState<
+    ConfigurationType | undefined
+  >("connect");
+
+  const toggleConfigType = useCallback(
+    (type: ConfigurationType) => {
+      if (configurationType === type) {
+        // eslint-disable-next-line unicorn/no-useless-undefined
+        setConfigurationType(undefined);
+        return;
+      }
+      setConfigurationType(type);
+    },
+    [configurationType, setConfigurationType],
+  );
 
   const installationsQuery = wrpc["github.listInstallations"].useQuery();
   const installations = useMemo(() => {
@@ -45,6 +63,7 @@ export const Component = () => {
       enabled: installationId != undefined,
     },
   );
+
   const repos = useMemo(() => {
     if (!listReposQuery.data) {
       return [];
@@ -71,7 +90,7 @@ export const Component = () => {
           repoId: repo.full_name.toString(),
           repoName: repo.name,
           repoOwner: repo.owner.login,
-          entryfile,
+          entryfile: "main.w",
           default_branch: repo.default_branch,
           imageUrl: repo.owner.avatar_url,
           installationId: installationId!,
@@ -94,10 +113,6 @@ export const Component = () => {
     installationsQuery.refetch();
   }, [installationsQuery.data]);
 
-  const loading = useMemo(() => {
-    return installationsQuery.isLoading;
-  }, [installationsQuery.isFetching]);
-
   const noReposFound = useMemo(() => {
     return (
       !installationId || (!listReposQuery.isFetching && repos.length === 0)
@@ -106,86 +121,109 @@ export const Component = () => {
 
   return (
     <>
-      {loading && (
+      {installationsQuery.isLoading && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
         </div>
       )}
 
-      {!loading && (
+      {!installationsQuery.isLoading && (
         <div className="flex justify-center pt-10 max-w-3xl mx-auto">
-          <div className="w-full bg-white rounded-lg shadow-xl border p-6">
-            <div className="gap-6 mb-4 flex flex-col text-sm w-full">
-              <div className="flex gap-x-2 w-full items-center">
-                <Select
-                  items={installations.map((installation) => ({
-                    value: installation.id.toString(),
-                    label: installation.account.login,
-                  }))}
-                  placeholder="Select a GitHub namespace"
-                  onChange={setInstallationId}
-                  value={installationId}
-                  btnClassName="w-full py-1.5 rounded-md border border-slate-300 mr-20 px-4 text-left shadow-sm"
-                />
-                <div className="text-slate-400 text-xl">/</div>
-                <Combobox
-                  items={
-                    repos.map((repo) => ({
-                      value: repo.full_name.toString(),
-                      label: repo.name,
-                    })) ?? []
-                  }
-                  value={repositoryId}
-                  placeholder={
-                    noReposFound
-                      ? "No repositories found"
-                      : "Select a GitHub repository"
-                  }
-                  onChange={setRepositoryId}
-                  renderItem={(item) => {
-                    const repo = repos.find(
-                      (repo) => repo.full_name.toString() === item.value,
-                    );
-                    return (
-                      <div className="flex items-center">
-                        <img
-                          src={repo?.owner.avatar_url}
-                          className="w-5 h-5 inline-block mr-2 rounded-full"
-                        />
-                        <span>{item.label}</span>
-                        <div className="mx-1 items-center">
-                          {repo?.private && (
-                            <LockClosedIcon className="w-3 h-3 inline-block text-slate-600" />
-                          )}
+          <div className="w-full bg-white rounded-lg shadow-xl border p-6 space-y-4">
+            <div className={clsx(theme.text1, "font-semibold text-lg")}>
+              Create a new App
+            </div>
+
+            <div className="gap-6 mb-4 flex flex-col w-full text-sm">
+              <div className="w-full space-y-2">
+                <div className={clsx(theme.text2)}>Select a Git Repository</div>
+
+                <div className="flex gap-2 w-full items-center">
+                  <Select
+                    items={installations.map((installation) => ({
+                      value: installation.id.toString(),
+                      label: installation.account.login,
+                    }))}
+                    placeholder="Select a GitHub namespace"
+                    onChange={setInstallationId}
+                    value={installationId ?? ""}
+                    btnClassName="w-full py-1.5 rounded-md border border-slate-300 mr-20 px-4 text-left shadow-sm"
+                  />
+                  <div className={clsx("text-xl", theme.text2)}>/</div>
+
+                  <Combobox
+                    items={
+                      repos.map((repo) => ({
+                        value: repo.full_name.toString(),
+                        label: repo.name,
+                      })) ?? []
+                    }
+                    value={repositoryId}
+                    placeholder={
+                      noReposFound
+                        ? "No repositories found"
+                        : "Select a GitHub repository"
+                    }
+                    onChange={setRepositoryId}
+                    renderItem={(item) => {
+                      const repo = repos.find(
+                        (repo) => repo.full_name.toString() === item.value,
+                      );
+                      return (
+                        <div className="flex items-center">
+                          <img
+                            src={repo?.owner.avatar_url}
+                            className="w-5 h-5 inline-block mr-2 rounded-full"
+                          />
+                          <span>{item.label}</span>
+                          <div className="mx-1 items-center">
+                            {repo?.private && (
+                              <LockClosedIcon className="w-3 h-3 inline-block text-slate-600" />
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  }}
-                />
+                      );
+                    }}
+                  />
+                </div>
               </div>
 
-              <div className="justify-end flex flex-col">
+              <div className="w-full space-y-2">
+                <div className={clsx(theme.text2)}>Starter configuration</div>
                 <button
                   aria-disabled={!installationId}
                   className={clsx(
-                    "w-full p-2 text-left flex items-center",
-                    "bg-white rounded-md shadow-sm border border-slate-300",
+                    "w-full p-4 text-left flex items-center",
+                    "rounded-md shadow-sm",
                     "transition-all hover:shadow",
+                    "border",
+                    theme.text1,
+                    theme.bgInput,
+                    theme.borderInput,
+                    theme.focusInput,
                     "gap-1",
                   )}
+                  onClick={() => {
+                    toggleConfigType("connect");
+                  }}
                 >
-                  <div className="text-slate-600 flex gap-x-2 items-center">
+                  <div className="flex gap-x-4 items-center">
                     <LinkIcon className="w-5 h-5" />
-                    <span className="text-sm">
-                      Connect to an existing repository
-                    </span>
+                    <div className="">
+                      <div className={clsx(theme.text1)}>Connect</div>
+                      <div className={clsx("text-xs", theme.text2)}>
+                        Connect to an existing repository
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex grow justify-end text-slate-500 items-center">
-                    <Input
-                      type="checkbox"
-                      containerClassName="flex items-center justify-center"
-                      onChange={() => {}}
+                    <Checkbox
+                      checked={configurationType === "connect"}
+                      onChange={() => {
+                        toggleConfigType("connect");
+                      }}
+                      className="cursor-pointer"
                     />
                   </div>
                 </button>
@@ -222,9 +260,11 @@ export const Component = () => {
                       createApp(repositoryId);
                     }}
                     primary
-                    disabled={!installationId}
+                    disabled={
+                      !installationId || !repositoryId || !configurationType
+                    }
                   >
-                    Create new app
+                    {createAppLoading ? "Creating..." : "Create new App"}
                   </Button>
                 </div>
               </div>

@@ -5,6 +5,8 @@ import {
   type ForwardRefExoticComponent,
 } from "react";
 
+import { useTheme } from "./theme-provider.js";
+
 interface ButtonProps {
   id?: string;
   primary?: boolean;
@@ -17,7 +19,6 @@ interface ButtonProps {
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
   small?: boolean;
   transparent?: boolean;
-  dataTestid?: string;
 }
 
 export const Button = forwardRef<
@@ -38,18 +39,20 @@ export const Button = forwardRef<
       children,
       small = false,
       transparent = false,
-      dataTestid,
     },
     ref,
   ) => {
+    const { theme } = useTheme();
+
     return (
       <button
         id={id}
         ref={ref}
         type={type}
+        aria-disabled={disabled}
         className={clsx(
           "inline-flex gap-2 items-center text-xs font-medium outline-none rounded",
-          "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
+          theme.focusInput,
           primary &&
             !transparent && [
               "text-white",
@@ -57,17 +60,14 @@ export const Button = forwardRef<
             ],
           !primary &&
             !transparent && [
-              "bg-white dark:bg-slate-800",
-              "hover:bg-slate-50 dark:hover:bg-slate-750",
-              "text-slate-900 placeholder:text-slate-500 dark:text-slate-300 dark:placeholder:text-slate-500",
+              theme.bgInput,
+              theme.bgInputHover,
+              theme.textInput,
             ],
-          transparent && [
-            "hover:bg-slate-50 dark:hover:bg-slate-750",
-            "text-slate-900 placeholder:text-slate-500 dark:text-slate-300 dark:placeholder:text-slate-500",
-          ],
+          transparent && [theme.bgInputHover, theme.textInput],
           !transparent && "border shadow-sm",
           {
-            ["border-slate-300 dark:border-slate-900"]: !primary,
+            [theme.borderInput]: !primary,
             "border-sky-700": primary,
             "px-2.5": label || children,
             "py-1.5": !small,
@@ -78,7 +78,6 @@ export const Button = forwardRef<
         title={title}
         disabled={disabled}
         onClick={onClick}
-        data-testid={dataTestid}
       >
         {Icon && <Icon className={clsx(label && "-ml-0.5", "h-4 w-4")} />}
         {label}
