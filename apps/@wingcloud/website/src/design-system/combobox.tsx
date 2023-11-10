@@ -36,7 +36,7 @@ export const Combobox = ({
   const [filtered, setFiltered] = useState<Item[]>(items ?? []);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [internalValue, setInternalValue] = useState(value);
+  const [internalValue, setInternalValue] = useState("");
   const internalOnChange = useCallback(
     (value: string) => {
       const item = items?.find((item) => item.value === value);
@@ -58,16 +58,20 @@ export const Combobox = ({
       setFiltered([]);
       return;
     }
-    if (value === "" || !filter) {
+    if (internalValue === "" || !filter) {
       setFiltered(items);
       return;
     }
     setFiltered(
       items.filter((item) => {
-        return item.label?.toLowerCase().includes(value?.toLowerCase());
+        return item.label?.toLowerCase().includes(internalValue?.toLowerCase());
       }),
     );
-  }, [items, value, filter]);
+  }, [items, internalValue, filter]);
+
+  useEffect(() => {
+    setInternalValue(value);
+  }, [value]);
 
   return (
     <HeadlessCombobox value={value} onChange={internalOnChange}>
@@ -115,7 +119,7 @@ export const Combobox = ({
                 value={item.value}
                 className={({ active, selected }) =>
                   clsx(
-                    "relative cursor-default select-none py-2 pl-3 pr-9",
+                    "relative cursor-default select-none py-2 pl-3 pr-8 text-xs",
                     active && "bg-slate-50",
                     selected && "bg-slate-200",
                   )

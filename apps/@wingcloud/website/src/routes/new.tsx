@@ -48,13 +48,6 @@ export const Component = () => {
     return installationsQuery.data.installations;
   }, [installationsQuery.data]);
 
-  useEffect(() => {
-    const firstInstallationId = installations[0]?.id.toString();
-    if (firstInstallationId) {
-      setInstallationId(firstInstallationId);
-    }
-  }, [installationsQuery.data]);
-
   const listReposQuery = wrpc["github.listRepositories"].useQuery(
     {
       installationId: installationId!,
@@ -119,6 +112,27 @@ export const Component = () => {
     );
   }, [listReposQuery.isFetching, repos.length, installationId]);
 
+  const selectRepoPlaceholder = useMemo(() => {
+    if (listReposQuery.isFetching) {
+      return "Loading...";
+    }
+    if (noReposFound) {
+      return "No repositories found";
+    }
+    return "Select a GitHub repository";
+  }, [listReposQuery.isFetching, noReposFound]);
+
+  useEffect(() => {
+    const firstInstallationId = installations[0]?.id.toString();
+    if (firstInstallationId) {
+      setInstallationId(firstInstallationId);
+    }
+  }, [installationsQuery.data]);
+
+  useEffect(() => {
+    setRepositoryId("");
+  }, [installationId]);
+
   return (
     <>
       {installationsQuery.isLoading && (
@@ -168,12 +182,9 @@ export const Component = () => {
                         })) ?? []
                       }
                       value={repositoryId}
-                      placeholder={
-                        noReposFound
-                          ? "No repositories found"
-                          : "Select a GitHub repository"
-                      }
+                      placeholder={selectRepoPlaceholder}
                       onChange={setRepositoryId}
+                      disabled={noReposFound || listReposQuery.isLoading}
                       renderItem={(item) => {
                         const repo = repos.find(
                           (repo) => repo.full_name.toString() === item.value,
