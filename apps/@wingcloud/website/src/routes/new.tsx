@@ -119,7 +119,7 @@ export const Component = () => {
     if (noReposFound) {
       return "No repositories found";
     }
-    return "Select a GitHub repository";
+    return "Repository name";
   }, [listReposQuery.isFetching, noReposFound]);
 
   useEffect(() => {
