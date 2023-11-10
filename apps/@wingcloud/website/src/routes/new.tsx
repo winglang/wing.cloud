@@ -153,7 +153,7 @@ export const Component = () => {
               Create a new App
             </div>
 
-            <div className="gap-6 mb-4 flex flex-col w-full text-sm">
+            <div className="gap-y-8 mb-4 flex flex-col w-full text-sm">
               <div className="w-full space-y-2">
                 <div className={clsx(theme.text2)}>Select a Git Repository</div>
 
