@@ -282,7 +282,10 @@ export const Component = () => {
                     }}
                     primary
                     disabled={
-                      !installationId || !repositoryId || !configurationType
+                      createAppLoading ||
+                      !installationId ||
+                      !repositoryId ||
+                      !configurationType
                     }
                   >
                     {createAppLoading ? "Creating..." : "Create new App"}

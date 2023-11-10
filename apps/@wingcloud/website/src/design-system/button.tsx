@@ -52,6 +52,7 @@ export const Button = forwardRef<
         aria-disabled={disabled}
         className={clsx(
           "inline-flex gap-2 items-center text-xs font-medium outline-none rounded",
+          "transition-all",
           theme.focusInput,
           primary &&
             !transparent && [
