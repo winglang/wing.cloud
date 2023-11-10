@@ -36,6 +36,23 @@ export const Combobox = ({
   const [filtered, setFiltered] = useState<Item[]>(items ?? []);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const [internalValue, setInternalValue] = useState(value);
+  const internalOnChange = useCallback(
+    (value: string) => {
+      const item = items?.find((item) => item.value === value);
+
+      if (!item) {
+        onChange("");
+        setInternalValue(value);
+        return;
+      }
+      onChange(value);
+      setInternalValue(item.label ?? item.value);
+      inputRef.current?.focus();
+    },
+    [onChange, items],
+  );
+
   useEffect(() => {
     if (items === undefined) {
       setFiltered([]);
@@ -52,30 +69,23 @@ export const Combobox = ({
     );
   }, [items, value, filter]);
 
-  const internalOnChange = useCallback(
-    (selected: string) => {
-      onChange(selected);
-      inputRef.current?.focus();
-    },
-    [onChange],
-  );
-
   return (
     <HeadlessCombobox value={value} onChange={internalOnChange}>
       <div className="relative w-full">
         <HeadlessCombobox.Input
+          ref={inputRef}
           className={clsx(
-            "w-full rounded-md py-1.5 pl-3 pr-10",
-            "shadow-sm text-sm border",
+            "w-full pr-8 text-left relative",
+            "items-center px-2.5 py-1.5 border text-xs rounded",
             theme.bgInput,
             theme.textInput,
             theme.borderInput,
             theme.focusInput,
             readonly && [theme.text1, "opacity-70 select-text"],
           )}
-          value={value}
+          value={internalValue}
           placeholder={placeholder}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) => internalOnChange(event.target.value)}
         />
         <HeadlessCombobox.Button
           aria-disabled={disabled}

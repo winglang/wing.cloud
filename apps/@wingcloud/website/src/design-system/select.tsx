@@ -20,7 +20,6 @@ export interface SelectProps {
   className?: string;
   btnClassName?: string;
   showSelected?: boolean;
-  dataTestid?: string;
 }
 
 export const Select = memo(
@@ -33,7 +32,6 @@ export const Select = memo(
     className,
     btnClassName,
     showSelected = true,
-    dataTestid,
   }: SelectProps) => {
     const { theme } = useTheme();
 
@@ -63,7 +61,15 @@ export const Select = memo(
             <div ref={setReferenceElement} className="w-full">
               <Listbox.Button
                 as="button"
-                className={clsx("relative", btnClassName)}
+                className={clsx(
+                  btnClassName,
+                  "w-full pr-8 text-left relative",
+                  "items-center px-2.5 py-1.5 border text-xs rounded",
+                  theme.bgInput,
+                  theme.textInput,
+                  theme.borderInput,
+                  theme.focusInput,
+                )}
               >
                 {placeholder && !value && (
                   <div className={clsx("truncate", theme.text2)}>
