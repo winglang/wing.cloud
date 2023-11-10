@@ -227,7 +227,7 @@ pub class RuntimeService {
 
         let msg = Message.fromJson(Json.parse(message));
 
-        log("wing url: ${props.wingCloudUrl}");
+        log("wing cloud url: ${props.wingCloudUrl}");
 
         let url = this.runtimeHandler.start(
           gitToken: msg.token,
