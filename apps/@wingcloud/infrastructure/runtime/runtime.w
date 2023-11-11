@@ -7,6 +7,7 @@ bring "../containers.w" as containers;
 bring "../flyio" as flyio;
 bring "./runtime-docker.w" as runtimeDocker;
 bring "../environments.w" as environments;
+bring "@cdktf/provider-aws" as awsprovider;
 
 struct RuntimeStartOptions {
   gitToken: str?;
@@ -185,9 +186,11 @@ pub class RuntimeService {
       bucketName = "BUCKET_HANDLE_${bucketAddr.substring(bucketAddr.length - 8, bucketAddr.length)}";
     } else {
       let awsUser = new aws.iamUser.IamUser(name: "${this.node.addr}-user");
-      let bucketArn: str = unsafeCast(this.logs).bucket.arn;
-      bucketName = unsafeCast(this.logs).bucket.bucket;
-      bucketRegion = unsafeCast(this.logs).bucket.region;
+      let bucket: awsprovider.s3Bucket.S3Bucket = unsafeCast(this.logs).bucket;
+      let bucketArn: str = bucket.arn;
+      bucketName = bucket.bucket;
+      bucketRegion = bucket.region;
+      bucket.forceDestroy = true;
       let awsPolicy = new aws.iamUserPolicy.IamUserPolicy(
         user: awsUser.name,
         policy: Json.stringify({

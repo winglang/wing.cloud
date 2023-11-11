@@ -33,10 +33,13 @@ struct IPullRequestPayload {
   installation: IPullRequestInstallation?;
 }
 
-pub struct IPullRequestContext {
+pub struct IContext {
   id: str;
-  payload: IPullRequestPayload;
   octokit: octokit.OctoKit;
+}
+
+pub struct IPullRequestContext extends IContext {
+  payload: IPullRequestPayload;
 }
 
 pub struct IPullRequestSyncContext extends IPullRequestContext {}
@@ -44,3 +47,35 @@ pub struct IPullRequestSyncContext extends IPullRequestContext {}
 pub struct IPullRequestOpenedContext extends IPullRequestContext {}
 
 pub struct IPullRequestClosedContext extends IPullRequestContext {}
+
+struct IPushPayload {
+  repository: IProbotRepository;
+  installation: IPullRequestInstallation?;
+  after: str;
+  ref: str;
+}
+
+pub struct IPushContext extends IContext {
+  payload: IPushPayload;
+}
+
+pub struct VerifyAndReceieveProps {
+  id: str;
+  name: str;
+  signature: str;
+  payload: str;
+}
+
+pub interface IProbotWebhooks {
+  inflight on(name: str, handler: inflight (): void);
+  inflight verifyAndReceive(props: VerifyAndReceieveProps);
+}
+
+pub interface IProbotAuth {
+  inflight call(ProbotInstance, installationId: num): octokit.OctoKit;
+}
+
+pub struct ProbotInstance {
+  webhooks: IProbotWebhooks;
+  auth: IProbotAuth;
+}

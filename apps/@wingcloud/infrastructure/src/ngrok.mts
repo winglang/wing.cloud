@@ -1,5 +1,6 @@
 import child_process from "node:child_process";
 import fetch from "node-fetch";
+import { appendFileSync } from "node:fs";
 
 export interface NgrokResult {
   pid?: number;
@@ -28,22 +29,23 @@ export const startNgrok = async (
   }
   const pid = await shell("ngrok", options);
 
-  let i = 0;
   let publicUrl;
+  let ngrokPort = 4040;
   while (true) {
+    let err: any;
     try {
-      const data = await fetch("http://127.0.0.1:4040/api/tunnels");
-      const json: any = await data.json();
-      const tunnel = json.tunnels.find(
-        (t: any) => t.config.addr === `http://localhost:${port}`,
-      );
-      publicUrl = tunnel.public_url;
-      break;
-    } catch {
-      if (i++ > 20) {
-        throw new Error("failed to start ngrok");
+      const url = await tryPort(port, ngrokPort++);
+      if (url) {
+        publicUrl = url;
+        break;
       }
+    } catch (err: any) {
+      err = err;
+    } finally {
       await sleep(250);
+      if (ngrokPort >= 4140) {
+        throw new Error(`max ngrok ports reached`);
+      }
     }
   }
 
@@ -51,7 +53,35 @@ export const startNgrok = async (
 };
 
 export const killNgrok = async (pid: number) => {
+  appendFileSync("/tmp/104", `\nkill ${pid}`)
   process.kill(pid);
+};
+
+const tryPort = async (hostPort: string, ngrokPort: number) => {
+  let i = 0;
+  while (true) {
+    let err: any;
+    try {
+      appendFileSync("/tmp/104", `\n${i}: ${ngrokPort} ${hostPort}`)
+      const data = await fetch(`http://127.0.0.1:${ngrokPort}/api/tunnels`);
+      const json: any = await data.json();
+      const tunnel = json.tunnels.find(
+        (t: any) => t.config.addr === `http://localhost:${hostPort}`,
+      );
+      appendFileSync("/tmp/104", `\n${i}: ${JSON.stringify(json)}`)
+      if (tunnel) {
+        return tunnel?.public_url;
+      }
+    } catch (err: any) {
+      err = err;
+    } finally {
+      await sleep(250);
+      if (i++ > 20) {
+        throw new Error(`failed to start ngrok on port ${hostPort}: ${err ? err.message : "timeout"}`);
+      }
+    }
+  }
+  
 };
 
 const sleep = (ms: number) => {
