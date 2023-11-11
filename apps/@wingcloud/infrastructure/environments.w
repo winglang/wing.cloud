@@ -5,22 +5,24 @@ bring "./status-reports.w" as status_report;
 pub struct Environment {
   id: str;
   appId: str;
+  type: str;
   repo: str;
   branch: str;
   status: str;
-  prNumber: num;
   installationId: num;
+  prNumber: num?;
   url: str?;
   commentId: num?;
-  testResults: status_report.TestStatusReport?;
+  testResults: status_report.TestResults?;
 }
 
-struct CreateEnvironmentOptions {
+pub struct CreateEnvironmentOptions {
   appId: str;
+  type: str;
   repo: str;
   branch: str;
   status: str;
-  prNumber: num;
+  prNumber: num?;
   installationId: num;
 }
 
@@ -45,7 +47,7 @@ struct UpdateEnvironmentCommentIdOptions {
 struct UpdateEnvironmentTestResultsOptions {
   id: str;
   appId: str;
-  testResults: status_report.TestStatusReport;
+  testResults: status_report.TestResults;
 }
 
 struct GetEnvironmentOptions {
@@ -67,6 +69,7 @@ pub class Environments {
     let environment = Environment {
       id: "environment_${nanoid62.Nanoid62.generate()}",
       appId: options.appId,
+      type: options.type,
       repo: options.repo,
       branch: options.branch,
       status: options.status,
@@ -74,36 +77,36 @@ pub class Environments {
       installationId: options.installationId,
     };
 
+    let getItem = (pk: str, sk: str) => {
+      let item = MutJson {
+        pk: pk,
+        sk: sk,
+        id: environment.id,
+        appId: environment.appId,
+        type: environment.type,
+        repo: environment.repo,
+        branch: environment.branch,
+        status: environment.status,
+        installationId: environment.installationId,
+      };
+
+      if let prNumber = environment.prNumber {
+        item.set("prNumber", prNumber);
+      }
+
+      return item;
+    };
+
     this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: {
-            pk: "ENVIRONMENT#${environment.id}",
-            sk: "#",
-            id: environment.id,
-            appId: environment.appId,
-            repo: environment.repo,
-            branch: environment.branch,
-            status: environment.status,
-            prNumber: environment.prNumber,
-            installationId: environment.installationId,
-          },
+          item: getItem("ENVIRONMENT#${environment.id}", "#"),
           conditionExpression: "attribute_not_exists(pk)"
         },
       },
       {
         put: {
-          item: {
-            pk: "APP#${environment.appId}",
-            sk: "ENVIRONMENT#${environment.id}",
-            id: environment.id,
-            appId: environment.appId,
-            repo: environment.repo,
-            branch: environment.branch,
-            status: environment.status,
-            prNumber: environment.prNumber,
-            installationId: environment.installationId,
-          },
+          item: getItem("APP#${environment.appId}", "ENVIRONMENT#${environment.id}"),
         },
       },
     ]);
@@ -279,14 +282,15 @@ pub class Environments {
       return {
         id: item.get("id").asStr(),
         appId: item.get("appId").asStr(),
+        type: item.get("type").asStr(),
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),
         status: item.get("status").asStr(),
-        prNumber: item.get("prNumber").asNum(),
         installationId: item.get("installationId").asNum(),
+        prNumber: item.tryGet("prNumber")?.tryAsNum(),
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
-        testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
+        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
       };
     }
 
@@ -306,15 +310,16 @@ pub class Environments {
       environments = environments.concat([{
         id: item.get("id").asStr(),
         appId: item.get("appId").asStr(),
+        type: item.get("type").asStr(),
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),
         status: item.get("status").asStr(),
-        prNumber: item.get("prNumber").asNum(),
+        prNumber: item.tryGet("prNumber")?.tryAsNum(),
         installationId: item.get("installationId").asNum(),
         // https://github.com/winglang/wing/issues/4470
         url: item.tryGet("url")?.tryAsStr(),
         commentId: item.tryGet("commentId")?.tryAsNum(),
-        testResults: status_report.TestStatusReport.tryFromJson(item.tryGet("testResults")),
+        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
       }]);
     }
     return environments;
