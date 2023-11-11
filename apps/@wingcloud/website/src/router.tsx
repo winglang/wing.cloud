@@ -7,25 +7,21 @@ export const router = createBrowserRouter([
   {
     path: "/",
     lazy: () => import("./routes/index.js"),
-    children: [
-      {
-        path: "apps",
-        lazy: () => import("./routes/apps.js"),
-      },
-      {
-        path: "apps/:appName",
-        lazy: () => import("./routes/apps/app.js"),
-      },
-      {
-        path: "apps/:appName/:environmentId",
-        lazy: () => import("./routes/environments/environment.js"),
-      },
-      {
-        path: "new",
-        lazy: () => import("./routes/new.js"),
-      },
-    ],
   },
+  {
+    path: "apps",
+    lazy: () => import("./routes/apps.js"),
+  },
+
+  {
+    path: "apps/:appId",
+    lazy: () => import("./routes/apps/app-id.js"),
+  },
+  {
+    path: "new",
+    lazy: () => import("./routes/new.js"),
+  },
+
   {
     path: "*",
     element: <NoMatch />,

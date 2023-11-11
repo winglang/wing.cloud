@@ -11,11 +11,6 @@ bring "./apps.w" as Apps;
 bring "./users.w" as Users;
 bring "./environments.w" as Environments;
 bring "./lowkeys-map.w" as lowkeys;
-
-// TODO: https://github.com/winglang/wing/issues/3644
-class Util {
-  extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
-}
 bring "./environment-manager.w" as EnvironmentManager;
 bring "./status-reports.w" as status_reports;
 bring "./probot-adapter.w" as adapter;
@@ -72,16 +67,9 @@ pub class Api {
 
     api.get("/wrpc/auth.check", inflight (request) => {
       if let payload = getJWTPayloadFromCookie(request) {
-        // check if the user from the cookie is valid
-        let userId = getUserFromCookie(request);
-
-        // check if user exists in the db
-        let username = users.getUsername(userId: userId);
-
         return {
           body: {
             userId: payload.userId,
-            username: username,
           },
         };
       }
@@ -192,65 +180,11 @@ pub class Api {
       }
     });
 
-    api.get("/wrpc/github.getRepository", inflight (request) => {
-      if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = ${accessToken}");
-
-        let owner = request.query.get("owner");
-        let repo = request.query.get("repo");
-
-        let repository = GitHub.Client.getRepository({
-          token: accessToken,
-          owner: owner,
-          repo: repo,
-        });
-
-        return {
-          body: {
-            repository: repository
-          },
-        };
-      } else {
-        return {
-          status: 401,
-        };
-      }
-    });
-
-    api.get("/wrpc/github.getPullRequest", inflight (request) => {
-      if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = ${accessToken}");
-
-        let owner = request.query.get("owner");
-        let repo = request.query.get("repo");
-        let pullNumber = request.query.get("pullNumber");
-
-        let pullRequest = GitHub.Client.getPullRequest({
-          token: accessToken,
-          owner: owner,
-          repo: repo,
-          pull_number: pullNumber,
-        });
-
-        return {
-          body: {
-            pullRequest: pullRequest
-          },
-        };
-      } else {
-        return {
-          status: 401,
-        };
-      }
-    });
-
     api.get("/wrpc/app.get", inflight (request) => {
       let userId = getUserFromCookie(request);
 
-      let appId = request.query.get("appId");
-
       let app = apps.get(
-        appId: appId,
+        id: request.query.get("id"),
       );
 
       if app.userId != userId {
@@ -268,33 +202,6 @@ pub class Api {
         },
       };
     });
-
-    api.get("/wrpc/app.getByName", inflight (request) => {
-      let userId = getUserFromCookie(request);
-
-      let appName = request.query.get("appName");
-
-      let app = apps.getByName(
-        userId: userId,
-        appName: appName,
-      );
-
-      if app.userId != userId {
-        return {
-          status: 403,
-          body: {
-            error: "Forbidden",
-          },
-        };
-      }
-
-      return {
-        body: {
-            app: app,
-        },
-      };
-    });
-
 
     api.post("/wrpc/app.rename", inflight (request) => {
       let userId = getUserFromCookie(request);
@@ -302,8 +209,8 @@ pub class Api {
       let input = Json.parse(request.body ?? "");
 
       apps.rename(
-        appId: input.get("appId").asStr(),
-        appName: input.get("appName").asStr(),
+        id: input.get("id").asStr(),
+        name: input.get("name").asStr(),
         userId: userId,
         repository: input.get("repository").asStr(),
       );
@@ -311,44 +218,16 @@ pub class Api {
       return {
       };
     });
-
     api.post("/wrpc/app.delete", inflight (request) => {
       let userId = getUserFromCookie(request);
 
       let input = Json.parse(request.body ?? "");
 
       apps.delete(
-        appId: input.get("appId").asStr(),
+        id: input.get("id").asStr(),
         userId: userId,
+        repository: input.get("repository").asStr(),
       );
-    });
-
-    api.get("/wrpc/app.environments", inflight (request) => {
-      let userId = getUserFromCookie(request);
-
-      let environments = props.environments.list(
-        appId: request.query.get("appId"),
-      );
-
-      return {
-        body: {
-          environments: environments,
-        },
-      };
-    });
-
-    api.get("/wrpc/app.environment", inflight (request) => {
-      let userId = getUserFromCookie(request);
-
-      let environment = props.environments.get(
-        id: request.query.get("environmentId"),
-      );
-
-      return {
-        body: {
-          environment: environment,
-        },
-      };
     });
 
     api.post("/wrpc/user.createApp", inflight (request) => {
@@ -360,40 +239,33 @@ pub class Api {
         let gitHubLogin = users.getUsername(userId: userId);
 
         let defaultBranch = input.get("default_branch").asStr();
-        let repoId = input.get("repoId").asStr();
+        let repository = input.get("repositoryId").asStr();
 
         let commitData = GitHub.Client.getLastCommit(
           token: accessToken,
-          owner:  input.get("repoOwner").asStr(),
-          repo: input.get("repoName").asStr(),
-          default_branch: input.get("default_branch").asStr(),
+          owner:  input.get("owner").asStr(),
+          repo: input.get("repositoryName").asStr(),
+          default_branch: defaultBranch,
         );
 
-        // TODO: https://github.com/winglang/wing/issues/3644
-        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9]+", "-");
-
         let app = apps.create(
-          appName: appName,
-          description: input.tryGet("description")?.tryAsStr(),
-          repoId: input.get("repoId").asStr(),
-          repoName: input.get("repoName").asStr(),
-          repoOwner: input.get("repoOwner").asStr(),
+          name: input.get("appName").asStr(),
+          lastCommitMessage: commitData?.commit?.message ?? "",
           imageUrl: input.get("imageUrl").asStr(),
+          repository: repository,
           userId: userId,
           entryfile: input.get("entryfile").asStr(),
           createdAt: datetime.utcNow().toIso(),
           createdBy: gitHubLogin,
-          lastCommitMessage: commitData?.commit?.message ?? "",
         );
-
+        
         let installationId = num.fromStr(input.get("installationId").asStr());
         queue.push(Json.stringify(EnvironmentManager.CreateEnvironmentOptions {
           createEnvironment: {
             branch: defaultBranch,
-            appId: app.appId,
+            appId: app.id,
             type: "production",
-            prTitle: defaultBranch,
-            repo: repoId,
+            repo: repository,
             status: "initializing",
             installationId: installationId,
           },
@@ -403,7 +275,7 @@ pub class Api {
 
         return {
           body: {
-            appId: app.appId,
+            appId: app.id,
           },
         };
       } else {

@@ -20,7 +20,6 @@ struct IPullRequestHead {
 struct IPullRequestPR {
   head: IPullRequestHead;
   number: num;
-  title: str;
 }
 
 struct IPullRequestInstallation {

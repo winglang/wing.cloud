@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { AppCard } from "../components/app-card.js";
+import { Header } from "../components/header.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { Button } from "../design-system/button.js";
 import { Input } from "../design-system/input.js";
@@ -17,82 +18,80 @@ export const Component = () => {
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-  const listAppsQuery = wrpc["user.listApps"].useQuery();
+  const appsList = wrpc["user.listApps"].useQuery();
 
   const apps = useMemo(() => {
-    if (!listAppsQuery.data) {
+    if (!appsList.data) {
       return [];
     }
-    return listAppsQuery.data.apps.filter((app) =>
-      `${app.appName}${app.lastCommitMessage}`
+    return appsList.data.apps.filter((app) =>
+      `${app.name}${app.lastCommitMessage}`
         .toLocaleLowerCase()
         .includes(search.toLocaleLowerCase()),
     );
-  }, [listAppsQuery.data, search]);
-
-  const loading = useMemo(() => {
-    return listAppsQuery.isLoading || listAppsQuery.isFetching;
-  }, [listAppsQuery.isLoading, listAppsQuery.isFetching]);
+  }, [appsList.data, search]);
 
   return (
     <>
-      <div className="flex gap-x-2">
-        <Input
-          type="text"
-          leftIcon={MagnifyingGlassIcon}
-          className="block w-full"
-          containerClassName="w-full"
-          name="search"
-          id="search"
-          placeholder="Search..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-          }}
-        />
-        <Button
-          label="New"
-          primary
-          icon={PlusIcon}
-          onClick={() => {
-            navigate("/new");
-          }}
-        />
-      </div>
+      <Header breadcrumbs={[{ label: "Apps", to: "/apps" }]} />
 
-      {loading && (
-        <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <SpinnerLoader />
+      <div className="p-6 space-y-4 w-full max-w-5xl mx-auto">
+        <div className="flex gap-x-2">
+          <Input
+            type="text"
+            leftIcon={MagnifyingGlassIcon}
+            className="block w-full"
+            containerClassName="w-full"
+            name="search"
+            id="search"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
+          />
+          <Button
+            label="New"
+            primary
+            icon={PlusIcon}
+            onClick={() => {
+              navigate("/new");
+            }}
+          />
         </div>
-      )}
 
-      {!loading && apps.length === 0 && (
-        <div className="text-center">
-          <FolderPlusIcon className="w-12 h-12 mx-auto text-gray-400" />
-          <h3 className="mt-2 text-sm font-semibold text-gray-900">
-            No apps found.
-          </h3>
+        {appsList.isLoading && (
+          <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <SpinnerLoader />
+          </div>
+        )}
 
-          {listAppsQuery.data?.apps.length === 0 && (
-            <div>
-              <p className="mt-1 text-sm text-gray-500">
-                Get started by creating a new app.
-              </p>
-              <Button
-                label="New App"
-                icon={PlusIcon}
-                primary
-                className="mt-6"
-                onClick={() => {
-                  navigate("/new");
-                }}
-              />
-            </div>
-          )}
-        </div>
-      )}
+        {!appsList.isLoading && apps.length === 0 && (
+          <div className="text-center">
+            <FolderPlusIcon className="w-12 h-12 mx-auto text-gray-400" />
+            <h3 className="mt-2 text-sm font-semibold text-gray-900">
+              No apps found.
+            </h3>
 
-      {!loading && apps.length > 0 && (
+            {appsList.data?.apps.length === 0 && (
+              <div>
+                <p className="mt-1 text-sm text-gray-500">
+                  Get started by creating a new app.
+                </p>
+                <Button
+                  label="New App"
+                  icon={PlusIcon}
+                  primary
+                  className="mt-6"
+                  onClick={() => {
+                    navigate("/new");
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
         <div
           className={clsx(
             "flex flex-wrap gap-6 w-full",
@@ -101,15 +100,15 @@ export const Component = () => {
         >
           {apps.map((app) => (
             <AppCard
-              key={app.appId}
+              key={app.id}
               onClick={() => {
-                navigate(`/apps/${app.appName}`);
+                navigate(`/apps/${app.id}`);
               }}
               app={app}
             />
           ))}
         </div>
-      )}
+      </div>
     </>
   );
 };
