@@ -106,10 +106,12 @@ pub class EnvironmentsTest {
         try {
           let userId = props.users.create(gitHubLogin: "fake-login");
           let app = props.apps.create(
-            name: "test-app",
+            appName: "test-app",
             createdAt: "0",
             createdBy: userId,
-            repository: "${repo.owner}/${repo.repo}",
+            repoId: "${repo.owner}/${repo.repo}",
+            repoName: repo.repo,
+            repoOwner: repo.owner,
             userId: userId,
             entryfile: "main.w"
           );
@@ -154,7 +156,7 @@ pub class EnvironmentsTest {
 
           // verify environment created
           let isRunning = util.waitUntil(inflight () => {
-            let envs = props.environments.list(appId: app.id);
+            let envs = props.environments.list(appId: app.appId);
             if let env = envs.tryAt(0) {
               if env.status == "running" {
                 return true;
@@ -167,7 +169,7 @@ pub class EnvironmentsTest {
           assert(isRunning);
 
           // make sure its responding
-          let env = props.environments.list(appId: app.id).at(0);
+          let env = props.environments.list(appId: app.appId).at(0);
           if let url = env.url {
             util.waitUntil(inflight () => {
               try {
@@ -218,9 +220,9 @@ pub class EnvironmentsTest {
               content: util.base64Encode(entry.value.asStr())
             );
           }
-  
+
           let userId = props.users.create(gitHubLogin: "fake-login");
-    
+
           let jwt = JWT.JWT.sign(
             secret: props.appSecret,
             userId: userId,
@@ -229,7 +231,7 @@ pub class EnvironmentsTest {
             refreshToken: githubToken,
             refreshTokenExpiresIn: 1000,
           );
-    
+
           let authCookie = Cookie.Cookie.serialize(
             "auth",
             jwt,
@@ -239,24 +241,24 @@ pub class EnvironmentsTest {
               sameSite: "strict",
             },
           );
-    
+
           // use app octokit to get the installations
           let res = appOctokit.apps.listInstallations();
           if res.status < 200 || res.status >= 300 {
             throw "failed to get user installations";
           }
-  
+
           let var installationId: num? = nil;
           for installation in res.data {
             if installation.account.login == repo.owner {
               installationId = installation.id;
             }
           }
-  
+
           if !installationId? {
             throw "failed to find installation for owner ${repo.owner}";
           }
-  
+
           let createRes = http.post("${props.wingCloudUrl}/wrpc/user.createApp",
             body: Json.stringify({
               default_branch: "main",
@@ -272,28 +274,28 @@ pub class EnvironmentsTest {
               "cookie": authCookie
             }
           );
-  
+
           if createRes.status < 200 || createRes.status >= 300 {
             throw "failed to create app ${createRes.status}";
           }
-  
+
           if let appId = Json.tryParse(createRes.body)?.tryGet("appId")?.tryAsStr() {
             // verify environment created
-            let app = props.apps.get(id: appId);
+            let app = props.apps.get(appId: appId);
             let isRunning = util.waitUntil(inflight () => {
-              let envs = props.environments.list(appId: app.id);
+              let envs = props.environments.list(appId: app.appId);
               if let env = envs.tryAt(0) {
                 if env.status == "running" {
                   return true;
                 }
               }
-    
+
               return false;
             }, timeout: 10m);
-    
+
             assert(isRunning);
 
-            let env = props.environments.list(appId: app.id).at(0);
+            let env = props.environments.list(appId: app.appId).at(0);
             assert(env.type == "production");
           }
         } finally {

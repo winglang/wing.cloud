@@ -101,12 +101,13 @@ pub class ProbotApp {
           this.environmentManager.create(
             createEnvironment: {
               branch: branch,
-              appId: app.id,
+              appId: app.appId,
               type: "preview",
               repo: context.payload.repository.full_name,
               status: "initializing",
               installationId: installation.id,
               prNumber: context.payload.pull_request.number,
+              prTitle: context.payload.pull_request.title,
             },
             app: app,
             sha: context.payload.pull_request.head.sha,
@@ -132,7 +133,7 @@ pub class ProbotApp {
 
       let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
       for app in apps {
-        for environment in this.environments.list(appId: app.id) {
+        for environment in this.environments.list(appId: app.appId) {
           if environment.branch != branch || environment.status == "stopped" {
             continue;
           }
@@ -150,7 +151,7 @@ pub class ProbotApp {
 
       let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
       for app in apps {
-        for environment in this.environments.list(appId: app.id) {
+        for environment in this.environments.list(appId: app.appId) {
           if environment.branch != branch || environment.status == "stopped" {
             continue;
           }
@@ -166,10 +167,10 @@ pub class ProbotApp {
 
     this.adapter.handlePush(inflight (context: probot.IPushContext) => {
       let branch = context.payload.ref.replace("refs/heads/", "");
-      
+
       let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
       for app in apps {
-        for environment in this.environments.list(appId: app.id) {
+        for environment in this.environments.list(appId: app.appId) {
           if environment.branch != branch || environment.status == "stopped" || environment.type != "production" {
             continue;
           }
