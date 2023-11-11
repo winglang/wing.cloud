@@ -21,7 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^3.3.2",
     "octokit": "^3.1.1",
-    "winglang": "^0.44.11"
+    "winglang": "^0.45.5"
   },
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.315",

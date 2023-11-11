@@ -293,11 +293,10 @@ pub class ProbotApp {
             throw "handlePullRequstSync: runtime service error ${res.body}";
           }
 
-          if let body = res.body {
-            if let url = Json.tryParse(body)?.get("url")?.tryAsStr() {
-              this.environments.updateUrl(id: environment.id, appId: app.id, url: url);
-              return;
-            }
+
+          if let url = Json.tryParse(res.body)?.get("url")?.tryAsStr() {
+            this.environments.updateUrl(id: environment.id, appId: app.id, url: url);
+            return;
           }
 
           throw "handlePullRequstSync: invalid runtime service response ${res.body}";

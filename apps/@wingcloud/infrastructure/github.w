@@ -68,7 +68,7 @@ pub class Exchange {
     }
 
     log("oauth = ${response.body}");
-    return AuthTokens.fromJson(Json.parse(response.body ?? ""));
+    return AuthTokens.fromJson(Json.parse(response.body));
   }
 
   extern "./src/github.ts" pub static inflight getLoginFromAccessToken(accessToken: str): str;
