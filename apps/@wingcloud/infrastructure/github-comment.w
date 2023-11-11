@@ -37,7 +37,7 @@ pub class GithubComment {
           if let testResults = environment.testResults {
             testsString = "";
             let var i = 0;
-            for testResult in testResults.testResults {
+            for testResult in testResults.data.testResults {
               let var icon = "✅";
               if !testResult.pass {
                 icon = "❌";

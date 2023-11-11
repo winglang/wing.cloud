@@ -31,7 +31,7 @@ export function useReportStatus(
       data: payload,
     };
     const token = await keyStore.createToken(data);
-    await fetch(`${context.wingApiUrl}/environment.report`, {
+    await fetch(`${context.wingApiUrl}/report`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

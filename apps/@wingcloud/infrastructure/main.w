@@ -7,13 +7,11 @@ bring "./reverse-proxy.w" as ReverseProxy;
 bring "./users.w" as Users;
 bring "./apps.w" as Apps;
 bring "./environments.w" as Environments;
-bring "./environment-manager.w" as EnvironmentManager;
 bring "./api.w" as wingcloud_api;
 
+bring "./runtime/runtime-callbacks.w" as runtime_callbacks;
 bring "./runtime/runtime.w" as runtime;
-bring "./runtime/runtime-client.w" as runtime_client;
 bring "./probot.w" as probot;
-bring "./probot-adapter.w" as adapter;
 bring "./cloudfront.w" as cloudFront;
 
 // And the sun, and the moon, and the stars, and the flowers.
@@ -40,37 +38,13 @@ let apps = new Apps.Apps(table);
 let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
 
-let probotAdapter = new adapter.ProbotAdapter(
-  probotAppId: util.env("BOT_GITHUB_APP_ID"),
-  probotSecretKey: util.env("BOT_GITHUB_PRIVATE_KEY"),
-  webhookSecret: util.env("BOT_GITHUB_WEBHOOK_SECRET"),
-);
-
-let rntm = new runtime.RuntimeService(
-  wingCloudUrl: api.url,
-  flyToken: util.tryEnv("FLY_TOKEN"),
-  flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
-  environments: environments,
-);
-
-let environmentManager = new EnvironmentManager.EnvironmentManager(
-  apps: apps,
-  environments: environments,
-  runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
-  probotAdapter: probotAdapter,
-);
-
-let appSecret = util.env("APP_SECRET");
 let wingCloudApi = new wingcloud_api.Api(
   api: api,
   apps: apps,
   users: users,
-  environments: environments,
-  environmentManager: environmentManager,
-  probotAdapter: probotAdapter,
   githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
-  appSecret: appSecret,
+  appSecret: util.env("APP_SECRET"),
 );
 
 let websitePort = 5174;
@@ -82,14 +56,31 @@ let website = new ex.ReactApp(
   localPort: websitePort,
 );
 
+let runtimeCallbacks = new runtime_callbacks.RuntimeCallbacks();
+
+api.post("/report", inflight (req) => {
+  runtimeCallbacks.topic.publish(req.body ?? "");
+
+  return {
+    status: 200
+  };
+});
+
+let rntm = new runtime.RuntimeService(
+  wingCloudUrl: api.url,
+  flyToken: util.tryEnv("FLY_TOKEN"),
+  flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
+  environments: environments,
+);
 let probotApp = new probot.ProbotApp(
-  probotAdapter: probotAdapter,
+  probotAppId: util.env("BOT_GITHUB_APP_ID"),
+  probotSecretKey: util.env("BOT_GITHUB_PRIVATE_KEY"),
+  webhookSecret: util.env("BOT_GITHUB_WEBHOOK_SECRET"),
   runtimeUrl: rntm.api.url,
+  runtimeCallbacks: runtimeCallbacks,
   environments: environments,
   apps: apps,
-  environmentManager: environmentManager,
 );
-
 bring "cdktf" as cdktf;
 new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
 
@@ -137,13 +128,7 @@ let proxy = new ReverseProxy.ReverseProxy(
   zoneName: zoneName,
   aliases: ["${subDomain}.${zoneName}"],
   origins: origins,
-  port: (): num? => {
-    if util.tryEnv("WING_IS_TEST") == "true" {
-      return nil;
-    } else {
-      return 3900;
-    }
-  }()
+  port: 3900
 );
 
 let var webhookUrl = probotApp.githubApp.webhookUrl;
@@ -158,22 +143,16 @@ if util.tryEnv("WING_TARGET") == "sim" {
   webhookUrl = devNgrok.url;
 }
 
-let updateGithubWebhook = inflight () => {
+let deploy = new cloud.OnDeploy(inflight () => {
   probotApp.githubApp.updateWebhookUrl("${webhookUrl}/webhook");
   log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
-};
-
-let deploy = new cloud.OnDeploy(updateGithubWebhook);
+});
 
 bring "./tests/environments.w" as tests;
 new tests.EnvironmentsTest(
   users: users,
   apps: apps,
   environments: environments,
-  githubApp: probotApp.githubApp,
-  updateGithubWebhook: updateGithubWebhook,
-  appSecret: appSecret,
-  wingCloudUrl: api.url,
   githubToken: util.tryEnv("TESTS_GITHUB_TOKEN"),
   githubOrg: util.tryEnv("TESTS_GITHUB_ORG"),
   githubUser: util.tryEnv("TESTS_GITHUB_USER"),

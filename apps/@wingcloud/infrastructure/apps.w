@@ -65,23 +65,8 @@ pub class Apps {
     this.table = table;
   }
 
-  pub inflight create(options: CreateAppOptions): App {
+  pub inflight create(options: CreateAppOptions): str {
     let appId = "app_${nanoid62.Nanoid62.generate()}";
-
-    let app = App{
-      id: appId,
-      name: options.name,
-      description: options.description,
-      imageUrl: options.imageUrl,
-      repository: options.repository,
-      userId: options.userId,
-      entryfile: options.entryfile,
-      createdAt: options.createdAt,
-      createdBy: options.createdBy,
-      updatedAt: options.createdAt,
-      updatedBy: options.createdBy,
-      lastCommitMessage: options.lastCommitMessage,
-    };
 
     // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
     let makeItem = (id:str, pk: str, sk: str): Item => {
@@ -134,7 +119,7 @@ pub class Apps {
       },
     ]);
 
-    return app;
+    return appId;
   }
 
   pub inflight rename(options: RenameAppOptions): void {

@@ -18,10 +18,6 @@ pub class GithubApp {
     this.privateKey = privateKey;
   }
 
-  pub inflight createGithubAppJwtToken(): str {
-    return GithubApp.createGithubAppJwt(this.appId, this.privateKey);
-  }
-
   pub inflight updateWebhookUrl(url: str) {
     let jwt = GithubApp.createGithubAppJwt(this.appId, this.privateKey);
 
