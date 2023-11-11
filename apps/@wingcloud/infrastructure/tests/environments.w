@@ -8,26 +8,14 @@ bring "../users.w" as users;
 bring "../apps.w" as apps;
 bring "../environments.w" as environments;
 bring "../types/octokit-types.w" as octokit;
-bring "../github-app.w" as github_app;
-bring "../cookie.w" as Cookie;
-bring "../jwt.w" as JWT;
 
 struct EnvironmentsTestProps {
   users: users.Users;
   apps: apps.Apps;
   environments: environments.Environments;
-  githubApp: github_app.GithubApp;
-  updateGithubWebhook: inflight (): void;
-  appSecret: str;
-  wingCloudUrl: str;
   githubToken: str?;
   githubOrg: str?;
   githubUser: str?;
-}
-
-struct CreateRepoResult {
-  owner: str;
-  repo: str;
 }
 
 pub class EnvironmentsTest {
@@ -73,43 +61,35 @@ pub class EnvironmentsTest {
       }
     }) as "delete test repos";
 
-    let createRepo = inflight (octokit: octokit.OctoKit): CreateRepoResult => {
-      // create a new repo
-      let repoName = "wing-test-${util.nanoid(alphabet: "abcdefghijk0123456789", size: 8)}";
-
-      let var owner = "";
-      let var isOrg = true;
-      if let org = props.githubOrg {
-        let res = octokit.repos.createInOrg(name: repoName, org: org, private: true, auto_init: true);
-        assert(res.status >= 200 && res.status < 300);
-        owner = org;
-      } elif let user = props.githubUser {
-        let res = octokit.repos.createForAuthenticatedUser(name: repoName, private: true, auto_init: true);
-        assert(res.status >= 200 && res.status < 300);
-        owner = user;
-        isOrg = false;
-      } else {
-        throw "missing github owner";
-      }
-
-      return { repo: repoName, owner: owner };
-    };
-
     new std.Test(inflight () => {
       if let githubToken = props.githubToken {
-        props.updateGithubWebhook();
         let octokit = ok.octokit(githubToken);
 
         // create a new repo
-        let repo = createRepo(octokit);
+        let repoName = "wing-test-${util.nanoid(alphabet: "abcdefghijk0123456789", size: 8)}";
+
+        let var owner = "";
+        let var isOrg = true;
+        if let org = props.githubOrg {
+          let res = octokit.repos.createInOrg(name: repoName, org: org, private: true, auto_init: true);
+          assert(res.status >= 200 && res.status < 300);
+          owner = org;
+        } elif let user = props.githubUser {
+          let res = octokit.repos.createForAuthenticatedUser(name: repoName, private: true, auto_init: true);
+          assert(res.status >= 200 && res.status < 300);
+          owner = user;
+          isOrg = false;
+        } else {
+          throw "missing github owner";
+        }
 
         try {
           let userId = props.users.create(gitHubLogin: "fake-login");
-          let app = props.apps.create(
+          let appId = props.apps.create(
             name: "test-app",
             createdAt: "0",
             createdBy: userId,
-            repository: "${repo.owner}/${repo.repo}",
+            repository: "${owner}/${repoName}",
             userId: userId,
             entryfile: "main.w"
           );
@@ -117,8 +97,8 @@ pub class EnvironmentsTest {
           // create a PR
           let branchName = "branch-1";
           let ref = octokit.git.getRef(
-            owner: repo.owner,
-            repo: repo.repo,
+            owner: owner,
+            repo: repoName,
             ref: "heads/main"
           );
 
@@ -127,16 +107,16 @@ pub class EnvironmentsTest {
           }
 
           octokit.git.createRef(
-            owner: repo.owner,
-            repo: repo.repo,
+            owner: owner,
+            repo: repoName,
             ref: "refs/heads/${branchName}",
             sha: ref.data.object.sha,
           );
 
           for entry in Json.entries(redisExample) {
             octokit.repos.createOrUpdateFileContents(
-              owner: repo.owner,
-              repo: repo.repo,
+              owner: owner,
+              repo: repoName,
               branch: branchName,
               path: entry.key,
               message: "add ${entry.key}",
@@ -147,14 +127,14 @@ pub class EnvironmentsTest {
           octokit.pulls.create(
             base: "main",
             head: branchName,
-            owner: repo.owner,
-            repo: repo.repo,
+            owner: owner,
+            repo: repoName,
             title: "Test Changes"
           );
 
           // verify environment created
           let isRunning = util.waitUntil(inflight () => {
-            let envs = props.environments.list(appId: app.id);
+            let envs = props.environments.list(appId: appId);
             if let env = envs.tryAt(0) {
               if env.status == "running" {
                 return true;
@@ -167,7 +147,7 @@ pub class EnvironmentsTest {
           assert(isRunning);
 
           // make sure its responding
-          let env = props.environments.list(appId: app.id).at(0);
+          let env = props.environments.list(appId: appId).at(0);
           if let url = env.url {
             util.waitUntil(inflight () => {
               try {
@@ -182,126 +162,16 @@ pub class EnvironmentsTest {
             assert(false);
           }
 
-          assert(env.type == "preview");
-
           // verify tests passed
-          assert(env.testResults?.testResults?.length == 1);
-          assert(env.testResults?.testResults?.at(0)?.path == "root/Default/test:Hello, world!");
-          assert(env.testResults?.testResults?.at(0)?.pass == true);
+          assert(env.testResults?.data?.testResults?.length == 1);
+          assert(env.testResults?.data?.testResults?.at(0)?.path == "root/Default/test:Hello, world!");
+          assert(env.testResults?.data?.testResults?.at(0)?.pass == true);
         } finally {
-          octokit.repos.delete(owner: repo.owner, repo: repo.repo);
+          octokit.repos.delete(owner: owner, repo: repoName);
         }
       } else {
         throw "missing github token";
       }
     }, timeout: 10m) as "create environment from PR";
-
-    new std.Test(inflight () => {
-      if let githubToken = props.githubToken {
-        props.updateGithubWebhook();
-        let token = props.githubApp.createGithubAppJwtToken();
-        let appOctokit = ok.octokit(token);
-        let octokit = ok.octokit(githubToken);
-
-        // create a new repo
-        let repo = createRepo(octokit);
-
-        try {
-          // add files to main
-          for entry in Json.entries(redisExample) {
-            octokit.repos.createOrUpdateFileContents(
-              owner: repo.owner,
-              repo: repo.repo,
-              branch: "main",
-              path: entry.key,
-              message: "add ${entry.key}",
-              content: util.base64Encode(entry.value.asStr())
-            );
-          }
-  
-          let userId = props.users.create(gitHubLogin: "fake-login");
-    
-          let jwt = JWT.JWT.sign(
-            secret: props.appSecret,
-            userId: userId,
-            accessToken: githubToken,
-            accessTokenExpiresIn: 1000,
-            refreshToken: githubToken,
-            refreshTokenExpiresIn: 1000,
-          );
-    
-          let authCookie = Cookie.Cookie.serialize(
-            "auth",
-            jwt,
-            {
-              httpOnly: true,
-              secure: true,
-              sameSite: "strict",
-            },
-          );
-    
-          // use app octokit to get the installations
-          let res = appOctokit.apps.listInstallations();
-          if res.status < 200 || res.status >= 300 {
-            throw "failed to get user installations";
-          }
-  
-          let var installationId: num? = nil;
-          for installation in res.data {
-            if installation.account.login == repo.owner {
-              installationId = installation.id;
-            }
-          }
-  
-          if !installationId? {
-            throw "failed to find installation for owner ${repo.owner}";
-          }
-  
-          let createRes = http.post("${props.wingCloudUrl}/wrpc/user.createApp",
-            body: Json.stringify({
-              default_branch: "main",
-              repositoryId: "${repo.owner}/${repo.repo}",
-              owner: repo.owner,
-              repositoryName: repo.repo,
-              appName: "test-app",
-              imageUrl: "",
-              entryfile: "main.w",
-              installationId: "${installationId}",
-            }),
-            headers: {
-              "cookie": authCookie
-            }
-          );
-  
-          if createRes.status < 200 || createRes.status >= 300 {
-            throw "failed to create app ${createRes.status}";
-          }
-  
-          if let appId = Json.tryParse(createRes.body)?.tryGet("appId")?.tryAsStr() {
-            // verify environment created
-            let app = props.apps.get(id: appId);
-            let isRunning = util.waitUntil(inflight () => {
-              let envs = props.environments.list(appId: app.id);
-              if let env = envs.tryAt(0) {
-                if env.status == "running" {
-                  return true;
-                }
-              }
-    
-              return false;
-            }, timeout: 10m);
-    
-            assert(isRunning);
-
-            let env = props.environments.list(appId: app.id).at(0);
-            assert(env.type == "production");
-          }
-        } finally {
-          octokit.repos.delete(owner: repo.owner, repo: repo.repo);
-        }
-      } else {
-        throw "missing github token";
-      }
-    }, timeout: 1m) as "create production environment for app";
   }
 }
