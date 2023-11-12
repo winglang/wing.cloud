@@ -106,7 +106,7 @@ pub inflight class Client {
       throw "failed to get apps ${appsRespone.body}";
     }
 
-    return IAppsResult.fromJson(this.verifyJsonResponse(Json.parse(appsRespone.body ?? "invalid")));
+    return IAppsResult.fromJson(this.verifyJsonResponse(Json.parse(appsRespone.body)));
   }
 
   pub appsCount(): num {
@@ -117,7 +117,7 @@ pub inflight class Client {
       throw "failed to get app count ${countRes.body}";
     }
 
-    let count = ICountResult.fromJson(this.verifyJsonResponse(Json.parse(countRes.body ?? "invalid")));
+    let count = ICountResult.fromJson(this.verifyJsonResponse(Json.parse(countRes.body)));
     return count.data.apps.totalCount;
   }
 
@@ -216,7 +216,7 @@ pub inflight class Client {
       throw "failed to create machine ${props.appName}: ${machineRes.body}";
     }
 
-    let rdata = IRuntimeCreateMachineResult.fromJson(this.verifyJsonResponse(Json.parse(machineRes.body ?? "invalid")));
+    let rdata = IRuntimeCreateMachineResult.fromJson(this.verifyJsonResponse(Json.parse(machineRes.body)));
     let data: ICreateMachineResult = {
       id: rdata.id,
       instanceId: rdata.instance_id,
@@ -255,7 +255,7 @@ pub inflight class Client {
       throw "failed to get app ${appName}: ${res.body}";
     }
 
-    return IGetAppResult.fromJson(this.verifyJsonResponse(Json.parse(res.body ?? "invalid")));
+    return IGetAppResult.fromJson(this.verifyJsonResponse(Json.parse(res.body)));
   }
 
   pub isAppExists(appName: str): bool {
@@ -269,7 +269,7 @@ pub inflight class Client {
       throw "failed to check if app existts ${appName}: ${res.body}";
     }
 
-    let notFoundError = this.checkForNotFoundError(Json.parse(res.body ?? "invalid"));
+    let notFoundError = this.checkForNotFoundError(Json.parse(res.body));
     return !notFoundError;
   }
 

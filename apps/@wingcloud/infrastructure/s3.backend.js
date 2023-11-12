@@ -1,7 +1,7 @@
 /**
  *    - TF_BACKEND_BUCKET - The name of the s3 bucket to use for storing Terraform state
  *    - TF_BACKEND_BUCKET_REGION - The region the bucket was deployed to
- *    - TF_BACKEND_STATE_FILE - The object key used to store state file 
+ *    - TF_BACKEND_STATE_FILE - The object key used to store state file
  */
 
 exports.Platform = class BackendS3 {
