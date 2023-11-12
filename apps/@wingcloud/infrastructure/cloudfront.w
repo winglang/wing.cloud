@@ -121,6 +121,22 @@ pub class CloudFrontDistribution {
     // https://github.com/winglang/wing/issues/4907
     let bucket: aws.s3Bucket.S3Bucket = unsafeCast(this.logsBucket).bucket;
     let logsBucketName = bucket.bucket;
+    let bucketPolicy = new aws.iamPolicy.IamPolicy({
+      name: "reverse-proxy-logs-bucket-policy",
+      description: "Reverse Proxy logs S3 bucket policy",
+      policy: Json.stringify({
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Effect: "Allow",
+            Action: ["s3:*"],
+            Resource: "${bucket.arn}/*",
+          }
+        ],
+      }),
+    });
+    bucket.policy = bucketPolicy.arn;
+
     let cachePolicy = new CachePolicy(
       name: "cache-policy-for-${this.getDefaultOriginId(props.origins)}",
 
