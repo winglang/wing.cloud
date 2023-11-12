@@ -8,6 +8,7 @@ bring "./users.w" as Users;
 bring "./apps.w" as Apps;
 bring "./environments.w" as Environments;
 bring "./environment-manager.w" as EnvironmentManager;
+bring "./secrets.w" as Secrets;
 bring "./api.w" as wingcloud_api;
 
 bring "./runtime/runtime.w" as runtime;
@@ -17,6 +18,7 @@ bring "./probot-adapter.w" as adapter;
 bring "./cloudfront.w" as cloudFront;
 
 // And the sun, and the moon, and the stars, and the flowers.
+let appSecret = util.env("APP_SECRET");
 
 let DEFAULT_STAGING_LANDING_DOMAIN = "wing-cloud-staging-dev-only.webflow.io";
 
@@ -39,6 +41,7 @@ let table = new ex.DynamodbTable(
 let apps = new Apps.Apps(table);
 let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
+let secrets = new Secrets.Secrets(table, appSecret);
 
 let probotAdapter = new adapter.ProbotAdapter(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
@@ -60,7 +63,6 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   probotAdapter: probotAdapter,
 );
 
-let appSecret = util.env("APP_SECRET");
 let wingCloudApi = new wingcloud_api.Api(
   api: api,
   apps: apps,
