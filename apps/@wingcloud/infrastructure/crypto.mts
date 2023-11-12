@@ -8,7 +8,7 @@ interface EncryptedData {
 export const encrypt = (key: string, text: string): EncryptedData => {
   const digestKey = createHash('sha256').update(key).digest('base64').substring(0, 32);
   const iv = randomBytes(16);
-  let cipher = createCipheriv("aes-256-cbc", Buffer.from(digestKey), iv);
+  const cipher = createCipheriv("aes-256-cbc", Buffer.from(digestKey), iv);
  
   const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
 
