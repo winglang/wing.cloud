@@ -135,7 +135,7 @@ pub class CloudFrontDistribution {
         ],
       }),
     });
-    bucket.policy = bucketPolicy.arn;
+    //bucket.policy = bucketPolicy.arn;
 
     let cachePolicy = new CachePolicy(
       name: "cache-policy-for-${this.getDefaultOriginId(props.origins)}",
