@@ -51,9 +51,8 @@ export async function startServer({
         const data = keyStore.publicKey();
         res.send(data);
       });
-      app.get("/logs", async (req, res) => {
-        const data = await readFile(logfile, "utf8");
-        res.send(data);
+      app.get("/health", async (req, res) => {
+        res.sendStatus(200);
       });
     },
   });

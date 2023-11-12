@@ -15,7 +15,7 @@ FROM docker:24-git
 
 RUN apk update
 RUN apk add bash ip6tables pigz sysstat procps lsof nodejs npm
-RUN npm i -g pnpm projen
+RUN npm i -g pnpm projen winglang
 
 WORKDIR /app
 
