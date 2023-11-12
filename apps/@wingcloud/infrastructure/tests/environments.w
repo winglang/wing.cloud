@@ -262,9 +262,9 @@ pub class EnvironmentsTest {
           let createRes = http.post("${props.wingCloudUrl}/wrpc/user.createApp",
             body: Json.stringify({
               default_branch: "main",
-              repositoryId: "${repo.owner}/${repo.repo}",
-              owner: repo.owner,
-              repositoryName: repo.repo,
+              repoId: "${repo.owner}/${repo.repo}",
+              repoOwner: repo.owner,
+              repoName: repo.repo,
               appName: "test-app",
               imageUrl: "",
               entryfile: "main.w",
@@ -276,7 +276,7 @@ pub class EnvironmentsTest {
           );
 
           if createRes.status < 200 || createRes.status >= 300 {
-            throw "failed to create app ${createRes.status}";
+            throw "failed to create app ${createRes.status} ${createRes.body}";
           }
 
           if let appId = Json.tryParse(createRes.body)?.tryGet("appId")?.tryAsStr() {
