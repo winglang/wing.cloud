@@ -12,5 +12,8 @@ export const createProbot = async (
       secret: webhookSecret,
     },
   });
+  probot.onError(c => {
+    console.log("probot error", c.message);
+  })
   return probot;
 };

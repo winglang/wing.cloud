@@ -9,6 +9,8 @@ import {
 } from "@skyrpex/wingen";
 import { JsonFile, web } from "projen";
 
+const winglangVersion = '^0.45.5'
+
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
   devDeps: ["@skyrpex/wingen"],
@@ -207,10 +209,10 @@ const runtime = new TypescriptProject({
   },
 });
 
-runtime.addDeps(`winglang`);
-runtime.addDeps(`@winglang/sdk`);
-runtime.addDeps(`@winglang/compiler`);
-runtime.addDeps(`@wingconsole/app`);
+runtime.addDeps(`winglang@${winglangVersion}`);
+runtime.addDeps(`@winglang/sdk@${winglangVersion}`);
+runtime.addDeps(`@winglang/compiler@${winglangVersion}`);
+runtime.addDeps(`@wingconsole/app@${winglangVersion}`);
 runtime.addDeps("express");
 runtime.addDeps("jsonwebtoken");
 runtime.addDeps("jwk-to-pem");
@@ -241,15 +243,15 @@ infrastructure.addGitIgnore("/.env.*");
 infrastructure.addGitIgnore("!/.env.example");
 
 infrastructure.addGitIgnore("/target/");
-infrastructure.addDeps(`winglang`);
+infrastructure.addDeps(`winglang@${winglangVersion}`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
 infrastructure.addTask("test-aws", {
-  exec: "node ./bin/wing.mjs test -t tf-aws main.w --platform override-function-memory.js",
+  exec: "node ./bin/wing.mjs test -t tf-aws main.w",
 });
 infrastructure.compileTask.exec(
-  "node ./bin/wing.mjs compile -t tf-aws --platform override-function-memory.js",
+  "node ./bin/wing.mjs compile -t tf-aws",
 );
 
 const terraformInitTask = infrastructure.addTask("terraformInit");
