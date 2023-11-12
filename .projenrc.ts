@@ -242,7 +242,7 @@ infrastructure.addGitIgnore("/.env");
 infrastructure.addGitIgnore("/.env.*");
 infrastructure.addGitIgnore("!/.env.example");
 
-infrastructure.addGitIgnore("/target/");
+infrastructure.addGitIgnore("**/target/");
 infrastructure.addDeps(`winglang@${winglangVersion}`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
@@ -339,6 +339,8 @@ infrastructure.addDeps("cookie");
 infrastructure.addDeps("jose");
 
 infrastructure.addDeps("octokit", "node-fetch");
+
+infrastructure.addDeps("@aws-sdk/client-ssm");
 
 infrastructure.addDevDeps("@octokit/rest");
 
