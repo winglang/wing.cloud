@@ -76,7 +76,7 @@ export const Component = () => {
                 No apps found.
               </h3>
 
-              {listAppsQuery.data?.apps.length === 0 && (
+              {apps.length === 0 && (
                 <div>
                   <p className="mt-1 text-sm text-gray-500">
                     Get started by creating a new app.
