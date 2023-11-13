@@ -14,11 +14,10 @@ export const StatusDot = ({ selected }: StatusDotProps) => {
         "w-3 h-3 rounded-full",
         "border-2",
         theme.borderInput,
-        theme.bgInput,
         theme.bgInputHover,
         selected && [
           "ring-1 ring-sky-500/50 border-sky-500 outline-none",
-          "bg-sky-500",
+          "bg-sky-400",
         ],
       )}
     />

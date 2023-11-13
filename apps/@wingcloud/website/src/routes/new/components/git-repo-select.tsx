@@ -105,13 +105,14 @@ export const GitRepoSelect = ({
           </div>
         )}
         {!loading && filteredRepos.length === 0 && (
-          <div className="text-center flex justify-center w-full">
-            <div className="flex gap-1 opacity-90">
-              <GithubIcon className={clsx("w-5 h-5", theme.text1)} />
-              <h3 className={clsx("text-sm font-semibold", theme.text1)}>
-                No repos found.
-              </h3>
-            </div>
+          <div
+            className={clsx(
+              "text-center flex justify-center w-full",
+              "text-xs",
+              theme.text1,
+            )}
+          >
+            No repos found.
           </div>
         )}
         {filteredRepos.map((repo) => (
@@ -119,7 +120,7 @@ export const GitRepoSelect = ({
             key={repo.id}
             className={clsx(
               "text-xs px-2.5 py-1.5 gap-1",
-              "w-full p-2 text-left flex items-center",
+              "w-full text-left flex items-center",
               "rounded transition-all border",
               theme.text1,
               theme.bgInputHover,
