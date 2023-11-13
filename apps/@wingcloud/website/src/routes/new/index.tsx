@@ -1,3 +1,4 @@
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +20,7 @@ export const Component = () => {
 
   const [configurationType, setConfigurationType] = useState<
     ConfigurationType | undefined
-  >("connect");
+  >();
 
   const onError = useCallback((error: Error) => {
     showNotification("Failed to create the app", {
@@ -44,19 +45,29 @@ export const Component = () => {
       >
         <div className="flex items-center gap-1">
           <button
-            className={clsx(theme.text1, "font-semibold text-lg")}
+            className={clsx(theme.text1, "font-semibold items-center")}
             onClick={resetForm}
           >
             Create a new App
           </button>
+          {configurationType && (
+            <>
+              <ChevronRightIcon className="h-4 w-4 flex-shrink-0 text-slate-600" />
+              <div className="font-semibold items-center">
+                {configurationType}
+              </div>
+            </>
+          )}
         </div>
 
         <div className="mb-4 flex flex-col w-full text-sm">
           <div className="w-full space-y-8">
-            <AppConfigurationList
-              onSetType={setConfigurationType}
-              type={configurationType}
-            />
+            {!configurationType && (
+              <AppConfigurationList
+                onSetType={setConfigurationType}
+                type={configurationType}
+              />
+            )}
 
             {configurationType && (
               <AppConfiguration
@@ -64,7 +75,7 @@ export const Component = () => {
                 onCreateApp={() => {
                   navigate("/apps/");
                 }}
-                onCancel={onCancel}
+                onCancel={resetForm}
                 onError={onError}
               />
             )}

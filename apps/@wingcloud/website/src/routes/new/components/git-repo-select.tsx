@@ -43,12 +43,18 @@ export const GitRepoSelect = ({
     return "Select a GitHub namespace";
   }, [loading, installations.length]);
 
+  const searchPlaceholder = useMemo(() => {
+    return repositoryId ? repositoryId.split("/")[1] : "Search...";
+  }, [repositoryId]);
+
   const filteredRepos = useMemo(() => {
     return repos.filter((repo) => {
       if (search === "") {
         return true;
       }
-      return repo.full_name.includes(search);
+      return repo.full_name
+        .toLocaleLowerCase()
+        .includes(search.toLocaleLowerCase());
     });
   }, [repos, search]);
 
@@ -89,7 +95,7 @@ export const GitRepoSelect = ({
             containerClassName="w-full"
             name="search"
             id="search"
-            placeholder="Search..."
+            placeholder={searchPlaceholder}
             value={search}
             disabled={loading}
             onChange={(e) => {
@@ -99,36 +105,43 @@ export const GitRepoSelect = ({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 max-h-52 overflow-auto rounded p-1">
-        {loading && (
-          <div className="bg-white p-6 w-full flex items-center justify-center">
-            <SpinnerLoader size="sm" />
-          </div>
-        )}
-        {!loading && filteredRepos.length === 0 && (
-          <div
-            className={clsx(
-              "text-center flex justify-center w-full",
-              "text-xs",
-              theme.text1,
-            )}
-          >
-            No repos found.
-          </div>
-        )}
-        {!loading &&
-          filteredRepos.map((repo) => (
+      {loading && (
+        <div className="bg-white p-6 w-full flex items-center justify-center">
+          <SpinnerLoader size="sm" />
+        </div>
+      )}
+      {!loading && filteredRepos.length === 0 && (
+        <div
+          className={clsx(
+            "text-center flex justify-center w-full",
+            "text-xs",
+            theme.text1,
+          )}
+        >
+          No repos found.
+        </div>
+      )}
+      {!loading && (
+        <div
+          className={clsx(
+            "flex flex-col max-h-80 overflow-auto rounded",
+            "border divide-y",
+            theme.borderInput,
+          )}
+        >
+          {filteredRepos.map((repo) => (
             <button
               key={repo.id}
               className={clsx(
-                "text-xs px-2.5 py-1.5 gap-1",
+                "text-xs px-4 py-2 gap-1",
                 "w-full text-left flex items-center",
-                "rounded transition-all border",
+                "transition-all outline-none focus:outline-none",
                 theme.text1,
                 theme.bgInputHover,
-                theme.focusInput,
-                theme.bgInput,
-                theme.borderInput,
+                "focus:bg-slate-50 dark:focus:bg-slate-750",
+                repositoryId === repo.full_name &&
+                  "bg-slate-50 dark:bg-slate-750",
+                repositoryId !== repo.full_name && theme.bgInput,
               )}
               onClick={() => {
                 setRepositoryId(repo.full_name);
@@ -143,7 +156,8 @@ export const GitRepoSelect = ({
               </div>
             </button>
           ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
