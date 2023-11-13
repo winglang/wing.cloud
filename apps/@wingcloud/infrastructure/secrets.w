@@ -33,6 +33,10 @@ pub struct ListSecretsOptions {
   appId: str;
 }
 
+pub struct ListSecretsByEnvironmentOptions {
+  environmentId: str;
+}
+
 pub class Secrets {
   table: ex.DynamodbTable;
   crypto: crypto.Crypto;
@@ -75,7 +79,7 @@ pub class Secrets {
       return item;
     };
 
-    this.table.transactWriteItems(transactItems: [
+    let items: MutArray<ex.DynamodbTransactWriteItem> = MutArray<ex.DynamodbTransactWriteItem>[
       {
         put: {
           item: getItem("SECRET#${secret.id}", "#"),
@@ -87,7 +91,17 @@ pub class Secrets {
           item: getItem("APP#${secret.appId}", "SECRET#${secret.id}"),
         },
       },
-    ]);
+    ];
+
+    if let environmentId = secret.environmentId {
+      items.push({
+        put: {
+          item: getItem("ENVIRONMENT#${secret.environmentId}", "SECRET#${secret.id}"),
+        },
+      });
+    }
+
+    this.table.transactWriteItems(transactItems: items.copy());
 
     return secret;
   }
@@ -101,18 +115,7 @@ pub class Secrets {
     );
 
     if let item = result.item {
-      let temp = MutJson{
-        id: item.get("id").asStr(),
-        appId: item.get("appId").asStr(),
-        name: item.get("name").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        environmentId: item.tryGet("environmentId")?.tryAsStr(),
-      };
-
-      temp.set("value", this.crypto.decrypt(icrypto.EncryptedData.fromJson(item.get("value"))));
-
-      return Secret.fromJson(temp);
+      return Secret.fromJson(this.fromDB(item));
     }
 
     throw "Secret [${options.id}] not found";
@@ -128,20 +131,40 @@ pub class Secrets {
     );
     let var secrets: Array<Secret> = [];
     for item in result.items {
-      let temp = MutJson{
-        id: item.get("id").asStr(),
-        appId: item.get("appId").asStr(),
-        name: item.get("name").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        environmentId: item.tryGet("environmentId")?.tryAsStr(),
-      };
-
-      temp.set("value", this.crypto.decrypt(icrypto.EncryptedData.fromJson(item.get("value"))));
-
-      secrets = secrets.concat([Secret.fromJson(temp)]);
+      secrets = secrets.concat([Secret.fromJson(this.fromDB(item))]);
     }
 
     return secrets;
+  }
+
+  pub inflight listByEnvironment(options: ListSecretsByEnvironmentOptions): Array<Secret> {
+    let result = this.table.query(
+      keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+      expressionAttributeValues: {
+        ":pk": "ENVIRONMENT#${options.environmentId}",
+        ":sk": "SECRET#",
+      },
+    );
+    let var secrets: Array<Secret> = [];
+    for item in result.items {
+      secrets = secrets.concat([Secret.fromJson(this.fromDB(item))]);
+    }
+
+    return secrets;
+  }
+
+  inflight fromDB(item: Json): Secret {
+    let temp = MutJson{
+      id: item.get("id").asStr(),
+      appId: item.get("appId").asStr(),
+      name: item.get("name").asStr(),
+      createdAt: item.get("createdAt").asStr(),
+      updatedAt: item.get("updatedAt").asStr(),
+      environmentId: item.tryGet("environmentId")?.tryAsStr(),
+    };
+
+    temp.set("value", this.crypto.decrypt(icrypto.EncryptedData.fromJson(item.get("value"))));
+    
+    return Secret.fromJson(temp);
   }
 }
