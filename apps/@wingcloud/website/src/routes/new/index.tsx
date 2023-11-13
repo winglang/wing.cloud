@@ -11,15 +11,15 @@ import {
   AppConfiguration,
   type ConfigurationType,
 } from "./components/app-configuration.js";
-import { CreateAppFooter } from "./components/create-app-footer.js";
 
 export const Component = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const { showNotification } = useNotifications();
 
-  const [configurationType, setConfigurationType] =
-    useState<ConfigurationType>();
+  const [configurationType, setConfigurationType] = useState<
+    ConfigurationType | undefined
+  >("connect");
 
   const onError = useCallback((error: Error) => {
     showNotification("Failed to create the app", {
@@ -32,13 +32,23 @@ export const Component = () => {
     navigate("/apps");
   }, [navigate]);
 
+  const resetForm = useCallback(() => {
+    // eslint-disable-next-line unicorn/no-useless-undefined
+    setConfigurationType(undefined);
+  }, []);
+
   return (
     <div className="flex justify-center transition-all">
       <div
         className={clsx("w-full rounded shadow p-6 space-y-4", theme.bgInput)}
       >
-        <div className={clsx(theme.text1, "font-semibold text-lg")}>
-          Create a new App
+        <div className="flex items-center gap-1">
+          <button
+            className={clsx(theme.text1, "font-semibold text-lg")}
+            onClick={resetForm}
+          >
+            Create a new App
+          </button>
         </div>
 
         <div className="gap-y-8 mb-4 flex flex-col w-full text-sm">
