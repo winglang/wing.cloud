@@ -20,6 +20,10 @@ export const Component = () => {
   const [search, setSearch] = useState("");
   const listAppsQuery = wrpc["user.listApps"].useQuery();
 
+  const loading = useMemo(() => {
+    return listAppsQuery.isFetching;
+  }, [listAppsQuery.isFetching]);
+
   const apps = useMemo(() => {
     if (!listAppsQuery.data) {
       return [];
@@ -57,12 +61,12 @@ export const Component = () => {
         />
       </div>
 
-      {listAppsQuery.isFetching && (
+      {loading && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
         </div>
       )}
-      {!listAppsQuery.isFetching && (
+      {!loading && (
         <>
           {apps.length === 0 && (
             <div className="text-center">
