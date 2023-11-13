@@ -144,7 +144,7 @@ pub class Api {
       return {
         status: 302,
         headers: {
-          Location: "/apps",
+          Location: "/apps/",
           "Set-Cookie": authCookie,
         },
       };
