@@ -1,6 +1,7 @@
 bring ex;
 bring "./nanoid62.w" as nanoid62;
-bring "./crypto.w" as crypto;
+bring "./crypto/crypto.w" as crypto;
+bring "./crypto/icrypto.w" as icrypto;
 
 pub struct Secret {
   id: str;
@@ -34,11 +35,11 @@ pub struct ListSecretsOptions {
 
 pub class Secrets {
   table: ex.DynamodbTable;
-  appSecret: str;
+  crypto: crypto.Crypto;
 
-  init(table: ex.DynamodbTable, appSecret: str) {
+  init(table: ex.DynamodbTable) {
     this.table = table;
-    this.appSecret = appSecret;
+    this.crypto = new crypto.Crypto();
   }
 
   pub inflight create(options: CreateSecretOptions): Secret {
@@ -64,7 +65,7 @@ pub class Secrets {
         updatedAt: createdAt,
       };
 
-      let encrypted = crypto.encrypt(this.appSecret, secret.value);
+      let encrypted = this.crypto.encrypt(secret.value);
       item.set("value", encrypted);
 
       if let environmentId = secret.environmentId {
@@ -109,7 +110,7 @@ pub class Secrets {
         environmentId: item.tryGet("environmentId")?.tryAsStr(),
       };
 
-      temp.set("value", crypto.decrypt(this.appSecret, crypto.EncryptedData.fromJson(item.get("value"))));
+      temp.set("value", this.crypto.decrypt(icrypto.EncryptedData.fromJson(item.get("value"))));
 
       return Secret.fromJson(temp);
     }
@@ -136,7 +137,7 @@ pub class Secrets {
         environmentId: item.tryGet("environmentId")?.tryAsStr(),
       };
 
-      temp.set("value", crypto.decrypt(this.appSecret, crypto.EncryptedData.fromJson(item.get("value"))));
+      temp.set("value", this.crypto.decrypt(icrypto.EncryptedData.fromJson(item.get("value"))));
 
       secrets = secrets.concat([Secret.fromJson(temp)]);
     }

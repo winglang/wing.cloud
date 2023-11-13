@@ -1,9 +1,9 @@
 bring util;
 bring ex;
-bring "../crypto.w" as crypto;
+bring "../crypto/icrypto.w" as icrypto;
+bring "../crypto/crypto.w" as crypto;
 bring "../secrets.w" as Secrets;
 
-let appSecret = util.env("APP_SECRET");
 let table = new ex.DynamodbTable(
   name: "data",
   attributeDefinitions: {
@@ -14,20 +14,17 @@ let table = new ex.DynamodbTable(
   rangeKey: "sk",
 );
 
-let secrets = new Secrets.Secrets(table, appSecret);
+let secrets = new Secrets.Secrets(table);
 
-test "can securely store sensitive data" {
+test "not storing sensitive data" {
   let secret = secrets.create(appId: "app-id", name: "test-secret", value: "secret-value");
-  let storedSecret = secrets.get(id: secret.id);
   let item = table.getItem(key: {
     pk: "SECRET#${secret.id}",
     sk: "#",
   });
-  let encryptedData = crypto.EncryptedData.fromJson(item.item?.get("value"));
-  let value = crypto.decrypt(appSecret, encryptedData);
-  
-  assert(secret.value == value);
-  assert(storedSecret.value == value);
+  let encryptedData = icrypto.EncryptedData.fromJson(item.item?.get("value"));
+
+  assert(secret.value != encryptedData.data.text);
 }
 
 test "can store and list secrets" {

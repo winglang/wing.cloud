@@ -13,4 +13,5 @@ node_modules/
 /.env.*
 !/.env.example
 /target/
+/crypto/target/
 !/turbo.json

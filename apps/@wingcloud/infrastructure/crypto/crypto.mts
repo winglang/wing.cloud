@@ -2,7 +2,7 @@ import { createHash, randomBytes, createCipheriv, createDecipheriv } from 'crypt
  
 interface EncryptedData {
   iv: string;
-  data: string;
+  text: string;
 }
 
 export const encrypt = (key: string, text: string): EncryptedData => {
@@ -12,7 +12,7 @@ export const encrypt = (key: string, text: string): EncryptedData => {
  
   const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
 
-  return { iv: iv.toString("base64"), data: encrypted.toString('base64') };
+  return { iv: iv.toString("base64"), text: encrypted.toString('base64') };
 };
 
 export const decrypt = (key: string, encrypted: EncryptedData) => {
@@ -27,7 +27,7 @@ export const decrypt = (key: string, encrypted: EncryptedData) => {
     }
   });
   
-  decipher.write(encrypted.data, 'base64');
+  decipher.write(encrypted.text, 'base64');
   decipher.end();
 
   return decrypted
