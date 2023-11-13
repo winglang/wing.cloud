@@ -35,11 +35,9 @@ export const AppConfigurationItem = ({
         theme.text1,
         theme.bgInput,
         theme.borderInput,
+        theme.focusInput,
         "gap-1",
-        !disabled && [
-          theme.focusInput,
-          checked && ["ring-2 ring-sky-500/50 border-sky-500 outline-none"],
-        ],
+        checked && ["ring-2 ring-sky-500/50 border-sky-500 outline-none"],
       )}
       onClick={onChange}
     >

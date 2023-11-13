@@ -35,7 +35,7 @@ export const GitRepoSelect = ({
     if (repos.length === 0) {
       return "No repositories found";
     }
-    return "Repository name";
+    return "Select a repository";
   }, [loading, repos.length]);
 
   return (
