@@ -1,13 +1,13 @@
 bring cloud;
 bring aws;
-bring "./iconfig.w" as ic;
+bring "./iparameter.w" as i;
 bring "@cdktf/provider-aws" as tfaws;
 
-pub class Config impl ic.IConfig {
-    extern "./config.tfaws.ts" pub static inflight fetchParameterValue(key: str): str;
+pub class Parameter impl i.IParameter {
+    extern "./parameter.tfaws.ts" pub static inflight fetchParameterValue(key: str): str;
     key: str;
     
-    init(props: ic.ConfigProps) {
+    init(props: i.ParameterProps) {
         this.key= "/wing-cloud/apps/config/staging/${props.name}";
         new tfaws.ssmParameter.SsmParameter(
             name: this.key,
@@ -17,7 +17,7 @@ pub class Config impl ic.IConfig {
     }
 
     pub inflight get(): str {
-        return Config.fetchParameterValue(this.key);
+        return Parameter.fetchParameterValue(this.key);
     }
 
     pub onLift(host: std.IInflightHost, ops: Array<str>) {        
@@ -25,8 +25,7 @@ pub class Config impl ic.IConfig {
         if let host = aws.Function.from(host) {
             host.addPolicyStatements(aws.PolicyStatement {
                 actions: ["ssm:GetParameter"],
-                // we'll have to see if that's causing cyclic dependencies
-                resources: ["arn:aws:ssm:us-east-1:110379683389:parameter${this.key}"],  
+                resources: ["arn:aws:ssm:us-east-1:110379683389:parameter${this.key}"],
                 effect: aws.Effect.ALLOW,
               });
         }

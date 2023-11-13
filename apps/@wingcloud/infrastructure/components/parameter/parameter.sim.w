@@ -1,11 +1,11 @@
 bring cloud;
-bring "./iconfig.w" as ic;
+bring "./iparameter.w" as i;
 
-pub class Config impl ic.IConfig {
+pub class Parameter impl i.IParameter {
     state: cloud.Bucket;
     key: str;
 
-    init(props: ic.ConfigProps) {
+    init(props: i.ParameterProps) {
         this.state = new cloud.Bucket();        
         this.key = "/config/${props.name}";        
         this.state.addObject(this.key, props.value);
