@@ -1,8 +1,8 @@
 import clsx from "clsx";
 import { useNavigate } from "react-router-dom";
 
-import { useTheme } from "../design-system/theme-provider.js";
-import { usePopupWindow } from "../utils/popup-window.js";
+import { useTheme } from "../../../design-system/theme-provider.js";
+import { usePopupWindow } from "../../../utils/popup-window.js";
 
 export const MissingRepoButton = ({ onClose }: { onClose: () => void }) => {
   const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];

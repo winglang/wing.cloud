@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { wrpc } from "../utils/wrpc.js";
 
-export type ConfigurationType = "connect";
-
 export const useCreateAppFromRepo = () => {
   const [createAppLoading, setCreateAppLoading] = useState(false);
   const [repositoryId, setRepositoryId] = useState<string>();
@@ -83,6 +81,10 @@ export const useCreateAppFromRepo = () => {
     return !installationId || !repositoryId;
   }, [installationId, repositoryId]);
 
+  const loading = useMemo(() => {
+    return installationsQuery.isLoading || listReposQuery.isLoading;
+  }, [installationsQuery.isLoading, listReposQuery.isLoading]);
+
   return {
     createApp,
     installations,
@@ -92,7 +94,7 @@ export const useCreateAppFromRepo = () => {
     repositoryId,
     setRepositoryId,
     createAppLoading,
-    loadingRepositories: listReposQuery.isLoading,
+    loadingRepositories: loading,
     disabled,
   };
 };

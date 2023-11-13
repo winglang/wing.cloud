@@ -1,8 +1,8 @@
 import clsx from "clsx";
 
-import { useTheme } from "../design-system/theme-provider.js";
+import { useTheme } from "../../../design-system/theme-provider.js";
 
-export interface AppConfigurationItemProps {
+export interface AppConfigurationListItemProps {
   name: string;
   description?: string;
   icon?: React.ReactNode;
@@ -12,7 +12,7 @@ export interface AppConfigurationItemProps {
   classname?: string;
 }
 
-export const AppConfigurationItem = ({
+export const AppConfigurationListItem = ({
   name,
   description,
   icon,
@@ -20,7 +20,7 @@ export const AppConfigurationItem = ({
   checked,
   onChange,
   classname,
-}: AppConfigurationItemProps) => {
+}: AppConfigurationListItemProps) => {
   const { theme } = useTheme();
 
   return (

@@ -2,10 +2,10 @@ import { LockClosedIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
 
-import { Combobox } from "../design-system/combobox.js";
-import { Select } from "../design-system/select.js";
-import { useTheme } from "../design-system/theme-provider.js";
-import type { Installation, Repository } from "../utils/wrpc.js";
+import { Combobox } from "../../../design-system/combobox.js";
+import { Select } from "../../../design-system/select.js";
+import { useTheme } from "../../../design-system/theme-provider.js";
+import type { Installation, Repository } from "../../../utils/wrpc.js";
 
 export interface GitRepoSelectProps {
   installationId?: string;
@@ -28,6 +28,16 @@ export const GitRepoSelect = ({
 }: GitRepoSelectProps) => {
   const { theme } = useTheme();
 
+  const selectInstallationPlaceholder = useMemo(() => {
+    if (loading) {
+      return "Loading...";
+    }
+    if (installations.length === 0) {
+      return "No GitHub namespaces found";
+    }
+    return "Select a GitHub namespace";
+  }, [loading, installations.length]);
+
   const selectRepoPlaceholder = useMemo(() => {
     if (loading) {
       return "Loading...";
@@ -46,7 +56,7 @@ export const GitRepoSelect = ({
             value: installation.id.toString(),
             label: installation.account.login,
           }))}
-          placeholder="Select a GitHub namespace"
+          placeholder={selectInstallationPlaceholder}
           onChange={setInstallationId}
           value={installationId ?? ""}
           className="w-full"

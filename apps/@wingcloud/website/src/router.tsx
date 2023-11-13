@@ -22,7 +22,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "new",
-        lazy: () => import("./routes/new.js"),
+        lazy: () => import("./routes/new/index.js"),
       },
     ],
   },
