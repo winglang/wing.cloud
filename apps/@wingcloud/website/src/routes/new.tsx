@@ -1,16 +1,14 @@
-import { LinkIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
-  AppConfigTypeList,
+  AppConfigurationList,
   type ConfigurationType,
-} from "../components/app-config-type-list.js";
+} from "../components/app-configuration-list.js";
 import { GitRepoSelect } from "../components/git-repo-select.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { Button } from "../design-system/button.js";
-import { Checkbox } from "../design-system/checkbox.js";
 import { useTheme } from "../design-system/theme-provider.js";
 import { usePopupWindow } from "../utils/popup-window.js";
 import { wrpc } from "../utils/wrpc.js";
@@ -114,7 +112,7 @@ export const Component = () => {
       )}
 
       {!installationsQuery.isLoading && (
-        <div className="flex justify-center pt-10 max-w-2xl mx-auto">
+        <div className="flex justify-center md:pt-10 max-w-2xl mx-auto transition-all">
           <div
             className={clsx(
               "w-full rounded-lg shadow-xl border p-6 space-y-4",
@@ -127,69 +125,76 @@ export const Component = () => {
 
             <div className="gap-y-8 mb-4 flex flex-col w-full text-sm">
               <div className="w-full space-y-2">
-                <div className={clsx(theme.text2)}>Select a Git Repository</div>
-
-                <GitRepoSelect
-                  installationId={installationId}
-                  setInstallationId={setInstallationId}
-                  repositoryId={repositoryId}
-                  setRepositoryId={setRepositoryId}
-                  installations={installations}
-                  repos={repos}
-                  loading={listReposQuery.isFetching}
-                />
-              </div>
-
-              <div className="w-full space-y-2">
-                <div className={clsx(theme.text2)}>Starter configuration</div>
-                <AppConfigTypeList
+                <div className={clsx(theme.text2)}></div>
+                <AppConfigurationList
                   onSetType={setConfigurationType}
                   type={configurationType}
-                  disabled={!repositoryId}
                 />
               </div>
 
-              <div className="w-full flex">
-                <div className="text-xs text-center flex gap-2 items-center">
-                  <span>Missing Gint repository?</span>
-                  <button
-                    className="text-blue-600"
-                    onClick={() =>
-                      openPopupWindow({
-                        url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
-                        onClose: onCloseRepositoryPopup,
-                      })
+              {configurationType === "connect" && (
+                <>
+                  <div className="w-full space-y-2">
+                    <div className={clsx(theme.text2)}>
+                      Select a Git Repository
+                    </div>
+
+                    <GitRepoSelect
+                      installationId={installationId}
+                      setInstallationId={setInstallationId}
+                      repositoryId={repositoryId}
+                      setRepositoryId={setRepositoryId}
+                      installations={installations}
+                      repos={repos}
+                      loading={listReposQuery.isLoading}
+                    />
+
+                    <div className="text-xs flex gap-1 items-center pt-2">
+                      <span className={clsx(theme.text1)}>
+                        Missing Git repository?
+                      </span>
+                      <button
+                        className="text-sky-600"
+                        onClick={() =>
+                          openPopupWindow({
+                            url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
+                            onClose: onCloseRepositoryPopup,
+                          })
+                        }
+                      >
+                        Adjust GitHub App Permissions
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="w-full flex">
+              <div className="justify-end flex gap-x-2 grow">
+                <Button
+                  onClick={() => {
+                    navigate("/apps");
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (!installationId) {
+                      return;
                     }
-                  >
-                    Adjust GitHub App Permissions →
-                  </button>
-                </div>
-                <div className="justify-end flex gap-x-2 grow">
-                  <Button
-                    onClick={() => {
-                      navigate("/apps");
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      if (!installationId) {
-                        return;
-                      }
-                      createApp(repositoryId);
-                    }}
-                    primary
-                    disabled={
-                      createAppLoading ||
-                      !installationId ||
-                      !repositoryId ||
-                      !configurationType
-                    }
-                  >
-                    {createAppLoading ? "Creating..." : "Create new App"}
-                  </Button>
-                </div>
+                    createApp(repositoryId);
+                  }}
+                  primary
+                  disabled={
+                    createAppLoading ||
+                    !installationId ||
+                    !repositoryId ||
+                    !configurationType
+                  }
+                >
+                  {createAppLoading ? "Creating..." : "Create new App"}
+                </Button>
               </div>
             </div>
           </div>
