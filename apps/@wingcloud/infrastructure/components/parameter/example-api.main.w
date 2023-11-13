@@ -21,5 +21,5 @@ q.setConsumer(inflight (event: str) => {
 });
 
 test "config" {
-  expect.equal(param.get(), "bar");
+  expect.equal(stageName.get(), "staging");
 }
