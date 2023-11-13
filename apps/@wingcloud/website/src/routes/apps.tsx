@@ -25,10 +25,11 @@ export const Component = () => {
   }, [listAppsQuery.isFetching]);
 
   const apps = useMemo(() => {
-    if (!listAppsQuery.data) {
-      return [];
-    }
-    return listAppsQuery.data.apps.filter((app) =>
+    return listAppsQuery.data?.apps || [];
+  }, [listAppsQuery.data]);
+
+  const filteredApps = useMemo(() => {
+    return apps.filter((app) =>
       `${app.appName}${app.lastCommitMessage}`
         .toLocaleLowerCase()
         .includes(search.toLocaleLowerCase()),
@@ -68,7 +69,7 @@ export const Component = () => {
       )}
       {!loading && (
         <>
-          {apps.length === 0 && (
+          {filteredApps.length === 0 && (
             <div className="text-center">
               <FolderPlusIcon className="w-12 h-12 mx-auto text-gray-400" />
               <h3 className="mt-2 text-sm font-semibold text-gray-900">
@@ -94,14 +95,14 @@ export const Component = () => {
             </div>
           )}
 
-          {apps.length > 0 && (
+          {filteredApps.length > 0 && (
             <div
               className={clsx(
                 "flex flex-wrap gap-6 w-full",
                 "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
               )}
             >
-              {apps.map((app) => (
+              {filteredApps.map((app) => (
                 <AppCard
                   key={app.appId}
                   onClick={() => {
