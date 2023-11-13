@@ -73,25 +73,22 @@ export const ConnectRepoSettings = ({
   return (
     <div className="w-full space-y-2">
       <div className={clsx(theme.text1)}>Select a Git Repository</div>
-
-      <div className="w-full space-y-4">
-        <GitRepoSelect
-          installationId={installationId}
-          setInstallationId={setInstallationId}
-          repositoryId={repositoryId || ""}
-          setRepositoryId={setRepositoryId}
-          installations={installations}
-          repos={repos}
-          loading={loading}
-        />
-        <MissingRepoButton onClose={onMissingRepoClosed} />
-        <CreateAppFooter
-          onCancel={onCancel}
-          onCreate={onCreate}
-          disabled={!repositoryId}
-          loading={createAppLoading}
-        />
-      </div>
+      <GitRepoSelect
+        installationId={installationId}
+        setInstallationId={setInstallationId}
+        repositoryId={repositoryId || ""}
+        setRepositoryId={setRepositoryId}
+        installations={installations}
+        repos={repos}
+        loading={loading}
+      />
+      <MissingRepoButton onClose={onMissingRepoClosed} />
+      <CreateAppFooter
+        onCancel={onCancel}
+        onCreate={onCreate}
+        disabled={!repositoryId}
+        loading={createAppLoading}
+      />
     </div>
   );
 };
