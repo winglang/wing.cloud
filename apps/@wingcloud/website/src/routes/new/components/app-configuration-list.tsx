@@ -1,5 +1,8 @@
 import { LinkIcon, SquaresPlusIcon } from "@heroicons/react/24/outline";
+import clsx from "clsx";
 import { useCallback } from "react";
+
+import { useTheme } from "../../../design-system/theme-provider.js";
 
 import { AppConfigurationListItem } from "./app-configuration-list-item.js";
 import type { ConfigurationType } from "./app-configuration.js";
@@ -15,6 +18,8 @@ export const AppConfigurationList = ({
   type,
   disabled,
 }: AppConfigurationListProps) => {
+  const { theme } = useTheme();
+
   const toggleConfigType = useCallback(
     (value: ConfigurationType) => {
       if (disabled) {
@@ -27,6 +32,7 @@ export const AppConfigurationList = ({
 
   return (
     <div className="w-full space-y-2">
+      <div className={clsx(theme.text1)}>Select a configuration</div>
       <AppConfigurationListItem
         name="Connect"
         description="Connect to an existing repository"

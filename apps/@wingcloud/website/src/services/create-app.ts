@@ -7,9 +7,24 @@ export const useCreateAppFromRepo = () => {
   const [repositoryId, setRepositoryId] = useState<string>();
   const [installationId, setInstallationId] = useState<string>();
 
+  const listInstallationsQuery = wrpc["github.listInstallations"].useQuery();
+
+  const listReposQuery = wrpc["github.listRepositories"].useQuery(
+    {
+      installationId: installationId!,
+    },
+    {
+      enabled: installationId != undefined,
+    },
+  );
+
   const createAppMutation = wrpc["user.createApp"].useMutation();
 
   const createApp = useCallback(async () => {
+    const repos = listReposQuery.data?.repositories;
+    if (!repos) {
+      return;
+    }
     const repo = repos.find(
       (repo) => repo.full_name.toString() === repositoryId,
     );
@@ -39,39 +54,18 @@ export const useCreateAppFromRepo = () => {
       },
     );
     setCreateAppLoading(false);
-  }, [createAppMutation]);
-
-  const installationsQuery = wrpc["github.listInstallations"].useQuery();
-
-  const installations = useMemo(() => {
-    if (!installationsQuery.data) {
-      return [];
-    }
-    return installationsQuery.data.installations;
-  }, [installationsQuery.data]);
-
-  const listReposQuery = wrpc["github.listRepositories"].useQuery(
-    {
-      installationId: installationId!,
-    },
-    {
-      enabled: installationId != undefined,
-    },
-  );
-
-  const repos = useMemo(() => {
-    if (!listReposQuery.data) {
-      return [];
-    }
-    return listReposQuery.data.repositories;
-  }, [listReposQuery.data]);
+  }, [createAppMutation, installationId, listReposQuery.data, repositoryId]);
 
   useEffect(() => {
+    const installations = listInstallationsQuery.data?.installations;
+    if (!installations || installations.length === 0) {
+      return;
+    }
     const firstInstallationId = installations[0]?.id.toString();
     if (firstInstallationId) {
       setInstallationId(firstInstallationId);
     }
-  }, [installationsQuery.data]);
+  }, [listInstallationsQuery.data]);
 
   useEffect(() => {
     setRepositoryId("");
@@ -82,13 +76,11 @@ export const useCreateAppFromRepo = () => {
   }, [installationId, repositoryId]);
 
   const loading = useMemo(() => {
-    return installationsQuery.isLoading || listReposQuery.isLoading;
-  }, [installationsQuery.isLoading, listReposQuery.isLoading]);
+    return listInstallationsQuery.isLoading || listReposQuery.isLoading;
+  }, [listInstallationsQuery.isLoading, listReposQuery.isLoading]);
 
   return {
     createApp,
-    installations,
-    repos,
     installationId,
     setInstallationId,
     repositoryId,
@@ -96,5 +88,7 @@ export const useCreateAppFromRepo = () => {
     createAppLoading,
     loadingRepositories: loading,
     disabled,
+    listReposQuery,
+    listInstallationsQuery,
   };
 };

@@ -2,8 +2,6 @@ import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { Fragment, memo, useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
-import { usePopper } from "react-popper";
 
 import { useTheme } from "./theme-provider.js";
 interface Item {
@@ -37,19 +35,6 @@ export const Select = memo(
   }: SelectProps) => {
     const { theme } = useTheme();
 
-    const [referenceElement, setReferenceElement] =
-      useState<HTMLElement | null>(
-        // eslint-disable-next-line unicorn/no-null
-        null,
-      );
-    const [popperElement, setPopperElement] = useState<HTMLElement | null>(
-      // eslint-disable-next-line unicorn/no-null
-      null,
-    );
-    const { styles, attributes } = usePopper(referenceElement, popperElement, {
-      strategy: "fixed",
-    });
-
     const [root] = useState(() => document.createElement("div"));
     useEffect(() => {
       document.body.append(root);
@@ -64,7 +49,7 @@ export const Select = memo(
       <Listbox value={value} onChange={onChange} disabled={disabled}>
         {() => (
           <div className={clsx("relative inline-block", className)}>
-            <div ref={setReferenceElement} className="w-full">
+            <div className="w-full">
               <Listbox.Button
                 as="button"
                 className={clsx(

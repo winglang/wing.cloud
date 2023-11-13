@@ -51,8 +51,8 @@ export const Component = () => {
           </button>
         </div>
 
-        <div className="gap-y-8 mb-4 flex flex-col w-full text-sm">
-          <div className="w-full space-y-6">
+        <div className="mb-4 flex flex-col w-full text-sm">
+          <div className="w-full space-y-8">
             <AppConfigurationList
               onSetType={setConfigurationType}
               type={configurationType}

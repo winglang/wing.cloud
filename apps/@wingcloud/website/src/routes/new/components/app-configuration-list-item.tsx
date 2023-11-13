@@ -1,5 +1,6 @@
 import clsx from "clsx";
 
+import { StatusDot } from "../../../components/status-dot.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 
 export interface AppConfigurationListItemProps {
@@ -29,15 +30,12 @@ export const AppConfigurationListItem = ({
       className={clsx(
         classname,
         "w-full p-4 text-left flex items-center",
-        "rounded-md shadow-sm",
-        "transition-all hover:shadow",
-        "border",
+        "border rounded transition-all",
         theme.text1,
+        theme.bgInputHover,
+        !disabled && theme.focusInput,
         theme.bgInput,
         theme.borderInput,
-        !disabled && theme.focusInput,
-        "gap-1",
-        checked && ["ring-2 ring-sky-500/50 border-sky-500 outline-none"],
       )}
       onClick={onChange}
     >
@@ -52,16 +50,7 @@ export const AppConfigurationListItem = ({
       </div>
 
       <div className="flex grow justify-end text-slate-500 items-center">
-        {onChange && (
-          <div
-            className={clsx(
-              "w-3 h-3 rounded-full",
-              "border-2",
-              theme.borderInput,
-              checked && "bg-sky-400",
-            )}
-          />
-        )}
+        {onChange && <StatusDot selected={checked ?? false} />}
       </div>
     </button>
   );
