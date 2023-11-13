@@ -127,7 +127,7 @@ pub class CloudFrontDistribution {
     });
 
     new aws.s3BucketOwnershipControls.S3BucketOwnershipControls({
-      bucket: bucket.bucket,
+      bucket: bucket.id,
       rule: {
         objectOwnership: "ObjectWriter",
       },
