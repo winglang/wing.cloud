@@ -120,7 +120,7 @@ pub class CloudFrontDistribution {
     this.logsBucket = new cloud.Bucket() as "reverse-proxy-logs-bucket";
     // https://github.com/winglang/wing/issues/4907
   
-    let bucket: aws.s3Bucket.S3Bucket = unsafeCast(this).bucket;
+    let bucket: aws.s3Bucket.S3Bucket = unsafeCast(this.logsBucket).bucket;
 
     new aws.s3BucketAcl.S3BucketAcl({
       bucket: bucket.bucket,
