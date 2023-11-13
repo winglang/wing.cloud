@@ -98,7 +98,7 @@ export const GitRepoSelect = ({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 max-h-52 overflow-auto rounded">
         {loading && (
           <div className="bg-white p-6 w-full flex items-center justify-center">
             <SpinnerLoader size="sm" />
@@ -115,32 +115,33 @@ export const GitRepoSelect = ({
             No repos found.
           </div>
         )}
-        {filteredRepos.map((repo) => (
-          <button
-            key={repo.id}
-            className={clsx(
-              "text-xs px-2.5 py-1.5 gap-1",
-              "w-full text-left flex items-center",
-              "rounded transition-all border",
-              theme.text1,
-              theme.bgInputHover,
-              theme.focusInput,
-              theme.bgInput,
-              theme.borderInput,
-            )}
-            onClick={() => {
-              setRepositoryId(repo.full_name);
-            }}
-          >
-            <div className="flex items-center gap-2">
-              <img className="w-4 h-4" src={repo.owner.avatar_url} />
-              <div>{repo.full_name}</div>
-            </div>
-            <div className="flex flex-grow justify-end">
-              <StatusDot selected={repositoryId === repo.full_name} />
-            </div>
-          </button>
-        ))}
+        {!loading &&
+          filteredRepos.map((repo) => (
+            <button
+              key={repo.id}
+              className={clsx(
+                "text-xs px-2.5 py-1.5 gap-1",
+                "w-full text-left flex items-center",
+                "rounded transition-all border",
+                theme.text1,
+                theme.bgInputHover,
+                theme.focusInput,
+                theme.bgInput,
+                theme.borderInput,
+              )}
+              onClick={() => {
+                setRepositoryId(repo.full_name);
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <img className="w-4 h-4" src={repo.owner.avatar_url} />
+                <div>{repo.full_name}</div>
+              </div>
+              <div className="flex flex-grow justify-end">
+                <StatusDot selected={repositoryId === repo.full_name} />
+              </div>
+            </button>
+          ))}
       </div>
     </div>
   );

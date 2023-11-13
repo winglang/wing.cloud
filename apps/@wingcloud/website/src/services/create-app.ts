@@ -76,8 +76,8 @@ export const useCreateAppFromRepo = () => {
   }, [installationId, repositoryId]);
 
   const loading = useMemo(() => {
-    return listInstallationsQuery.isLoading || listReposQuery.isLoading;
-  }, [listInstallationsQuery.isLoading, listReposQuery.isLoading]);
+    return listInstallationsQuery.isFetching || listReposQuery.isFetching;
+  }, [listInstallationsQuery.isFetching, listReposQuery.isFetching]);
 
   return {
     createApp,
@@ -86,7 +86,7 @@ export const useCreateAppFromRepo = () => {
     repositoryId,
     setRepositoryId,
     createAppLoading,
-    loadingRepositories: loading,
+    loading,
     disabled,
     listReposQuery,
     listInstallationsQuery,

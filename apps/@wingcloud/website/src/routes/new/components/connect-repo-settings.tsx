@@ -30,11 +30,12 @@ export const ConnectRepoSettings = ({
     setInstallationId,
     repositoryId,
     setRepositoryId,
-    loadingRepositories,
+    loading,
     createAppLoading,
   } = useCreateAppFromRepo();
 
   const [installations, setInstallations] = useState<Installation[]>([]);
+
   useEffect(() => {
     if (!listInstallationsQuery.data) {
       return;
@@ -81,7 +82,7 @@ export const ConnectRepoSettings = ({
           setRepositoryId={setRepositoryId}
           installations={installations}
           repos={repos}
-          loading={loadingRepositories}
+          loading={loading}
         />
         <MissingRepoButton onClose={onMissingRepoClosed} />
         <CreateAppFooter
