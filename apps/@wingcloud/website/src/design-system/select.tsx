@@ -52,6 +52,7 @@ export const Select = memo(
             <div className="w-full">
               <Listbox.Button
                 as="button"
+                aria-disabled={disabled}
                 className={clsx(
                   btnClassName,
                   "w-full pr-8 text-left relative",
@@ -60,6 +61,7 @@ export const Select = memo(
                   theme.textInput,
                   theme.borderInput,
                   theme.focusInput,
+                  disabled && "cursor-not-allowed opacity-50",
                 )}
               >
                 {placeholder && !value && (

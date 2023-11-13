@@ -53,7 +53,7 @@ export const GitRepoSelect = ({
   }, [repos, search]);
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-2">
       <div className="flex gap-2 w-full items-center">
         <div className="w-1/3">
           <Select
@@ -65,6 +65,7 @@ export const GitRepoSelect = ({
             onChange={setInstallationId}
             value={installationId ?? ""}
             className="w-full"
+            disabled={loading}
             renderItem={(item) => {
               return (
                 <div className="flex items-center gap-1">
@@ -98,7 +99,7 @@ export const GitRepoSelect = ({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 max-h-52 overflow-auto rounded">
+      <div className="flex flex-col gap-2 max-h-52 overflow-auto rounded p-1">
         {loading && (
           <div className="bg-white p-6 w-full flex items-center justify-center">
             <SpinnerLoader size="sm" />
