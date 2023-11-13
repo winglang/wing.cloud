@@ -1,19 +1,21 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { AppConfigurationList } from "../components/app-configuration-list.js";
 import { ConnectRepoSettings } from "../components/connect-repo-settings.js";
 import { Button } from "../design-system/button.js";
+import { useNotifications } from "../design-system/notification.js";
 import { useTheme } from "../design-system/theme-provider.js";
 import {
-  useCreateFromRepoApp,
+  useCreateAppFromRepo,
   type ConfigurationType,
 } from "../services/create-app.js";
 
 export const Component = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const { showNotification } = useNotifications();
 
   const [configurationType, setConfigurationType] =
     useState<ConfigurationType>("connect");
@@ -27,11 +29,31 @@ export const Component = () => {
     repositoryId,
     setRepositoryId,
     loadingRepositories,
-    createApploading,
+    createAppLoading,
     disabled,
-  } = useCreateFromRepoApp({
-    configurationType,
-  });
+  } = useCreateAppFromRepo();
+
+  const onCreateApp = useCallback(async () => {
+    try {
+      await createApp();
+      navigate("/apps");
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        showNotification("Failed to create the app", {
+          body: error.message,
+          type: "error",
+        });
+      } else {
+        showNotification("Failed to create the app", {
+          body: "Something went wrong",
+          type: "error",
+        });
+      }
+
+      console.error(error);
+    }
+  }, [createApp, navigate]);
 
   return (
     <>
@@ -76,8 +98,8 @@ export const Component = () => {
               >
                 Cancel
               </Button>
-              <Button onClick={createApp} primary disabled={disabled}>
-                {createApploading ? "Creating..." : "Create new App"}
+              <Button onClick={onCreateApp} primary disabled={disabled}>
+                {createAppLoading ? "Creating..." : "Create new App"}
               </Button>
             </div>
           </div>

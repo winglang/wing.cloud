@@ -1,25 +1,15 @@
-import { create } from "node:domain";
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { wrpc } from "../utils/wrpc.js";
 
 export type ConfigurationType = "connect";
 
-export interface CreateAppOptions {
-  configurationType: ConfigurationType;
-}
-
-export const useCreateFromRepoApp = ({
-  configurationType,
-}: CreateAppOptions) => {
+export const useCreateAppFromRepo = () => {
   const [createAppLoading, setCreateAppLoading] = useState(false);
-  const [disabled, setDisabled] = useState(false);
-
-  const createAppMutation = wrpc["user.createApp"].useMutation();
-
   const [repositoryId, setRepositoryId] = useState<string>();
   const [installationId, setInstallationId] = useState<string>();
+
+  const createAppMutation = wrpc["user.createApp"].useMutation();
 
   const createApp = useCallback(async () => {
     const repo = repos.find(
@@ -45,11 +35,12 @@ export const useCreateFromRepoApp = ({
       },
       {
         onError: (error) => {
-          console.error(error);
           setCreateAppLoading(false);
+          throw error;
         },
       },
     );
+    setCreateAppLoading(false);
   }, [createAppMutation]);
 
   const installationsQuery = wrpc["github.listInstallations"].useQuery();
@@ -87,6 +78,10 @@ export const useCreateFromRepoApp = ({
   useEffect(() => {
     setRepositoryId("");
   }, [installationId]);
+
+  const disabled = useMemo(() => {
+    return !installationId || !repositoryId;
+  }, [installationId, repositoryId]);
 
   return {
     createApp,

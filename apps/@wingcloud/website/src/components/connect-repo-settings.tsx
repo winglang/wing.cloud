@@ -36,7 +36,7 @@ export const ConnectRepoSettings = ({
       <GitRepoSelect
         installationId={installationId}
         setInstallationId={setInstallationId}
-        repositoryId={repositoryId}
+        repositoryId={repositoryId || ""}
         setRepositoryId={setRepositoryId}
         installations={installations}
         repos={repos}
