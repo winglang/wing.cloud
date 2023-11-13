@@ -120,12 +120,12 @@ let origins = (() => {
     });
   } else {
     originsArray.push({
-      pathPattern: "",
+      pathPattern: "/",
       domainName: util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN,
       originId: "landingPage",
     });
     originsArray.push({
-      pathPattern: "/*",
+      pathPattern: "",
       domainName: website.url.replace("https://", ""),
       originId: "website",
     });

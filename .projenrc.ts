@@ -9,6 +9,8 @@ import {
 } from "@skyrpex/wingen";
 import { JsonFile, web } from "projen";
 
+const winglangVersion = '^0.45.5'
+
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
   devDeps: ["@skyrpex/wingen"],
@@ -207,21 +209,23 @@ const runtime = new TypescriptProject({
   },
 });
 
-runtime.addDeps(`winglang`);
-runtime.addDeps(`@winglang/sdk`);
-runtime.addDeps(`@winglang/compiler`);
-runtime.addDeps(`@wingconsole/app`);
+runtime.addDeps(`winglang@${winglangVersion}`);
+runtime.addDeps(`@winglang/sdk@${winglangVersion}`);
+runtime.addDeps(`@winglang/compiler@${winglangVersion}`);
+runtime.addDeps(`@wingconsole/app@${winglangVersion}`);
 runtime.addDeps("express");
 runtime.addDeps("jsonwebtoken");
 runtime.addDeps("jwk-to-pem");
 runtime.addDeps("jose");
 runtime.addDeps("node-fetch");
+runtime.addDeps("which");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/jsonwebtoken");
 runtime.addDevDeps("@types/jwk-to-pem");
 runtime.addDevDeps("simple-git");
 runtime.addDevDeps("msw");
+runtime.addDevDeps("@types/which");
 
 runtime.addGitIgnore("target/");
 
@@ -241,7 +245,7 @@ infrastructure.addGitIgnore("/.env.*");
 infrastructure.addGitIgnore("!/.env.example");
 
 infrastructure.addGitIgnore("/target/");
-infrastructure.addDeps(`winglang`);
+infrastructure.addDeps(`winglang@${winglangVersion}`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
