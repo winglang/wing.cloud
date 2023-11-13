@@ -126,6 +126,13 @@ pub class CloudFrontDistribution {
       acl: "log-delivery-write"
     });
 
+    new aws.s3BucketOwnershipControls.S3BucketOwnershipControls({
+      bucket: bucket.id,
+      rule: {
+        objectOwnership: "ObjectWriter",
+      },
+    });
+
     new aws.s3BucketPolicy.S3BucketPolicy({
       bucket: bucket.id,
       policy: Json.stringify({
