@@ -117,13 +117,42 @@ pub class CloudFrontDistribution {
   }
 
   init(props: CloudFrontDistributionProps) {
-    this.logsBucket = new cloud.Bucket() as "reverse-proxy-logs-bucket";
+    this.logsBucket = new cloud.Bucket(public: true) as "reverse-proxy-logs-bucket";
     // https://github.com/winglang/wing/issues/4907
     let bucket: aws.s3Bucket.S3Bucket = unsafeCast(this.logsBucket).bucket;
-    let logsBucketName = bucket.bucket;
-    let cachePolicy = new CachePolicy(
-      name: "cache-policy-for-${this.getDefaultOriginId(props.origins)}",
 
+    new aws.s3BucketAcl.S3BucketAcl({
+      bucket: bucket.bucket,
+      acl: "log-delivery-write"
+    });
+
+    new aws.s3BucketOwnershipControls.S3BucketOwnershipControls({
+      bucket: bucket.bucket,
+      rule: {
+        objectOwnership: "ObjectWriter",
+      },
+    });
+
+    new aws.s3BucketPolicy.S3BucketPolicy({
+      bucket: bucket.bucket,
+      policy: Json.stringify({
+        Version: "2012-10-17",
+        Statement: [
+          {
+            Sid: "CloudFrontLogs",
+            Effect: "Allow",
+            Principal: {
+              Service: "cloudfront.amazonaws.com",
+            },
+            Action: "s3:PutObject",
+            Resource: "${bucket.arn}/*",
+          },
+        ],
+      }),
+    });
+
+    let cachePolicy = new CachePolicy(
+      name: "cache-policy-for-${this.getDefaultOriginId(props.origins)}"
     );
 
     this.distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
@@ -163,7 +192,7 @@ pub class CloudFrontDistribution {
       origin: this.getHttpOrigins(props.origins),
       aliases: props.aliases,
       loggingConfig: {
-        bucket: logsBucketName,
+        bucket: bucket.bucketDomainName,
         includeCookies: true,
         prefix: "reverse-proxy"
       }

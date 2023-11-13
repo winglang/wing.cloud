@@ -95,7 +95,7 @@ export const Component = () => {
                       label: "Delete App",
                       onClick: () => {
                         deleteApp();
-                        navigate("/apps");
+                        navigate("/apps/");
                       },
                     },
                   ]}

@@ -120,14 +120,14 @@ let origins = (() => {
     });
   } else {
     originsArray.push({
-      pathPattern: "/",
-      domainName: util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN,
-      originId: "landingPage",
+      pathPattern: "/apps/*",
+      domainName: website.url.replace("https://", ""),
+      originId: "website",
     });
     originsArray.push({
       pathPattern: "",
-      domainName: website.url.replace("https://", ""),
-      originId: "website",
+      domainName: util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN,
+      originId: "landingPage",
     });
   }
   return originsArray.copy();

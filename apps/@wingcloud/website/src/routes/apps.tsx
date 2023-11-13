@@ -52,7 +52,7 @@ export const Component = () => {
           primary
           icon={PlusIcon}
           onClick={() => {
-            navigate("/new");
+            navigate("new");
           }}
         />
       </div>
@@ -82,7 +82,7 @@ export const Component = () => {
                     primary
                     className="mt-6"
                     onClick={() => {
-                      navigate("/new");
+                      navigate("new");
                     }}
                   />
                 </div>
