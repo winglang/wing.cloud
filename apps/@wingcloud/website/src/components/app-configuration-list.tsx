@@ -20,11 +20,6 @@ export const AppConfigurationList = ({
       if (disabled) {
         return;
       }
-      if (type === value) {
-        // eslint-disable-next-line unicorn/no-useless-undefined
-        onSetType(undefined);
-        return;
-      }
       onSetType(value);
     },
     [type, onSetType, disabled],

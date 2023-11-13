@@ -56,12 +56,12 @@ export const Component = () => {
         />
       </div>
 
-      {listAppsQuery.isLoading && (
+      {listAppsQuery.isFetching && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
         </div>
       )}
-      {!listAppsQuery.isLoading && (
+      {!listAppsQuery.isFetching && (
         <>
           {apps.length === 0 && (
             <div className="text-center">
