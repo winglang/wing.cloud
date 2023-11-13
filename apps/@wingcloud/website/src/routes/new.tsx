@@ -7,18 +7,16 @@ import {
   type ConfigurationType,
 } from "../components/app-configuration-list.js";
 import { GitRepoSelect } from "../components/git-repo-select.js";
+import { MissingRepoButton } from "../components/missing-repo-button.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { Button } from "../design-system/button.js";
 import { useTheme } from "../design-system/theme-provider.js";
 import { usePopupWindow } from "../utils/popup-window.js";
 import { wrpc } from "../utils/wrpc.js";
 
-const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
-
 export const Component = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const openPopupWindow = usePopupWindow();
 
   const [installationId, setInstallationId] = useState<string>();
   const [repositoryId, setRepositoryId] = useState("");
@@ -148,23 +146,7 @@ export const Component = () => {
                       repos={repos}
                       loading={listReposQuery.isLoading}
                     />
-
-                    <div className="text-xs flex gap-1 items-center pt-2">
-                      <span className={clsx(theme.text1)}>
-                        Missing Git repository?
-                      </span>
-                      <button
-                        className="text-sky-600"
-                        onClick={() =>
-                          openPopupWindow({
-                            url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
-                            onClose: onCloseRepositoryPopup,
-                          })
-                        }
-                      >
-                        Adjust GitHub App Permissions
-                      </button>
-                    </div>
+                    <MissingRepoButton onClose={onCloseRepositoryPopup} />
                   </div>
                 </>
               )}
