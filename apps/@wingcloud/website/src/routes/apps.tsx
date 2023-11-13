@@ -7,7 +7,7 @@ import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { AppCard } from "../components/app-card.js";
+import { AppCard } from "./apps/components/app-card.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { Button } from "../design-system/button.js";
 import { Input } from "../design-system/input.js";

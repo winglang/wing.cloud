@@ -5,13 +5,13 @@ import {
 } from "@heroicons/react/24/outline";
 import { useMemo, useState } from "react";
 
-import { Button } from "../design-system/button.js";
-import { Input } from "../design-system/input.js";
-import { BranchIcon } from "../icons/branch-icon.js";
-import type { Environment } from "../utils/wrpc.js";
+import { Button } from "../../../design-system/button.js";
+import { Input } from "../../../design-system/input.js";
+import { BranchIcon } from "../../../icons/branch-icon.js";
+import type { Environment } from "../../../utils/wrpc.js";
 
 import { EnvironmentsListItem } from "./environments-list-item.js";
-import { SpinnerLoader } from "./spinner-loader.js";
+import { SpinnerLoader } from "../../../components/spinner-loader.js";
 
 export interface EnvironmentsListProps {
   environments: Environment[];

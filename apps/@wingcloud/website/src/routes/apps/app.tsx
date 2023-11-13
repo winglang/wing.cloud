@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { EnvironmentsList } from "../../components/environments-list.js";
+import { EnvironmentsList } from "../environments/components/environments-list.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { Menu } from "../../design-system/menu.js";
