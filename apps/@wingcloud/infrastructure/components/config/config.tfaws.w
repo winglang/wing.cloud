@@ -5,29 +5,19 @@ bring "@cdktf/provider-aws" as tfaws;
 
 pub class Config impl ic.IConfig {
     extern "./config.tfaws.ts" pub static inflight fetchParameterValue(key: str): str;
-
-    // would be nice to share pre- and inflight, also as a static class attribute or something like this
-    // see  https://github.com/winglang/wing/issues/1668
-    pub static key(name: str): str {
-        return "/wing-cloud/apps/config/staging/${name}";
-    }
-
-    pub static inflight keyInflight(name: str): str {
-        return "/wing-cloud/apps/config/staging/${name}";
-    }
-
-    // can't do static methods yet, see
-    // https://github.com/winglang/wing/issues/2583
-    pub add(name: str, value: str) {
+    key: str;
+    
+    init(props: ic.ConfigProps) {
+        this.key= "/wing-cloud/apps/config/staging/${props.name}";
         new tfaws.ssmParameter.SsmParameter(
-            name: Config.key(name),
+            name: this.key,
             type: "String",
-            value: value,
-        ) as Config.key(name);
+            value: props.value,
+        );
     }
 
-    pub inflight get(name: str): str {
-        return Config.fetchParameterValue(Config.keyInflight(name));
+    pub inflight get(): str {
+        return Config.fetchParameterValue(this.key);
     }
 
     pub onLift(host: std.IInflightHost, ops: Array<str>) {        
@@ -35,7 +25,8 @@ pub class Config impl ic.IConfig {
         if let host = aws.Function.from(host) {
             host.addPolicyStatements(aws.PolicyStatement {
                 actions: ["ssm:GetParameter"],
-                resources: ["arn:aws:ssm:us-east-1:110379683389:parameter${Config.key("*")}"],  
+                // we'll have to see if that's causing cyclic dependencies
+                resources: ["arn:aws:ssm:us-east-1:110379683389:parameter${this.key}"],  
                 effect: aws.Effect.ALLOW,
               });
         }

@@ -1,6 +1,10 @@
 bring cloud;
 
 pub interface IConfig {
-    add(key: str, value: str): void;
-    inflight get(key: str): str;
+    inflight get(): str;
+}
+
+pub struct ConfigProps {
+    name: str;
+    value: str;
 }

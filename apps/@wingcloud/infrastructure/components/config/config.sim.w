@@ -3,24 +3,15 @@ bring "./iconfig.w" as ic;
 
 pub class Config impl ic.IConfig {
     state: cloud.Bucket;
+    key: str;
 
-    init() {
+    init(props: ic.ConfigProps) {
         this.state = new cloud.Bucket();        
+        this.key = "/config/${props.name}";        
+        this.state.addObject(this.key, props.value);
     }
 
-    pub static key(name: str): str {
-        return "/config/${name}";
-    }
-
-    pub static inflight keyInflight(name: str): str {
-        return "/config/${name}";
-    }
-
-    pub add(name: str, value: str) {
-        this.state.addObject(Config.key(name), value);
-    }
-
-    pub inflight get(name: str): str {
-        return this.state.get(Config.keyInflight(name));
+    pub inflight get(): str {
+        return this.state.get(this.key);
     }    
 }

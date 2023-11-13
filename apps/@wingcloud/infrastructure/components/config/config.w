@@ -7,19 +7,15 @@ bring "./iconfig.w" as ic;
 pub class Config impl ic.IConfig {
     platform: ic.IConfig;
 
-    init () {
+    init(props: ic.ConfigProps) {
         if util.env("WING_TARGET") == "sim" {
-            this.platform = new sim.Config();
+            this.platform = new sim.Config(props);
         } else {
-            this.platform = new tfaws.Config();
+            this.platform = new tfaws.Config(props);
         }
     }
 
-    pub add(name: str, value: str) {        
-        this.platform.add(name, value);
-    }
-
-    pub inflight get(name: str): str { 
-        return this.platform.get(name);       
+    pub inflight get(): str { 
+        return this.platform.get();    
     }
 }
