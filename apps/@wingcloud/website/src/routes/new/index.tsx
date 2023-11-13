@@ -53,7 +53,7 @@ export const Component = () => {
           {configurationType && (
             <>
               <ChevronRightIcon className="h-4 w-4 flex-shrink-0 text-slate-600" />
-              <div className="font-semibold items-center opacity-80">
+              <div className="font-semibold items-center">
                 {configurationType}
               </div>
             </>
