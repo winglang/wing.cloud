@@ -27,20 +27,16 @@ export const Component = () => {
   }, []);
 
   return (
-    <div className="flex justify-center md:pt-10 max-w-2xl mx-auto transition-all">
+    <div className="flex justify-center transition-all">
       <div
-        className={clsx(
-          "w-full rounded-lg shadow-xl border p-6 space-y-4",
-          theme.bgInput,
-        )}
+        className={clsx("w-full rounded shadow p-6 space-y-4", theme.bgInput)}
       >
         <div className={clsx(theme.text1, "font-semibold text-lg")}>
           Create a new App
         </div>
 
         <div className="gap-y-8 mb-4 flex flex-col w-full text-sm">
-          <div className="w-full space-y-2">
-            <div className={clsx(theme.text2)}></div>
+          <div className="w-full space-y-4">
             <AppConfigurationList
               onSetType={setConfigurationType}
               type={configurationType}

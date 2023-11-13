@@ -72,7 +72,7 @@ export const Select = memo(
                 )}
               >
                 {placeholder && !value && (
-                  <div className={clsx("truncate", theme.text2)}>
+                  <div className={clsx("truncate", theme.text1)}>
                     {placeholder}
                   </div>
                 )}
