@@ -122,12 +122,12 @@ pub class CloudFrontDistribution {
     let bucket: aws.s3Bucket.S3Bucket = unsafeCast(this.logsBucket).bucket;
 
     new aws.s3BucketAcl.S3BucketAcl({
-      bucket: bucket.id,
+      bucket: bucket.bucket,
       acl: "log-delivery-write"
     });
 
     new aws.s3BucketOwnershipControls.S3BucketOwnershipControls({
-      bucket: bucket.id,
+      bucket: bucket.bucket,
       rule: {
         objectOwnership: "ObjectWriter",
       },
