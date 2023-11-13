@@ -35,7 +35,7 @@ export const AppConfigurationListItem = ({
         theme.text1,
         theme.bgInput,
         theme.borderInput,
-        theme.focusInput,
+        !disabled && theme.focusInput,
         "gap-1",
         checked && ["ring-2 ring-sky-500/50 border-sky-500 outline-none"],
       )}

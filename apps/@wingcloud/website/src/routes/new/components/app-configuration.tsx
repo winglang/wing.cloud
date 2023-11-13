@@ -2,7 +2,7 @@ import { ConnectRepoSettings } from "./connect-repo-settings.js";
 
 export type ConfigurationType = "connect";
 export interface AppConfigurationProps {
-  type: ConfigurationType;
+  type?: ConfigurationType;
   onCreateApp: () => void;
   onCancel: () => void;
   onError: (error: Error) => void;

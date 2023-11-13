@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { Combobox } from "../../../design-system/combobox.js";
 import { Select } from "../../../design-system/select.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
+import { GithubIcon } from "../../../icons/github-icon.js";
 import type { Installation, Repository } from "../../../utils/wrpc.js";
 
 export interface GitRepoSelectProps {
@@ -60,6 +61,16 @@ export const GitRepoSelect = ({
           onChange={setInstallationId}
           value={installationId ?? ""}
           className="w-full"
+          renderItem={(item) => {
+            return (
+              <div className="flex items-center gap-1">
+                <GithubIcon
+                  className={clsx("w-4 h-4 inline-block", theme.text1)}
+                />
+                {item.label}
+              </div>
+            );
+          }}
         />
       </div>
 

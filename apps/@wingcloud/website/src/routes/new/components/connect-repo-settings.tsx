@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../../services/create-app.js";
@@ -21,7 +20,6 @@ export const ConnectRepoSettings = ({
   onError,
 }: ConnectRepoSettingsProps) => {
   const { theme } = useTheme();
-  const navigate = useNavigate();
 
   const {
     createApp,
@@ -47,8 +45,8 @@ export const ConnectRepoSettings = ({
   }, [createApp, onCreateApp, onError]);
 
   return (
-    <div className="w-full space-y-2">
-      <div className={clsx(theme.text2)}>Select a Git Repository</div>
+    <div className="w-full space-y-4">
+      <div className={clsx(theme.text1)}>Select a Git Repository</div>
       <GitRepoSelect
         installationId={installationId}
         setInstallationId={setInstallationId}

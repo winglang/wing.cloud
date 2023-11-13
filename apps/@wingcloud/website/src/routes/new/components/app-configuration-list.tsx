@@ -26,7 +26,7 @@ export const AppConfigurationList = ({
   );
 
   return (
-    <>
+    <div className="w-full space-y-2">
       <AppConfigurationListItem
         name="Connect"
         description="Connect to an existing repository"
@@ -45,6 +45,6 @@ export const AppConfigurationList = ({
         disabled={true}
         classname="opacity-50 cursor-default"
       />
-    </>
+    </div>
   );
 };

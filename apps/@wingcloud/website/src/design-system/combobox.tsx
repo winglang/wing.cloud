@@ -1,5 +1,5 @@
 import { Combobox as HeadlessCombobox, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useMemo, useRef } from "react";
 import { useEffect, useState } from "react";
@@ -97,12 +97,12 @@ export const Combobox = ({
           aria-disabled={disabled}
           className={clsx(
             "absolute inset-0 flex items-center px-2 w-full",
-            "rounded-md",
+            "rounded",
             theme.borderInput,
             theme.focusInput,
           )}
         >
-          <ChevronDownIcon
+          <ChevronUpDownIcon
             className={clsx("h-4 w-4 absolute right-2", theme.textInput)}
             aria-hidden="true"
           />

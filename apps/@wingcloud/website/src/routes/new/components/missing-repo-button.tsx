@@ -12,7 +12,7 @@ export const MissingRepoButton = ({ onClose }: { onClose: () => void }) => {
   const openPopupWindow = usePopupWindow();
   return (
     <div className="text-xs flex gap-1 items-center pt-2">
-      <span className={clsx(theme.text1)}>Missing Git repository?</span>
+      <span className={clsx(theme.text1)}>Missing a repository?</span>
       <button
         className="text-sky-600"
         onClick={() =>
