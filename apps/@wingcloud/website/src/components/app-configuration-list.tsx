@@ -1,11 +1,12 @@
 import { LinkIcon, SquaresPlusIcon } from "@heroicons/react/24/outline";
 import { useCallback } from "react";
 
+import type { ConfigurationType } from "../services/create-app.js";
+
 import { AppConfigurationItem } from "./app-configuration-item.js";
 
-export type ConfigurationType = "connect";
 export interface AppConfigurationListProps {
-  onSetType: (configType?: ConfigurationType) => void;
+  onSetType: (configType: ConfigurationType) => void;
   type?: ConfigurationType;
   disabled?: boolean;
 }

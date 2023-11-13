@@ -1,187 +1,88 @@
 import clsx from "clsx";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import {
-  AppConfigurationList,
-  type ConfigurationType,
-} from "../components/app-configuration-list.js";
-import { GitRepoSelect } from "../components/git-repo-select.js";
-import { MissingRepoButton } from "../components/missing-repo-button.js";
-import { SpinnerLoader } from "../components/spinner-loader.js";
+import { AppConfigurationList } from "../components/app-configuration-list.js";
+import { ConnectRepoSettings } from "../components/connect-repo-settings.js";
 import { Button } from "../design-system/button.js";
 import { useTheme } from "../design-system/theme-provider.js";
-import { usePopupWindow } from "../utils/popup-window.js";
-import { wrpc } from "../utils/wrpc.js";
+import {
+  useCreateFromRepoApp,
+  type ConfigurationType,
+} from "../services/create-app.js";
 
 export const Component = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
 
-  const [installationId, setInstallationId] = useState<string>();
-  const [repositoryId, setRepositoryId] = useState("");
-  const [configurationType, setConfigurationType] = useState<
-    ConfigurationType | undefined
-  >("connect");
+  const [configurationType, setConfigurationType] =
+    useState<ConfigurationType>("connect");
 
-  const installationsQuery = wrpc["github.listInstallations"].useQuery();
-  const installations = useMemo(() => {
-    if (!installationsQuery.data) {
-      return [];
-    }
-    return installationsQuery.data.installations;
-  }, [installationsQuery.data]);
-
-  const listReposQuery = wrpc["github.listRepositories"].useQuery(
-    {
-      installationId: installationId!,
-    },
-    {
-      enabled: installationId != undefined,
-    },
-  );
-
-  const repos = useMemo(() => {
-    if (!listReposQuery.data) {
-      return [];
-    }
-    return listReposQuery.data.repositories;
-  }, [listReposQuery.data]);
-
-  const [createAppLoading, setCreateAppLoading] = useState(false);
-  const createAppMutation = wrpc["user.createApp"].useMutation();
-
-  const createApp = useCallback(
-    async (repoId: string) => {
-      const repo = repos.find((repo) => repo.full_name.toString() === repoId);
-      if (!repo) {
-        return;
-      }
-
-      setCreateAppLoading(true);
-      setRepositoryId(repo.full_name.toString());
-      await createAppMutation.mutateAsync(
-        {
-          appName: repo.name,
-          description: repo.description,
-          repoId: repo.full_name.toString(),
-          repoName: repo.name,
-          repoOwner: repo.owner.login,
-          entryfile: "main.w",
-          default_branch: repo.default_branch,
-          imageUrl: repo.owner.avatar_url,
-          installationId: installationId!,
-        },
-        {
-          onError: (error) => {
-            console.error(error);
-            setCreateAppLoading(false);
-          },
-        },
-      );
-      navigate("/apps");
-    },
-    [createAppMutation],
-  );
-
-  const onCloseRepositoryPopup = useCallback(() => {
-    // eslint-disable-next-line unicorn/no-useless-undefined
-    setInstallationId(undefined);
-    installationsQuery.refetch();
-  }, [installationsQuery.data]);
-
-  useEffect(() => {
-    const firstInstallationId = installations[0]?.id.toString();
-    if (firstInstallationId) {
-      setInstallationId(firstInstallationId);
-    }
-  }, [installationsQuery.data]);
-
-  useEffect(() => {
-    setRepositoryId("");
-  }, [installationId]);
+  const {
+    createApp,
+    installations,
+    repos,
+    installationId,
+    setInstallationId,
+    repositoryId,
+    setRepositoryId,
+    loadingRepositories,
+    createApploading,
+    disabled,
+  } = useCreateFromRepoApp({
+    configurationType,
+  });
 
   return (
     <>
-      {installationsQuery.isLoading && (
-        <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <SpinnerLoader />
-        </div>
-      )}
+      <div className="flex justify-center md:pt-10 max-w-2xl mx-auto transition-all">
+        <div
+          className={clsx(
+            "w-full rounded-lg shadow-xl border p-6 space-y-4",
+            theme.bgInput,
+          )}
+        >
+          <div className={clsx(theme.text1, "font-semibold text-lg")}>
+            Create a new App
+          </div>
 
-      {!installationsQuery.isLoading && (
-        <div className="flex justify-center md:pt-10 max-w-2xl mx-auto transition-all">
-          <div
-            className={clsx(
-              "w-full rounded-lg shadow-xl border p-6 space-y-4",
-              theme.bgInput,
+          <div className="gap-y-8 mb-4 flex flex-col w-full text-sm">
+            <div className="w-full space-y-2">
+              <div className={clsx(theme.text2)}></div>
+              <AppConfigurationList
+                onSetType={setConfigurationType}
+                type={configurationType}
+              />
+            </div>
+
+            {configurationType === "connect" && (
+              <ConnectRepoSettings
+                installations={installations}
+                repos={repos}
+                installationId={installationId}
+                setInstallationId={setInstallationId}
+                repositoryId={repositoryId}
+                setRepositoryId={setRepositoryId}
+                loading={loadingRepositories}
+              />
             )}
-          >
-            <div className={clsx(theme.text1, "font-semibold text-lg")}>
-              Create a new App
-            </div>
-
-            <div className="gap-y-8 mb-4 flex flex-col w-full text-sm">
-              <div className="w-full space-y-2">
-                <div className={clsx(theme.text2)}></div>
-                <AppConfigurationList
-                  onSetType={setConfigurationType}
-                  type={configurationType}
-                />
-              </div>
-
-              {configurationType === "connect" && (
-                <>
-                  <div className="w-full space-y-2">
-                    <div className={clsx(theme.text2)}>
-                      Select a Git Repository
-                    </div>
-
-                    <GitRepoSelect
-                      installationId={installationId}
-                      setInstallationId={setInstallationId}
-                      repositoryId={repositoryId}
-                      setRepositoryId={setRepositoryId}
-                      installations={installations}
-                      repos={repos}
-                      loading={listReposQuery.isLoading}
-                    />
-                    <MissingRepoButton onClose={onCloseRepositoryPopup} />
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="w-full flex">
-              <div className="justify-end flex gap-x-2 grow">
-                <Button
-                  onClick={() => {
-                    navigate("/apps");
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={() => {
-                    if (!installationId) {
-                      return;
-                    }
-                    createApp(repositoryId);
-                  }}
-                  primary
-                  disabled={
-                    createAppLoading ||
-                    !installationId ||
-                    !repositoryId ||
-                    !configurationType
-                  }
-                >
-                  {createAppLoading ? "Creating..." : "Create new App"}
-                </Button>
-              </div>
+          </div>
+          <div className="w-full flex">
+            <div className="justify-end flex gap-x-2 grow">
+              <Button
+                onClick={() => {
+                  navigate("/apps");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button onClick={createApp} primary disabled={disabled}>
+                {createApploading ? "Creating..." : "Create new App"}
+              </Button>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </>
   );
 };
