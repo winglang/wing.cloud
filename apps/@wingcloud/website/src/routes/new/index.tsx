@@ -29,7 +29,7 @@ export const Component = () => {
   }, []);
 
   const onCancel = useCallback(() => {
-    navigate("/apps");
+    navigate("/apps/");
   }, [navigate]);
 
   const resetForm = useCallback(() => {
@@ -62,7 +62,7 @@ export const Component = () => {
               <AppConfiguration
                 type={configurationType}
                 onCreateApp={() => {
-                  navigate("/apps");
+                  navigate("/apps/");
                 }}
                 onCancel={onCancel}
                 onError={onError}
