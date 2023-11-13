@@ -1,6 +1,6 @@
 bring cloud;
 bring expect;
-bring "./Parameter.w" as p;
+bring "./parameter.w" as p;
 
 let param = new p.Parameter(
     name: "foo",
