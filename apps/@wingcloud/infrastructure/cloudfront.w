@@ -127,14 +127,14 @@ pub class CloudFrontDistribution {
     });
 
     new aws.s3BucketOwnershipControls.S3BucketOwnershipControls({
-      bucket: bucket.id,
+      bucket: bucket.bucket,
       rule: {
         objectOwnership: "ObjectWriter",
       },
     });
 
     new aws.s3BucketPolicy.S3BucketPolicy({
-      bucket: bucket.id,
+      bucket: bucket.bucket,
       policy: Json.stringify({
         Version: "2012-10-17",
         Statement: [
