@@ -316,11 +316,18 @@ pub class Api {
       let userId = getUserFromCookie(request);
 
       let input = Json.parse(request.body ?? "");
+      let appId = input.get("appId").asStr();
 
       apps.delete(
-        appId: input.get("appId").asStr(),
+        appId: appId,
         userId: userId,
       );
+
+      return {
+        body: {
+          appId: appId,
+        },
+      };
     });
 
     api.get("/wrpc/app.environments", inflight (request) => {
@@ -404,6 +411,7 @@ pub class Api {
         return {
           body: {
             appId: app.appId,
+            appName: app.appName,
           },
         };
       } else {

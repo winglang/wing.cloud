@@ -51,12 +51,8 @@ export const Header = () => {
   const location = useLocation();
 
   const breadcrumbs = useMemo(() => {
-    if (location.pathname === "/new") {
+    if (location.pathname.startsWith("/apps/new")) {
       return [
-        {
-          label: "apps",
-          to: "/apps/",
-        },
         {
           label: "new",
           to: "new",
@@ -80,7 +76,7 @@ export const Header = () => {
         <ol role="list" className="flex items-center space-x-2 truncate">
           <li>
             <div>
-              <Link to="/apps" className="text-[#212627] hover:text-slate-800">
+              <Link to="/apps/" className="text-[#212627] hover:text-slate-800">
                 <WingIcon className="h-5 w-auto" />
               </Link>
             </div>

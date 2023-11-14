@@ -7,11 +7,12 @@ import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { AppCard } from "../components/app-card.js";
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { Button } from "../design-system/button.js";
 import { Input } from "../design-system/input.js";
 import { wrpc } from "../utils/wrpc.js";
+
+import { AppCard } from "./apps/components/app-card.js";
 
 export const Component = () => {
   const navigate = useNavigate();
@@ -19,20 +20,21 @@ export const Component = () => {
   const [search, setSearch] = useState("");
   const listAppsQuery = wrpc["user.listApps"].useQuery();
 
+  const loading = useMemo(() => {
+    return listAppsQuery.isFetching;
+  }, [listAppsQuery.isFetching]);
+
   const apps = useMemo(() => {
-    if (!listAppsQuery.data) {
-      return [];
-    }
-    return listAppsQuery.data.apps.filter((app) =>
+    return listAppsQuery.data?.apps ?? [];
+  }, [listAppsQuery.data]);
+
+  const filteredApps = useMemo(() => {
+    return apps.filter((app) =>
       `${app.appName}${app.lastCommitMessage}`
         .toLocaleLowerCase()
         .includes(search.toLocaleLowerCase()),
     );
   }, [listAppsQuery.data, search]);
-
-  const loading = useMemo(() => {
-    return listAppsQuery.isLoading || listAppsQuery.isFetching;
-  }, [listAppsQuery.isLoading, listAppsQuery.isFetching]);
 
   return (
     <>
@@ -65,50 +67,53 @@ export const Component = () => {
           <SpinnerLoader />
         </div>
       )}
+      {!loading && (
+        <>
+          {filteredApps.length === 0 && (
+            <div className="text-center">
+              <FolderPlusIcon className="w-12 h-12 mx-auto text-gray-400" />
+              <h3 className="mt-2 text-sm font-semibold text-gray-900">
+                No apps found.
+              </h3>
 
-      {!loading && apps.length === 0 && (
-        <div className="text-center">
-          <FolderPlusIcon className="w-12 h-12 mx-auto text-gray-400" />
-          <h3 className="mt-2 text-sm font-semibold text-gray-900">
-            No apps found.
-          </h3>
-
-          {listAppsQuery.data?.apps.length === 0 && (
-            <div>
-              <p className="mt-1 text-sm text-gray-500">
-                Get started by creating a new app.
-              </p>
-              <Button
-                label="New App"
-                icon={PlusIcon}
-                primary
-                className="mt-6"
-                onClick={() => {
-                  navigate("new");
-                }}
-              />
+              {apps.length === 0 && (
+                <div>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Get started by creating a new app.
+                  </p>
+                  <Button
+                    label="New App"
+                    icon={PlusIcon}
+                    primary
+                    className="mt-6"
+                    onClick={() => {
+                      navigate("new");
+                    }}
+                  />
+                </div>
+              )}
             </div>
           )}
-        </div>
-      )}
 
-      {!loading && apps.length > 0 && (
-        <div
-          className={clsx(
-            "flex flex-wrap gap-6 w-full",
-            "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
+          {filteredApps.length > 0 && (
+            <div
+              className={clsx(
+                "flex flex-wrap gap-6 w-full",
+                "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
+              )}
+            >
+              {filteredApps.map((app) => (
+                <AppCard
+                  key={app.appId}
+                  onClick={() => {
+                    navigate(`/apps/${app.appName}`);
+                  }}
+                  app={app}
+                />
+              ))}
+            </div>
           )}
-        >
-          {apps.map((app) => (
-            <AppCard
-              key={app.appId}
-              onClick={() => {
-                navigate(`/apps/${app.appName}`);
-              }}
-              app={app}
-            />
-          ))}
-        </div>
+        </>
       )}
     </>
   );

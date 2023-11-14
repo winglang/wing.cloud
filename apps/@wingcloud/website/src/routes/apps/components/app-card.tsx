@@ -1,8 +1,8 @@
 import clsx from "clsx";
 
-import { GithubIcon } from "../icons/github-icon.js";
-import { useTimeAgo } from "../utils/time.js";
-import type { App } from "../utils/wrpc.js";
+import { GithubIcon } from "../../../icons/github-icon.js";
+import { useTimeAgo } from "../../../utils/time.js";
+import type { App } from "../../../utils/wrpc.js";
 
 export const AppCard = ({
   app,
