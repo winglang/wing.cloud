@@ -25,8 +25,8 @@ importers:
         specifier: ^0.76.27
         version: 0.76.27(constructs@10.3.0)
       tsx:
-        specifier: ^4.1.2
-        version: 4.1.2
+        specifier: ^3.14.0
+        version: 3.14.0
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -61,8 +61,8 @@ importers:
         specifier: ^10.3.0
         version: 10.3.0
       cookie:
-        specifier: ^0.6.0
-        version: 0.6.0
+        specifier: ^0.5.0
+        version: 0.5.0
       express:
         specifier: ^4.18.2
         version: 4.18.2
@@ -89,8 +89,8 @@ importers:
         version: 0.47.2(constructs@10.3.0)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.328
-        version: 0.0.328(eslint@8.53.0)
+        specifier: ^0.0.315
+        version: 0.0.315(eslint@8.53.0)
       '@octokit/rest':
         specifier: ^20.0.2
         version: 20.0.2
@@ -143,11 +143,11 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.53.0)(prettier@3.1.0)
       eslint-plugin-unicorn:
-        specifier: ^49.0.0
-        version: 49.0.0(eslint@8.53.0)
+        specifier: ^48.0.1
+        version: 48.0.1(eslint@8.53.0)
       tsx:
-        specifier: ^4.1.2
-        version: 4.1.2
+        specifier: ^3.14.0
+        version: 3.14.0
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -189,8 +189,8 @@ importers:
         version: 0.47.2(constructs@10.2.70)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.328
-        version: 0.0.328(eslint@8.53.0)
+        specifier: ^0.0.318
+        version: 0.0.318(eslint@8.53.0)
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -240,8 +240,8 @@ importers:
         specifier: ^7.2.0
         version: 7.2.0(typescript@5.2.2)
       tsx:
-        specifier: ^4.1.2
-        version: 4.1.2
+        specifier: ^3.14.0
+        version: 3.14.0
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -286,8 +286,8 @@ importers:
         specifier: ^3.450.0
         version: 3.450.0
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.328
-        version: 0.0.328(eslint@8.53.0)
+        specifier: ^0.0.315
+        version: 0.0.315(eslint@8.53.0)
       '@ibm/plex':
         specifier: ^6.3.0
         version: 6.3.0
@@ -331,8 +331,8 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.53.0)(prettier@3.1.0)
       eslint-plugin-unicorn:
-        specifier: ^49.0.0
-        version: 49.0.0(eslint@8.53.0)
+        specifier: ^48.0.1
+        version: 48.0.1(eslint@8.53.0)
       get-port:
         specifier: ^7.0.0
         version: 7.0.0
@@ -349,8 +349,8 @@ importers:
         specifier: ^3.3.5
         version: 3.3.5
       tsx:
-        specifier: ^4.1.2
-        version: 4.1.2
+        specifier: ^3.14.0
+        version: 3.14.0
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -383,8 +383,8 @@ importers:
   packages/@wingcloud/wrpc:
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.328
-        version: 0.0.328(eslint@8.53.0)
+        specifier: ^0.0.315
+        version: 0.0.315(eslint@8.53.0)
       '@tanstack/react-query':
         specifier: ^5.8.3
         version: 5.8.3(react-dom@18.2.0)(react@18.2.0)
@@ -416,14 +416,14 @@ importers:
         specifier: ^5.0.1
         version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.53.0)(prettier@3.1.0)
       eslint-plugin-unicorn:
-        specifier: ^49.0.0
-        version: 49.0.0(eslint@8.53.0)
+        specifier: ^48.0.1
+        version: 48.0.1(eslint@8.53.0)
       react:
         specifier: ^18.2.0
         version: 18.2.0
       tsx:
-        specifier: ^4.1.2
-        version: 4.1.2
+        specifier: ^3.14.0
+        version: 3.14.0
       typescript:
         specifier: ^5.2.2
         version: 5.2.2
@@ -1864,11 +1864,20 @@ packages:
       constructs: 10.3.0
     dev: false
 
-  /@cloudy-ts/eslint-plugin@0.0.328(eslint@8.53.0):
-    resolution: {integrity: sha512-5NicaZI0fxsEJJLBwCQ9wPe7XfijN/q23jlie8Wk0jREY19HOabknw6nOFv2LUO7PCqBewsHFYeTOst+yR+Jug==}
+  /@cloudy-ts/eslint-plugin@0.0.315(eslint@8.53.0):
+    resolution: {integrity: sha512-frY36qQ9f6WlivmM8iXgP+Fi7rJMNl7ctGI6662VYUbaJjVQ6J83PI2S2/Udbo7N3qU04E168UH91Wz/EvNjEQ==}
     engines: {node: '>= 18.16.0'}
     peerDependencies:
-      eslint: ^8.53.0
+      eslint: ^8.52.0
+    dependencies:
+      eslint: 8.53.0
+    dev: true
+
+  /@cloudy-ts/eslint-plugin@0.0.318(eslint@8.53.0):
+    resolution: {integrity: sha512-JyhhLFlu7ZrD02wA9gbkUeMKH7jdib1hNpyZoVnN+79OMV/zbLwoQzzURt/MrbNPYtIlnZfzdgkUunh7QGazxg==}
+    engines: {node: '>= 18.16.0'}
+    peerDependencies:
+      eslint: ^8.52.0
     dependencies:
       eslint: 8.53.0
     dev: true
@@ -5363,11 +5372,6 @@ packages:
     engines: {node: '>= 0.6'}
     dev: false
 
-  /cookie@0.6.0:
-    resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
-    engines: {node: '>= 0.6'}
-    dev: false
-
   /core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
 
@@ -5940,6 +5944,30 @@ packages:
       prettier: 3.1.0
       prettier-linter-helpers: 1.0.0
       synckit: 0.8.5
+    dev: true
+
+  /eslint-plugin-unicorn@48.0.1(eslint@8.53.0):
+    resolution: {integrity: sha512-FW+4r20myG/DqFcCSzoumaddKBicIPeFnTrifon2mWIzlfyvzwyqZjqVP7m4Cqr/ZYisS2aiLghkUWaPg6vtCw==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      eslint: '>=8.44.0'
+    dependencies:
+      '@babel/helper-validator-identifier': 7.22.20
+      '@eslint-community/eslint-utils': 4.4.0(eslint@8.53.0)
+      ci-info: 3.9.0
+      clean-regexp: 1.0.0
+      eslint: 8.53.0
+      esquery: 1.5.0
+      indent-string: 4.0.0
+      is-builtin-module: 3.2.1
+      jsesc: 3.0.2
+      lodash: 4.17.21
+      pluralize: 8.0.0
+      read-pkg-up: 7.0.1
+      regexp-tree: 0.1.27
+      regjsparser: 0.10.0
+      semver: 7.5.4
+      strip-indent: 3.0.0
     dev: true
 
   /eslint-plugin-unicorn@49.0.0(eslint@8.53.0):
@@ -9836,9 +9864,8 @@ packages:
       - ts-node
     dev: true
 
-  /tsx@4.1.2:
-    resolution: {integrity: sha512-1spM1bFV6MP2s4tO4tDC7g52fsaFdtEWdO4GfGdqi20qUgPbnAJqixOyIAvCSx1DDj3YIUB4CD06owTWUsOAuQ==}
-    engines: {node: '>=18.0.0'}
+  /tsx@3.14.0:
+    resolution: {integrity: sha512-xHtFaKtHxM9LOklMmJdI3BEnQq/D5F73Of2E1GDrITi9sgoVkvIsrQUTY1G8FlmGtA+awCI4EBlTRRYxkL2sRg==}
     hasBin: true
     dependencies:
       esbuild: 0.18.20
