@@ -31,7 +31,7 @@ export const NewAppContainer = ({
         </div>
 
         <div className="mb-4 flex flex-col w-full text-sm">
-          <div className="w-full space-y-8">{children}</div>
+          <div className="w-full">{children}</div>
         </div>
       </div>
     </div>

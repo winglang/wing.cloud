@@ -1,7 +1,9 @@
+import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useNotifications } from "../../design-system/notification.js";
+import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
 import type { Installation } from "../../utils/wrpc.js";
 
@@ -12,6 +14,8 @@ import { NewAppContainer } from "./components/new-app-container.js";
 
 export const Component = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
+
   const { showNotification } = useNotifications();
 
   const onError = useCallback((error: Error) => {
@@ -79,22 +83,25 @@ export const Component = () => {
 
   return (
     <NewAppContainer step="connect">
-      <GitRepoSelect
-        installationId={installationId}
-        setInstallationId={setInstallationId}
-        repositoryId={repositoryId || ""}
-        setRepositoryId={setRepositoryId}
-        installations={installations}
-        repos={repos}
-        loading={loading}
-      />
-      <MissingRepoButton onClose={onMissingRepoClosed} />
-      <CreateAppFooter
-        onCancel={onCancel}
-        onCreate={onCreate}
-        disabled={!repositoryId}
-        loading={createAppLoading}
-      />
+      <div className="w-full space-y-2">
+        <div className={clsx(theme.text1)}>Select a repository</div>
+        <GitRepoSelect
+          installationId={installationId}
+          setInstallationId={setInstallationId}
+          repositoryId={repositoryId || ""}
+          setRepositoryId={setRepositoryId}
+          installations={installations}
+          repos={repos}
+          loading={loading}
+        />
+        <MissingRepoButton onClose={onMissingRepoClosed} />
+        <CreateAppFooter
+          onCancel={onCancel}
+          onCreate={onCreate}
+          disabled={!repositoryId}
+          loading={createAppLoading}
+        />
+      </div>
     </NewAppContainer>
   );
 };

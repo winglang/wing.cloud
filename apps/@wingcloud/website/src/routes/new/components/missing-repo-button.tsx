@@ -12,7 +12,7 @@ export const MissingRepoButton = ({ onClose }: { onClose: () => void }) => {
     <div className="text-xs flex gap-1 items-center">
       <span className={clsx(theme.text1)}>Missing a repository?</span>
       <button
-        className="text-sky-600"
+        className="text-sky-600 text-left"
         onClick={() =>
           openPopupWindow({
             url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
