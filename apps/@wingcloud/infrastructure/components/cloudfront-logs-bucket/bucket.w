@@ -24,6 +24,13 @@ pub class CloudfrontLogsBucket {
 
     let canonicalAwsUserId = new aws.dataAwsCanonicalUserId.DataAwsCanonicalUserId();
 
+    new aws.s3BucketOwnershipControls.S3BucketOwnershipControls(
+      bucket: this.tfBucket.bucket,
+      rule: {
+        objectOwnership: "ObjectWriter",
+      },
+    );
+
     new aws.s3BucketAcl.S3BucketAcl({
       bucket: this.tfBucket.bucket,
       accessControlPolicy: {
