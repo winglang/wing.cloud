@@ -7,7 +7,7 @@ import {
 export interface Repository {
   id: number;
   name: string;
-  description?: string;
+  description: string | null;
   full_name: string;
   private: boolean;
   owner: { login: string; avatar_url: string };
@@ -18,7 +18,7 @@ export interface Repository {
 export interface App {
   appId: string;
   appName: string;
-  description?: string;
+  description: string;
   imageUrl?: string;
   repoId: string;
   repoName: string;
@@ -131,7 +131,7 @@ export const wrpc = createWRPCReact<{
   "user.createApp": MutationProcedure<
     {
       repoId: string;
-      description?: string;
+      description: string;
       repoName: string;
       repoOwner: string;
       default_branch: string;
