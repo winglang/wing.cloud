@@ -7,6 +7,9 @@
     "compile": {
       "dotEnv": [
         ".env"
+      ],
+      "outputs": [
+        "dist/**"
       ]
     },
     "dev": {
