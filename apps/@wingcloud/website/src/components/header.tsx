@@ -51,15 +51,6 @@ export const Header = () => {
   const location = useLocation();
 
   const breadcrumbs = useMemo(() => {
-    if (location.pathname.startsWith("/apps/new")) {
-      return [
-        {
-          label: "new",
-          to: "new",
-        },
-      ];
-    }
-
     const parts = location.pathname.split("/").filter((part) => part !== "");
     return parts.map((part, index) => {
       const to = `/${parts.slice(0, index + 1).join("/")}`;
