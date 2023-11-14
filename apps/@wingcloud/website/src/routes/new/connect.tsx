@@ -1,19 +1,16 @@
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useNotifications } from "../../design-system/notification.js";
-import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
 import type { Installation } from "../../utils/wrpc.js";
 
 import { CreateAppFooter } from "./components/create-app-footer.js";
 import { GitRepoSelect } from "./components/git-repo-select.js";
 import { MissingRepoButton } from "./components/missing-repo-button.js";
+import { NewAppContainer } from "./components/new-app-container.js";
 
 export const Component = () => {
-  const { theme } = useTheme();
   const navigate = useNavigate();
   const { showNotification } = useNotifications();
 
@@ -81,43 +78,23 @@ export const Component = () => {
   }, [listInstallationsQuery.refetch, setInstallationId, setRepositoryId]);
 
   return (
-    <div className="flex justify-center transition-all">
-      <div
-        className={clsx("w-full rounded shadow p-6 space-y-4", theme.bgInput)}
-      >
-        <div className="flex items-center gap-1">
-          <button
-            className={clsx(theme.text1, "font-semibold items-center")}
-            onClick={onCancel}
-          >
-            Create a new App
-          </button>
-          <ChevronRightIcon className="h-4 w-4 flex-shrink-0 text-slate-600" />
-          <div className="font-semibold items-center">Connect</div>
-        </div>
-
-        <div className="mb-4 flex flex-col w-full text-sm">
-          <div className="w-full space-y-2">
-            <div className={clsx(theme.text1)}>Select a Git Repository</div>
-            <GitRepoSelect
-              installationId={installationId}
-              setInstallationId={setInstallationId}
-              repositoryId={repositoryId || ""}
-              setRepositoryId={setRepositoryId}
-              installations={installations}
-              repos={repos}
-              loading={loading}
-            />
-            <MissingRepoButton onClose={onMissingRepoClosed} />
-            <CreateAppFooter
-              onCancel={onCancel}
-              onCreate={onCreate}
-              disabled={!repositoryId}
-              loading={createAppLoading}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    <NewAppContainer step="connect">
+      <GitRepoSelect
+        installationId={installationId}
+        setInstallationId={setInstallationId}
+        repositoryId={repositoryId || ""}
+        setRepositoryId={setRepositoryId}
+        installations={installations}
+        repos={repos}
+        loading={loading}
+      />
+      <MissingRepoButton onClose={onMissingRepoClosed} />
+      <CreateAppFooter
+        onCancel={onCancel}
+        onCreate={onCreate}
+        disabled={!repositoryId}
+        loading={createAppLoading}
+      />
+    </NewAppContainer>
   );
 };
