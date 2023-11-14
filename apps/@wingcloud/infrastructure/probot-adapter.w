@@ -15,13 +15,13 @@ pub class ProbotAdapter {
   pub webhookSecret: str;
   inflight var instance: probot.ProbotInstance?;
 
-  init(props: ProbotAdapterProps) {
+  new(props: ProbotAdapterProps) {
     this.appId =  props.probotAppId;
     this.secretKey = props.probotSecretKey;
     this.webhookSecret = props.webhookSecret;
   }
 
-  inflight init() {
+  inflight new() {
     this.instance = ProbotAdapter.createProbot(this.appId, this.secretKey, this.webhookSecret);
   }
 

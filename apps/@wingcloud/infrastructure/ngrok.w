@@ -18,7 +18,7 @@ pub class Ngrok {
 
   pub url: str;
 
-  init(props: NgrokProps) {
+  new(props: NgrokProps) {
     let state = new sim.State();
     this.url = state.token("url");
     new cloud.Service(inflight () => {
