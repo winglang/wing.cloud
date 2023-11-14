@@ -8,10 +8,10 @@ import clsx from "clsx";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
-import { BranchIcon } from "../icons/branch-icon.js";
-import { GithubIcon } from "../icons/github-icon.js";
-import { useTimeAgo } from "../utils/time.js";
-import type { Environment } from "../utils/wrpc.js";
+import { BranchIcon } from "../../../icons/branch-icon.js";
+import { GithubIcon } from "../../../icons/github-icon.js";
+import { useTimeAgo } from "../../../utils/time.js";
+import type { Environment } from "../../../utils/wrpc.js";
 
 type Status = "initializing" | "tests" | "deploying" | "running" | "failed";
 

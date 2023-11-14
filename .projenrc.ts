@@ -185,7 +185,7 @@ new Turbo(infrastructure, {
     [terraformInitTask.name]: {
       inputs: ["package.json"],
       outputs: [
-        "target/main.tfaws/.terraform",
+        "target/main.tfaws/.terraform/**",
         "target/main.tfaws/.terraform.lock.hcl",
       ],
     },
@@ -195,7 +195,7 @@ new Turbo(infrastructure, {
       outputs: [
         "target/main.tfaws/**",
         "!target/main.tfaws/.terraform.lock.hcl",
-        "!target/main.tfaws/.terraform",
+        "!target/main.tfaws/.terraform/**",
         "!target/main.tfaws/terraform.tfstate",
         "!target/main.tfaws/terraform.tfstate.backup",
         "!target/main.tfaws/tfplan",
