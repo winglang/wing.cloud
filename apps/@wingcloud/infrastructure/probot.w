@@ -34,7 +34,7 @@ pub class ProbotApp {
   apps: apps.Apps;
   githubComment: comment.GithubComment;
 
-  init(props: ProbotAppProps) {
+  new(props: ProbotAppProps) {
     this.adapter = props.probotAdapter;
     this.runtimeUrl = props.runtimeUrl;
     this.environments = props.environments;

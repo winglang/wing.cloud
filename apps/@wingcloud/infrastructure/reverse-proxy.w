@@ -22,7 +22,7 @@ pub class ReverseProxy {
   pub url: str;
   pub paths: Array<str>;
 
-  init(props: ReverseProxyProps) {
+  new(props: ReverseProxyProps) {
     if util.env("WING_TARGET") == "sim" {
       let inner = new ReverseProxy_sim(props);
       this.url = inner.url;
@@ -42,7 +42,7 @@ class ReverseProxy_tfaws {
   pub paths: Array<str>;
   aliases: Array<str>;
   origins: Array<CloudFront.Origin>;
-  init(props: ReverseProxyProps) {
+  new(props: ReverseProxyProps) {
     this.aliases = props.aliases;
     this.origins = props.origins;
     //validated certificate
@@ -88,7 +88,7 @@ class ReverseProxy_sim {
 
   extern "./reverse-proxy-local.mts" pub static inflight startReverseProxyServer(props: ReverseProxyServerProps): SimReverseProxyResult;
 
-  init(props: ReverseProxyProps) {
+  new(props: ReverseProxyProps) {
     this.state = new sim.State();
     this.origins = props.origins;
     new cloud.Service(inflight () => {

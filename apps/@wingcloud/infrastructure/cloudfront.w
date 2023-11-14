@@ -2,6 +2,7 @@ bring cloud;
 bring util;
 bring "@cdktf/provider-aws" as aws;
 bring "./dnsimple.w" as DNSimple;
+bring "./components/cloudfront-logs-bucket/bucket.w" as logsBucket;
 
 struct CachePolicyProps {
   name: str;
@@ -10,7 +11,7 @@ struct CachePolicyProps {
 class CachePolicy {
   pub policy: aws.cloudfrontCachePolicy.CloudfrontCachePolicy;
 
-  init(props: CachePolicyProps) {
+  new(props: CachePolicyProps) {
     this.policy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
       // Since we currently use the same cache policy for website files and API endpoints,
       // we need to get rid of the default cache TTL, otherwise our API endpoints will
@@ -65,7 +66,7 @@ struct CloudFrontDistributionProps {
 
 pub class CloudFrontDistribution {
   pub distribution: aws.cloudfrontDistribution.CloudfrontDistribution;
-  pub logsBucket: cloud.Bucket;
+  pub logsBucket: logsBucket.CloudfrontLogsBucket;
 
   getDefaultOriginId (origins: Array<Origin>): str {
     for origin in origins {
@@ -116,40 +117,9 @@ pub class CloudFrontDistribution {
     return cacheBehaviors.copy();
   }
 
-  init(props: CloudFrontDistributionProps) {
-    this.logsBucket = new cloud.Bucket(public: true) as "reverse-proxy-logs-bucket";
+  new(props: CloudFrontDistributionProps) {
+    this.logsBucket = new logsBucket.CloudfrontLogsBucket("reverse-proxy") as "reverse-proxy-logs-bucket";
     // https://github.com/winglang/wing/issues/4907
-    let bucket: aws.s3Bucket.S3Bucket = unsafeCast(this.logsBucket).bucket;
-
-    new aws.s3BucketAcl.S3BucketAcl({
-      bucket: bucket.bucket,
-      acl: "log-delivery-write"
-    });
-
-    new aws.s3BucketOwnershipControls.S3BucketOwnershipControls({
-      bucket: bucket.bucket,
-      rule: {
-        objectOwnership: "ObjectWriter",
-      },
-    });
-
-    new aws.s3BucketPolicy.S3BucketPolicy({
-      bucket: bucket.bucket,
-      policy: Json.stringify({
-        Version: "2012-10-17",
-        Statement: [
-          {
-            Sid: "CloudFrontLogs",
-            Effect: "Allow",
-            Principal: {
-              Service: "cloudfront.amazonaws.com",
-            },
-            Action: "s3:PutObject",
-            Resource: "${bucket.arn}/*",
-          },
-        ],
-      }),
-    });
 
     let cachePolicy = new CachePolicy(
       name: "cache-policy-for-${this.getDefaultOriginId(props.origins)}"
@@ -192,7 +162,7 @@ pub class CloudFrontDistribution {
       origin: this.getHttpOrigins(props.origins),
       aliases: props.aliases,
       loggingConfig: {
-        bucket: bucket.bucketDomainName,
+        bucket: this.logsBucket.domainName(),
         includeCookies: true,
         prefix: "reverse-proxy"
       }

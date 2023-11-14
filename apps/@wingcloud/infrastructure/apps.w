@@ -25,7 +25,7 @@ struct Item extends App {
 
 struct CreateAppOptions {
   appName: str;
-  description: str?;
+  description: str;
   repoOwner: str;
   repoName: str;
   repoId: str;
@@ -67,7 +67,7 @@ struct ListAppByRepositoryOptions {
 }
 
 struct MakeItemOptions {
-  appId:str;
+  appId: str;
   pk: str;
   sk: str;
 }
@@ -75,29 +75,12 @@ struct MakeItemOptions {
 pub class Apps {
   table: ex.DynamodbTable;
 
-  init(table: ex.DynamodbTable) {
+  new(table: ex.DynamodbTable) {
     this.table = table;
   }
 
   pub inflight create(options: CreateAppOptions): App {
     let appId = "app_${nanoid62.Nanoid62.generate()}";
-
-    let app = App {
-      appId: appId,
-      appName: options.appName,
-      description: options.description,
-      imageUrl: options.imageUrl,
-      repoId: options.repoId,
-      repoOwner: options.repoOwner,
-      repoName: options.repoName,
-      userId: options.userId,
-      entryfile: options.entryfile,
-      createdAt: options.createdAt,
-      createdBy: options.createdBy,
-      updatedAt: options.createdAt,
-      updatedBy: options.createdBy,
-      lastCommitMessage: options.lastCommitMessage,
-    };
 
     // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
     let makeItem = (ops: MakeItemOptions): Item => {
@@ -163,7 +146,22 @@ pub class Apps {
 
     ]);
 
-    return app;
+    return {
+      appId: appId,
+      appName: options.appName,
+      description: options.description,
+      imageUrl: options.imageUrl,
+      repoId: options.repoId,
+      repoOwner: options.repoOwner,
+      repoName: options.repoName,
+      userId: options.userId,
+      entryfile: options.entryfile,
+      createdAt: options.createdAt,
+      createdBy: options.createdBy,
+      updatedAt: options.createdAt,
+      updatedBy: options.createdBy,
+      lastCommitMessage: options.lastCommitMessage,
+    };
   }
 
   pub inflight rename(options: RenameAppOptions): void {
