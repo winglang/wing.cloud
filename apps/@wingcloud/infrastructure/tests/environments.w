@@ -107,6 +107,7 @@ pub class EnvironmentsTest {
           let userId = props.users.create(gitHubLogin: "fake-login");
           let app = props.apps.create(
             appName: "test-app",
+            description: "test app",
             createdAt: "0",
             createdBy: userId,
             repoId: "${repo.owner}/${repo.repo}",

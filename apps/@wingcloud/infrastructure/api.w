@@ -382,7 +382,7 @@ pub class Api {
 
         let app = apps.create(
           appName: appName,
-          description: input.tryGet("description")?.tryAsStr(),
+          description: input.tryGet("description")?.tryAsStr() ?? "",
           repoId: input.get("repoId").asStr(),
           repoName: input.get("repoName").asStr(),
           repoOwner: input.get("repoOwner").asStr(),
