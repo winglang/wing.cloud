@@ -75,7 +75,7 @@ struct MakeItemOptions {
 pub class Apps {
   table: ex.DynamodbTable;
 
-  init(table: ex.DynamodbTable) {
+  new(table: ex.DynamodbTable) {
     this.table = table;
   }
 

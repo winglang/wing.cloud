@@ -18,7 +18,7 @@ pub class GithubComment {
   environments: environments.Environments;
   apps: apps.Apps;
 
-  init(props: GithubCommentProps) {
+  new(props: GithubCommentProps) {
     this.environments = props.environments;
     this.apps = props.apps;
   }

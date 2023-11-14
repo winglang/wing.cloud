@@ -18,7 +18,7 @@ struct ICreateMachineProps {
  */
 inflight class App {
   pub props: IAppProps;
-  init(props: IAppProps) {
+  new(props: IAppProps) {
     this.props = props;
   }
 
@@ -139,7 +139,7 @@ inflight class App {
  */
  pub inflight class Fly {
   client: client.Client;
-  init(client: client.Client) {
+  new(client: client.Client) {
     this.client = client;
   }
 

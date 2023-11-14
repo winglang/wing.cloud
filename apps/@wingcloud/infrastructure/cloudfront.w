@@ -11,7 +11,7 @@ struct CachePolicyProps {
 class CachePolicy {
   pub policy: aws.cloudfrontCachePolicy.CloudfrontCachePolicy;
 
-  init(props: CachePolicyProps) {
+  new(props: CachePolicyProps) {
     this.policy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
       // Since we currently use the same cache policy for website files and API endpoints,
       // we need to get rid of the default cache TTL, otherwise our API endpoints will
@@ -117,7 +117,7 @@ pub class CloudFrontDistribution {
     return cacheBehaviors.copy();
   }
 
-  init(props: CloudFrontDistributionProps) {
+  new(props: CloudFrontDistributionProps) {
     this.logsBucket = new logsBucket.CloudfrontLogsBucket("reverse-proxy") as "reverse-proxy-logs-bucket";
     // https://github.com/winglang/wing/issues/4907
 
