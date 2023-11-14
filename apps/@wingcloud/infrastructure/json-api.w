@@ -15,7 +15,7 @@ pub class JsonApi {
   pub url: str;
   var handlerCount: num;
 
-  init(props: JsonApiProps) {
+  new(props: JsonApiProps) {
     this.api = props.api;
     this.url = this.api.url;
     this.handlerCount = 0;

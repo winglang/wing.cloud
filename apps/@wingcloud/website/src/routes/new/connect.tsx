@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { Button } from "../../design-system/button.js";
 import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
@@ -67,7 +68,13 @@ export const Component = () => {
         onError(error);
       }
     }
-  }, [createApp, onError]);
+  }, [createApp, onError, navigate]);
+
+  useEffect(() => {
+    if (repositoryId) {
+      onCreate();
+    }
+  }, [repositoryId]);
 
   const onMissingRepoClosed = useCallback(() => {
     // eslint-disable-next-line unicorn/no-useless-undefined
@@ -98,12 +105,13 @@ export const Component = () => {
           disabled={createAppLoading}
         />
         <MissingRepoButton onClose={onMissingRepoClosed} />
-        <CreateAppFooter
-          onCancel={onCancel}
-          onCreate={onCreate}
-          disabled={!repositoryId}
-          loading={createAppLoading}
-        />
+        <div className="w-full flex">
+          <div className="justify-end flex gap-x-2 grow">
+            <Button onClick={onCancel} disabled={createAppLoading}>
+              Back
+            </Button>
+          </div>
+        </div>
       </div>
     </NewAppContainer>
   );

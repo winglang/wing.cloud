@@ -70,7 +70,7 @@ struct ListEnvironmentOptions {
 pub class Environments {
   table: ex.DynamodbTable;
 
-  init(table: ex.DynamodbTable) {
+  new(table: ex.DynamodbTable) {
     this.table = table;
   }
 

@@ -15,7 +15,7 @@ struct DNSRecordProps {
 class Dummy {}
 
 class Once {
-  init(uid: str, block: (): void) {
+  new(uid: str, block: (): void) {
     let root = std.Node.of(this).root;
     let exists = root.node.tryFindChild(uid);
     if exists? {
@@ -31,7 +31,7 @@ class Once {
 }
 
 class DNSimpleProvider {
-  init() {
+  new() {
     if util.env("WING_TARGET") != "tf-aws" {
       return this;
     }
@@ -45,7 +45,7 @@ class DNSimpleProvider {
 pub class DNSimpleZoneRecord {
   pub record: dnsimple.zoneRecord.ZoneRecord;
 
-  init(props: DNSRecordProps) {
+  new(props: DNSRecordProps) {
     new DNSimpleProvider();
     this.record = new dnsimple.zoneRecord.ZoneRecord(
       zoneName: props.zoneName,
@@ -64,7 +64,7 @@ struct CertificateProps {
 class Certificate {
   pub certificate: aws.acmCertificate.AcmCertificate;
 
-  init(props: CertificateProps) {
+  new(props: CertificateProps) {
     this.certificate = new aws.acmCertificate.AcmCertificate(
       domainName: props.domainName,
       validationMethod: "DNS",
@@ -85,7 +85,7 @@ struct DNSimpleValidateCertificateProps {
 pub class DNSimpleValidatedCertificate {
   pub certificate: Certificate;
 
-  init(props: DNSimpleValidateCertificateProps) {
+  new(props: DNSimpleValidateCertificateProps) {
     this.certificate = new Certificate(domainName: "${props.subDomain}.${props.zoneName}");
     let dnsRecord = new DNSimpleZoneRecord(
       subDomain: "replaced",

@@ -6,7 +6,7 @@ class Policy {
   pub name: str;
   pub policy: aws.iamPolicy.IamPolicy;
 
-  init(name: str, file: str) {
+  new(name: str, file: str) {
     this.name = name;
 
     let policyAsset = new cdktf.TerraformAsset(
@@ -21,10 +21,10 @@ class Policy {
 }
 
 pub class Github {
-  init(environment: str) {
+  new(environment: str) {
     // needs to be present once in the account
-    let provider = new cdktf.TerraformHclModule(  
-      source: "philips-labs/github-oidc/aws//modules/provider",  
+    let provider = new cdktf.TerraformHclModule(
+      source: "philips-labs/github-oidc/aws//modules/provider",
       version: "0.7.1"
     ) as "provider";
 
@@ -40,9 +40,9 @@ pub class Github {
         "repo" => "winglang/wing.cloud",
         "role_name" => "wing-cloud-repo-${environment}",
         "default_conditions" => ["allow_main"],
-        "role_policy_arns" => [admin.policy.arn]        
+        "role_policy_arns" => [admin.policy.arn]
       },
-      
+
     ) as "wing-cloud-repo";
 
     // get the role arn for the github action
@@ -51,7 +51,7 @@ pub class Github {
     ) as "role-arn";
 
 
-    // Readonly Role 
+    // Readonly Role
 
     let readOnly = new aws.dataAwsIamPolicy.DataAwsIamPolicy(
       arn: "arn:aws:iam::aws:policy/ReadOnlyAccess"

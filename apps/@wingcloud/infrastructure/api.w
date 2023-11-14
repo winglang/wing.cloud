@@ -33,7 +33,7 @@ struct ApiProps {
 }
 
 pub class Api {
-  init(props: ApiProps) {
+  new(props: ApiProps) {
     let api = new json_api.JsonApi(api: props.api);
     let apps = props.apps;
     let users = props.users;

@@ -46,7 +46,7 @@ pub class EnvironmentManager {
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
 
-  init(props: EnvironmentsProps) {
+  new(props: EnvironmentsProps) {
     this.apps = props.apps;
     this.environments = props.environments;
     this.runtimeClient = props.runtimeClient;

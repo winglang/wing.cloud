@@ -70,7 +70,8 @@ export const Button = forwardRef<
           {
             [theme.borderInput]: !primary,
             "border-sky-700": primary,
-            "px-2.5": label || children,
+            "px-2.5": (label || children) && !small,
+            "px-1": (label || children) && small,
             "py-1.5": !small,
             "cursor-not-allowed opacity-50": disabled,
           },

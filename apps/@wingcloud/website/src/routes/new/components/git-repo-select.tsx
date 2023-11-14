@@ -1,9 +1,11 @@
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import {
+  LockClosedIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 
 import { SpinnerLoader } from "../../../components/spinner-loader.js";
-import { StatusDot } from "../../../components/status-dot.js";
 import { Input } from "../../../design-system/input.js";
 import { Select } from "../../../design-system/select.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
@@ -116,14 +118,14 @@ export const GitRepoSelect = ({
         <div
           className={clsx(
             "text-center flex justify-center w-full",
-            "text-xs",
+            "text-xs py-2",
             theme.text1,
           )}
         >
           No repos found.
         </div>
       )}
-      {!loading && (
+      {!loading && filteredRepos.length > 0 && (
         <div
           className={clsx(
             "flex flex-col max-h-80 overflow-auto rounded",
@@ -132,12 +134,12 @@ export const GitRepoSelect = ({
           )}
         >
           {filteredRepos.map((repo) => (
-            <button
+            <div
               aria-disabled={disabled}
               key={repo.id}
               className={clsx(
                 theme.text1,
-                "text-xs px-2.5 py-1.5 gap-1",
+                "text-xs px-2.5 py-2 gap-1",
                 "w-full text-left flex items-center",
                 "transition-all outline-none focus:outline-none",
                 "focus:bg-slate-50 dark:focus:bg-slate-750",
@@ -147,19 +149,32 @@ export const GitRepoSelect = ({
                 disabled && "opacity-50 cursor-not-allowed",
                 !disabled && theme.bgInputHover,
               )}
-              onClick={() => {
-                setRepositoryId(repo.full_name);
-              }}
-              disabled={disabled}
             >
               <div className="flex items-center gap-2">
                 <img className="w-4 h-4" src={repo.owner.avatar_url} />
-                <div>{repo.name}</div>
+                <div className="flex gap-1 items-center">
+                  <div>{repo.name}</div>
+                  {repo.private && <LockClosedIcon className="w-3 h-3" />}
+                </div>
               </div>
               <div className="flex flex-grow justify-end">
-                <StatusDot selected={repositoryId === repo.full_name} />
+                <button
+                  className={clsx(
+                    "rounded px-1 py-0.5 border text-xs",
+                    theme.borderInput,
+                    theme.bgInputHover,
+                    theme.textInput,
+                  )}
+                  onClick={() => {
+                    setRepositoryId(repo.full_name);
+                  }}
+                  disabled={disabled}
+                >
+                  {(repositoryId === repo.full_name && "Loading...") ||
+                    "Connect"}
+                </button>
               </div>
-            </button>
+            </div>
           ))}
         </div>
       )}
