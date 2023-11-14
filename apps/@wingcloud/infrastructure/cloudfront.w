@@ -3,6 +3,7 @@ bring util;
 bring "@cdktf/provider-aws" as aws;
 bring "./dnsimple.w" as DNSimple;
 bring "./components/cloudfront-logs-bucket/bucket.tfaws.w" as logsBucket;
+bring "./components/cloudfront-logs-bucket/athena.tfaws.w" as athenaLogsTable;
 
 struct CachePolicyProps {
   name: str;
@@ -168,5 +169,7 @@ pub class CloudFrontDistribution {
       },
       dependsOn: [this.logsBucket.dependable]
     );
+
+    new athenaLogsTable.CloudfrontLogsTable(this.logsBucket.name(), "reverse-proxy");
   }
 }
