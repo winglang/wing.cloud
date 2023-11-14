@@ -18,6 +18,7 @@ export interface GitRepoSelectProps {
   installations: Installation[];
   repos: Repository[];
   loading: boolean;
+  disabled?: boolean;
 }
 
 export const GitRepoSelect = ({
@@ -28,6 +29,7 @@ export const GitRepoSelect = ({
   installations,
   repos,
   loading,
+  disabled,
 }: GitRepoSelectProps) => {
   const { theme } = useTheme();
 
@@ -71,7 +73,7 @@ export const GitRepoSelect = ({
             onChange={setInstallationId}
             value={installationId ?? ""}
             className="w-full"
-            disabled={loading}
+            disabled={loading || disabled}
             renderItem={(item) => {
               return (
                 <div className="flex items-center gap-1">
@@ -97,7 +99,7 @@ export const GitRepoSelect = ({
             id="search"
             placeholder={searchPlaceholder}
             value={search}
-            disabled={loading}
+            disabled={loading || disabled}
             onChange={(e) => {
               setSearch(e.target.value);
             }}
@@ -131,21 +133,24 @@ export const GitRepoSelect = ({
         >
           {filteredRepos.map((repo) => (
             <button
+              aria-disabled={disabled}
               key={repo.id}
               className={clsx(
+                theme.text1,
                 "text-xs px-4 py-2 gap-1",
                 "w-full text-left flex items-center",
                 "transition-all outline-none focus:outline-none",
-                theme.text1,
-                theme.bgInputHover,
                 "focus:bg-slate-50 dark:focus:bg-slate-750",
                 repositoryId === repo.full_name &&
                   "bg-slate-50 dark:bg-slate-750",
                 repositoryId !== repo.full_name && theme.bgInput,
+                disabled && "opacity-50 cursor-not-allowed",
+                !disabled && theme.bgInputHover,
               )}
               onClick={() => {
                 setRepositoryId(repo.full_name);
               }}
+              disabled={disabled}
             >
               <div className="flex items-center gap-2">
                 <img className="w-4 h-4" src={repo.owner.avatar_url} />

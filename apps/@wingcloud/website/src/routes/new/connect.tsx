@@ -93,6 +93,7 @@ export const Component = () => {
           installations={installations}
           repos={repos}
           loading={loading}
+          disabled={createAppLoading}
         />
         <MissingRepoButton onClose={onMissingRepoClosed} />
         <CreateAppFooter
