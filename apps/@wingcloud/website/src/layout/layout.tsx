@@ -10,7 +10,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
 
   const location = useLocation();
 
-  if (location.pathname !== "/") {
+  if (location.pathname !== "/apps") {
     try {
       authCheck = wrpc["auth.check"].useQuery(undefined, {
         throwOnError: true,
@@ -18,7 +18,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
       });
     } catch (error) {
       console.log(error);
-      window.location.href = "/";
+      window.location.href = "/apps";
     }
   }
 

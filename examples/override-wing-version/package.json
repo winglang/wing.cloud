@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "winglang": "0.29.0"
+    "winglang": "0.44.13"
   }
 }
