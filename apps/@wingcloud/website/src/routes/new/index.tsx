@@ -13,17 +13,6 @@ export const Component = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
 
-  const onCancel = useCallback(() => {
-    navigate("/apps/new");
-  }, [navigate]);
-
-  const onTypeChange = useCallback(
-    (type: string) => {
-      navigate(`/apps/new/${type}`);
-    },
-    [navigate],
-  );
-
   return (
     <NewAppContainer>
       <div className="w-full space-y-2">
@@ -33,7 +22,7 @@ export const Component = () => {
           description="Connect to an existing repository"
           icon={<LinkIcon className="w-5 h-5" />}
           onClick={() => {
-            onTypeChange("connect");
+            navigate("/apps/new/connect");
           }}
         />
         <AppConfigurationListItem
@@ -46,7 +35,13 @@ export const Component = () => {
         />
         <div className="w-full flex pt-4">
           <div className="justify-end flex gap-x-2 grow">
-            <Button onClick={onCancel}>Back</Button>
+            <Button
+              onClick={() => {
+                navigate("/apps/new");
+              }}
+            >
+              Back
+            </Button>
           </div>
         </div>
       </div>

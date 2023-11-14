@@ -44,12 +44,7 @@ export const GitRepoSelect = ({
     if (installations.length === 0) {
       return "No GitHub namespaces found";
     }
-    return "Select a GitHub namespace";
   }, [loading, installations.length]);
-
-  const searchPlaceholder = useMemo(() => {
-    return repositoryId ? repositoryId.split("/")[1] : "Search...";
-  }, [repositoryId]);
 
   const filteredRepos = useMemo(() => {
     return repos.filter((repo) => {
@@ -99,7 +94,7 @@ export const GitRepoSelect = ({
             containerClassName="w-full"
             name="search"
             id="search"
-            placeholder={searchPlaceholder}
+            placeholder="Search..."
             value={search}
             disabled={loading || disabled}
             onChange={(e) => {
