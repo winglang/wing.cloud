@@ -1,3 +1,4 @@
+import { LinkIcon, SquaresPlusIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -5,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../design-system/button.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 
-import { AppConfigurationList } from "./components/app-configuration-list.js";
+import { AppConfigurationListItem } from "./components/app-configuration-list-item.js";
 import { NewAppContainer } from "./components/new-app-container.js";
 
 export const Component = () => {
@@ -27,7 +28,22 @@ export const Component = () => {
     <NewAppContainer>
       <div className="w-full space-y-2">
         <div className={clsx(theme.text1)}>Select a configuration</div>
-        <AppConfigurationList onSetType={onSetType} />
+        <AppConfigurationListItem
+          name="Connect"
+          description="Connect to an existing repository"
+          icon={<LinkIcon className="w-5 h-5" />}
+          onChange={() => {
+            onSetType("connect");
+          }}
+        />
+        <AppConfigurationListItem
+          name=""
+          description="More coming soon!"
+          icon={<SquaresPlusIcon className="w-5 h-5" />}
+          checked={false}
+          disabled={true}
+          classname="opacity-50 cursor-default"
+        />
         <div className="w-full flex pt-4">
           <div className="justify-end flex gap-x-2 grow">
             <Button onClick={onCancel}>Back</Button>

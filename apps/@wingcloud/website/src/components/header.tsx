@@ -81,9 +81,9 @@ export const Header = () => {
         <ol role="list" className="flex items-center space-x-2 truncate">
           <li>
             <div>
-              <Link to="/apps" className="text-[#212627] hover:text-slate-800">
+              <a href="/" className="text-[#212627] hover:text-slate-800">
                 <WingIcon className="h-5 w-auto" />
-              </Link>
+              </a>
             </div>
           </li>
           {breadcrumbs.map((breadcrumb, index) => {
