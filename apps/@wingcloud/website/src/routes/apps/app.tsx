@@ -1,13 +1,13 @@
 import { useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { EnvironmentsList } from "../environments/components/environments-list.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { Menu } from "../../design-system/menu.js";
 import { GithubIcon } from "../../icons/github-icon.js";
 import { MenuIcon } from "../../icons/menu-icon.js";
 import { wrpc } from "../../utils/wrpc.js";
+import { EnvironmentsList } from "../environments/components/environments-list.js";
 
 export interface AppProps {
   appName: string;
@@ -103,7 +103,7 @@ export const Component = () => {
                 />
 
                 {repoUrl && (
-                  <a href={repoUrl + "/compare"} target="_blank">
+                  <a href={repoUrl} target="_blank">
                     <Button className="truncate">Git Repository</Button>
                   </a>
                 )}
