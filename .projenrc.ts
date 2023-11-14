@@ -8,7 +8,7 @@ import {
   Turbo,
 } from "@skyrpex/wingen";
 
-const winglangVersion = "^0.45.5";
+const winglangVersion = "^0.47.2";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
