@@ -83,6 +83,18 @@ let website = new ex.ReactApp(
   localPort: websitePort,
 );
 
+// HACK: Configure the CloudFront Distribution to fallback to `/apps/index.html`.
+if util.env("WING_TARGET") == "tf-aws" {
+  let distributionNode = unsafeCast(std.Node.of(website).children.at(0).node.findChild("Distribution"));
+  distributionNode.addOverride("custom_error_response", [
+    {
+      error_code: 403,
+      response_code: 200,
+      response_page_path: "/apps/index.html",
+    },
+  ]);
+}
+
 let probotApp = new probot.ProbotApp(
   probotAdapter: probotAdapter,
   runtimeUrl: rntm.api.url,
