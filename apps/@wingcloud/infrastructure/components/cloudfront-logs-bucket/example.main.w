@@ -1,8 +1,8 @@
 bring cloud;
 bring expect;
 bring "cdktf" as cdktf;
-bring "./bucket.w" as logsBucket;
-bring "./athena.w" as athena;
+bring "./bucket.tfaws.w" as logsBucket;
+bring "./athena.tfaws.w" as athena;
 bring "@cdktf/provider-aws" as aws;
 
 let logPrefix = "testing";
