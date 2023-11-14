@@ -10,7 +10,7 @@ pub class GithubApp {
 
   extern "./src/create-github-app-jwt.mts" pub static inflight createGithubAppJwt(appId: str, privateKey: str): str;
 
-  init(appId: str, privateKey: str, handler: inflight (cloud.ApiRequest): cloud.ApiResponse) {
+  new(appId: str, privateKey: str, handler: inflight (cloud.ApiRequest): cloud.ApiResponse) {
     this.api = new cloud.Api();
     this.webhookUrl = this.api.url;
     this.api.post("/webhook", handler);

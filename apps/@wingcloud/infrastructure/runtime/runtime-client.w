@@ -20,7 +20,7 @@ struct RuntimeClientDeleteOptions {
 pub class RuntimeClient {
   runtimeUrl: str;
 
-  init(props: RuntimeClientProps) {
+  new(props: RuntimeClientProps) {
     this.runtimeUrl = props.runtimeUrl;
   }
 

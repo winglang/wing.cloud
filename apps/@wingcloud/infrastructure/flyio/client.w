@@ -81,7 +81,7 @@ pub inflight class Client {
   var graphqlUrl: str;
   var apiUrl: str;
 
-  init(props: ClientProps) {
+  new(props: ClientProps) {
     this.token = props.token;
     this.orgSlug = props.orgSlug;
     this.graphqlUrl = "https://api.fly.io/graphql";

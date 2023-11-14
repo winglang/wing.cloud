@@ -11,7 +11,7 @@ struct DockerImageProps {
 
 pub class DockerImage {
   pub imageName: str;
-  init(props: DockerImageProps) {
+  new(props: DockerImageProps) {
     new docker.provider.DockerProvider();
     new nullProvider.provider.NullProvider();
     new randomProvider.provider.RandomProvider();

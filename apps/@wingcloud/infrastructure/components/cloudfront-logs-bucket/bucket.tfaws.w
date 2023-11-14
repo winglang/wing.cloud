@@ -7,7 +7,7 @@ pub class CloudfrontLogsBucket {
   pub dependable: cdktf.ITerraformDependable;
   tfBucket: aws.s3Bucket.S3Bucket;
 
-  init(name: str) {
+  new(name: str) {
     if util.env("WING_TARGET") == "sim" {
       throw "CloudfrontLogsBucket is not supported in sim";
     }
@@ -72,7 +72,7 @@ pub class CloudfrontLogsBucket {
         expiration: {
           days: 365,
         },
-      }],      
+      }],
     );
   }
 

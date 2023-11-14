@@ -2,6 +2,7 @@ bring cloud;
 bring util;
 bring http;
 bring ex;
+bring "cdktf" as cdktf;
 
 bring "./reverse-proxy.w" as ReverseProxy;
 bring "./users.w" as Users;
@@ -82,6 +83,18 @@ let website = new ex.ReactApp(
   localPort: websitePort,
 );
 
+// HACK: Configure the CloudFront Distribution to fallback to `/apps/index.html`.
+if util.env("WING_TARGET") == "tf-aws" {
+  let distributionNode = unsafeCast(std.Node.of(website).children.at(0).node.findChild("Distribution"));
+  distributionNode.addOverride("custom_error_response", [
+    {
+      error_code: 403,
+      response_code: 200,
+      response_page_path: "/apps/index.html",
+    },
+  ]);
+}
+
 let probotApp = new probot.ProbotApp(
   probotAdapter: probotAdapter,
   runtimeUrl: rntm.api.url,
@@ -89,9 +102,6 @@ let probotApp = new probot.ProbotApp(
   apps: apps,
   environmentManager: environmentManager,
 );
-
-bring "cdktf" as cdktf;
-new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
 
 let apiDomainName = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
@@ -179,3 +189,7 @@ new tests.EnvironmentsTest(
   githubUser: util.tryEnv("TESTS_GITHUB_USER"),
 );
 
+new cdktf.TerraformOutput(value: api.url) as "API URL";
+new cdktf.TerraformOutput(value: website.url) as "Website URL";
+new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
+new cdktf.TerraformOutput(value: proxy.url) as "Proxy URL";
