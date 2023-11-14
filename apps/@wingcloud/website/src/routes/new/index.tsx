@@ -22,14 +22,13 @@ export const Component = () => {
           description="Connect to an existing repository"
           icon={<LinkIcon className="w-5 h-5" />}
           onClick={() => {
-            navigate("/apps/new/connect");
+            navigate("/apps/new/connect/");
           }}
         />
         <AppConfigurationListItem
           name=""
           description="More coming soon!"
           icon={<SquaresPlusIcon className="w-5 h-5" />}
-          checked={false}
           disabled={true}
           classname="opacity-50 cursor-default"
         />
@@ -37,7 +36,7 @@ export const Component = () => {
           <div className="justify-end flex gap-x-2 grow">
             <Button
               onClick={() => {
-                navigate("/apps/new");
+                navigate("/apps/new/");
               }}
             >
               Back
