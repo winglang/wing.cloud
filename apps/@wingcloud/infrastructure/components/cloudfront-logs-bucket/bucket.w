@@ -14,7 +14,7 @@ pub class CloudfrontLogsBucket {
       bucketPrefix: "cloudfront-logs-${name}",
     );
 
-    new aws.s3BucketPublicAccessBlock.S3BucketPublicAccessBlock(
+    let publicBlock = new aws.s3BucketPublicAccessBlock.S3BucketPublicAccessBlock(
       bucket: this.tfBucket.bucket,
       blockPublicAcls: true,
       blockPublicPolicy: true,
@@ -24,11 +24,12 @@ pub class CloudfrontLogsBucket {
 
     let canonicalAwsUserId = new aws.dataAwsCanonicalUserId.DataAwsCanonicalUserId();
 
-    new aws.s3BucketOwnershipControls.S3BucketOwnershipControls(
+    let ownership = new aws.s3BucketOwnershipControls.S3BucketOwnershipControls(
       bucket: this.tfBucket.bucket,
       rule: {
         objectOwnership: "ObjectWriter",
       },
+      dependsOn: [publicBlock],
     );
 
     new aws.s3BucketAcl.S3BucketAcl({
@@ -54,7 +55,8 @@ pub class CloudfrontLogsBucket {
           permission: "FULL_CONTROL",
         }
         ]
-      }
+      },
+      dependsOn: [ownership],
     });
 
     new aws.s3BucketLifecycleConfiguration.S3BucketLifecycleConfiguration(
