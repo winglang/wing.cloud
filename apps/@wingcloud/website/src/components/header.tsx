@@ -20,7 +20,7 @@ const UserMenu = () => {
   const signOut = useCallback(() => {
     // eslint-disable-next-line unicorn/no-useless-undefined
     signOutMutation.mutateAsync(undefined).then(() => {
-      navigate("/");
+      navigate("/apps");
     });
   }, [navigate, signOutMutation]);
 
@@ -56,11 +56,11 @@ export const Header = () => {
       return [
         {
           label: "apps",
-          to: "/apps",
+          to: "/apps/",
         },
         {
           label: "new",
-          to: "/new",
+          to: "new",
         },
       ];
     }
@@ -70,7 +70,7 @@ export const Header = () => {
       const to = `/${parts.slice(0, index + 1).join("/")}`;
       return {
         label: part,
-        to,
+        to: `${to}/`,
       };
     });
   }, [location.pathname]);
@@ -81,7 +81,7 @@ export const Header = () => {
         <ol role="list" className="flex items-center space-x-2 truncate">
           <li>
             <div>
-              <Link to="/" className="text-[#212627] hover:text-slate-800">
+              <Link to="/apps" className="text-[#212627] hover:text-slate-800">
                 <WingIcon className="h-5 w-auto" />
               </Link>
             </div>

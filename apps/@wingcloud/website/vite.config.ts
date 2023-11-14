@@ -6,4 +6,8 @@ import { api } from "./plugins/index.js";
 
 export default defineConfig({
   plugins: [api(), react(), wingcloud()],
+  base: "/apps",
+  build: {
+    outDir: "./dist/apps",
+  },
 });

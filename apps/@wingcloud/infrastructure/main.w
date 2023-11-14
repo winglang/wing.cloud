@@ -2,6 +2,7 @@ bring cloud;
 bring util;
 bring http;
 bring ex;
+bring "cdktf" as cdktf;
 
 bring "./reverse-proxy.w" as ReverseProxy;
 bring "./users.w" as Users;
@@ -92,9 +93,6 @@ let probotApp = new probot.ProbotApp(
   environmentManager: environmentManager,
 );
 
-bring "cdktf" as cdktf;
-new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
-
 let apiDomainName = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
     // See https://github.com/winglang/wing/issues/4688.
@@ -122,14 +120,14 @@ let origins = (() => {
     });
   } else {
     originsArray.push({
-      pathPattern: "/",
-      domainName: util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN,
-      originId: "landingPage",
+      pathPattern: "/apps/*",
+      domainName: website.url.replace("https://", ""),
+      originId: "website",
     });
     originsArray.push({
       pathPattern: "",
-      domainName: website.url.replace("https://", ""),
-      originId: "website",
+      domainName: util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN,
+      originId: "landingPage",
     });
   }
   return originsArray.copy();
@@ -181,3 +179,7 @@ new tests.EnvironmentsTest(
   githubUser: util.tryEnv("TESTS_GITHUB_USER"),
 );
 
+new cdktf.TerraformOutput(value: api.url) as "API URL";
+new cdktf.TerraformOutput(value: website.url) as "Website URL";
+new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
+new cdktf.TerraformOutput(value: proxy.url) as "Proxy URL";

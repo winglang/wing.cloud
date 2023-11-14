@@ -6,7 +6,7 @@ bring "./icrypto.w" as icrypto;
 pub class Crypto impl icrypto.ICrypto {
   keyArn: str;
 
-  init() {
+  new() {
     let key = new aws.kmsKey.KmsKey();
     this.keyArn = key.arn;
   }

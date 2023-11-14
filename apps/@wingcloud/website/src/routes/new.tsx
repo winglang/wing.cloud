@@ -58,7 +58,7 @@ export const Component = () => {
         imageUrl: repo.owner.avatar_url,
         installationId: installationId!,
       });
-      navigate("/apps");
+      navigate("/apps/");
     },
     [createAppMutation],
   );

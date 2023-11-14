@@ -44,7 +44,7 @@ pub class Secrets {
   table: ex.DynamodbTable;
   crypto: crypto.Crypto;
 
-  init(table: ex.DynamodbTable) {
+  new(table: ex.DynamodbTable) {
     this.table = table;
     this.crypto = new crypto.Crypto();
   }

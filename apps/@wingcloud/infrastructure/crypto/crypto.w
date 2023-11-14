@@ -5,7 +5,7 @@ bring "./crypto.aws.w" as aws;
 
 pub class Crypto impl icrypto.ICrypto {
   inner: icrypto.ICrypto;
-  init() {
+  new() {
     if util.env("WING_TARGET") == "sim" {
       this.inner = new sim.Crypto();
     } elif util.env("WING_TARGET") == "tf-aws" {

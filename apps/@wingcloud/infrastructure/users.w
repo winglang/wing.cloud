@@ -24,7 +24,7 @@ struct GetUsernameOptions {
 pub class Users {
   table: ex.DynamodbTable;
 
-  init(table: ex.DynamodbTable) {
+  new(table: ex.DynamodbTable) {
     this.table = table;
   }
 

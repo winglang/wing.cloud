@@ -1,0 +1,5 @@
+
+> @wingcloud/type-opaque@0.0.0 test /Users/eladcohen/dev3/wing.cloud/packages/@wingcloud/type-opaque
+> vitest run
+
+ ELIFECYCLE  Test failed. See above for more details.

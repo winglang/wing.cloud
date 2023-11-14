@@ -1,0 +1,5 @@
+
+> @wingcloud/type-prefixed-id@0.0.0 test /Users/eladcohen/dev3/wing.cloud/packages/@wingcloud/type-prefixed-id
+> vitest run
+
+ ELIFECYCLE  Test failed. See above for more details.

@@ -4,7 +4,7 @@ bring util;
 pub class Crypto impl icrypto.ICrypto {
   key: str;
 
-  init() {
+  new() {
     this.key = "seed-key";
   }
 
