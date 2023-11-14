@@ -5,7 +5,8 @@ import { useCallback } from "react";
 import { useTheme } from "../../../design-system/theme-provider.js";
 
 import { AppConfigurationListItem } from "./app-configuration-list-item.js";
-import type { ConfigurationType } from "./app-configuration.js";
+
+export type ConfigurationType = "connect";
 
 export interface AppConfigurationListProps {
   onSetType: (configType: ConfigurationType) => void;

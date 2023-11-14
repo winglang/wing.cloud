@@ -52,7 +52,7 @@ export const Header = () => {
   const location = useLocation();
 
   const breadcrumbs = useMemo(() => {
-    if (location.pathname === "/new") {
+    if (location.pathname.startsWith("/apps/new")) {
       return [
         {
           label: "apps",
