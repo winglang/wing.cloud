@@ -55,10 +55,6 @@ export const Header = () => {
     if (location.pathname.startsWith("/apps/new")) {
       return [
         {
-          label: "apps",
-          to: "/apps/",
-        },
-        {
           label: "new",
           to: "new",
         },
@@ -81,9 +77,9 @@ export const Header = () => {
         <ol role="list" className="flex items-center space-x-2 truncate">
           <li>
             <div>
-              <a href="/" className="text-[#212627] hover:text-slate-800">
+              <Link to="/apps/" className="text-[#212627] hover:text-slate-800">
                 <WingIcon className="h-5 w-auto" />
-              </a>
+              </Link>
             </div>
           </li>
           {breadcrumbs.map((breadcrumb, index) => {
