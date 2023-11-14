@@ -32,6 +32,7 @@ pub struct GetSecretOptions {
   appId: str;
   environmentType: str?;
   environmentId: str?;
+  decryptValue: bool?;
 }
 
 pub struct ListSecretsOptions {
@@ -39,6 +40,7 @@ pub struct ListSecretsOptions {
   environmentType: str?;
   environmentId: str?;
   mergeAllSecrets: bool?;
+  decryptValues: bool?;
 }
 
 pub struct ListSecretsByEnvironmentOptions {
@@ -122,7 +124,7 @@ pub class Secrets {
     );
 
     if let item = result.item {
-      return Secret.fromJson(this.fromDB(item));
+      return Secret.fromJson(this.fromDB(item, options.decryptValue ?? false));
     }
 
     throw "Secret [${options.id}] not found";
@@ -184,7 +186,7 @@ pub class Secrets {
 
     let var secrets: MutMap<Secret> = {};
     for item in items {
-      let secret = Secret.fromJson(this.fromDB(item));
+      let secret = Secret.fromJson(this.fromDB(item, options.decryptValues ?? false));
       let secretName = secret.name;
       // override the current secret if exists since items at the end of the array are more specific
       secrets.set(secretName, secret);
@@ -193,7 +195,7 @@ pub class Secrets {
     return secrets.values();
   }
 
-  inflight fromDB(item: Json): Secret {
+  inflight fromDB(item: Json, decryptValue: bool): Secret {
     let temp = MutJson{
       id: item.get("id").asStr(),
       appId: item.get("appId").asStr(),
@@ -204,7 +206,11 @@ pub class Secrets {
       environmentId: item.tryGet("environmentId")?.tryAsStr(),
     };
 
-    temp.set("value", this.crypto.decrypt(icrypto.EncryptedData.fromJson(item.get("value"))));
+    if decryptValue {
+      temp.set("value", this.crypto.decrypt(icrypto.EncryptedData.fromJson(item.get("value"))));
+    } else {
+      temp.set("value", "***");
+    }
     
     return Secret.fromJson(temp);
   }

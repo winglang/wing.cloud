@@ -31,9 +31,9 @@ test "can store and get a secret" {
   let secret1 = secrets.create(appId: "app-id", name: "test-secret", value: "secret-value");
   let secret2 = secrets.create(appId: "app-id", environmentType: "production", name: "test-secret-2", value: "secret-value-2");
   let secret3 = secrets.create(appId: "app-id", environmentType: "production", environmentId: "env-id", name: "test-secret-3", value: "secret-value-3");
-  let storedSecret1 = secrets.get(appId: "app-id", id: secret1.id);
-  let storedSecret2 = secrets.get(appId: "app-id", environmentType: "production", id: secret2.id);
-  let storedSecret3 = secrets.get(appId: "app-id", environmentType: "production", environmentId: "env-id", id: secret3.id);
+  let storedSecret1 = secrets.get(appId: "app-id", id: secret1.id, decryptValue: true);
+  let storedSecret2 = secrets.get(appId: "app-id", environmentType: "production", id: secret2.id, decryptValue: true);
+  let storedSecret3 = secrets.get(appId: "app-id", environmentType: "production", environmentId: "env-id", id: secret3.id, decryptValue: true);
 
   let expected1 = Secrets.Secret{
     id: secret1.id,
@@ -101,7 +101,7 @@ test "can list secrets without merging" {
   };
   
   // with envType and envId
-  let storedSecrets = secrets.list(appId: "app-id", environmentType: "preview", environmentId: "env-id");
+  let storedSecrets = secrets.list(appId: "app-id", environmentType: "preview", environmentId: "env-id", decryptValues: true);
   assert(storedSecrets.length == 2);
   for secret in storedSecrets {
     if secret.id == secret1.id {
@@ -151,4 +151,13 @@ test "can list secrets with merging" {
   for secret in storedSecrets3 {
     assert(secret.id == secret3.id || secret.id == secret4.id || secret.id == secret6.id);
   }
+}
+
+test "will not decrypt values by default" {
+  let secret1 = secrets.create(appId: "app-id", name: "test-secret", value: "secret-value");
+  let storedSecret1 = secrets.get(appId: "app-id", id: secret1.id);
+  assert(storedSecret1.value == "***");
+
+  let storedSecrets = secrets.list(appId: "app-id");
+  assert(storedSecrets.at(0).value == "***");
 }
