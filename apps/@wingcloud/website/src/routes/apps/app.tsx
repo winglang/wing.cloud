@@ -102,11 +102,11 @@ export const Component = () => {
                   icon={<MenuIcon className="h-4 w-4 text-slate-700" />}
                 />
 
-                {repoUrl && (
-                  <a href={repoUrl} target="_blank">
-                    <Button className="truncate">Git Repository</Button>
-                  </a>
-                )}
+                <a href={repoUrl} target="_blank">
+                  <Button className="truncate" disabled={!repoUrl}>
+                    Git Repository
+                  </Button>
+                </a>
               </div>
             </div>
           </div>
