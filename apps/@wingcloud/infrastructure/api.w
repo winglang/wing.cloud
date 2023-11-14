@@ -316,8 +316,7 @@ pub class Api {
       let userId = getUserFromCookie(request);
 
       let input = Json.parse(request.body ?? "");
-
-      let appId =input.get("appId").asStr();
+      let appId = input.get("appId").asStr();
 
       apps.delete(
         appId: appId,
