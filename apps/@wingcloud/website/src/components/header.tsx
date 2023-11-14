@@ -2,7 +2,7 @@ import { UserCircleIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
 import { useCallback } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import { Menu } from "../design-system/menu.js";
 import { WingIcon } from "../icons/wing-icon.js";
@@ -14,15 +14,14 @@ export interface Breadcrumb {
 }
 
 const UserMenu = () => {
-  const navigate = useNavigate();
   const signOutMutation = wrpc["auth.signout"].useMutation();
 
   const signOut = useCallback(() => {
     // eslint-disable-next-line unicorn/no-useless-undefined
     signOutMutation.mutateAsync(undefined).then(() => {
-      navigate("/apps");
+      location.href = "/";
     });
-  }, [navigate, signOutMutation]);
+  }, [signOutMutation]);
 
   return (
     <Menu
