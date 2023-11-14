@@ -10,6 +10,7 @@ pub struct Secret {
   value: str;
   createdAt: str;
   updatedAt: str;
+  environmentType: str?;
   environmentId: str?;
 }
 
@@ -22,18 +23,22 @@ pub struct CreateSecretOptions {
   appId: str;
   name: str;
   value: str;
+  environmentType: str?;
   environmentId: str?;
 }
 
 pub struct GetSecretOptions {
   id: str;
   appId: str;
+  environmentType: str?;
   environmentId: str?;
 }
 
 pub struct ListSecretsOptions {
   appId: str;
+  environmentType: str?;
   environmentId: str?;
+  mergeAllSecrets: bool?;
 }
 
 pub struct ListSecretsByEnvironmentOptions {
@@ -43,10 +48,12 @@ pub struct ListSecretsByEnvironmentOptions {
 pub class Secrets {
   table: ex.DynamodbTable;
   crypto: crypto.Crypto;
+  global: str;
 
   new(table: ex.DynamodbTable) {
     this.table = table;
     this.crypto = new crypto.Crypto();
+    this.global = "global";
   }
 
   pub inflight create(options: CreateSecretOptions): Secret {
@@ -58,34 +65,37 @@ pub class Secrets {
       value: options.value,
       createdAt: createdAt,
       updatedAt: createdAt,
+      environmentType: options.environmentType,
       environmentId: options.environmentId,
     };
 
-    let getItem = (pk: str, sk: str) => {
-      let item = MutJson {
-        pk: pk,
-        sk: sk,
-        id: secret.id,
-        appId: secret.appId,
-        name: secret.name,
-        createdAt: createdAt,
-        updatedAt: createdAt,
-      };
+    let item = MutJson {
+      pk: "APP#${secret.appId}",
+      sk: "TYPE#${secret.environmentType ?? this.global}#ENVIRONMENT#${secret.environmentId ?? this.global}#SECRET#${secret.id}",
+      id: secret.id,
+      appId: secret.appId,
+      name: secret.name,
+      value: this.crypto.encrypt(secret.value),
+      createdAt: createdAt,
+      updatedAt: createdAt,
+    };
 
-      let encrypted = this.crypto.encrypt(secret.value);
-      item.set("value", encrypted);
+    if let environmentType = secret.environmentType {
+      item.set("environmentType", environmentType);
+    }
 
-      if let environmentId = secret.environmentId {
-        item.set("environmentId", environmentId);
+    if let environmentId = secret.environmentId {
+      if !secret.environmentType? {
+        throw "environment type must be provided when specifing environment id";
       }
 
-      return item;
-    };
+      item.set("environmentId", environmentId);
+    }
 
     this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: getItem("APP#${secret.appId}", "ENVIRONMENT#${secret.environmentId}#SECRET#${secret.id}"),
+          item: Json.deepCopy(item),
           conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
         },
       },
@@ -95,10 +105,19 @@ pub class Secrets {
   }
 
   pub inflight get(options: GetSecretOptions): Secret {
+    if let environmentId = options.environmentId {
+      if !options.environmentType? {
+        throw "environment type must be provided when specifing environment id";
+      }
+    }
+
+    let environmentType = options.environmentType ?? this.global;
+    let environmentId = options.environmentId ?? this.global;
+
     let result = this.table.getItem(
       key: {
         pk: "APP#${options.appId}",
-        sk: "ENVIRONMENT#${options.environmentId}#SECRET#${options.id}",
+        sk: "TYPE#${environmentType}#ENVIRONMENT#${environmentId}#SECRET#${options.id}",
       },
     );
 
@@ -110,19 +129,68 @@ pub class Secrets {
   }
 
   pub inflight list(options: ListSecretsOptions): Array<Secret> {
-    let result = this.table.query(
-      keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-      expressionAttributeValues: {
-        ":pk": "APP#${options.appId}",
-        ":sk": "ENVIRONMENT#${options.environmentId}#",
-      },
-    );
-    let var secrets: Array<Secret> = [];
-    for item in result.items {
-      secrets = secrets.concat([Secret.fromJson(this.fromDB(item))]);
+    if let environmentId = options.environmentId {
+      if !options.environmentType? {
+        throw "environment type must be provided when specifing environment id";
+      }
+    }
+  
+    let var items = Array<Json>[];
+    let mergeAllSecrets = options.mergeAllSecrets ?? false;
+    if !mergeAllSecrets {
+      let result = this.table.query(
+        keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+        expressionAttributeValues: {
+          ":pk": "APP#${options.appId}",
+          ":sk": "TYPE#${options.environmentType ?? this.global}#ENVIRONMENT#${options.environmentId ?? this.global}#"
+        },
+      );
+      items = items.concat(result.items);
+    } else {
+      // fetch everything that belongs to the app
+      let result = this.table.query(
+        keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+        expressionAttributeValues: {
+          ":pk": "APP#${options.appId}",
+          ":sk": "TYPE#${this.global}#ENVIRONMENT#${this.global}#"
+        },
+      );
+      items = items.concat(result.items);
+
+      if let environmentType = options.environmentType {
+        // fetch everything that belongs to those app and environment type
+        let result = this.table.query(
+          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          expressionAttributeValues: {
+            ":pk": "APP#${options.appId}",
+            ":sk": "TYPE#${environmentType}#ENVIRONMENT#${this.global}#"
+          },
+        );
+        items = items.concat(result.items);
+
+        if let environmentId = options.environmentId {
+          // fetch everything that belongs to those app, environment type and environment id
+          let result = this.table.query(
+            keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+            expressionAttributeValues: {
+              ":pk": "APP#${options.appId}",
+              ":sk": "TYPE#${environmentType}#ENVIRONMENT#${environmentId}#"
+            },
+          );
+          items = items.concat(result.items);
+        }
+      }
     }
 
-    return secrets;
+    let var secrets: MutMap<Secret> = {};
+    for item in items {
+      let secret = Secret.fromJson(this.fromDB(item));
+      let secretName = secret.name;
+      // override the current secret if exists since items at the end of the array are more specific
+      secrets.set(secretName, secret);
+    }
+
+    return secrets.values();
   }
 
   inflight fromDB(item: Json): Secret {
@@ -132,6 +200,7 @@ pub class Secrets {
       name: item.get("name").asStr(),
       createdAt: item.get("createdAt").asStr(),
       updatedAt: item.get("updatedAt").asStr(),
+      environmentType: item.tryGet("environmentType")?.tryAsStr(),
       environmentId: item.tryGet("environmentId")?.tryAsStr(),
     };
 
