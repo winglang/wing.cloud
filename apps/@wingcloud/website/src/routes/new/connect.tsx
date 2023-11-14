@@ -1,3 +1,4 @@
+import { LinkIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -24,10 +25,6 @@ export const Component = () => {
       type: "error",
     });
   }, []);
-
-  const onAppCreated = useCallback(() => {
-    navigate("/apps/");
-  }, [navigate]);
 
   const onCancel = useCallback(() => {
     navigate("/apps/new");
@@ -63,14 +60,14 @@ export const Component = () => {
 
   const onCreate = useCallback(async () => {
     try {
-      await createApp();
-      onAppCreated();
+      const app = await createApp();
+      navigate(`/apps/${app?.appName}`);
     } catch (error) {
       if (error instanceof Error) {
         onError(error);
       }
     }
-  }, [createApp, onAppCreated, onError]);
+  }, [createApp, onError]);
 
   const onMissingRepoClosed = useCallback(() => {
     // eslint-disable-next-line unicorn/no-useless-undefined
@@ -82,7 +79,12 @@ export const Component = () => {
   }, [listInstallationsQuery.refetch, setInstallationId, setRepositoryId]);
 
   return (
-    <NewAppContainer step="connect">
+    <NewAppContainer
+      step={{
+        name: "Connect to a Git repository",
+        icon: LinkIcon,
+      }}
+    >
       <div className="w-full space-y-2">
         <div className={clsx(theme.text1)}>Select a repository</div>
         <GitRepoSelect

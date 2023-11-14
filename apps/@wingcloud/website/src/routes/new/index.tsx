@@ -30,7 +30,7 @@ export const Component = () => {
         <AppConfigurationList onSetType={onSetType} />
         <div className="w-full flex pt-4">
           <div className="justify-end flex gap-x-2 grow">
-            <Button onClick={onCancel}>Cancel</Button>
+            <Button onClick={onCancel}>Back</Button>
           </div>
         </div>
       </div>

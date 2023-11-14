@@ -144,6 +144,7 @@ export const wrpc = createWRPCReact<{
     },
     {
       appId: string;
+      appName: string;
     }
   >;
 }>();

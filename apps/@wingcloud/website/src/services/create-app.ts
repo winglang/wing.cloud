@@ -34,7 +34,7 @@ export const useCreateAppFromRepo = () => {
 
     setCreateAppLoading(true);
     setRepositoryId(repo.full_name.toString());
-    await createAppMutation.mutateAsync(
+    const response = await createAppMutation.mutateAsync(
       {
         appName: repo.name,
         description: repo.description,
@@ -54,6 +54,7 @@ export const useCreateAppFromRepo = () => {
       },
     );
     setCreateAppLoading(false);
+    return response;
   }, [createAppMutation, installationId, listReposQuery.data, repositoryId]);
 
   useEffect(() => {

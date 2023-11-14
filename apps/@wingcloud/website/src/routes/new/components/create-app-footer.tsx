@@ -16,7 +16,9 @@ export const CreateAppFooter = ({
   return (
     <div className="w-full flex">
       <div className="justify-end flex gap-x-2 grow">
-        <Button onClick={onCancel}>Back</Button>
+        <Button onClick={onCancel} disabled={disabled}>
+          Back
+        </Button>
         <Button onClick={onCreate} primary disabled={disabled || loading}>
           {loading ? "Creating..." : "Create new App"}
         </Button>

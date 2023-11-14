@@ -1,12 +1,15 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { type PropsWithChildren } from "react";
+import { type ForwardRefExoticComponent, type PropsWithChildren } from "react";
 import { Link } from "react-router-dom";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
 
 export interface NewAppContainerProps {
-  step?: string;
+  step?: {
+    name: string;
+    icon: ForwardRefExoticComponent<any>;
+  };
 }
 
 export const NewAppContainer = ({
@@ -25,7 +28,8 @@ export const NewAppContainer = ({
           {step && (
             <>
               <ChevronRightIcon className="h-4 w-4 flex-shrink-0" />
-              <div className="truncate">{step}</div>
+              <step.icon className="h-4 w-4 flex-shrink-0" />
+              <div className="truncate">{step.name}</div>
             </>
           )}
         </div>

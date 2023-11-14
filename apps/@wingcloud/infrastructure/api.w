@@ -404,6 +404,7 @@ pub class Api {
         return {
           body: {
             appId: app.appId,
+            appName: app.appName,
           },
         };
       } else {
