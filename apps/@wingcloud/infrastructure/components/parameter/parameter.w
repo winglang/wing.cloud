@@ -7,7 +7,7 @@ bring "./iparameter.w" as i;
 pub class Parameter impl i.IParameter {
   platform: i.IParameter;
 
-  init(props: i.ParameterProps) {
+  new(props: i.ParameterProps) {
     if util.env("WING_TARGET") == "sim" {
       this.platform = new sim.Parameter(props);
     } else {
@@ -15,7 +15,7 @@ pub class Parameter impl i.IParameter {
     }
   }
 
-  pub inflight get(): str { 
-    return this.platform.get();    
+  pub inflight get(): str {
+    return this.platform.get();
   }
 }

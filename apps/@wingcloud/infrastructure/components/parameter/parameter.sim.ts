@@ -1,1 +1,0 @@
-exports.toResource = (x) => x;
