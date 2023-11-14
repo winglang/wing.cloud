@@ -3,13 +3,13 @@ import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
 import type { Installation } from "../../utils/wrpc.js";
 
-import { CreateAppFooter } from "./components/create-app-footer.js";
 import { GitRepoSelect } from "./components/git-repo-select.js";
 import { MissingRepoButton } from "./components/missing-repo-button.js";
 import { NewAppContainer } from "./components/new-app-container.js";
@@ -40,9 +40,9 @@ export const Component = () => {
     repositoryId,
     setRepositoryId,
     loading,
-    createAppLoading,
   } = useCreateAppFromRepo();
 
+  const [createAppLoading, setCreateAppLoading] = useState(false);
   const [installations, setInstallations] = useState<Installation[]>([]);
 
   useEffect(() => {
@@ -60,10 +60,12 @@ export const Component = () => {
   }, [listReposQuery.data]);
 
   const onCreate = useCallback(async () => {
+    setCreateAppLoading(true);
     try {
       const app = await createApp();
       navigate(`/apps/${app?.appName}`);
     } catch (error) {
+      setCreateAppLoading(false);
       if (error instanceof Error) {
         onError(error);
       }
@@ -94,22 +96,30 @@ export const Component = () => {
     >
       <div className="w-full space-y-2">
         <div className={clsx(theme.text1)}>Select a repository</div>
-        <GitRepoSelect
-          installationId={installationId}
-          setInstallationId={setInstallationId}
-          repositoryId={repositoryId || ""}
-          setRepositoryId={setRepositoryId}
-          installations={installations}
-          repos={repos}
-          loading={loading}
-          disabled={createAppLoading}
-        />
-        <MissingRepoButton onClose={onMissingRepoClosed} />
-        <div className="w-full flex">
-          <div className="justify-end flex gap-x-2 grow">
-            <Button onClick={onCancel} disabled={createAppLoading}>
-              Back
-            </Button>
+        <div className="w-full relative">
+          {createAppLoading && (
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <div className="absolute inset-0 bg-white dark:bg-gray-900 opacity-50" />
+              <SpinnerLoader className="z-20" />
+            </div>
+          )}
+          <GitRepoSelect
+            installationId={installationId}
+            setInstallationId={setInstallationId}
+            repositoryId={repositoryId || ""}
+            setRepositoryId={setRepositoryId}
+            installations={installations}
+            repos={repos}
+            loading={loading}
+            disabled={createAppLoading}
+          />
+          <MissingRepoButton onClose={onMissingRepoClosed} />
+          <div className="w-full flex">
+            <div className="justify-end flex gap-x-2 grow">
+              <Button onClick={onCancel} disabled={createAppLoading}>
+                Back
+              </Button>
+            </div>
           </div>
         </div>
       </div>

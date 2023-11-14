@@ -170,8 +170,7 @@ export const GitRepoSelect = ({
                   }}
                   disabled={disabled}
                 >
-                  {(repositoryId === repo.full_name && "Loading...") ||
-                    "Connect"}
+                  Connect
                 </button>
               </div>
             </div>
