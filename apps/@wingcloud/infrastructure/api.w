@@ -325,7 +325,7 @@ pub class Api {
 
       return {
         body: {
-          appsId: appId,
+          appId: appId,
         },
       };
     });

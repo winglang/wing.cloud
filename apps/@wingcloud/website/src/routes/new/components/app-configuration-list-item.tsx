@@ -9,7 +9,7 @@ export interface AppConfigurationListItemProps {
   icon?: React.ReactNode;
   disabled?: boolean;
   checked?: boolean;
-  onChange?: () => void;
+  onClick?: () => void;
   classname?: string;
 }
 
@@ -19,7 +19,7 @@ export const AppConfigurationListItem = ({
   icon,
   disabled,
   checked,
-  onChange,
+  onClick,
   classname,
 }: AppConfigurationListItemProps) => {
   const { theme } = useTheme();
@@ -37,7 +37,7 @@ export const AppConfigurationListItem = ({
         theme.bgInput,
         theme.borderInput,
       )}
-      onClick={onChange}
+      onClick={onClick}
     >
       <div className="flex gap-x-4 items-center h-full">
         <div className={clsx(theme.text1)}>{icon}</div>
@@ -50,7 +50,7 @@ export const AppConfigurationListItem = ({
       </div>
 
       <div className="flex grow justify-end text-slate-500 items-center">
-        {onChange && <StatusDot selected={checked ?? false} />}
+        {onClick && <StatusDot selected={checked ?? false} />}
       </div>
     </button>
   );

@@ -17,7 +17,7 @@ export const Component = () => {
     navigate("/apps/new");
   }, [navigate]);
 
-  const onSetType = useCallback(
+  const onTypeChange = useCallback(
     (type: string) => {
       navigate(`/apps/new/${type}`);
     },
@@ -32,8 +32,8 @@ export const Component = () => {
           name="Connect"
           description="Connect to an existing repository"
           icon={<LinkIcon className="w-5 h-5" />}
-          onChange={() => {
-            onSetType("connect");
+          onClick={() => {
+            onTypeChange("connect");
           }}
         />
         <AppConfigurationListItem

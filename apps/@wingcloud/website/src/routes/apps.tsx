@@ -25,7 +25,7 @@ export const Component = () => {
   }, [listAppsQuery.isFetching]);
 
   const apps = useMemo(() => {
-    return listAppsQuery.data?.apps || [];
+    return listAppsQuery.data?.apps ?? [];
   }, [listAppsQuery.data]);
 
   const filteredApps = useMemo(() => {
