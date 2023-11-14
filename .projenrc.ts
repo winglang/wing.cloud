@@ -53,6 +53,7 @@ new Turbo(website, {
   pipeline: {
     compile: {
       dotEnv: [".env"],
+      outputs: ["dist/**"],
     },
     dev: {
       dependsOn: ["^compile"],
