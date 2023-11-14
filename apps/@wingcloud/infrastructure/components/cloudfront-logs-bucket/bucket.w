@@ -1,8 +1,10 @@
 bring cloud;
 bring util;
+bring "cdktf" as cdktf;
 bring "@cdktf/provider-aws" as aws;
 
 pub class CloudfrontLogsBucket {
+  pub dependable: cdktf.ITerraformDependable;
   tfBucket: aws.s3Bucket.S3Bucket;
 
   init(name: str) {
@@ -10,8 +12,11 @@ pub class CloudfrontLogsBucket {
       throw "CloudfrontLogsBucket is not supported in sim";
     }
 
+    let isTestEnvironment = util.tryEnv("WING_IS_TEST") != nil;
+
     this.tfBucket = new aws.s3Bucket.S3Bucket(
       bucketPrefix: "cloudfront-logs-${name}",
+      forceDestroy: isTestEnvironment,
     );
 
     let publicBlock = new aws.s3BucketPublicAccessBlock.S3BucketPublicAccessBlock(
@@ -32,7 +37,7 @@ pub class CloudfrontLogsBucket {
       dependsOn: [publicBlock],
     );
 
-    new aws.s3BucketAcl.S3BucketAcl({
+    this.dependable = new aws.s3BucketAcl.S3BucketAcl({
       bucket: this.tfBucket.bucket,
       accessControlPolicy: {
         owner: {
@@ -73,5 +78,9 @@ pub class CloudfrontLogsBucket {
 
   pub domainName(): str {
     return this.tfBucket.bucketDomainName;
+  }
+
+  pub name(): str {
+    return this.tfBucket.bucket;
   }
 }
