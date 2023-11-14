@@ -27,10 +27,13 @@ pub struct CreateSecretOptions {
 
 pub struct GetSecretOptions {
   id: str;
+  appId: str;
+  environmentId: str?;
 }
 
 pub struct ListSecretsOptions {
   appId: str;
+  environmentId: str?;
 }
 
 pub struct ListSecretsByEnvironmentOptions {
@@ -79,29 +82,14 @@ pub class Secrets {
       return item;
     };
 
-    let items: MutArray<ex.DynamodbTransactWriteItem> = MutArray<ex.DynamodbTransactWriteItem>[
+    this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: getItem("SECRET#${secret.id}", "#"),
-          conditionExpression: "attribute_not_exists(pk)"
+          item: getItem("APP#${secret.appId}", "ENVIRONMENT#${secret.environmentId}#SECRET#${secret.id}"),
+          conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
         },
       },
-      {
-        put: {
-          item: getItem("APP#${secret.appId}", "SECRET#${secret.id}"),
-        },
-      },
-    ];
-
-    if let environmentId = secret.environmentId {
-      items.push({
-        put: {
-          item: getItem("ENVIRONMENT#${secret.environmentId}", "SECRET#${secret.id}"),
-        },
-      });
-    }
-
-    this.table.transactWriteItems(transactItems: items.copy());
+    ]);
 
     return secret;
   }
@@ -109,8 +97,8 @@ pub class Secrets {
   pub inflight get(options: GetSecretOptions): Secret {
     let result = this.table.getItem(
       key: {
-        pk: "SECRET#${options.id}",
-        sk: "#",
+        pk: "APP#${options.appId}",
+        sk: "ENVIRONMENT#${options.environmentId}#SECRET#${options.id}",
       },
     );
 
@@ -126,23 +114,7 @@ pub class Secrets {
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
         ":pk": "APP#${options.appId}",
-        ":sk": "SECRET#",
-      },
-    );
-    let var secrets: Array<Secret> = [];
-    for item in result.items {
-      secrets = secrets.concat([Secret.fromJson(this.fromDB(item))]);
-    }
-
-    return secrets;
-  }
-
-  pub inflight listByEnvironment(options: ListSecretsByEnvironmentOptions): Array<Secret> {
-    let result = this.table.query(
-      keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-      expressionAttributeValues: {
-        ":pk": "ENVIRONMENT#${options.environmentId}",
-        ":sk": "SECRET#",
+        ":sk": "ENVIRONMENT#${options.environmentId}#",
       },
     );
     let var secrets: Array<Secret> = [];
