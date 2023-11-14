@@ -76,7 +76,7 @@ export const GitRepoSelect = ({
             disabled={loading || disabled}
             renderItem={(item) => {
               return (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <GithubIcon
                     className={clsx("w-4 h-4 inline-block", theme.text1)}
                   />
@@ -137,7 +137,7 @@ export const GitRepoSelect = ({
               key={repo.id}
               className={clsx(
                 theme.text1,
-                "text-xs px-4 py-2 gap-1",
+                "text-xs px-2.5 py-1.5 gap-1",
                 "w-full text-left flex items-center",
                 "transition-all outline-none focus:outline-none",
                 "focus:bg-slate-50 dark:focus:bg-slate-750",
@@ -154,7 +154,7 @@ export const GitRepoSelect = ({
             >
               <div className="flex items-center gap-2">
                 <img className="w-4 h-4" src={repo.owner.avatar_url} />
-                <div>{repo.full_name}</div>
+                <div>{repo.name}</div>
               </div>
               <div className="flex flex-grow justify-end">
                 <StatusDot selected={repositoryId === repo.full_name} />

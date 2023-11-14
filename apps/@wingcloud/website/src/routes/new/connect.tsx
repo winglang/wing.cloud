@@ -81,7 +81,7 @@ export const Component = () => {
   return (
     <NewAppContainer
       step={{
-        name: "Connect to a Git repository",
+        name: "Connect",
         icon: LinkIcon,
       }}
     >
