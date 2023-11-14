@@ -49,7 +49,7 @@ export const Component = () => {
 
       await createAppMutation.mutateAsync({
         appName: repo.name,
-        description: repo.description,
+        description: repo.description ?? "",
         repoId: repo.full_name.toString(),
         repoName: repo.name,
         repoOwner: repo.owner.login,
