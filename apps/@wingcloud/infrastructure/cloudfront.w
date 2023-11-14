@@ -2,7 +2,7 @@ bring cloud;
 bring util;
 bring "@cdktf/provider-aws" as aws;
 bring "./dnsimple.w" as DNSimple;
-bring "./components/cloudfront-logs-bucket/bucket.w" as logsBucket;
+bring "./components/cloudfront-logs-bucket/bucket.tfaws.w" as logsBucket;
 
 struct CachePolicyProps {
   name: str;
@@ -165,7 +165,8 @@ pub class CloudFrontDistribution {
         bucket: this.logsBucket.domainName(),
         includeCookies: true,
         prefix: "reverse-proxy"
-      }
+      },
+      dependsOn: [this.logsBucket.dependable]
     );
   }
 }
