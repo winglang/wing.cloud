@@ -33,7 +33,7 @@ interface IRuntimeHandler {
 
 class RuntimeHandler_sim impl IRuntimeHandler {
   container: containers.Container_sim;
-  init() {
+  new() {
     this.container = new containers.Container_sim(name: "previews-runtime", image: "../runtime", args: {
       "SETUP_DOCKER": "false",
     },  port: 3000, privileged: true);
@@ -90,7 +90,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   flyToken: str;
   flyOrgSlug: str;
   image: runtimeDocker.RuntimeDockerImage;
-  init(props: FlyRuntimeHandlerProps) {
+  new(props: FlyRuntimeHandlerProps) {
     this.flyToken = props.flyToken;
     this.flyOrgSlug = props.flyOrgSlug;
     this.image = new runtimeDocker.RuntimeDockerImage(flyOrgSlug: props.flyOrgSlug);
@@ -171,7 +171,7 @@ pub class RuntimeService {
   pub api: cloud.Api;
   runtimeHandler: IRuntimeHandler;
 
-  init(props: RuntimeServiceProps) {
+  new(props: RuntimeServiceProps) {
     this.logs = new cloud.Bucket() as "deployment logs";
 
     let var bucketName: str = "";
