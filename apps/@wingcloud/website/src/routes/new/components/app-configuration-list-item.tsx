@@ -8,7 +8,6 @@ export interface AppConfigurationListItemProps {
   description?: string;
   icon?: React.ReactNode;
   disabled?: boolean;
-  checked?: boolean;
   onClick?: () => void;
   classname?: string;
 }
@@ -18,7 +17,6 @@ export const AppConfigurationListItem = ({
   description,
   icon,
   disabled,
-  checked,
   onClick,
   classname,
 }: AppConfigurationListItemProps) => {
@@ -47,10 +45,6 @@ export const AppConfigurationListItem = ({
             {description}
           </div>
         </div>
-      </div>
-
-      <div className="flex grow justify-end text-slate-500 items-center">
-        {onClick && <StatusDot selected={checked ?? false} />}
       </div>
     </button>
   );
