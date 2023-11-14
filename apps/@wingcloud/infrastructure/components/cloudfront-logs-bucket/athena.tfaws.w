@@ -3,7 +3,7 @@ bring util;
 bring "@cdktf/provider-aws" as aws;
 
 pub class CloudfrontLogsTable {
-  init(bucketName: str, prefix: str) {
+  new(bucketName: str, prefix: str) {
 
     let isTestEnvironment = util.tryEnv("WING_IS_TEST") != nil;
 
