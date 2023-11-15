@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { type PropsWithChildren } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -30,13 +31,20 @@ export const Layout = ({ children }: PropsWithChildren) => {
         </div>
       )}
 
-      {authCheck?.data?.userId && <Header />}
+      <div className="absolute inset-0 flex flex-col">
+        {authCheck?.data?.userId && <Header />}
 
-      {!authCheck?.isLoading && (
-        <div className="py-4 px-4 sm:px-6 sm:py-6 space-y-4 w-full max-w-5xl mx-auto transition-all">
-          {children}
-        </div>
-      )}
+        {!authCheck?.isLoading && (
+          <div
+            className={clsx(
+              "py-4 px-4 sm:px-6 sm:py-6 w-full max-w-5xl mx-auto transition-all",
+              "flex-grow",
+            )}
+          >
+            {children}
+          </div>
+        )}
+      </div>
     </>
   );
 };

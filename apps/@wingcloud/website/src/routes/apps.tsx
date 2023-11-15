@@ -37,7 +37,7 @@ export const Component = () => {
   }, [listAppsQuery.data, search]);
 
   return (
-    <>
+    <div className="space-y-4">
       <div className="flex gap-x-2">
         <Input
           type="text"
@@ -115,6 +115,6 @@ export const Component = () => {
           )}
         </>
       )}
-    </>
+    </div>
   );
 };

@@ -8,7 +8,8 @@ import { useNotifications } from "../../design-system/notification.js";
 import { GithubIcon } from "../../icons/github-icon.js";
 import { MenuIcon } from "../../icons/menu-icon.js";
 import { wrpc } from "../../utils/wrpc.js";
-import { EnvironmentsList } from "../environments/components/environments-list.js";
+
+import { EnvironmentsList } from "./components/environments-list.js";
 
 export interface AppProps {
   appName: string;
@@ -82,7 +83,7 @@ export const Component = () => {
       )}
 
       {app && (
-        <>
+        <div className="space-y-4">
           <div className="flex gap-x-2 bg-white rounded p-4 shadow">
             <img src={app.imageUrl} alt="" className="w-14 h-14 rounded-full" />
             <div className="space-y-1 pt-2 truncate ml-2">
@@ -138,7 +139,7 @@ export const Component = () => {
               repoUrl={repoUrl}
             />
           </div>
-        </>
+        </div>
       )}
     </>
   );

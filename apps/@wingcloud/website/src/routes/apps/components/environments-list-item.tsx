@@ -1,5 +1,4 @@
 import {
-  ArrowTopRightOnSquareIcon,
   BeakerIcon,
   CheckCircleIcon,
   XCircleIcon,

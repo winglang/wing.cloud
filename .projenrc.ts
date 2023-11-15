@@ -82,6 +82,7 @@ website.addDeps("clsx");
 website.addDeps("@headlessui/react");
 website.addDeps("@heroicons/react");
 website.addDeps("react-popper");
+website.addDeps("@wingconsole/ui");
 
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 
