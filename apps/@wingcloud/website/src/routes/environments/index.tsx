@@ -30,9 +30,11 @@ export const InfoItem = ({
   const { theme } = useTheme();
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 truncate">
       <div className={clsx("text-sm", theme.text2)}>{label}</div>
-      <div className="text-sm text-left items-center flex">{value}</div>
+      <div className="text-sm text-left items-center flex truncate">
+        {value}
+      </div>
     </div>
   );
 };
@@ -135,8 +137,8 @@ export const Component = () => {
                 )}
               </div>
 
-              <div className="flex flex-grow">
-                <div className="flex flex-col gap-6 px-4">
+              <div className="flex flex-grow truncate">
+                <div className="flex flex-col gap-6 px-4 truncate">
                   <div className="flex gap-8">
                     <InfoItem
                       label="Status"
@@ -169,18 +171,50 @@ export const Component = () => {
                     <InfoItem
                       label="Environment"
                       value={
-                        <div className="text-xs rounded-lg px-2 py-0.5 capitalize font-semibold bg-slate-100 text-slate-700 text-center">
-                          Preview
+                        <div
+                          className={clsx(
+                            "text-xs rounded-lg px-2 py-0.5 capitalize font-semibold bg-slate-100 text-center",
+                            theme.text1,
+                          )}
+                        >
+                          {environment.data?.environment.type}
                         </div>
                       }
                     />
                   </div>
-                  <div className="flex gap-8">
-                    <InfoItem
-                      label="Branch"
-                      value={environment.data?.environment.branch}
-                    />
-                  </div>
+                  <InfoItem
+                    label="Branch"
+                    value={
+                      <a
+                        className={clsx(
+                          "text-xs font-semibold hover:underline truncate",
+                          theme.text1,
+                        )}
+                        href={`https://github.com/${environment.data?.environment.repo}/tree/${environment.data?.environment.branch}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {environment.data?.environment.branch}
+                      </a>
+                    }
+                  />
+                  <InfoItem
+                    label="URLs"
+                    value={
+                      <a
+                        className={clsx(
+                          "text-xs font-semibold hover:underline",
+                          "truncate font-mono",
+                          theme.text1,
+                        )}
+                        href={`https://github.com/${environment.data?.environment.repo}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {`https://github.com/${environment.data?.environment.repo}`}
+                      </a>
+                    }
+                  />
                 </div>
 
                 <div className="flex flex-grow justify-end">

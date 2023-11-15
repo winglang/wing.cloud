@@ -54,17 +54,18 @@ interface StatusReport {
 export interface Environment {
   id: string;
   appId: string;
+  type: string;
   repo: string;
   branch: string;
   status: string;
+  installationId: number;
   prNumber: number;
   prTitle: string;
-  installationId: number;
   url?: string;
   commentId?: number;
+  testResults?: TestResults;
   createdAt: string;
   updatedAt: string;
-  testResults?: TestResults;
 }
 
 interface Log {
