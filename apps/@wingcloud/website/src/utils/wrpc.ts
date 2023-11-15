@@ -67,6 +67,18 @@ export interface Environment {
   testResults?: TestResults;
 }
 
+export interface Secret {
+  id: string;
+  appId: string;
+  name: string;
+  environmentType: string;
+  value: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type EnvironmentType = "produciton" | "preview";
+
 export const wrpc = createWRPCReact<{
   "auth.check": QueryProcedure<
     undefined,
@@ -118,6 +130,30 @@ export const wrpc = createWRPCReact<{
     {
       environment: Environment;
     }
+  >;
+  "app.listSecrets": QueryProcedure<
+    { appId: string },
+    {
+      secrets: Array<Secret>;
+    }
+  >;
+  "app.decryptSecret": MutationProcedure<
+    { appId: string; secretId: string; environmentType: string; },
+    { value: string; }
+  >;
+  "app.createSecret": MutationProcedure<
+    { appId: string; environmentType: EnvironmentType; name: string; value: string; },
+    {}
+  >;
+  "app.listEntryfiles": QueryProcedure<
+    { owner: string; repo: string; default_branch: string; },
+    {
+      entryfiles: Array<string>;
+    }
+  >;
+  "app.updateEntryfile": MutationProcedure<
+    { appId: string; appName: string; repoId: string; entryfile: string; },
+    {}
   >;
   "app.rename": MutationProcedure<
     { appId: string; appName: string; repository: string },
