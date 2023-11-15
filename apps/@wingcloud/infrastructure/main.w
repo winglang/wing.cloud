@@ -101,7 +101,7 @@ if util.env("WING_TARGET") == "tf-aws" {
 
   // make sure only assets are cached
   distributionNode.addOverride("ordered_cache_behavior", {
-    "path_pattern": "assets/*",
+    "path_pattern": "apps/assets/*",
     "allowed_methods": ["GET", "HEAD"],
     "cached_methods": ["GET", "HEAD"],
     "target_origin_id" : "s3Origin",
