@@ -7,8 +7,7 @@ import { Button } from "../../design-system/button.js";
 import { Select } from "../../design-system/select.js";
 import { useNotifications } from "../../design-system/notification.js";
 import { wrpc } from "../../utils/wrpc.js";
-import { SecretsListItem } from "../secrets/components/secrets-list-item.js";
-import { NewSecret } from "../secrets/components/new-secret.js";
+import { SecretsList } from "../secrets/components/secrets-list.js";
 
 export interface AppProps {
   appName: string;
@@ -123,27 +122,7 @@ export const Component = () => {
             <span className="text-slate-500 text-xs truncate">Updating this property will restart all active environments. Learn more about <a className="text-blue-600" href="https://www.winglang.io/docs/language-reference#112-execution-model" target="_blank">Wing entrypoints</a> </span>
           </div>
 
-          <div className="flex flex-col gap-x-2 bg-white rounded p-4 shadow">
-            <div className="flex flex-col text-slate-700 text-x truncate">
-              <div className="flex flex-row items-center">
-                <span>Secrets</span>
-              </div>
-            </div>
-            <div className="flex">
-              <NewSecret appId={app.appId} />
-            </div>
-            <div className="w-full flex flex-col mt-2">
-              {secretsQuery.isLoading &&<SpinnerLoader size="sm" className="z-20" />}
-              {secrets.map((secret) => (
-                <SecretsListItem
-                  key={secret.id}
-                  secret={secret}
-                />
-              ))}
-            </div>
-            <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
-            <span className="text-slate-500 text-xs truncate">Learn more about <a className="text-blue-600" href="https://www.winglang.io/docs/standard-library/cloud/secret" target="_blank">Wing Secrets</a> </span>
-          </div>
+          <SecretsList app={app} secrets={secrets} loading={secretsQuery.isLoading} />
         </>
       )}
     </>
