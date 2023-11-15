@@ -145,6 +145,10 @@ export const wrpc = createWRPCReact<{
     { appId: string; environmentType: EnvironmentType; name: string; value: string; },
     {}
   >;
+  "app.deleteSecret": MutationProcedure<
+    { appId: string; environmentType: string; secretId: string; },
+    {}
+  >;
   "app.listEntryfiles": QueryProcedure<
     { owner: string; repo: string; default_branch: string; },
     {

@@ -26,8 +26,6 @@ export const SecretsListItem = ({
   const decryptSecretMutation = wrpc["app.decryptSecret"].useMutation();
 
   const decryptSecret = useCallback(async () => {
-    await decryptSecretMutation.mutateAsync({ appId: secret.appId, environmentType: secret.environmentType, secretId: secret.id });
-
     try {
       setLoading(true);
       const { value } = await decryptSecretMutation.mutateAsync({ appId: secret.appId, environmentType: secret.environmentType, secretId: secret.id }); 
@@ -43,6 +41,25 @@ export const SecretsListItem = ({
       setLoading(false);
     }
   }, [secret?.id, decryptSecretMutation]);
+
+  const deleteSecretMutation = wrpc["app.deleteSecret"].useMutation();
+
+  const deleteSecret = useCallback(async () => {
+    try {
+      setLoading(true);
+      await deleteSecretMutation.mutateAsync({ appId: secret.appId, environmentType: secret.environmentType, secretId: secret.id });
+      
+    } catch (error) {
+      if (error instanceof Error) {
+        showNotification("Failed to delete secret", {
+          body: error.message,
+          type: "error",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [secret?.id, deleteSecretMutation]);
 
   const updatedAt = useTimeAgo(secret.updatedAt);
 
@@ -99,8 +116,8 @@ export const SecretsListItem = ({
 
           <div className="flex gap-x-4 text-xs items-center justify-end">
             <div>
-              <Button onClick={() => {}} disabled={false} className="truncate">
-                Edit
+              <Button onClick={deleteSecret} disabled={loading} className="truncate">
+                Delete
               </Button>
             </div>
           </div>
