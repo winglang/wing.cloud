@@ -4,7 +4,7 @@
   "type": "module",
   "sideEffects": false,
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.328",
+    "@cloudy-ts/eslint-plugin": "^0.0.315",
     "@tanstack/react-query": "^5.8.3",
     "@types/node": "18",
     "@types/react": "^18.2.37",
@@ -15,9 +15,9 @@
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prettier": "^5.0.1",
-    "eslint-plugin-unicorn": "^49.0.0",
+    "eslint-plugin-unicorn": "^48.0.1",
     "react": "^18.2.0",
-    "tsx": "^4.1.2",
+    "tsx": "^3.14.0",
     "typescript": "^5.2.2",
     "vitest": "^0.34.6"
   },
