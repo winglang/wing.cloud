@@ -1,11 +1,18 @@
 import {
   CheckBadgeIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
   NoSymbolIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Console } from "@wingconsole/ui";
 import clsx from "clsx";
-import { useMemo, type ReactNode } from "react";
+import {
+  useMemo,
+  type ReactNode,
+  useEffect,
+  useState,
+  type PropsWithChildren,
+} from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { SpinnerLoader } from "../../components/spinner-loader.js";
@@ -30,6 +37,36 @@ export const InfoItem = ({
   );
 };
 
+const CollapsibleItem = ({
+  title,
+  children,
+}: PropsWithChildren<{ title: string }>) => {
+  const { theme } = useTheme();
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={clsx(
+          "flex items-center p-2 w-full text-left",
+          theme.bgInputHover,
+          theme.bgInput,
+          theme.textInput,
+        )}
+      >
+        {isOpen ? (
+          <ChevronDownIcon className="h-5 w-5" />
+        ) : (
+          <ChevronRightIcon className="h-5 w-5" />
+        )}
+        <span className="ml-2 font-medium">{title}</span>
+      </button>
+      {isOpen && <div className="p-2">{children}</div>}
+    </div>
+  );
+};
+
 export const Component = () => {
   const { theme } = useTheme();
   const { environmentId } = useParams();
@@ -40,18 +77,25 @@ export const Component = () => {
     },
     {
       enabled: environmentId != undefined,
+      // TODO: query invalidation
+      refetchInterval: 1000 * 10,
+    },
+  );
+
+  const logs = wrpc["app.environment.logs"].useQuery(
+    {
+      environmentId: environmentId!,
+    },
+    {
+      enabled: environmentId != undefined,
+      // TODO: query invalidation
+      refetchInterval: 1000 * 10,
     },
   );
 
   const status = useMemo(() => {
     return environment.data?.environment.status ?? "";
   }, [environment.data?.environment.status]);
-
-  const logs = [
-    "This is a log example",
-    "This is another log example",
-    "This is another log example with some more text",
-  ];
 
   const tests = useMemo(() => {
     return environment.data?.environment.testResults?.testResults ?? [];
@@ -66,8 +110,8 @@ export const Component = () => {
       )}
       {!environment.isLoading && (
         <div className="space-y-4">
-          <div className="bg-white p-6 w-full rounded shadow">
-            <div className="flex gap-4">
+          <div className="bg-white p-4 w-full rounded shadow">
+            <div className="flex gap-4 p-2">
               <div className="rounded w-80 h-40 shadow p-1 flex items-center justify-center border border-slate-200 bg-slate-100">
                 {status !== "running" && (
                   <NoSymbolIcon className="w-10 h-10 text-slate-300" />
@@ -138,31 +182,48 @@ export const Component = () => {
             </div>
           </div>
 
-          <div className="bg-white p-6 w-full rounded shadow space-y-2">
-            <div className="text-sm font-semibold">Tests</div>
-            <div>
-              {tests.map((test) => (
-                <div key={test.path} className={clsx("text-xs", theme.text1)}>
-                  {test.pass ? (
-                    <CheckBadgeIcon className="w-4 h-4 inline-block text-green-500" />
-                  ) : (
-                    <XMarkIcon className="w-4 h-4 inline-block text-red-500" />
-                  )}
-                  <span className="ml-1 text-slate-700">{test.path}</span>
+          <div className="bg-white p-4 w-full rounded shadow space-y-2">
+            <CollapsibleItem
+              title="Test Logs"
+              children={
+                <div className="text-2xs font-mono">
+                  {logs.data?.tests.map((log, index) => (
+                    <div
+                      key={index}
+                      className={clsx(
+                        theme.text1,
+                        theme.bgInputHover,
+                        "w-full",
+                      )}
+                    >
+                      {log.message}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              }
+            />
           </div>
 
-          <div className="bg-white p-6 w-full rounded shadow space-y-2">
-            <div className="text-sm font-semibold">Logs</div>
-            <div>
-              {logs.map((log) => (
-                <div key={log} className={clsx("text-xs", theme.text1)}>
-                  {log}
+          <div className="bg-white p-4 w-full rounded shadow space-y-2">
+            <CollapsibleItem
+              title="Build Logs"
+              children={
+                <div className="text-2xs font-mono">
+                  {logs.data?.build.map((log, index) => (
+                    <div
+                      key={index}
+                      className={clsx(
+                        theme.text1,
+                        theme.bgInputHover,
+                        "w-full",
+                      )}
+                    >
+                      {log.message}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              }
+            />
           </div>
         </div>
       )}

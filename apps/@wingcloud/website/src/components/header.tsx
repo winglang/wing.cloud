@@ -62,7 +62,7 @@ export const Header = () => {
   }, [location.pathname]);
 
   return (
-    <header className={clsx("p-6", "bg-white", "shadow")}>
+    <header className="p-6 bg-white shadow z-10">
       <nav className="flex" aria-label="Breadcrumb">
         <ol role="list" className="flex items-center space-x-2 truncate">
           <li>

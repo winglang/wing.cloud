@@ -38,8 +38,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
           <div
             className={clsx(
               "py-4 px-4 sm:px-6 sm:py-6 transition-all",
-              "w-full",
-              "flex-grow",
+              "w-full flex-grow overflow-auto",
             )}
           >
             {children}

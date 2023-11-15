@@ -67,6 +67,11 @@ export interface Environment {
   testResults?: TestResults;
 }
 
+interface Log {
+  message: string;
+  timestamp: number;
+}
+
 export const wrpc = createWRPCReact<{
   "auth.check": QueryProcedure<
     undefined,
@@ -117,6 +122,13 @@ export const wrpc = createWRPCReact<{
     { environmentId: string },
     {
       environment: Environment;
+    }
+  >;
+  "app.environment.logs": QueryProcedure<
+    { environmentId: string },
+    {
+      build: Log[];
+      tests: Log[];
     }
   >;
   "app.rename": MutationProcedure<

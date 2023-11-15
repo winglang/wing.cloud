@@ -30,6 +30,7 @@ export const Component = () => {
     { appId: app?.appId! },
     {
       enabled: app !== undefined,
+      // TODO: query invalidation
       refetchInterval: 1000 * 10,
     },
   );

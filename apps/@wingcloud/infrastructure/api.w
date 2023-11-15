@@ -30,6 +30,12 @@ struct ApiProps {
   githubAppClientId: str;
   githubAppClientSecret: str;
   appSecret: str;
+  logs: cloud.Bucket;
+}
+
+struct Log {
+  message: str;
+  timestamp: num;
 }
 
 pub class Api {
@@ -37,6 +43,7 @@ pub class Api {
     let api = new json_api.JsonApi(api: props.api);
     let apps = props.apps;
     let users = props.users;
+    let logs = props.logs;
     let queue = new cloud.Queue();
 
     let AUTH_COOKIE_NAME = "auth";
@@ -354,6 +361,41 @@ pub class Api {
       return {
         body: {
           environment: environment,
+        },
+      };
+    });
+
+    api.get("/wrpc/app.environment.logs", inflight (request) => {
+      let userId = getUserFromCookie(request);
+
+      let envId = request.query.get("environmentId");
+
+      let buildMessages = logs.get("${envId}/deployment.log").split("\n");
+      let buildLogs = MutArray<Log>[];
+      for message in buildMessages {
+          buildLogs.push(Log {
+            message: message,
+            timestamp: 0,
+          });
+      }
+
+      let testEntries = logs.list("${envId}/tests");
+      let testLogs = MutArray<Log>[];
+      for entry in testEntries {
+        let log = logs.get(entry);
+        let messages = log.split("\n");
+        for message in messages {
+            testLogs.push(Log {
+              message: message,
+              timestamp: 0,
+            });
+          }
+      }
+
+      return {
+        body: {
+          build: buildLogs.copy(),
+          tests: testLogs.copy(),
         },
       };
     });
