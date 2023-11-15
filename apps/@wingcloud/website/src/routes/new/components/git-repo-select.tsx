@@ -75,7 +75,10 @@ export const GitRepoSelect = ({
               return (
                 <div className="flex items-center gap-2">
                   <GithubIcon
-                    className={clsx("w-4 h-4 inline-block", theme.text1)}
+                    className={clsx(
+                      "w-4 h-4 inline-block shrink-0",
+                      theme.text1,
+                    )}
                   />
                   {item.label}
                 </div>
@@ -146,10 +149,12 @@ export const GitRepoSelect = ({
               )}
             >
               <div className="flex items-center gap-2">
-                <img className="w-4 h-4" src={repo.owner.avatar_url} />
-                <div className="flex gap-1 items-center">
-                  <div>{repo.name}</div>
-                  {repo.private && <LockClosedIcon className="w-3 h-3" />}
+                <img className="w-4 h-4 shrink-0" src={repo.owner.avatar_url} />
+                <div className="flex gap-1 items-center truncate">
+                  <div className="truncate">{repo.name}</div>
+                  {repo.private && (
+                    <LockClosedIcon className="w-3 h-3 shrink-0" />
+                  )}
                 </div>
               </div>
               <div className="flex flex-grow justify-end">

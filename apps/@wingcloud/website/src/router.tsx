@@ -26,7 +26,11 @@ export const router = createBrowserRouter([
       },
       {
         path: ":appName/:environmentId",
-        lazy: () => import("./routes/environments/environment.js"),
+        lazy: () => import("./routes/environments/index.js"),
+      },
+      {
+        path: ":appName/:environmentId/preview",
+        lazy: () => import("./routes/environments/console-preview.js"),
       },
     ],
   },

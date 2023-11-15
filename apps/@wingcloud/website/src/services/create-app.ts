@@ -77,8 +77,8 @@ export const useCreateAppFromRepo = () => {
   }, [installationId, repositoryId]);
 
   const loading = useMemo(() => {
-    return listInstallationsQuery.isFetching || listReposQuery.isFetching;
-  }, [listInstallationsQuery.isFetching, listReposQuery.isFetching]);
+    return listInstallationsQuery.isLoading || listReposQuery.isLoading;
+  }, [listInstallationsQuery.isLoading, listReposQuery.isLoading]);
 
   return {
     createApp,

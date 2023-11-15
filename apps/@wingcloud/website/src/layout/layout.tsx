@@ -37,7 +37,8 @@ export const Layout = ({ children }: PropsWithChildren) => {
         {!authCheck?.isLoading && (
           <div
             className={clsx(
-              "py-4 px-4 sm:px-6 sm:py-6 w-full max-w-5xl mx-auto transition-all",
+              "py-4 px-4 sm:px-6 sm:py-6 transition-all",
+              "w-full",
               "flex-grow",
             )}
           >

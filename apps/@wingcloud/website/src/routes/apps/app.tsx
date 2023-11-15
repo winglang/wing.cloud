@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { SpinnerLoader } from "../../components/spinner-loader.js";
@@ -75,7 +75,7 @@ export const Component = () => {
   }, [app?.appId, deleteAppMutation]);
 
   return (
-    <>
+    <div className="max-w-5xl mx-auto">
       {!app && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
@@ -141,6 +141,6 @@ export const Component = () => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };

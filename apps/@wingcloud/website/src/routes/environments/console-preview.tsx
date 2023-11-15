@@ -1,11 +1,14 @@
 import { Console } from "@wingconsole/ui";
+import clsx from "clsx";
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 import { SpinnerLoader } from "../../components/spinner-loader.js";
+import { useTheme } from "../../design-system/theme-provider.js";
 import { wrpc } from "../../utils/wrpc.js";
 
 export const Component = () => {
+  const { theme } = useTheme();
   const { environmentId } = useParams();
 
   const environment = wrpc["app.environment"].useQuery(
@@ -30,8 +33,13 @@ export const Component = () => {
       )}
 
       {url && (
-        <div className="bg-white p-4 w-full h-full">
-          <div className="bg-slate-300 dark:bg-slate-800 w-full h-full">
+        <div className="bg-white rounded p-4 w-full h-full shadow">
+          <div
+            className={clsx(
+              "w-full h-full rounded overflow-hidden border",
+              theme.borderInput,
+            )}
+          >
             <Console
               trpcUrl={`${url}/trpc`}
               wsUrl={`${url.startsWith("http:") ? "ws://" : "wss://"}${
