@@ -1,9 +1,9 @@
 import {
-  CheckBadgeIcon,
+  CheckCircleIcon,
   ChevronDownIcon,
   ChevronRightIcon,
   NoSymbolIcon,
-  XMarkIcon,
+  XCircleIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import {
@@ -39,30 +39,40 @@ export const InfoItem = ({
 
 const CollapsibleItem = ({
   title,
+  rightOptions,
   children,
-}: PropsWithChildren<{ title: string }>) => {
+}: PropsWithChildren<{ title: string; rightOptions?: ReactNode }>) => {
   const { theme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
+    <div className="bg-white w-full rounded shadow">
+      <div
         className={clsx(
-          "flex items-center p-2 w-full text-left",
-          theme.bgInputHover,
+          "flex items-center justify-between w-full text-left p-6",
+          isOpen && "border-b rounded-t",
+          !isOpen && "rounded",
+          theme.borderInput,
           theme.bgInput,
           theme.textInput,
         )}
       >
-        {isOpen ? (
-          <ChevronDownIcon className="h-5 w-5" />
-        ) : (
-          <ChevronRightIcon className="h-5 w-5" />
-        )}
-        <span className="ml-2 font-medium">{title}</span>
-      </button>
-      {isOpen && <div className="p-2">{children}</div>}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={clsx("flex  items-center")}
+        >
+          {isOpen ? (
+            <ChevronDownIcon className="h-4 w-4" />
+          ) : (
+            <ChevronRightIcon className="h-4 w-4" />
+          )}
+          <div className="ml-2 font-medium text-sm">{title}</div>
+        </button>
+
+        <div className="flex flex-grow justify-end gap-4">{rightOptions}</div>
+      </div>
+
+      {isOpen && <div className="px-6 pb-6 pt-4">{children}</div>}
     </div>
   );
 };
@@ -110,8 +120,8 @@ export const Component = () => {
       )}
       {!environment.isLoading && (
         <div className="space-y-4">
-          <div className="bg-white p-4 w-full rounded shadow">
-            <div className="flex gap-4 p-2">
+          <div className="bg-white p-6 w-full rounded shadow">
+            <div className="flex gap-4">
               <div className="rounded w-80 h-40 shadow p-1 flex items-center justify-center border border-slate-200 bg-slate-100">
                 {status !== "running" && (
                   <NoSymbolIcon className="w-10 h-10 text-slate-300" />
@@ -182,49 +192,49 @@ export const Component = () => {
             </div>
           </div>
 
-          <div className="bg-white p-4 w-full rounded shadow space-y-2">
-            <CollapsibleItem
-              title="Test Logs"
-              children={
-                <div className="text-2xs font-mono">
-                  {logs.data?.tests.map((log, index) => (
-                    <div
-                      key={index}
-                      className={clsx(
-                        theme.text1,
-                        theme.bgInputHover,
-                        "w-full",
-                      )}
-                    >
-                      {log.message}
-                    </div>
-                  ))}
+          <CollapsibleItem
+            title="Tests"
+            rightOptions={
+              <div className="flex gap-2 text-xs">
+                <div className="flex gap-0.5">
+                  <span>{tests.filter((test) => test.pass).length}</span>
+                  <CheckCircleIcon className="w-4 h-4 text-green-400" />
                 </div>
-              }
-            />
-          </div>
+                <div className="flex gap-0.5">
+                  <span>{tests.filter((test) => !test.pass).length}</span>
+                  <XCircleIcon className="w-4 h-4 text-red-400" />
+                </div>
+              </div>
+            }
+            children={
+              <div className="text-2xs font-mono">
+                {logs.data?.tests.map((log, index) => (
+                  <div
+                    key={index}
+                    className={clsx(theme.text1, theme.bgInputHover, "w-full")}
+                  >
+                    {log.message}
+                  </div>
+                ))}
+              </div>
+            }
+          />
 
-          <div className="bg-white p-4 w-full rounded shadow space-y-2">
-            <CollapsibleItem
-              title="Build Logs"
-              children={
-                <div className="text-2xs font-mono">
-                  {logs.data?.build.map((log, index) => (
-                    <div
-                      key={index}
-                      className={clsx(
-                        theme.text1,
-                        theme.bgInputHover,
-                        "w-full",
-                      )}
-                    >
-                      {log.message}
-                    </div>
-                  ))}
-                </div>
-              }
-            />
-          </div>
+          <CollapsibleItem
+            title="Build"
+            children={
+              <div className="text-2xs font-mono">
+                {logs.data?.build.map((log, index) => (
+                  <div
+                    key={index}
+                    className={clsx(theme.text1, theme.bgInputHover, "w-full")}
+                  >
+                    {log.message}
+                  </div>
+                ))}
+              </div>
+            }
+          />
         </div>
       )}
     </div>
