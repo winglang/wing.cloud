@@ -10,6 +10,8 @@ import { MenuIcon } from "../../icons/menu-icon.js";
 import { wrpc } from "../../utils/wrpc.js";
 import { EnvironmentsList } from "../environments/components/environments-list.js";
 
+import { DeleteModal } from "./components/delete-modal.js";
+
 export interface AppProps {
   appName: string;
 }
@@ -73,6 +75,8 @@ export const Component = () => {
     }
   }, [app?.appId, deleteAppMutation]);
 
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
   return (
     <>
       {!app && (
@@ -109,7 +113,7 @@ export const Component = () => {
                   items={[
                     {
                       label: "Delete App",
-                      onClick: deleteApp,
+                      onClick: () => setDeleteModalOpen(true),
                     },
                   ]}
                   icon={<MenuIcon className="h-4 w-4 text-slate-700" />}
@@ -139,6 +143,15 @@ export const Component = () => {
             />
           </div>
         </>
+      )}
+
+      {appName && app?.appId && (
+        <DeleteModal
+          appId={app.appId}
+          appName={appName}
+          show={deleteModalOpen}
+          onClose={setDeleteModalOpen}
+        />
       )}
     </>
   );
