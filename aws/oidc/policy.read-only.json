@@ -5,9 +5,10 @@
             "Effect": "Allow",
             "Action": [
                 "sts:GetServiceBearerToken",
-                "ecr:GetAuthorizationToken"
+                "ecr:GetAuthorizationToken",
+                "lambda:InvokeFunction"
             ],
             "Resource": "*"
-        }        
+        }
     ]
 }
