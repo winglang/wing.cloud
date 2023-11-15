@@ -29,6 +29,14 @@ export const DeleteModal = ({
       showNotification(`App ${appId} deleted`, { type: "success" });
       navigate("/apps/");
     },
+    onError(error) {
+      if (error instanceof Error) {
+        showNotification(error.message, { type: "error" });
+      } else {
+        showNotification(`Unknown error: ${error}`, { type: "error" });
+      }
+      onClose(false);
+    },
   });
 
   return (
@@ -72,13 +80,13 @@ export const DeleteModal = ({
           className={clsx(
             "inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto",
             {
-              "opacity-50 cursor-not-allowed": !deleteApp.isIdle,
+              "opacity-50 cursor-not-allowed": deleteApp.isPending,
             },
           )}
-          disabled={!deleteApp.isIdle}
+          disabled={deleteApp.isPending}
           onClick={() => deleteApp.mutate({ appId })}
         >
-          {deleteApp.isIdle && <span>Delete</span>}
+          {!deleteApp.isPending && <span>Delete</span>}
           {deleteApp.isPending && <span>Deleting...</span>}
         </button>
         <button
@@ -86,10 +94,10 @@ export const DeleteModal = ({
           className={clsx(
             "mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto",
             {
-              "opacity-50 cursor-not-allowed": !deleteApp.isIdle,
+              "opacity-50 cursor-not-allowed": deleteApp.isPending,
             },
           )}
-          disabled={!deleteApp.isIdle}
+          disabled={deleteApp.isPending}
           onClick={() => onClose(false)}
         >
           Cancel
