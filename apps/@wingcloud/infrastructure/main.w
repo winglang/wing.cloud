@@ -97,6 +97,8 @@ if util.env("WING_TARGET") == "tf-aws" {
   ]);
   // set default TTL to 0
   distributionNode.addOverride("default_cache_behavior.default_ttl", 0);
+  distributionNode.addOverride("default_cache_behavior.min_ttl", 0);
+
   // make sure only assets are cached
   distributionNode.addOverride("ordered_cache_behavior", {
     "path_pattern": "assets/*",
@@ -109,9 +111,9 @@ if util.env("WING_TARGET") == "tf-aws" {
         "forward": "none"
       }
     },
-    "min_ttl": 0,
-    "default_ttl": 86400,
-    "max_ttl": 31536000, //365 days
+    "min_ttl": 31536000, //365 days
+    "default_ttl": 31536000,
+    "max_ttl": 31536000, 
     "compress": true,
     "viewer_protocol_policy":"redirect-to-https"
   });
