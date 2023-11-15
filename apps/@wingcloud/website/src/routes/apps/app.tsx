@@ -73,6 +73,10 @@ export const Component = () => {
     }
   }, [app?.appId, deleteAppMutation]);
 
+  const goToSettings = useCallback(async () => {
+    navigate(`/apps/${app?.appName}/settings`);
+  }, [app?.appId]);
+
   return (
     <>
       {!app && (
@@ -107,6 +111,10 @@ export const Component = () => {
               <div className="flex flex-col justify-between gap-3 h-full items-end">
                 <Menu
                   items={[
+                    {
+                      label: "Settings",
+                      onClick: goToSettings,
+                    },
                     {
                       label: "Delete App",
                       onClick: deleteApp,
