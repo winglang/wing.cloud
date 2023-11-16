@@ -8,7 +8,7 @@ import {
   Turbo,
 } from "@skyrpex/wingen";
 
-const winglangVersion = "^0.47.2";
+const winglangVersion = "^0.47.7";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -155,7 +155,7 @@ infrastructure.addGitIgnore("/.env");
 infrastructure.addGitIgnore("/.env.*");
 infrastructure.addGitIgnore("!/.env.example");
 
-infrastructure.addGitIgnore("/target/");
+infrastructure.addGitIgnore("**/target/");
 infrastructure.addDeps(`winglang@${winglangVersion}`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");

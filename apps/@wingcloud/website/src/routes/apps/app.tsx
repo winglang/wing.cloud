@@ -9,6 +9,7 @@ import { GithubIcon } from "../../icons/github-icon.js";
 import { MenuIcon } from "../../icons/menu-icon.js";
 import { wrpc } from "../../utils/wrpc.js";
 
+import { DeleteModal } from "./components/delete-modal.js";
 import { EnvironmentsList } from "./components/environments-list.js";
 
 export interface AppProps {
@@ -75,6 +76,8 @@ export const Component = () => {
     }
   }, [app?.appId, deleteAppMutation]);
 
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
   return (
     <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6">
       {!app && (
@@ -111,7 +114,7 @@ export const Component = () => {
                   items={[
                     {
                       label: "Delete App",
-                      onClick: deleteApp,
+                      onClick: () => setDeleteModalOpen(true),
                     },
                   ]}
                   icon={<MenuIcon className="h-4 w-4 text-slate-700" />}
@@ -141,6 +144,15 @@ export const Component = () => {
             />
           </div>
         </div>
+      )}
+
+      {appName && app?.appId && (
+        <DeleteModal
+          appId={app.appId}
+          appName={appName}
+          show={deleteModalOpen}
+          onClose={setDeleteModalOpen}
+        />
       )}
     </div>
   );

@@ -125,22 +125,9 @@ export const Component = () => {
         <div className="space-y-4">
           <div className="bg-white p-6 w-full rounded shadow">
             <div className="flex gap-4">
-              <div className="rounded w-80 h-40 shadow p-1 flex items-center justify-center border border-slate-200 bg-slate-100">
-                {status !== "running" && (
-                  <NoSymbolIcon className="w-10 h-10 text-slate-300" />
-                )}
-                {status === "running" && (
-                  <img
-                    src="/assets/console-preview.png"
-                    alt="console-preview"
-                    className="rounded"
-                  />
-                )}
-              </div>
-
               <div className="flex flex-grow truncate gap-x-4">
-                <div className="flex flex-col gap-6 truncate">
-                  <div className="flex gap-8">
+                <div className="flex flex-grow flex-col gap-4 sm:gap-6 truncate transition-all">
+                  <div className="flex gap-4 sm:gap-10 lg:gap-16 transition-all">
                     <InfoItem
                       label="Status"
                       value={
@@ -172,6 +159,19 @@ export const Component = () => {
                         </div>
                       }
                     />
+                    <InfoItem
+                      label="Branch"
+                      value={
+                        <a
+                          className="hover:underline truncate"
+                          href={`https://github.com/${environment.data?.environment.repo}/tree/${environment.data?.environment.branch}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {environment.data?.environment.branch}
+                        </a>
+                      }
+                    />
                     {environment.data?.environment.createdAt && (
                       <InfoItem
                         label="Created"
@@ -181,19 +181,7 @@ export const Component = () => {
                       />
                     )}
                   </div>
-                  <InfoItem
-                    label="Branch"
-                    value={
-                      <a
-                        className="hover:underline truncate"
-                        href={`https://github.com/${environment.data?.environment.repo}/tree/${environment.data?.environment.branch}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {environment.data?.environment.branch}
-                      </a>
-                    }
-                  />
+
                   <InfoItem
                     label="URLs"
                     value={
@@ -209,7 +197,7 @@ export const Component = () => {
                   />
                 </div>
 
-                <div className="flex flex-grow justify-end">
+                <div className="flex justify-end">
                   <Link to="./preview">
                     <Button>Visit</Button>
                   </Link>
