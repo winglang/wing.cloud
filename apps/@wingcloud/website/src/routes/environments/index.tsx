@@ -123,88 +123,81 @@ export const Component = () => {
       )}
       {!environment.isLoading && (
         <div className="space-y-4">
-          <div className="bg-white p-6 w-full rounded shadow">
-            <div className="flex gap-4">
-              <div className="flex flex-grow truncate gap-x-4">
-                <div className="flex flex-grow flex-col gap-4 sm:gap-6 truncate transition-all">
-                  <div className="flex gap-4 sm:gap-10 lg:gap-16 transition-all">
-                    <InfoItem
-                      label="Branch"
-                      value={
-                        <a
-                          className="hover:underline truncate"
-                          href={`https://github.com/${environment.data?.environment.repo}/tree/${environment.data?.environment.branch}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {environment.data?.environment.branch}
-                        </a>
-                      }
-                    />
-                    <InfoItem
-                      label="Environment"
-                      value={
-                        <div className="rounded-lg px-2 py-0.5 capitalize bg-slate-100 text-center">
-                          {environment.data?.environment.type}
-                        </div>
-                      }
-                    />
+          <div className="bg-white p-6 w-full rounded shadow gap-4 flex">
+            <div className="flex flex-grow flex-col gap-4 sm:gap-6 truncate transition-all">
+              <div className="flex gap-4 sm:gap-10 lg:gap-16 transition-all">
+                <InfoItem
+                  label="Branch"
+                  value={
+                    <a
+                      className="hover:underline truncate"
+                      href={`https://github.com/${environment.data?.environment.repo}/tree/${environment.data?.environment.branch}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {environment.data?.environment.branch}
+                    </a>
+                  }
+                />
+                <InfoItem
+                  label="Environment"
+                  value={
+                    <div className="rounded-lg px-2 py-0.5 capitalize bg-slate-100 text-center">
+                      {environment.data?.environment.type}
+                    </div>
+                  }
+                />
 
-                    <InfoItem
-                      label="Status"
-                      value={
-                        <div className="flex items-center">
-                          <div
-                            title={status}
-                            className={clsx(
-                              "w-2.5 h-2.5",
-                              "rounded-full",
-                              status === "initializing" &&
-                                "bg-slate-400 animate-pulse",
-                              status === "deploying" &&
-                                "bg-yellow-300 animate-pulse",
-                              status === "running" && "bg-green-300",
-                              status === "failed" && "bg-red-300",
-                            )}
-                          />
-                          <div className="rounded-xl px-2 py-0.5 capitalize">
-                            {status}
-                          </div>
-                        </div>
-                      }
-                    />
-
-                    {environment.data?.environment.createdAt && (
-                      <InfoItem
-                        label="Created"
-                        value={getDateTime(
-                          environment.data?.environment.createdAt,
+                <InfoItem
+                  label="Status"
+                  value={
+                    <div className="flex items-center">
+                      <div
+                        title={status}
+                        className={clsx(
+                          "w-2.5 h-2.5",
+                          "rounded-full",
+                          status === "initializing" &&
+                            "bg-slate-400 animate-pulse",
+                          status === "deploying" &&
+                            "bg-yellow-300 animate-pulse",
+                          status === "running" && "bg-green-300",
+                          status === "failed" && "bg-red-300",
                         )}
                       />
-                    )}
-                  </div>
+                      <div className="rounded-xl px-2 py-0.5 capitalize">
+                        {status}
+                      </div>
+                    </div>
+                  }
+                />
 
+                {environment.data?.environment.createdAt && (
                   <InfoItem
-                    label="URLs"
-                    value={
-                      <a
-                        className="hover:underline truncate font-mono"
-                        href={`https://github.com/${environment.data?.environment.repo}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {`https://github.com/${environment.data?.environment.repo}`}
-                      </a>
-                    }
+                    label="Created"
+                    value={getDateTime(environment.data?.environment.createdAt)}
                   />
-                </div>
-
-                <div className="flex justify-end">
-                  <Link to="./preview">
-                    <Button>Visit</Button>
-                  </Link>
-                </div>
+                )}
               </div>
+
+              <InfoItem
+                label="URLs"
+                value={
+                  <a
+                    className="hover:underline truncate font-mono"
+                    href={`https://github.com/${environment.data?.environment.repo}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {`https://github.com/${environment.data?.environment.repo}`}
+                  </a>
+                }
+              />
+            </div>
+            <div className="flex justify-end items-start">
+              <Link to="./preview">
+                <Button>Visit</Button>
+              </Link>
             </div>
           </div>
 
