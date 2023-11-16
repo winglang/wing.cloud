@@ -9,7 +9,6 @@ import clsx from "clsx";
 import {
   useMemo,
   type ReactNode,
-  useEffect,
   useState,
   type PropsWithChildren,
 } from "react";
@@ -18,6 +17,7 @@ import { Link, useParams } from "react-router-dom";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { useTheme } from "../../design-system/theme-provider.js";
+import { getDateTime } from "../../utils/time.js";
 import { wrpc } from "../../utils/wrpc.js";
 
 export const InfoItem = ({
@@ -31,8 +31,13 @@ export const InfoItem = ({
 
   return (
     <div className="flex flex-col gap-1 truncate">
-      <div className={clsx("text-sm", theme.text2)}>{label}</div>
-      <div className="text-sm text-left items-center flex truncate">
+      <div className={clsx("text-xs", theme.text2)}>{label}</div>
+      <div
+        className={clsx(
+          "flex items-center truncate text-xs font-normal",
+          theme.text1,
+        )}
+      >
         {value}
       </div>
     </div>
@@ -49,30 +54,25 @@ const CollapsibleItem = ({
 
   return (
     <div className="bg-white w-full rounded shadow">
-      <div
+      <button
         className={clsx(
           "flex items-center justify-between w-full text-left p-6",
-          isOpen && "border-b rounded-t",
+          isOpen && "border-b rounded-t shadow-sm",
           !isOpen && "rounded",
           theme.borderInput,
           theme.bgInput,
           theme.textInput,
         )}
+        onClick={() => setIsOpen(!isOpen)}
       >
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className={clsx("flex  items-center")}
-        >
-          {isOpen ? (
-            <ChevronDownIcon className="h-4 w-4" />
-          ) : (
-            <ChevronRightIcon className="h-4 w-4" />
-          )}
-          <div className="ml-2 font-medium text-sm">{title}</div>
-        </button>
+        <div className="flex items-center flex-grow gap-2">
+          {isOpen && <ChevronDownIcon className="h-4 w-4" />}
+          {!isOpen && <ChevronRightIcon className="h-4 w-4" />}
+          <div className="font-medium text-sm">{title}</div>
+        </div>
 
-        <div className="flex flex-grow justify-end gap-4">{rightOptions}</div>
-      </div>
+        <div className="flex justify-end gap-4">{rightOptions}</div>
+      </button>
 
       {isOpen && <div className="px-6 pb-6 pt-4">{children}</div>}
     </div>
@@ -114,7 +114,7 @@ export const Component = () => {
   }, [environment.data?.environment.testResults?.testResults]);
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6">
       {environment.isLoading && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
@@ -137,8 +137,8 @@ export const Component = () => {
                 )}
               </div>
 
-              <div className="flex flex-grow truncate">
-                <div className="flex flex-col gap-6 px-4 truncate">
+              <div className="flex flex-grow truncate gap-x-4">
+                <div className="flex flex-col gap-6 truncate">
                   <div className="flex gap-8">
                     <InfoItem
                       label="Status"
@@ -157,12 +157,7 @@ export const Component = () => {
                               status === "failed" && "bg-red-300",
                             )}
                           />
-                          <div
-                            className={clsx(
-                              "text-xs rounded-xl px-2 py-0.5 capitalize font-semibold",
-                              theme.text1,
-                            )}
-                          >
+                          <div className="rounded-xl px-2 py-0.5 capitalize">
                             {status}
                           </div>
                         </div>
@@ -171,25 +166,25 @@ export const Component = () => {
                     <InfoItem
                       label="Environment"
                       value={
-                        <div
-                          className={clsx(
-                            "text-xs rounded-lg px-2 py-0.5 capitalize font-semibold bg-slate-100 text-center",
-                            theme.text1,
-                          )}
-                        >
+                        <div className="rounded-lg px-2 py-0.5 capitalize bg-slate-100 text-center">
                           {environment.data?.environment.type}
                         </div>
                       }
                     />
+                    {environment.data?.environment.createdAt && (
+                      <InfoItem
+                        label="Created"
+                        value={getDateTime(
+                          environment.data?.environment.createdAt,
+                        )}
+                      />
+                    )}
                   </div>
                   <InfoItem
                     label="Branch"
                     value={
                       <a
-                        className={clsx(
-                          "text-xs font-semibold hover:underline truncate",
-                          theme.text1,
-                        )}
+                        className="hover:underline truncate"
                         href={`https://github.com/${environment.data?.environment.repo}/tree/${environment.data?.environment.branch}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -202,11 +197,7 @@ export const Component = () => {
                     label="URLs"
                     value={
                       <a
-                        className={clsx(
-                          "text-xs font-semibold hover:underline",
-                          "truncate font-mono",
-                          theme.text1,
-                        )}
+                        className="hover:underline truncate font-mono"
                         href={`https://github.com/${environment.data?.environment.repo}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -245,7 +236,11 @@ export const Component = () => {
                 {logs.data?.tests.map((log, index) => (
                   <div
                     key={index}
-                    className={clsx(theme.text1, theme.bgInputHover, "w-full")}
+                    className={clsx(
+                      theme.text1,
+                      theme.bgInputHover,
+                      "w-full py-0.5",
+                    )}
                   >
                     {log.message}
                   </div>
@@ -261,7 +256,11 @@ export const Component = () => {
                 {logs.data?.build.map((log, index) => (
                   <div
                     key={index}
-                    className={clsx(theme.text1, theme.bgInputHover, "w-full")}
+                    className={clsx(
+                      theme.text1,
+                      theme.bgInputHover,
+                      "w-full py-0.5",
+                    )}
                   >
                     {log.message}
                   </div>

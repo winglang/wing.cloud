@@ -33,26 +33,19 @@ export const Component = () => {
       )}
 
       {url && (
-        <div className="bg-white rounded p-4 w-full h-full shadow">
-          <div
-            className={clsx(
-              "w-full h-full rounded overflow-hidden border",
-              theme.borderInput,
-            )}
-          >
-            <Console
-              trpcUrl={`${url}/trpc`}
-              wsUrl={`${url.startsWith("http:") ? "ws://" : "wss://"}${
-                location.host
-              }/trpc`}
-              layout={1}
-              theme="light"
-              onTrace={(trace) => {
-                // Playground and Learn need to be able to listen to all traces.
-                window.parent.postMessage({ trace }, "*");
-              }}
-            />
-          </div>
+        <div className={clsx("w-full h-full border", theme.borderInput)}>
+          <Console
+            trpcUrl={`${url}/trpc`}
+            wsUrl={`${url.startsWith("http:") ? "ws://" : "wss://"}${
+              location.host
+            }/trpc`}
+            layout={1}
+            theme="light"
+            onTrace={(trace) => {
+              // Playground and Learn need to be able to listen to all traces.
+              window.parent.postMessage({ trace }, "*");
+            }}
+          />
         </div>
       )}
     </>

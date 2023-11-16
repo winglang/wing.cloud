@@ -19,7 +19,7 @@ export const NewAppContainer = ({
   const { theme } = useTheme();
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6">
       <div className="flex justify-center transition-all">
         <div
           className={clsx("w-full rounded shadow p-6 space-y-4", theme.bgInput)}

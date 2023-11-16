@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const getDateTime = (datetime: string) => {
+export const getDateTime = (datetime: string) => {
   const date = new Date(datetime);
   return date.toLocaleDateString(undefined, {
     month: "short",
