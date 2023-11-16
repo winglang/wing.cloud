@@ -11,6 +11,7 @@ bring "../types/octokit-types.w" as octokit;
 bring "../github-app.w" as github_app;
 bring "../cookie.w" as Cookie;
 bring "../jwt.w" as JWT;
+bring "../components/parameter/iparameter.w" as parameter;
 
 struct EnvironmentsTestProps {
   users: users.Users;
@@ -19,7 +20,7 @@ struct EnvironmentsTestProps {
   githubApp: github_app.GithubApp;
   updateGithubWebhook: inflight (): void;
   appSecret: str;
-  wingCloudUrl: str;
+  wingCloudUrl: parameter.IParameter;
   githubToken: str?;
   githubOrg: str?;
   githubUser: str?;
@@ -260,7 +261,7 @@ pub class EnvironmentsTest {
             throw "failed to find installation for owner ${repo.owner}";
           }
 
-          let createRes = http.post("${props.wingCloudUrl}/wrpc/user.createApp",
+          let createRes = http.post("${props.wingCloudUrl.get()}/wrpc/user.createApp",
             body: Json.stringify({
               default_branch: "main",
               repoId: "${repo.owner}/${repo.repo}",

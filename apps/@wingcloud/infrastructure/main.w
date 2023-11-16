@@ -16,6 +16,7 @@ bring "./runtime/runtime-client.w" as runtime_client;
 bring "./probot.w" as probot;
 bring "./probot-adapter.w" as adapter;
 bring "./cloudfront.w" as cloudFront;
+bring "./components/parameter/parameter.w" as parameter;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 
 // And the sun, and the moon, and the stars, and the flowers.
@@ -27,6 +28,11 @@ let api = new cloud.Api(
   corsOptions: cloud.ApiCorsOptions {
     allowOrigin: ["*"],
   }
+);
+
+let apiUrlParam = new parameter.Parameter(
+  name: "api-url",
+  value: api.url,
 );
 
 let table = new ex.DynamodbTable(
@@ -49,7 +55,7 @@ let probotAdapter = new adapter.ProbotAdapter(
 );
 
 let rntm = new runtime.RuntimeService(
-  wingCloudUrl: api.url,
+  wingCloudUrl: apiUrlParam,
   flyToken: util.tryEnv("FLY_TOKEN"),
   flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
   environments: environments,
@@ -174,7 +180,7 @@ new tests.EnvironmentsTest(
   githubApp: probotApp.githubApp,
   updateGithubWebhook: updateGithubWebhook,
   appSecret: appSecret,
-  wingCloudUrl: api.url,
+  wingCloudUrl: apiUrlParam,
   githubToken: util.tryEnv("TESTS_GITHUB_TOKEN"),
   githubOrg: util.tryEnv("TESTS_GITHUB_ORG"),
   githubUser: util.tryEnv("TESTS_GITHUB_USER"),
