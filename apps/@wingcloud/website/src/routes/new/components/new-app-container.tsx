@@ -23,7 +23,7 @@ export const NewAppContainer = ({
       <div className="flex justify-center transition-all">
         <div
           className={clsx(
-            "w-full rounded shadow p-6 space-y-4 border",
+            "w-full rounded p-6 space-y-4 border",
             theme.bg4,
             theme.borderInput,
           )}
