@@ -138,25 +138,30 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.decryptSecret": MutationProcedure<
-    { appId: string; secretId: string; environmentType: string; },
-    { value: string; }
+    { appId: string; secretId: string; environmentType: string },
+    { value: string }
   >;
   "app.createSecret": MutationProcedure<
-    { appId: string; environmentType: EnvironmentType; name: string; value: string; },
+    {
+      appId: string;
+      environmentType: EnvironmentType;
+      name: string;
+      value: string;
+    },
     {}
   >;
   "app.deleteSecret": MutationProcedure<
-    { appId: string; environmentType: string; secretId: string; },
+    { appId: string; environmentType: string; secretId: string },
     {}
   >;
   "app.listEntryfiles": QueryProcedure<
-    { owner: string; repo: string; default_branch: string; },
+    { owner: string; repo: string; default_branch: string },
     {
       entryfiles: Array<string>;
     }
   >;
   "app.updateEntryfile": MutationProcedure<
-    { appId: string; appName: string; repoId: string; entryfile: string; },
+    { appId: string; appName: string; repoId: string; entryfile: string },
     {}
   >;
   "app.rename": MutationProcedure<

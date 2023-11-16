@@ -9,10 +9,12 @@ const env = expand(
   }),
 );
 
-spawnSync("pnpm", ["wing", ...process.argv.slice(2)], {
+const wing = spawnSync("pnpm", ["wing", ...process.argv.slice(2)], {
   stdio: "inherit",
   env: {
     ...process.env,
     ...env.parsed,
   },
 });
+
+process.exit(wing.status !== null ? wing.status : 1);

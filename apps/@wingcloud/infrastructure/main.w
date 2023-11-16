@@ -9,6 +9,7 @@ bring "./users.w" as Users;
 bring "./apps.w" as Apps;
 bring "./environments.w" as Environments;
 bring "./environment-manager.w" as EnvironmentManager;
+bring "./secrets.w" as Secrets;
 bring "./api.w" as wingcloud_api;
 
 bring "./runtime/runtime.w" as runtime;
@@ -16,8 +17,11 @@ bring "./runtime/runtime-client.w" as runtime_client;
 bring "./probot.w" as probot;
 bring "./probot-adapter.w" as adapter;
 bring "./cloudfront.w" as cloudFront;
+bring "./components/parameter/parameter.w" as parameter;
+bring "./patches/react-app.patch.w" as reactAppPatch;
 
 // And the sun, and the moon, and the stars, and the flowers.
+let appSecret = util.env("APP_SECRET");
 
 let DEFAULT_STAGING_LANDING_DOMAIN = "wing-cloud-staging-dev-only.webflow.io";
 
@@ -26,6 +30,11 @@ let api = new cloud.Api(
   corsOptions: cloud.ApiCorsOptions {
     allowOrigin: ["*"],
   }
+);
+
+let apiUrlParam = new parameter.Parameter(
+  name: "api-url",
+  value: api.url,
 );
 
 let table = new ex.DynamodbTable(
@@ -40,6 +49,7 @@ let table = new ex.DynamodbTable(
 let apps = new Apps.Apps(table);
 let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
+let secrets = new Secrets.Secrets();
 
 let probotAdapter = new adapter.ProbotAdapter(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
@@ -48,7 +58,7 @@ let probotAdapter = new adapter.ProbotAdapter(
 );
 
 let rntm = new runtime.RuntimeService(
-  wingCloudUrl: api.url,
+  wingCloudUrl: apiUrlParam,
   flyToken: util.tryEnv("FLY_TOKEN"),
   flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
   environments: environments,
@@ -61,7 +71,6 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   probotAdapter: probotAdapter,
 );
 
-let appSecret = util.env("APP_SECRET");
 let wingCloudApi = new wingcloud_api.Api(
   api: api,
   apps: apps,
@@ -83,17 +92,7 @@ let website = new ex.ReactApp(
   localPort: websitePort,
 );
 
-// HACK: Configure the CloudFront Distribution to fallback to `/apps/index.html`.
-if util.env("WING_TARGET") == "tf-aws" {
-  let distributionNode = unsafeCast(std.Node.of(website).children.at(0).node.findChild("Distribution"));
-  distributionNode.addOverride("custom_error_response", [
-    {
-      error_code: 403,
-      response_code: 200,
-      response_page_path: "/apps/index.html",
-    },
-  ]);
-}
+reactAppPatch.ReactAppPatch.apply(website);
 
 let probotApp = new probot.ProbotApp(
   probotAdapter: probotAdapter,
@@ -183,7 +182,7 @@ new tests.EnvironmentsTest(
   githubApp: probotApp.githubApp,
   updateGithubWebhook: updateGithubWebhook,
   appSecret: appSecret,
-  wingCloudUrl: api.url,
+  wingCloudUrl: apiUrlParam,
   githubToken: util.tryEnv("TESTS_GITHUB_TOKEN"),
   githubOrg: util.tryEnv("TESTS_GITHUB_ORG"),
   githubUser: util.tryEnv("TESTS_GITHUB_USER"),
