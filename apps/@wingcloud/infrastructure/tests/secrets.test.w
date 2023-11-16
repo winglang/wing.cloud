@@ -4,27 +4,17 @@ bring "../crypto/icrypto.w" as icrypto;
 bring "../crypto/crypto.w" as crypto;
 bring "../secrets.w" as Secrets;
 
-let table = new ex.DynamodbTable(
-  name: "data",
-  attributeDefinitions: {
-    "pk": "S",
-    "sk": "S",
-  },
-  hashKey: "pk",
-  rangeKey: "sk",
-);
-
-let secrets = new Secrets.Secrets(table);
+let secrets = new Secrets.Secrets();
 
 test "not storing sensitive data" {
   let secret = secrets.create(appId: "app-id", environmentType: "production", name: "test-secret", value: "secret-value");
-  let item = table.getItem(key: {
+  let item = secrets.table.getItem(key: {
     pk: "APP#${secret.appId}",
     sk: "SECRET#TYPE#production#SECRET#${secret.id}",
   });
-  let encryptedData = icrypto.EncryptedData.fromJson(item.item?.get("value"));
-
-  assert(secret.value != encryptedData.data.text);
+  let encryptedValue = item.item?.get("value");
+  let value = Json secret.value;
+  assert(Json value != encryptedValue);
 }
 
 test "can store and get a secret" {

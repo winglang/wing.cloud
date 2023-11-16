@@ -39,14 +39,20 @@ pub struct ListSecretsOptions {
 }
 
 pub class Secrets {
-  table: ex.DynamodbTable;
+  pub table: ex.DynamodbTable;
   crypto: crypto.Crypto;
-  global: str;
 
-  new(table: ex.DynamodbTable) {
-    this.table = table;
+  new() {
+    this.table = new ex.DynamodbTable(
+      name: "secrets",
+      attributeDefinitions: {
+        "pk": "S",
+        "sk": "S",
+      },
+      hashKey: "pk",
+      rangeKey: "sk",
+    );
     this.crypto = new crypto.Crypto();
-    this.global = "global";
   }
 
   pub inflight create(options: CreateSecretOptions): Secret {

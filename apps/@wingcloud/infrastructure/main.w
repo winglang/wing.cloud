@@ -42,7 +42,7 @@ let table = new ex.DynamodbTable(
 let apps = new Apps.Apps(table);
 let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
-let secrets = new Secrets.Secrets(table);
+let secrets = new Secrets.Secrets();
 
 let probotAdapter = new adapter.ProbotAdapter(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
