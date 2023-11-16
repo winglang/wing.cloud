@@ -39,7 +39,8 @@ pub class Github {
         "openid_connect_provider_arn" => provider.get("openid_connect_provider.arn"),
         "repo" => "winglang/wing.cloud",
         "role_name" => "wing-cloud-repo-${environment}",
-        "default_conditions" => ["allow_main"],
+        "github_environments" => [environment],
+        "default_conditions" => ["allow_environment"],
         "role_policy_arns" => [admin.policy.arn]
       },
 
