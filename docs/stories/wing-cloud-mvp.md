@@ -98,7 +98,7 @@ P1: Users won't be able to select from a template and all new repositories will 
 P2: Users will be able to select from from a gallery of starter projects to populate the repository. 
 ### Entrypoint for existing repositories
 
-When selecting an existing repository, the entrypoint needs to be determine.
+When selecting an existing repository, the entrypoint needs to be determined.
 
 P1: A text box will allow the user to specify the entrypoint and `main.w` will be the initial value. Users can edit this value manually. No validation needs to be performed against the repository. If the value is wrong (the entrypoint file doesn't exist), there will be an error later and the user will be able to update the entrypoint in **Settings**.
 
