@@ -8,7 +8,7 @@ import {
   Turbo,
 } from "@skyrpex/wingen";
 
-const winglangVersion = "^0.47.6";
+const winglangVersion = "^0.47.7";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -154,8 +154,7 @@ infrastructure.addGitIgnore("/.env");
 infrastructure.addGitIgnore("/.env.*");
 infrastructure.addGitIgnore("!/.env.example");
 
-infrastructure.addGitIgnore("/target/");
-infrastructure.addGitIgnore("/crypto/target/");
+infrastructure.addGitIgnore("**/target/");
 infrastructure.addDeps(`winglang@${winglangVersion}`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
@@ -250,6 +249,8 @@ infrastructure.addDeps("octokit", "node-fetch");
 infrastructure.addDeps("@aws-sdk/client-kms");
 
 infrastructure.addDevDeps("@types/cookie");
+infrastructure.addDeps("@aws-sdk/client-ssm");
+
 infrastructure.addDevDeps("@octokit/rest");
 
 infrastructure.addDevDeps(website.name);

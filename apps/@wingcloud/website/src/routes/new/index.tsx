@@ -36,7 +36,7 @@ export const Component = () => {
           <div className="justify-end flex gap-x-2 grow">
             <Button
               onClick={() => {
-                navigate("/apps/new/");
+                navigate("/apps/");
               }}
             >
               Back
