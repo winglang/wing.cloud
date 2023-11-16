@@ -148,7 +148,7 @@ export const EnvironmentsListItem = ({
             {linkEnabled && (
               <Link
                 to={`/apps/${appName}/${environment.id}/preview`}
-                className={clsx("text-xs hover:underline ", theme.text2)}
+                className={clsx("text-xs hover:underline ", theme.text1)}
               >
                 Visit Preview
               </Link>
