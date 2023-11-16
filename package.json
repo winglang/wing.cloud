@@ -11,7 +11,7 @@
     "@types/node": "18",
     "prettier": "^3.1.0",
     "projen": "^0.76.27",
-    "tsx": "^3.14.0",
+    "tsx": "^4.1.2",
     "typescript": "^5.2.2"
   },
   "scripts": {
