@@ -127,7 +127,7 @@ export const GitRepoSelect = ({
         <div
           className={clsx(
             "flex flex-col max-h-80 overflow-auto rounded",
-            "border divide-y divide-white dark:divide-slate-700",
+            "border divide-y divide-slate-200 dark:divide-slate-700",
             theme.borderInput,
           )}
         >
