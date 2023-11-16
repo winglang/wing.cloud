@@ -34,8 +34,9 @@ export const InfoItem = ({
       <div className={clsx("text-xs", theme.text2)}>{label}</div>
       <div
         className={clsx(
-          "flex items-center truncate text-xs font-normal",
-          theme.text1,
+          "flex items-center truncate text-xs font-medium",
+          //theme.text1,
+          "text-slate-800 dark:text-slate-250",
         )}
       >
         {value}
