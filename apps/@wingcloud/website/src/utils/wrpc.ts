@@ -67,6 +67,18 @@ export interface Environment {
   testResults?: TestResults;
 }
 
+export interface Secret {
+  id: string;
+  appId: string;
+  name: string;
+  environmentType: string;
+  value: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type EnvironmentType = "produciton" | "preview";
+
 export const wrpc = createWRPCReact<{
   "auth.check": QueryProcedure<
     undefined,
