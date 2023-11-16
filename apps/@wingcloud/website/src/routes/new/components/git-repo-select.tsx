@@ -145,7 +145,6 @@ export const GitRepoSelect = ({
                   "bg-slate-50 dark:bg-slate-750",
                 repositoryId !== repo.full_name && theme.bgInput,
                 disabled && "opacity-50 cursor-not-allowed",
-                !disabled && theme.bgInputHover,
               )}
             >
               <div className="flex items-center gap-2">

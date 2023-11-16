@@ -129,6 +129,28 @@ export const Component = () => {
                 <div className="flex flex-grow flex-col gap-4 sm:gap-6 truncate transition-all">
                   <div className="flex gap-4 sm:gap-10 lg:gap-16 transition-all">
                     <InfoItem
+                      label="Branch"
+                      value={
+                        <a
+                          className="hover:underline truncate"
+                          href={`https://github.com/${environment.data?.environment.repo}/tree/${environment.data?.environment.branch}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {environment.data?.environment.branch}
+                        </a>
+                      }
+                    />
+                    <InfoItem
+                      label="Environment"
+                      value={
+                        <div className="rounded-lg px-2 py-0.5 capitalize bg-slate-100 text-center">
+                          {environment.data?.environment.type}
+                        </div>
+                      }
+                    />
+
+                    <InfoItem
                       label="Status"
                       value={
                         <div className="flex items-center">
@@ -151,27 +173,7 @@ export const Component = () => {
                         </div>
                       }
                     />
-                    <InfoItem
-                      label="Environment"
-                      value={
-                        <div className="rounded-lg px-2 py-0.5 capitalize bg-slate-100 text-center">
-                          {environment.data?.environment.type}
-                        </div>
-                      }
-                    />
-                    <InfoItem
-                      label="Branch"
-                      value={
-                        <a
-                          className="hover:underline truncate"
-                          href={`https://github.com/${environment.data?.environment.repo}/tree/${environment.data?.environment.branch}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {environment.data?.environment.branch}
-                        </a>
-                      }
-                    />
+
                     {environment.data?.environment.createdAt && (
                       <InfoItem
                         label="Created"
