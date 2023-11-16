@@ -28,10 +28,6 @@ export const router = createBrowserRouter([
         path: ":appName/:environmentId",
         lazy: () => import("./routes/environments/environment.js"),
       },
-      {
-        path: ":appName/settings",
-        lazy: () => import("./routes/apps/settings.js"),
-      },
     ],
   },
   {
