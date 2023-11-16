@@ -60,16 +60,16 @@ export const DeleteModal = ({
             as="h3"
             className="text-base font-semibold leading-6 text-gray-900"
           >
-            Delete app
+            Delete App
           </Dialog.Title>
           <div className="mt-2">
             <p className="text-sm text-gray-500">
-              Are you sure you want to delete the app{" "}
+              The App{" "}
               <span className="bg-slate-200 text-slate-700 px-1 rounded">
                 {appName}
-              </span>
-              ? All of its Deployments, Secrets and Settings will be permanently
-              removed from our servers forever. This action cannot be undone.
+              </span>{" "}
+              will be permanently deleted, including its preview and production
+              environments. This action is irreversible and can not be undone.
             </p>
           </div>
         </div>
