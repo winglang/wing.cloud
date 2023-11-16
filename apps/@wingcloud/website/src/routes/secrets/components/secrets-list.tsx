@@ -1,4 +1,7 @@
+import clsx from "clsx";
+
 import { SpinnerLoader } from "../../../components/spinner-loader.js";
+import { useTheme } from "../../../design-system/theme-provider.js";
 import { type App, type Secret } from "../../../utils/wrpc.js";
 
 import { NewSecret } from "./new-secret.js";
@@ -13,9 +16,10 @@ export const SecretsList = ({
   secrets: Secret[];
   loading: boolean;
 }) => {
+  const { theme } = useTheme();
   return (
     <div className="flex flex-col bg-white rounded p-4 shadow gap-2">
-      <div className="text-slate-700 truncate">Secrets</div>
+      <div className={clsx("truncate", theme.text1)}>Secrets</div>
       <div className="flex flex-col gap-6">
         <NewSecret appId={app.appId} />
         <div className="w-full flex flex-col gap-2">
@@ -26,7 +30,7 @@ export const SecretsList = ({
         </div>
       </div>
       <hr className="h-px mt-2 mb-4 bg-gray-200 border-0 dark:bg-gray-700" />
-      <span className="text-slate-500 text-xs truncate">
+      <span className={clsx("text-xs truncate", theme.text2)}>
         Learn more about{" "}
         <a
           className="text-blue-600"

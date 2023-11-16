@@ -2,6 +2,7 @@ import {
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
+import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -9,6 +10,7 @@ import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { useNotifications } from "../../design-system/notification.js";
 import { Select } from "../../design-system/select.js";
+import { useTheme } from "../../design-system/theme-provider.js";
 import { wrpc } from "../../utils/wrpc.js";
 import { SecretsList } from "../secrets/components/secrets-list.js";
 
@@ -17,6 +19,7 @@ export interface AppProps {
 }
 
 export const Component = () => {
+  const { theme } = useTheme();
   const { appName } = useParams();
   const { showNotification } = useNotifications();
 
@@ -52,7 +55,7 @@ export const Component = () => {
 
   const isValidEntryfile = useMemo(() => {
     if (!app?.entryfile || !entryfilesQuery.data) {
-      return false;
+      return true;
     }
     return entryfilesQuery.data.entryfiles.includes(app.entryfile);
   }, [app, entryfilesQuery.data]);
@@ -75,7 +78,7 @@ export const Component = () => {
     },
     {
       enabled: app != undefined,
-      refetchInterval: 1000 * 5,
+      refetchInterval: 1000 * 3,
     },
   );
 
@@ -119,7 +122,7 @@ export const Component = () => {
       {app && (
         <>
           <div className="flex flex-col gap-x-2 bg-white rounded p-4 shadow">
-            <div className="flex flex-col text-slate-700 text-x truncate">
+            <div className={clsx("flex flex-col text-x truncate", theme.text1)}>
               <div className="flex flex-row items-center gap-2">
                 <span>App Entrypoint</span>
                 {!isValidEntryfile && !entryfilesQuery.isLoading && (
@@ -156,8 +159,10 @@ export const Component = () => {
             </div>
             <hr className="h-px mt-4 mb-2 bg-gray-200 border-0 dark:bg-gray-700" />
             <div className="flex flex-row gap-2">
-              <ExclamationCircleIcon className="h-4 w-4 flex-shrink-0 text-slate-600" />
-              <span className="text-slate-500 text-xs truncate">
+              <ExclamationCircleIcon
+                className={clsx("h-4 w-4 flex-shrink-0", theme.text2)}
+              />
+              <span className={clsx("text-xs truncate", theme.text2)}>
                 Updating this property will restart all active environments.
                 Learn more about{" "}
                 <a

@@ -6,6 +6,7 @@ import { Button } from "../../../design-system/button.js";
 import { Input } from "../../../design-system/input.js";
 import { useNotifications } from "../../../design-system/notification.js";
 import { Select } from "../../../design-system/select.js";
+import { useTheme } from "../../../design-system/theme-provider.js";
 import { wrpc } from "../../../utils/wrpc.js";
 import type { EnvironmentType } from "../../../utils/wrpc.js";
 
@@ -15,6 +16,7 @@ const environmentTypes = [
 ];
 
 export const NewSecret = ({ appId }: { appId: string }) => {
+  const { theme } = useTheme();
   const { showNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
   const [environmentType, setEnvironmentType] = useState<EnvironmentType>();
@@ -32,6 +34,10 @@ export const NewSecret = ({ appId }: { appId: string }) => {
         name,
         value,
       });
+      setName("");
+      setValue("");
+      // eslint-disable-next-line unicorn/no-useless-undefined
+      setEnvironmentType(undefined);
       showNotification("Secret created");
       setLoading(false);
     } catch (error) {
@@ -43,7 +49,7 @@ export const NewSecret = ({ appId }: { appId: string }) => {
         });
       }
     }
-  }, [createMutation]);
+  }, [name, value, environmentType, createMutation]);
 
   return (
     <div className={clsx("bg-white rounded text-left w-full block")}>
@@ -52,6 +58,7 @@ export const NewSecret = ({ appId }: { appId: string }) => {
           <span>Key</span>
           <Input
             type="text"
+            value={name}
             placeholder="e.g. API_KEY"
             onChange={(evt) => setName(evt.currentTarget.value)}
             className="mt-2 w-full"
@@ -62,6 +69,7 @@ export const NewSecret = ({ appId }: { appId: string }) => {
           <span>Value</span>
           <Input
             type="text"
+            value={value}
             onChange={(evt) => setValue(evt.currentTarget.value)}
             className="mt-2 w-full"
           />
@@ -96,8 +104,10 @@ export const NewSecret = ({ appId }: { appId: string }) => {
       </div>
       <hr className="h-px mb-2 mt-4 bg-gray-200 border-0 dark:bg-gray-700" />
       <div className="flex flex-row gap-2">
-        <ExclamationCircleIcon className="h-4 w-4 flex-shrink-0 text-slate-600" />
-        <span className="text-slate-500 text-xs truncate">
+        <ExclamationCircleIcon
+          className={clsx("h-4 w-4 flex-shrink-0", theme.text2)}
+        />
+        <span className={clsx("text-xs truncate", theme.text2)}>
           Learn more about{" "}
           <a
             className="text-blue-600"

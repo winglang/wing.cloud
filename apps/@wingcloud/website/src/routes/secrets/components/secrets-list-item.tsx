@@ -8,6 +8,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { Button } from "../../../design-system/button.js";
 import { useNotifications } from "../../../design-system/notification.js";
+import { useTheme } from "../../../design-system/theme-provider.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import { wrpc } from "../../../utils/wrpc.js";
 import type { Secret } from "../../../utils/wrpc.js";
@@ -15,6 +16,7 @@ import type { Secret } from "../../../utils/wrpc.js";
 const EmptySecret = "•••••••••••••••";
 
 export const SecretsListItem = ({ secret }: { secret: Secret }) => {
+  const { theme } = useTheme();
   const { showNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
   const [secretValue, setSecretValue] = useState(EmptySecret);
@@ -68,19 +70,21 @@ export const SecretsListItem = ({ secret }: { secret: Secret }) => {
 
   return (
     <div className="text-xs flex truncate items-center gap-4">
-      <LockClosedIcon
-        className={clsx("w-5 h-5 text-slate-500", "rounded-full")}
-      />
+      <LockClosedIcon className={clsx("w-5 h-5 rounded-full", theme.text2)} />
 
       <div className="flex flex-col gap-2 truncate w-1/3">
         <span className="text-xs space-x-2 truncate flex flex-grow">
           {secret.name}
         </span>
-        <div className="text-slate-600 flex gap-x-1 items-center truncate">
-          <span className="text-slate-500 truncate">
+        <div
+          className={clsx("flex gap-x-1 items-center truncate", theme.text2)}
+        >
+          <span className={clsx("truncate", theme.text2)}>
             {secret.environmentType}
           </span>
-          <span className="text-slate-400 truncate">updated {updatedAt}</span>
+          <span className={clsx("truncate", theme.text2)}>
+            updated {updatedAt}
+          </span>
         </div>
       </div>
 
@@ -89,16 +93,18 @@ export const SecretsListItem = ({ secret }: { secret: Secret }) => {
           <EyeIcon
             onClick={decryptSecret}
             className={clsx(
-              "w-4 h-4 text-slate-500",
+              "w-4 h-4",
               "rounded-full cursor-pointer shrink-0",
+              theme.text2,
             )}
           />
         ) : (
           <EyeSlashIcon
             onClick={() => setSecretValue(EmptySecret)}
             className={clsx(
-              "w-4 h-4 text-slate-500",
+              "w-4 h-4",
               "rounded-full cursor-pointer",
+              theme.text2,
             )}
           />
         )}

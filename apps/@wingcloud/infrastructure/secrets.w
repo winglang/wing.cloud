@@ -38,6 +38,12 @@ pub struct ListSecretsOptions {
   decryptValues: bool?;
 }
 
+pub struct DeleteSecretOptions {
+  id: str;
+  appId: str;
+  environmentType: str;
+}
+
 pub class Secrets {
   pub table: ex.DynamodbTable;
   crypto: crypto.Crypto;
@@ -123,6 +129,18 @@ pub class Secrets {
     }
 
     return secrets.copy();
+  }
+
+  pub inflight delete(options: DeleteSecretOptions) {
+    let var secrets = MutArray<Secret>[];
+
+    // make sure secret exists
+    let item = this.get(id: options.id, appId: options.appId, environmentType: options.environmentType);
+
+    let res = this.table.deleteItem(key: {
+      pk: "APP#${item.appId}",
+      sk: "SECRET#TYPE#${item.environmentType}#SECRET#${item.id}",
+    });
   }
 
   inflight fromDB(item: Json, decryptValue: bool): Secret {
