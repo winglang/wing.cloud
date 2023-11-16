@@ -2,7 +2,7 @@ bring cloud;
 bring util;
 bring fs;
 bring http;
-bring "./octokit.w" as ok;
+bring "../octokit.w" as ok;
 bring "./dir.w" as dir;
 bring "../users.w" as users;
 bring "../apps.w" as apps;
