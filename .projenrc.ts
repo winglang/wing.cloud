@@ -8,7 +8,7 @@ import {
   Turbo,
 } from "@skyrpex/wingen";
 
-const winglangVersion = "^0.47.6";
+const winglangVersion = "^0.47.7";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -249,6 +249,8 @@ infrastructure.addDeps("cookie");
 infrastructure.addDeps("jose");
 
 infrastructure.addDeps("octokit", "node-fetch");
+
+infrastructure.addDeps("@aws-sdk/client-ssm");
 
 infrastructure.addDevDeps("@octokit/rest");
 
