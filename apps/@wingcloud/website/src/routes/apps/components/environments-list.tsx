@@ -1,8 +1,10 @@
 import { LinkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import clsx from "clsx";
 import { useMemo, useState } from "react";
 
 import { SpinnerLoader } from "../../../components/spinner-loader.js";
 import { Input } from "../../../design-system/input.js";
+import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
 import type { Environment } from "../../../utils/wrpc.js";
 
@@ -21,6 +23,8 @@ export const EnvironmentsList = ({
   repoUrl,
   loading,
 }: EnvironmentsListProps) => {
+  const { theme } = useTheme();
+
   const [search, setSearch] = useState("");
 
   const filteredEnvs = useMemo(() => {
@@ -37,13 +41,13 @@ export const EnvironmentsList = ({
   return (
     <>
       {loading && (
-        <div className="bg-white p-6 w-full flex items-center justify-center">
+        <div className="p-6 w-full flex items-center justify-center">
           <SpinnerLoader size="sm" />
         </div>
       )}
 
       {!loading && environments.length === 0 && (
-        <div className="text-center bg-white p-6 w-full">
+        <div className={clsx("text-center p-6 w-full", theme.bgInput)}>
           <LinkIcon className="w-8 h-8 mx-auto text-slate-400" />
           <h3 className="mt-2 text-sm font-semibold text-slate-900">
             No preview environments found.
@@ -67,7 +71,7 @@ export const EnvironmentsList = ({
       {environments.length > 0 && (
         <div className="space-y-4">
           <div className="space-y-2">
-            <div className="text-slate-700 text-lg pt-2">
+            <div className={clsx("text-lg pt-2", theme.text1)}>
               Preview Environments
             </div>
 

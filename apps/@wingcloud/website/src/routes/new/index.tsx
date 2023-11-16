@@ -1,6 +1,5 @@
 import { LinkIcon, SquaresPlusIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "../../design-system/button.js";

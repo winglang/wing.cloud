@@ -22,10 +22,14 @@ export const NewAppContainer = ({
     <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6">
       <div className="flex justify-center transition-all">
         <div
-          className={clsx("w-full rounded shadow p-6 space-y-4", theme.bgInput)}
+          className={clsx(
+            "w-full rounded shadow p-6 space-y-4 border",
+            theme.bg4,
+            theme.borderInput,
+          )}
         >
-          <div className="flex items-center gap-1">
-            <Link to="/apps/new/" className="font-semibold">
+          <div className={clsx("flex items-center gap-1", theme.text1)}>
+            <Link to="/apps/new/" className={clsx("font-semibold")}>
               Create a new App
             </Link>
             {step && (

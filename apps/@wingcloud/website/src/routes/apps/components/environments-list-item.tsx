@@ -7,6 +7,7 @@ import clsx from "clsx";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
+import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../utils/time.js";
@@ -35,6 +36,8 @@ export const EnvironmentsListItem = ({
   appName: string;
   environment: Environment;
 }) => {
+  const { theme } = useTheme();
+
   const status = useMemo(() => {
     return environment.status as Status;
   }, [environment.status]);
@@ -52,16 +55,19 @@ export const EnvironmentsListItem = ({
   return (
     <div
       className={clsx(
-        "bg-white rounded p-4 text-left w-full block",
-        "shadow hover:shadow-md transition-all",
+        "rounded p-4 text-left w-full block",
+        theme.bgInput,
+        "border",
+        theme.borderInput,
       )}
     >
       <div className="flex items-center gap-x-4">
         <div className="relative">
           <BranchIcon
             className={clsx(
-              "w-8 h-8 text-slate-500",
+              "w-8 h-8 ",
               "rounded-full border-slate-300 border",
+              theme.text2,
             )}
           />
           <div
@@ -82,24 +88,35 @@ export const EnvironmentsListItem = ({
           <div className="text-xs space-y-1 truncate">
             <Link
               to={`/apps/${appName}/${environment.id}`}
-              className="font-semibold truncate hover:underline text-slate-700"
+              className={clsx(
+                "font-semibold truncate hover:underline",
+                theme.text1,
+              )}
               rel="noopener noreferrer"
             >
               {environment.prTitle}
             </Link>
 
             <div className="truncate flex gap-x-5">
-              <div className="text-slate-600 flex gap-x-1 items-center">
+              <div className={clsx("flex gap-x-1 items-center", theme.text2)}>
                 <GithubIcon className="w-3 h-3 inline-block" />
                 <a
                   href={`https://github.com/${environment.repo}/tree/${environment.branch}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="truncate hover:underline items-end flex font-mono"
+                  className={clsx(
+                    "truncate hover:underline items-end flex font-mono",
+                    theme.text2,
+                  )}
                 >
                   {environment.branch}
                 </a>
-                <span className="text-slate-400 truncate items-center flex">
+                <span
+                  className={clsx(
+                    "truncate items-center flex opacity-70",
+                    theme.text2,
+                  )}
+                >
                   updated {updatedAt}
                 </span>
               </div>
@@ -108,12 +125,14 @@ export const EnvironmentsListItem = ({
                 <div
                   className={clsx(
                     "flex items-end gap-x-0.5",
-                    "rounded-xl bg-slate-100 px-1 py-0.5",
-                    "border border-slate-200",
+                    "rounded-xl px-1 py-0.5",
+                    "border",
+                    theme.bg3,
+                    theme.border3,
                   )}
                   title={`tests ${testStatus}`}
                 >
-                  <BeakerIcon className="w-4 h-4 text-slate-500" />
+                  <BeakerIcon className={clsx("w-4 h-4", theme.text2)} />
                   {testStatus === "passed" && (
                     <CheckCircleIcon className="w-4 h-4 text-green-500" />
                   )}
@@ -127,19 +146,17 @@ export const EnvironmentsListItem = ({
 
           <div className="flex gap-x-4 text-xs items-center justify-end">
             {linkEnabled && (
-              <a
-                href={environment.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs hover:underline text-slate-600"
+              <Link
+                to={`/apps/${appName}/${environment.id}/preview`}
+                className={clsx("text-xs hover:underline ", theme.text2)}
               >
-                View Preview
-              </a>
+                Visit Preview
+              </Link>
             )}
             {!linkEnabled && (
               <div
                 className={clsx(
-                  status === "initializing" && "text-slate-600 bg-slate-100",
+                  status === "initializing" && theme.bg3,
                   status === "tests" && "text-yellow-600 bg-yellow-100",
                   status === "deploying" && "text-yellow-600 bg-yellow-100",
                   status === "failed" && "text-red-600 bg-red-100",

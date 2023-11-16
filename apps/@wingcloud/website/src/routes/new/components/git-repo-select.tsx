@@ -108,7 +108,7 @@ export const GitRepoSelect = ({
       </div>
 
       {loading && (
-        <div className="bg-white p-6 w-full flex items-center justify-center">
+        <div className="p-6 w-full flex items-center justify-center">
           <SpinnerLoader size="sm" />
         </div>
       )}
@@ -127,7 +127,7 @@ export const GitRepoSelect = ({
         <div
           className={clsx(
             "flex flex-col max-h-80 overflow-auto rounded",
-            "border divide-y",
+            "border divide-y divide-white dark:divide-slate-700",
             theme.borderInput,
           )}
         >

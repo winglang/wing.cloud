@@ -4,17 +4,20 @@ import {
   PlusIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { Button } from "../design-system/button.js";
 import { Input } from "../design-system/input.js";
+import { useTheme } from "../design-system/theme-provider.js";
 import { wrpc } from "../utils/wrpc.js";
 
 import { AppCard } from "./apps/components/app-card.js";
 
 export const Component = () => {
+  const { theme } = useTheme();
+
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
@@ -68,14 +71,16 @@ export const Component = () => {
           <>
             {filteredApps.length === 0 && (
               <div className="text-center">
-                <FolderPlusIcon className="w-12 h-12 mx-auto text-gray-400" />
-                <h3 className="mt-2 text-sm font-semibold text-gray-900">
+                <FolderPlusIcon
+                  className={clsx("w-12 h-12 mx-auto", theme.text1)}
+                />
+                <h3 className={clsx("mt-2 text-sm font-semibold", theme.text1)}>
                   No apps found.
                 </h3>
 
                 {apps.length === 0 && (
                   <div>
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className={clsx("mt-1 text-sm", theme.text2)}>
                       Get started by creating a new app.
                     </p>
                     <Button

@@ -2,7 +2,6 @@ import {
   CheckCircleIcon,
   ChevronDownIcon,
   ChevronRightIcon,
-  NoSymbolIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
@@ -20,13 +19,7 @@ import { useTheme } from "../../design-system/theme-provider.js";
 import { getDateTime } from "../../utils/time.js";
 import { wrpc } from "../../utils/wrpc.js";
 
-export const InfoItem = ({
-  label,
-  value,
-}: {
-  label: string;
-  value: ReactNode;
-}) => {
+const InfoItem = ({ label, value }: { label: string; value: ReactNode }) => {
   const { theme } = useTheme();
 
   return (
@@ -54,14 +47,19 @@ const CollapsibleItem = ({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="bg-white w-full rounded shadow">
+    <div
+      className={clsx(
+        "w-full rounded border",
+        theme.bgInput,
+        theme.borderInput,
+      )}
+    >
       <button
         className={clsx(
           "flex items-center justify-between w-full text-left p-6",
           isOpen && "border-b rounded-t shadow-sm",
           !isOpen && "rounded",
           theme.borderInput,
-          theme.bgInput,
           theme.textInput,
         )}
         onClick={() => setIsOpen(!isOpen)}
@@ -123,7 +121,13 @@ export const Component = () => {
       )}
       {!environment.isLoading && (
         <div className="space-y-4">
-          <div className="bg-white p-6 w-full rounded shadow gap-4 flex">
+          <div
+            className={clsx(
+              "p-6 w-full rounded gap-4 flex border",
+              theme.bgInput,
+              theme.borderInput,
+            )}
+          >
             <div className="flex flex-grow flex-col gap-4 sm:gap-6 truncate transition-all">
               <div className="flex gap-4 sm:gap-10 lg:gap-16 transition-all">
                 <InfoItem
@@ -142,7 +146,7 @@ export const Component = () => {
                 <InfoItem
                   label="Environment"
                   value={
-                    <div className="rounded-lg px-2 py-0.5 capitalize bg-slate-100 text-center">
+                    <div className="rounded-lg px-2 py-0.5 capitalize bg-slate-100 dark:bg-slate-750 text-center">
                       {environment.data?.environment.type}
                     </div>
                   }
@@ -196,7 +200,7 @@ export const Component = () => {
             </div>
             <div className="flex justify-end items-start">
               <Link to="./preview">
-                <Button>Visit</Button>
+                <Button disabled={status !== "running"}>Visit</Button>
               </Link>
             </div>
           </div>

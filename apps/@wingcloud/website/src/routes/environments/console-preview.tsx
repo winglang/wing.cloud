@@ -8,7 +8,7 @@ import { useTheme } from "../../design-system/theme-provider.js";
 import { wrpc } from "../../utils/wrpc.js";
 
 export const Component = () => {
-  const { theme } = useTheme();
+  const { theme, mode } = useTheme();
   const { environmentId } = useParams();
 
   const environment = wrpc["app.environment"].useQuery(
@@ -40,7 +40,7 @@ export const Component = () => {
               location.host
             }/trpc`}
             layout={1}
-            theme="light"
+            theme={mode}
             onTrace={(trace) => {
               // Playground and Learn need to be able to listen to all traces.
               window.parent.postMessage({ trace }, "*");

@@ -5,6 +5,7 @@ import { useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import { Menu } from "../design-system/menu.js";
+import { useTheme } from "../design-system/theme-provider.js";
 import { WingIcon } from "../icons/wing-icon.js";
 import { wrpc } from "../utils/wrpc.js";
 
@@ -48,6 +49,7 @@ const UserMenu = () => {
 };
 
 export const Header = () => {
+  const { theme } = useTheme();
   const location = useLocation();
 
   const breadcrumbs = useMemo(() => {
@@ -62,12 +64,12 @@ export const Header = () => {
   }, [location.pathname]);
 
   return (
-    <header className="p-6 bg-white shadow z-10">
+    <header className={clsx("p-6 shadow z-10", theme.bgInput)}>
       <nav className="flex" aria-label="Breadcrumb">
         <ol role="list" className="flex items-center space-x-2 truncate">
           <li>
             <div>
-              <Link to="/apps/" className="text-[#212627] hover:text-slate-800">
+              <Link to="/apps/" className={clsx(theme.text1, theme.text1Hover)}>
                 <WingIcon className="h-5 w-auto" />
               </Link>
             </div>
@@ -76,9 +78,15 @@ export const Header = () => {
             return (
               <li key={index} className="truncate">
                 <div className="flex items-center truncate">
-                  <ChevronRightIcon className="h-4 w-4 flex-shrink-0 text-slate-600" />
+                  <ChevronRightIcon
+                    className={clsx("h-4 w-4 flex-shrink-0", theme.text1)}
+                  />
                   <Link
-                    className="ml-2 text-sm font-medium text-slate-600 hover:text-slate-700 truncate"
+                    className={clsx(
+                      "ml-2 text-sm font-medium truncate",
+                      theme.text1,
+                      theme.text1Hover,
+                    )}
                     to={breadcrumb.to}
                   >
                     {breadcrumb.label}
