@@ -24,6 +24,9 @@
       "dotEnv": [
         ".env"
       ],
+      "inputs": [
+        "!target/**"
+      ],
       "outputs": [
         "target/main.tfaws/**",
         "!target/main.tfaws/.terraform.lock.hcl",
