@@ -72,6 +72,14 @@ struct MakeItemOptions {
   sk: str;
 }
 
+struct UpdateEntryfileOptions {
+  appId: str;
+  appName: str;
+  userId: str;
+  repository: str;
+  entryfile: str;
+}
+
 pub class Apps {
   table: ex.DynamodbTable;
 
@@ -397,5 +405,74 @@ pub class Apps {
       }]);
     }
     return apps;
+  }
+
+  pub inflight updateEntrypoint(options: UpdateEntryfileOptions): void {
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "APP#${options.appId}",
+            sk: "#",
+          },
+          updateExpression: "SET #entryfile = :entryfile",
+          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
+          expressionAttributeNames: {
+            "#pk": "pk",
+            "#entryfile": "entryfile",
+            "#userId": "userId",
+          },
+          expressionAttributeValues: {
+            ":entryfile": options.entryfile,
+            ":userId": options.userId,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#${options.userId}",
+            sk: "APP#${options.appId}",
+          },
+          updateExpression: "SET #entryfile = :entryfile",
+          expressionAttributeNames: {
+            "#entryfile": "entryfile",
+          },
+          expressionAttributeValues: {
+            ":entryfile": options.entryfile,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#${options.userId}",
+            sk: "APP_NAME#${options.appName}",
+          },
+          updateExpression: "SET #entryfile = :entryfile",
+          expressionAttributeNames: {
+            "#entryfile": "entryfile",
+          },
+          expressionAttributeValues: {
+            ":entryfile": options.entryfile,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "REPOSITORY#${options.repository}",
+            sk: "APP#${options.appId}",
+          },
+          updateExpression: "SET #entryfile = :entryfile",
+          expressionAttributeNames: {
+            "#entryfile": "entryfile",
+          },
+          expressionAttributeValues: {
+            ":entryfile": options.entryfile,
+          },
+        }
+      },
+    ]);
   }
 }

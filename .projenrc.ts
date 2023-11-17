@@ -244,12 +244,13 @@ infrastructure.addDeps(
   "@cdktf/provider-random",
 );
 
-infrastructure.addDevDeps("@types/cookie");
 infrastructure.addDeps("cookie");
-
 infrastructure.addDeps("jose");
-
 infrastructure.addDeps("octokit", "node-fetch");
+infrastructure.addDeps("@aws-sdk/client-kms");
+
+infrastructure.addDevDeps("@types/cookie");
+infrastructure.addDeps("@aws-sdk/client-ssm");
 
 infrastructure.addDevDeps("@octokit/rest");
 

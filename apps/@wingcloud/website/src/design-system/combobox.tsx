@@ -20,6 +20,7 @@ export interface ComboboxProps {
   filter?: boolean;
   placeholder?: string;
   renderItem?: (item: Item) => JSX.Element;
+  className?: string;
 }
 
 export const Combobox = ({
@@ -31,6 +32,7 @@ export const Combobox = ({
   readonly,
   filter = true,
   renderItem,
+  className,
 }: ComboboxProps) => {
   const { theme } = useTheme();
   const [filtered, setFiltered] = useState<Item[]>(items ?? []);
@@ -77,7 +79,7 @@ export const Combobox = ({
 
   return (
     <HeadlessCombobox value={value} onChange={internalOnChange}>
-      <div className="relative w-full">
+      <div className={clsx("relative w-full", className)}>
         <HeadlessCombobox.Input
           ref={inputRef}
           className={clsx(

@@ -8,6 +8,7 @@ bring "../flyio" as flyio;
 bring "./runtime-docker.w" as runtimeDocker;
 bring "../environments.w" as environments;
 bring "@cdktf/provider-aws" as awsprovider;
+bring "../components/parameter/iparameter.w" as parameter;
 
 struct RuntimeStartOptions {
   gitToken: str?;
@@ -18,7 +19,7 @@ struct RuntimeStartOptions {
   logsBucketRegion: str;
   awsAccessKeyId: str;
   awsSecretAccessKey: str;
-  wingCloudUrl: str;
+  wingCloudUrl: parameter.IParameter;
   environmentId: str;
 }
 
@@ -60,7 +61,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "ENTRYFILE" => opts.entryfile,
       "WING_TARGET" => util.env("WING_TARGET"),
       "LOGS_BUCKET_NAME" => util.env(opts.logsBucketName), // get simulator handle for the bucket
-      "WING_CLOUD_URL" => opts.wingCloudUrl,
+      "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
       "ENVIRONMENT_ID" => opts.environmentId,
       "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
     };
@@ -114,7 +115,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "GIT_SHA" => opts.gitSha,
       "ENTRYFILE" => opts.entryfile,
       "WING_TARGET" => util.env("WING_TARGET"),
-      "WING_CLOUD_URL" => opts.wingCloudUrl,
+      "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
       "LOGS_BUCKET_NAME" => opts.logsBucketName,
       "ENVIRONMENT_ID" => opts.environmentId,
       "AWS_ACCESS_KEY_ID" => opts.awsAccessKeyId,
@@ -156,7 +157,7 @@ struct Message {
 }
 
 struct RuntimeServiceProps {
-  wingCloudUrl: str;
+  wingCloudUrl: parameter.IParameter;
   flyToken: str?;
   flyOrgSlug: str?;
   environments: environments.Environments;
