@@ -36,7 +36,7 @@ export const Component = () => {
   }, [listAppsQuery.data, search]);
 
   return (
-    <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6">
+    <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6 transition-all">
       <div className="space-y-4">
         <div className="flex gap-x-2">
           <Input

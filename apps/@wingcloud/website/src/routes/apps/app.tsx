@@ -83,7 +83,7 @@ export const Component = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   return (
-    <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6">
+    <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6 transition-all">
       {!app && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />

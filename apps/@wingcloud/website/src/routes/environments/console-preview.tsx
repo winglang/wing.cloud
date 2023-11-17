@@ -39,7 +39,7 @@ export const Component = () => {
             wsUrl={`${url.startsWith("http:") ? "ws://" : "wss://"}${
               location.host
             }/trpc`}
-            layout={1}
+            layout={5}
             theme={mode}
             onTrace={(trace) => {
               // Playground and Learn need to be able to listen to all traces.
