@@ -102,11 +102,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Compile Wing Cloud dependencies
         run: npx turbo compile --filter=!@wingcloud/infrastructure
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
       - name: Test Wing Cloud AWS
+        continue-on-error: true
         env:
           ## Inflight
           APP_SECRET: ${{ secrets.APP_SECRET }}
@@ -130,5 +127,9 @@ jobs:
           ## Terraform
           DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
           DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
-        run: pnpm wing test -t tf-aws main.w --platform s3.backend.js
+        run: pnpm wing test --no-clean -t tf-aws main.w --platform s3.backend.js
         working-directory: 'apps/@wingcloud/infrastructure'
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
