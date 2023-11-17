@@ -179,8 +179,8 @@ export const Component = () => {
                         "rounded-full shrink-0",
                         status === "initializing" &&
                           "bg-slate-400 animate-pulse",
-                        status === "deploying" && "bg-yellow-300 animate-pulse",
                         status === "tests" && "bg-yellow-300 animate-pulse",
+                        status === "deploying" && "bg-yellow-300 animate-pulse",
                         status === "running" && "bg-green-300",
                         status === "failed" && "bg-red-300",
                       )}
