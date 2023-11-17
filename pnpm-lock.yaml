@@ -13,8 +13,8 @@ importers:
         version: 1.10.16
     devDependencies:
       '@skyrpex/wingen':
-        specifier: ^0.6.4
-        version: 0.6.4(projen@0.76.27)
+        specifier: ../wingen
+        version: link:../wingen
       '@types/node':
         specifier: '18'
         version: 18.18.9
@@ -3533,18 +3533,6 @@ packages:
   /@sinclair/typebox@0.27.8:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
     dev: true
-
-  /@skyrpex/wingen@0.6.4(projen@0.76.27):
-    resolution: {integrity: sha512-VMgxyBO0dopFVH+uznisDS2rBwf5HV9P5CQ1iZcdB1D+f1SgJQyfjW1jTQ79yr3f4CTzdWfwTCxQJC5Ep5SIfw==}
-    engines: {node: '>= 18.17.1'}
-    peerDependencies:
-      projen: ^0.72.1
-    dependencies:
-      case: 1.6.3
-      projen: 0.76.27(constructs@10.3.0)
-    dev: true
-    bundledDependencies:
-      - case
 
   /@smithy/abort-controller@2.0.13:
     resolution: {integrity: sha512-eeOPD+GF9BzF/Mjy3PICLePx4l0f3rG/nQegQHRLTloN5p1lSJJNZsyn+FzDnW8P2AduragZqJdtKNCxXozB1Q==}

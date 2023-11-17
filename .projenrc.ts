@@ -43,7 +43,8 @@ const winglangVersion = "^0.47.7";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
-  devDeps: ["@skyrpex/wingen"],
+  // devDeps: ["@skyrpex/wingen"],
+  devDeps: ["../wingen"],
   name: "@wingcloud/monorepo",
 });
 
