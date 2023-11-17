@@ -17,9 +17,22 @@ deploy_env() {
   cd $CURRENT_DIR
 }
 
-deploy_env "tfstate" "wing-cloud-staging" "staging"
-deploy_env "tfstate" "wing-cloud-production" "production"
-deploy_env "oidc" "wing-cloud-staging" "staging"
-deploy_env "oidc" "wing-cloud-production" "production"
+if [ "$#" -eq 1 ]; then
+  ENVIRONMENT=$(echo $1 | tr '[:upper:]' '[:lower:]')
+  if [ "$ENVIRONMENT" == "staging" ] || [ "$ENVIRONMENT" == "production" ] || [ "$ENVIRONMENT" == "testing" ]; then
+    deploy_env "tfstate" "wing-cloud-$ENVIRONMENT" "$ENVIRONMENT"
+    deploy_env "oidc" "wing-cloud-$ENVIRONMENT" "$ENVIRONMENT"
+  else
+    echo "Invalid ENVIRONMENT. Please provide either 'staging', 'production' or 'testing' as an argument."
+    exit 1
+  fi
+else
+  deploy_env "tfstate" "wing-cloud-staging" "staging"
+  deploy_env "tfstate" "wing-cloud-production" "production"
+  deploy_env "tfstate" "wing-cloud-testing" "testing"
+  deploy_env "oidc" "wing-cloud-staging" "staging"
+  deploy_env "oidc" "wing-cloud-production" "production"
+  deploy_env "oidc" "wing-cloud-testing" "testing"
+fi
 
 echo "Deployed all services successfully"
