@@ -102,6 +102,10 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Compile Wing Cloud dependencies
         run: npx turbo compile --filter=!@wingcloud/infrastructure
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
       - name: Test Wing Cloud AWS
         env:
           ## Inflight
