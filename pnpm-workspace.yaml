@@ -2,6 +2,11 @@
 
 packages:
   - packages/@wingcloud/wrpc
+  - packages/@wingcloud/probot
+  - packages/@wingcloud/nanoid
+  - packages/@wingcloud/simutils
+  - packages/@wingcloud/ngrok
+  - packages/@wingcloud/containers
   - packages/@wingcloud/vite
   - apps/@wingcloud/website
   - apps/@wingcloud/runtime

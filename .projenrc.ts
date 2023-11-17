@@ -8,6 +8,36 @@ import {
   Turbo,
 } from "@skyrpex/wingen";
 
+interface WingLibProjectOptions {
+  readonly monorepo: MonorepoProject;
+  readonly name: string;
+  readonly outdir?: string;
+  readonly deps?: string[];
+  readonly devDeps?: string[];
+  readonly typescript?: boolean;
+}
+
+class WingLibProject extends NodeProject {
+  constructor(options: WingLibProjectOptions) {
+    super({
+      outdir: `packages/${options.name}`,
+      ...options,
+      parent: options.monorepo,
+    });
+
+    this.addFields({
+      type: "module",
+    });
+
+    if (options.typescript) {
+      new TypescriptConfig(this, {
+        include: ["src/**/*"],
+      });
+    }
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 const winglangVersion = "^0.47.7";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,6 +56,41 @@ const wrpc = new TypescriptProject({
 wrpc
   .tryFindObjectFile("tsconfig.json")!
   .addToArray("compilerOptions.lib", "DOM", "DOM.Iterable");
+
+///////////////////////////////////////////////////////////////////////////////
+const probot = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/probot",
+  devDeps: ["@probot/adapter-aws-lambda-serverless"],
+  typescript: true,
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const nanoid = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/nanoid",
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const simutils = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/simutils",
+  deps: ["get-port"],
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const ngrok = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/ngrok",
+  deps: [simutils.name],
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const containers = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/containers",
+  devDeps: [nanoid.name],
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 const vite = new NodeEsmProject({
@@ -62,7 +127,7 @@ new Turbo(website, {
 });
 
 website.addDeps("vite");
-website.addScript("dev", "vite dev");
+// website.addScript("dev", "vite dev");
 website.addScript("compile", "vite build");
 website.addGitIgnore("/dist/");
 website.addGitIgnore("/public/wing.js");
@@ -232,6 +297,15 @@ infrastructure.addDevDeps("@types/jsonwebtoken");
 infrastructure.addDevDeps("@types/express");
 
 infrastructure.addDeps("glob");
+
+infrastructure.addDeps(
+  probot.name,
+  containers.name,
+  nanoid.name,
+  simutils.name,
+  ngrok.name,
+);
+infrastructure.addScript("example", "node ./bin/wing.mjs it example.main.w");
 
 infrastructure.addDeps(
   "constructs",
