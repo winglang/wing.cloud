@@ -40,7 +40,8 @@ export const startNgrok = async (
         break;
       }
     } catch (err: any) {
-      console.error(err);
+      console.error(err)
+      throw err;
       err = err;
     } finally {
       await sleep(250);
