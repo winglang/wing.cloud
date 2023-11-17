@@ -10,9 +10,9 @@ struct ContainersProps {
 }
 
 pub class Containers impl types.IContainers {
-    implementation: types.IContainers;
+  implementation: types.IContainers;
 
-    new(props: ContainersProps?) {
+  new(props: ContainersProps?) {
 		// let driver = props?.driver ?? util.tryEnv("CONTAINERS_DRIVER") ?? "docker";
 		let driver = props?.driver ?? "docker";
 		if driver == "docker" {
@@ -26,13 +26,13 @@ pub class Containers impl types.IContainers {
 		} else {
 			throw "Unknown CONTAINERS_DRIVER: ${driver}";
 		}
-    }
+  }
 
-    pub inflight create(options: types.CreateContainerOptions): types.Container {
-        return this.implementation.create(options);
-    }
+  pub inflight create(options: types.CreateContainerOptions): types.Container {
+    return this.implementation.create(options);
+  }
 
-    pub inflight destroy(containerID: types.ContainerID): void {
-        this.implementation.destroy(containerID);
-    }
+  pub inflight destroy(containerID: types.ContainerID): void {
+    this.implementation.destroy(containerID);
+  }
 }

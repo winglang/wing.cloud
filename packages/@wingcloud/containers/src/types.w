@@ -1,20 +1,20 @@
 pub struct ContainerID {
-    value: str;
+  value: str;
 }
 
 pub struct Container {
-    containerID: ContainerID;
-    url: str;
+  containerID: ContainerID;
+  url: str;
 }
 
 pub struct CreateContainerOptions {
-    image: str;
+  image: str;
 	port: num;
 	readiness: str?;
 	env: Map<str>?;
 }
 
 pub interface IContainers {
-    inflight create(options: CreateContainerOptions): Container;
-    inflight destroy(containerID: ContainerID): void;
+  inflight create(options: CreateContainerOptions): Container;
+  inflight destroy(containerID: ContainerID): void;
 }
