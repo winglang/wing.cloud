@@ -39,12 +39,11 @@ class WingLibProject extends NodeProject {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-const winglangVersion = "^0.47.7";
+const winglangVersion = "^0.48.1";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
-  // devDeps: ["@skyrpex/wingen"],
-  devDeps: ["../wingen"],
+  devDeps: ["@skyrpex/wingen"],
   name: "@wingcloud/monorepo",
 });
 
