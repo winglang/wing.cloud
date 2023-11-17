@@ -73,7 +73,7 @@ jobs:
           VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}
           PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
           PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
-        run: pnpm wing test main.w
+        run: pnpm wing test --debug --progress --no-update-check --no-analytics main.w
         working-directory: 'apps/@wingcloud/infrastructure'
   aws:
     runs-on: ubuntu-latest
