@@ -33,6 +33,12 @@ jobs:
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: "1.5.7"
+      - name: Setup ngrok CLI
+        run: |
+          wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+          tar xvzf ./ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin
+          rm ./ngrok-v3-stable-linux-amd64.tgz
+          ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}}
       - name: Get pnpm store directory
         shell: bash
         run: |
