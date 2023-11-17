@@ -111,6 +111,12 @@ Performs a deployment in all accounts
 ./bin/deploy-all
 ```
 
+#### Deploy single account
+
+```
+./bin/deploy-all testing
+```
+
 ## Dev
 
 The actual wing code lives in these two folders
