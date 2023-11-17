@@ -72,7 +72,7 @@ export const Component = () => {
             {filteredApps.length === 0 && (
               <div className="text-center">
                 <FolderPlusIcon
-                  className={clsx("w-12 h-12 mx-auto", theme.text1)}
+                  className={clsx("w-12 h-12 mx-auto", theme.text2)}
                 />
                 <h3 className={clsx("mt-2 text-sm font-semibold", theme.text1)}>
                   No apps found.
