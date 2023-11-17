@@ -11,11 +11,6 @@
       "outputs": [
         "dist/**"
       ]
-    },
-    "dev": {
-      "dependsOn": [
-        "^compile"
-      ]
     }
   }
 }

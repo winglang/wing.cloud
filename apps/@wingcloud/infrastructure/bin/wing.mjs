@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-process-exit */
 import { spawnSync } from "node:child_process";
 
 import { config } from "dotenv";
@@ -17,4 +18,4 @@ const wing = spawnSync("pnpm", ["wing", ...process.argv.slice(2)], {
   },
 });
 
-process.exit(wing.status !== null ? wing.status : 1);
+process.exit(wing.status);
