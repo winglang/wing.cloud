@@ -9,11 +9,11 @@ struct NgrokShellResult {
 
 struct NgrokProps {
   url: str;
-  domain: str?;
+  domain: str;
 }
 
 pub class Ngrok {
-  extern "./src/ngrok.mts" static inflight startNgrok(port: str, domain: str?): NgrokShellResult;
+  extern "./src/ngrok.mts" static inflight startNgrok(port: str, domain: str): NgrokShellResult;
   extern "./src/ngrok.mts" static inflight killNgrok(pid: num);
 
   pub url: str;

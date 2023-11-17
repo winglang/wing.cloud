@@ -40,6 +40,7 @@ export const startNgrok = async (
         break;
       }
     } catch (err: any) {
+      console.error(err);
       err = err;
     } finally {
       await sleep(250);
@@ -81,7 +82,7 @@ const tryPort = async (hostPort: string, ngrokPort: number) => {
       }
     }
   }
-  
+
 };
 
 const sleep = (ms: number) => {
