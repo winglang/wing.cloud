@@ -53,51 +53,47 @@ const InfoItem = ({
 const CollapsibleItem = ({
   title,
   disabled,
-  loading = false,
   rightOptions,
   children,
 }: PropsWithChildren<{
   title: string;
   disabled?: boolean;
-  loading?: boolean;
   rightOptions?: ReactNode;
 }>) => {
   const { theme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <SkeletonLoader loading={loading}>
-      <div
+    <div
+      className={clsx(
+        "w-full rounded border",
+        theme.bgInput,
+        theme.borderInput,
+      )}
+    >
+      <button
         className={clsx(
-          "w-full rounded border",
-          theme.bgInput,
+          "flex items-center justify-between w-full text-left p-6",
+          isOpen && "border-b rounded-t shadow-sm",
+          !isOpen && "rounded",
           theme.borderInput,
+          theme.textInput,
+          disabled && "cursor-not-allowed opacity-50",
         )}
+        disabled={disabled}
+        onClick={() => setIsOpen(!isOpen)}
       >
-        <button
-          className={clsx(
-            "flex items-center justify-between w-full text-left p-6",
-            isOpen && "border-b rounded-t shadow-sm",
-            !isOpen && "rounded",
-            theme.borderInput,
-            theme.textInput,
-            disabled && "cursor-not-allowed opacity-50",
-          )}
-          disabled={disabled}
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <div className="flex items-center flex-grow gap-2">
-            {isOpen && <ChevronDownIcon className="h-4 w-4" />}
-            {!isOpen && <ChevronRightIcon className="h-4 w-4" />}
-            <div className="font-medium text-sm">{title}</div>
-          </div>
+        <div className="flex items-center flex-grow gap-2">
+          {isOpen && <ChevronDownIcon className="h-4 w-4" />}
+          {!isOpen && <ChevronRightIcon className="h-4 w-4" />}
+          <div className="font-medium text-sm">{title}</div>
+        </div>
 
-          <div className="flex justify-end gap-4">{rightOptions}</div>
-        </button>
+        <div className="flex justify-end gap-4">{rightOptions}</div>
+      </button>
 
-        {isOpen && <div className="px-6 pb-6 pt-4">{children}</div>}
-      </div>
-    </SkeletonLoader>
+      {isOpen && <div className="px-6 pb-6 pt-4">{children}</div>}
+    </div>
   );
 };
 
@@ -233,8 +229,6 @@ export const Component = () => {
 
         <CollapsibleItem
           title="Tests"
-          disabled={logs.isLoading}
-          loading={logs.isLoading}
           rightOptions={
             <div className="flex gap-2 text-xs">
               <div className="flex gap-0.5">
@@ -249,9 +243,9 @@ export const Component = () => {
           }
           children={
             <div className="text-2xs font-mono">
-              {logs.data?.tests.length === 0 && (
-                <div className={clsx(theme.text1, "w-full py-0.5")}>
-                  No build logs.
+              {(!logs.data || logs.data?.tests.length === 0) && (
+                <div className={clsx(theme.text2, "w-full py-0.5 text-center")}>
+                  No test logs.
                 </div>
               )}
               {logs.data?.tests.map((log, index) => (
@@ -272,12 +266,10 @@ export const Component = () => {
 
         <CollapsibleItem
           title="Build"
-          disabled={logs.isLoading}
-          loading={logs.isLoading}
           children={
             <div className="text-2xs font-mono">
-              {logs.data?.build.length === 0 && (
-                <div className={clsx(theme.text1, "w-full py-0.5")}>
+              {(!logs.data || logs.data?.build.length === 0) && (
+                <div className={clsx(theme.text2, "w-full py-0.5 text-center")}>
                   No build logs.
                 </div>
               )}
