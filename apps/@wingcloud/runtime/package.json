@@ -39,7 +39,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "projen dev",
+    "dev": "tsup --watch",
     "test": "vitest run",
     "default": "projen default",
     "compile": "projen compile",

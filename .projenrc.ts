@@ -46,6 +46,8 @@ const monorepo = new MonorepoProject({
   name: "@wingcloud/monorepo",
 });
 
+monorepo.devTask.reset("turbo dev --concurrency 12");
+
 ///////////////////////////////////////////////////////////////////////////////
 const wrpc = new TypescriptProject({
   monorepo,
@@ -203,8 +205,6 @@ runtime.addDevDeps("msw");
 runtime.addDevDeps("@types/which");
 
 runtime.addGitIgnore("target/");
-
-runtime.devTask.exec("tsup --watch --onSuccess 'node lib/entrypoint-local.js'");
 
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
