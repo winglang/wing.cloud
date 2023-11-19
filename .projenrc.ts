@@ -8,13 +8,46 @@ import {
   Turbo,
 } from "@skyrpex/wingen";
 
-const winglangVersion = "^0.47.7";
+///////////////////////////////////////////////////////////////////////////////
+interface WingLibProjectOptions {
+  readonly monorepo: MonorepoProject;
+  readonly name: string;
+  readonly outdir?: string;
+  readonly deps?: string[];
+  readonly devDeps?: string[];
+  readonly typescript?: boolean;
+}
+
+class WingLibProject extends NodeProject {
+  constructor(options: WingLibProjectOptions) {
+    super({
+      outdir: `packages/${options.name}`,
+      ...options,
+      parent: options.monorepo,
+    });
+
+    this.addFields({
+      type: "module",
+    });
+
+    if (options.typescript) {
+      new TypescriptConfig(this, {
+        include: ["src/**/*"],
+      });
+    }
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+const winglangVersion = "^0.48.1";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
   devDeps: ["@skyrpex/wingen"],
   name: "@wingcloud/monorepo",
 });
+
+monorepo.devTask.reset("turbo dev --concurrency 12");
 
 ///////////////////////////////////////////////////////////////////////////////
 const wrpc = new TypescriptProject({
@@ -26,6 +59,41 @@ const wrpc = new TypescriptProject({
 wrpc
   .tryFindObjectFile("tsconfig.json")!
   .addToArray("compilerOptions.lib", "DOM", "DOM.Iterable");
+
+///////////////////////////////////////////////////////////////////////////////
+const probot = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/probot",
+  devDeps: ["@probot/adapter-aws-lambda-serverless"],
+  typescript: true,
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const nanoid = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/nanoid",
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const simutils = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/simutils",
+  deps: ["get-port"],
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const ngrok = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/ngrok",
+  deps: [simutils.name],
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const containers = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/containers",
+  devDeps: [nanoid.name],
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 const vite = new NodeEsmProject({
@@ -55,14 +123,10 @@ new Turbo(website, {
       dotEnv: [".env"],
       outputs: ["dist/**"],
     },
-    dev: {
-      dependsOn: ["^compile"],
-    },
   },
 });
 
 website.addDeps("vite");
-website.addScript("dev", "vite dev");
 website.addScript("compile", "vite build");
 website.addGitIgnore("/dist/");
 website.addGitIgnore("/public/wing.js");
@@ -139,8 +203,6 @@ runtime.addDevDeps("@types/which");
 
 runtime.addGitIgnore("target/");
 
-runtime.devTask.exec("tsup --watch --onSuccess 'node lib/entrypoint-local.js'");
-
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
   monorepo,
@@ -162,7 +224,7 @@ infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
 infrastructure.addTask("test-aws", {
   exec: "node ./bin/wing.mjs test -t tf-aws main.w",
 });
-infrastructure.compileTask.exec("node ./bin/wing.mjs compile -t tf-aws");
+infrastructure.compileTask.exec("node ./bin/wing.mjs compile main.w -t tf-aws");
 
 const terraformInitTask = infrastructure.addTask("terraformInit");
 terraformInitTask.exec(
@@ -182,15 +244,18 @@ deployTask.exec(
 new Turbo(infrastructure, {
   pipeline: {
     [terraformInitTask.name]: {
+      dependsOn: ["compile"],
       inputs: ["package.json"],
       outputs: [
         "target/main.tfaws/.terraform/**",
         "target/main.tfaws/.terraform.lock.hcl",
       ],
+      cache: false,
     },
     compile: {
-      dependsOn: ["^compile", terraformInitTask.name],
+      dependsOn: ["^compile"],
       dotEnv: [".env"],
+      inputs: ["!target/**"],
       outputs: [
         "target/main.tfaws/**",
         "!target/main.tfaws/.terraform.lock.hcl",
@@ -201,7 +266,7 @@ new Turbo(infrastructure, {
       ],
     },
     [planTask.name]: {
-      dependsOn: ["compile"],
+      dependsOn: ["compile", terraformInitTask.name],
       // outputs: ["target/main.tfaws/tfplan"],
       cache: false,
     },
@@ -232,6 +297,15 @@ infrastructure.addDevDeps("@types/jsonwebtoken");
 infrastructure.addDevDeps("@types/express");
 
 infrastructure.addDeps("glob");
+
+infrastructure.addDeps(
+  probot.name,
+  containers.name,
+  nanoid.name,
+  simutils.name,
+  ngrok.name,
+);
+infrastructure.addScript("example", "node ./bin/wing.mjs it example.main.w");
 
 infrastructure.addDeps(
   "constructs",

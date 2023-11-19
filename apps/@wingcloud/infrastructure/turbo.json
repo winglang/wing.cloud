@@ -5,21 +5,27 @@
   ],
   "pipeline": {
     "terraformInit": {
+      "dependsOn": [
+        "compile"
+      ],
       "inputs": [
         "package.json"
       ],
       "outputs": [
         "target/main.tfaws/.terraform/**",
         "target/main.tfaws/.terraform.lock.hcl"
-      ]
+      ],
+      "cache": false
     },
     "compile": {
       "dependsOn": [
-        "^compile",
-        "terraformInit"
+        "^compile"
       ],
       "dotEnv": [
         ".env"
+      ],
+      "inputs": [
+        "!target/**"
       ],
       "outputs": [
         "target/main.tfaws/**",
@@ -32,7 +38,8 @@
     },
     "plan": {
       "dependsOn": [
-        "compile"
+        "compile",
+        "terraformInit"
       ],
       "cache": false
     },
