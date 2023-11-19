@@ -13,7 +13,7 @@
     "jwk-to-pem": "^2.0.5",
     "node-fetch": "^3.3.2",
     "which": "^4.0.0",
-    "winglang": "^0.48.1"
+    "winglang": "^0.48.6"
   },
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.329",
