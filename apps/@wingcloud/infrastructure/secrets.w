@@ -1,5 +1,4 @@
 bring ex;
-bring "./nanoid62.w" as nanoid62;
 bring "./crypto/crypto.w" as crypto;
 bring "./crypto/icrypto.w" as icrypto;
 
@@ -64,7 +63,7 @@ pub class Secrets {
   pub inflight create(options: CreateSecretOptions): Secret {
     let createdAt = datetime.utcNow().toIso();
     let secret = Secret {
-      id: "secret_${nanoid62.Nanoid62.generate()}",
+      id: options.name,
       appId: options.appId,
       environmentType: options.environmentType,
       name: options.name,

@@ -4,7 +4,7 @@ import {
   EyeSlashIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { Button } from "../../../design-system/button.js";
 import { useNotifications } from "../../../design-system/notification.js";
@@ -15,7 +15,13 @@ import type { Secret } from "../../../utils/wrpc.js";
 
 const EmptySecret = "•••••••••••••••";
 
-export const SecretsListItem = ({ secret }: { secret: Secret }) => {
+export const SecretsListItem = ({
+  secret,
+  setUpdatingSecrets,
+}: {
+  secret: Secret;
+  setUpdatingSecrets: (value: boolean) => void;
+}) => {
   const { theme } = useTheme();
   const { showNotification } = useNotifications();
   const [loading, setLoading] = useState(false);
@@ -25,7 +31,6 @@ export const SecretsListItem = ({ secret }: { secret: Secret }) => {
 
   const decryptSecret = useCallback(async () => {
     try {
-      setLoading(true);
       const { value } = await decryptSecretMutation.mutateAsync({
         appId: secret.appId,
         environmentType: secret.environmentType,
@@ -39,8 +44,6 @@ export const SecretsListItem = ({ secret }: { secret: Secret }) => {
           type: "error",
         });
       }
-    } finally {
-      setLoading(false);
     }
   }, [secret?.id, decryptSecretMutation]);
 
@@ -49,11 +52,13 @@ export const SecretsListItem = ({ secret }: { secret: Secret }) => {
   const deleteSecret = useCallback(async () => {
     try {
       setLoading(true);
+      setUpdatingSecrets(true);
       await deleteSecretMutation.mutateAsync({
         appId: secret.appId,
         environmentType: secret.environmentType,
         secretId: secret.id,
       });
+      showNotification("Secret deleted");
     } catch (error) {
       if (error instanceof Error) {
         showNotification("Failed to delete secret", {
@@ -63,6 +68,7 @@ export const SecretsListItem = ({ secret }: { secret: Secret }) => {
       }
     } finally {
       setLoading(false);
+      setUpdatingSecrets(false);
     }
   }, [secret?.id, deleteSecretMutation]);
 
@@ -72,7 +78,7 @@ export const SecretsListItem = ({ secret }: { secret: Secret }) => {
     <div className="text-xs flex truncate items-center gap-4">
       <LockClosedIcon className={clsx("w-5 h-5 rounded-full", theme.text2)} />
 
-      <div className="flex flex-col gap-2 truncate w-1/3">
+      <div className="flex flex-col gap-2 truncate w-1/2">
         <span className="text-xs space-x-2 truncate flex flex-grow">
           {secret.name}
         </span>
@@ -88,7 +94,7 @@ export const SecretsListItem = ({ secret }: { secret: Secret }) => {
         </div>
       </div>
 
-      <div className="flex grow text-xs gap-x-2 truncate items-center justify-center">
+      <div className="flex grow text-xs gap-x-2 truncate items-center justify-start">
         {secretValue === EmptySecret ? (
           <EyeIcon
             onClick={decryptSecret}

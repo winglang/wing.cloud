@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useState, useMemo } from "react";
 
 import { SpinnerLoader } from "../../../components/spinner-loader.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
@@ -16,17 +17,43 @@ export const SecretsList = ({
   secrets: Secret[];
   loading: boolean;
 }) => {
+  const [updatingSecrets, setUpdatingSecrets] = useState(false);
   const { theme } = useTheme();
+  const groupedSecrets = useMemo(() => {
+    const groups: Map<string, Secret[]> = new Map();
+    for (let secret of secrets) {
+      if (!groups.has(secret.environmentType)) {
+        groups.set(secret.environmentType, []);
+      }
+
+      groups.get(secret.environmentType)?.push(secret);
+    }
+
+    return [...groups.entries()];
+  }, [secrets]);
+
   return (
     <div className="flex flex-col bg-white rounded p-4 shadow gap-2">
       <div className={clsx("truncate", theme.text1)}>Secrets</div>
       <div className="flex flex-col gap-6">
-        <NewSecret appId={app.appId} />
+        <NewSecret appId={app.appId} setUpdatingSecrets={setUpdatingSecrets} />
         <div className="w-full flex flex-col gap-2">
-          {loading && <SpinnerLoader size="sm" className="z-20" />}
-          {secrets.map((secret) => (
-            <SecretsListItem key={secret.id} secret={secret} />
-          ))}
+          {(loading || updatingSecrets) && (
+            <SpinnerLoader size="sm" className="z-20" />
+          )}
+          {!loading &&
+            groupedSecrets.map((group) => (
+              <div className="w-full flex flex-col gap-2" key={group[0]}>
+                <div className="capitalize">{group[0]}</div>
+                {group[1].map((secret, index) => (
+                  <SecretsListItem
+                    key={index}
+                    secret={secret}
+                    setUpdatingSecrets={setUpdatingSecrets}
+                  />
+                ))}
+              </div>
+            ))}
         </div>
       </div>
       <hr className="h-px mt-2 mb-4 bg-gray-200 border-0 dark:bg-gray-700" />

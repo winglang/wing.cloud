@@ -15,10 +15,16 @@ const environmentTypes = [
   { value: "preview", label: "preview" },
 ];
 
-export const NewSecret = ({ appId }: { appId: string }) => {
+export const NewSecret = ({
+  appId,
+  setUpdatingSecrets,
+}: {
+  appId: string;
+  setUpdatingSecrets: (value: boolean) => void;
+}) => {
   const { theme } = useTheme();
   const { showNotification } = useNotifications();
-  const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [environmentType, setEnvironmentType] = useState<EnvironmentType>();
   const [name, setName] = useState("");
   const [value, setValue] = useState("");
@@ -27,7 +33,8 @@ export const NewSecret = ({ appId }: { appId: string }) => {
 
   const create = useCallback(async () => {
     try {
-      setLoading(true);
+      setCreating(true);
+      setUpdatingSecrets(true);
       await createMutation.mutateAsync({
         appId,
         environmentType: environmentType!,
@@ -39,50 +46,55 @@ export const NewSecret = ({ appId }: { appId: string }) => {
       // eslint-disable-next-line unicorn/no-useless-undefined
       setEnvironmentType(undefined);
       showNotification("Secret created");
-      setLoading(false);
+      setCreating(false);
     } catch (error) {
-      setLoading(false);
+      setCreating(false);
       if (error instanceof Error) {
         showNotification("Failed to create secret", {
           body: error.message,
           type: "error",
         });
       }
+    } finally {
+      setUpdatingSecrets(false);
     }
   }, [name, value, environmentType, createMutation]);
+
+  const isSaveDisabled = useMemo(() => {
+    return creating || !name || !value || !environmentType;
+  }, [creating, name, value, environmentType]);
 
   return (
     <div className={clsx("bg-white rounded text-left w-full block")}>
       <div className="flex grow items-center gap-x-4">
-        <div className="flex flex-col text-xs w-1/3">
+        <div className="flex flex-col text-xs w-1/3 gap-2">
           <span>Key</span>
           <Input
             type="text"
             value={name}
             placeholder="e.g. API_KEY"
             onChange={(evt) => setName(evt.currentTarget.value)}
-            className="mt-2 w-full"
+            className="w-full"
           />
         </div>
 
-        <div className="flex flex-col text-xs w-1/3">
+        <div className="flex flex-col text-xs w-1/3 gap-2">
           <span>Value</span>
           <Input
             type="text"
             value={value}
             onChange={(evt) => setValue(evt.currentTarget.value)}
-            className="mt-2 w-full"
+            className="w-full"
           />
         </div>
 
-        <div className="flex flex-col text-xs w-1/3">
+        <div className="flex flex-col text-xs w-1/3 gap-2">
           <span>Type</span>
           <Select
             value={environmentType || ""}
             items={environmentTypes}
             placeholder="Select an option"
             onChange={(value) => setEnvironmentType(value as EnvironmentType)}
-            className="mt-2"
             renderItem={(item) => {
               return (
                 <div className="flex items-center gap-2">
@@ -96,7 +108,11 @@ export const NewSecret = ({ appId }: { appId: string }) => {
 
         <div className="self-end">
           <div className="flex flex-col justify-between gap-3 h-full items-end">
-            <Button className="truncate" onClick={create} disabled={loading}>
+            <Button
+              className="truncate"
+              onClick={create}
+              disabled={isSaveDisabled}
+            >
               Save
             </Button>
           </div>
