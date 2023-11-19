@@ -6,6 +6,21 @@ pub interface Process {
 	inflight kill(): void;
 }
 
+pub interface Buffer {
+  toString(): str;
+}
+
+pub struct SyncProcess {
+	status: num?;
+  stdout: Buffer;
+  stderr: Buffer;
+}
+
+pub struct SpawnSyncOptions {
+	cwd: str?;
+	env: Map<str>?;
+}
+
 pub struct ServiceProps {
 	cwd: str?;
 	env: Map<str>?;
@@ -37,7 +52,26 @@ pub class Service {
 			};
 		});
 	}
-	extern "./index.js" static inflight spawn(file: str, args: Array<str>, props: ServiceProps?): Process;
+  static mergeEnv(env: Map<str>): Map<str> {
+    let commonEnv = MutMap<str>{
+			"HOME" => util.env("HOME"),
+			"PATH" => util.env("PATH"),
+		};
+    for key in env.keys() {
+      commonEnv.set(key, env.get(key));
+    }
+    return commonEnv.copy();
+  }
+  pub static spawnSync(file: str, args: Array<str>, options: SpawnSyncOptions?): SyncProcess {
+    return Service.spawnSync_(
+      file,
+      args,
+      cwd: options?.cwd,
+      env: Service.mergeEnv(options?.env ?? {}),
+    );
+  }
+	extern "./index.js" static inflight spawn(file: str, args: Array<str>, options: ServiceProps?): Process;
+	extern "./spawn-sync.cjs" static spawnSync_(file: str, args: Array<str>, options: SpawnSyncOptions?): SyncProcess;
 }
 
 pub class Port {

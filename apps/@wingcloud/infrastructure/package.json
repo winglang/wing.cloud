@@ -18,6 +18,7 @@
     "@wingcloud/ngrok": "workspace:^",
     "@wingcloud/probot": "workspace:^",
     "@wingcloud/simutils": "workspace:^",
+    "@wingcloud/vite": "workspace:^",
     "cdktf": "^0.19.1",
     "constructs": "^10.3.0",
     "cookie": "^0.6.0",

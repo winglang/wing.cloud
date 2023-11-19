@@ -96,14 +96,14 @@ const containers = new WingLibProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-const vite = new NodeEsmProject({
+const vite = new WingLibProject({
   monorepo,
   name: "@wingcloud/vite",
+  deps: ["vite", simutils.name],
 });
-vite.addFields({ types: "./src/index.d.ts" });
-
-vite.addDevDeps("vite");
-vite.addDeps("dotenv");
+vite.addFields({
+  bin: { "wingcloud-vite": "./bin/wingcloud-vite.js" },
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
@@ -126,8 +126,7 @@ new Turbo(website, {
   },
 });
 
-website.addDeps("vite");
-website.addScript("compile", "vite build");
+website.addDevDeps("vite");
 website.addGitIgnore("/dist/");
 website.addGitIgnore("/public/wing.js");
 
@@ -136,8 +135,6 @@ website.addDeps("react", "react-dom");
 website.addDevDeps("@types/react", "@types/react-dom");
 
 website.addDeps("react-router-dom");
-
-website.addDevDeps(vite.name);
 
 website.addDevDeps("tsx", "get-port", "zod");
 website.addDeps(wrpc.name);
@@ -315,6 +312,7 @@ infrastructure.addDeps(
   nanoid.name,
   simutils.name,
   ngrok.name,
+  vite.name,
 );
 infrastructure.addScript("example", "node ./bin/wing.mjs it example.main.w");
 

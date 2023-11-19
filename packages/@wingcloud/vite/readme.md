@@ -1,23 +1,18 @@
 # `@wingcloud/vite`
 
-Vite plugin for Wing Cloud. Features:
-
-- Generates type definitions based on the `.env.example` file
+Vite package for Wing.
 
 ## Usage
 
-Add the integration to `vite.config.ts`:
+```
+being "@wingcloud/vite" as vite;
 
-```ts
-import wingcloud from "@wingcloud/vite";
-import { defineConfig } from "vite";
-
-export default defineConfig({
-  plugins: [...wingcloud()],
-});
+let website = new vite.Vite(
+  root: "../website",
+);
 ```
 
-Configure TypeScript to use the generated types:
+Configure TypeScript to use the generated types in your `website` project:
 
 ```json
 {

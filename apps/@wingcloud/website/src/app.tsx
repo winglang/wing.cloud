@@ -7,15 +7,14 @@ import { NotificationsProvider } from "./design-system/notification.js";
 import { DefaultTheme, ThemeProvider } from "./design-system/theme-provider.js";
 import { router } from "./router.jsx";
 
-const API_URL = new URL(location.origin);
-API_URL.pathname = "/wrpc";
+const API_URL = import.meta.env["VITE_API_URL"];
 
 export const App = () => {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
     <QueryClientProvider client={queryClient}>
-      <WRPCProvider value={{ url: API_URL.toString() }}>
+      <WRPCProvider value={{ url: API_URL }}>
         <ThemeProvider mode="light" theme={DefaultTheme}>
           <NotificationsProvider>
             <RouterProvider router={router} />
