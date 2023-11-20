@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import { simulator, cloud } from "@winglang/sdk";
 import { type ApiSchema } from "@winglang/sdk/lib/target-sim/schema-resources.js";
+
 import { handler } from "./index.js";
 
 const start = async () => {
@@ -18,9 +19,7 @@ const start = async () => {
   const logsBucket = sim.getResource(
     "root/Default/runtime.RuntimeService/deployment logs",
   ) as cloud.IBucketClient;
-  const config = sim.getResourceConfig(
-    "root/Default/cloud.Api",
-  ) as ApiSchema;
+  const config = sim.getResourceConfig("root/Default/cloud.Api") as ApiSchema;
   await handler({ logsBucket, wingApiUrl: config.attrs.url });
 };
 

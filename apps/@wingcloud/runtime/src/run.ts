@@ -9,6 +9,7 @@ import { Executer } from "./executer.js";
 import { useReportStatus } from "./report-status.js";
 import { Setup } from "./setup.js";
 import { fileBucketSync } from "./storage/file-bucket-sync.js";
+import { createEndpoints } from "./wing/endpoints.js";
 import { startServer } from "./wing/server.js";
 
 export interface RunProps {
@@ -40,12 +41,10 @@ export const run = async function ({ context, requestedPort }: RunProps) {
       e,
       context,
     }).setup();
-    
-    if (testResults) {
-      await report("tests", { testResults });
-    } else {
-      await report("error", { message: "failed to run tests" });
-    }
+
+    await (testResults
+      ? report("tests", { testResults })
+      : report("error", { message: "failed to run tests" }));
 
     const { port, close } = await startServer({
       consolePath: paths["@wingconsole/app"],
@@ -54,6 +53,9 @@ export const run = async function ({ context, requestedPort }: RunProps) {
       keyStore,
       requestedPort,
     });
+
+    const endpoints = await createEndpoints({ port });
+    await report("endpoints", { endpoints });
 
     await report("running");
 
@@ -74,7 +76,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
     );
     await report("error", { message: error.toString() });
     cancelFileSync?.();
-    
+
     throw error;
   }
 };

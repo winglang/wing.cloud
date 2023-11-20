@@ -13,6 +13,7 @@ export type EnvironmentStatus =
   | "deploying"
   | "tests"
   | "running"
+  | "endpoints"
   | "error"
   | "stopped";
 
@@ -24,7 +25,11 @@ export function useReportStatus(
     status: EnvironmentStatus,
     payload?: Record<string, any>,
   ) {
-    console.log("updating status for environment", status, context.environment.id);
+    console.log(
+      "updating status for environment",
+      status,
+      context.environment.id,
+    );
     const data: ReportEnvironmentStatusInput = {
       environmentId: context.environment.id,
       status,

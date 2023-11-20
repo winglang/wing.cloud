@@ -183,6 +183,8 @@ const runtime = new TypescriptProject({
   },
 });
 
+runtime.devTask.exec(`tsup --watch --onSuccess "node lib/entrypoint-local.js"`);
+
 runtime.addDeps(`winglang@${winglangVersion}`);
 runtime.addDeps(`@winglang/sdk@${winglangVersion}`);
 runtime.addDeps(`@winglang/compiler@${winglangVersion}`);
@@ -193,6 +195,7 @@ runtime.addDeps("jwk-to-pem");
 runtime.addDeps("jose");
 runtime.addDeps("node-fetch");
 runtime.addDeps("which");
+runtime.addDeps("ngrok");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/jsonwebtoken");
