@@ -60,6 +60,11 @@ struct UpdateEnvironmentTestResultsOptions {
 }
 
 struct GetEnvironmentOptions {
+  id: str;
+}
+
+struct GetEnvironmentByBranchOptions {
+  appId: str;
   branch: str;
 }
 
@@ -138,15 +143,7 @@ pub class Environments {
         put: {
           item: makeItem(
             pk: "APP#${environment.appId}",
-            sk: "ENVIRONMENT#${environment.id}"
-          ),
-        },
-      },
-      {
-        put: {
-          item: makeItem(
-            pk: "BRANCH#${environment.branch}",
-            sk: "ENVIRONMENT#${environment.id}"
+            sk: "BRANCH#${environment.branch}"
           ),
         },
       },
@@ -314,7 +311,7 @@ pub class Environments {
   pub inflight get(options: GetEnvironmentOptions): Environment {
     let result = this.table.getItem(
       key: {
-        pk: "BRANCH#${options.branch}",
+        pk: "ENVIRONMENT#${options.id}",
         sk: "#",
       },
     );
@@ -339,6 +336,36 @@ pub class Environments {
     }
 
     throw "Environment [${options.id}] not found";
+  }
+
+  pub inflight getByBranch(options: GetEnvironmentByBranchOptions): Environment {
+    let result = this.table.getItem(
+      key: {
+        pk: "APP#${options.appId}",
+        sk: "BRANCH#${options.branch}",
+      },
+    );
+
+    if let item = result.item {
+      return {
+        id: item.get("id").asStr(),
+        appId: item.get("appId").asStr(),
+        type: item.get("type").asStr(),
+        repo: item.get("repo").asStr(),
+        branch: item.get("branch").asStr(),
+        status: item.get("status").asStr(),
+        installationId: item.get("installationId").asNum(),
+        prNumber: item.tryGet("prNumber")?.tryAsNum(),
+        prTitle: item.tryGet("prTitle")?.tryAsStr(),
+        url: item.tryGet("url")?.tryAsStr(),
+        commentId: item.tryGet("commentId")?.tryAsNum(),
+        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
+        createdAt: item.get("createdAt").asStr(),
+        updatedAt: item.get("updatedAt").asStr(),
+      };
+    }
+
+    throw "Environment [${options.branch}] not found";
   }
 
   pub inflight list(options: ListEnvironmentOptions): Array<Environment> {

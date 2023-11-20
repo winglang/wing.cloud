@@ -360,8 +360,17 @@ pub class Api {
     api.get("/wrpc/app.environment", inflight (request) => {
       let userId = getUserFromCookie(request);
 
-      let environment = props.environments.get(
-        id: request.query.get("environmentId"),
+      let appName = request.query.get("appName");
+      let branch = request.query.get("branch");
+
+      let appId = apps.getByName(
+        userId: userId,
+        appName: appName,
+      ).appId;
+
+      let environment = props.environments.getByBranch(
+        appId: appId,
+        branch: branch,
       );
 
       return {
@@ -488,7 +497,20 @@ pub class Api {
     api.get("/wrpc/app.environment.logs", inflight (request) => {
       let userId = getUserFromCookie(request);
 
-      let envId = request.query.get("environmentId");
+      let appName = request.query.get("appName");
+      let branch = request.query.get("branch");
+
+      let appId = apps.getByName(
+        userId: userId,
+        appName: appName,
+      ).appId;
+
+      let environment = props.environments.getByBranch(
+        appId: appId,
+        branch: branch,
+      );
+
+      let envId = environment.id;
 
       let buildMessages = logs.get("${envId}/deployment.log").split("\n");
       let buildLogs = MutArray<Log>[];

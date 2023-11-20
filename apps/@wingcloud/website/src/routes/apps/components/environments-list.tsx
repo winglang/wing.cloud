@@ -47,13 +47,24 @@ export const EnvironmentsList = ({
       )}
 
       {!loading && environments.length === 0 && (
-        <div className={clsx("text-center p-6 w-full", theme.bgInput)}>
-          <LinkIcon className="w-8 h-8 mx-auto text-slate-400" />
-          <h3 className="mt-2 text-sm font-semibold text-slate-900">
+        <div
+          className={clsx(
+            "text-center p-6 w-ful border",
+            theme.bgInput,
+            theme.borderInput,
+          )}
+        >
+          <LinkIcon className={clsx("w-8 h-8 mx-auto", theme.text2)} />
+          <h3 className={clsx("mt-2 text-sm font-semibold", theme.text1)}>
             No preview environments found.
           </h3>
 
-          <p className="mt-1 text-sm text-slate-500 flex gap-x-1 w-full justify-center">
+          <p
+            className={clsx(
+              "mt-1 text-sm flex gap-x-1 w-full justify-center",
+              theme.text2,
+            )}
+          >
             <span>Get started by</span>
             <a
               className="text-blue-600 hover:underline"

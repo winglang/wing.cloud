@@ -132,13 +132,13 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.environment": QueryProcedure<
-    { environmentId: string },
+    { appName: string; branch: string },
     {
       environment: Environment;
     }
   >;
   "app.environment.logs": QueryProcedure<
-    { environmentId: string },
+    { appName: string; branch: string },
     {
       build: Log[];
       tests: Log[];

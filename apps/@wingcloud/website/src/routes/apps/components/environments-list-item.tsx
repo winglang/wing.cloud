@@ -87,7 +87,7 @@ export const EnvironmentsListItem = ({
         <div className="flex justify-between items-center truncate grow">
           <div className="text-xs space-y-1 truncate">
             <Link
-              to={`/apps/${appName}/${environment.id}`}
+              to={`/apps/${appName}/${environment.branch}`}
               className={clsx(
                 "font-semibold truncate hover:underline",
                 theme.text1,
@@ -147,7 +147,7 @@ export const EnvironmentsListItem = ({
           <div className="flex gap-x-4 text-xs items-center justify-end">
             {linkEnabled && (
               <Link
-                to={`/apps/${appName}/${environment.id}/preview`}
+                to={`/apps/${appName}/${environment.branch}/preview`}
                 className={clsx("text-xs hover:underline ", theme.text1)}
               >
                 Visit Preview

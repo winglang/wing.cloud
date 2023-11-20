@@ -99,14 +99,16 @@ const CollapsibleItem = ({
 
 export const Component = () => {
   const { theme } = useTheme();
-  const { environmentId } = useParams();
+
+  const { appName, branch } = useParams();
 
   const environment = wrpc["app.environment"].useQuery(
     {
-      environmentId: environmentId!,
+      appName: appName!,
+      branch: branch!,
     },
     {
-      enabled: environmentId != undefined,
+      enabled: appName !== undefined && branch !== undefined,
       // TODO: query invalidation
       refetchInterval: 1000 * 10,
     },
@@ -114,10 +116,11 @@ export const Component = () => {
 
   const logs = wrpc["app.environment.logs"].useQuery(
     {
-      environmentId: environmentId!,
+      appName: appName!,
+      branch: branch!,
     },
     {
-      enabled: environmentId != undefined,
+      enabled: appName !== undefined && branch !== undefined,
       // TODO: query invalidation
       refetchInterval: 1000 * 10,
     },
