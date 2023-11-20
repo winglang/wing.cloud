@@ -170,7 +170,7 @@ export const SecretsList = ({ app }: { app: App }) => {
             ))}
         </div>
       </div>
-      <hr className="h-px mt-2 bg-gray-200 border-0 dark:bg-gray-700" />
+      <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
       <span className={clsx("text-xs truncate", theme.text2)}>
         Learn more about{" "}
         <a
