@@ -106,7 +106,7 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2
       winglang:
-        specifier: ^0.48.8
+        specifier: ^0.48.6
         version: 0.48.8(constructs@10.3.0)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
@@ -179,13 +179,13 @@ importers:
   apps/@wingcloud/runtime:
     dependencies:
       '@wingconsole/app':
-        specifier: ^0.48.8
+        specifier: ^0.48.6
         version: 0.48.8(constructs@10.2.70)
       '@winglang/compiler':
-        specifier: ^0.48.8
+        specifier: ^0.48.6
         version: 0.48.8(constructs@10.2.70)
       '@winglang/sdk':
-        specifier: ^0.48.8
+        specifier: ^0.48.6
         version: 0.48.8(constructs@10.2.70)
       express:
         specifier: ^4.18.2
@@ -206,7 +206,7 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0
       winglang:
-        specifier: ^0.48.8
+        specifier: ^0.48.6
         version: 0.48.8(constructs@10.2.70)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
