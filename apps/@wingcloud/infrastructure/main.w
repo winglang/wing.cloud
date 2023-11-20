@@ -89,20 +89,11 @@ let wingCloudApi = new wingcloud_api.Api(
   logs: bucketLogs,
 );
 
-// let websitePort = 5174;
-// let website = new ex.ReactApp(
-//   projectPath: "../website",
-//   startCommand: "pnpm vite --port ${websitePort}",
-//   buildCommand: "pnpm vite build",
-//   buildDir: "dist",
-//   localPort: websitePort,
-// );
-// reactAppPatch.ReactAppPatch.apply(website);
-
 let website = new vite.Vite(
   root: "../website",
   env: {
-    VITE_API_URL: api.url,
+    // VITE_API_URL: "${api.url}/wrpc",
+    VITE_API_URL: "/wrpc",
     VITE_GITHUB_APP_CLIENT_ID: util.env("BOT_GITHUB_CLIENT_ID"),
     VITE_GITHUB_APP_NAME: util.env("BOT_GITHUB_APP_NAME"),
   },
@@ -117,58 +108,58 @@ let probotApp = new probot.ProbotApp(
   environmentManager: environmentManager,
 );
 
-// let apiDomainName = (() => {
-//   if util.env("WING_TARGET") == "tf-aws" {
-//     // See https://github.com/winglang/wing/issues/4688.
-//     return cdktf.Fn.trimprefix(cdktf.Fn.trimsuffix(api.url, "/prod"), "https://");
-//   }
-//   return api.url;
-// })();
-// let subDomain = util.env("PROXY_SUBDOMAIN");
-// let zoneName = util.env("PROXY_ZONE_NAME");
-// //https://github.com/winglang/wing/issues/221
-// let origins = (() => {
-//   let originsArray = MutArray<cloudFront.Origin>[
-//     {
-//       pathPattern: "/wrpc/*",
-//       domainName: apiDomainName,
-//       originId: "wrpc",
-//       originPath: "/prod",
-//     },
-//   ];
-//   if util.env("WING_TARGET") == "sim" {
-//     originsArray.push({
-//       pathPattern: "",
-//       domainName: website.url.replace("https://", ""),
-//       originId: "website",
-//     });
-//   } else {
-//     originsArray.push({
-//       pathPattern: "/apps/*",
-//       domainName: website.url.replace("https://", ""),
-//       originId: "website",
-//     });
-//     originsArray.push({
-//       pathPattern: "",
-//       domainName: util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN,
-//       originId: "landingPage",
-//     });
-//   }
-//   return originsArray.copy();
-// })();
-// let proxy = new ReverseProxy.ReverseProxy(
-//   subDomain: subDomain,
-//   zoneName: zoneName,
-//   aliases: ["${subDomain}.${zoneName}"],
-//   origins: origins,
-//   port: (): num? => {
-//     if util.tryEnv("WING_IS_TEST") == "true" {
-//       return nil;
-//     } else {
-//       return 3900;
-//     }
-//   }()
-// );
+let apiDomainName = (() => {
+  if util.env("WING_TARGET") == "tf-aws" {
+    // See https://github.com/winglang/wing/issues/4688.
+    return cdktf.Fn.trimprefix(cdktf.Fn.trimsuffix(api.url, "/prod"), "https://");
+  }
+  return api.url;
+})();
+let subDomain = util.env("PROXY_SUBDOMAIN");
+let zoneName = util.env("PROXY_ZONE_NAME");
+//https://github.com/winglang/wing/issues/221
+let origins = (() => {
+  let originsArray = MutArray<cloudFront.Origin>[
+    {
+      pathPattern: "/wrpc/*",
+      domainName: apiDomainName,
+      originId: "wrpc",
+      originPath: "/prod",
+    },
+  ];
+  if util.env("WING_TARGET") == "sim" {
+    originsArray.push({
+      pathPattern: "",
+      domainName: website.url.replace("https://", ""),
+      originId: "website",
+    });
+  } else {
+    originsArray.push({
+      pathPattern: "/apps/*",
+      domainName: website.url.replace("https://", ""),
+      originId: "website",
+    });
+    originsArray.push({
+      pathPattern: "",
+      domainName: util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN,
+      originId: "landingPage",
+    });
+  }
+  return originsArray.copy();
+})();
+let proxy = new ReverseProxy.ReverseProxy(
+  subDomain: subDomain,
+  zoneName: zoneName,
+  aliases: ["${subDomain}.${zoneName}"],
+  origins: origins,
+  port: (): num? => {
+    if util.tryEnv("WING_IS_TEST") == "true" {
+      return nil;
+    } else {
+      return 3900;
+    }
+  }()
+);
 
 let var webhookUrl = probotApp.githubApp.webhookUrl;
 if util.tryEnv("WING_TARGET") == "sim" {
@@ -182,28 +173,28 @@ if util.tryEnv("WING_TARGET") == "sim" {
   webhookUrl = devNgrok.url;
 }
 
-// let updateGithubWebhook = inflight () => {
-//   probotApp.githubApp.updateWebhookUrl("${webhookUrl}/webhook");
-//   log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
-// };
+let updateGithubWebhook = inflight () => {
+  probotApp.githubApp.updateWebhookUrl("${webhookUrl}/webhook");
+  log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
+};
 
-// let deploy = new cloud.OnDeploy(updateGithubWebhook);
+let deploy = new cloud.OnDeploy(updateGithubWebhook);
 
-// bring "./tests/environments.w" as tests;
-// new tests.EnvironmentsTest(
-//   users: users,
-//   apps: apps,
-//   environments: environments,
-//   githubApp: probotApp.githubApp,
-//   updateGithubWebhook: updateGithubWebhook,
-//   appSecret: appSecret,
-//   wingCloudUrl: apiUrlParam,
-//   githubToken: util.tryEnv("TESTS_GITHUB_TOKEN"),
-//   githubOrg: util.tryEnv("TESTS_GITHUB_ORG"),
-//   githubUser: util.tryEnv("TESTS_GITHUB_USER"),
-// );
+bring "./tests/environments.w" as tests;
+new tests.EnvironmentsTest(
+  users: users,
+  apps: apps,
+  environments: environments,
+  githubApp: probotApp.githubApp,
+  updateGithubWebhook: updateGithubWebhook,
+  appSecret: appSecret,
+  wingCloudUrl: apiUrlParam,
+  githubToken: util.tryEnv("TESTS_GITHUB_TOKEN"),
+  githubOrg: util.tryEnv("TESTS_GITHUB_ORG"),
+  githubUser: util.tryEnv("TESTS_GITHUB_USER"),
+);
 
 new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: website.url) as "Website URL";
 new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
-// new cdktf.TerraformOutput(value: proxy.url) as "Proxy URL";
+new cdktf.TerraformOutput(value: proxy.url) as "Proxy URL";

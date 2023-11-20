@@ -85,6 +85,22 @@ pub class Api {
       return payload?.accessToken;
     };
 
+    api.get("/", inflight (request) => {
+      return {
+        body: {
+          message: "Status: OK",
+        },
+      };
+    });
+
+    api.get("/wrpc", inflight (request) => {
+      return {
+        body: {
+          message: "Status: OK",
+        },
+      };
+    });
+
     api.get("/wrpc/auth.check", inflight (request) => {
       if let payload = getJWTPayloadFromCookie(request) {
         // check if the user from the cookie is valid
@@ -386,7 +402,6 @@ pub class Api {
           secrets: prodSecrets.concat(previewSecrets)
         },
       };
-
     });
 
     api.post("/wrpc/app.decryptSecret", inflight (request) => {

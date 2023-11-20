@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.454.0",
-    "@cloudy-ts/eslint-plugin": "^0.0.331",
+    "@cloudy-ts/eslint-plugin": "^0.0.332",
     "@ibm/plex": "^6.3.0",
     "@types/node": "20",
     "@types/react": "^18.2.37",
