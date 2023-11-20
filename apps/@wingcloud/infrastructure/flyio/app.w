@@ -11,6 +11,7 @@ struct ICreateMachineProps {
   memoryMb: num?;
   env: Map<str>;
   port: num;
+  files: Array<client.File>?;
 }
 
 /**
@@ -94,6 +95,7 @@ inflight class App {
       region: props.region,
       memoryMb: props.memoryMb,
       env: props.env,
+      files: props.files,
     });
 
     this.props.client.waitForMachineState(
@@ -131,6 +133,10 @@ inflight class App {
 
   pub exists(): bool {
     return this.props.client.isAppExists(this.props.name);
+  }
+
+  pub addSecrets(secrets: Map<str>) {
+    this.props.client.createSecrets(this.props.name, secrets);
   }
 }
 

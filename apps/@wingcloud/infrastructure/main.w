@@ -67,6 +67,7 @@ let rntm = new runtime.RuntimeService(
 let environmentManager = new EnvironmentManager.EnvironmentManager(
   apps: apps,
   environments: environments,
+  secrets: secrets,
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
 );
