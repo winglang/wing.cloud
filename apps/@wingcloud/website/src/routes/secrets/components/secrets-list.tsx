@@ -127,9 +127,9 @@ export const SecretsList = ({ app }: { app: App }) => {
   return (
     <div className="flex flex-col bg-white rounded p-4 shadow gap-2">
       <div className={clsx("truncate", theme.text1)}>Secrets</div>
-      <div className="flex flex-col py-4">
+      <div className="flex flex-col">
         <NewSecret loading={updatingSecrets} onCreate={onCreate} />
-        <div className="w-full flex flex-col gap-2 relative">
+        <div className="w-full flex flex-col gap-2 relative py-4">
           {(loading || updatingSecrets) && (
             <div className="flex items-center justify-center absolute inset-0 z-10">
               <SpinnerLoader size="sm" className="z-20" />
