@@ -45,7 +45,6 @@ export const Layout = ({ children }: PropsWithChildren) => {
         {!authCheck?.isLoading && (
           <div
             className={clsx(
-              "transition-all",
               "w-full flex-grow overflow-auto",
               !fullWidthPage &&
                 "max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6 transition-all",
