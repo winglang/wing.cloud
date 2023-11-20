@@ -10,6 +10,7 @@ bring "./jwt.w" as JWT;
 bring "./apps.w" as Apps;
 bring "./users.w" as Users;
 bring "./environments.w" as Environments;
+bring "./secrets.w" as Secrets;
 bring "./lowkeys-map.w" as lowkeys;
 
 // TODO: https://github.com/winglang/wing/issues/3644
@@ -19,6 +20,7 @@ class Util {
 bring "./environment-manager.w" as EnvironmentManager;
 bring "./status-reports.w" as status_reports;
 bring "./probot-adapter.w" as adapter;
+bring "./octokit.w" as Octokit;
 
 struct ApiProps {
   api: cloud.Api;
@@ -26,10 +28,16 @@ struct ApiProps {
   users: Users.Users;
   environments: Environments.Environments;
   environmentManager: EnvironmentManager.EnvironmentManager;
+  secrets: Secrets.Secrets;
   probotAdapter: adapter.ProbotAdapter;
   githubAppClientId: str;
   githubAppClientSecret: str;
   appSecret: str;
+}
+
+struct EnvironmentAction {
+  type: str;
+  data: Json;
 }
 
 pub class Api {
@@ -358,6 +366,150 @@ pub class Api {
       };
     });
 
+    api.get("/wrpc/app.listSecrets", inflight (request) => {
+      let userId = getUserFromCookie(request);
+      let appId = request.query.get("appId");
+      let prodSecrets = props.secrets.list(appId: appId, environmentType: "production");
+      let previewSecrets = props.secrets.list(appId: appId, environmentType: "preview");
+
+      return {
+        body: {
+          secrets: prodSecrets.concat(previewSecrets)
+        },
+      };
+      
+    });
+
+    api.post("/wrpc/app.decryptSecret", inflight (request) => {
+      let userId = getUserFromCookie(request);
+      let input = Json.parse(request.body ?? "");
+      let appId = input.get("appId").asStr();
+      let secretId = input.get("secretId").asStr();
+      let environmentType = input.get("environmentType").asStr();
+
+      let secret = props.secrets.get(id: secretId, appId: appId, environmentType: environmentType, decryptValue: true);
+
+      return {
+        status: 200,
+        body: {
+          value: secret.value,
+        },
+      };
+    });
+
+    api.post("/wrpc/app.createSecret", inflight (request) => {
+      let userId = getUserFromCookie(request);
+      let input = Json.parse(request.body ?? "");
+      let appId = input.get("appId").asStr();
+      let environmentType = input.get("environmentType").asStr();
+      if environmentType != "production" && environmentType != "preview" {
+        return {
+          status: 400,
+          body: { error: "invalid environment type" }
+        };
+      }
+
+      let name = input.get("name").asStr();
+      if name == "" {
+        return {
+          status: 400,
+          body: { error: "invalid name" }
+        };
+      }
+
+      let value = input.get("value").asStr();
+      if value == "" {
+        return {
+          status: 400,
+          body: { error: "invalid value" }
+        };
+      }
+
+      let secret = props.secrets.create(appId: appId, environmentType: environmentType, name: name, value: value);
+
+      return {
+        status: 200,
+        body: {
+          secretId: secret.id
+        }
+      };
+    });
+
+    api.post("/wrpc/app.deleteSecret", inflight (request) => {
+      let userId = getUserFromCookie(request);
+      let input = Json.parse(request.body ?? "");
+      let appId = input.get("appId").asStr();
+      let environmentType = input.get("environmentType").asStr();
+      let secretId = input.get("secretId").asStr();
+
+      props.secrets.delete(id: secretId, appId: appId, environmentType: environmentType);
+
+      return {
+        status: 200,
+        body: {
+          secretId: secretId
+        }
+      };
+    });
+
+    api.get("/wrpc/app.listEntryfiles", inflight (request) => {
+      if let accessToken = getAccessTokenFromCookie(request) {
+        log("accessToken = ${accessToken}");
+
+        let owner = request.query.get("owner");
+        let repo = request.query.get("repo");
+        let defaultBranch = request.query.get("default_branch");
+
+        let octokit = Octokit.octokit(accessToken);
+        let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/${defaultBranch}");
+        let tree = octokit.git.getTree(owner: owner, repo: repo, tree_sha: ref.data.object.sha, recursive: "true");
+
+        let entryfiles = MutArray<str>[];
+        for item in tree.data.tree {
+          if let path = item.path {
+            if item.type == "blob" && path.endsWith("main.w") {
+              entryfiles.push(path);
+            }
+          }
+        }
+
+        return {
+          body: {
+            entryfiles: entryfiles.copy()
+          },
+        };
+      } else {
+        return {
+          status: 401,
+        };
+      }
+    });
+
+    api.post("/wrpc/app.updateEntryfile", inflight (request) => {
+      log("${Json.stringify(request)}");
+      let userId = getUserFromCookie(request);
+      let input = Json.parse(request.body ?? "");
+      let appId = input.get("appId").asStr();
+      let appName = input.get("appName").asStr();
+      let repoId = input.get("repoId").asStr();
+      let entryfile = input.get("entryfile").asStr();
+      apps.updateEntrypoint(appId: appId, appName: appName, repository: repoId, userId: userId, entryfile: entryfile);
+
+      let app = apps.get(appId: appId);
+      queue.push(Json.stringify(EnvironmentAction{ 
+        type: "restartAll",
+        data: EnvironmentManager.RestartAllEnvironmentOptions {
+          app: app,
+      }}));
+
+      return {
+        status: 200,
+        body: {
+          appId: appId,
+        },
+      };
+    });
+
     api.post("/wrpc/user.createApp", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
         let userId = getUserFromCookie(request);
@@ -394,19 +546,21 @@ pub class Api {
         );
 
         let installationId = num.fromStr(input.get("installationId").asStr());
-        queue.push(Json.stringify(EnvironmentManager.CreateEnvironmentOptions {
-          createEnvironment: {
-            branch: defaultBranch,
-            appId: app.appId,
-            type: "production",
-            prTitle: defaultBranch,
-            repo: repoId,
-            status: "initializing",
-            installationId: installationId,
-          },
-          app: app,
-          sha: commitData.sha,
-        }));
+        queue.push(Json.stringify(EnvironmentAction{ 
+          type: "create",
+          data: EnvironmentManager.CreateEnvironmentOptions {
+            createEnvironment: {
+              branch: defaultBranch,
+              appId: app.appId,
+              type: "production",
+              prTitle: defaultBranch,
+              repo: repoId,
+              status: "initializing",
+              installationId: installationId,
+            },
+            app: app,
+            sha: commitData.sha,
+        }}));
 
         return {
           body: {
@@ -448,14 +602,21 @@ pub class Api {
       };
     });
 
-    // queue for new apps environment
+    // queue for environment actions
     queue.setConsumer(inflight (event) => {
       try {
-        log("create new environment event: ${event}");
-        let createOptions = EnvironmentManager.CreateEnvironmentOptions.fromJson(Json.parse(event));
-        props.environmentManager.create(createOptions);
+        let action = EnvironmentAction.parseJson(event);
+        if action.type == "create" {
+          log("create new environment event: ${event}");
+          let createOptions = EnvironmentManager.CreateEnvironmentOptions.fromJson(action.data);
+          props.environmentManager.create(createOptions);
+        } elif action.type == "restartAll" {
+          log("restart all environments event: ${event}");
+          let restartAllOptions = EnvironmentManager.RestartAllEnvironmentOptions.fromJson(action.data);
+          props.environmentManager.restartAll(restartAllOptions);
+        }
       } catch err {
-        log("failed to create new environment ${err}");
+        log("failed to execute environment action ${err}");
       }
     });
   }

@@ -25,6 +25,10 @@ pub struct RestartEnvironmentOptions {
   sha: str;
 }
 
+pub struct RestartAllEnvironmentOptions {
+  app: apps.App;
+}
+
 pub struct StopEnvironmentOptions {
   environment: environments.Environment;
   app: apps.App;
@@ -92,6 +96,18 @@ pub class EnvironmentManager {
       sha: options.sha,
       token: tokenRes.data.token,
     );
+  }
+
+  pub inflight restartAll(options: RestartAllEnvironmentOptions) {
+    let environments = this.environments.list(appId: options.app.appId);
+    for environment in environments {
+      let octokit = this.auth(environment.installationId);
+      let owner = environment.repo.split("/").at(0);
+      let repo = environment.repo.split("/").at(1);
+      let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/${environment.branch}");
+
+      this.restart(app: options.app, environment: environment, sha: ref.data.object.sha);
+    }
   }
 
   pub inflight stop(options: StopEnvironmentOptions) {

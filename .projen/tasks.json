@@ -47,7 +47,7 @@
       "description": "Start the development task",
       "steps": [
         {
-          "exec": "turbo dev"
+          "exec": "turbo dev --concurrency 12"
         }
       ]
     },

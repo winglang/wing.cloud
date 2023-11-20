@@ -42,12 +42,7 @@
     },
     "dev": {
       "name": "dev",
-      "description": "Start the development task",
-      "steps": [
-        {
-          "exec": "tsup --watch --onSuccess 'node lib/entrypoint-local.js'"
-        }
-      ]
+      "description": "Start the development task"
     },
     "install": {
       "name": "install",
