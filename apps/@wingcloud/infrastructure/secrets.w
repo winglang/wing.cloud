@@ -1,5 +1,4 @@
 bring ex;
-bring "./nanoid62.w" as nanoid62;
 bring "./crypto/crypto.w" as crypto;
 bring "./crypto/icrypto.w" as icrypto;
 
@@ -38,6 +37,12 @@ pub struct ListSecretsOptions {
   decryptValues: bool?;
 }
 
+pub struct DeleteSecretOptions {
+  id: str;
+  appId: str;
+  environmentType: str;
+}
+
 pub class Secrets {
   pub table: ex.DynamodbTable;
   crypto: crypto.Crypto;
@@ -58,7 +63,7 @@ pub class Secrets {
   pub inflight create(options: CreateSecretOptions): Secret {
     let createdAt = datetime.utcNow().toIso();
     let secret = Secret {
-      id: "secret_${nanoid62.Nanoid62.generate()}",
+      id: options.name,
       appId: options.appId,
       environmentType: options.environmentType,
       name: options.name,
@@ -123,6 +128,18 @@ pub class Secrets {
     }
 
     return secrets.copy();
+  }
+
+  pub inflight delete(options: DeleteSecretOptions) {
+    let var secrets = MutArray<Secret>[];
+
+    // make sure secret exists
+    let item = this.get(id: options.id, appId: options.appId, environmentType: options.environmentType);
+
+    let res = this.table.deleteItem(key: {
+      pk: "APP#${item.appId}",
+      sk: "SECRET#TYPE#${item.environmentType}#SECRET#${item.id}",
+    });
   }
 
   inflight fromDB(item: Json, decryptValue: bool): Secret {

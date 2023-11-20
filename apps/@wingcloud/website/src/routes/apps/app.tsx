@@ -5,7 +5,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { Menu } from "../../design-system/menu.js";
-import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { GithubIcon } from "../../icons/github-icon.js";
 import { MenuIcon } from "../../icons/menu-icon.js";
@@ -23,7 +22,6 @@ export const Component = () => {
 
   const { appName } = useParams();
   const navigate = useNavigate();
-  const { showNotification } = useNotifications();
 
   const appQuery = wrpc["app.getByName"].useQuery({ appName: appName! });
 
@@ -63,22 +61,9 @@ export const Component = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const deleteAppMutation = wrpc["app.delete"].useMutation();
-  const deleteApp = useCallback(async () => {
-    try {
-      setLoading(true);
-      await deleteAppMutation.mutateAsync({ appId: app?.appId! });
-      navigate("/apps/");
-    } catch (error) {
-      setLoading(false);
-      if (error instanceof Error) {
-        showNotification("Failed to delete the app", {
-          body: error.message,
-          type: "error",
-        });
-      }
-    }
-  }, [app?.appId, deleteAppMutation]);
+  const goToSettings = useCallback(async () => {
+    navigate(`/apps/${app?.appName}/settings`);
+  }, [app?.appName]);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
@@ -126,6 +111,10 @@ export const Component = () => {
               <div className="flex flex-col justify-between gap-3 h-full items-end">
                 <Menu
                   items={[
+                    {
+                      label: "Settings",
+                      onClick: goToSettings,
+                    },
                     {
                       label: "Delete App",
                       onClick: () => setDeleteModalOpen(true),
