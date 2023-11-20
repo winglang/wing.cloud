@@ -27,7 +27,7 @@ While the *Wing Framework* covers the **development stage** in the application l
 * **Environment Type** - for v1.0 we have only *preview* and *production*.
 * **Branch** - a git repository branch. Each environment tracks a particular git branch.
 * **Preview** - a type of an ephemeral environment which can be deployed ad-hoc and cleaned up quickly.
-* **Platform** - a concrete implementation of the Wing Cloud Library (e.g. `tf-aws`, `awscdk`).
+* **Platform** - a concrete implementation of the Wing Cloud Library (e.g. `tf-aws`, `awscdk`). Wing Cloud 1.0 will support two platform types: `sim` (which is used for preview environment branches) and `cloudlet` (which is used for `main`).
 * **Entrypoint** - the name of the application entrypoint file (defaults to `main.w`).
 * **Team** - a billable account that owns applications and can be accessed by a set of users.
 * **User** - identified by a GitHub login
@@ -56,7 +56,7 @@ The focus of v1.0 of Wing Cloud is to optimize "time to value". In our case, it'
 High-level requirements:
 
 * Wing Cloud 1.0 *should support* Winglang and TypeScript as source languages
-* Wing Cloud 1.0 "time to value" (*from sign up to sample app in production*) will be under 1 minute.
+* Wing Cloud 1.0 "time to value" (*from sign up to sample app in production running on a cloudlet*) will be under 1 minute.
 * Wing Cloud 1.0 *should support* all the resources in the Wing SDK (the `cloud` library). 
 * Wing Cloud 1.0 should support all trusted libraries (`@winglibs`)
 * Wing Cloud 1.0 *should support* containerized workloads (`cloud.Workload`)
@@ -64,8 +64,9 @@ High-level requirements:
 * Wing Cloud 1.0 *should support* external SSL terminated endpoints with custom domains
 * Wing Cloud 1.0 should automatically create preview environments for all PRs
 * Wing Cloud 1.0 *should allow* interacting with all preview and production environments via a Wing Console experience
-* Wing Cloud 1.0 *will only support* a "free tier" designed for prototypes and simple apps.
+* Wing Cloud 1.0 *will only support* a "free tier" (cloudlet platform) designed for prototypes and simple apps.
 * Wing Cloud 1.0 *will allow* users to "join the waitlist" for a paid tier designed for production use cases.
+* Wing Cloud 1.0 will allow users to quickly setup and clone and get started to develop locally.
 ### Out of scope for v1.0
 
 The following is a list of future capabilities that we plan to implement at a later release:
@@ -107,6 +108,8 @@ P1: A text box will allow the user to specify the entrypoint and `main.w` will b
 
 P2: The UI will query GitHub and look for potential entrypoints (e.g. `main.w` files) and will give users the option to select the entrypoint. The selection will default to `main.w` or if there is only one possible entrypoint, it will be the selected option.
 
+If there are already pull request branches in For v1.0 there is no need to create preview environments for the existing pull requests.
+
 ### App name
 
 A default `name` for the app will also be proposed to the user based on the repository name (e.g. if the repository name is `eladb/my-app` then the proposed appid will be `my-app`). If the team already has an app with that name, then a suffix will be added (e.g. `my-app-2`).
@@ -120,7 +123,8 @@ When creating a new app, we will show the list of environments defined for this 
 The UI will show:
 
 1. PR branches are deployed to preview environments.
-2. `main` branch is deployed to a production environment.
+2. `main` branch is deployed to a production environment on top of cloudlet platform.
+
 
 ## Preview flow
 
@@ -129,6 +133,8 @@ A preview environment will be automatically created when a user submits a pull r
 P2: If the author of the PR is not a registered Wing Cloud user, Wing Cloud will add a comment to the PR instructing them to sign up. Once this user signs up, the preview environment will be created only after another commit is pushed to the repository (not ideal behavior but okay to get started).
 
 The environment will automatically be updated every time a commit is pushed to this branch.
+
+State and endpoints should be preserved across updates of preview environments.
 ### Preview environment inputs
 
 Users should be able to set the input values for preview environments. The same set of input values will apply to all preview environments created for this app.
@@ -161,13 +167,13 @@ The build, test and deployment status will be displayed and updated live in the 
 Each environment (both production and preview) will have a page in the Wing Cloud web app (e.g. https://wing.cloud/monadahq/hello/main). This page will include both the deployment status and console interaction for this environment:
 
 * **GitHub repository link** and the repository's description from GitHub
-* **Build logs**: a **streaming log** of the build, with errors highlighted and linkable to the relevant source code in GitHub.
+* **Build and deployment logs**: a **streaming log** of the build, with errors highlighted and linkable to the relevant source code in GitHub.
 * **Tests**: if tests were executed during builds (currently only for preview environments), a list of all the tests and their results, as well as logs captured for each test.
 * **Endpoints**: a list of public endpoints exposed by the application running in this environment.
-* **Console**: a fully functional Wing Console experience that can be used to interact with the application deployed into this environment (e.g. list the files in the bucket, invoke functions etc).
-* **Deployment Logs**: logs from the build and deployment process of this environment.
+* **Application Map**: a fully functional "Wing Console" experience that can be used to interact with the application deployed into this environment (e.g. list the files in the bucket, invoke functions etc).
 * **Runtime Logs**: live streaming of application logs (not related to tests). It should be possible to scroll back all the way to when the environment was created. For preview environments, this is every commit. For production environments, the logs should be retained across deployments.
 * **Checks**: the last status of all the `cloud.Check` resources in the application, as well as a way to run each test manually and view its logs and results.
+* **Clone locally**: a button that shows a command line to copy & paste into your terminal which will clone the repository and install the Wing toolchain locally for development.
 ## Configure flow
 
 Each app has a settings page with the following configuration:
@@ -177,7 +183,7 @@ Each app has a settings page with the following configuration:
 * **Environments** (initially this will always include an entry for preview environments and a single `main` environment). For each:
 	* **Enabled?**: whether the environment is enabled for automatic deployment
 	* **Tracking branch**: the branch being auto-deployed (defaults to `main`). Changing the tracking branch is P2.
-	* **Platform**: currently always `wcp` (Wing Cloud Platform).
+	* **Platform**: currently always `cloudlet` (the platform based on the stateful simulator)
 	* **Inputs**: a page where you can set the inputs for this environment (see next)
 * **Inputs**: for every "input" defined in the application defined in the application, a secure value must be supplied for each type of environment (preview, prod). If a value is missing for a certain input, a **warning** icon will be displayed next to the "Inputs" section as well as on the main view of the app.
 ## URLs
