@@ -96,25 +96,6 @@ pub class Api {
       throw "Unauthorized";
     });
 
-    api.post("/wrpc/auth.signout", inflight (request) => {
-      return {
-        headers: {
-          "Set-Cookie": Cookie.Cookie.serialize(
-            AUTH_COOKIE_NAME,
-            "",
-            {
-              httpOnly: true,
-              secure: true,
-              sameSite: "strict",
-              expires: 0,
-            },
-          ),
-        },
-        body: {
-        },
-      };
-    });
-
     api.get("/wrpc/github.callback", inflight (request) => {
       let code = request.query.get("code");
 
@@ -377,7 +358,7 @@ pub class Api {
           secrets: prodSecrets.concat(previewSecrets)
         },
       };
-      
+
     });
 
     api.post("/wrpc/app.decryptSecret", inflight (request) => {
@@ -496,7 +477,7 @@ pub class Api {
       apps.updateEntrypoint(appId: appId, appName: appName, repository: repoId, userId: userId, entryfile: entryfile);
 
       let app = apps.get(appId: appId);
-      queue.push(Json.stringify(EnvironmentAction{ 
+      queue.push(Json.stringify(EnvironmentAction{
         type: "restartAll",
         data: EnvironmentManager.RestartAllEnvironmentOptions {
           app: app,
@@ -546,7 +527,7 @@ pub class Api {
         );
 
         let installationId = num.fromStr(input.get("installationId").asStr());
-        queue.push(Json.stringify(EnvironmentAction{ 
+        queue.push(Json.stringify(EnvironmentAction{
           type: "create",
           data: EnvironmentManager.CreateEnvironmentOptions {
             createEnvironment: {
