@@ -10,10 +10,10 @@ import {
   type ReactNode,
   useState,
   type PropsWithChildren,
-  useEffect,
 } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 
+import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { SkeletonLoader } from "../../design-system/skeleton-loader.js";
 import { useTheme } from "../../design-system/theme-provider.js";
@@ -51,17 +51,23 @@ const InfoItem = ({
 };
 
 const CollapsibleItem = ({
+  id,
   title,
   disabled,
+  loading = false,
+  defaultOpen = false,
   rightOptions,
   children,
 }: PropsWithChildren<{
+  id?: string;
   title: string;
   disabled?: boolean;
+  loading?: boolean;
+  defaultOpen?: boolean;
   rightOptions?: ReactNode;
 }>) => {
   const { theme } = useTheme();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
     <div
@@ -72,6 +78,7 @@ const CollapsibleItem = ({
       )}
     >
       <button
+        id={id}
         className={clsx(
           "flex items-center justify-between w-full text-left p-6",
           isOpen && "border-b rounded-t shadow-sm",
@@ -92,7 +99,16 @@ const CollapsibleItem = ({
         <div className="flex justify-end gap-4">{rightOptions}</div>
       </button>
 
-      {isOpen && <div className="px-6 pb-6 pt-4">{children}</div>}
+      {isOpen && (
+        <div className="px-6 pb-6 pt-4">
+          {loading && (
+            <div className="flex items-center justify-center">
+              <SpinnerLoader size="sm" />
+            </div>
+          )}
+          {!loading && children}
+        </div>
+      )}
     </div>
   );
 };
@@ -100,7 +116,16 @@ const CollapsibleItem = ({
 export const Component = () => {
   const { theme } = useTheme();
 
+  const location = useLocation();
+
   const { appName, branch } = useParams();
+
+  const locationHash = useMemo(() => {
+    // url includes an ID with #
+    if (location.hash) {
+      return location.hash.slice(1);
+    }
+  }, [location.search]);
 
   const environment = wrpc["app.environment"].useQuery(
     {
@@ -233,7 +258,10 @@ export const Component = () => {
         </div>
 
         <CollapsibleItem
+          id="tests"
           title="Tests"
+          defaultOpen={locationHash === "tests"}
+          loading={logs.isLoading}
           rightOptions={
             <div className="flex gap-2 text-xs">
               <div className="flex gap-0.5">
@@ -271,6 +299,7 @@ export const Component = () => {
 
         <CollapsibleItem
           title="Deployment logs"
+          loading={logs.isLoading}
           children={
             <div className="text-2xs font-mono">
               {(!logs.data || logs.data?.build.length === 0) && (

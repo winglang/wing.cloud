@@ -129,12 +129,14 @@ export const EnvironmentsListItem = ({
               </div>
 
               {["passed", "failed"].includes(testStatus) && (
-                <div
+                <Link
+                  to={`/apps/${appName}/${environment.branch}/#tests`}
                   className={clsx(
                     "flex items-end gap-x-0.5",
                     "rounded-xl px-1 py-0.5",
                     "border",
                     theme.bg3,
+                    theme.bg3Hover,
                     theme.border3,
                   )}
                   title={`tests ${testStatus}`}
@@ -146,7 +148,7 @@ export const EnvironmentsListItem = ({
                   {testStatus === "failed" && (
                     <XCircleIcon className="w-4 h-4 text-red-500" />
                   )}
-                </div>
+                </Link>
               )}
             </div>
           </div>
