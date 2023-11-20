@@ -53,11 +53,11 @@ export const EnvironmentsListItem = ({
   const updatedAt = useTimeAgo(environment.updatedAt);
 
   const statusString = useMemo(() => {
-    if(status === "tests"){
-        return "Running Tests"
+    if (status === "tests") {
+      return "Running Tests";
     }
     return status.charAt(0).toUpperCase() + status.slice(1);
-  },[status]);
+  }, [status]);
 
   return (
     <div

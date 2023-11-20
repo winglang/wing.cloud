@@ -27,16 +27,30 @@ export const EnvironmentsList = ({
 
   const [search, setSearch] = useState("");
 
-  const filteredEnvs = useMemo(() => {
+  const productionEnvs = useMemo(() => {
     if (!environments) {
       return [];
     }
-    return environments.filter((env) =>
+    return environments.filter((env) => env.type === "production");
+  }, [environments, search]);
+
+  const previewEnvs = useMemo(() => {
+    if (!environments) {
+      return [];
+    }
+    return environments.filter((env) => env.type === "preview");
+  }, [environments, search]);
+
+  const filteredPreviewEnvs = useMemo(() => {
+    if (!previewEnvs) {
+      return [];
+    }
+    return previewEnvs.filter((env) =>
       `${env.prTitle}${env.branch}${env.status}`
         .toLocaleLowerCase()
         .includes(search.toLocaleLowerCase()),
     );
-  }, [environments, search]);
+  }, [previewEnvs, search]);
 
   return (
     <>
@@ -81,42 +95,67 @@ export const EnvironmentsList = ({
 
       {environments.length > 0 && (
         <div className="space-y-4">
+          {productionEnvs.length > 0 && (
+            <div className="space-y-2">
+              <div className={clsx("text-lg pt-2", theme.text1)}>
+                Production
+              </div>
+
+              {productionEnvs.map((environment) => (
+                <EnvironmentsListItem
+                  key={environment.id}
+                  appName={appName}
+                  environment={environment}
+                />
+              ))}
+            </div>
+          )}
+
           <div className="space-y-2">
             <div className={clsx("text-lg pt-2", theme.text1)}>
               Preview Environments
             </div>
 
-            <Input
-              type="text"
-              leftIcon={MagnifyingGlassIcon}
-              className="block w-full"
-              containerClassName="w-full"
-              name="search"
-              id="search"
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-              }}
-            />
+            {previewEnvs.length > 0 && (
+              <Input
+                type="text"
+                leftIcon={MagnifyingGlassIcon}
+                className="block w-full"
+                containerClassName="w-full"
+                name="search"
+                id="search"
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                }}
+              />
+            )}
+
+            {filteredPreviewEnvs.map((environment) => (
+              <EnvironmentsListItem
+                key={environment.id}
+                appName={appName}
+                environment={environment}
+              />
+            ))}
+
+            {filteredPreviewEnvs.length === 0 && (
+              <div
+                className={clsx(
+                  "p-4 w-full border text-center",
+                  theme.bgInput,
+                  theme.borderInput,
+                  theme.text1,
+                )}
+              >
+                <BranchIcon className="w-12 h-12 mx-auto text-gray-400" />
+                <h3 className="mt-2 text-sm font-semibold text-gray-900">
+                  No previews found.
+                </h3>
+              </div>
+            )}
           </div>
-
-          {filteredEnvs.map((environment) => (
-            <EnvironmentsListItem
-              key={environment.id}
-              appName={appName}
-              environment={environment}
-            />
-          ))}
-
-          {filteredEnvs.length === 0 && (
-            <div className="text-center">
-              <BranchIcon className="w-12 h-12 mx-auto text-gray-400" />
-              <h3 className="mt-2 text-sm font-semibold text-gray-900">
-                No previews found.
-              </h3>
-            </div>
-          )}
         </div>
       )}
     </>
