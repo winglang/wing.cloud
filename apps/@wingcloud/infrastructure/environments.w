@@ -60,12 +60,18 @@ struct UpdateEnvironmentTestResultsOptions {
 }
 
 struct GetEnvironmentOptions {
-  id: str;
+  branch: str;
 }
 
 struct ListEnvironmentOptions {
   appId: str;
 }
+
+struct MakeItemOptions {
+  pk: str;
+  sk: str;
+}
+
 
 pub class Environments {
   table: ex.DynamodbTable;
@@ -90,10 +96,10 @@ pub class Environments {
       updatedAt: createdAt,
     };
 
-    let getItem = (pk: str, sk: str) => {
+    let makeItem = (ops: MakeItemOptions) => {
       let item = MutJson {
-        pk: pk,
-        sk: sk,
+        pk: ops.pk,
+        sk: ops.sk,
         id: environment.id,
         appId: environment.appId,
         type: environment.type,
@@ -116,13 +122,32 @@ pub class Environments {
     this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: getItem("ENVIRONMENT#${environment.id}", "#"),
+          item: makeItem(pk: "ENVIRONMENT#${environment.id}", sk: "#"),
           conditionExpression: "attribute_not_exists(pk)"
         },
       },
       {
         put: {
-          item: getItem("APP#${environment.appId}", "ENVIRONMENT#${environment.id}"),
+          item: makeItem(
+            pk: "APP#${environment.appId}",
+            sk: "ENVIRONMENT#${environment.id}"
+          ),
+        },
+      },
+      {
+        put: {
+          item: makeItem(
+            pk: "APP#${environment.appId}",
+            sk: "ENVIRONMENT#${environment.id}"
+          ),
+        },
+      },
+      {
+        put: {
+          item: makeItem(
+            pk: "BRANCH#${environment.branch}",
+            sk: "ENVIRONMENT#${environment.id}"
+          ),
         },
       },
     ]);
@@ -289,7 +314,7 @@ pub class Environments {
   pub inflight get(options: GetEnvironmentOptions): Environment {
     let result = this.table.getItem(
       key: {
-        pk: "ENVIRONMENT#${options.id}",
+        pk: "BRANCH#${options.branch}",
         sk: "#",
       },
     );

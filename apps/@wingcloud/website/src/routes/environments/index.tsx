@@ -267,7 +267,7 @@ export const Component = () => {
         />
 
         <CollapsibleItem
-          title="Build"
+          title="Deployment logs"
           children={
             <div className="text-2xs font-mono">
               {(!logs.data || logs.data?.build.length === 0) && (
