@@ -109,7 +109,7 @@ export const GitRepoSelect = ({
 
       {loading && (
         <div className="p-6 w-full flex items-center justify-center">
-          <SpinnerLoader size="sm" />
+          <SpinnerLoader />
         </div>
       )}
       {!loading && filteredRepos.length === 0 && (

@@ -149,7 +149,7 @@ export const Component = () => {
                 <div
                   className={clsx("absolute inset-0 opacity-50", theme.bgInput)}
                 />
-                <SpinnerLoader size="sm" className="z-20" />
+                <SpinnerLoader className="z-20" />
               </div>
             )}
             <EnvironmentsList

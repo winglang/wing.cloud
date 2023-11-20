@@ -153,6 +153,10 @@ pub class Environments {
   }
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
+    let branch = this.get(
+      id: options.id,
+    ).branch;
+
     this.table.transactWriteItems(transactItems: [
       {
         update: {
@@ -178,6 +182,21 @@ pub class Environments {
           key: {
             pk: "APP#${options.appId}",
             sk: "ENVIRONMENT#${options.id}",
+          },
+          updateExpression: "SET #status = :status",
+          expressionAttributeNames: {
+            "#status": "status",
+          },
+          expressionAttributeValues: {
+            ":status": options.status,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#${options.appId}",
+            sk: "BRANCH#${branch}",
           },
           updateExpression: "SET #status = :status",
           expressionAttributeNames: {
@@ -192,6 +211,10 @@ pub class Environments {
   }
 
   pub inflight updateUrl(options: UpdateEnvironmentUrlOptions) {
+    let branch = this.get(
+      id: options.id,
+    ).branch;
+
     this.table.transactWriteItems(transactItems: [
       {
         update: {
@@ -217,6 +240,21 @@ pub class Environments {
           key: {
             pk: "APP#${options.appId}",
             sk: "ENVIRONMENT#${options.id}",
+          },
+          updateExpression: "SET #url = :url",
+          expressionAttributeNames: {
+            "#url": "url",
+          },
+          expressionAttributeValues: {
+            ":url": options.url,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#${options.appId}",
+            sk: "BRANCH#${branch}",
           },
           updateExpression: "SET #url = :url",
           expressionAttributeNames: {
@@ -231,6 +269,10 @@ pub class Environments {
   }
 
   pub inflight updateCommentId(options: UpdateEnvironmentCommentIdOptions) {
+    let branch = this.get(
+      id: options.id,
+    ).branch;
+
     this.table.transactWriteItems(transactItems: [
       {
         update: {
@@ -256,6 +298,21 @@ pub class Environments {
           key: {
             pk: "APP#${options.appId}",
             sk: "ENVIRONMENT#${options.id}",
+          },
+          updateExpression: "SET #commentId = :commentId",
+          expressionAttributeNames: {
+            "#commentId": "commentId",
+          },
+          expressionAttributeValues: {
+            ":commentId": options.commentId,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#${options.appId}",
+            sk: "BRANCH#${branch}",
           },
           updateExpression: "SET #commentId = :commentId",
           expressionAttributeNames: {
@@ -270,6 +327,10 @@ pub class Environments {
   }
 
   pub inflight updateTestResults(options: UpdateEnvironmentTestResultsOptions) {
+    let branch = this.get(
+      id: options.id,
+    ).branch;
+
     this.table.transactWriteItems(transactItems: [
       {
         update: {
@@ -305,6 +366,21 @@ pub class Environments {
           },
         }
       },
+      {
+        update: {
+          key: {
+            pk: "APP#${options.appId}",
+            sk: "BRANCH#${branch}",
+          },
+          updateExpression: "SET #testResults = :testResults",
+          expressionAttributeNames: {
+            "#testResults": "testResults",
+          },
+          expressionAttributeValues: {
+            ":testResults": options.testResults,
+          },
+        }
+      }
     ]);
   }
 
