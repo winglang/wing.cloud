@@ -147,16 +147,6 @@ export const Component = () => {
           <div className="flex flex-grow flex-col gap-4 sm:gap-6 truncate transition-all">
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 transition-all">
               <InfoItem
-                label="Environment"
-                loading={environment.isLoading}
-                value={
-                  <div className="rounded-lg px-2 py-0.5 capitalize bg-slate-100 dark:bg-slate-750 text-center truncate">
-                    {environment.data?.environment.type}
-                  </div>
-                }
-              />
-
-              <InfoItem
                 label="Branch"
                 loading={environment.isLoading}
                 value={
@@ -168,6 +158,16 @@ export const Component = () => {
                   >
                     {environment.data?.environment.branch}
                   </a>
+                }
+              />
+
+              <InfoItem
+                label="Environment"
+                loading={environment.isLoading}
+                value={
+                  <div className="rounded-lg px-2 py-0.5 capitalize bg-slate-100 dark:bg-slate-750 text-center truncate">
+                    {environment.data?.environment.type}
+                  </div>
                 }
               />
 
