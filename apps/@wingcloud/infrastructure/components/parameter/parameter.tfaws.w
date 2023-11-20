@@ -6,14 +6,16 @@ bring "@cdktf/provider-aws" as tfaws;
 pub class Parameter impl i.IParameter {
   extern "./parameter.tfaws.ts" pub static inflight fetchParameterValue(key: str): str;
   key: str;
+  arn: str;
 
   new(props: i.ParameterProps) {
-    this.key= "/wing-cloud/apps/config/staging/${props.name}";
-    new tfaws.ssmParameter.SsmParameter(
+    this.key = "/wing-cloud/apps/config/${props.name}";
+    let parameter = new tfaws.ssmParameter.SsmParameter(
       name: this.key,
       type: "String",
       value: props.value,
     );
+    this.arn = parameter.arn;
   }
 
   pub inflight get(): str {
@@ -25,7 +27,7 @@ pub class Parameter impl i.IParameter {
     if let host = aws.Function.from(host) {
       host.addPolicyStatements(aws.PolicyStatement {
         actions: ["ssm:GetParameter"],
-        resources: ["arn:aws:ssm:us-east-1:110379683389:parameter${this.key}"],
+        resources: [this.arn],
         effect: aws.Effect.ALLOW,
       });
     }
