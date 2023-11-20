@@ -18,7 +18,7 @@ bring "./probot.w" as probot;
 bring "./probot-adapter.w" as adapter;
 bring "./cloudfront.w" as cloudFront;
 bring "./components/parameter/parameter.w" as parameter;
-bring "./patches/react-app.patch.w" as reactAppPatch;
+bring "./patches/vite.patch.w" as vitePatch;
 bring "./node_modules/@wingcloud/vite/src/vite.w" as vite;
 
 let appSecret = util.env("APP_SECRET");
@@ -107,6 +107,7 @@ let website = new vite.Vite(
     VITE_GITHUB_APP_NAME: util.env("BOT_GITHUB_APP_NAME"),
   },
 );
+vitePatch.VitePatch.apply(website);
 
 let probotApp = new probot.ProbotApp(
   probotAdapter: probotAdapter,

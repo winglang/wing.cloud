@@ -111,7 +111,7 @@ const website = new NodeProject({
   name: "@wingcloud/website",
   outdir: "apps/@wingcloud/website",
 });
-website.addDevDeps("typescript", "@types/node@18");
+website.addDevDeps("typescript", "@types/node@20");
 new TypescriptConfig(website, {
   include: ["src/**/*"],
 });
@@ -174,7 +174,7 @@ const runtime = new TypescriptProject({
     entry: ["src/**/*.ts"],
     outDir: "lib",
     format: ["esm"],
-    target: "node18",
+    target: "node20",
     dts: true,
     bundle: false,
     clean: true,
