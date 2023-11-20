@@ -7,70 +7,36 @@ import clsx from "clsx";
 import { useCallback, useState } from "react";
 
 import { Button } from "../../../design-system/button.js";
-import { useNotifications } from "../../../design-system/notification.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { useTimeAgo } from "../../../utils/time.js";
-import { wrpc } from "../../../utils/wrpc.js";
 import type { Secret } from "../../../utils/wrpc.js";
 
 const EmptySecret = "•••••••••••••••";
 
 export const SecretsListItem = ({
   secret,
-  setUpdatingSecrets,
+  loading,
+  onDecrypt,
+  onDelete,
 }: {
   secret: Secret;
-  setUpdatingSecrets: (value: boolean) => void;
+  loading: boolean;
+  onDecrypt: (secret: Secret) => Promise<string | undefined>;
+  onDelete: (secret: Secret) => Promise<void>;
 }) => {
   const { theme } = useTheme();
-  const { showNotification } = useNotifications();
-  const [loading, setLoading] = useState(false);
   const [secretValue, setSecretValue] = useState(EmptySecret);
 
-  const decryptSecretMutation = wrpc["app.decryptSecret"].useMutation();
-
   const decryptSecret = useCallback(async () => {
-    try {
-      const { value } = await decryptSecretMutation.mutateAsync({
-        appId: secret.appId,
-        environmentType: secret.environmentType,
-        secretId: secret.id,
-      });
+    const value = await onDecrypt(secret);
+    if (value) {
       setSecretValue(value);
-    } catch (error) {
-      if (error instanceof Error) {
-        showNotification("Failed to retrieve secret value", {
-          body: error.message,
-          type: "error",
-        });
-      }
     }
-  }, [secret?.id, decryptSecretMutation]);
-
-  const deleteSecretMutation = wrpc["app.deleteSecret"].useMutation();
+  }, [secret?.id]);
 
   const deleteSecret = useCallback(async () => {
-    try {
-      setLoading(true);
-      setUpdatingSecrets(true);
-      await deleteSecretMutation.mutateAsync({
-        appId: secret.appId,
-        environmentType: secret.environmentType,
-        secretId: secret.id,
-      });
-      showNotification("Secret deleted");
-    } catch (error) {
-      if (error instanceof Error) {
-        showNotification("Failed to delete secret", {
-          body: error.message,
-          type: "error",
-        });
-      }
-    } finally {
-      setLoading(false);
-      setUpdatingSecrets(false);
-    }
-  }, [secret?.id, deleteSecretMutation]);
+    await onDelete(secret);
+  }, [secret?.id]);
 
   const updatedAt = useTimeAgo(secret.updatedAt);
 

@@ -4,10 +4,8 @@ import { useCallback, useMemo, useState } from "react";
 
 import { Button } from "../../../design-system/button.js";
 import { Input } from "../../../design-system/input.js";
-import { useNotifications } from "../../../design-system/notification.js";
 import { Select } from "../../../design-system/select.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
-import { wrpc } from "../../../utils/wrpc.js";
 import type { EnvironmentType } from "../../../utils/wrpc.js";
 
 const environmentTypes = [
@@ -16,53 +14,32 @@ const environmentTypes = [
 ];
 
 export const NewSecret = ({
-  appId,
-  setUpdatingSecrets,
+  loading,
+  onCreate,
 }: {
-  appId: string;
-  setUpdatingSecrets: (value: boolean) => void;
+  loading: boolean;
+  onCreate: (
+    name: string,
+    value: string,
+    environmentType: EnvironmentType,
+  ) => Promise<void>;
 }) => {
   const { theme } = useTheme();
-  const { showNotification } = useNotifications();
-  const [creating, setCreating] = useState(false);
   const [environmentType, setEnvironmentType] = useState<EnvironmentType>();
   const [name, setName] = useState("");
   const [value, setValue] = useState("");
 
-  const createMutation = wrpc["app.createSecret"].useMutation();
-
   const create = useCallback(async () => {
-    try {
-      setCreating(true);
-      setUpdatingSecrets(true);
-      await createMutation.mutateAsync({
-        appId,
-        environmentType: environmentType!,
-        name,
-        value,
-      });
-      setName("");
-      setValue("");
-      // eslint-disable-next-line unicorn/no-useless-undefined
-      setEnvironmentType(undefined);
-      showNotification("Secret created");
-      setCreating(false);
-    } catch (error) {
-      setCreating(false);
-      if (error instanceof Error) {
-        showNotification("Failed to create secret", {
-          body: error.message,
-          type: "error",
-        });
-      }
-    } finally {
-      setUpdatingSecrets(false);
-    }
-  }, [name, value, environmentType, createMutation]);
+    await onCreate(name, value, environmentType!);
+    setName("");
+    setValue("");
+    // eslint-disable-next-line unicorn/no-useless-undefined
+    setEnvironmentType(undefined);
+  }, [name, value, environmentType]);
 
   const isSaveDisabled = useMemo(() => {
-    return creating || !name || !value || !environmentType;
-  }, [creating, name, value, environmentType]);
+    return loading || !name || !value || !environmentType;
+  }, [loading, name, value, environmentType]);
 
   return (
     <div className={clsx("bg-white rounded text-left w-full block")}>

@@ -72,20 +72,6 @@ export const Component = () => {
 
   const updateEntryfileMutation = wrpc["app.updateEntryfile"].useMutation();
 
-  const secretsQuery = wrpc["app.listSecrets"].useQuery(
-    {
-      appId: app?.appId || "",
-    },
-    {
-      enabled: app != undefined,
-      refetchInterval: 1000 * 3,
-    },
-  );
-
-  const secrets = useMemo(() => {
-    return secretsQuery.data?.secrets || [];
-  }, [secretsQuery.data]);
-
   const [loading, setLoading] = useState(false);
 
   const updateEntryfile = useCallback(async () => {
@@ -176,11 +162,7 @@ export const Component = () => {
             </div>
           </div>
 
-          <SecretsList
-            app={app}
-            secrets={secrets}
-            loading={secretsQuery.isLoading}
-          />
+          <SecretsList app={app} />
         </>
       )}
     </>
