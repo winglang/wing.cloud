@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { type PropsWithChildren } from "react";
+import { useMemo, type PropsWithChildren } from "react";
 import { useLocation } from "react-router-dom";
 
 import { Header } from "../components/header.js";
@@ -10,6 +10,14 @@ export const Layout = ({ children }: PropsWithChildren) => {
   let authCheck;
 
   const location = useLocation();
+
+  const fullWidthPage = useMemo(() => {
+    // Full screen content for the console preview
+    if (/\/apps\/[^/]+\/[^/]+\/preview\/?/.test(location.pathname)) {
+      return true;
+    }
+    return false;
+  }, [location.pathname]);
 
   if (location.pathname !== "/apps") {
     try {
@@ -36,7 +44,12 @@ export const Layout = ({ children }: PropsWithChildren) => {
 
         {!authCheck?.isLoading && (
           <div
-            className={clsx("transition-all", "w-full flex-grow overflow-auto")}
+            className={clsx(
+              "transition-all",
+              "w-full flex-grow overflow-auto",
+              !fullWidthPage &&
+                "max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6 transition-all",
+            )}
           >
             {children}
           </div>
