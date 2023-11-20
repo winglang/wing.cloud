@@ -23,14 +23,16 @@ While the *Wing Framework* covers the **development stage** in the application l
 * **App** - a unit of deployment.
 * **Library** - a reusable package published to an npm repository (private or public) and consumed by other libraries or apps. As far as Wing Cloud is concerned, libraries are simply npm modules installed using `npm install` during build.
 * **Repository** - where the source code of an application is managed (currently only GitHub is supported).
-* **Environment** - a space with a stable address where an instance of the application is deployed. In v1.0 each app can have multiple *preview* environments and a single *production* environment.
+* **Environment** - a space with a stable address where an instance of the application is deployed. In v1.0 each app can have multiple *preview* environments (associated with PR branches) and a single *production* environment (associated with the `main` branch of the repository).
 * **Environment Type** - for v1.0 we have only *preview* and *production*.
+* **Branch** - a git repository branch. Each environment tracks a particular git branch.
 * **Preview** - a type of an ephemeral environment which can be deployed ad-hoc and cleaned up quickly.
 * **Platform** - a concrete implementation of the Wing Cloud Library (e.g. `tf-aws`, `awscdk`).
 * **Entrypoint** - the name of the application entrypoint file (defaults to `main.w`).
 * **Team** - a billable account that owns applications and can be accessed by a set of users.
 * **User** - identified by a GitHub login
-* **Input** - a value needed by an app in order to operate. They are stored securely in Wing Cloud and served to the application's environment to be consumed by the app during preflight and inflight. Inputs are defined within the application and Wing Cloud allows users to associate values to these inputs per environment type (preview/prod).
+* **Input** - a value needed by an app in order to operate. They are stored securely (encrypted at rest) in Wing Cloud and served to the application's environment to be consumed by the app during preflight and inflight. Inputs are defined as part of the application code and Wing Cloud allows users to associate values to these inputs per environment type (preview/prod).
+* **Endpoint** -- TBD
 
 Granularity:
 
@@ -42,6 +44,7 @@ Granularity:
 | App         | `1:N` | Preview     |
 | App         | `1:N` | Library     |
 | Environment | `1:1` | Platform    |
+| Environment | `1:1` | Branch
 | Team        | `1:N` | App         |
 | Team        | `1:N` | User        |
 | Environment | `1:N` | Input       |
@@ -85,7 +88,7 @@ The following is a list of future capabilities that we plan to implement at a la
 Every Wing Cloud app is connected to a GitHub repository and associated with an entrypoint within this repository (e.g. `main.w` or `main.ts`).
 ### Repository
 
-When a user creates an app through the website they can choose whether they want to *create a new GitHub  repository* (P2) or *connect to an existing* one (P1).
+When a user creates an app through https://wing.cloud they can choose whether they want to *create a new GitHub  repository* (P2) or *connect to an existing* one (P1).
 
 > The reason we want to support both connecting to an existing repository and creating a new one is in order to reduce the "time to value". We want people to be able to sign up and immediately see the value of Wing Cloud, so being able to create a new repository is important. It's totally fine to implement these out one by one (technically these features are layered on top of each other), but I think repository creation needs to be part of the launch of 1.0.
 
@@ -110,6 +113,15 @@ A default `name` for the app will also be proposed to the user based on the repo
 
 P2: It will be nice to show a nice green checkbox to indicate if it's possible to use this app name (same design as the GitHub repository creation experience).
 
+### Environments
+
+When creating a new app, we will show the list of environments defined for this app, but in v1.0 this UI will only be **read-only**.
+
+The UI will show:
+
+1. PR branches are deployed to preview environments.
+2. `main` branch is deployed to a production environment.
+
 ## Preview flow
 
 A preview environment will be automatically created when a user submits a pull request to the app's repository.
@@ -129,8 +141,8 @@ As soon as a pull request is created, Wing Cloud will post a comment into the pu
 * P1: Build status
 * P1: Test status and a way to view detailed test results.
 * P1: Link to the Wing Cloud page of this environment, which is where the Wing Console UI will show for this environment. This is a link looks like this: https://wing.cloud/:team/:app/:branch and can only be accessed by authenticated Wing Cloud users that are part of this team.
-* P1: Once deployed is complete, links to all exposed endpoints of this app such as websites and REST APIs. These endpoints provide *direct access* to the application and **don't go through additional Wing Cloud authentication**. Therefore we should use a random subdomain so that it won't be possible to guess these domain names without sharing them. For example, https://j8ksnsjd84.:team.:app.wingcloud.dev will point to 
-### Environment Page
+* P1: Once deployed is complete, links to all exposed endpoints of this app such as websites and REST APIs. These endpoints provide *direct access* to the application and **don't go through additional Wing Cloud authentication** (see [Application Endpoints](#application-endpoints) below).
+### Preview environment page
 
 For each app in the Wing Cloud web app, users should be able to view a list of all active preview environments in the Wing Cloud website, and for each environment, they will be able to operate on it through a Wing Console experience (see [Operate](#operate)).
 ## Deploy flow
@@ -146,7 +158,7 @@ P2: Every time a new deployment is complete, an **email** will be sent to all te
 The build, test and deployment status will be displayed and updated live in the environment page in the Wing Cloud web app.
 ## Operate flow
 
-Each environment (both production and preview) will have a page in the Wing Cloud web app (e.g. https://wing.cloud/monadahq/hello/prod). This page will include both the deployment status and console interaction for this environment:
+Each environment (both production and preview) will have a page in the Wing Cloud web app (e.g. https://wing.cloud/monadahq/hello/main). This page will include both the deployment status and console interaction for this environment:
 
 * **GitHub repository link** and the repository's description from GitHub
 * **Build logs**: a **streaming log** of the build, with errors highlighted and linkable to the relevant source code in GitHub.
@@ -162,7 +174,7 @@ Each app has a settings page with the following configuration:
 
 * **Name**: the unique name of the application (within the team), cannot be changed once an app is created (P1). The name must be symbolic (lowercase, digits, hyphens). E.g. `my-app-123`. Name changes are P2.
 * **Source**: `repository` (e.g. `monadahq/hello`) and `entrypoint` (e.g. `main.w`).
-* **Environments** (initially this will always include an entry for preview environments and a single `prod` environment). For each:
+* **Environments** (initially this will always include an entry for preview environments and a single `main` environment). For each:
 	* **Enabled?**: whether the environment is enabled for automatic deployment
 	* **Tracking branch**: the branch being auto-deployed (defaults to `main`). Changing the tracking branch is P2.
 	* **Platform**: currently always `wcp` (Wing Cloud Platform).
@@ -171,7 +183,7 @@ Each app has a settings page with the following configuration:
 ## URLs
 ### Programmatic API
 
-For v1.0, we can continue to use the RPC-style API we've built so far but the goal is to eventually expose a public REST API (P2).
+For v1.0, we should move to a REST API but it's a P2 and okay if we stay with the RPC-style API for a little longer. Eventually the standard for SaaS products is REST.
 
 The base domain of our REST API will be https://api.wing.cloud
 
@@ -182,7 +194,7 @@ https://api.wing.cloud/teams/TEAM/apps/APP/envs/ENV
 Some examples:
 
 * To create a new app to the `monadahq` team, submit a `POST` request to `/teams/monadahq/apps`.
-* To get the status of the `prod` environment in the `hello` app, submit a `GET` request to `/teams/monadahq/apps/hello/envs/prod`
+* To get the status of the `prod` environment in the `hello` app, submit a `GET` request to `/teams/monadahq/apps/hello/envs/main`
 ### Web application
 
 The web app URLs should look like this:
@@ -194,7 +206,7 @@ Action pages such as "new app" should use an `?action=ACTION` parameter.
 For example:
 
 * https://wing.cloud/monadahq/hello is the main dashboard for the `monadahq/hello` app.
-* https://wing.cloud/monadahq/hello/prod is the `prod` environment (status + console).
+* https://wing.cloud/monadahq/hello/main is the environment associated with the `main` branch (status + console).
 * https://wing.cloud/monadahq?action=new-app - the new application page
 ### Application endpoints
 
@@ -205,7 +217,6 @@ We propose this scheme:
 `https://<endpointid>.wingcloud.dev`
 
 For example: https://v1stgxr8z5.wingcloud.dev
-
 ### Authentication
 
 Everything under https://wing.cloud (or https://api.wing.cloud, which includes the wing console view for preview/prod environments), should be authenticated with a Wing Cloud user.
@@ -221,9 +232,13 @@ This section includes a list of major capabilities required to implement 1.0.
 * [Endpoints](https://github.com/winglang/wing/issues/2430) - formal modeling of outputs/endpoints
 * [Checks](https://github.com/winglang/wing/issues/4806) - SDK resources and Console UI for live checks
 ## FAQ
-### Why are we coupling Wing for TypeScript with the Wing Cloud launch?
+### Why are we including Wing for TypeScript in this spec?
 
-From an engineering and execution standpoint, these are two different tracks and we can manage them independently, but from a launch/marketing perspective, we believe that TypeScript support is part of the "minimal viable product" for Wing Cloud. We want to make sure we reduce the barrier for customers as much as possible so that we can provide as much value to as many people as possible as part of this launch.
+From an engineering and execution standpoint, Wing for TypeScript and Wing Cloud 1.0 are two different tracks, and we can manage and release them independently. 
+
+From a launch/marketing perspective, we think that supporting TypeScript will be needed initially if we want people to be able to get to production with Wing Cloud 1.0, which implies it's part of the MVP. We want to make sure we reduce the barrier for customers as much as possible so that we can provide as much value to as many people as possible as part of this launch.
+
+We will make the final decision about the launch closer to the date.
 ### What's the target platform for production?
 
 In v1.0 we will only support the free tier for production in Wing and as such it doesn't require to support large scale and highly available applications.
