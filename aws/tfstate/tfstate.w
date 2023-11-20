@@ -4,7 +4,7 @@ bring "cdktf" as cdktf;
 bring "@cdktf/provider-aws" as aws;
 
 pub class TerraformState {
-  init(environment: str) {
+  new(environment: str) {
     let dynamoDbTable = new aws.dynamodbTable.DynamodbTable(
       name: "wingcloud-tfstate-lock-${environment}",
       billingMode: "PAY_PER_REQUEST",
@@ -12,11 +12,11 @@ pub class TerraformState {
       attribute: {
           name: "LockID",
           type: "S"
-      },      
+      },
     );
 
     let s3Bucket = new aws.s3Bucket.S3Bucket(
-        bucket: "wingcloud-tfstate-${environment}",        
+        bucket: "wingcloud-tfstate-${environment}",
         lifecycle: {
           preventDestroy: true
         }
@@ -35,7 +35,7 @@ pub class TerraformState {
         versioningConfiguration: {
           status: "Enabled"
         }
-    );  
+    );
 
     new cdktf.TerraformOutput(
         value: dynamoDbTable.id

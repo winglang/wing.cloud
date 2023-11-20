@@ -2,6 +2,8 @@ bring cloud;
 bring util;
 bring "@cdktf/provider-aws" as aws;
 bring "./dnsimple.w" as DNSimple;
+bring "./components/cloudfront-logs-bucket/bucket.tfaws.w" as logsBucket;
+bring "./components/cloudfront-logs-bucket/athena.tfaws.w" as athenaLogsTable;
 
 struct CachePolicyProps {
   name: str;
@@ -10,7 +12,7 @@ struct CachePolicyProps {
 class CachePolicy {
   pub policy: aws.cloudfrontCachePolicy.CloudfrontCachePolicy;
 
-  init(props: CachePolicyProps) {
+  new(props: CachePolicyProps) {
     this.policy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
       // Since we currently use the same cache policy for website files and API endpoints,
       // we need to get rid of the default cache TTL, otherwise our API endpoints will
@@ -65,6 +67,7 @@ struct CloudFrontDistributionProps {
 
 pub class CloudFrontDistribution {
   pub distribution: aws.cloudfrontDistribution.CloudfrontDistribution;
+  pub logsBucket: logsBucket.CloudfrontLogsBucket;
 
   getDefaultOriginId (origins: Array<Origin>): str {
     for origin in origins {
@@ -115,10 +118,12 @@ pub class CloudFrontDistribution {
     return cacheBehaviors.copy();
   }
 
-  init(props: CloudFrontDistributionProps) {
-    let cachePolicy = new CachePolicy(
-      name: "cache-policy-for-${this.getDefaultOriginId(props.origins)}",
+  new(props: CloudFrontDistributionProps) {
+    this.logsBucket = new logsBucket.CloudfrontLogsBucket("reverse-proxy") as "reverse-proxy-logs-bucket";
+    // https://github.com/winglang/wing/issues/4907
 
+    let cachePolicy = new CachePolicy(
+      name: "cache-policy-for-${this.getDefaultOriginId(props.origins)}"
     );
 
     this.distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
@@ -157,6 +162,14 @@ pub class CloudFrontDistribution {
       },
       origin: this.getHttpOrigins(props.origins),
       aliases: props.aliases,
+      loggingConfig: {
+        bucket: this.logsBucket.domainName(),
+        includeCookies: true,
+        prefix: "reverse-proxy"
+      },
+      dependsOn: [this.logsBucket.dependable]
     );
+
+    new athenaLogsTable.CloudfrontLogsTable(this.logsBucket.name(), "reverse-proxy");
   }
 }

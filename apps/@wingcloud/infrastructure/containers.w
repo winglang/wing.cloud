@@ -34,7 +34,7 @@ pub class Container_sim {
   table: ex.Table;
   urlKey: str;
 
-  init(opts: ContainerOpts) {
+  new(opts: ContainerOpts) {
     this.containerNameBase = "wing-${opts.name}-${this.node.addr}";
 
     this.appDir = Container_sim.entrypointDir(this);

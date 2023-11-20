@@ -25,7 +25,7 @@ struct Item extends App {
 
 struct CreateAppOptions {
   appName: str;
-  description: str?;
+  description: str;
   repoOwner: str;
   repoName: str;
   repoId: str;
@@ -67,37 +67,28 @@ struct ListAppByRepositoryOptions {
 }
 
 struct MakeItemOptions {
-  appId:str;
+  appId: str;
   pk: str;
   sk: str;
+}
+
+struct UpdateEntryfileOptions {
+  appId: str;
+  appName: str;
+  userId: str;
+  repository: str;
+  entryfile: str;
 }
 
 pub class Apps {
   table: ex.DynamodbTable;
 
-  init(table: ex.DynamodbTable) {
+  new(table: ex.DynamodbTable) {
     this.table = table;
   }
 
   pub inflight create(options: CreateAppOptions): App {
     let appId = "app_${nanoid62.Nanoid62.generate()}";
-
-    let app = App {
-      appId: appId,
-      appName: options.appName,
-      description: options.description,
-      imageUrl: options.imageUrl,
-      repoId: options.repoId,
-      repoOwner: options.repoOwner,
-      repoName: options.repoName,
-      userId: options.userId,
-      entryfile: options.entryfile,
-      createdAt: options.createdAt,
-      createdBy: options.createdBy,
-      updatedAt: options.createdAt,
-      updatedBy: options.createdBy,
-      lastCommitMessage: options.lastCommitMessage,
-    };
 
     // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
     let makeItem = (ops: MakeItemOptions): Item => {
@@ -163,7 +154,22 @@ pub class Apps {
 
     ]);
 
-    return app;
+    return {
+      appId: appId,
+      appName: options.appName,
+      description: options.description,
+      imageUrl: options.imageUrl,
+      repoId: options.repoId,
+      repoOwner: options.repoOwner,
+      repoName: options.repoName,
+      userId: options.userId,
+      entryfile: options.entryfile,
+      createdAt: options.createdAt,
+      createdBy: options.createdBy,
+      updatedAt: options.createdAt,
+      updatedBy: options.createdBy,
+      lastCommitMessage: options.lastCommitMessage,
+    };
   }
 
   pub inflight rename(options: RenameAppOptions): void {
@@ -399,5 +405,74 @@ pub class Apps {
       }]);
     }
     return apps;
+  }
+
+  pub inflight updateEntrypoint(options: UpdateEntryfileOptions): void {
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "APP#${options.appId}",
+            sk: "#",
+          },
+          updateExpression: "SET #entryfile = :entryfile",
+          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
+          expressionAttributeNames: {
+            "#pk": "pk",
+            "#entryfile": "entryfile",
+            "#userId": "userId",
+          },
+          expressionAttributeValues: {
+            ":entryfile": options.entryfile,
+            ":userId": options.userId,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#${options.userId}",
+            sk: "APP#${options.appId}",
+          },
+          updateExpression: "SET #entryfile = :entryfile",
+          expressionAttributeNames: {
+            "#entryfile": "entryfile",
+          },
+          expressionAttributeValues: {
+            ":entryfile": options.entryfile,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#${options.userId}",
+            sk: "APP_NAME#${options.appName}",
+          },
+          updateExpression: "SET #entryfile = :entryfile",
+          expressionAttributeNames: {
+            "#entryfile": "entryfile",
+          },
+          expressionAttributeValues: {
+            ":entryfile": options.entryfile,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "REPOSITORY#${options.repository}",
+            sk: "APP#${options.appId}",
+          },
+          updateExpression: "SET #entryfile = :entryfile",
+          expressionAttributeNames: {
+            "#entryfile": "entryfile",
+          },
+          expressionAttributeValues: {
+            ":entryfile": options.entryfile,
+          },
+        }
+      },
+    ]);
   }
 }

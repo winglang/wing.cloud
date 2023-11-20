@@ -7,7 +7,39 @@ import {
   Eslint,
   Turbo,
 } from "@skyrpex/wingen";
-import { JsonFile, web } from "projen";
+
+///////////////////////////////////////////////////////////////////////////////
+interface WingLibProjectOptions {
+  readonly monorepo: MonorepoProject;
+  readonly name: string;
+  readonly outdir?: string;
+  readonly deps?: string[];
+  readonly devDeps?: string[];
+  readonly typescript?: boolean;
+}
+
+class WingLibProject extends NodeProject {
+  constructor(options: WingLibProjectOptions) {
+    super({
+      outdir: `packages/${options.name}`,
+      ...options,
+      parent: options.monorepo,
+    });
+
+    this.addFields({
+      type: "module",
+    });
+
+    if (options.typescript) {
+      new TypescriptConfig(this, {
+        include: ["src/**/*"],
+      });
+    }
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+const winglangVersion = "^0.48.6";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -15,95 +47,7 @@ const monorepo = new MonorepoProject({
   name: "@wingcloud/monorepo",
 });
 
-///////////////////////////////////////////////////////////////////////////////
-const opaqueType = new TypescriptProject({
-  monorepo,
-  name: "@wingcloud/type-opaque",
-});
-
-///////////////////////////////////////////////////////////////////////////////
-const nanoid62 = new TypescriptProject({
-  monorepo,
-  name: "@wingcloud/nanoid62",
-  deps: ["nanoid"],
-});
-
-///////////////////////////////////////////////////////////////////////////////
-const flyio = new TypescriptProject({
-  monorepo,
-  name: "@wingcloud/flyio",
-  description: "Fly.io client library",
-});
-
-flyio.compileTask.reset();
-flyio.compileTask.exec("jsii");
-flyio.packageTask.exec("jsii-pacmak");
-flyio.devTask.exec("jsii --watch");
-
-flyio.addDeps("node-fetch@2");
-flyio.addDevDeps("@types/node-fetch@2");
-flyio.addDevDeps("jsii");
-flyio.addDevDeps("jsii-pacmak");
-
-flyio.tryRemoveFile("./tsconfig.json");
-
-new Turbo(flyio, {
-  pipeline: {
-    compile: {
-      outputs: ["./src/**/*.js", "./src/**/*.d.ts"],
-    },
-  },
-});
-
-flyio.addGitIgnore("**/*.js");
-flyio.addGitIgnore("**/*.d.ts");
-flyio.addGitIgnore(".jsii");
-flyio.addGitIgnore("tsconfig.tsbuildinfo");
-flyio.addFields({
-  type: "commonjs",
-  main: "./src/index.js",
-  exports: {
-    ".": "./src/index.js",
-  },
-  types: "./src/index.d.ts",
-  jsii: {
-    outdir: "dist",
-    targets: [],
-    versionFormat: "full",
-  },
-  bundledDependencies: ["node-fetch"],
-  author: {
-    name: "wing.cloud",
-    url: "https://wing.cloud",
-  },
-  repository: {
-    type: "git",
-    url: "https://github.com/winglang/wing.cloud",
-  },
-  license: "BSD-3-Clause",
-});
-
-///////////////////////////////////////////////////////////////////////////////
-const prefixedIdType = new TypescriptProject({
-  monorepo,
-  name: "@wingcloud/type-prefixed-id",
-  deps: [nanoid62.name, "zod"],
-});
-
-///////////////////////////////////////////////////////////////////////////////
-const cookies = new TypescriptProject({
-  monorepo,
-  name: "@wingcloud/express-cookies",
-  deps: ["cookie"],
-  devDeps: ["express", "@types/express", "@types/cookie"],
-  peerDeps: ["express"],
-});
-
-///////////////////////////////////////////////////////////////////////////////
-const env = new TypescriptProject({
-  monorepo,
-  name: "@wingcloud/get-environment-variable",
-});
+monorepo.devTask.reset("turbo dev --concurrency 12");
 
 ///////////////////////////////////////////////////////////////////////////////
 const wrpc = new TypescriptProject({
@@ -115,6 +59,41 @@ const wrpc = new TypescriptProject({
 wrpc
   .tryFindObjectFile("tsconfig.json")!
   .addToArray("compilerOptions.lib", "DOM", "DOM.Iterable");
+
+///////////////////////////////////////////////////////////////////////////////
+const probot = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/probot",
+  devDeps: ["@probot/adapter-aws-lambda-serverless"],
+  typescript: true,
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const nanoid = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/nanoid",
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const simutils = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/simutils",
+  deps: ["get-port"],
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const ngrok = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/ngrok",
+  deps: [simutils.name],
+});
+
+///////////////////////////////////////////////////////////////////////////////
+const containers = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/containers",
+  devDeps: [nanoid.name],
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 const vite = new NodeEsmProject({
@@ -142,15 +121,12 @@ new Turbo(website, {
   pipeline: {
     compile: {
       dotEnv: [".env"],
-    },
-    dev: {
-      dependsOn: ["^compile"],
+      outputs: ["dist/**"],
     },
   },
 });
 
 website.addDeps("vite");
-website.addScript("dev", "vite dev");
 website.addScript("compile", "vite build");
 website.addGitIgnore("/dist/");
 website.addGitIgnore("/public/wing.js");
@@ -207,25 +183,25 @@ const runtime = new TypescriptProject({
   },
 });
 
-runtime.addDeps(`winglang`);
-runtime.addDeps(`@winglang/sdk`);
-runtime.addDeps(`@winglang/compiler`);
-runtime.addDeps(`@wingconsole/app`);
+runtime.addDeps(`winglang@${winglangVersion}`);
+runtime.addDeps(`@winglang/sdk@${winglangVersion}`);
+runtime.addDeps(`@winglang/compiler@${winglangVersion}`);
+runtime.addDeps(`@wingconsole/app@${winglangVersion}`);
 runtime.addDeps("express");
 runtime.addDeps("jsonwebtoken");
 runtime.addDeps("jwk-to-pem");
 runtime.addDeps("jose");
 runtime.addDeps("node-fetch");
+runtime.addDeps("which");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/jsonwebtoken");
 runtime.addDevDeps("@types/jwk-to-pem");
 runtime.addDevDeps("simple-git");
 runtime.addDevDeps("msw");
+runtime.addDevDeps("@types/which");
 
 runtime.addGitIgnore("target/");
-
-runtime.devTask.exec("tsup --watch --onSuccess 'node lib/entrypoint-local.js'");
 
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
@@ -240,17 +216,15 @@ infrastructure.addGitIgnore("/.env");
 infrastructure.addGitIgnore("/.env.*");
 infrastructure.addGitIgnore("!/.env.example");
 
-infrastructure.addGitIgnore("/target/");
-infrastructure.addDeps(`winglang`);
+infrastructure.addGitIgnore("**/target/");
+infrastructure.addDeps(`winglang@${winglangVersion}`);
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
 infrastructure.addTask("test-aws", {
   exec: "node ./bin/wing.mjs test -t tf-aws main.w",
 });
-infrastructure.compileTask.exec(
-  "node ./bin/wing.mjs compile -t tf-aws",
-);
+infrastructure.compileTask.exec("node ./bin/wing.mjs compile main.w -t tf-aws");
 
 const terraformInitTask = infrastructure.addTask("terraformInit");
 terraformInitTask.exec(
@@ -270,26 +244,29 @@ deployTask.exec(
 new Turbo(infrastructure, {
   pipeline: {
     [terraformInitTask.name]: {
+      dependsOn: ["compile"],
       inputs: ["package.json"],
       outputs: [
-        "target/main.tfaws/.terraform",
+        "target/main.tfaws/.terraform/**",
         "target/main.tfaws/.terraform.lock.hcl",
       ],
+      cache: false,
     },
     compile: {
-      dependsOn: ["^compile", terraformInitTask.name],
+      dependsOn: ["^compile"],
       dotEnv: [".env"],
+      inputs: ["!target/**"],
       outputs: [
         "target/main.tfaws/**",
         "!target/main.tfaws/.terraform.lock.hcl",
-        "!target/main.tfaws/.terraform",
+        "!target/main.tfaws/.terraform/**",
         "!target/main.tfaws/terraform.tfstate",
         "!target/main.tfaws/terraform.tfstate.backup",
         "!target/main.tfaws/tfplan",
       ],
     },
     [planTask.name]: {
-      dependsOn: ["compile"],
+      dependsOn: ["compile", terraformInitTask.name],
       // outputs: ["target/main.tfaws/tfplan"],
       cache: false,
     },
@@ -322,6 +299,15 @@ infrastructure.addDevDeps("@types/express");
 infrastructure.addDeps("glob");
 
 infrastructure.addDeps(
+  probot.name,
+  containers.name,
+  nanoid.name,
+  simutils.name,
+  ngrok.name,
+);
+infrastructure.addScript("example", "node ./bin/wing.mjs it example.main.w");
+
+infrastructure.addDeps(
   "constructs",
   "cdktf",
   "@cdktf/provider-aws",
@@ -331,17 +317,17 @@ infrastructure.addDeps(
   "@cdktf/provider-random",
 );
 
-infrastructure.addDevDeps("@types/cookie");
 infrastructure.addDeps("cookie");
-
 infrastructure.addDeps("jose");
-
 infrastructure.addDeps("octokit", "node-fetch");
+infrastructure.addDeps("@aws-sdk/client-kms");
+
+infrastructure.addDevDeps("@types/cookie");
+infrastructure.addDeps("@aws-sdk/client-ssm");
 
 infrastructure.addDevDeps("@octokit/rest");
 
 infrastructure.addDevDeps(website.name);
-infrastructure.addDevDeps(flyio.name);
 infrastructure.addDevDeps(runtime.name);
 
 ///////////////////////////////////////////////////////////////////////////////

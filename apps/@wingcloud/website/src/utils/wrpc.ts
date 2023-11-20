@@ -4,10 +4,15 @@ import {
   type QueryProcedure,
 } from "@wingcloud/wrpc";
 
+export interface Installation {
+  id: number;
+  account: { login: string };
+}
+
 export interface Repository {
   id: number;
   name: string;
-  description?: string;
+  description: string | null;
   full_name: string;
   private: boolean;
   owner: { login: string; avatar_url: string };
@@ -18,7 +23,7 @@ export interface Repository {
 export interface App {
   appId: string;
   appName: string;
-  description?: string;
+  description: string;
   imageUrl?: string;
   repoId: string;
   repoName: string;
@@ -62,6 +67,18 @@ export interface Environment {
   testResults?: TestResults;
 }
 
+export interface Secret {
+  id: string;
+  appId: string;
+  name: string;
+  environmentType: string;
+  value: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type EnvironmentType = "produciton" | "preview";
+
 export const wrpc = createWRPCReact<{
   "auth.check": QueryProcedure<
     undefined,
@@ -75,10 +92,7 @@ export const wrpc = createWRPCReact<{
   "github.listInstallations": QueryProcedure<
     undefined,
     {
-      installations: Array<{
-        id: number;
-        account: { login: string };
-      }>;
+      installations: Array<Installation>;
     }
   >;
   "github.listRepositories": QueryProcedure<
@@ -131,7 +145,7 @@ export const wrpc = createWRPCReact<{
   "user.createApp": MutationProcedure<
     {
       repoId: string;
-      description?: string;
+      description: string;
       repoName: string;
       repoOwner: string;
       default_branch: string;
@@ -142,6 +156,7 @@ export const wrpc = createWRPCReact<{
     },
     {
       appId: string;
+      appName: string;
     }
   >;
 }>();

@@ -8,6 +8,7 @@ bring "../flyio" as flyio;
 bring "./runtime-docker.w" as runtimeDocker;
 bring "../environments.w" as environments;
 bring "@cdktf/provider-aws" as awsprovider;
+bring "../components/parameter/iparameter.w" as parameter;
 
 struct RuntimeStartOptions {
   gitToken: str?;
@@ -18,7 +19,7 @@ struct RuntimeStartOptions {
   logsBucketRegion: str;
   awsAccessKeyId: str;
   awsSecretAccessKey: str;
-  wingCloudUrl: str;
+  wingCloudUrl: parameter.IParameter;
   environmentId: str;
 }
 
@@ -33,7 +34,7 @@ interface IRuntimeHandler {
 
 class RuntimeHandler_sim impl IRuntimeHandler {
   container: containers.Container_sim;
-  init() {
+  new() {
     this.container = new containers.Container_sim(name: "previews-runtime", image: "../runtime", args: {
       "SETUP_DOCKER": "false",
     },  port: 3000, privileged: true);
@@ -60,7 +61,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "ENTRYFILE" => opts.entryfile,
       "WING_TARGET" => util.env("WING_TARGET"),
       "LOGS_BUCKET_NAME" => util.env(opts.logsBucketName), // get simulator handle for the bucket
-      "WING_CLOUD_URL" => opts.wingCloudUrl,
+      "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
       "ENVIRONMENT_ID" => opts.environmentId,
       "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
     };
@@ -90,7 +91,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   flyToken: str;
   flyOrgSlug: str;
   image: runtimeDocker.RuntimeDockerImage;
-  init(props: FlyRuntimeHandlerProps) {
+  new(props: FlyRuntimeHandlerProps) {
     this.flyToken = props.flyToken;
     this.flyOrgSlug = props.flyOrgSlug;
     this.image = new runtimeDocker.RuntimeDockerImage(flyOrgSlug: props.flyOrgSlug);
@@ -114,7 +115,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "GIT_SHA" => opts.gitSha,
       "ENTRYFILE" => opts.entryfile,
       "WING_TARGET" => util.env("WING_TARGET"),
-      "WING_CLOUD_URL" => opts.wingCloudUrl,
+      "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
       "LOGS_BUCKET_NAME" => opts.logsBucketName,
       "ENVIRONMENT_ID" => opts.environmentId,
       "AWS_ACCESS_KEY_ID" => opts.awsAccessKeyId,
@@ -156,7 +157,7 @@ struct Message {
 }
 
 struct RuntimeServiceProps {
-  wingCloudUrl: str;
+  wingCloudUrl: parameter.IParameter;
   flyToken: str?;
   flyOrgSlug: str?;
   environments: environments.Environments;
@@ -171,7 +172,7 @@ pub class RuntimeService {
   pub api: cloud.Api;
   runtimeHandler: IRuntimeHandler;
 
-  init(props: RuntimeServiceProps) {
+  new(props: RuntimeServiceProps) {
     this.logs = new cloud.Bucket() as "deployment logs";
 
     let var bucketName: str = "";

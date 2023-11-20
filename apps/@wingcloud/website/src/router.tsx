@@ -5,24 +5,28 @@ import { NoMatch } from "./components/no-match.js";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
+    path: "/apps",
     lazy: () => import("./routes/index.js"),
     children: [
       {
-        path: "apps",
+        path: "",
         lazy: () => import("./routes/apps.js"),
       },
       {
-        path: "apps/:appName",
+        path: "new",
+        lazy: () => import("./routes/new/index.js"),
+      },
+      {
+        path: "new/connect",
+        lazy: () => import("./routes/new/connect.js"),
+      },
+      {
+        path: ":appName",
         lazy: () => import("./routes/apps/app.js"),
       },
       {
-        path: "apps/:appName/:environmentId",
+        path: ":appName/:environmentId",
         lazy: () => import("./routes/environments/environment.js"),
-      },
-      {
-        path: "new",
-        lazy: () => import("./routes/new.js"),
       },
     ],
   },

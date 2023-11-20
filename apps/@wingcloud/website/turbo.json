@@ -7,11 +7,9 @@
     "compile": {
       "dotEnv": [
         ".env"
-      ]
-    },
-    "dev": {
-      "dependsOn": [
-        "^compile"
+      ],
+      "outputs": [
+        "dist/**"
       ]
     }
   }

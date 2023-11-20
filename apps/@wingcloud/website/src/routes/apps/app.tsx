@@ -1,13 +1,16 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { EnvironmentsList } from "../../components/environments-list.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { Menu } from "../../design-system/menu.js";
+import { useNotifications } from "../../design-system/notification.js";
 import { GithubIcon } from "../../icons/github-icon.js";
 import { MenuIcon } from "../../icons/menu-icon.js";
 import { wrpc } from "../../utils/wrpc.js";
+import { EnvironmentsList } from "../environments/components/environments-list.js";
+
+import { DeleteModal } from "./components/delete-modal.js";
 
 export interface AppProps {
   appName: string;
@@ -16,6 +19,7 @@ export interface AppProps {
 export const Component = () => {
   const { appName } = useParams();
   const navigate = useNavigate();
+  const { showNotification } = useNotifications();
 
   const appQuery = wrpc["app.getByName"].useQuery({ appName: appName! });
 
@@ -52,10 +56,26 @@ export const Component = () => {
     return repositoryQuery.data?.repository.html_url || "";
   }, [repositoryQuery.data]);
 
+  const [loading, setLoading] = useState(false);
+
   const deleteAppMutation = wrpc["app.delete"].useMutation();
-  const deleteApp = useCallback(() => {
-    deleteAppMutation.mutateAsync({ appId: app?.appId! });
+  const deleteApp = useCallback(async () => {
+    try {
+      setLoading(true);
+      await deleteAppMutation.mutateAsync({ appId: app?.appId! });
+      navigate("/apps/");
+    } catch (error) {
+      setLoading(false);
+      if (error instanceof Error) {
+        showNotification("Failed to delete the app", {
+          body: error.message,
+          type: "error",
+        });
+      }
+    }
   }, [app?.appId, deleteAppMutation]);
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   return (
     <>
@@ -73,9 +93,9 @@ export const Component = () => {
               <div className="text-slate-700 text-xl self-center truncate">
                 {app.appName}
               </div>
-              <div className="text-slate-500 text-xs self-center">
+              <div className="text-slate-500 text-xs self-center truncate">
                 {app.description === "" ? (
-                  <div className="space-x-1 flex items-center">
+                  <div className="space-x-1 flex items-center truncate">
                     <GithubIcon className="h-3 w-3 shrink-0" />
                     <span className="truncate" title={app.lastCommitMessage}>
                       {app.lastCommitMessage?.split("\n")[0]}
@@ -93,31 +113,45 @@ export const Component = () => {
                   items={[
                     {
                       label: "Delete App",
-                      onClick: () => {
-                        deleteApp();
-                        navigate("/apps");
-                      },
+                      onClick: () => setDeleteModalOpen(true),
                     },
                   ]}
                   icon={<MenuIcon className="h-4 w-4 text-slate-700" />}
                 />
 
-                {repoUrl && (
-                  <a href={repoUrl + "/compare"} target="_blank">
-                    <Button className="truncate">Git Repository</Button>
-                  </a>
-                )}
+                <a href={repoUrl} target="_blank">
+                  <Button className="truncate" disabled={!repoUrl || loading}>
+                    Git Repository
+                  </Button>
+                </a>
               </div>
             </div>
           </div>
 
-          <EnvironmentsList
-            environments={environments}
-            loading={environmentsQuery.isLoading}
-            appName={app.appName}
-            repoUrl={repoUrl}
-          />
+          <div className="w-full relative">
+            {loading && (
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="absolute inset-0 bg-white dark:bg-gray-900 opacity-50" />
+                <SpinnerLoader size="sm" className="z-20" />
+              </div>
+            )}
+            <EnvironmentsList
+              environments={environments}
+              loading={environmentsQuery.isLoading}
+              appName={app.appName}
+              repoUrl={repoUrl}
+            />
+          </div>
         </>
+      )}
+
+      {appName && app?.appId && (
+        <DeleteModal
+          appId={app.appId}
+          appName={appName}
+          show={deleteModalOpen}
+          onClose={setDeleteModalOpen}
+        />
       )}
     </>
   );

@@ -2,7 +2,7 @@ bring cloud;
 bring util;
 bring fs;
 bring http;
-bring "./octokit.w" as ok;
+bring "../octokit.w" as ok;
 bring "./dir.w" as dir;
 bring "../users.w" as users;
 bring "../apps.w" as apps;
@@ -11,6 +11,7 @@ bring "../types/octokit-types.w" as octokit;
 bring "../github-app.w" as github_app;
 bring "../cookie.w" as Cookie;
 bring "../jwt.w" as JWT;
+bring "../components/parameter/iparameter.w" as parameter;
 
 struct EnvironmentsTestProps {
   users: users.Users;
@@ -19,7 +20,7 @@ struct EnvironmentsTestProps {
   githubApp: github_app.GithubApp;
   updateGithubWebhook: inflight (): void;
   appSecret: str;
-  wingCloudUrl: str;
+  wingCloudUrl: parameter.IParameter;
   githubToken: str?;
   githubOrg: str?;
   githubUser: str?;
@@ -31,7 +32,7 @@ struct CreateRepoResult {
 }
 
 pub class EnvironmentsTest {
-  init(props: EnvironmentsTestProps) {
+  new(props: EnvironmentsTestProps) {
     let readdirContents = (path: str): Json => {
       let dirContents = MutJson{};
       for file in fs.readdir(path) {
@@ -107,6 +108,7 @@ pub class EnvironmentsTest {
           let userId = props.users.create(gitHubLogin: "fake-login");
           let app = props.apps.create(
             appName: "test-app",
+            description: "test app",
             createdAt: "0",
             createdBy: userId,
             repoId: "${repo.owner}/${repo.repo}",
@@ -259,12 +261,12 @@ pub class EnvironmentsTest {
             throw "failed to find installation for owner ${repo.owner}";
           }
 
-          let createRes = http.post("${props.wingCloudUrl}/wrpc/user.createApp",
+          let createRes = http.post("${props.wingCloudUrl.get()}/wrpc/user.createApp",
             body: Json.stringify({
               default_branch: "main",
-              repositoryId: "${repo.owner}/${repo.repo}",
-              owner: repo.owner,
-              repositoryName: repo.repo,
+              repoId: "${repo.owner}/${repo.repo}",
+              repoOwner: repo.owner,
+              repoName: repo.repo,
               appName: "test-app",
               imageUrl: "",
               entryfile: "main.w",
@@ -276,7 +278,7 @@ pub class EnvironmentsTest {
           );
 
           if createRes.status < 200 || createRes.status >= 300 {
-            throw "failed to create app ${createRes.status}";
+            throw "failed to create app ${createRes.status} ${createRes.body}";
           }
 
           if let appId = Json.tryParse(createRes.body)?.tryGet("appId")?.tryAsStr() {

@@ -18,9 +18,16 @@ pub class GithubComment {
   environments: environments.Environments;
   apps: apps.Apps;
 
-  init(props: GithubCommentProps) {
+  new(props: GithubCommentProps) {
     this.environments = props.environments;
     this.apps = props.apps;
+  }
+
+  inflight envStatusToString(status: str): str {
+    if status == "tests" {
+      return "Running Tests";
+    }
+    return status.at(0).uppercase() + status.substring(1);
   }
 
   pub inflight createOrUpdate(props: GithubCommentCreateProps): num {
@@ -56,7 +63,7 @@ pub class GithubComment {
           let entryfile = "[${app.appName}](https://github.com/${environment.repo}/blob/${environment.branch}/${app.entryfile})";
 
           let date = std.Datetime.utcNow().toIso();
-          let tableRows = "| ${entryfile} | ${environment.status} | ${previewUrl} | ${testsString} | ${date} |";
+          let tableRows = "| ${entryfile} | ${this.envStatusToString(environment.status)} | ${previewUrl} | ${testsString} | ${date} |";
 
           commentBody = "${commentBody}\n${tableRows}";
 

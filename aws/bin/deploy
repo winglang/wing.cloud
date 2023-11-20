@@ -12,8 +12,8 @@ fi
 
 export ENVIRONMENT=$(echo $1 | tr '[:upper:]' '[:lower:]')
 
-if [ "$ENVIRONMENT" != "staging" ] && [ "$ENVIRONMENT" != "production" ]; then
-    echo "Invalid ENVIRONMENT. Please provide either 'staging' or 'production' as an argument."
+if [ "$ENVIRONMENT" != "staging" ] && [ "$ENVIRONMENT" != "production" ] && [ "$ENVIRONMENT" != "testing" ]; then
+    echo "Invalid ENVIRONMENT. Please provide either 'staging', 'production' or 'testing' as an argument."
     exit 1
 fi
 
@@ -24,8 +24,10 @@ fi
 
 if [ "$ENVIRONMENT" == "staging" ]; then
     ACCOUNT_ID="891197207596"
-else
+elif [ "$ENVIRONMENT" == "production" ]; then
     ACCOUNT_ID="108269615366"
+else
+    ACCOUNT_ID="110379683389"
 fi
 
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
