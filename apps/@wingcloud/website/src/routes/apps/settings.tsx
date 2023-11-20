@@ -106,7 +106,7 @@ export const Component = () => {
       )}
 
       {app && (
-        <>
+        <div className="space-y-4">
           <div
             className={clsx(
               "flex flex-col gap-x-2 rounded p-4 border",
@@ -169,7 +169,7 @@ export const Component = () => {
           </div>
 
           <SecretsList appId={app.appId} />
-        </>
+        </div>
       )}
     </div>
   );
