@@ -162,7 +162,7 @@ export const Component = () => {
             </div>
           </div>
 
-          <SecretsList app={app} />
+          <SecretsList appId={app.appId} />
         </>
       )}
     </>

@@ -12,17 +12,17 @@ import type { EnvironmentType } from "../../../utils/wrpc.js";
 import { NewSecret } from "./new-secret.js";
 import { SecretsListItem } from "./secrets-list-item.js";
 
-export const SecretsList = ({ app }: { app: App }) => {
+export const SecretsList = ({ appId }: { appId: string }) => {
   const { showNotification } = useNotifications();
   const { theme } = useTheme();
   const [updatingSecrets, setUpdatingSecrets] = useState(false);
 
   const secretsQuery = wrpc["app.listSecrets"].useQuery(
     {
-      appId: app.appId || "",
+      appId: appId || "",
     },
     {
-      enabled: app != undefined,
+      enabled: appId != undefined,
       refetchInterval: 1000 * 10,
     },
   );
@@ -38,7 +38,7 @@ export const SecretsList = ({ app }: { app: App }) => {
       try {
         setUpdatingSecrets(true);
         await createMutation.mutateAsync({
-          appId: app.appId,
+          appId: appId,
           environmentType: environmentType!,
           name,
           value,
