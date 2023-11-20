@@ -12,11 +12,7 @@ export const Component = () => {
 
   return (
     <Layout>
-      {pathname === "/apps" && (
-        <div className="p-4">
-          <GithubLogin />
-        </div>
-      )}
+      {pathname === "/apps" && <GithubLogin />}
       {pathname !== "/apps" && <Outlet />}
     </Layout>
   );
