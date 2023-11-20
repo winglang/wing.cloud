@@ -56,7 +56,7 @@ export const EnvironmentsListItem = ({
     if (status === "tests") {
       return "Running Tests";
     }
-    return status.charAt(0).toUpperCase() + status.slice(1);
+    return status;
   }, [status]);
 
   return (
@@ -173,7 +173,15 @@ export const EnvironmentsListItem = ({
                   "capitalize font-[500]",
                 )}
               >
-                {statusString}
+                {status === "failed" && (
+                  <Link
+                    to={`/apps/${appName}/${environment.branch}/#logs`}
+                    className="hover:underline"
+                  >
+                    {statusString}
+                  </Link>
+                )}
+                {status !== "failed" && statusString}
               </div>
             )}
           </div>

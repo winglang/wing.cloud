@@ -298,7 +298,9 @@ export const Component = () => {
         />
 
         <CollapsibleItem
+          id="logs"
           title="Deployment logs"
+          defaultOpen={locationHash === "logs"}
           loading={logs.isLoading}
           children={
             <div className="text-2xs font-mono">
