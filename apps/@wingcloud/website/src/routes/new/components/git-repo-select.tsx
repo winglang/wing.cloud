@@ -134,7 +134,7 @@ export const GitRepoSelect = ({
               key={repo.id}
               className={clsx(
                 theme.text1,
-                "text-xs px-2.5 py-2 gap-1",
+                "text-xs px-2.5 py-4 gap-1",
                 "w-full text-left flex items-center",
                 "transition-all outline-none focus:outline-none",
                 "focus:bg-slate-50 dark:focus:bg-slate-750",

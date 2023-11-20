@@ -52,14 +52,16 @@ export const Component = () => {
             setSearch(e.target.value);
           }}
         />
-        <Button
-          label="New"
-          primary
-          icon={PlusIcon}
-          onClick={() => {
-            navigate("new");
-          }}
-        />
+        {apps.length > 0 && (
+          <Button
+            label="New"
+            primary
+            icon={PlusIcon}
+            onClick={() => {
+              navigate("new");
+            }}
+          />
+        )}
       </div>
 
       {loading && (
