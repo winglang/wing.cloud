@@ -4,12 +4,12 @@
   "type": "module",
   "sideEffects": false,
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.332",
+    "@cloudy-ts/eslint-plugin": "^0.0.333",
     "@tanstack/react-query": "^5.8.4",
     "@types/node": "20",
-    "@types/react": "^18.2.37",
-    "@typescript-eslint/eslint-plugin": "^6.11.0",
-    "@typescript-eslint/parser": "^6.11.0",
+    "@types/react": "^18.2.38",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-import-resolver-node": "^0.3.9",
     "eslint-import-resolver-typescript": "^3.6.1",
@@ -17,8 +17,8 @@
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-unicorn": "^49.0.0",
     "react": "^18.2.0",
-    "tsx": "^4.1.4",
-    "typescript": "^5.2.2",
+    "tsx": "^4.2.0",
+    "typescript": "^5.3.2",
     "vitest": "^0.34.6"
   },
   "scripts": {

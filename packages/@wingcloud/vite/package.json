@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@wingcloud/simutils": "workspace:^",
-    "vite": "^5.0.0"
+    "vite": "^5.0.2"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",

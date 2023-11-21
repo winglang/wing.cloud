@@ -7,12 +7,12 @@
     "turbo": "^1.10.16"
   },
   "devDependencies": {
-    "@skyrpex/wingen": "^0.6.9",
+    "@skyrpex/wingen": "^0.6.10",
     "@types/node": "20",
     "prettier": "^3.1.0",
     "projen": "^0.77.1",
-    "tsx": "^4.1.4",
-    "typescript": "^5.2.2"
+    "tsx": "^4.2.0",
+    "typescript": "^5.3.2"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
