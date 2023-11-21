@@ -92,7 +92,6 @@ let wingCloudApi = new wingcloud_api.Api(
 let website = new vite.Vite(
   root: "../website",
   env: {
-    // VITE_API_URL: "${api.url}/wrpc",
     VITE_API_URL: "/wrpc",
     VITE_GITHUB_APP_CLIENT_ID: util.env("BOT_GITHUB_CLIENT_ID"),
     VITE_GITHUB_APP_NAME: util.env("BOT_GITHUB_APP_NAME"),
