@@ -2,6 +2,8 @@ import { Menu as HeadlessMenu, Transition } from "@headlessui/react";
 import clsx from "clsx";
 import { Fragment } from "react";
 
+import { useTheme } from "./theme-provider.js";
+
 interface Item {
   label?: string;
   onClick: () => void;
@@ -15,6 +17,7 @@ export interface MenuProps {
 }
 
 export const Menu = ({ title, icon, items = [], btnClassName }: MenuProps) => {
+  const { theme } = useTheme();
   return (
     <div className="relative items-center flex">
       <HeadlessMenu as="div" className="relative inline-block text-left">
@@ -38,7 +41,15 @@ export const Menu = ({ title, icon, items = [], btnClassName }: MenuProps) => {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <HeadlessMenu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-10">
+          <HeadlessMenu.Items
+            className={clsx(
+              "absolute right-0 mt-2 w-56 origin-top-right",
+              "rounded shadow-lg z-10",
+              "divide-y divide-gray-100 dark:divide-gray-700",
+              theme.bgInput,
+              theme.focusInput,
+            )}
+          >
             <div className="px-1 py-1 ">
               {items.map((item) => (
                 <HeadlessMenu.Item key={item.label}>
@@ -47,8 +58,9 @@ export const Menu = ({ title, icon, items = [], btnClassName }: MenuProps) => {
                       key={item.label}
                       onClick={item.onClick}
                       className={clsx(
-                        active && "bg-slate-100",
+                        active && theme.bg3,
                         "group flex w-full items-center rounded px-2 py-2 text-sm",
+                        theme.textInput,
                       )}
                     >
                       {item.label}

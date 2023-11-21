@@ -161,6 +161,7 @@ struct RuntimeServiceProps {
   flyToken: str?;
   flyOrgSlug: str?;
   environments: environments.Environments;
+  logs: cloud.Bucket;
 }
 
 bring "@cdktf/provider-aws" as aws;
@@ -173,7 +174,7 @@ pub class RuntimeService {
   runtimeHandler: IRuntimeHandler;
 
   new(props: RuntimeServiceProps) {
-    this.logs = new cloud.Bucket() as "deployment logs";
+    this.logs = props.logs;
 
     let var bucketName: str = "";
     let var bucketRegion: str = "";

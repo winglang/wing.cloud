@@ -44,7 +44,7 @@ export const DefaultTheme: Theme = {
   bg1: "bg-slate-300 dark:bg-slate-800",
   bg2: "bg-slate-200 dark:bg-slate-800",
   bg3: "bg-slate-100 dark:bg-slate-700",
-  bg4: "bg-white dark:bg-slate-550",
+  bg4: "bg-white dark:bg-slate-800",
   bgInput: "bg-white dark:bg-slate-800",
   bgInputHover: "hover:bg-slate-50 dark:hover:bg-slate-750",
   bg2Hover: "hover:bg-slate-200 dark:hover:bg-slate-750",

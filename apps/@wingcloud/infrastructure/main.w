@@ -57,11 +57,14 @@ let probotAdapter = new adapter.ProbotAdapter(
   webhookSecret: util.env("BOT_GITHUB_WEBHOOK_SECRET"),
 );
 
+let bucketLogs = new cloud.Bucket() as "deployment logs";
+
 let rntm = new runtime.RuntimeService(
   wingCloudUrl: apiUrlParam,
   flyToken: util.tryEnv("FLY_TOKEN"),
   flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
   environments: environments,
+  logs: bucketLogs,
 );
 
 let environmentManager = new EnvironmentManager.EnvironmentManager(
@@ -82,6 +85,7 @@ let wingCloudApi = new wingcloud_api.Api(
   githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
   appSecret: appSecret,
+  logs: bucketLogs,
 );
 
 let websitePort = 5174;
