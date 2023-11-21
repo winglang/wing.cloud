@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "../../design-system/button.js";
 import { Menu } from "../../design-system/menu.js";
+import { useTheme } from "../../design-system/theme-provider.js";
 import { MenuIcon } from "../../icons/menu-icon.js";
 import { wrpc } from "../../utils/wrpc.js";
 
@@ -48,9 +49,17 @@ const Page = ({ appName }: PageProps) => {
     navigate(`/apps/${appName}/settings`);
   }, [appName]);
 
+  const { theme } = useTheme();
+
   return (
     <>
-      <div className="flex gap-x-2 bg-white rounded p-4 shadow">
+      <div
+        className={clsx(
+          "flex gap-x-2 rounded p-4 border",
+          theme.bgInput,
+          theme.borderInput,
+        )}
+      >
         {app.data?.app.imageUrl ? (
           <img
             src={app.data.app.imageUrl}
