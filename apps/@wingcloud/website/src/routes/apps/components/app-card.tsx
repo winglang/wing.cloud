@@ -40,15 +40,7 @@ export const AppCard = ({
         </div>
 
         <div className="w-full truncate space-y-1">
-          <div className={clsx("text-lg", theme.text1)}>{app.appName}</div>
-          <div className={clsx("text-xs flex gap-x-1", theme.text2)}>
-            {app.lastCommitMessage && (
-              <GithubIcon className={clsx("h-4 w-4 shrink-0", theme.text1)} />
-            )}
-            <div className="truncate" title={app.lastCommitMessage}>
-              {app.lastCommitMessage?.split("\n")[0] || app.entryfile}
-            </div>
-          </div>
+          <div className="text-lg text-slate-800">{app.appName}</div>
         </div>
       </div>
 

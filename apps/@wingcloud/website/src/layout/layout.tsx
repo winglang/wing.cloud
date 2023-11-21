@@ -1,14 +1,11 @@
 import clsx from "clsx";
-import { useMemo, type PropsWithChildren } from "react";
+import { useMemo, type PropsWithChildren, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 import { Header } from "../components/header.js";
-import { SpinnerLoader } from "../components/spinner-loader.js";
 import { wrpc } from "../utils/wrpc.js";
 
 export const Layout = ({ children }: PropsWithChildren) => {
-  let authCheck;
-
   const location = useLocation();
 
   const fullWidthPage = useMemo(() => {
@@ -19,39 +16,32 @@ export const Layout = ({ children }: PropsWithChildren) => {
     return false;
   }, [location.pathname]);
 
-  if (location.pathname !== "/apps") {
-    try {
-      authCheck = wrpc["auth.check"].useQuery(undefined, {
-        throwOnError: true,
-        retry: false,
-      });
-    } catch (error) {
-      console.log(error);
+  const authCheck = wrpc["auth.check"].useQuery(undefined, {
+    enabled: location.pathname !== "/apps",
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (location.pathname === "/apps") {
+      return;
+    }
+
+    if (authCheck.isError) {
       window.location.href = "/apps";
     }
-  }
+  }, [authCheck.isError, location.pathname]);
 
   return (
     <>
-      {authCheck?.isLoading && (
-        <div className="fixed inset-0 flex items-center justify-center">
-          <SpinnerLoader />
-        </div>
-      )}
+      <Header />
 
-      <div className="absolute inset-0 flex flex-col">
-        {authCheck?.data?.userId && <Header />}
-
-        {!authCheck?.isLoading && (
-          <div
-            className={clsx(
-              "w-full flex-grow overflow-auto",
-              !fullWidthPage && "max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6",
-            )}
-          >
-            {children}
-          </div>
+      <div
+        className={clsx(
+          "w-full flex-grow overflow-auto",
+          !fullWidthPage && "max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6",
         )}
+      >
+        {children}
       </div>
     </>
   );

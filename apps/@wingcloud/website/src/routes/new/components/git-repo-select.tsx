@@ -17,9 +17,10 @@ export interface GitRepoSelectProps {
   setInstallationId: (installationId: string) => void;
   repositoryId: string;
   setRepositoryId: (repositoryId: string) => void;
-  installations: Installation[];
-  repos: Repository[];
-  loading: boolean;
+  installations: Installation[] | undefined;
+  installationsLoading?: boolean;
+  repos: Repository[] | undefined;
+  reposLoading?: boolean;
   disabled?: boolean;
 }
 
@@ -29,8 +30,9 @@ export const GitRepoSelect = ({
   repositoryId,
   setRepositoryId,
   installations,
+  installationsLoading,
   repos,
-  loading,
+  reposLoading,
   disabled,
 }: GitRepoSelectProps) => {
   const { theme } = useTheme();
@@ -38,39 +40,44 @@ export const GitRepoSelect = ({
   const [search, setSearch] = useState("");
 
   const installationPlaceholder = useMemo(() => {
-    if (loading) {
+    if (installationsLoading) {
       return "Loading...";
     }
-    if (installations.length === 0) {
+
+    if (installations?.length === 0) {
       return "No GitHub namespaces found";
     }
-  }, [loading, installations.length]);
+  }, [installationsLoading, installations?.length]);
 
   const filteredRepos = useMemo(() => {
-    return repos.filter((repo) => {
-      if (search === "") {
-        return true;
-      }
-      return repo.full_name
-        .toLocaleLowerCase()
-        .includes(search.toLocaleLowerCase());
-    });
+    return (
+      repos?.filter((repo) => {
+        if (search === "") {
+          return true;
+        }
+        return repo.full_name
+          .toLocaleLowerCase()
+          .includes(search.toLocaleLowerCase());
+      }) ?? []
+    );
   }, [repos, search]);
 
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full space-y-4">
       <div className="flex gap-2 w-full items-center">
         <div className="w-1/3">
           <Select
-            items={installations.map((installation) => ({
-              value: installation.id.toString(),
-              label: installation.account.login,
-            }))}
+            items={
+              installations?.map((installation) => ({
+                value: installation.id.toString(),
+                label: installation.account.login,
+              })) ?? []
+            }
             placeholder={installationPlaceholder}
             onChange={setInstallationId}
             value={installationId ?? ""}
             className="w-full"
-            disabled={loading || disabled}
+            disabled={installationsLoading}
             renderItem={(item) => {
               return (
                 <div className="flex items-center gap-2">
@@ -95,11 +102,9 @@ export const GitRepoSelect = ({
             leftIcon={MagnifyingGlassIcon}
             className="block w-full"
             containerClassName="w-full"
-            name="search"
-            id="search"
-            placeholder="Search..."
+            placeholder="Filter repos..."
             value={search}
-            disabled={loading || disabled}
+            disabled={disabled}
             onChange={(e) => {
               setSearch(e.target.value);
             }}
@@ -107,12 +112,28 @@ export const GitRepoSelect = ({
         </div>
       </div>
 
-      {loading && (
-        <div className="p-6 w-full flex items-center justify-center">
-          <SpinnerLoader />
+      {reposLoading && (
+        <div className="bg-white p-6 w-full flex items-center justify-center">
+          <SpinnerLoader size="sm" />
         </div>
       )}
-      {!loading && filteredRepos.length === 0 && (
+
+      {!reposLoading &&
+        repos &&
+        repos?.length > 0 &&
+        filteredRepos.length === 0 && (
+          <div
+            className={clsx(
+              "text-center flex justify-center w-full",
+              "text-xs py-2",
+              theme.text1,
+            )}
+          >
+            No repos found for the given filter query.
+          </div>
+        )}
+
+      {!reposLoading && (!repos || repos.length === 0) && (
         <div
           className={clsx(
             "text-center flex justify-center w-full",
@@ -123,59 +144,61 @@ export const GitRepoSelect = ({
           No repos found.
         </div>
       )}
-      {!loading && filteredRepos.length > 0 && (
-        <div
-          className={clsx(
-            "flex flex-col max-h-80 overflow-auto rounded",
-            "border divide-y divide-slate-200 dark:divide-slate-700",
-            theme.borderInput,
-          )}
-        >
-          {filteredRepos.map((repo) => (
-            <div
-              aria-disabled={disabled}
-              key={repo.id}
-              className={clsx(
-                theme.text1,
-                "text-xs px-2.5 py-4 gap-1",
-                "w-full text-left flex items-center",
-                "transition-all outline-none focus:outline-none",
-                "focus:bg-slate-50 dark:focus:bg-slate-750",
-                repositoryId === repo.full_name &&
-                  "bg-slate-50 dark:bg-slate-750",
-                repositoryId !== repo.full_name && theme.bgInput,
-                disabled && "opacity-50 cursor-not-allowed",
-              )}
-            >
-              <div className="flex items-center gap-2">
-                <img className="w-6 h-6 shrink-0" src={repo.owner.avatar_url} />
-                <div className="flex gap-1 items-center truncate">
-                  <div className="truncate">{repo.name}</div>
-                  {repo.private && (
-                    <LockClosedIcon className="w-3 h-3 shrink-0" />
-                  )}
+
+      {!reposLoading &&
+        filteredRepos !== undefined &&
+        filteredRepos.length > 0 && (
+          <div
+            className={clsx(
+              "flex flex-col max-h-80 overflow-auto rounded",
+              "border divide-y",
+              theme.borderInput,
+            )}
+          >
+            {filteredRepos?.map((repo) => (
+              <div
+                aria-disabled={disabled}
+                key={repo.id}
+                className={clsx(
+                  theme.text1,
+                  "text-xs px-2.5 py-2 gap-1",
+                  "w-full text-left flex items-center",
+                  "transition-all outline-none focus:outline-none",
+                  "focus:bg-slate-50 dark:focus:bg-slate-750",
+                  repositoryId === repo.full_name &&
+                    "bg-slate-50 dark:bg-slate-750",
+                  repositoryId !== repo.full_name && theme.bgInput,
+                  disabled && "opacity-50 cursor-not-allowed",
+                  !disabled && theme.bgInputHover,
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <img className="w-4 h-4" src={repo.owner.avatar_url} />
+                  <div className="flex gap-1 items-center">
+                    <div>{repo.name}</div>
+                    {repo.private && <LockClosedIcon className="w-3 h-3" />}
+                  </div>
+                </div>
+                <div className="flex flex-grow justify-end">
+                  <button
+                    className={clsx(
+                      "rounded px-1 py-0.5 border text-xs",
+                      theme.borderInput,
+                      theme.bgInputHover,
+                      theme.textInput,
+                    )}
+                    onClick={() => {
+                      setRepositoryId(repo.full_name);
+                    }}
+                    disabled={disabled}
+                  >
+                    Connect
+                  </button>
                 </div>
               </div>
-              <div className="flex flex-grow justify-end">
-                <button
-                  className={clsx(
-                    "rounded px-1 py-0.5 border text-xs",
-                    theme.borderInput,
-                    theme.bgInputHover,
-                    theme.textInput,
-                  )}
-                  onClick={() => {
-                    setRepositoryId(repo.full_name);
-                  }}
-                  disabled={disabled}
-                >
-                  Connect
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
     </div>
   );
 };

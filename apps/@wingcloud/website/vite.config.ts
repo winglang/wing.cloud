@@ -10,4 +10,9 @@ export default defineConfig({
   build: {
     outDir: "./dist/apps",
   },
+  server: {
+    hmr: {
+      port: 5177,
+    },
+  },
 });

@@ -39,7 +39,7 @@ class WingLibProject extends NodeProject {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-const winglangVersion = "^0.48.6";
+const winglangVersion = "^0.48.9";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -256,7 +256,17 @@ new Turbo(infrastructure, {
     compile: {
       dependsOn: ["^compile"],
       dotEnv: [".env"],
-      inputs: ["!target/**"],
+      inputs: [
+        "**/*.w",
+        "**/*.js",
+        "**/*.cjs",
+        "**/*.mjs",
+        "**/*.ts",
+        "**/*.cts",
+        "**/*.mts",
+        "!target/**",
+        "!node_modules/**",
+      ],
       outputs: [
         "target/main.tfaws/**",
         "!target/main.tfaws/.terraform.lock.hcl",

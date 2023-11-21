@@ -34,7 +34,6 @@ export interface App {
   createdAt: string;
   updatedBy: string;
   updatedAt: string;
-  lastCommitMessage?: string;
 }
 
 export interface TestResult {
@@ -133,7 +132,7 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.environments": QueryProcedure<
-    { appId: string },
+    { appName: string },
     {
       environments: Array<Environment>;
     }
@@ -184,11 +183,7 @@ export const wrpc = createWRPCReact<{
     { appId: string; appName: string; repoId: string; entryfile: string },
     {}
   >;
-  "app.rename": MutationProcedure<
-    { appId: string; appName: string; repository: string },
-    {}
-  >;
-  "app.delete": MutationProcedure<{ appId: string }, {}>;
+  "app.delete": MutationProcedure<{ appName: string }>;
   "user.listApps": QueryProcedure<
     undefined,
     {
@@ -209,7 +204,6 @@ export const wrpc = createWRPCReact<{
     },
     {
       appId: string;
-      appName: string;
     }
   >;
 }>();

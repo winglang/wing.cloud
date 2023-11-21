@@ -310,28 +310,16 @@ pub class Api {
       };
     });
 
-
-    api.post("/wrpc/app.rename", inflight (request) => {
-      let userId = getUserFromCookie(request);
-
-      let input = Json.parse(request.body ?? "");
-
-      apps.rename(
-        appId: input.get("appId").asStr(),
-        appName: input.get("appName").asStr(),
-        userId: userId,
-        repository: input.get("repository").asStr(),
-      );
-
-      return {
-      };
-    });
-
     api.post("/wrpc/app.delete", inflight (request) => {
       let userId = getUserFromCookie(request);
 
       let input = Json.parse(request.body ?? "");
-      let appId = input.get("appId").asStr();
+      let appName = input.get("appName").asStr();
+
+      let appId = apps.getByName(
+        userId: userId,
+        appName: appName,
+      ).appId;
 
       apps.delete(
         appId: appId,
@@ -348,8 +336,13 @@ pub class Api {
     api.get("/wrpc/app.environments", inflight (request) => {
       let userId = getUserFromCookie(request);
 
+      let appId = props.apps.getByName(
+        userId: userId,
+        appName: request.query.get("appName"),
+      ).appId;
+
       let environments = props.environments.list(
-        appId: request.query.get("appId"),
+        appId: appId,
       );
 
       return {
@@ -515,7 +508,8 @@ pub class Api {
       queue.push(Json.stringify(EnvironmentAction{
         type: "restartAll",
         data: EnvironmentManager.RestartAllEnvironmentOptions {
-          app: app,
+          appId: appId,
+          entryfile: app.entryfile,
       }}));
 
       return {
@@ -576,62 +570,90 @@ pub class Api {
       };
     });
 
+    let productionEnvironmentQueue = new cloud.Queue() as "Production Environment Queue";
+    productionEnvironmentQueue.setConsumer(inflight (event) => {
+      let input = Json.parse(event);
+
+      let appId = input.get("appId").asStr();
+      let entryfile = input.get("entryfile").asStr();
+      let repoId = input.get("repoId").asStr();
+      let defaultBranch = input.get("default_branch").asStr();
+
+      let commitData = GitHub.Client.getLastCommit(
+        token: input.get("accessToken").asStr(),
+        owner:  input.get("repoOwner").asStr(),
+        repo: input.get("repoName").asStr(),
+        default_branch: defaultBranch,
+      );
+
+      let installationId = input.get("installationId").asNum();
+      queue.push(Json.stringify(EnvironmentAction {
+        type: "create",
+        data: EnvironmentManager.CreateEnvironmentOptions {
+          createEnvironment: {
+            branch: defaultBranch,
+            appId: appId,
+            type: "production",
+            prTitle: defaultBranch,
+            repo: repoId,
+            status: "initializing",
+            installationId: installationId,
+          },
+          appId: appId,
+          entryfile: entryfile,
+          sha: commitData.sha,
+      }}));
+    });
     api.post("/wrpc/user.createApp", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
         let userId = getUserFromCookie(request);
 
         let input = Json.parse(request.body ?? "");
 
-        let gitHubLogin = users.getUsername(userId: userId);
-
         let defaultBranch = input.get("default_branch").asStr();
         let repoId = input.get("repoId").asStr();
-
-        let commitData = GitHub.Client.getLastCommit(
-          token: accessToken,
-          owner:  input.get("repoOwner").asStr(),
-          repo: input.get("repoName").asStr(),
-          default_branch: input.get("default_branch").asStr(),
-        );
+        let repoOwner = input.get("repoOwner").asStr();
+        let repoName = input.get("repoName").asStr();
+        let entryfile = input.get("entryfile").asStr();
 
         // TODO: https://github.com/winglang/wing/issues/3644
-        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9]+", "-");
+        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9-]+", "*");
+        if appName.contains("*") {
+          return {
+            status: 422,
+            body: {
+              message: "Invalid app name. Must consist of alphanumeric characters and hiphens only.",
+            },
+          };
+        }
 
-        let app = apps.create(
+        let appId = apps.create(
           appName: appName,
           description: input.tryGet("description")?.tryAsStr() ?? "",
-          repoId: input.get("repoId").asStr(),
-          repoName: input.get("repoName").asStr(),
-          repoOwner: input.get("repoOwner").asStr(),
+          repoId: repoId,
+          repoName: repoName,
+          repoOwner: repoOwner,
           imageUrl: input.get("imageUrl").asStr(),
           userId: userId,
-          entryfile: input.get("entryfile").asStr(),
+          entryfile: entryfile,
           createdAt: datetime.utcNow().toIso(),
-          createdBy: gitHubLogin,
-          lastCommitMessage: commitData?.commit?.message ?? "",
+          createdBy: userId,
         );
 
-        let installationId = num.fromStr(input.get("installationId").asStr());
-        queue.push(Json.stringify(EnvironmentAction{
-          type: "create",
-          data: EnvironmentManager.CreateEnvironmentOptions {
-            createEnvironment: {
-              branch: defaultBranch,
-              appId: app.appId,
-              type: "production",
-              prTitle: defaultBranch,
-              repo: repoId,
-              status: "initializing",
-              installationId: installationId,
-            },
-            app: app,
-            sha: commitData.sha,
-        }}));
+        productionEnvironmentQueue.push(Json.stringify({
+          accessToken: accessToken,
+          repoId: repoId,
+          repoOwner: repoOwner,
+          repoName: repoName,
+          default_branch: defaultBranch,
+          installationId: num.fromStr(input.get("installationId").asStr()),
+          appId: appId,
+          entryfile: entryfile,
+        }));
 
         return {
           body: {
-            appId: app.appId,
-            appName: app.appName,
+            appId: appId,
           },
         };
       } else {

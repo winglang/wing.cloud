@@ -8,18 +8,12 @@ import { useNotifications } from "../../../design-system/notification.js";
 import { wrpc } from "../../../utils/wrpc.js";
 
 export interface DeleteModalProps {
-  appId: string;
   appName: string;
   show: boolean;
   onClose: (value: boolean) => void;
 }
 
-export const DeleteModal = ({
-  appId,
-  appName,
-  show,
-  onClose,
-}: DeleteModalProps) => {
+export const DeleteModal = ({ appName, show, onClose }: DeleteModalProps) => {
   const { showNotification } = useNotifications();
 
   const navigate = useNavigate();
@@ -84,7 +78,7 @@ export const DeleteModal = ({
             },
           )}
           disabled={deleteApp.isPending}
-          onClick={() => deleteApp.mutate({ appId })}
+          onClick={() => deleteApp.mutate({ appName })}
         >
           {!deleteApp.isPending && <span>Delete</span>}
           {deleteApp.isPending && <span>Deleting...</span>}

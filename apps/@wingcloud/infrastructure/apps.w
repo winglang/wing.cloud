@@ -15,7 +15,6 @@ pub struct App {
   updatedAt: str;
   updatedBy: str;
   imageUrl: str?;
-  lastCommitMessage: str?;
 }
 
 struct Item extends App {
@@ -34,7 +33,6 @@ struct CreateAppOptions {
   createdAt: str;
   createdBy: str;
   imageUrl: str?;
-  lastCommitMessage: str?;
 }
 
 struct RenameAppOptions {
@@ -87,7 +85,7 @@ pub class Apps {
     this.table = table;
   }
 
-  pub inflight create(options: CreateAppOptions): App {
+  pub inflight create(options: CreateAppOptions): str {
     let appId = "app_${nanoid62.Nanoid62.generate()}";
 
     // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
@@ -108,7 +106,6 @@ pub class Apps {
         createdBy: options.createdBy,
         updatedAt: options.createdAt,
         updatedBy: options.createdBy,
-        lastCommitMessage: options.lastCommitMessage,
       };
     };
 
@@ -154,76 +151,7 @@ pub class Apps {
 
     ]);
 
-    return {
-      appId: appId,
-      appName: options.appName,
-      description: options.description,
-      imageUrl: options.imageUrl,
-      repoId: options.repoId,
-      repoOwner: options.repoOwner,
-      repoName: options.repoName,
-      userId: options.userId,
-      entryfile: options.entryfile,
-      createdAt: options.createdAt,
-      createdBy: options.createdBy,
-      updatedAt: options.createdAt,
-      updatedBy: options.createdBy,
-      lastCommitMessage: options.lastCommitMessage,
-    };
-  }
-
-  pub inflight rename(options: RenameAppOptions): void {
-    this.table.transactWriteItems(transactItems: [
-      {
-        update: {
-          key: {
-            pk: "APP#${options.appId}",
-            sk: "#",
-          },
-          updateExpression: "SET #appName = :appName",
-          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
-          expressionAttributeNames: {
-            "#pk": "pk",
-            "#appName": "appName",
-            "#userId": "userId",
-          },
-          expressionAttributeValues: {
-            ":appName": options.appName,
-            ":userId": options.userId,
-          },
-        }
-      },
-      {
-        update: {
-          key: {
-            pk: "USER#${options.userId}",
-            sk: "APP#${options.appId}",
-          },
-          updateExpression: "SET #appName = :appName",
-          expressionAttributeNames: {
-            "#appName": "appName",
-          },
-          expressionAttributeValues: {
-            ":appName": options.appName,
-          },
-        }
-      },
-      {
-        update: {
-          key: {
-            pk: "REPOSITORY#${options.repository}",
-            sk: "APP#${options.appId}",
-          },
-          updateExpression: "SET #appName = :appName",
-          expressionAttributeNames: {
-            "#appName": "appName",
-          },
-          expressionAttributeValues: {
-            ":appName": options.appName,
-          },
-        }
-      },
-    ]);
+    return appId;
   }
 
   pub inflight get(options: GetAppOptions): App {
@@ -249,7 +177,6 @@ pub class Apps {
         createdBy: item.get("createdBy").asStr(),
         updatedAt: item.get("updatedAt").asStr(),
         updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       };
     }
 
@@ -279,7 +206,6 @@ pub class Apps {
         createdBy: item.get("createdBy").asStr(),
         updatedAt: item.get("updatedAt").asStr(),
         updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       };
     }
 
@@ -310,7 +236,6 @@ pub class Apps {
         createdBy: item.get("createdBy").asStr(),
         updatedAt: item.get("updatedAt").asStr(),
         updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       }]);
     }
     return apps;
@@ -401,7 +326,6 @@ pub class Apps {
         createdBy: item.get("createdBy").asStr(),
         updatedAt: item.get("updatedAt").asStr(),
         updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       }]);
     }
     return apps;

@@ -54,7 +54,10 @@ export const useCreateAppFromRepo = () => {
       },
     );
     setCreateAppLoading(false);
-    return response;
+    return {
+      appId: response.appId,
+      appName: repo.name,
+    };
   }, [createAppMutation, installationId, listReposQuery.data, repositoryId]);
 
   useEffect(() => {
@@ -72,14 +75,6 @@ export const useCreateAppFromRepo = () => {
     setRepositoryId("");
   }, [installationId]);
 
-  const disabled = useMemo(() => {
-    return !installationId || !repositoryId;
-  }, [installationId, repositoryId]);
-
-  const loading = useMemo(() => {
-    return listInstallationsQuery.isLoading || listReposQuery.isLoading;
-  }, [listInstallationsQuery.isLoading, listReposQuery.isLoading]);
-
   return {
     createApp,
     installationId,
@@ -87,8 +82,6 @@ export const useCreateAppFromRepo = () => {
     repositoryId,
     setRepositoryId,
     createAppLoading,
-    loading,
-    disabled,
     listReposQuery,
     listInstallationsQuery,
   };

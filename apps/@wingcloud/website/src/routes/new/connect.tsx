@@ -14,6 +14,8 @@ import type { Installation } from "../../utils/wrpc.js";
 import { GitRepoSelect } from "./components/git-repo-select.js";
 import { NewAppContainer } from "./components/new-app-container.js";
 
+const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
+
 export const Component = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
@@ -39,25 +41,9 @@ export const Component = () => {
     setInstallationId,
     repositoryId,
     setRepositoryId,
-    loading,
   } = useCreateAppFromRepo();
 
   const [createAppLoading, setCreateAppLoading] = useState(false);
-  const [installations, setInstallations] = useState<Installation[]>([]);
-
-  useEffect(() => {
-    if (!listInstallationsQuery.data) {
-      return;
-    }
-    setInstallations(listInstallationsQuery.data.installations);
-  }, [listInstallationsQuery.data]);
-
-  const repos = useMemo(() => {
-    if (!listReposQuery.data || installationId === "") {
-      return [];
-    }
-    return listReposQuery.data.repositories;
-  }, [listReposQuery.data]);
 
   const onCreate = useCallback(async () => {
     setCreateAppLoading(true);
@@ -78,8 +64,6 @@ export const Component = () => {
     }
   }, [repositoryId]);
 
-  const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
-
   const openPopupWindow = usePopupWindow();
 
   return (
@@ -89,7 +73,7 @@ export const Component = () => {
         icon: LinkIcon,
       }}
     >
-      <div className="w-full space-y-2">
+      <div className="w-full space-y-4">
         <div className={clsx(theme.text1)}>Select a repository</div>
         <div className="w-full relative space-y-2">
           {createAppLoading && (
@@ -103,10 +87,10 @@ export const Component = () => {
             setInstallationId={setInstallationId}
             repositoryId={repositoryId || ""}
             setRepositoryId={setRepositoryId}
-            installations={installations}
-            repos={repos}
-            loading={loading}
-            disabled={createAppLoading}
+            installations={listInstallationsQuery.data?.installations}
+            installationsLoading={listInstallationsQuery.isLoading}
+            repos={listReposQuery.data?.repositories}
+            reposLoading={listReposQuery.isPending || listReposQuery.isLoading}
           />
           <div className="text-xs flex gap-1 items-center">
             <span className={clsx(theme.text1)}>Missing a repository?</span>

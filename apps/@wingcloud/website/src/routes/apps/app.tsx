@@ -2,38 +2,26 @@ import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { Menu } from "../../design-system/menu.js";
-import { useTheme } from "../../design-system/theme-provider.js";
-import { GithubIcon } from "../../icons/github-icon.js";
 import { MenuIcon } from "../../icons/menu-icon.js";
 import { wrpc } from "../../utils/wrpc.js";
 
 import { DeleteModal } from "./components/delete-modal.js";
 import { EnvironmentsList } from "./components/environments-list.js";
 
-export interface AppProps {
+interface PageProps {
   appName: string;
 }
 
-export const Component = () => {
-  const { theme } = useTheme();
-
-  const { appName } = useParams();
+const Page = ({ appName }: PageProps) => {
   const navigate = useNavigate();
 
-  const appQuery = wrpc["app.getByName"].useQuery({ appName: appName! });
-
-  const app = useMemo(() => {
-    return appQuery.data?.app;
-  }, [appQuery.data]);
+  const app = wrpc["app.getByName"].useQuery({ appName });
 
   const environmentsQuery = wrpc["app.environments"].useQuery(
-    { appId: app?.appId! },
+    { appName },
     {
-      enabled: app !== undefined,
-      // TODO: query invalidation
       refetchInterval: 1000 * 10,
     },
   );
@@ -46,119 +34,87 @@ export const Component = () => {
     );
   }, [environmentsQuery.data]);
 
-  const repositoryQuery = wrpc["github.getRepository"].useQuery(
-    {
-      owner: app?.repoOwner || "",
-      repo: app?.repoName || "",
-    },
-    {
-      enabled: app != undefined,
-    },
-  );
-  const repoUrl = useMemo(() => {
-    return repositoryQuery.data?.repository.html_url || "";
-  }, [repositoryQuery.data]);
-
-  const [loading, setLoading] = useState(false);
-
-  const goToSettings = useCallback(async () => {
-    navigate(`/apps/${app?.appName}/settings`);
-  }, [app?.appName]);
-
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
+  const repoURL = useMemo(() => {
+    if (!app.data) {
+      return;
+    }
+
+    return `https://github.com/${app.data.app.repoOwner}/${app.data.app.repoName}`;
+  }, [app.data]);
+
+  const goToSettings = useCallback(async () => {
+    navigate(`/apps/${appName}/settings`);
+  }, [appName]);
+
   return (
-    <div>
-      {!app && (
-        <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <SpinnerLoader />
-        </div>
-      )}
-
-      {app && (
-        <div className="space-y-4">
-          <div
-            className={clsx(
-              "flex gap-x-2 rounded p-4 border",
-              theme.bgInput,
-              theme.borderInput,
-            )}
-          >
-            <img src={app.imageUrl} alt="" className="w-14 h-14 rounded-full" />
-            <div className="space-y-1 pt-2 truncate ml-2">
-              <div
-                className={clsx("text-xl self-center truncate", theme.text1)}
-              >
-                {app.appName}
-              </div>
-              <div
-                className={clsx("text-xs self-center truncate", theme.text2)}
-              >
-                {app.description === "" ? (
-                  <div className="space-x-1 flex items-center truncate">
-                    <GithubIcon className="h-3 w-3 shrink-0" />
-                    <span className="truncate" title={app.lastCommitMessage}>
-                      {app.lastCommitMessage?.split("\n")[0]}
-                    </span>
-                  </div>
-                ) : (
-                  app.description
-                )}
-              </div>
-            </div>
-
-            <div className="flex grow justify-end items-end">
-              <div className="flex flex-col justify-between gap-3 h-full items-end">
-                <Menu
-                  items={[
-                    {
-                      label: "Settings",
-                      onClick: goToSettings,
-                    },
-                    {
-                      label: "Delete App",
-                      onClick: () => setDeleteModalOpen(true),
-                    },
-                  ]}
-                  icon={<MenuIcon className={clsx("h-4 w-4", theme.text1)} />}
-                />
-
-                <a href={repoUrl} target="_blank">
-                  <Button className="truncate" disabled={!repoUrl || loading}>
-                    Git Repository
-                  </Button>
-                </a>
-              </div>
-            </div>
+    <>
+      <div className="flex gap-x-2 bg-white rounded p-4 shadow">
+        {app.data?.app.imageUrl ? (
+          <img
+            src={app.data.app.imageUrl}
+            alt=""
+            className="w-14 h-14 rounded-full"
+          />
+        ) : (
+          <div className="w-14 h-14 rounded-full animate-pulse bg-slate-300" />
+        )}
+        <div className="space-y-1 pt-2 truncate ml-2">
+          <div className="text-slate-700 text-xl self-center truncate">
+            {appName}
           </div>
+        </div>
 
-          <div className="w-full relative">
-            {loading && (
-              <div className="absolute inset-0 flex items-center justify-center z-10">
-                <div
-                  className={clsx("absolute inset-0 opacity-50", theme.bgInput)}
-                />
-                <SpinnerLoader className="z-20" />
-              </div>
-            )}
-            <EnvironmentsList
-              environments={environments}
-              loading={environmentsQuery.isLoading}
-              appName={app.appName}
-              repoUrl={repoUrl}
+        <div className="flex grow justify-end items-end">
+          <div className="flex flex-col justify-between gap-3 h-full items-end">
+            <Menu
+              items={[
+                {
+                  label: "Settings",
+                  onClick: goToSettings,
+                },
+                {
+                  label: "Delete App",
+                  onClick: () => setDeleteModalOpen(true),
+                },
+              ]}
+              icon={<MenuIcon className="h-4 w-4 text-slate-700" />}
             />
+
+            <a href={repoURL} target="_blank">
+              <Button className="truncate" disabled={!repoURL}>
+                Git Repository
+              </Button>
+            </a>
           </div>
         </div>
-      )}
+      </div>
 
-      {appName && app?.appId && (
-        <DeleteModal
-          appId={app.appId}
+      <div className="w-full relative">
+        <EnvironmentsList
+          environments={environments}
+          loading={environmentsQuery.isLoading}
           appName={appName}
-          show={deleteModalOpen}
-          onClose={setDeleteModalOpen}
+          repoUrl={repoURL}
         />
-      )}
-    </div>
+      </div>
+
+      <DeleteModal
+        appName={appName}
+        show={deleteModalOpen}
+        onClose={setDeleteModalOpen}
+      />
+    </>
+  );
+};
+
+export const Component = () => {
+  const { appName } = useParams();
+  return (
+    <>
+      {!appName && <div>App not found</div>}
+      {appName && <Page appName={appName} />}
+    </>
   );
 };

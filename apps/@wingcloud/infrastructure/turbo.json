@@ -25,7 +25,15 @@
         ".env"
       ],
       "inputs": [
-        "!target/**"
+        "**/*.w",
+        "**/*.js",
+        "**/*.cjs",
+        "**/*.mjs",
+        "**/*.ts",
+        "**/*.cts",
+        "**/*.mts",
+        "!target/**",
+        "!node_modules/**"
       ],
       "outputs": [
         "target/main.tfaws/**",

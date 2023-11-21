@@ -13,7 +13,7 @@ import { EnvironmentsListItem } from "./environments-list-item.js";
 export interface EnvironmentsListProps {
   environments: Environment[];
   appName: string;
-  repoUrl: string;
+  repoUrl?: string;
   loading?: boolean;
 }
 
@@ -54,110 +54,157 @@ export const EnvironmentsList = ({
 
   return (
     <>
-      {loading && (
-        <div className="p-6 w-full flex items-center justify-center">
-          <SpinnerLoader />
-        </div>
-      )}
+      <div className="py-4 space-y-4">
+        <div className="space-y-2">
+          <div className={clsx("text-lg", theme.text1)}>Production</div>
 
-      {!loading && environments.length === 0 && (
-        <div
-          className={clsx(
-            "text-center p-6 w-ful border",
-            theme.bgInput,
-            theme.borderInput,
-          )}
-        >
-          <LinkIcon className={clsx("w-8 h-8 mx-auto", theme.text2)} />
-          <h3 className={clsx("mt-2 text-sm font-semibold", theme.text1)}>
-            No preview environments found.
-          </h3>
-
-          <p
-            className={clsx(
-              "mt-1 text-sm flex gap-x-1 w-full justify-center",
-              theme.text2,
-            )}
-          >
-            <span>Get started by</span>
-            <a
-              className="text-blue-600 hover:underline"
-              href={`${repoUrl}/compare`}
-              target="_blank"
-              rel="noopener noreferrer"
+          {loading && (
+            <div
+              className={clsx(
+                "p-4 w-full border text-center rounded",
+                theme.bgInput,
+                theme.borderInput,
+                theme.text1,
+              )}
             >
-              opening a Pull Request
-            </a>
-            .
-          </p>
-        </div>
-      )}
-
-      {environments.length > 0 && (
-        <div className="space-y-4">
-          {productionEnvs.length > 0 && (
-            <div className="space-y-2">
-              <div className={clsx("text-lg pt-2", theme.text1)}>
-                Production
+              <div className="flex items-center justify-center">
+                <SpinnerLoader size="sm" />
               </div>
-
-              {productionEnvs.map((environment) => (
-                <EnvironmentsListItem
-                  key={environment.id}
-                  appName={appName}
-                  environment={environment}
-                />
-              ))}
             </div>
           )}
 
-          <div className="space-y-2">
-            <div className={clsx("text-lg pt-2", theme.text1)}>
-              Preview Environments
+          {!loading && productionEnvs.length === 0 && (
+            <div
+              className={clsx(
+                "p-4 w-full border text-center rounded",
+                theme.bgInput,
+                theme.borderInput,
+                theme.text1,
+              )}
+            >
+              <BranchIcon className="w-12 h-12 mx-auto text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-800">
+                There's no production environment yet
+              </h3>
             </div>
+          )}
 
-            {previewEnvs.length > 0 && (
-              <Input
-                type="text"
-                leftIcon={MagnifyingGlassIcon}
-                className="block w-full"
-                containerClassName="w-full"
-                name="search"
-                id="search"
-                placeholder="Search..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                }}
-              />
-            )}
-
-            {filteredPreviewEnvs.map((environment) => (
-              <EnvironmentsListItem
-                key={environment.id}
-                appName={appName}
-                environment={environment}
-              />
-            ))}
-
-            {filteredPreviewEnvs.length === 0 && (
-              <div
-                className={clsx(
-                  "p-4 w-full border text-center",
-                  theme.bgInput,
-                  theme.borderInput,
-                  theme.text1,
-                )}
-              >
-                <BranchIcon className="w-12 h-12 mx-auto text-gray-400" />
-                <h3 className="mt-2 text-sm font-semibold text-gray-900">
-                  No previews found.
-                </h3>
-              </div>
-            )}
-          </div>
+          {productionEnvs.map((environment) => (
+            <EnvironmentsListItem
+              key={environment.id}
+              appName={appName}
+              environment={environment}
+            />
+          ))}
         </div>
-      )}
+
+        <div className="space-y-2">
+          <div className={clsx("text-lg", theme.text1)}>
+            Preview Environments
+          </div>
+
+          <Input
+            type="text"
+            leftIcon={MagnifyingGlassIcon}
+            className="block w-full"
+            containerClassName="w-full"
+            placeholder="Filter preview environments..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
+          />
+
+          {loading && (
+            <div
+              className={clsx(
+                "p-4 w-full border text-center rounded",
+                theme.bgInput,
+                theme.borderInput,
+                theme.text1,
+              )}
+            >
+              <div className="flex items-center justify-center">
+                <SpinnerLoader size="sm" />
+              </div>
+            </div>
+          )}
+
+          {!loading && filteredPreviewEnvs.length === 0 && (
+            <div
+              className={clsx(
+                "p-4 w-full border text-center",
+                theme.bgInput,
+                theme.borderInput,
+                theme.text1,
+              )}
+            >
+              <BranchIcon className="w-12 h-12 mx-auto text-gray-400" />
+
+              {search && (
+                <>
+                  <h3 className="mt-2 text-sm font-medium text-gray-800">
+                    No previews found for the query "{search}".
+                  </h3>
+                  <p
+                    className={clsx(
+                      "mt-1 text-xs flex gap-x-1 w-full justify-center",
+                      theme.text2,
+                    )}
+                  >
+                    <span>
+                      Try a different query or{" "}
+                      <button
+                        className="text-blue-600 hover:underline"
+                        onClick={() => setSearch("")}
+                      >
+                        clear the query
+                      </button>
+                      .
+                    </span>
+                  </p>
+                </>
+              )}
+
+              {!search && (
+                <>
+                  <h3 className="mt-2 text-sm font-medium text-gray-800">
+                    No previews found.
+                  </h3>
+
+                  <p
+                    className={clsx(
+                      "mt-1 text-xs flex gap-x-1 w-full justify-center",
+                      theme.text2,
+                    )}
+                  >
+                    <span>Get started by</span>
+                    <span>
+                      <a
+                        className="text-blue-600 hover:underline"
+                        href={`${repoUrl}/compare`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        opening a Pull Request
+                      </a>
+                      .
+                    </span>
+                  </p>
+                </>
+              )}
+            </div>
+          )}
+
+          {filteredPreviewEnvs.map((environment) => (
+            <EnvironmentsListItem
+              key={environment.id}
+              appName={appName}
+              environment={environment}
+            />
+          ))}
+        </div>
+      </div>
     </>
   );
 };
