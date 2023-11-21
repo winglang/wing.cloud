@@ -27,29 +27,30 @@ pub class GithubComment {
     if status == "tests" {
       return "Running Tests";
     }
+    if status == "running" {
+      return "✅ Ready";
+    }
     return status.at(0).uppercase() + status.substring(1);
   }
 
   pub inflight createOrUpdate(props: GithubCommentCreateProps): num {
-    let wingIdentifier = "[wing]: wing";
     let var commentId: num? = nil;
-    let var commentBody = "${wingIdentifier}
-
-| App         | Status | Preview | Tests | Updated (UTC) |
-| --------------- | ------ | ------- | ----- | -------------- |";
+    let tableHeader = "<tr><th>App</th><th>Status</th><th>Preview</th><th>Updated (UTC)</th></tr>";
+    let var commentBody = "<table>${tableHeader}";
     for app in this.apps.listByRepository(repository: props.repo) {
       for environment in this.environments.list(appId: app.appId) {
         if environment.repo == props.repo && environment.prNumber == props.prNumber {
-          let var testsString = "---";
+          let var testRows = "";
           if let testResults = environment.testResults {
-            testsString = "";
             let var i = 0;
             for testResult in testResults.testResults {
               let var icon = "✅";
               if !testResult.pass {
                 icon = "❌";
               }
-              testsString = "${icon} ${testResult.path}<br> ${testsString}";
+              let testName = testResult.path.split(":").at(-1);
+              let testResourcePath = testResult.path.split(":").at(0);
+              testRows = "${testRows}<tr><td>${testName}</td><td>${testResourcePath}</td><td>${icon}</td></tr>";
               i += 1;
             }
           }
@@ -57,15 +58,21 @@ pub class GithubComment {
           let var previewUrl = "";
           let shouldDisplayUrl = environment.status == "running";
           if(shouldDisplayUrl) {
-            previewUrl = "[Visit](${environment.url})";
+            previewUrl = "<a href=\"${environment.url}\">Visit Preview</a>";
           }
 
-          let entryfile = "[${app.appName}](https://github.com/${environment.repo}/blob/${environment.branch}/${app.entryfile})";
+          let entryfile = "<a href=\"https://github.com/${environment.repo}/blob/${environment.branch}/${app.entryfile}\">${app.appName}</a>";
 
-          let date = std.Datetime.utcNow().toIso();
-          let tableRows = "| ${entryfile} | ${this.envStatusToString(environment.status)} | ${previewUrl} | ${testsString} | ${date} |";
+          let date = std.Datetime.utcNow();
+          let dateStr = "${date.dayOfMonth}-${date.month}-${date.year} ${date.hours}:${date.min} (UTC)";
+          let tableRows = "<tr><td>${entryfile}</td><td>${this.envStatusToString(environment.status)}</td><td>${previewUrl}</td><td>${dateStr}</td></tr>";
+          let testsSection = "<details><summary>Tests</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th></tr>${testRows}</table></details>";
 
-          commentBody = "${commentBody}\n${tableRows}";
+          commentBody = "${commentBody}${tableRows}</table>";
+
+          if testRows != "" {
+            commentBody = "${commentBody}<br>${testsSection}";
+          }
 
           if !commentId? && environment.commentId? {
             commentId = environment.commentId;
