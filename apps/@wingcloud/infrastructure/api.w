@@ -130,6 +130,7 @@ pub class Api {
               secure: true,
               sameSite: "strict",
               expires: 0,
+              path: "/",
             },
           ),
         },
@@ -169,6 +170,8 @@ pub class Api {
           httpOnly: true,
           secure: true,
           sameSite: "strict",
+          maxAge: 3600,
+          path: "/",
         },
       );
 
@@ -280,24 +283,33 @@ pub class Api {
 
       let appId = request.query.get("appId");
 
-      let app = apps.get(
-        appId: appId,
-      );
+      try {
+        let app = apps.get(
+          appId: appId,
+        );
 
-      if app.userId != userId {
+        if app.userId != userId {
+          return {
+            status: 403,
+            body: {
+              error: "Forbidden or not found",
+            },
+          };
+        }
+
         return {
-          status: 403,
           body: {
-            error: "Forbidden",
+            app: app,
+          },
+        };
+      } catch error {
+        return {
+          status: 400,
+          body: {
+            error: "Forbidden or not found",
           },
         };
       }
-
-      return {
-        body: {
-            app: app,
-        },
-      };
     });
 
     api.get("/wrpc/app.getByName", inflight (request) => {
