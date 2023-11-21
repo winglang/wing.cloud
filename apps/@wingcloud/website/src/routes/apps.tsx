@@ -97,6 +97,7 @@ export const Component = () => {
             <div
               className={clsx(
                 "flex flex-wrap gap-6 w-full",
+                "py-4",
                 "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
               )}
             >
