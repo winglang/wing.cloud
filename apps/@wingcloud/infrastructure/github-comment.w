@@ -6,6 +6,7 @@ bring "./types/octokit-types.w" as octokit;
 struct GithubCommentProps {
   environments: environments.Environments;
   apps: apps.Apps;
+  siteDomain: str;
 }
 
 struct GithubCommentCreateProps {
@@ -17,10 +18,12 @@ struct GithubCommentCreateProps {
 pub class GithubComment {
   environments: environments.Environments;
   apps: apps.Apps;
+  siteDomain: str;
 
   new(props: GithubCommentProps) {
     this.environments = props.environments;
     this.apps = props.apps;
+    this.siteDomain = props.siteDomain;
   }
 
   inflight envStatusToString(status: str): str {
@@ -44,13 +47,13 @@ pub class GithubComment {
           if let testResults = environment.testResults {
             let var i = 0;
             for testResult in testResults.testResults {
-              let var icon = "✅";
+              let var testRes = "✅ Passed";
               if !testResult.pass {
-                icon = "❌";
+                testRes = "❌ Failed";
               }
               let testName = testResult.path.split(":").at(-1);
               let testResourcePath = testResult.path.split(":").at(0);
-              testRows = "${testRows}<tr><td>${testName}</td><td>${testResourcePath}</td><td>${icon}</td></tr>";
+              testRows = "${testRows}<tr><td>${testName}</td><td>${testResourcePath}</td><td>${testRes}</td></tr>";
               i += 1;
             }
           }
@@ -58,14 +61,14 @@ pub class GithubComment {
           let var previewUrl = "";
           let shouldDisplayUrl = environment.status == "running";
           if(shouldDisplayUrl) {
-            previewUrl = "<a href=\"${environment.url}\">Visit Preview</a>";
+            previewUrl = "<a target=\"_blank\" href=\"${this.siteDomain}/apps/${app.appName}/${environment.branch}/preview\">Visit Preview</a>";
           }
 
-          let entryfile = "<a href=\"https://github.com/${environment.repo}/blob/${environment.branch}/${app.entryfile}\">${app.appName}</a>";
+          let appNameLink = "<a target=\"_blank\" href=\"${this.siteDomain}/apps/${app.appName}\">${app.appName}</a>";
 
           let date = std.Datetime.utcNow();
           let dateStr = "${date.dayOfMonth}-${date.month}-${date.year} ${date.hours}:${date.min} (UTC)";
-          let tableRows = "<tr><td>${entryfile}</td><td>${this.envStatusToString(environment.status)}</td><td>${previewUrl}</td><td>${dateStr}</td></tr>";
+          let tableRows = "<tr><td>${appNameLink}</td><td>${this.envStatusToString(environment.status)}</td><td>${previewUrl}</td><td>${dateStr}</td></tr>";
           let testsSection = "<details><summary>Tests</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th></tr>${testRows}</table></details>";
 
           commentBody = "${commentBody}${tableRows}</table>";
