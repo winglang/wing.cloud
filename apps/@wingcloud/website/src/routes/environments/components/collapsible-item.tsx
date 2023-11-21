@@ -35,7 +35,7 @@ export const CollapsibleItem = ({
       <button
         id={id}
         className={clsx(
-          "flex items-center justify-between w-full text-left p-6",
+          "flex items-center justify-between w-full text-left p-6 outline-none",
           isOpen && "border-b rounded-t shadow-sm",
           !isOpen && "rounded",
           theme.borderInput,
