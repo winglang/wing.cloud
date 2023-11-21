@@ -56,7 +56,8 @@ export type EnvironmentStatus =
   | "tests"
   | "deploying"
   | "running"
-  | "error";
+  | "error"
+  | "stopped";
 
 export interface Environment {
   id: string;

@@ -5,11 +5,12 @@ import { createConsoleApp } from "@wingconsole/app";
 import { type Application } from "express";
 
 import { type KeyStore } from "../auth/key-store.js";
+import type { Logger } from "../logger.js";
 
 export interface StartServerProps {
   consolePath: string;
   entryfilePath: string;
-  logfile: string;
+  logger: Logger;
   keyStore: KeyStore;
   requestedPort?: number;
 }
@@ -17,26 +18,19 @@ export interface StartServerProps {
 export async function startServer({
   consolePath,
   entryfilePath,
-  logfile,
+  logger,
   keyStore,
   requestedPort,
 }: StartServerProps) {
   const wingConsole = await import(consolePath);
   const create: typeof createConsoleApp = wingConsole.createConsoleApp;
-  const writeMessageToFile = (message: any, ...props: any) => {
-    appendFileSync(
-      logfile,
-      `${message}${props.length > 0 ? ":" + props.join(",") : ""}\n`,
-      "utf8",
-    );
-  };
   const { port, close } = await create({
     wingfile: entryfilePath,
     requestedPort,
     log: {
-      info: writeMessageToFile,
-      error: writeMessageToFile,
-      verbose: writeMessageToFile,
+      info: logger.log,
+      error: logger.log,
+      verbose: logger.log,
     },
     config: {
       addEventListener(event: any, listener: any) {},

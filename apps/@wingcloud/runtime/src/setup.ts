@@ -9,7 +9,7 @@ import { installWing } from "./wing/install.js";
 import { wingTest } from "./wing/test.js";
 
 export interface SetupProps {
-  e: Executer;
+  executer: Executer;
   context: EnvironmentContext;
 }
 
@@ -21,12 +21,12 @@ export interface WingPaths {
 }
 
 export class Setup {
-  e: Executer;
+  executer: Executer;
   context: EnvironmentContext;
   sourceDir: string;
 
-  constructor({ e, context }: SetupProps) {
-    this.e = e;
+  constructor({ executer, context }: SetupProps) {
+    this.executer = executer;
     this.context = context;
     this.sourceDir = mkdtempSync(join(tmpdir(), "source-"));
   }
@@ -47,7 +47,7 @@ export class Setup {
 
   private async gitClone() {
     return this.context.gitProvider.clone(
-      this.e,
+      this.executer,
       this.context.environment.commit,
       this.sourceDir,
     );
@@ -55,12 +55,15 @@ export class Setup {
 
   private async npmInstall(cwd: string) {
     if (existsSync(join(cwd, "package.json"))) {
-      return this.e.exec("npm", ["install"], { cwd, throwOnFailure: true });
+      return this.executer.exec("npm", ["install"], {
+        cwd,
+        throwOnFailure: true,
+      });
     }
   }
 
   private async runInstallWing(cwd: string) {
-    return installWing(cwd, this.e);
+    return installWing(cwd, this.executer);
   }
 
   private async runWingTest(wingPaths: WingPaths, entryfile: string) {

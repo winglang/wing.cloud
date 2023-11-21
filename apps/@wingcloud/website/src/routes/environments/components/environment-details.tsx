@@ -69,6 +69,7 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
                       "bg-yellow-300 animate-pulse",
                     environment?.status === "running" && "bg-green-300",
                     environment?.status === "error" && "bg-red-300",
+                    environment?.status === "stopped" && "bg-slate-400",
                   )}
                 />
                 <div className="rounded-xl px-2 py-0.5 capitalize truncate">

@@ -21,6 +21,10 @@ export class Environment {
     return this.bucketKey("deployment");
   }
 
+  buildKey() {
+    return this.bucketKey("build");
+  }
+
   private bucketKey(key: string) {
     return `${this.id}/${key}.log`;
   }

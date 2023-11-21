@@ -1,9 +1,10 @@
 import { randomBytes } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { appendFileSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { createKeyStore } from "./auth/key-store.js";
+import { BucketLogger } from "./bucket-logger.js";
 import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
 import { useReportStatus } from "./report-status.js";
@@ -17,40 +18,46 @@ export interface RunProps {
 }
 
 export const run = async function ({ context, requestedPort }: RunProps) {
-  const logfile = join(tmpdir(), "log-" + randomBytes(8).toString("hex"));
-  console.log(`Setup preview runtime. logfile ${logfile}`);
+  const executorLogfile = join(
+    tmpdir(),
+    "log-" + randomBytes(8).toString("hex"),
+  );
+  console.log(`Setup preview runtime. logfile ${executorLogfile}`);
 
   const keyStore = await createKeyStore(context.environment.id);
   const report = useReportStatus(context, keyStore);
 
-  const e = new Executer(logfile);
+  const executer = new Executer(executorLogfile);
 
-  let cancelFileSync;
+  const logger = new BucketLogger({
+    key: context.environment.buildKey(),
+    bucket: context.logsBucket,
+  });
+
+  let executorLogsSync;
   try {
     await report("deploying");
 
     const { cancelSync } = fileBucketSync({
-      file: logfile,
+      file: executorLogfile,
       key: context.environment.deploymentKey(),
       bucket: context.logsBucket,
     });
-    cancelFileSync = cancelSync;
+    executorLogsSync = cancelSync;
 
     const { paths, entryfilePath, testResults } = await new Setup({
-      e,
+      executer,
       context,
     }).setup();
-    
-    if (testResults) {
-      await report("tests", { testResults });
-    } else {
-      await report("error", { message: "failed to run tests" });
-    }
+
+    await (testResults
+      ? report("tests", { testResults })
+      : report("error", { message: "failed to run tests" }));
 
     const { port, close } = await startServer({
       consolePath: paths["@wingconsole/app"],
       entryfilePath,
-      logfile,
+      logger,
       keyStore,
       requestedPort,
     });
@@ -59,22 +66,25 @@ export const run = async function ({ context, requestedPort }: RunProps) {
 
     return {
       paths,
-      logfile,
+      logfile: executorLogfile,
       port,
       close: async () => {
-        cancelSync();
+        cancelSync?.();
+        logger.cancelFileSync();
         await close();
       },
     };
   } catch (error: any) {
+    appendFileSync(executorLogfile, `${error.toString()}\n`, "utf8");
     console.error(
       "preview runtime error",
       error,
-      readFileSync(logfile, "utf8"),
+      readFileSync(executorLogfile, "utf8"),
     );
     await report("error", { message: error.toString() });
-    cancelFileSync?.();
-    
+    logger.cancelFileSync();
+    executorLogsSync?.();
+
     throw error;
   }
 };
