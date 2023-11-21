@@ -38,7 +38,12 @@ export class Executer {
     }
 
     if (!options?.dontAppendPrefix) {
-      appendFileSync(logfile, `Running ${command} ${args}\n`, "utf8");
+      const time = new Date().toISOString();
+      appendFileSync(
+        logfile,
+        `${time} Running ${command} ${args.join(" ")}\n`,
+        "utf8",
+      );
     }
     const subprocess = spawnSync(command, args, {
       cwd: options?.cwd,
@@ -48,9 +53,10 @@ export class Executer {
         : process.env,
     });
     if (!options?.dontAppendSuffix) {
+      const time = new Date().toISOString();
       appendFileSync(
         logfile,
-        `Command ${command} exited with status ${subprocess.status}\n`,
+        `${time} Command ${command} exited with status ${subprocess.status}\n`,
         "utf8",
       );
     }

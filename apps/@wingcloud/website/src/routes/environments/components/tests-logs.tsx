@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
+import { getTime } from "../../../utils/time.js";
 import type { Log, TestResult } from "../../../utils/wrpc.js";
 
 import { CollapsibleItem } from "./collapsible-item.js";
@@ -14,13 +15,14 @@ export interface TestsLogsProps {
   loading?: boolean;
 }
 
+export const TEST_LOGS_ID = "test-logs";
+
 export const TestsLogs = ({ logs, testResults, loading }: TestsLogsProps) => {
   const { theme } = useTheme();
 
   const location = useLocation();
 
   const locationHash = useMemo(() => {
-    // url includes an ID with #
     if (location.hash) {
       return location.hash.slice(1);
     }
@@ -28,9 +30,9 @@ export const TestsLogs = ({ logs, testResults, loading }: TestsLogsProps) => {
 
   return (
     <CollapsibleItem
-      id="tests"
+      id={TEST_LOGS_ID}
       title="Tests"
-      defaultOpen={locationHash === "tests"}
+      defaultOpen={locationHash === TEST_LOGS_ID}
       loading={loading}
       rightOptions={
         <div className="flex gap-2 text-xs">
@@ -54,9 +56,10 @@ export const TestsLogs = ({ logs, testResults, loading }: TestsLogsProps) => {
           {logs.map((log, index) => (
             <div
               key={index}
-              className={clsx(theme.text1, theme.bgInputHover, "w-full py-0.5")}
+              className={clsx(theme.bgInputHover, "w-full py-0.5 flex gap-2")}
             >
-              {log.message}
+              <div className={clsx(theme.text2)}>{getTime(log.time)}</div>
+              <div className={clsx(theme.text1)}>{log.message}</div>
             </div>
           ))}
         </div>

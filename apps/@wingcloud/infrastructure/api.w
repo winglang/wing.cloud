@@ -13,9 +13,14 @@ bring "./environments.w" as Environments;
 bring "./secrets.w" as Secrets;
 bring "./lowkeys-map.w" as lowkeys;
 
+struct Log {
+  message: str;
+  time: str;
+}
 // TODO: https://github.com/winglang/wing/issues/3644
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
+  extern "./util.js" pub static inflight parseLogs(logs: Array<str>): Array<Log>;
 }
 bring "./environment-manager.w" as EnvironmentManager;
 bring "./status-reports.w" as status_reports;
@@ -36,10 +41,6 @@ struct ApiProps {
   logs: cloud.Bucket;
 }
 
-struct Log {
-  message: str;
-  timestamp: num;
-}
 
 struct EnvironmentAction {
   type: str;
@@ -546,36 +547,25 @@ pub class Api {
 
       let deployMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
       let deployLogs = MutArray<Log>[];
-      for message in deployMessages {
-          deployLogs.push(Log {
-            message: message,
-            // TODO: logs should have timestamps
-            timestamp: 0,
-          });
+      for log in Util.parseLogs(deployMessages) {
+        deployLogs.push(log);
       }
 
       let buildMessages = logs.tryGet("${envId}/build.log")?.split("\n") ?? [];
       let buildLogs = MutArray<Log>[];
-      for message in buildMessages {
-          buildLogs.push(Log {
-            message: message,
-            // TODO: logs should have timestamps
-            timestamp: 0,
-          });
+      for log in Util.parseLogs(buildMessages) {
+        buildLogs.push(log);
       }
 
       let testEntries = logs.list("${envId}/tests");
       let testLogs = MutArray<Log>[];
+
       for entry in testEntries {
-        let log = logs.get(entry);
-        let messages = log.split("\n");
-        for message in messages {
-            testLogs.push(Log {
-              message: message,
-              // TODO: logs should have timestamps
-              timestamp: 0,
-            });
-          }
+        let logEntry = logs.get(entry);
+        let testMessages = logEntry.split("\n");
+        for log in Util.parseLogs(testMessages) {
+          testLogs.push(log);
+        }
       }
 
       return {

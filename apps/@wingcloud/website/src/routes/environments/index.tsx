@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { wrpc } from "../../utils/wrpc.js";
 
-import { BuildLogs } from "./components/build-logs.js";
+import { RuntimeLogs } from "./components/build-logs.js";
 import { DeploymentLogs } from "./components/deployment-logs.js";
 import { EnvironmentDetails } from "./components/environment-details.js";
 import { TestsLogs } from "./components/tests-logs.js";
@@ -56,7 +56,7 @@ export const Component = () => {
           loading={logs.isLoading}
         />
 
-        <BuildLogs logs={logs.data?.build || []} loading={logs.isLoading} />
+        <RuntimeLogs logs={logs.data?.build || []} loading={logs.isLoading} />
       </div>
     </div>
   );

@@ -78,7 +78,7 @@ export interface Environment {
 
 export interface Log {
   message: string;
-  timestamp: number;
+  time: string;
 }
 
 export interface Secret {

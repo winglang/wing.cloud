@@ -14,7 +14,9 @@ export interface WingTestProps {
 async function wingCompile(wingCompilerPath: string, entryfilePath: string) {
   const wingCompiler = await import(wingCompilerPath);
   const compile: typeof compileFn = wingCompiler.compile;
-  const simfile = await compile(entryfilePath, { platform: [BuiltinPlatform.SIM] });
+  const simfile = await compile(entryfilePath, {
+    platform: [BuiltinPlatform.SIM],
+  });
   return simfile;
 }
 
@@ -26,14 +28,19 @@ async function wingTestOne(
   const result = await testRunner.runTest(testResourcePath);
   const traces = result.traces
     .map((t) => {
-      return t.type === "log" ? (t.data.message as string) : undefined;
+      if (t.type !== "log") {
+        return;
+      }
+      return `${t.timestamp} ${t.data.message}`;
     })
     .filter((t) => !!t)
     .join("\n");
-  const logs = result.error ? `${result.error}\n${traces}` : (traces || "<no logs>");
+
+  const logs = result.error ? `${traces}\n${result.error}` : traces;
+
   await props.bucketWrite(
     props.environment.testKey(result.pass, testResourcePath),
-    logs,
+    logs || "<no logs>",
   );
   return { path: result.path, pass: result.pass };
 }
@@ -46,9 +53,10 @@ export async function wingTest(props: WingTestProps) {
 
   try {
     const wingSdk = await import(props.wingSdkPath);
-    const simulator: simulator.Simulator = await new wingSdk.simulator.Simulator({
-      simfile,
-    });
+    const simulator: simulator.Simulator =
+      await new wingSdk.simulator.Simulator({
+        simfile,
+      });
     await simulator.start();
 
     const client = simulator.getResource(

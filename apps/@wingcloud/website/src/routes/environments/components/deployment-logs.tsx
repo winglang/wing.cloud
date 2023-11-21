@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
+import { getTime } from "../../../utils/time.js";
 import type { Log } from "../../../utils/wrpc.js";
 
 import { CollapsibleItem } from "./collapsible-item.js";
@@ -10,6 +11,8 @@ export interface DeploymentLogsProps {
   logs: Log[];
   loading?: boolean;
 }
+
+export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 
 export const DeploymentLogs = ({ logs, loading }: DeploymentLogsProps) => {
   const { theme } = useTheme();
@@ -25,9 +28,9 @@ export const DeploymentLogs = ({ logs, loading }: DeploymentLogsProps) => {
 
   return (
     <CollapsibleItem
-      id="deploy-logs"
+      id={DEPLOYMENT_LOGS_ID}
       title="Deployment logs"
-      defaultOpen={locationHash === "logs"}
+      defaultOpen={locationHash === DEPLOYMENT_LOGS_ID}
       loading={loading}
       children={
         <div className="text-2xs font-mono">
@@ -39,9 +42,10 @@ export const DeploymentLogs = ({ logs, loading }: DeploymentLogsProps) => {
           {logs.map((log, index) => (
             <div
               key={index}
-              className={clsx(theme.text1, theme.bgInputHover, "w-full py-0.5")}
+              className={clsx(theme.bgInputHover, "w-full py-0.5 flex gap-2")}
             >
-              {log.message}
+              <div className={clsx(theme.text2)}>{getTime(log.time)}</div>
+              <div className={clsx(theme.text1)}>{log.message}</div>
             </div>
           ))}
         </div>

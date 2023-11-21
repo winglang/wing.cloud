@@ -12,6 +12,8 @@ import { BranchIcon } from "../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import type { Environment } from "../../../utils/wrpc.js";
+import { DEPLOYMENT_LOGS_ID } from "../../environments/components/deployment-logs.js";
+import { TEST_LOGS_ID } from "../../environments/components/tests-logs.js";
 
 type ErrorStatus = "failed" | "passed";
 
@@ -130,7 +132,7 @@ export const EnvironmentsListItem = ({
 
               {testStatus && (
                 <Link
-                  to={`/apps/${appName}/${environment.branch}/#tests`}
+                  to={`/apps/${appName}/${environment.branch}/#${TEST_LOGS_ID}`}
                   className={clsx(
                     "flex items-end gap-x-0.5",
                     "rounded-xl px-1 py-0.5",
@@ -175,7 +177,7 @@ export const EnvironmentsListItem = ({
               >
                 {status === "error" && (
                   <Link
-                    to={`/apps/${appName}/${environment.branch}/#deploy-logs`}
+                    to={`/apps/${appName}/${environment.branch}/#${DEPLOYMENT_LOGS_ID}`}
                     className="hover:underline"
                   >
                     {statusString}
