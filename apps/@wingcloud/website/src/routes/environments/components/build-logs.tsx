@@ -6,12 +6,12 @@ import { useTheme } from "../../../design-system/theme-provider.js";
 import type { Log } from "../../../utils/wrpc.js";
 
 import { CollapsibleItem } from "./collapsible-item.js";
-export interface DeploymentLogsProps {
+export interface BuildLogsProps {
   logs: Log[];
   loading?: boolean;
 }
 
-export const DeploymentLogs = ({ logs, loading }: DeploymentLogsProps) => {
+export const BuildLogs = ({ logs, loading }: BuildLogsProps) => {
   const { theme } = useTheme();
 
   const location = useLocation();
@@ -25,15 +25,15 @@ export const DeploymentLogs = ({ logs, loading }: DeploymentLogsProps) => {
 
   return (
     <CollapsibleItem
-      id="deploy-logs"
-      title="Deployment logs"
+      id="build-logs"
+      title="Build logs"
       defaultOpen={locationHash === "logs"}
       loading={loading}
       children={
         <div className="text-2xs font-mono">
           {logs.length === 0 && (
             <div className={clsx(theme.text2, "w-full py-0.5 text-center")}>
-              No deployment logs.
+              No build logs.
             </div>
           )}
           {logs.map((log, index) => (

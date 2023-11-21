@@ -148,6 +148,7 @@ export const wrpc = createWRPCReact<{
   "app.environment.logs": QueryProcedure<
     { appName: string; branch: string },
     {
+      deploy: Log[];
       build: Log[];
       tests: Log[];
     }

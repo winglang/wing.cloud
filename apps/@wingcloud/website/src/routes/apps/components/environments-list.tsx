@@ -143,7 +143,7 @@ export const EnvironmentsList = ({
             {filteredPreviewEnvs.length === 0 && (
               <div
                 className={clsx(
-                  "p-4 w-full border text-center",
+                  "p-4 w-full border text-center rounded",
                   theme.bgInput,
                   theme.borderInput,
                   theme.text1,

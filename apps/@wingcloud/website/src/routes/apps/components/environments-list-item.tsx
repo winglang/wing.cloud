@@ -175,7 +175,7 @@ export const EnvironmentsListItem = ({
               >
                 {status === "error" && (
                   <Link
-                    to={`/apps/${appName}/${environment.branch}/#logs`}
+                    to={`/apps/${appName}/${environment.branch}/#deploy-logs`}
                     className="hover:underline"
                   >
                     {statusString}

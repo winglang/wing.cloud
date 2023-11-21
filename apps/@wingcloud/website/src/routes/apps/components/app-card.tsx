@@ -21,7 +21,7 @@ export const AppCard = ({
       onClick={onClick}
       className={clsx(
         "flex flex-col",
-        "w-full h-full p-4 rounded-lg",
+        "w-full h-full p-4 rounded",
         "text-left border",
         theme.bgInput,
         theme.borderInput,

@@ -544,7 +544,17 @@ pub class Api {
 
       let envId = environment.id;
 
-      let buildMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
+      let deployMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
+      let deployLogs = MutArray<Log>[];
+      for message in deployMessages {
+          deployLogs.push(Log {
+            message: message,
+            // TODO: logs should have timestamps
+            timestamp: 0,
+          });
+      }
+
+      let buildMessages = logs.tryGet("${envId}/build.log")?.split("\n") ?? [];
       let buildLogs = MutArray<Log>[];
       for message in buildMessages {
           buildLogs.push(Log {
@@ -570,6 +580,7 @@ pub class Api {
 
       return {
         body: {
+          deploy: deployLogs.copy(),
           build: buildLogs.copy(),
           tests: testLogs.copy(),
         },
