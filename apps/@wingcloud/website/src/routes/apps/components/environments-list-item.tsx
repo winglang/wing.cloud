@@ -13,8 +13,6 @@ import { GithubIcon } from "../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import type { Environment } from "../../../utils/wrpc.js";
 
-type Status = "initializing" | "tests" | "deploying" | "running" | "failed";
-
 const getTestStatus = (environment: Environment) => {
   if (!environment.testResults?.testResults?.length) {
     return "";
@@ -24,7 +22,7 @@ const getTestStatus = (environment: Environment) => {
       (testResult) => testResult.pass === false,
     )
   ) {
-    return "failed";
+    return "error";
   }
   return "passed";
 };
@@ -39,7 +37,7 @@ export const EnvironmentsListItem = ({
   const { theme } = useTheme();
 
   const status = useMemo(() => {
-    return environment.status as Status;
+    return environment.status;
   }, [environment.status]);
 
   const testStatus = useMemo(() => {
@@ -86,7 +84,7 @@ export const EnvironmentsListItem = ({
               status === "initializing" && "bg-slate-400 animate-pulse",
               status === "deploying" && "bg-yellow-300 animate-pulse",
               status === "running" && "bg-green-300",
-              status === "failed" && "bg-red-300",
+              status === "error" && "bg-red-300",
             )}
           />
         </div>
@@ -145,7 +143,7 @@ export const EnvironmentsListItem = ({
                   {testStatus === "passed" && (
                     <CheckCircleIcon className="w-4 h-4 text-green-500" />
                   )}
-                  {testStatus === "failed" && (
+                  {testStatus === "error" && (
                     <XCircleIcon className="w-4 h-4 text-red-500" />
                   )}
                 </Link>
@@ -168,12 +166,12 @@ export const EnvironmentsListItem = ({
                   status === "initializing" && theme.bg3,
                   status === "tests" && "text-yellow-600 bg-yellow-100",
                   status === "deploying" && "text-yellow-600 bg-yellow-100",
-                  status === "failed" && "text-red-600 bg-red-100",
+                  status === "error" && "text-red-600 bg-red-100",
                   "text-xs rounded-xl px-2 py-0.5",
                   "capitalize font-[500]",
                 )}
               >
-                {status === "failed" && (
+                {status === "error" && (
                   <Link
                     to={`/apps/${appName}/${environment.branch}/#logs`}
                     className="hover:underline"
@@ -181,7 +179,7 @@ export const EnvironmentsListItem = ({
                     {statusString}
                   </Link>
                 )}
-                {status !== "failed" && statusString}
+                {status !== "error" && statusString}
               </div>
             )}
           </div>

@@ -549,6 +549,7 @@ pub class Api {
       for message in buildMessages {
           buildLogs.push(Log {
             message: message,
+            // TODO: logs should have timestamps
             timestamp: 0,
           });
       }
@@ -561,6 +562,7 @@ pub class Api {
         for message in messages {
             testLogs.push(Log {
               message: message,
+              // TODO: logs should have timestamps
               timestamp: 0,
             });
           }

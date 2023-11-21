@@ -43,7 +43,6 @@ export const Component = () => {
             layout={5}
             theme={mode}
             onTrace={(trace) => {
-              // Playground and Learn need to be able to listen to all traces.
               window.parent.postMessage({ trace }, "*");
             }}
           />

@@ -37,7 +37,7 @@ export interface App {
   lastCommitMessage?: string;
 }
 
-interface TestResult {
+export interface TestResult {
   path: string;
   pass: boolean;
 }
@@ -51,13 +51,20 @@ interface StatusReport {
   status: string;
 }
 
+export type EnvironmentStatus =
+  | "initializing"
+  | "tests"
+  | "deploying"
+  | "running"
+  | "error";
+
 export interface Environment {
   id: string;
   appId: string;
   type: string;
   repo: string;
   branch: string;
-  status: string;
+  status: EnvironmentStatus;
   installationId: number;
   prNumber: number;
   prTitle: string;
@@ -68,7 +75,7 @@ export interface Environment {
   updatedAt: string;
 }
 
-interface Log {
+export interface Log {
   message: string;
   timestamp: number;
 }
