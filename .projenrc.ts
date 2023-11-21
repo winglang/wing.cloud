@@ -190,6 +190,7 @@ runtime.addDeps(`@winglang/sdk@${winglangVersion}`);
 runtime.addDeps(`@winglang/compiler@${winglangVersion}`);
 runtime.addDeps(`@wingconsole/app@${winglangVersion}`);
 runtime.addDeps("express");
+runtime.addDeps("http-proxy");
 runtime.addDeps("jsonwebtoken");
 runtime.addDeps("jwk-to-pem");
 runtime.addDeps("jose");
@@ -198,6 +199,7 @@ runtime.addDeps("which");
 runtime.addDeps("ngrok");
 
 runtime.addDevDeps("@types/express");
+runtime.addDevDeps("@types/http-proxy");
 runtime.addDevDeps("@types/jsonwebtoken");
 runtime.addDevDeps("@types/jwk-to-pem");
 runtime.addDevDeps("simple-git");
