@@ -2,6 +2,7 @@ bring cloud;
 bring http;
 bring ex;
 bring util;
+bring fs;
 bring "constructs" as constructs;
 bring "../containers.w" as containers;
 bring "../flyio" as flyio;
@@ -9,7 +10,13 @@ bring "./runtime-docker.w" as runtimeDocker;
 bring "../environments.w" as environments;
 bring "@cdktf/provider-aws" as awsprovider;
 bring "../components/parameter/iparameter.w" as parameter;
+bring "../nanoid62.w" as nanoid62;
 
+class Consts {
+  pub static inflight secretsPath(): str {
+    return "/root/.wing/secrets.json";
+  }
+}
 struct RuntimeStartOptions {
   gitToken: str?;
   gitRepo: str;
@@ -21,6 +28,7 @@ struct RuntimeStartOptions {
   awsSecretAccessKey: str;
   wingCloudUrl: parameter.IParameter;
   environmentId: str;
+  secrets: Map<str>;
 }
 
 struct RuntimeStopOptions {
@@ -54,6 +62,11 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       volumes.set(repo.replace("file://", ""), "/source");
       repo = "file:///source";
     }
+
+    // write wing secrets.json
+    let secretsFile = fs.join(fs.mkdtemp("secrets-"), nanoid62.Nanoid62.generate());
+    fs.writeFile(secretsFile, Json.stringify(opts.secrets), encoding: "utf8");
+    volumes.set(secretsFile, Consts.secretsPath());
 
     let env = MutMap<str>{
       "GIT_REPO" => repo,
@@ -110,6 +123,15 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       app.create();
     }
 
+    app.addSecrets({
+      "WING_SECRETS": util.base64Encode(Json.stringify(opts.secrets))
+    });
+
+    let files = Array<flyio.File>[{
+      guest_path: Consts.secretsPath(),
+      secret_name: "WING_SECRETS"
+    }];
+
     let env = MutMap<str>{
       "GIT_REPO" => opts.gitRepo,
       "GIT_SHA" => opts.gitSha,
@@ -128,9 +150,9 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     }
 
     if exists {
-      app.update(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024);
+      app.update(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024, files: files);
     } else {
-      app.addMachine(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024);
+      app.addMachine(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024, files: files);
     }
 
     return app.url();
@@ -147,13 +169,14 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   }
 }
 
-struct Message {
+pub struct Message {
   repo: str;
   sha: str;
   entryfile: str;
   appId: str;
   environmentId: str;
   token: str?;
+  secrets: Map<str>;
 }
 
 struct RuntimeServiceProps {
@@ -238,6 +261,7 @@ pub class RuntimeService {
           entryfile: msg.entryfile,
           wingCloudUrl: props.wingCloudUrl,
           environmentId: msg.environmentId,
+          secrets: msg.secrets,
           logsBucketName: bucketName,
           logsBucketRegion: bucketRegion,
           awsAccessKeyId: awsAccessKeyId,
