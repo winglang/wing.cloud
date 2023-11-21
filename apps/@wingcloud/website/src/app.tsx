@@ -7,8 +7,10 @@ import { NotificationsProvider } from "./design-system/notification.js";
 import { DefaultTheme, ThemeProvider } from "./design-system/theme-provider.js";
 import { router } from "./router.jsx";
 
-const API_URL = import.meta.env["VITE_API_URL"];
-console.log({ API_URL });
+const API_URL = new URL(
+  import.meta.env["VITE_API_URL"],
+  location.href,
+).toString();
 
 export const App = () => {
   const [queryClient] = useState(() => new QueryClient());
