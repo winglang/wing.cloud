@@ -39,7 +39,7 @@ class WingLibProject extends NodeProject {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-const winglangVersion = "^0.48.1";
+const winglangVersion = "^0.48.6";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -146,6 +146,7 @@ website.addDeps("clsx");
 website.addDeps("@headlessui/react");
 website.addDeps("@heroicons/react");
 website.addDeps("react-popper");
+website.addDeps("@wingconsole/ui");
 
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 

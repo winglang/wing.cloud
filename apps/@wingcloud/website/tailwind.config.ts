@@ -1,10 +1,13 @@
+import ui from "@wingconsole/ui/tailwind-plugin.cjs";
 import { Config } from "tailwindcss";
 import defaultTheme from "tailwindcss/defaultTheme";
 
 export default {
-  content: ["index.html", "src/**/*"],
+  content: [...ui.content, "index.html", "src/**/*"],
   darkMode: "class",
+  plugins: [...ui.plugins],
   theme: {
+    ...ui.theme,
     fontFamily: {
       ...defaultTheme.fontFamily,
       sans: ["IBM Plex Sans", "Inter", ...defaultTheme.fontFamily.sans],

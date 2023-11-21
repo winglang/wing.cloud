@@ -37,7 +37,7 @@ export interface App {
   lastCommitMessage?: string;
 }
 
-interface TestResult {
+export interface TestResult {
   path: string;
   pass: boolean;
 }
@@ -51,20 +51,33 @@ interface StatusReport {
   status: string;
 }
 
+export type EnvironmentStatus =
+  | "initializing"
+  | "tests"
+  | "deploying"
+  | "running"
+  | "error";
+
 export interface Environment {
   id: string;
   appId: string;
+  type: string;
   repo: string;
   branch: string;
-  status: string;
+  status: EnvironmentStatus;
+  installationId: number;
   prNumber: number;
   prTitle: string;
-  installationId: number;
   url?: string;
   commentId?: number;
+  testResults?: TestResults;
   createdAt: string;
   updatedAt: string;
-  testResults?: TestResults;
+}
+
+export interface Log {
+  message: string;
+  timestamp: number;
 }
 
 export interface Secret {
@@ -126,10 +139,50 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.environment": QueryProcedure<
-    { environmentId: string },
+    { appName: string; branch: string },
     {
       environment: Environment;
     }
+  >;
+  "app.environment.logs": QueryProcedure<
+    { appName: string; branch: string },
+    {
+      build: Log[];
+      tests: Log[];
+    }
+  >;
+  "app.listSecrets": QueryProcedure<
+    { appId: string },
+    {
+      secrets: Array<Secret>;
+    }
+  >;
+  "app.decryptSecret": MutationProcedure<
+    { appId: string; secretId: string; environmentType: string },
+    { value: string }
+  >;
+  "app.createSecret": MutationProcedure<
+    {
+      appId: string;
+      environmentType: EnvironmentType;
+      name: string;
+      value: string;
+    },
+    {}
+  >;
+  "app.deleteSecret": MutationProcedure<
+    { appId: string; environmentType: string; secretId: string },
+    {}
+  >;
+  "app.listEntryfiles": QueryProcedure<
+    { owner: string; repo: string; default_branch: string },
+    {
+      entryfiles: Array<string>;
+    }
+  >;
+  "app.updateEntryfile": MutationProcedure<
+    { appId: string; appName: string; repoId: string; entryfile: string },
+    {}
   >;
   "app.rename": MutationProcedure<
     { appId: string; appName: string; repository: string },

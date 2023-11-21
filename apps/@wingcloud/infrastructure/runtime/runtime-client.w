@@ -1,6 +1,7 @@
 bring http;
 bring "../apps.w" as apps;
 bring "../environments.w" as environments;
+bring "./runtime.w" as runtime;
 
 struct RuntimeClientProps {
   runtimeUrl: str;
@@ -9,6 +10,7 @@ struct RuntimeClientProps {
 struct RuntimeClientCreateOptions {
   app: apps.App;
   environment: environments.Environment;
+  secrets: Map<str>;
   token: str;
   sha: str;
 }
@@ -25,13 +27,14 @@ pub class RuntimeClient {
   }
 
   pub inflight create(options: RuntimeClientCreateOptions) {
-    let res = http.post(this.runtimeUrl, body: Json.stringify({
+    let res = http.post(this.runtimeUrl, body: Json.stringify(runtime.Message {
       repo: options.environment.repo,
       sha: options.sha,
       entryfile: options.app.entryfile,
       appId: options.app.appId,
       environmentId: options.environment.id,
       token: options.token,
+      secrets: options.secrets,
     }));
 
     if !res.ok {

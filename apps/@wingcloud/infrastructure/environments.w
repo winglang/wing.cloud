@@ -63,9 +63,20 @@ struct GetEnvironmentOptions {
   id: str;
 }
 
+struct GetEnvironmentByBranchOptions {
+  appId: str;
+  branch: str;
+}
+
 struct ListEnvironmentOptions {
   appId: str;
 }
+
+struct MakeItemOptions {
+  pk: str;
+  sk: str;
+}
+
 
 pub class Environments {
   table: ex.DynamodbTable;
@@ -90,10 +101,10 @@ pub class Environments {
       updatedAt: createdAt,
     };
 
-    let getItem = (pk: str, sk: str) => {
+    let makeItem = (ops: MakeItemOptions) => {
       let item = MutJson {
-        pk: pk,
-        sk: sk,
+        pk: ops.pk,
+        sk: ops.sk,
         id: environment.id,
         appId: environment.appId,
         type: environment.type,
@@ -116,13 +127,24 @@ pub class Environments {
     this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: getItem("ENVIRONMENT#${environment.id}", "#"),
+          item: makeItem(pk: "ENVIRONMENT#${environment.id}", sk: "#"),
           conditionExpression: "attribute_not_exists(pk)"
         },
       },
       {
         put: {
-          item: getItem("APP#${environment.appId}", "ENVIRONMENT#${environment.id}"),
+          item: makeItem(
+            pk: "APP#${environment.appId}",
+            sk: "ENVIRONMENT#${environment.id}"
+          ),
+        },
+      },
+      {
+        put: {
+          item: makeItem(
+            pk: "APP#${environment.appId}",
+            sk: "BRANCH#${environment.branch}"
+          ),
         },
       },
     ]);
@@ -131,6 +153,10 @@ pub class Environments {
   }
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
+    let branch = this.get(
+      id: options.id,
+    ).branch;
+
     this.table.transactWriteItems(transactItems: [
       {
         update: {
@@ -156,6 +182,21 @@ pub class Environments {
           key: {
             pk: "APP#${options.appId}",
             sk: "ENVIRONMENT#${options.id}",
+          },
+          updateExpression: "SET #status = :status",
+          expressionAttributeNames: {
+            "#status": "status",
+          },
+          expressionAttributeValues: {
+            ":status": options.status,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#${options.appId}",
+            sk: "BRANCH#${branch}",
           },
           updateExpression: "SET #status = :status",
           expressionAttributeNames: {
@@ -170,6 +211,10 @@ pub class Environments {
   }
 
   pub inflight updateUrl(options: UpdateEnvironmentUrlOptions) {
+    let branch = this.get(
+      id: options.id,
+    ).branch;
+
     this.table.transactWriteItems(transactItems: [
       {
         update: {
@@ -195,6 +240,21 @@ pub class Environments {
           key: {
             pk: "APP#${options.appId}",
             sk: "ENVIRONMENT#${options.id}",
+          },
+          updateExpression: "SET #url = :url",
+          expressionAttributeNames: {
+            "#url": "url",
+          },
+          expressionAttributeValues: {
+            ":url": options.url,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#${options.appId}",
+            sk: "BRANCH#${branch}",
           },
           updateExpression: "SET #url = :url",
           expressionAttributeNames: {
@@ -209,6 +269,10 @@ pub class Environments {
   }
 
   pub inflight updateCommentId(options: UpdateEnvironmentCommentIdOptions) {
+    let branch = this.get(
+      id: options.id,
+    ).branch;
+
     this.table.transactWriteItems(transactItems: [
       {
         update: {
@@ -234,6 +298,21 @@ pub class Environments {
           key: {
             pk: "APP#${options.appId}",
             sk: "ENVIRONMENT#${options.id}",
+          },
+          updateExpression: "SET #commentId = :commentId",
+          expressionAttributeNames: {
+            "#commentId": "commentId",
+          },
+          expressionAttributeValues: {
+            ":commentId": options.commentId,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#${options.appId}",
+            sk: "BRANCH#${branch}",
           },
           updateExpression: "SET #commentId = :commentId",
           expressionAttributeNames: {
@@ -248,6 +327,10 @@ pub class Environments {
   }
 
   pub inflight updateTestResults(options: UpdateEnvironmentTestResultsOptions) {
+    let branch = this.get(
+      id: options.id,
+    ).branch;
+
     this.table.transactWriteItems(transactItems: [
       {
         update: {
@@ -283,6 +366,21 @@ pub class Environments {
           },
         }
       },
+      {
+        update: {
+          key: {
+            pk: "APP#${options.appId}",
+            sk: "BRANCH#${branch}",
+          },
+          updateExpression: "SET #testResults = :testResults",
+          expressionAttributeNames: {
+            "#testResults": "testResults",
+          },
+          expressionAttributeValues: {
+            ":testResults": options.testResults,
+          },
+        }
+      }
     ]);
   }
 
@@ -314,6 +412,36 @@ pub class Environments {
     }
 
     throw "Environment [${options.id}] not found";
+  }
+
+  pub inflight getByBranch(options: GetEnvironmentByBranchOptions): Environment {
+    let result = this.table.getItem(
+      key: {
+        pk: "APP#${options.appId}",
+        sk: "BRANCH#${options.branch}",
+      },
+    );
+
+    if let item = result.item {
+      return {
+        id: item.get("id").asStr(),
+        appId: item.get("appId").asStr(),
+        type: item.get("type").asStr(),
+        repo: item.get("repo").asStr(),
+        branch: item.get("branch").asStr(),
+        status: item.get("status").asStr(),
+        installationId: item.get("installationId").asNum(),
+        prNumber: item.tryGet("prNumber")?.tryAsNum(),
+        prTitle: item.tryGet("prTitle")?.tryAsStr(),
+        url: item.tryGet("url")?.tryAsStr(),
+        commentId: item.tryGet("commentId")?.tryAsNum(),
+        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
+        createdAt: item.get("createdAt").asStr(),
+        updatedAt: item.get("updatedAt").asStr(),
+      };
+    }
+
+    throw "Environment [${options.branch}] not found";
   }
 
   pub inflight list(options: ListEnvironmentOptions): Array<Environment> {
