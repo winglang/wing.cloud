@@ -148,7 +148,7 @@ export const GitRepoSelect = ({
               )}
             >
               <div className="flex items-center gap-2">
-                <img className="w-4 h-4 shrink-0" src={repo.owner.avatar_url} />
+                <img className="w-6 h-6 shrink-0" src={repo.owner.avatar_url} />
                 <div className="flex gap-1 items-center truncate">
                   <div className="truncate">{repo.name}</div>
                   {repo.private && (
