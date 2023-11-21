@@ -205,6 +205,29 @@ runtime.addDevDeps("@types/which");
 runtime.addGitIgnore("target/");
 
 ///////////////////////////////////////////////////////////////////////////////
+
+const platform = new TypescriptProject({
+  monorepo,
+  name: "@wingcloud/platform",
+  outdir: "packages/@wingcloud/platform",
+  tsup: {
+    entry: ["src/**/*.ts"],
+    outDir: "lib",
+    format: ["cjs"],
+    target: "node18",
+    dts: true,
+    bundle: false,
+    clean: true,
+  },
+});
+platform.addFields({ type: "commonjs" });
+platform.addFields({ types: "./lib/index.d.ts" });
+platform.addFields({ main: "./lib/index.js" });
+platform.addDeps(`@winglang/sdk@${winglangVersion}`);
+platform.addGitIgnore("**/target/");
+platform.addGitIgnore("wingcloud-platform-*"); // npm pack
+
+///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({
   monorepo,
   name: "@wingcloud/infrastructure",
@@ -305,6 +328,7 @@ infrastructure.addDeps(
   nanoid.name,
   simutils.name,
   ngrok.name,
+  platform.name,
 );
 infrastructure.addScript("example", "node ./bin/wing.mjs it example.main.w");
 
