@@ -13,16 +13,18 @@ import { GithubIcon } from "../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import type { Environment } from "../../../utils/wrpc.js";
 
-const getTestStatus = (environment: Environment) => {
+type ErrorStatus = "failed" | "passed";
+
+const getTestStatus = (environment: Environment): ErrorStatus | undefined => {
   if (!environment.testResults?.testResults?.length) {
-    return "";
+    return;
   }
   if (
     environment.testResults.testResults.some(
       (testResult) => testResult.pass === false,
     )
   ) {
-    return "error";
+    return "failed";
   }
   return "passed";
 };
@@ -126,7 +128,7 @@ export const EnvironmentsListItem = ({
                 </span>
               </div>
 
-              {["passed", "failed"].includes(testStatus) && (
+              {testStatus && (
                 <Link
                   to={`/apps/${appName}/${environment.branch}/#tests`}
                   className={clsx(
@@ -143,7 +145,7 @@ export const EnvironmentsListItem = ({
                   {testStatus === "passed" && (
                     <CheckCircleIcon className="w-4 h-4 text-green-500" />
                   )}
-                  {testStatus === "error" && (
+                  {testStatus === "failed" && (
                     <XCircleIcon className="w-4 h-4 text-red-500" />
                   )}
                 </Link>
