@@ -33,6 +33,12 @@ struct ApiProps {
   githubAppClientId: str;
   githubAppClientSecret: str;
   appSecret: str;
+  logs: cloud.Bucket;
+}
+
+struct Log {
+  message: str;
+  timestamp: num;
 }
 
 struct EnvironmentAction {
@@ -45,6 +51,7 @@ pub class Api {
     let api = new json_api.JsonApi(api: props.api);
     let apps = props.apps;
     let users = props.users;
+    let logs = props.logs;
     let queue = new cloud.Queue();
 
     let AUTH_COOKIE_NAME = "auth";
@@ -355,8 +362,17 @@ pub class Api {
     api.get("/wrpc/app.environment", inflight (request) => {
       let userId = getUserFromCookie(request);
 
-      let environment = props.environments.get(
-        id: request.query.get("environmentId"),
+      let appName = request.query.get("appName");
+      let branch = request.query.get("branch");
+
+      let appId = apps.getByName(
+        userId: userId,
+        appName: appName,
+      ).appId;
+
+      let environment = props.environments.getByBranch(
+        appId: appId,
+        branch: branch,
       );
 
       return {
@@ -377,7 +393,7 @@ pub class Api {
           secrets: prodSecrets.concat(previewSecrets)
         },
       };
-      
+
     });
 
     api.post("/wrpc/app.decryptSecret", inflight (request) => {
@@ -496,7 +512,7 @@ pub class Api {
       apps.updateEntrypoint(appId: appId, appName: appName, repository: repoId, userId: userId, entryfile: entryfile);
 
       let app = apps.get(appId: appId);
-      queue.push(Json.stringify(EnvironmentAction{ 
+      queue.push(Json.stringify(EnvironmentAction{
         type: "restartAll",
         data: EnvironmentManager.RestartAllEnvironmentOptions {
           app: app,
@@ -506,6 +522,56 @@ pub class Api {
         status: 200,
         body: {
           appId: appId,
+        },
+      };
+    });
+
+    api.get("/wrpc/app.environment.logs", inflight (request) => {
+      let userId = getUserFromCookie(request);
+
+      let appName = request.query.get("appName");
+      let branch = request.query.get("branch");
+
+      let appId = apps.getByName(
+        userId: userId,
+        appName: appName,
+      ).appId;
+
+      let environment = props.environments.getByBranch(
+        appId: appId,
+        branch: branch,
+      );
+
+      let envId = environment.id;
+
+      let buildMessages = logs.get("${envId}/deployment.log").split("\n");
+      let buildLogs = MutArray<Log>[];
+      for message in buildMessages {
+          buildLogs.push(Log {
+            message: message,
+            // TODO: logs should have timestamps
+            timestamp: 0,
+          });
+      }
+
+      let testEntries = logs.list("${envId}/tests");
+      let testLogs = MutArray<Log>[];
+      for entry in testEntries {
+        let log = logs.get(entry);
+        let messages = log.split("\n");
+        for message in messages {
+            testLogs.push(Log {
+              message: message,
+              // TODO: logs should have timestamps
+              timestamp: 0,
+            });
+          }
+      }
+
+      return {
+        body: {
+          build: buildLogs.copy(),
+          tests: testLogs.copy(),
         },
       };
     });
@@ -546,7 +612,7 @@ pub class Api {
         );
 
         let installationId = num.fromStr(input.get("installationId").asStr());
-        queue.push(Json.stringify(EnvironmentAction{ 
+        queue.push(Json.stringify(EnvironmentAction{
           type: "create",
           data: EnvironmentManager.CreateEnvironmentOptions {
             createEnvironment: {

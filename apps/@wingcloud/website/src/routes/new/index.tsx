@@ -1,6 +1,5 @@
 import { LinkIcon, SquaresPlusIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "../../design-system/button.js";
@@ -15,7 +14,7 @@ export const Component = () => {
 
   return (
     <NewAppContainer>
-      <div className="w-full space-y-2">
+      <div className="space-y-2">
         <div className={clsx(theme.text1)}>Select a configuration</div>
         <AppConfigurationListItem
           name="Connect"

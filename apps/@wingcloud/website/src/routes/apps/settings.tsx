@@ -98,7 +98,7 @@ export const Component = () => {
   }, [app?.appId, entryfile, updateEntryfileMutation]);
 
   return (
-    <>
+    <div>
       {!app && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
@@ -106,8 +106,14 @@ export const Component = () => {
       )}
 
       {app && (
-        <>
-          <div className="flex flex-col gap-x-2 bg-white rounded p-4 shadow">
+        <div className="space-y-4">
+          <div
+            className={clsx(
+              "flex flex-col gap-x-2 rounded p-4 border",
+              theme.bgInput,
+              theme.borderInput,
+            )}
+          >
             <div className={clsx("flex flex-col text-x truncate", theme.text1)}>
               <div className="flex flex-row items-center gap-2">
                 <span>App Entrypoint</span>
@@ -163,8 +169,8 @@ export const Component = () => {
           </div>
 
           <SecretsList appId={app.appId} />
-        </>
+        </div>
       )}
-    </>
+    </div>
   );
 };

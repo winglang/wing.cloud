@@ -125,7 +125,13 @@ export const SecretsList = ({ appId }: { appId: string }) => {
   const loading = secretsQuery.isLoading;
 
   return (
-    <div className="flex flex-col bg-white rounded p-4 shadow gap-2">
+    <div
+      className={clsx(
+        "flex flex-col gap-2 rounded p-4 border",
+        theme.bgInput,
+        theme.borderInput,
+      )}
+    >
       <div className={clsx("truncate", theme.text1)}>Secrets</div>
       <div className="flex flex-col">
         <NewSecret loading={updatingSecrets} onCreate={onCreate} />
