@@ -137,7 +137,7 @@ export const GitRepoSelect = ({
               key={repo.id}
               className={clsx(
                 theme.text1,
-                "text-xs px-2.5 py-2 gap-1",
+                "text-xs px-2.5 py-4 gap-1",
                 "w-full text-left flex items-center",
                 "transition-all outline-none focus:outline-none",
                 "focus:bg-slate-50 dark:focus:bg-slate-750",
@@ -148,7 +148,7 @@ export const GitRepoSelect = ({
               )}
             >
               <div className="flex items-center gap-2">
-                <img className="w-4 h-4 shrink-0" src={repo.owner.avatar_url} />
+                <img className="w-6 h-6 shrink-0" src={repo.owner.avatar_url} />
                 <div className="flex gap-1 items-center truncate">
                   <div className="truncate">{repo.name}</div>
                   {repo.private && (
