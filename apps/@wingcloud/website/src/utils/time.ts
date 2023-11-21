@@ -23,11 +23,13 @@ const getTimeFromNow = (datetime: string) => {
   }
 
   if (hours > 0) {
-    return `${hours} hours ago`;
+    const label = hours === 1 ? "hour" : "hours";
+    return `${hours} ${label} ago`;
   }
 
   if (minutes > 0) {
-    return `${minutes} minutes ago`;
+    const label = minutes === 1 ? "minute" : "minutes";
+    return `${minutes} ${label} ago`;
   }
 
   return "just now";

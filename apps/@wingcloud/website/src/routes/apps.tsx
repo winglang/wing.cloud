@@ -52,6 +52,7 @@ export const Component = () => {
               setSearch(e.target.value);
             }}
           />
+          {apps.length > 0 && (
           <Button
             label="New"
             primary
@@ -59,7 +60,8 @@ export const Component = () => {
             onClick={() => {
               navigate("new");
             }}
-          />
+            />
+          )}
         </div>
 
         {listAppsQuery.isLoading && (
