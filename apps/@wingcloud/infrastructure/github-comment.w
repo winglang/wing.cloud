@@ -26,12 +26,16 @@ pub class GithubComment {
     this.siteDomain = props.siteDomain;
   }
 
-  inflight envStatusToString(status: str): str {
+  inflight envStatusToString(status: str, appName: str, branch: str): str {
+    let inspect = "<a target=\"_blank\" href=\"${this.siteDomain}/apps/${appName}/${branch}\">Inspect</a>";
     if status == "tests" {
       return "Running Tests";
     }
     if status == "running" {
-      return "✅ Ready";
+      return "✅ Ready (${inspect})";
+    }
+    if status == "error" {
+      return "❌ Failed (${inspect})";
     }
     return status.at(0).uppercase() + status.substring(1);
   }
@@ -68,7 +72,7 @@ pub class GithubComment {
 
           let date = std.Datetime.utcNow();
           let dateStr = "${date.dayOfMonth}-${date.month}-${date.year} ${date.hours}:${date.min} (UTC)";
-          let tableRows = "<tr><td>${appNameLink}</td><td>${this.envStatusToString(environment.status)}</td><td>${previewUrl}</td><td>${dateStr}</td></tr>";
+          let tableRows = "<tr><td>${appNameLink}</td><td>${this.envStatusToString(environment.status, app.appName, environment.branch)}</td><td>${previewUrl}</td><td>${dateStr}</td></tr>";
           let testsSection = "<details><summary>Tests</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th></tr>${testRows}</table></details>";
 
           commentBody = "${commentBody}${tableRows}</table>";
