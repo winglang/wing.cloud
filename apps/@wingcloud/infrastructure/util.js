@@ -7,15 +7,12 @@ exports.replaceAll = (str, regex, replacement) => {
 exports.parseLog = (log) => {
   const regex = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)\s(.*)$/;
   const match = log.match(regex);
-  if (!match && log) {
-    return {
-      time: "",
-      message: log,
-    };
+  if (!match && !log) {
+    return;
   }
   return {
-    time: match[1],
-    message: match[2],
+    time: match ? match[1] : "",
+    message: match ? match[2] : "",
   };
 };
 
