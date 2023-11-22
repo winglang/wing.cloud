@@ -114,6 +114,7 @@ pub class Api {
               secure: true,
               sameSite: "strict",
               expires: 0,
+              path: "/",
             },
           ),
         },
@@ -153,6 +154,8 @@ pub class Api {
           httpOnly: true,
           secure: true,
           sameSite: "strict",
+          path: "/",
+          maxAge: 1h.seconds,
         },
       );
 

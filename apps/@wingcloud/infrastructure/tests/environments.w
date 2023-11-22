@@ -241,6 +241,8 @@ pub class EnvironmentsTest {
               httpOnly: true,
               secure: true,
               sameSite: "strict",
+              path: "/",
+              maxAge: 1h.seconds,
             },
           );
 
