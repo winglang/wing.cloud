@@ -11,6 +11,7 @@ TBD
 
 - [ ] Stateful simulator
 - [ ] Console adjustments to support stateful simulator
+- [ ] Performance improvements of provisioning new containers and deploying applications
 
 ## Support SDK cloud resources, ex. and Wing trusted libs (@winglibs)
 
@@ -23,6 +24,7 @@ TBD
 
 - [ ] `Workload` resource support in the Console
 - [ ] `Check` resource support in the Console
+- [ ] Add support for `bring ui;` in the Console (P2?)
 
 ## Endpoints
 
@@ -59,16 +61,16 @@ TBD
 - When users create an app they can choose to create a new repository which will be populated with a “Hello world” Wing application template.
 - App entrypoint is set to main.w file by default.
 - Users are able to change the App entrypoint in App settings page and choose from a list of existing *.main.w files from their repository.
-- When an entrypoint is updated, all of the Apps’ Preview environments will restart and set to load the new entrypoint.
+- When an entrypoint is updated, all the Apps’ Preview environments will restart and set to load the new entrypoint.
 - App name is the repository name. The user can’t update the App name after creation.
-- If more than one App is created for the same repository, new Apps name will be <repositlry-name>-<index>
+- Prevent users from creating more than one App for the same repository
 - Once App is created, it is added to a list of Apps displayed in the users’s Apps page
 - App URL should be: https://wing.cloud/apps/appName
 
 ### Remaining Tasks
 
 - [ ] create a new repository with Wing app template
-- [ ] support more than one App for a repository
+- [ ] prevent more than one App for a repository
 
 ## Allow users to quickly setup and develop locally
 
@@ -134,7 +136,7 @@ TBD
 - Preview environment console URL: https://wing.cloud/apps/appName/branch/preview
 - Each environment (both production and preview) will have a page in the Wing Cloud web app
 - Users are able to see build and deployments logs
-- Users are able to see tests if they where executed during build including their logs
+- Users are able to see tests if they were executed during build including their logs
 - Users can view their application in Wing Console
 - Users can see a list of public endpoints exposed by the application
 - Runtime logs
@@ -145,6 +147,7 @@ TBD
 - [ ] Improve deployment and build logs
 - [ ] Improve Tests section and logs
 - [ ] Runtime logs - need to discuss
+- [ ] Endpoints
 - [ ] Checks - need to discuss
 
 ## Inputs
