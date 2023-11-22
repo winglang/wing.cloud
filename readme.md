@@ -27,9 +27,13 @@ Copy the `.env.example` file into `.env`:
 cp .env.example .env
 ```
 
-Complete the missing `.env` variables. You'll need a [GitHub App](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app).
+Complete the missing `.env` variables (commented variables are optional). You'll need a [GitHub App](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app).
 
-Also, remove any commented lines from the `.env` file. It won't be necessary after [#4595](https://github.com/winglang/wing/issues/4595) is completed.
+For the `APP_SECRET` environment variable, you can generate a random string with the following command:
+
+```sh
+openssl rand -hex 32
+```
 
 ## Dev
 
