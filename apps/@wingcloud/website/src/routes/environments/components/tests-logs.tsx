@@ -1,6 +1,6 @@
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
@@ -53,8 +53,12 @@ export const TestsLogs = ({ logs, testResults, loading }: TestsLogsProps) => {
               No test logs.
             </div>
           )}
-          {logs.map((log, index) => (
-            <div key={index} className={clsx(theme.bgInputHover, "px-1")}>
+          {logs.map((log) => (
+            <div
+              id={log.path}
+              key={log.path}
+              className={clsx(theme.bgInputHover, "px-1")}
+            >
               <div className="flex gap-1 items-center">
                 <div className="grow gap-y-0.5">
                   <div className="flex gap-2">
