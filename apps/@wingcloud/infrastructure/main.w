@@ -170,7 +170,7 @@ let proxy = new ReverseProxy.ReverseProxy(
 
 let var webhookUrl = probotApp.githubApp.webhookUrl;
 if util.tryEnv("WING_TARGET") == "sim" {
-  bring "./ngrok.w" as ngrok;
+  bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
 
   let devNgrok = new ngrok.Ngrok(
     url: webhookUrl,
