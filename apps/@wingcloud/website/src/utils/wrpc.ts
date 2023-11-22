@@ -163,7 +163,7 @@ export const wrpc = createWRPCReact<{
     { appName: string; branch: string },
     {
       deploy: Log[];
-      build: Log[];
+      runtime: Log[];
       tests: TestLog[];
     }
   >;

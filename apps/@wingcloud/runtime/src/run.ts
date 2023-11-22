@@ -18,46 +18,40 @@ export interface RunProps {
 }
 
 export const run = async function ({ context, requestedPort }: RunProps) {
-  const executorLogfile = join(
-    tmpdir(),
-    "log-" + randomBytes(8).toString("hex"),
-  );
-  console.log(`Setup preview runtime. logfile ${executorLogfile}`);
-
   const keyStore = await createKeyStore(context.environment.id);
   const report = useReportStatus(context, keyStore);
 
-  const executer = new Executer(executorLogfile);
-
-  const logger = new BucketLogger({
-    key: context.environment.buildKey(),
+  const deployLogger = new BucketLogger({
+    key: context.environment.deploymentKey(),
     bucket: context.logsBucket,
   });
 
-  let executorLogsSync;
+  const runtimeLogger = new BucketLogger({
+    key: context.environment.runtimeKey(),
+    bucket: context.logsBucket,
+  });
+
+  const executer = new Executer(deployLogger.logfile);
+
   try {
     await report("deploying");
-
-    const { cancelSync } = fileBucketSync({
-      file: executorLogfile,
-      key: context.environment.deploymentKey(),
-      bucket: context.logsBucket,
-    });
-    executorLogsSync = cancelSync;
 
     const { paths, entryfilePath, testResults } = await new Setup({
       executer,
       context,
     }).setup();
 
-    await (testResults
-      ? report("tests", { testResults })
-      : report("error", { message: "failed to run tests" }));
+    if (testResults) {
+      await report("tests", { testResults });
+    } else {
+      await report("error", { message: "failed to run tests" });
+      deployLogger.log("failed to run tests");
+    }
 
     const { port, close } = await startServer({
       consolePath: paths["@wingconsole/app"],
       entryfilePath,
-      logger,
+      logger: runtimeLogger,
       keyStore,
       requestedPort,
     });
@@ -66,25 +60,22 @@ export const run = async function ({ context, requestedPort }: RunProps) {
 
     return {
       paths,
-      logfile: executorLogfile,
+      logfile: deployLogger.logfile,
       port,
       close: async () => {
-        cancelSync?.();
-        logger.cancelFileSync();
+        deployLogger.stop();
+        runtimeLogger.stop();
         await close();
       },
     };
   } catch (error: any) {
-    appendFileSync(executorLogfile, `${error.toString()}\n`, "utf8");
-    console.error(
-      "preview runtime error",
-      error,
-      readFileSync(executorLogfile, "utf8"),
-    );
-    await report("error", { message: error.toString() });
-    logger.cancelFileSync();
-    executorLogsSync?.();
+    runtimeLogger.log(error.toString());
 
+    console.error("preview runtime error", error);
+    await report("error", { message: error.toString() });
+
+    deployLogger.stop();
+    runtimeLogger.stop();
     throw error;
   }
 };

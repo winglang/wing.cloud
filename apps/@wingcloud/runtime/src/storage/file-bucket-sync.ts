@@ -13,22 +13,28 @@ export interface FileBucketSyncProps {
 }
 
 export function fileBucketSync({ file, key, bucket }: FileBucketSyncProps) {
-  //TODO: use streaming when supported
   let clear: NodeJS.Timeout;
+  let continueSync = true;
+
   const sync = async () => {
     try {
       const contents = readFileSync(file, "utf8");
+
       await bucket.put(key, contents);
     } catch (error) {
       console.error("failed to sync logs, retrying...", error);
     } finally {
-      clear = setTimeout(sync, fileBucketSyncMs);
+      if (continueSync) {
+        clear = setTimeout(sync, fileBucketSyncMs);
+      }
     }
   };
+
   sync();
 
   return {
     cancelSync: () => {
+      continueSync = false;
       clearTimeout(clear);
     },
   };

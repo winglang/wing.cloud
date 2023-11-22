@@ -9,7 +9,7 @@ import { Logger } from "./logger.js";
 import { fileBucketSync } from "./storage/file-bucket-sync.js";
 
 export class BucketLogger extends Logger {
-  cancelFileSync: () => void;
+  stop: () => void;
   logfile: string;
 
   constructor({ key, bucket }: { key: string; bucket: IBucketClient }) {
@@ -22,10 +22,10 @@ export class BucketLogger extends Logger {
         key,
         bucket,
       });
-      this.cancelFileSync = cancelSync;
+      this.stop = cancelSync;
     } catch (error) {
       console.log(error);
-      this.cancelFileSync = () => {};
+      this.stop = () => {};
     }
   }
 

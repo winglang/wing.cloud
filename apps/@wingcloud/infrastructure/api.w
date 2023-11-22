@@ -569,10 +569,10 @@ pub class Api {
         deployLogs.push(log);
       }
 
-      let buildMessages = logs.tryGet("${envId}/build.log")?.split("\n") ?? [];
-      let buildLogs = MutArray<Log>[];
-      for log in Util.parseLogs(buildMessages) {
-        buildLogs.push(log);
+      let runtimeMessages = logs.tryGet("${envId}/runtime.log")?.split("\n") ?? [];
+      let runtimeLogs = MutArray<Log>[];
+      for log in Util.parseLogs(runtimeMessages) {
+        runtimeLogs.push(log);
       }
 
       let testEntries = logs.list("${envId}/tests");
@@ -586,8 +586,8 @@ pub class Api {
       return {
         body: {
           deploy: deployLogs.copy(),
-          build: buildLogs.copy(),
-          tests: testLogs.copy(),
+          runtime: runtimeLogs.copy(),
+          tests: testLogs.copy()
         },
       };
     });

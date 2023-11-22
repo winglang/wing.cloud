@@ -56,7 +56,7 @@ export const Component = () => {
           loading={logs.isLoading}
         />
 
-        <RuntimeLogs logs={logs.data?.build || []} loading={logs.isLoading} />
+        <RuntimeLogs logs={logs.data?.runtime || []} loading={logs.isLoading} />
       </div>
     </div>
   );

@@ -21,8 +21,8 @@ export class Environment {
     return this.bucketKey("deployment");
   }
 
-  buildKey() {
-    return this.bucketKey("build");
+  runtimeKey() {
+    return this.bucketKey("runtime");
   }
 
   private bucketKey(key: string) {
