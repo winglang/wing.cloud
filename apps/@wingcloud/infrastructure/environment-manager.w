@@ -13,6 +13,7 @@ struct EnvironmentsProps {
   environments: environments.Environments;
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
+  siteDomain: str;
 }
 
 pub struct CreateEnvironmentOptions {
@@ -62,7 +63,7 @@ pub class EnvironmentManager {
     this.environments = props.environments;
     this.runtimeClient = props.runtimeClient;
     this.probotAdapter = props.probotAdapter;
-    this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps);
+    this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps, siteDomain: props.siteDomain);
   }
 
   pub inflight create(options: CreateEnvironmentOptions) {

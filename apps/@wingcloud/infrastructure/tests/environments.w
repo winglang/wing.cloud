@@ -96,216 +96,218 @@ pub class EnvironmentsTest {
       return { repo: repoName, owner: owner };
     };
 
-    // new std.Test(inflight () => {
-    //   if let githubToken = props.githubToken {
-    //     props.updateGithubWebhook();
-    //     let octokit = ok.octokit(githubToken);
+    new std.Test(inflight () => {
+      if let githubToken = props.githubToken {
+        props.updateGithubWebhook();
+        let octokit = ok.octokit(githubToken);
 
-    //     // create a new repo
-    //     let repo = createRepo(octokit);
+        // create a new repo
+        let repo = createRepo(octokit);
 
-    //     try {
-    //       let userId = props.users.create(gitHubLogin: "fake-login");
-    //       let appId = props.apps.create(
-    //         appName: "test-app",
-    //         description: "test app",
-    //         createdAt: "0",
-    //         createdBy: userId,
-    //         repoId: "${repo.owner}/${repo.repo}",
-    //         repoName: repo.repo,
-    //         repoOwner: repo.owner,
-    //         userId: userId,
-    //         entryfile: "main.w"
-    //       );
+        try {
+          let userId = props.users.create(gitHubLogin: "fake-login");
+          let appId = props.apps.create(
+            appName: "test-app",
+            description: "test app",
+            createdAt: "0",
+            createdBy: userId,
+            repoId: "${repo.owner}/${repo.repo}",
+            repoName: repo.repo,
+            repoOwner: repo.owner,
+            userId: userId,
+            entryfile: "main.w"
+          );
 
-    //       // create a PR
-    //       let branchName = "branch-1";
-    //       let ref = octokit.git.getRef(
-    //         owner: repo.owner,
-    //         repo: repo.repo,
-    //         ref: "heads/main"
-    //       );
+          // create a PR
+          let branchName = "branch-1";
+          let ref = octokit.git.getRef(
+            owner: repo.owner,
+            repo: repo.repo,
+            ref: "heads/main"
+          );
 
-    //       if ref.status < 200 || ref.status >= 300 {
-    //         throw "failed to get main ref";
-    //       }
+          if ref.status < 200 || ref.status >= 300 {
+            throw "failed to get main ref";
+          }
 
-    //       octokit.git.createRef(
-    //         owner: repo.owner,
-    //         repo: repo.repo,
-    //         ref: "refs/heads/${branchName}",
-    //         sha: ref.data.object.sha,
-    //       );
+          octokit.git.createRef(
+            owner: repo.owner,
+            repo: repo.repo,
+            ref: "refs/heads/${branchName}",
+            sha: ref.data.object.sha,
+          );
 
-    //       for entry in Json.entries(redisExample) {
-    //         octokit.repos.createOrUpdateFileContents(
-    //           owner: repo.owner,
-    //           repo: repo.repo,
-    //           branch: branchName,
-    //           path: entry.key,
-    //           message: "add ${entry.key}",
-    //           content: util.base64Encode(entry.value.asStr())
-    //         );
-    //       }
+          for entry in Json.entries(redisExample) {
+            octokit.repos.createOrUpdateFileContents(
+              owner: repo.owner,
+              repo: repo.repo,
+              branch: branchName,
+              path: entry.key,
+              message: "add ${entry.key}",
+              content: util.base64Encode(entry.value.asStr())
+            );
+          }
 
-    //       octokit.pulls.create(
-    //         base: "main",
-    //         head: branchName,
-    //         owner: repo.owner,
-    //         repo: repo.repo,
-    //         title: "Test Changes"
-    //       );
+          octokit.pulls.create(
+            base: "main",
+            head: branchName,
+            owner: repo.owner,
+            repo: repo.repo,
+            title: "Test Changes"
+          );
 
-    //       // verify environment created
-    //       let isRunning = util.waitUntil(inflight () => {
-    //         let envs = props.environments.list(appId: appId);
-    //         if let env = envs.tryAt(0) {
-    //           if env.status == "running" {
-    //             return true;
-    //           }
-    //         }
+          // verify environment created
+          let isRunning = util.waitUntil(inflight () => {
+            let envs = props.environments.list(appId: appId);
+            if let env = envs.tryAt(0) {
+              if env.status == "running" {
+                return true;
+              }
+            }
 
-    //         return false;
-    //       }, timeout: 10m);
+            return false;
+          }, timeout: 10m);
 
-    //       assert(isRunning);
+          assert(isRunning);
 
-    //       // make sure its responding
-    //       let env = props.environments.list(appId: appId).at(0);
-    //       if let url = env.url {
-    //         util.waitUntil(inflight () => {
-    //           try {
-    //             let res = http.get(url);
-    //             return res.ok;
-    //           } catch {
-    //             return false;
-    //           }
-    //         });
-    //       } else {
-    //         log("missing environment url");
-    //         assert(false);
-    //       }
+          // make sure its responding
+          let env = props.environments.list(appId: appId).at(0);
+          if let url = env.url {
+            util.waitUntil(inflight () => {
+              try {
+                let res = http.get(url);
+                return res.ok;
+              } catch {
+                return false;
+              }
+            });
+          } else {
+            log("missing environment url");
+            assert(false);
+          }
 
-    //       assert(env.type == "preview");
+          assert(env.type == "preview");
 
-    //       // verify tests passed
-    //       assert(env.testResults?.testResults?.length == 1);
-    //       assert(env.testResults?.testResults?.at(0)?.path == "root/Default/test:Hello, world!");
-    //       assert(env.testResults?.testResults?.at(0)?.pass == true);
-    //     } finally {
-    //       octokit.repos.delete(owner: repo.owner, repo: repo.repo);
-    //     }
-    //   } else {
-    //     throw "missing github token";
-    //   }
-    // }, timeout: 10m) as "create environment from PR";
+          // verify tests passed
+          assert(env.testResults?.testResults?.length == 1);
+          assert(env.testResults?.testResults?.at(0)?.path == "root/Default/test:Hello, world!");
+          assert(env.testResults?.testResults?.at(0)?.pass == true);
+        } finally {
+          octokit.repos.delete(owner: repo.owner, repo: repo.repo);
+        }
+      } else {
+        throw "missing github token";
+      }
+    }, timeout: 10m) as "create environment from PR";
 
-    // new (inflight () => {
-    //   if let githubToken = props.githubToken {
-    //     props.updateGithubWebhook();
-    //     let token = props.githubApp.createGithubAppJwtToken();
-    //     let appOctokit = ok.octokit(token);
-    //     let octokit = ok.octokit(githubToken);
+    new std.Test(inflight () => {
+      if let githubToken = props.githubToken {
+        props.updateGithubWebhook();
+        let token = props.githubApp.createGithubAppJwtToken();
+        let appOctokit = ok.octokit(token);
+        let octokit = ok.octokit(githubToken);
 
-    //     // create a new repo
-    //     let repo = createRepo(octokit);
+        // create a new repo
+        let repo = createRepo(octokit);
 
-    //     try {
-    //       // add files to main
-    //       for entry in Json.entries(redisExample) {
-    //         octokit.repos.createOrUpdateFileContents(
-    //           owner: repo.owner,
-    //           repo: repo.repo,
-    //           branch: "main",
-    //           path: entry.key,
-    //           message: "add ${entry.key}",
-    //           content: util.base64Encode(entry.value.asStr())
-    //         );
-    //       }
+        try {
+          // add files to main
+          for entry in Json.entries(redisExample) {
+            octokit.repos.createOrUpdateFileContents(
+              owner: repo.owner,
+              repo: repo.repo,
+              branch: "main",
+              path: entry.key,
+              message: "add ${entry.key}",
+              content: util.base64Encode(entry.value.asStr())
+            );
+          }
 
-    //       let userId = props.users.create(gitHubLogin: "fake-login");
+          let userId = props.users.create(gitHubLogin: "fake-login");
 
-    //       let jwt = JWT.JWT.sign(
-    //         secret: props.appSecret,
-    //         userId: userId,
-    //         accessToken: githubToken,
-    //         accessTokenExpiresIn: 1000,
-    //         refreshToken: githubToken,
-    //         refreshTokenExpiresIn: 1000,
-    //       );
+          let jwt = JWT.JWT.sign(
+            secret: props.appSecret,
+            userId: userId,
+            accessToken: githubToken,
+            accessTokenExpiresIn: 1000,
+            refreshToken: githubToken,
+            refreshTokenExpiresIn: 1000,
+          );
 
-    //       let authCookie = Cookie.Cookie.serialize(
-    //         "auth",
-    //         jwt,
-    //         {
-    //           httpOnly: true,
-    //           secure: true,
-    //           sameSite: "strict",
-    //         },
-    //       );
+          let authCookie = Cookie.Cookie.serialize(
+            "auth",
+            jwt,
+            {
+              httpOnly: true,
+              secure: true,
+              sameSite: "strict",
+              path: "/",
+              maxAge: 1h.seconds,
+            },
+          );
 
-    //       // use app octokit to get the installations
-    //       let res = appOctokit.apps.listInstallations();
-    //       if res.status < 200 || res.status >= 300 {
-    //         throw "failed to get user installations";
-    //       }
+          // use app octokit to get the installations
+          let res = appOctokit.apps.listInstallations();
+          if res.status < 200 || res.status >= 300 {
+            throw "failed to get user installations";
+          }
 
-    //       let var installationId: num? = nil;
-    //       for installation in res.data {
-    //         if installation.account.login == repo.owner {
-    //           installationId = installation.id;
-    //         }
-    //       }
+          let var installationId: num? = nil;
+          for installation in res.data {
+            if installation.account.login == repo.owner {
+              installationId = installation.id;
+            }
+          }
 
-    //       if !installationId? {
-    //         throw "failed to find installation for owner ${repo.owner}";
-    //       }
+          if !installationId? {
+            throw "failed to find installation for owner ${repo.owner}";
+          }
 
-    //       let createRes = http.post("${props.wingCloudUrl.get()}/wrpc/user.createApp",
-    //         body: Json.stringify({
-    //           default_branch: "main",
-    //           repoId: "${repo.owner}/${repo.repo}",
-    //           repoOwner: repo.owner,
-    //           repoName: repo.repo,
-    //           appName: "test-app",
-    //           imageUrl: "",
-    //           entryfile: "main.w",
-    //           installationId: "${installationId}",
-    //         }),
-    //         headers: {
-    //           "cookie": authCookie
-    //         }
-    //       );
+          let createRes = http.post("${props.wingCloudUrl.get()}/wrpc/user.createApp",
+            body: Json.stringify({
+              default_branch: "main",
+              repoId: "${repo.owner}/${repo.repo}",
+              repoOwner: repo.owner,
+              repoName: repo.repo,
+              appName: "test-app",
+              imageUrl: "",
+              entryfile: "main.w",
+              installationId: "${installationId}",
+            }),
+            headers: {
+              "cookie": authCookie
+            }
+          );
 
-    //       if createRes.status < 200 || createRes.status >= 300 {
-    //         throw "failed to create app ${createRes.status} ${createRes.body}";
-    //       }
+          if createRes.status < 200 || createRes.status >= 300 {
+            throw "failed to create app ${createRes.status} ${createRes.body}";
+          }
 
-    //       if let appId = Json.tryParse(createRes.body)?.tryGet("appId")?.tryAsStr() {
-    //         // verify environment created
-    //         let app = props.apps.get(appId: appId);
-    //         let isRunning = util.waitUntil(inflight () => {
-    //           let envs = props.environments.list(appId: app.appId);
-    //           if let env = envs.tryAt(0) {
-    //             if env.status == "running" {
-    //               return true;
-    //             }
-    //           }
+          if let appId = Json.tryParse(createRes.body)?.tryGet("appId")?.tryAsStr() {
+            // verify environment created
+            let app = props.apps.get(appId: appId);
+            let isRunning = util.waitUntil(inflight () => {
+              let envs = props.environments.list(appId: app.appId);
+              if let env = envs.tryAt(0) {
+                if env.status == "running" {
+                  return true;
+                }
+              }
 
-    //           return false;
-    //         }, timeout: 10m);
+              return false;
+            }, timeout: 10m);
 
-    //         assert(isRunning);
+            assert(isRunning);
 
-    //         let env = props.environments.list(appId: app.appId).at(0);
-    //         assert(env.type == "production");
-    //       }
-    //     } finally {
-    //       octokit.repos.delete(owner: repo.owner, repo: repo.repo);
-    //     }
-    //   } else {
-    //     throw "missing github token";
-    //   }
-    // }, timeout: std.Test1m) as "create production environment for app";
+            let env = props.environments.list(appId: app.appId).at(0);
+            assert(env.type == "production");
+          }
+        } finally {
+          octokit.repos.delete(owner: repo.owner, repo: repo.repo);
+        }
+      } else {
+        throw "missing github token";
+      }
+    }, timeout: std.Test1m) as "create production environment for app";
   }
 }
