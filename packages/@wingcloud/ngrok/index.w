@@ -35,7 +35,7 @@ pub class Ngrok {
         let var retries = 3;
         while retries > 0 {
           try {
-            let json = Json.parse(http.get("http://localhost:${ngrokAPIPort}/api/tunnels").body);
+            let json = Json.parse(http.get("http://127.0.0.1:${ngrokAPIPort}/api/tunnels").body);
             for tunnel in Json.values(json.get("tunnels")) {
               let address = tunnel.get("config").get("addr").asStr();
               log("Checking ${address}");
