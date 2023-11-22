@@ -108,7 +108,7 @@ export const EnvironmentsList = ({
             leftIcon={MagnifyingGlassIcon}
             className="block w-full"
             containerClassName="w-full"
-            placeholder="Filter..."
+            placeholder="Search..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
