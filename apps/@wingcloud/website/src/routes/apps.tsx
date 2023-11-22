@@ -41,7 +41,7 @@ export const Component = () => {
           leftIcon={MagnifyingGlassIcon}
           className="block w-full"
           containerClassName="w-full"
-          placeholder="Filter apps..."
+          placeholder="Search..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
