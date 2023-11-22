@@ -6,6 +6,11 @@ import { createProxyServer } from "http-proxy";
 const app = express();
 const proxy = createProxyServer({ changeOrigin: true });
 
+// If we don't handle the error, the server will crash when an origin is not available.
+proxy.on("error", (error) => {
+  console.error(error);
+});
+
 export interface Origin {
   pathPattern: string;
   domainName: string;
