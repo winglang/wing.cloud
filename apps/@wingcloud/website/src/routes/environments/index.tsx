@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 import { wrpc } from "../../utils/wrpc.js";

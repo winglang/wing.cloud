@@ -43,7 +43,7 @@ export const RuntimeLogs = ({ logs, loading }: RuntimeLogsProps) => {
               key={index}
               className={clsx(
                 theme.bgInputHover,
-                "w-full flex gap-2  px-1 py-0.5",
+                "w-full flex gap-2 pl-6 pr-1 py-0.5",
               )}
             >
               <div className={clsx(theme.text2)}>{getTime(log.timestamp)}</div>
