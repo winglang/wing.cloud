@@ -547,7 +547,7 @@ pub class Api {
 
       let envId = environment.id;
 
-      let buildMessages = logs.get("${envId}/deployment.log").split("\n");
+      let buildMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
       let buildLogs = MutArray<Log>[];
       for message in buildMessages {
           buildLogs.push(Log {
