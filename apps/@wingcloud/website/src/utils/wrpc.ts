@@ -90,6 +90,8 @@ export interface TestLog {
   path: string;
   pass: boolean;
   error: string;
+  time: number;
+  timestamp: string;
   traces: Array<Trace>;
 }
 

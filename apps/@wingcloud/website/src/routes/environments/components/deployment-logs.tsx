@@ -33,7 +33,7 @@ export const DeploymentLogs = ({ logs, loading }: DeploymentLogsProps) => {
       defaultOpen={locationHash === DEPLOYMENT_LOGS_ID}
       loading={loading}
       children={
-        <div className="text-2xs font-mono">
+        <div className="text-2xs font-mono py-4 px-3">
           {logs.length === 0 && (
             <div className={clsx(theme.text2, "w-full py-0.5 text-center")}>
               No deployment logs.
@@ -42,7 +42,10 @@ export const DeploymentLogs = ({ logs, loading }: DeploymentLogsProps) => {
           {logs.map((log, index) => (
             <div
               key={index}
-              className={clsx(theme.bgInputHover, "w-full py-0.5 flex gap-2")}
+              className={clsx(
+                theme.bgInputHover,
+                "w-full flex gap-2 px-1 py-0.5",
+              )}
             >
               <div className={clsx(theme.text2)}>{getTime(log.timestamp)}</div>
               <div className={clsx(theme.text1)}>{log.message}</div>

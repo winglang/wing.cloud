@@ -20,13 +20,15 @@ struct Log {
 
 struct Trace {
   message: str;
-  time: str;
+  timestamp: str;
 }
 
 struct TestLog {
   path: str;
   pass: bool;
   error: str?;
+  timestamp: str;
+  time: num;
   traces: Array<Trace>;
 }
 

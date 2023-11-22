@@ -47,33 +47,45 @@ export const TestsLogs = ({ logs, testResults, loading }: TestsLogsProps) => {
         </div>
       }
       children={
-        <div className="text-2xs font-mono">
+        <div className="text-2xs font-mono px-3 py-4">
           {logs.length === 0 && (
             <div className={clsx(theme.text2, "w-full py-0.5 text-center")}>
               No test logs.
             </div>
           )}
           {logs.map((log, index) => (
-            <div
-              key={index}
-              className={clsx(theme.bgInputHover, "w-full py-0.5")}
-            >
-              <div className="flex gap-2">
-                {log.pass ? (
-                  <CheckCircleIcon className="w-4 h-4 text-green-400" />
-                ) : (
-                  <XCircleIcon className="w-4 h-4 text-red-400" />
-                )}
-                <div className={clsx(theme.text2)}>{log.path}</div>
-              </div>
-              {log.traces.map((trace, index) => (
-                <div key={index} className="flex gap-2">
-                  <div className={clsx(theme.text2)}>
-                    {getTime(trace.timestamp)}
+            <div key={index} className={clsx(theme.bgInputHover, "px-1")}>
+              <div className="flex gap-1 items-center">
+                <div className="grow gap-y-0.5">
+                  <div className="flex gap-2">
+                    <div className="self-center">
+                      {log.pass ? (
+                        <CheckCircleIcon className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <XCircleIcon className="w-4 h-4 text-red-400" />
+                      )}
+                    </div>
+                    <div className={clsx(theme.text2)}>
+                      {getTime(log.timestamp)}
+                    </div>
+                    <div className="flex gap-1">
+                      <div className={clsx(theme.text1, "font-medium")}>
+                        {log.path.split("/").pop()}
+                      </div>
+                      <div className={clsx(theme.text2)}>({log.time}ms)</div>
+                    </div>
                   </div>
-                  <div className={clsx(theme.text1)}>{trace.message}</div>
+
+                  {log.traces.map((trace, index) => (
+                    <div key={index} className="flex gap-2 pl-6 py-0.5">
+                      <div className={clsx(theme.text2)}>
+                        {getTime(trace.timestamp)}
+                      </div>
+                      <div className={clsx(theme.text1)}>{trace.message}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           ))}
         </div>

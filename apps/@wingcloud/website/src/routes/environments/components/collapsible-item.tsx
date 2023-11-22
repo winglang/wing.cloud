@@ -55,14 +55,14 @@ export const CollapsibleItem = ({
       </button>
 
       {isOpen && (
-        <div className="px-6 pb-6 pt-4">
+        <>
           {loading && (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center p-4">
               <SpinnerLoader size="sm" />
             </div>
           )}
           {!loading && children}
-        </div>
+        </>
       )}
     </div>
   );

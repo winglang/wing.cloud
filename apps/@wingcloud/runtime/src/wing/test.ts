@@ -25,16 +25,22 @@ async function wingTestOne(
   testResourcePath: string,
   props: WingTestProps,
 ) {
+  const timestamp = new Date().toISOString();
+
+  const startTime = Date.now();
   const result = await testRunner.runTest(testResourcePath);
+  const time = Date.now() - startTime;
 
   const testResult = {
     ...result,
+    timestamp,
+    time,
     traces: result.traces
       .filter((t) => t.type === "log")
       .map((t) => {
         return {
           message: t.data.message,
-          time: t.timestamp,
+          timestamp: t.timestamp,
         };
       }),
   };
