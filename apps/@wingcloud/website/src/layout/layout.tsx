@@ -16,21 +16,6 @@ export const Layout = ({ children }: PropsWithChildren) => {
     return false;
   }, [location.pathname]);
 
-  const authCheck = wrpc["auth.check"].useQuery(undefined, {
-    enabled: location.pathname !== "/apps",
-    retry: false,
-  });
-
-  useEffect(() => {
-    if (location.pathname === "/apps") {
-      return;
-    }
-
-    if (authCheck.isError) {
-      window.location.href = "/apps";
-    }
-  }, [authCheck.isError, location.pathname]);
-
   return (
     <>
       <Header />
