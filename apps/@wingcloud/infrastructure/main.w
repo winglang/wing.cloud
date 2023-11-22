@@ -178,7 +178,7 @@ let updateGithubWebhook = inflight () => {
   log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
 };
 
-let deploy = new cloud.OnDeploy(updateGithubWebhook);
+new cloud.OnDeploy(updateGithubWebhook);
 
 bring "./tests/environments.w" as tests;
 new tests.EnvironmentsTest(
