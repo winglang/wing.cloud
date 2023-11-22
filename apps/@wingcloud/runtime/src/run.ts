@@ -69,7 +69,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
       },
     };
   } catch (error: any) {
-    runtimeLogger.log(error.toString());
+    deployLogger.log(error.toString());
 
     console.error("preview runtime error", error);
     await report("error", { message: error.toString() });
