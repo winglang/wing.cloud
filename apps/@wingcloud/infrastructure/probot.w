@@ -23,6 +23,7 @@ struct ProbotAppProps {
   environments: environments.Environments;
   environmentManager: environment_manager.EnvironmentManager;
   apps: apps.Apps;
+  siteDomain: str;
 }
 
 pub class ProbotApp {
@@ -40,7 +41,7 @@ pub class ProbotApp {
     this.environments = props.environments;
     this.environmentManager = props.environmentManager;
     this.apps = props.apps;
-    this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps);
+    this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps, siteDomain: props.siteDomain);
 
     let queue = new cloud.Queue();
     this.githubApp = new github.GithubApp(

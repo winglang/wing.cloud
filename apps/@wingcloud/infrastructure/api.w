@@ -114,6 +114,7 @@ pub class Api {
               secure: true,
               sameSite: "strict",
               expires: 0,
+              path: "/",
             },
           ),
         },
@@ -153,6 +154,8 @@ pub class Api {
           httpOnly: true,
           secure: true,
           sameSite: "strict",
+          path: "/",
+          maxAge: 1h.seconds,
         },
       );
 
@@ -544,7 +547,7 @@ pub class Api {
 
       let envId = environment.id;
 
-      let buildMessages = logs.get("${envId}/deployment.log").split("\n");
+      let buildMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
       let buildLogs = MutArray<Log>[];
       for message in buildMessages {
           buildLogs.push(Log {
