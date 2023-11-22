@@ -81,7 +81,7 @@ reactAppPatch.ReactAppPatch.apply(website);
 let subDomain = util.env("PROXY_SUBDOMAIN");
 let zoneName = util.env("PROXY_ZONE_NAME");
 
-let var siteDomain = "${subDomain}.${zoneName}";
+let var siteDomain = "https://${subDomain}.${zoneName}";
 if util.env("WING_TARGET") == "sim" {
   siteDomain = "http://localhost:3900";
 }
