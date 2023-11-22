@@ -308,6 +308,6 @@ pub class EnvironmentsTest {
       } else {
         throw "missing github token";
       }
-    }, timeout: std.Test1m) as "create production environment for app";
+    }, timeout: 1m) as "create production environment for app";
   }
 }
