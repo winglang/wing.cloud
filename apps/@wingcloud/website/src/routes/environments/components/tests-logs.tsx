@@ -69,7 +69,7 @@ export const TestsLogs = ({ logs, testResults, loading }: TestsLogsProps) => {
                       {getTime(log.timestamp)}
                     </div>
                     <div className="flex gap-1">
-                      <div className={clsx(theme.text1, "font-medium")}>
+                      <div className={clsx(theme.text1)}>
                         {log.path.split("/").pop()}
                       </div>
                       <div className={clsx(theme.text2)}>({log.time}ms)</div>
@@ -81,7 +81,7 @@ export const TestsLogs = ({ logs, testResults, loading }: TestsLogsProps) => {
                       <div className={clsx(theme.text2)}>
                         {getTime(trace.timestamp)}
                       </div>
-                      <div className={clsx(theme.text1)}>{trace.message}</div>
+                      <div className={clsx(theme.text2)}>{trace.message}</div>
                     </div>
                   ))}
                 </div>
