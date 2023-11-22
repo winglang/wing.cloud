@@ -1,23 +1,23 @@
-import * as childProcess from "node:child_process";
-
 import {
   CreateTableCommand,
+  PutItemCommand,
+  GetItemCommand,
   DynamoDBClient,
   KeyType,
-  KeySchemaElement,
 } from "@aws-sdk/client-dynamodb";
 
-export const createTable = async (props) => {
-  const client = new DynamoDBClient({
+export const createClient = (props) => {
+  return new DynamoDBClient({
     region: "local",
     credentials: {
       accessKeyId: "x",
       secretAccessKey: "y",
     },
-    endpoint: `http://0.0.0.0:${props.port}`,
-    // endpoint: `http://127.0.0.1:${props.port}`,
+    endpoint: props.endpoint,
   });
+};
 
+export const createTable = async (client, props) => {
   return client.send(
     new CreateTableCommand({
       TableName: props.tableName,
@@ -38,15 +38,23 @@ export const createTable = async (props) => {
   );
 };
 
-export const execFile = async (command, args, cwd) => {
-  return new Promise((resolve, reject) => {
-    childProcess.execFile(command, args, { cwd }, (error, stdout, stderr) => {
-      if (error) {
-        console.error(stderr);
-        return reject(error);
-      }
+export const testClient = async (client, props) => {
+  await client.send(
+    new PutItemCommand({
+      TableName: props.tableName,
+      Item: {
+        id: { S: "1" },
+        name: { S: "test" },
+      },
+    }),
+  );
 
-      return resolve(stdout ?? stderr);
-    });
-  });
+  return await client.send(
+    new GetItemCommand({
+      TableName: props.tableName,
+      Key: {
+        id: { S: "1" },
+      },
+    }),
+  );
 };
