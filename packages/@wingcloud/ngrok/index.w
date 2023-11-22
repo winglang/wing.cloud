@@ -34,16 +34,20 @@ pub class Ngrok {
       while ngrokAPIPort <= 4140 {
         let var retries = 3;
         while retries > 0 {
-          let json = Json.parse(http.get("http://localhost:${ngrokAPIPort}/api/tunnels").body);
-          for tunnel in Json.values(json.get("tunnels")) {
-            let address = tunnel.get("config").get("addr").asStr();
-            if address == props.url {
-              state.set("url", tunnel.get("public_url").asStr());
+          try {
+            let json = Json.parse(http.get("http://localhost:${ngrokAPIPort}/api/tunnels").body);
+            for tunnel in Json.values(json.get("tunnels")) {
+              let address = tunnel.get("config").get("addr").asStr();
+              log("Checking ${address}");
+              if address == props.url {
+                state.set("url", tunnel.get("public_url").asStr());
+                return nil;
+              }
             }
-            return nil;
+          } finally {
+            retries -= 1;
+            util.sleep(50ms);
           }
-          retries -= 1;
-          util.sleep(50ms);
         }
         ngrokAPIPort += 1;
       }
