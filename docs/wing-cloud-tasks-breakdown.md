@@ -85,7 +85,7 @@ TBD
 ### DOD
 
 - Users are able to change the App’s entrypoint
-- Users are able to change the Apps’ inputs (secrets and environment variables)
+- Users are able to set values to the app inputs (secrets and environment variables)
 - App’s setting page URL: https://wing.cloud/apps/appName/settings
 - Additional non configurable Apps’ settings: Name, Source
 - Additional non configurable Environments’ settings: enabled, tracking branch, platform
