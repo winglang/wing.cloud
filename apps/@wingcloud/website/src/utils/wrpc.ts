@@ -30,10 +30,7 @@ export interface App {
   repoOwner: string;
   userId: string;
   entryfile: string;
-  createdBy: string;
   createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
 }
 
 export interface TestResult {
@@ -71,7 +68,6 @@ export interface Environment {
   commentId?: number;
   testResults?: TestResults;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface Log {
@@ -86,7 +82,6 @@ export interface Secret {
   environmentType: string;
   value: string;
   createdAt: string;
-  updatedAt: string;
 }
 
 export type EnvironmentType = "produciton" | "preview";

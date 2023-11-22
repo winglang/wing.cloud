@@ -50,8 +50,6 @@ export const EnvironmentsListItem = ({
     return environment?.url != "" && status === "running";
   }, [environment, status]);
 
-  const updatedAt = useTimeAgo(environment.updatedAt);
-
   const statusString = useMemo(() => {
     if (status === "tests") {
       return "Running Tests";
@@ -118,14 +116,6 @@ export const EnvironmentsListItem = ({
                 >
                   {environment.branch}
                 </a>
-                <span
-                  className={clsx(
-                    "truncate items-center flex opacity-70",
-                    theme.text2,
-                  )}
-                >
-                  updated {updatedAt}
-                </span>
               </div>
 
               {testStatus && (

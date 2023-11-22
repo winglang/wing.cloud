@@ -15,7 +15,6 @@ pub struct Environment {
   url: str?;
   commentId: num?;
   createdAt: str;
-  updatedAt: str;
   testResults: status_report.TestResults?;
 }
 
@@ -98,7 +97,6 @@ pub class Environments {
       prTitle: options.prTitle,
       installationId: options.installationId,
       createdAt: createdAt,
-      updatedAt: createdAt,
     };
 
     let makeItem = (ops: MakeItemOptions) => {
@@ -114,7 +112,6 @@ pub class Environments {
         status: environment.status,
         installationId: environment.installationId,
         createdAt: environment.createdAt,
-        updatedAt: environment.updatedAt,
       };
 
       if let prNumber = environment.prNumber {
@@ -407,7 +404,6 @@ pub class Environments {
         commentId: item.tryGet("commentId")?.tryAsNum(),
         testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
         createdAt: item.get("createdAt").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
       };
     }
 
@@ -437,7 +433,6 @@ pub class Environments {
         commentId: item.tryGet("commentId")?.tryAsNum(),
         testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
         createdAt: item.get("createdAt").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
       };
     }
 
@@ -469,7 +464,6 @@ pub class Environments {
         commentId: item.tryGet("commentId")?.tryAsNum(),
         testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
         createdAt: item.get("createdAt").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
       }]);
     }
     return environments;

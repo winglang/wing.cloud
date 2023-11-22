@@ -1,8 +1,6 @@
 import clsx from "clsx";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
-import { GithubIcon } from "../../../icons/github-icon.js";
-import { useTimeAgo } from "../../../utils/time.js";
 import type { App } from "../../../utils/wrpc.js";
 
 export const AppCard = ({
@@ -13,8 +11,6 @@ export const AppCard = ({
   onClick: () => void;
 }) => {
   const { theme } = useTheme();
-
-  const updatedAt = useTimeAgo(app.updatedAt);
 
   return (
     <button
@@ -42,15 +38,6 @@ export const AppCard = ({
         <div className="w-full truncate space-y-1">
           <div className="text-lg text-slate-800">{app.appName}</div>
         </div>
-      </div>
-
-      <div
-        className={clsx(
-          "w-full truncate text-xs mt-3 h-full items-end",
-          theme.text2,
-        )}
-      >
-        {`Updated ${updatedAt} by ${app.updatedBy}`}
       </div>
     </button>
   );

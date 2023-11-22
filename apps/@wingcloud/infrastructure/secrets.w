@@ -9,7 +9,6 @@ pub struct Secret {
   name: str;
   value: str;
   createdAt: str;
-  updatedAt: str;
 }
 
 struct Item extends Secret {
@@ -69,7 +68,6 @@ pub class Secrets {
       name: options.name,
       value: options.value,
       createdAt: createdAt,
-      updatedAt: createdAt,
     };
 
     let item = MutJson {
@@ -81,7 +79,6 @@ pub class Secrets {
       name: secret.name,
       value: this.crypto.encrypt(secret.value),
       createdAt: createdAt,
-      updatedAt: createdAt,
     };
 
     this.table.transactWriteItems(transactItems: [
@@ -149,7 +146,6 @@ pub class Secrets {
       environmentType: item.get("environmentType").asStr(),
       name: item.get("name").asStr(),
       createdAt: item.get("createdAt").asStr(),
-      updatedAt: item.get("updatedAt").asStr(),
     };
 
     if decryptValue {
@@ -157,7 +153,7 @@ pub class Secrets {
     } else {
       temp.set("value", "***");
     }
-    
+
     return Secret.fromJson(temp);
   }
 }

@@ -110,7 +110,6 @@ pub class EnvironmentsTest {
             appName: "test-app",
             description: "test app",
             createdAt: "0",
-            createdBy: userId,
             repoId: "${repo.owner}/${repo.repo}",
             repoName: repo.repo,
             repoOwner: repo.owner,

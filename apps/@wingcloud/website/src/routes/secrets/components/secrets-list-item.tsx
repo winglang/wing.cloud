@@ -38,8 +38,6 @@ export const SecretsListItem = ({
     await onDelete(secret);
   }, [secret?.id]);
 
-  const updatedAt = useTimeAgo(secret.updatedAt);
-
   return (
     <div className="text-xs flex items-center gap-4">
       <LockClosedIcon className={clsx("w-5 h-5 rounded-full", theme.text2)} />
@@ -53,9 +51,6 @@ export const SecretsListItem = ({
         >
           <span className={clsx("truncate", theme.text2)}>
             {secret.environmentType}
-          </span>
-          <span className={clsx("truncate", theme.text2)}>
-            updated {updatedAt}
           </span>
         </div>
       </div>

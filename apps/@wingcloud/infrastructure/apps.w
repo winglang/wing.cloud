@@ -11,9 +11,6 @@ pub struct App {
   userId: str;
   entryfile: str;
   createdAt: str;
-  createdBy: str;
-  updatedAt: str;
-  updatedBy: str;
   imageUrl: str?;
 }
 
@@ -31,7 +28,6 @@ struct CreateAppOptions {
   userId: str;
   entryfile: str;
   createdAt: str;
-  createdBy: str;
   imageUrl: str?;
 }
 
@@ -103,9 +99,6 @@ pub class Apps {
         userId: options.userId,
         entryfile: options.entryfile,
         createdAt: options.createdAt,
-        createdBy: options.createdBy,
-        updatedAt: options.createdAt,
-        updatedBy: options.createdBy,
       };
     };
 
@@ -174,9 +167,6 @@ pub class Apps {
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
         createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
       };
     }
 
@@ -203,9 +193,6 @@ pub class Apps {
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
         createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
       };
     }
 
@@ -233,9 +220,6 @@ pub class Apps {
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
         createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
       }]);
     }
     return apps;
@@ -323,9 +307,6 @@ pub class Apps {
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
         createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
       }]);
     }
     return apps;

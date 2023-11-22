@@ -27,7 +27,6 @@ test "can store and get a secret" {
     name: "test-secret-2",
     value: "secret-value-2",
     createdAt: secret1.createdAt,
-    updatedAt: secret1.updatedAt,
     environmentType: "production",
   };
 
@@ -38,7 +37,7 @@ test "can list secrets" {
   let secret1 = secrets.create(appId: "app-id", environmentType: "preview", name: "test-secret", value: "secret-value");
   let secret2 = secrets.create(appId: "app-id", environmentType: "preview", name: "test-secret-2", value: "secret-value-2");
   let secret3 = secrets.create(appId: "app-id", environmentType: "production", name: "test-secret-3", value: "secret-value-3");
-  
+
   let expected1 = Secrets.Secret{
     id: secret1.id,
     appId: "app-id",
@@ -46,7 +45,6 @@ test "can list secrets" {
     name: "test-secret",
     value: "secret-value",
     createdAt: secret1.createdAt,
-    updatedAt: secret1.updatedAt,
   };
   let expected2 = Secrets.Secret{
     id: secret2.id,
@@ -55,9 +53,8 @@ test "can list secrets" {
     name: "test-secret-2",
     value: "secret-value-2",
     createdAt: secret2.createdAt,
-    updatedAt: secret2.updatedAt,
   };
-  
+
   // with envType and envId
   let storedSecrets = secrets.list(appId: "app-id", environmentType: "preview", decryptValues: true);
   assert(storedSecrets.length == 2);

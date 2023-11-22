@@ -640,7 +640,6 @@ pub class Api {
           userId: userId,
           entryfile: entryfile,
           createdAt: datetime.utcNow().toIso(),
-          createdBy: userId,
         );
 
         productionEnvironmentQueue.push(Json.stringify({
