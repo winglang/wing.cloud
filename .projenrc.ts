@@ -47,6 +47,15 @@ const monorepo = new MonorepoProject({
   name: "@wingcloud/monorepo",
 });
 
+monorepo.addDeps("semver");
+
+monorepo.addFields({
+  engines: {
+    pnpm: ">=8.10",
+    node: ">=20.0.0",
+  },
+});
+
 monorepo.devTask.reset("turbo dev --concurrency 12");
 
 ///////////////////////////////////////////////////////////////////////////////

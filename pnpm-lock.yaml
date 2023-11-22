@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      semver:
+        specifier: ^7.5.4
+        version: 7.5.4
       turbo:
         specifier: ^1.10.16
         version: 1.10.16
@@ -3132,7 +3135,7 @@ packages:
       '@octokit/request-error': 5.0.1
       '@octokit/types': 12.3.0
       deprecation: 2.3.1
-      lru-cache: 10.0.2
+      lru-cache: 10.0.3
       universal-github-app-jwt: 1.1.1
       universal-user-agent: 6.0.1
     dev: false
@@ -8707,13 +8710,6 @@ packages:
     resolution: {integrity: sha512-tqNXrS78oMOE73NMxK4EMLQsQowWf8jKooH9g7xPavRT706R6bkQJ6DY2Te7QukaZsulxa30wQ7bk0pm4XiHmA==}
     engines: {node: '>=8'}
 
-  /lru-cache@10.0.2:
-    resolution: {integrity: sha512-Yj9mA8fPiVgOUpByoTZO5pNrcl5Yk37FcSHsUINpAsaBIEZIuqcCclDZJCVxqQShDsmYX8QG63svJiTbOATZwg==}
-    engines: {node: 14 || >=16.14}
-    dependencies:
-      semver: 7.5.4
-    dev: false
-
   /lru-cache@10.0.3:
     resolution: {integrity: sha512-B7gr+F6MkqB3uzINHXNctGieGsRTMwIBgxkp0yq/5BwcuDzD4A8wQpHQW6vDAm1uKSLQghmRdD9sKqf2vJ1cEg==}
     engines: {node: 14 || >=16.14}
@@ -9744,7 +9740,7 @@ packages:
     resolution: {integrity: sha512-MkhCqzzBEpPvxxQ71Md0b1Kk51W01lrYvlMzSUaIzNsODdd7mqhiimSZlr+VegAz5Z6Vzt9Xg2ttE//XBhH3EQ==}
     engines: {node: '>=16 || 14 >=14.17'}
     dependencies:
-      lru-cache: 10.0.2
+      lru-cache: 10.0.3
       minipass: 7.0.4
     dev: false
 
