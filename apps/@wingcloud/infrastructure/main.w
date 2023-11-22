@@ -78,9 +78,12 @@ let website = new ex.ReactApp(
 
 reactAppPatch.ReactAppPatch.apply(website);
 
-let var siteDomain = util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN;
+let subDomain = util.env("PROXY_SUBDOMAIN");
+let zoneName = util.env("PROXY_ZONE_NAME");
+
+let var siteDomain = "${subDomain}.${zoneName}";
 if util.env("WING_TARGET") == "sim" {
-  siteDomain = website.url;
+  siteDomain = "http://localhost:3900";
 }
 
 let environmentManager = new EnvironmentManager.EnvironmentManager(
@@ -122,8 +125,7 @@ let apiDomainName = (() => {
   }
   return api.url;
 })();
-let subDomain = util.env("PROXY_SUBDOMAIN");
-let zoneName = util.env("PROXY_ZONE_NAME");
+
 //https://github.com/winglang/wing/issues/221
 let origins = (() => {
   let originsArray = MutArray<cloudFront.Origin>[
@@ -154,6 +156,7 @@ let origins = (() => {
   }
   return originsArray.copy();
 })();
+
 let proxy = new ReverseProxy.ReverseProxy(
   subDomain: subDomain,
   zoneName: zoneName,
