@@ -78,7 +78,19 @@ export interface Environment {
 
 export interface Log {
   message: string;
-  time: string;
+  timestamp: string;
+}
+
+export interface Trace {
+  message: string;
+  timestamp: string;
+}
+
+export interface TestLog {
+  path: string;
+  pass: boolean;
+  error: string;
+  traces: Array<Trace>;
 }
 
 export interface Secret {
@@ -150,7 +162,7 @@ export const wrpc = createWRPCReact<{
     {
       deploy: Log[];
       build: Log[];
-      tests: Log[];
+      tests: TestLog[];
     }
   >;
   "app.listSecrets": QueryProcedure<

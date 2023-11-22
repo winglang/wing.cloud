@@ -11,8 +11,8 @@ exports.parseLog = (log) => {
     return;
   }
   return {
-    time: match ? match[1] : "",
-    message: match ? match[2] : "",
+    timestamp: match ? match[1] : "",
+    message: match ? match[2] : log,
   };
 };
 
@@ -24,10 +24,10 @@ exports.parseLogs = (logs) => {
     if (!parsedLog) {
       continue;
     }
-    if (parsedLog.time) {
-      previousTime = parsedLog.time;
+    if (parsedLog.timestamp) {
+      previousTime = parsedLog.timestamp;
     } else {
-      parsedLog.time = previousTime;
+      parsedLog.timestamp = previousTime;
     }
     parsedLogs.push(parsedLog);
   }

@@ -17,6 +17,19 @@ struct Log {
   message: str;
   time: str;
 }
+
+struct Trace {
+  message: str;
+  time: str;
+}
+
+struct TestLog {
+  path: str;
+  pass: bool;
+  error: str?;
+  traces: Array<Trace>;
+}
+
 // TODO: https://github.com/winglang/wing/issues/3644
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
@@ -558,14 +571,11 @@ pub class Api {
       }
 
       let testEntries = logs.list("${envId}/tests");
-      let testLogs = MutArray<Log>[];
+      let testLogs = MutArray<TestLog>[];
 
       for entry in testEntries {
-        let logEntry = logs.get(entry);
-        let testMessages = logEntry.split("\n");
-        for log in Util.parseLogs(testMessages) {
-          testLogs.push(log);
-        }
+        let testResults = logs.getJson(entry);
+        testLogs.push(TestLog.fromJson(testResults));
       }
 
       return {

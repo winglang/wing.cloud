@@ -44,7 +44,7 @@ export const DeploymentLogs = ({ logs, loading }: DeploymentLogsProps) => {
               key={index}
               className={clsx(theme.bgInputHover, "w-full py-0.5 flex gap-2")}
             >
-              <div className={clsx(theme.text2)}>{getTime(log.time)}</div>
+              <div className={clsx(theme.text2)}>{getTime(log.timestamp)}</div>
               <div className={clsx(theme.text1)}>{log.message}</div>
             </div>
           ))}

@@ -5,12 +5,12 @@ import { useLocation } from "react-router-dom";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { getTime } from "../../../utils/time.js";
-import type { Log, TestResult } from "../../../utils/wrpc.js";
+import type { Log, TestLog, TestResult } from "../../../utils/wrpc.js";
 
 import { CollapsibleItem } from "./collapsible-item.js";
 
 export interface TestsLogsProps {
-  logs: Log[];
+  logs: TestLog[];
   testResults: TestResult[];
   loading?: boolean;
 }
@@ -56,10 +56,24 @@ export const TestsLogs = ({ logs, testResults, loading }: TestsLogsProps) => {
           {logs.map((log, index) => (
             <div
               key={index}
-              className={clsx(theme.bgInputHover, "w-full py-0.5 flex gap-2")}
+              className={clsx(theme.bgInputHover, "w-full py-0.5")}
             >
-              <div className={clsx(theme.text2)}>{getTime(log.time)}</div>
-              <div className={clsx(theme.text1)}>{log.message}</div>
+              <div className="flex gap-2">
+                {log.pass ? (
+                  <CheckCircleIcon className="w-4 h-4 text-green-400" />
+                ) : (
+                  <XCircleIcon className="w-4 h-4 text-red-400" />
+                )}
+                <div className={clsx(theme.text2)}>{log.path}</div>
+              </div>
+              {log.traces.map((trace, index) => (
+                <div key={index} className="flex gap-2">
+                  <div className={clsx(theme.text2)}>
+                    {getTime(trace.timestamp)}
+                  </div>
+                  <div className={clsx(theme.text1)}>{trace.message}</div>
+                </div>
+              ))}
             </div>
           ))}
         </div>

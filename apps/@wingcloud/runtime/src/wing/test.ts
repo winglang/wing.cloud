@@ -26,21 +26,22 @@ async function wingTestOne(
   props: WingTestProps,
 ) {
   const result = await testRunner.runTest(testResourcePath);
-  const traces = result.traces
-    .map((t) => {
-      if (t.type !== "log") {
-        return;
-      }
-      return `${t.timestamp} ${t.data.message}`;
-    })
-    .filter((t) => !!t)
-    .join("\n");
 
-  const logs = result.error ? `${traces}\n${result.error}` : traces;
+  const testResult = {
+    ...result,
+    traces: result.traces
+      .filter((t) => t.type === "log")
+      .map((t) => {
+        return {
+          message: t.data.message,
+          time: t.timestamp,
+        };
+      }),
+  };
 
   await props.bucketWrite(
     props.environment.testKey(result.pass, testResourcePath),
-    logs || "<no logs>",
+    JSON.stringify(testResult),
   );
   return { path: result.path, pass: result.pass };
 }
