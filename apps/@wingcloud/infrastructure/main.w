@@ -67,12 +67,29 @@ let rntm = new runtime.RuntimeService(
   logs: bucketLogs,
 );
 
+let websitePort = 5174;
+let website = new ex.ReactApp(
+  projectPath: "../website",
+  startCommand: "pnpm vite --port ${websitePort}",
+  buildCommand: "pnpm vite build",
+  buildDir: "dist",
+  localPort: websitePort,
+);
+
+reactAppPatch.ReactAppPatch.apply(website);
+
+let var siteDomain = util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN;
+if util.env("WING_TARGET") == "sim" {
+  siteDomain = website.url;
+}
+
 let environmentManager = new EnvironmentManager.EnvironmentManager(
   apps: apps,
   environments: environments,
   secrets: secrets,
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
+  siteDomain: siteDomain
 );
 
 let wingCloudApi = new wingcloud_api.Api(
@@ -89,23 +106,13 @@ let wingCloudApi = new wingcloud_api.Api(
   logs: bucketLogs,
 );
 
-let websitePort = 5174;
-let website = new ex.ReactApp(
-  projectPath: "../website",
-  startCommand: "pnpm vite --port ${websitePort}",
-  buildCommand: "pnpm vite build",
-  buildDir: "dist",
-  localPort: websitePort,
-);
-
-reactAppPatch.ReactAppPatch.apply(website);
-
 let probotApp = new probot.ProbotApp(
   probotAdapter: probotAdapter,
   runtimeUrl: rntm.api.url,
   environments: environments,
   apps: apps,
   environmentManager: environmentManager,
+  siteDomain: siteDomain
 );
 
 let apiDomainName = (() => {
@@ -163,7 +170,7 @@ let proxy = new ReverseProxy.ReverseProxy(
 
 let var webhookUrl = probotApp.githubApp.webhookUrl;
 if util.tryEnv("WING_TARGET") == "sim" {
-  bring "./ngrok.w" as ngrok;
+  bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
 
   let devNgrok = new ngrok.Ngrok(
     url: webhookUrl,
