@@ -21,7 +21,8 @@ TBD
 
 ### Remaining Tasks
 
-- [ ] Workload resource support in the Console
+- [ ] `Workload` resource support in the Console
+- [ ] `Check` resource support in the Console
 
 ## Endpoints
 
