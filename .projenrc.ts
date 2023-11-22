@@ -324,6 +324,7 @@ infrastructure.addDeps("octokit", "node-fetch");
 infrastructure.addDeps("@aws-sdk/client-kms");
 
 infrastructure.addDeps("@aws-sdk/client-ssm");
+infrastructure.addDeps("@aws-sdk/client-dynamodb");
 
 infrastructure.addDevDeps("@octokit/rest");
 
