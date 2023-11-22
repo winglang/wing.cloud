@@ -39,6 +39,7 @@ TBD
 - [ ] allocate custom domain for each exposed endpoint for example https://<endpointid>.wingcloud.dev
 - [ ] add a list of exposed URLs in the PR comment
 - [ ] add a list of exposed URLs in Wing Cloud - environment details page
+- [ ] Support external SSL terminated endpoints with custom domains
 
 ## Interact with preview and production environments
 
@@ -46,7 +47,7 @@ TBD
 
 - Preview / production environment is fully intractable in Wing Console.
 - Console view of an environment will be accessible to Wing Cloud signed up users
-- Console view of an environment will be accessible at:  https://wing.clould/apps/appName/branch/preview
+- Console view of an environment will be accessible at:  https://wing.cloud/apps/appName/branch/preview
 
 ### Remaining Tasks
 
@@ -173,9 +174,5 @@ TBD
 TBD
 
 ## Join Waitlist
-
-TBD
-
-## SSL
 
 TBD
