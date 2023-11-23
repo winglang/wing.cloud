@@ -2,12 +2,12 @@ import { createConsoleApp } from "@wingconsole/app";
 import { type Application } from "express";
 
 import { type KeyStore } from "../auth/key-store.js";
-import type { Logger } from "../logger.js";
+import type { LoggerInterface } from "../logger.js";
 
 export interface StartServerProps {
   consolePath: string;
   entryfilePath: string;
-  logger: Logger;
+  logger: LoggerInterface;
   keyStore: KeyStore;
   requestedPort?: number;
 }

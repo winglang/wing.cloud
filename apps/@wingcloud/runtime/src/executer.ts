@@ -1,10 +1,7 @@
 import { spawnSync } from "node:child_process";
-import {
-  writeFileSync,
-  openSync,
-  createReadStream,
-  appendFileSync,
-} from "node:fs";
+import { openSync, createReadStream } from "node:fs";
+
+import type { FileLogger } from "./file-logger.js";
 
 export interface ExecProps {
   cwd?: string;
@@ -16,11 +13,14 @@ export interface ExecProps {
 }
 
 export class Executer {
+  logger: FileLogger;
   logfile: string;
   outfile: number;
   errfile: number;
-  constructor(logfile: string) {
-    writeFileSync(logfile, "", "utf8");
+  constructor(logger: FileLogger) {
+    this.logger = logger;
+    const logfile = logger.logfile;
+
     createReadStream(logfile).pipe(process.stdout);
     this.logfile = logfile;
     this.errfile = openSync(logfile, "a");
@@ -38,12 +38,7 @@ export class Executer {
     }
 
     if (!options?.dontAppendPrefix) {
-      const time = new Date().toISOString();
-      appendFileSync(
-        logfile,
-        `${time} Running ${command} ${args.join(" ")}\n`,
-        "utf8",
-      );
+      this.logger.log(`Running ${command} ${args.join(" ")}`);
     }
     const subprocess = spawnSync(command, args, {
       cwd: options?.cwd,
@@ -53,11 +48,8 @@ export class Executer {
         : process.env,
     });
     if (!options?.dontAppendSuffix) {
-      const time = new Date().toISOString();
-      appendFileSync(
-        logfile,
-        `${time} Command ${command} exited with status ${subprocess.status}\n`,
-        "utf8",
+      this.logger.log(
+        `Command ${command} exited with status ${subprocess.status}`,
       );
     }
     if (

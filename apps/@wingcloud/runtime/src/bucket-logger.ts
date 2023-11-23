@@ -1,24 +1,19 @@
 import { randomBytes } from "node:crypto";
-import { appendFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import type { IBucketClient } from "@winglang/sdk/lib/cloud/bucket.js";
 
-import { Logger } from "./logger.js";
+import { FileLogger } from "./file-logger.js";
 import { fileBucketSync } from "./storage/file-bucket-sync.js";
 
-export class BucketLogger extends Logger {
+export class BucketLogger extends FileLogger {
   stop: () => void;
-  logfile: string;
 
   constructor({ key, bucket }: { key: string; bucket: IBucketClient }) {
-    super();
+    const logfile = join(tmpdir(), "log-" + randomBytes(8).toString("hex"));
 
-    this.logfile = join(tmpdir(), "log-" + randomBytes(8).toString("hex"));
-    if (!existsSync(this.logfile)) {
-      appendFileSync(this.logfile, "", "utf8");
-    }
+    super({ logfile });
 
     try {
       const { cancelSync } = fileBucketSync({
@@ -32,16 +27,4 @@ export class BucketLogger extends Logger {
       this.stop = () => {};
     }
   }
-
-  log = (message: string, props?: any[]) => {
-    const time = new Date().toISOString();
-
-    appendFileSync(
-      this.logfile,
-      `${time} ${message}${
-        props && props.length > 0 ? ":" + props.join(",") : ""
-      }\n`,
-      "utf8",
-    );
-  };
 }

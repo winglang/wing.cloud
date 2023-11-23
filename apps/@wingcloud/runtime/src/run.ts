@@ -25,7 +25,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
     bucket: context.logsBucket,
   });
 
-  const executer = new Executer(deployLogger.logfile);
+  const executer = new Executer(deployLogger);
   const setup = new Setup({
     executer,
     context,
