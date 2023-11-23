@@ -566,12 +566,14 @@ pub class Api {
 
       let deployMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
       let deployLogs = MutArray<Log>[];
+      // TODO: https://github.com/winglang/wing/issues/3644
       for log in Util.parseLogs(deployMessages) {
         deployLogs.push(log);
       }
 
       let runtimeMessages = logs.tryGet("${envId}/runtime.log")?.split("\n") ?? [];
       let runtimeLogs = MutArray<Log>[];
+      // TODO: https://github.com/winglang/wing/issues/3644
       for log in Util.parseLogs(runtimeMessages) {
         runtimeLogs.push(log);
       }

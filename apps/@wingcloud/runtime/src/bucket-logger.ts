@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { appendFileSync } from "node:fs";
+import { appendFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -16,6 +16,10 @@ export class BucketLogger extends Logger {
     super();
 
     this.logfile = join(tmpdir(), "log-" + randomBytes(8).toString("hex"));
+    if (!existsSync(this.logfile)) {
+      appendFileSync(this.logfile, "", "utf8");
+    }
+
     try {
       const { cancelSync } = fileBucketSync({
         file: this.logfile,
