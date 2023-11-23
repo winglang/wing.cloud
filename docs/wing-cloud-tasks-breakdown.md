@@ -179,13 +179,13 @@ TBD
 
 ## Appendix: tasks related to Winglang/SDK
 
-- [ ] #5038
-- [ ] #2726
-- [ ] #4806
-- [ ] #4810
-- [ ] #4842
-- [ ] #2430
-- [ ] #4556
-- [ ] #4887
-- [ ] #4914
+- [ ] https://github.com/winglang/wing/issues/5038
+- [ ] https://github.com/winglang/wing/issues/2726
+- [ ] https://github.com/winglang/wing/issues/4806
+- [ ] https://github.com/winglang/wing/issues/4810
+- [ ] https://github.com/winglang/wing/issues/4842
+- [ ] https://github.com/winglang/wing/issues/2430
+- [ ] https://github.com/winglang/wing/issues/4556
+- [ ] https://github.com/winglang/wing/issues/4887
+- [ ] https://github.com/winglang/wing/issues/4914
 
