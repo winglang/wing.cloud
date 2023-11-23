@@ -47,7 +47,7 @@ TBD
 
 - Preview / production environment is fully intractable in Wing Console.
 - Console view of an environment will be accessible to Wing Cloud signed up users
-- Console view of an environment will be accessible at:  https://wing.cloud/apps/appName/branch/preview
+- Console view of an environment will be accessible at:  https://wing.cloud/apps/appName/branch/console
 
 ### Remaining Tasks
 
@@ -134,7 +134,7 @@ TBD
 ### DOD
 
 - Preview environment URL: https://wing.cloud/apps/appName/branch
-- Preview environment console URL: https://wing.cloud/apps/appName/branch/preview
+- Preview environment console URL: https://wing.cloud/apps/appName/branch/console
 - Each environment (both production and preview) will have a page in the Wing Cloud web app
 - Users are able to see build and deployments logs
 - Users are able to see tests if they were executed during build including their logs
