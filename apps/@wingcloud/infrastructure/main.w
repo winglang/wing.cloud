@@ -126,42 +126,28 @@ let apiDomainName = (() => {
   return api.url;
 })();
 
-//https://github.com/winglang/wing/issues/221
-let origins = (() => {
-  let originsArray = MutArray<cloudFront.Origin>[
+let proxy = new ReverseProxy.ReverseProxy(
+  subDomain: subDomain,
+  zoneName: zoneName,
+  aliases: ["${subDomain}.${zoneName}"],
+  origins: [
     {
       pathPattern: "/wrpc/*",
       domainName: apiDomainName,
       originId: "wrpc",
       originPath: "/prod",
     },
-  ];
-  if util.env("WING_TARGET") == "sim" {
-    originsArray.push({
-      pathPattern: "",
-      domainName: website.url.replace("https://", ""),
-      originId: "website",
-    });
-  } else {
-    originsArray.push({
-      pathPattern: "/apps/*",
-      domainName: website.url.replace("https://", ""),
-      originId: "website",
-    });
-    originsArray.push({
-      pathPattern: "",
+    {
+      pathPattern: "*",
       domainName: util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN,
       originId: "landingPage",
-    });
-  }
-  return originsArray.copy();
-})();
-
-let proxy = new ReverseProxy.ReverseProxy(
-  subDomain: subDomain,
-  zoneName: zoneName,
-  aliases: ["${subDomain}.${zoneName}"],
-  origins: origins,
+    },
+    {
+      pathPattern: "",
+      domainName: website.url.replace("https://", ""),
+      originId: "website",
+    },
+  ],
   port: (): num? => {
     if util.tryEnv("WING_IS_TEST") == "true" {
       return nil;
