@@ -32,7 +32,28 @@ struct TestLog {
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
   extern "./util.js" pub static inflight parseLog(log: str): Log?;
+
+  pub static inflight parseLogs(messages: Array<str>): Array<Log> {
+    let var parsedLogs = MutArray<Log>[];
+
+    let var previousTime = "";
+    for message in messages {
+      if let var log = Util.parseLog(message) {
+        if (log.timestamp != "") {
+            previousTime = log.timestamp;
+        } else {
+            log = Log {
+                message: log.message,
+                timestamp: previousTime,
+            };
+        }
+        parsedLogs.push(log);
+      }
+    }
+    return parsedLogs.copy();
+  }
 }
+
 bring "./environment-manager.w" as EnvironmentManager;
 bring "./status-reports.w" as status_reports;
 bring "./probot-adapter.w" as adapter;
@@ -56,28 +77,6 @@ struct ApiProps {
 struct EnvironmentAction {
   type: str;
   data: Json;
-}
-
-class Logs {
-  pub static inflight parseLogs(messages: Array<str>): Array<Log> {
-    let var parsedLogs = MutArray<Log>[];
-
-    let var previousTime = "";
-    for message in messages {
-      if let var log = Util.parseLog(message) {
-        if (log.timestamp != "") {
-            previousTime = log.timestamp;
-        } else {
-            log = Log {
-                message: log.message,
-                timestamp: previousTime,
-            };
-        }
-        parsedLogs.push(log);
-      }
-    }
-    return parsedLogs.copy();
-  }
 }
 
 pub class Api {
@@ -582,11 +581,10 @@ pub class Api {
       let envId = environment.id;
 
       let deployMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
-      let deployLogs = Logs.parseLogs(deployMessages);
+      let deployLogs = Util.parseLogs(deployMessages);
 
       let runtimeMessages = logs.tryGet("${envId}/runtime.log")?.split("\n") ?? [];
-      let runtimeLogs = Logs.parseLogs(runtimeMessages);
-      // TODO: https://github.com/winglang/wing/issues/3644
+      let runtimeLogs = Util.parseLogs(runtimeMessages);
 
       let testEntries = logs.list("${envId}/tests");
       let testLogs = MutArray<TestLog>[];

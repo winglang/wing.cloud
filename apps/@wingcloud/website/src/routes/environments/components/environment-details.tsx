@@ -19,7 +19,7 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
   return (
     <div
       className={clsx(
-        "p-6 w-full rounded gap-4 flex border",
+        "p-4 w-full rounded gap-4 flex border",
         theme.bgInput,
         theme.borderInput,
       )}

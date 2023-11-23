@@ -67,21 +67,22 @@ export const run = async function ({ context, requestedPort }: RunProps) {
       },
     };
   } catch (error: any) {
-    let errorMessage = error.message;
     if (wingPaths) {
       const wingCompiler = await import(wingPaths["@winglang/compiler"]);
       if (error instanceof wingCompiler.CompileError) {
         // TODO: Use @wingconsole/server/src/utils/format-wing-error.ts to format the error
-        errorMessage = error.diagnostics
+        let errorMessage = error.diagnostics
           .map((diagnostic: any) => diagnostic.message)
           .join("\n");
+
         runtimeLogger.log(`Error: ${errorMessage}`);
       } else {
-        deployLogger.log(error);
+        deployLogger.log(error.message);
       }
+    } else {
+      deployLogger.log(error.message);
     }
-
-    await report("error", { message: errorMessage });
+    await report("error", { message: error.message });
 
     deployLogger.stop();
     runtimeLogger.stop();

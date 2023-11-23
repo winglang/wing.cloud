@@ -12,12 +12,11 @@ export class BucketLogger extends FileLogger {
 
   constructor({ key, bucket }: { key: string; bucket: IBucketClient }) {
     const logfile = join(tmpdir(), "log-" + randomBytes(8).toString("hex"));
-
     super({ logfile });
 
     try {
       const { cancelSync } = fileBucketSync({
-        file: this.logfile,
+        file: logfile,
         key,
         bucket,
       });
