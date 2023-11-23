@@ -24,6 +24,7 @@ struct Trace {
 }
 
 struct TestLog {
+  id: str;
   path: str;
   pass: bool;
   error: str?;

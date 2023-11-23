@@ -43,8 +43,17 @@ export const Component = () => {
   );
 
   const location = useLocation();
+  const locationHash = useMemo(() => location.hash.slice(1), [location.hash]);
+
+  const selectedTestId = useMemo(() => {
+    if (!logs.data?.tests) {
+      return;
+    }
+    const testId = decodeURIComponent(locationHash);
+    return logs.data?.tests.find((test) => test.id === testId)?.id;
+  }, [logs.data?.tests, locationHash]);
+
   useEffect(() => {
-    const locationHash = location.hash.slice(1);
     switch (locationHash) {
       case TEST_LOGS_ID: {
         setTestLogsOpen(true);
@@ -61,12 +70,17 @@ export const Component = () => {
 
         break;
       }
+      default: {
+        if (selectedTestId) {
+          setTestLogsOpen(true);
+        }
+      }
     }
-  }, [location.hash]);
+  }, [locationHash, logs.data?.tests]);
 
   useEffect(() => {
     if (environment.data?.environment?.status === "error") {
-      setDeploymentLogsOpen(true);
+      setRuntimeLogsOpen(true);
     }
   }, [environment.data?.environment?.status]);
 
@@ -84,6 +98,7 @@ export const Component = () => {
           testResults={
             environment.data?.environment.testResults?.testResults || []
           }
+          selectedTestId={selectedTestId}
           logs={logs.data?.tests || []}
           loading={logs.isLoading}
         />

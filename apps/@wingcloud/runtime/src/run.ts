@@ -75,10 +75,12 @@ export const run = async function ({ context, requestedPort }: RunProps) {
         errorMessage = error.diagnostics
           .map((diagnostic: any) => diagnostic.message)
           .join("\n");
+        runtimeLogger.log(`Error: ${errorMessage}`);
+      } else {
+        deployLogger.log(error);
       }
     }
 
-    deployLogger.log(errorMessage);
     await report("error", { message: errorMessage });
 
     deployLogger.stop();

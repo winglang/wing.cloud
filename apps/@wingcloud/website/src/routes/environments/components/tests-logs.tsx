@@ -1,5 +1,6 @@
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
+import { useEffect, useState } from "react";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { getTime } from "../../../utils/time.js";
@@ -13,6 +14,7 @@ export interface TestsLogsProps {
   loading?: boolean;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  selectedTestId?: string;
 }
 
 export const TEST_LOGS_ID = "test-logs";
@@ -23,8 +25,20 @@ export const TestsLogs = ({
   loading,
   isOpen,
   setIsOpen,
+  selectedTestId,
 }: TestsLogsProps) => {
   const { theme } = useTheme();
+
+  const [animateLogId, setAnimateLogId] = useState(selectedTestId);
+
+  useEffect(() => {
+    setAnimateLogId(selectedTestId);
+    const timeout = setTimeout(() => {
+      // eslint-disable-next-line unicorn/no-useless-undefined
+      setAnimateLogId(undefined);
+    }, 2000);
+    return () => clearTimeout(timeout);
+  }, [selectedTestId]);
 
   return (
     <CollapsibleItem
@@ -54,9 +68,17 @@ export const TestsLogs = ({
           )}
           {logs.map((log) => (
             <div
-              id={log.path}
+              id={log.id}
               key={log.path}
-              className={clsx(theme.bgInputHover, "px-1")}
+              className={clsx(
+                "px-1",
+                theme.bgInputHover,
+                animateLogId === log.id && [
+                  theme.bg3,
+                  "animate-pulse transition-all",
+                ],
+                selectedTestId === log.id && theme.bg3,
+              )}
             >
               <div className="flex gap-1 items-center">
                 <div className="grow gap-y-0.5">

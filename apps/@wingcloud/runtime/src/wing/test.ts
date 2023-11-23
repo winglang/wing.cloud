@@ -34,8 +34,10 @@ async function wingTestOne(
   const result = await testRunner.runTest(testResourcePath);
   const time = Date.now() - startTime;
 
+  const id = testResourcePath.replaceAll(/[^\dA-Za-z]/g, "");
   const testResult = {
     ...result,
+    id,
     timestamp,
     time,
     traces: result.traces
@@ -52,7 +54,7 @@ async function wingTestOne(
     props.environment.testKey(result.pass, testResourcePath),
     JSON.stringify(testResult),
   );
-  return { path: result.path, pass: result.pass };
+  return { id, path: result.path, pass: result.pass };
 }
 
 export async function wingTest(props: WingTestProps) {

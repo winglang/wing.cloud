@@ -55,9 +55,10 @@ pub class GithubComment {
               if !testResult.pass {
                 testRes = "❌ Failed";
               }
+              let testId = testResult.id;
               let testName = testResult.path.split(":").at(-1);
               let testResourcePath = testResult.path.split(":").at(0);
-              let link = "<a target=\"_blank\" href=\"${this.siteDomain}/apps/${app.appName}/${environment.branch}/#test-logs\">View</a>";
+              let link = "<a target=\"_blank\" href=\"${this.siteDomain}/apps/${app.appName}/${environment.branch}/#${testId}\">View</a>";
               testRows = "${testRows}<tr><td>${testName}</td><td>${testResourcePath}</td><td>${testRes}</td><td>${link}</td></tr>";
               i += 1;
             }
