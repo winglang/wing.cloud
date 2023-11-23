@@ -176,3 +176,16 @@ TBD
 ## Join Waitlist
 
 TBD
+
+## Appendix: tasks related to Winglang/SDK
+
+- [ ] #5038
+- [ ] #2726
+- [ ] #4806
+- [ ] #4810
+- [ ] #4842
+- [ ] #2430
+- [ ] #4556
+- [ ] #4887
+- [ ] #4914
+
