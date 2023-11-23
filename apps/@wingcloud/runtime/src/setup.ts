@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -31,7 +31,7 @@ export class Setup {
     this.sourceDir = mkdtempSync(join(tmpdir(), "source-"));
   }
 
-  async setup() {
+  async run() {
     const entryfilePath = join(
       this.sourceDir,
       this.context.environment.entryfile,
@@ -40,9 +40,18 @@ export class Setup {
     await this.gitClone();
     await this.npmInstall(entrydir);
     const wingPaths = await this.runInstallWing(entrydir);
-    const testResults = await this.runWingTest(wingPaths, entryfilePath);
 
-    return { paths: wingPaths, entryfilePath, testResults };
+    return { paths: wingPaths, entryfilePath };
+  }
+
+  async runWingTest(wingPaths: WingPaths, entryfile: string) {
+    return wingTest({
+      wingCompilerPath: wingPaths["@winglang/compiler"],
+      wingSdkPath: wingPaths["@winglang/sdk"],
+      entryfilePath: entryfile,
+      environment: this.context.environment,
+      bucketWrite: useBucketWrite({ bucket: this.context.logsBucket }),
+    });
   }
 
   private async gitClone() {
@@ -64,15 +73,5 @@ export class Setup {
 
   private async runInstallWing(cwd: string) {
     return installWing(cwd, this.executer);
-  }
-
-  private async runWingTest(wingPaths: WingPaths, entryfile: string) {
-    return wingTest({
-      wingCompilerPath: wingPaths["@winglang/compiler"],
-      wingSdkPath: wingPaths["@winglang/sdk"],
-      entryfilePath: entryfile,
-      environment: this.context.environment,
-      bucketWrite: useBucketWrite({ bucket: this.context.logsBucket }),
-    });
   }
 }

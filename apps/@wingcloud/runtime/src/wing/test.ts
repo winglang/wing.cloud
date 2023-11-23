@@ -11,7 +11,10 @@ export interface WingTestProps {
   bucketWrite: (key: string, contents: string) => Promise<void>;
 }
 
-async function wingCompile(wingCompilerPath: string, entryfilePath: string) {
+export async function wingCompile(
+  wingCompilerPath: string,
+  entryfilePath: string,
+) {
   const wingCompiler = await import(wingCompilerPath);
   const compile: typeof compileFn = wingCompiler.compile;
   const simfile = await compile(entryfilePath, {
