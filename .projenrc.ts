@@ -39,9 +39,6 @@ class WingLibProject extends NodeProject {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-const winglangVersion = "^0.48.6";
-
-///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
   devDeps: ["@skyrpex/wingen"],
   name: "@wingcloud/monorepo",
@@ -111,7 +108,7 @@ const website = new NodeProject({
   name: "@wingcloud/website",
   outdir: "apps/@wingcloud/website",
 });
-website.addDevDeps("typescript", "@types/node@18");
+website.addDevDeps("typescript", "@types/node@20");
 new TypescriptConfig(website, {
   include: ["src/**/*"],
 });
@@ -177,17 +174,17 @@ const runtime = new TypescriptProject({
     entry: ["src/**/*.ts"],
     outDir: "lib",
     format: ["esm"],
-    target: "node18",
+    target: "node20",
     dts: true,
     bundle: false,
     clean: true,
   },
 });
 
-runtime.addDeps(`winglang@${winglangVersion}`);
-runtime.addDeps(`@winglang/sdk@${winglangVersion}`);
-runtime.addDeps(`@winglang/compiler@${winglangVersion}`);
-runtime.addDeps(`@wingconsole/app@${winglangVersion}`);
+runtime.addDeps("winglang");
+runtime.addDeps("@winglang/sdk");
+runtime.addDeps("@winglang/compiler");
+runtime.addDeps("@wingconsole/app");
 runtime.addDeps("express");
 runtime.addDeps("jsonwebtoken");
 runtime.addDeps("jwk-to-pem");
@@ -218,7 +215,7 @@ infrastructure.addGitIgnore("/.env.*");
 infrastructure.addGitIgnore("!/.env.example");
 
 infrastructure.addGitIgnore("**/target/");
-infrastructure.addDeps(`winglang@${winglangVersion}`);
+infrastructure.addDeps("winglang");
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
