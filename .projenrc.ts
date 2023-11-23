@@ -196,7 +196,7 @@ runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/jsonwebtoken");
 runtime.addDevDeps("@types/jwk-to-pem");
 runtime.addDevDeps("simple-git");
-runtime.addDevDeps("msw");
+runtime.addDevDeps("msw@1");
 runtime.addDevDeps("@types/which");
 
 runtime.addGitIgnore("target/");
@@ -316,7 +316,7 @@ infrastructure.addDeps(
 );
 
 infrastructure.addDeps("cookie-es");
-infrastructure.addDeps("jose");
+infrastructure.addDeps("jose@4");
 infrastructure.addDeps("octokit", "node-fetch");
 infrastructure.addDeps("@aws-sdk/client-kms");
 
