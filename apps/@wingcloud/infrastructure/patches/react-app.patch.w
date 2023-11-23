@@ -9,7 +9,7 @@ pub class ReactAppPatch {
     pub static apply(reactApp: ex.ReactApp) {
         if util.env("WING_TARGET") == "tf-aws" {
             let distributionNode = unsafeCast(std.Node.of(reactApp).children.at(0).node.findChild("Distribution"));
-            distributionNode.addOverride("custom_error_response", [
+            distributionNode?.addOverride("custom_error_response", [
             {
                 error_code: 403,
                 response_code: 200,
@@ -17,11 +17,11 @@ pub class ReactAppPatch {
             },
             ]);
             // set default TTL to 0
-            distributionNode.addOverride("default_cache_behavior.default_ttl", 0);
-            distributionNode.addOverride("default_cache_behavior.min_ttl", 0);
-        
+            distributionNode?.addOverride("default_cache_behavior.default_ttl", 0);
+            distributionNode?.addOverride("default_cache_behavior.min_ttl", 0);
+
             // make sure only assets are cached
-            distributionNode.addOverride("ordered_cache_behavior", {
+            distributionNode?.addOverride("ordered_cache_behavior", {
             "path_pattern": "apps/assets/*",
             "allowed_methods": ["GET", "HEAD"],
             "cached_methods": ["GET", "HEAD"],
@@ -34,7 +34,7 @@ pub class ReactAppPatch {
             },
             "min_ttl": 31536000, //365 days
             "default_ttl": 31536000,
-            "max_ttl": 31536000, 
+            "max_ttl": 31536000,
             "compress": true,
             "viewer_protocol_policy":"redirect-to-https"
             });
