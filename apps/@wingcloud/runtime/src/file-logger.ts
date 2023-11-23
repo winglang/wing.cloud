@@ -13,7 +13,7 @@ export class FileLogger implements LoggerInterface {
     }
   }
 
-  log = (message: string, props?: any[]) => {
+  log(message: string, props?: any[]) {
     const time = new Date().toISOString();
 
     appendFileSync(
@@ -23,5 +23,5 @@ export class FileLogger implements LoggerInterface {
       }\n`,
       "utf8",
     );
-  };
+  }
 }
