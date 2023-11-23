@@ -12,6 +12,7 @@ import { BranchIcon } from "../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import type { Environment } from "../../../utils/wrpc.js";
+import { RUNTIME_LOGS_ID } from "../../environments/components/build-logs.js";
 import { DEPLOYMENT_LOGS_ID } from "../../environments/components/deployment-logs.js";
 import { TEST_LOGS_ID } from "../../environments/components/tests-logs.js";
 
@@ -177,7 +178,7 @@ export const EnvironmentsListItem = ({
               >
                 {status === "error" && (
                   <Link
-                    to={`/apps/${appName}/${environment.branch}/#${DEPLOYMENT_LOGS_ID}`}
+                    to={`/apps/${appName}/${environment.branch}/#${RUNTIME_LOGS_ID}`}
                     className="hover:underline"
                   >
                     {statusString}
