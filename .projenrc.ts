@@ -253,7 +253,18 @@ new Turbo(infrastructure, {
     compile: {
       dependsOn: ["^compile"],
       dotEnv: [".env"],
-      inputs: ["!target/**"],
+      inputs: [
+        "**/*",
+        // "**/*.w",
+        // "**/*.js",
+        // "**/*.cjs",
+        // "**/*.mjs",
+        // "**/*.ts",
+        // "**/*.cts",
+        // "**/*.mts",
+        "!node_modules/**",
+        "!target/**",
+      ],
       outputs: [
         "target/main.tfaws/**",
         "!target/main.tfaws/.terraform.lock.hcl",
