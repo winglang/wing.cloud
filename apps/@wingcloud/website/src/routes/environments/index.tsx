@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 
 import { wrpc } from "../../utils/wrpc.js";
@@ -13,6 +13,10 @@ import { TEST_LOGS_ID, TestsLogs } from "./components/tests-logs.js";
 
 export const Component = () => {
   const { appName, branch } = useParams();
+
+  const [testLogsOpen, setTestLogsOpen] = useState(false);
+  const [runtimeLogsOpen, setRuntimeLogsOpen] = useState(false);
+  const [deploymentLogsOpen, setDeploymentLogsOpen] = useState(false);
 
   const environment = wrpc["app.environment"].useQuery(
     {
@@ -39,19 +43,32 @@ export const Component = () => {
   );
 
   const location = useLocation();
+  useEffect(() => {
+    const locationHash = location.hash.slice(1);
+    switch (locationHash) {
+      case TEST_LOGS_ID: {
+        setTestLogsOpen(true);
 
-  const locationHash = useMemo(() => {
-    if (location.hash) {
-      return location.hash.slice(1);
+        break;
+      }
+      case DEPLOYMENT_LOGS_ID: {
+        setDeploymentLogsOpen(true);
+
+        break;
+      }
+      case RUNTIME_LOGS_ID: {
+        setRuntimeLogsOpen(true);
+
+        break;
+      }
     }
-  }, [location.search]);
+  }, [location.hash]);
 
-  const openDeploymentLogs = useMemo(() => {
-    return (
-      locationHash === DEPLOYMENT_LOGS_ID ||
-      environment.data?.environment.status === "error"
-    );
-  }, [locationHash, environment.data?.environment.status]);
+  useEffect(() => {
+    if (environment.data?.environment?.status === "error") {
+      setDeploymentLogsOpen(true);
+    }
+  }, [environment.data?.environment?.status]);
 
   return (
     <div>
@@ -62,7 +79,8 @@ export const Component = () => {
         />
 
         <TestsLogs
-          defaultOpen={locationHash === TEST_LOGS_ID}
+          isOpen={testLogsOpen}
+          setIsOpen={setTestLogsOpen}
           testResults={
             environment.data?.environment.testResults?.testResults || []
           }
@@ -71,13 +89,15 @@ export const Component = () => {
         />
 
         <DeploymentLogs
-          defaultOpen={openDeploymentLogs}
+          isOpen={deploymentLogsOpen}
+          setIsOpen={setDeploymentLogsOpen}
           logs={logs.data?.deploy || []}
           loading={logs.isLoading}
         />
 
         <RuntimeLogs
-          defaultOpen={locationHash === RUNTIME_LOGS_ID}
+          isOpen={runtimeLogsOpen}
+          setIsOpen={setRuntimeLogsOpen}
           logs={logs.data?.runtime || []}
           loading={logs.isLoading}
         />

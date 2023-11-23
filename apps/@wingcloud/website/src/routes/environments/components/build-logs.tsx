@@ -8,7 +8,8 @@ import { CollapsibleItem } from "./collapsible-item.js";
 export interface RuntimeLogsProps {
   logs: Log[];
   loading?: boolean;
-  defaultOpen?: boolean;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }
 
 export const RUNTIME_LOGS_ID = "runtime-logs";
@@ -16,7 +17,8 @@ export const RUNTIME_LOGS_ID = "runtime-logs";
 export const RuntimeLogs = ({
   logs,
   loading,
-  defaultOpen,
+  isOpen,
+  setIsOpen,
 }: RuntimeLogsProps) => {
   const { theme } = useTheme();
 
@@ -24,7 +26,8 @@ export const RuntimeLogs = ({
     <CollapsibleItem
       id={RUNTIME_LOGS_ID}
       title="Runtime logs"
-      defaultOpen={defaultOpen}
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
       loading={loading}
       children={
         <div className="text-2xs font-mono py-4 px-3">

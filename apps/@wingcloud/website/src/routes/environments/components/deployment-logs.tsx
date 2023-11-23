@@ -8,7 +8,8 @@ import { CollapsibleItem } from "./collapsible-item.js";
 export interface DeploymentLogsProps {
   logs: Log[];
   loading?: boolean;
-  defaultOpen?: boolean;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }
 
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
@@ -16,7 +17,8 @@ export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 export const DeploymentLogs = ({
   logs,
   loading,
-  defaultOpen,
+  isOpen,
+  setIsOpen,
 }: DeploymentLogsProps) => {
   const { theme } = useTheme();
 
@@ -24,7 +26,8 @@ export const DeploymentLogs = ({
     <CollapsibleItem
       id={DEPLOYMENT_LOGS_ID}
       title="Deployment logs"
-      defaultOpen={defaultOpen}
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
       loading={loading}
       children={
         <div className="text-2xs font-mono py-4 px-3">

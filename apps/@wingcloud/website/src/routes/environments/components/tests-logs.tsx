@@ -11,7 +11,8 @@ export interface TestsLogsProps {
   logs: TestLog[];
   testResults: TestResult[];
   loading?: boolean;
-  defaultOpen?: boolean;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
 }
 
 export const TEST_LOGS_ID = "test-logs";
@@ -20,7 +21,8 @@ export const TestsLogs = ({
   logs,
   testResults,
   loading,
-  defaultOpen,
+  isOpen,
+  setIsOpen,
 }: TestsLogsProps) => {
   const { theme } = useTheme();
 
@@ -28,7 +30,8 @@ export const TestsLogs = ({
     <CollapsibleItem
       id={TEST_LOGS_ID}
       title="Tests"
-      defaultOpen={defaultOpen}
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
       loading={loading}
       rightOptions={
         <div className="flex gap-2 text-xs">
