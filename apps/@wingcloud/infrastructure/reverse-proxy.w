@@ -5,7 +5,7 @@ bring sim;
 bring "./dnsimple.w" as DNSimple;
 bring "./cloudfront.w" as CloudFront;
 
-struct Origin {
+pub struct Origin {
   pathPattern: str;
   domainName: str;
 }
@@ -32,44 +32,6 @@ pub class ReverseProxy {
     }
   }
 }
-
-// class ReverseProxy_tfaws {
-//   pub url: str;
-//   pub paths: Array<str>;
-//   aliases: Array<str>;
-//   origins: Array<CloudFront.Origin>;
-//   new(props: ReverseProxyProps) {
-//     this.aliases = props.aliases;
-//     this.origins = props.origins;
-//     //validated certificate
-//     let validatedCertificate = new DNSimple.DNSimpleValidatedCertificate(
-//       zoneName: props.zoneName,
-//       subDomain: props.subDomain
-//     );
-//     //create distribution
-//     let cloudFrontDist = new CloudFront.CloudFrontDistribution(
-//       validatedCertificate: validatedCertificate,
-//       aliases: props.aliases,
-//       origins: props.origins
-//     );
-//     //create dnsimple record
-//     let dnsRecord = new DNSimple.DNSimpleZoneRecord(
-//       zoneName: props.zoneName,
-//       subDomain: props.subDomain,
-//       recordType: "CNAME",
-//       ttl: 60,
-//       distributionUrl: cloudFrontDist.distribution.domainName
-//     );
-
-//     this.url = props.aliases.tryAt(0) ?? cloudFrontDist.distribution.domainName;
-
-//     let paths = MutArray<str>[];
-//     for origin in this.origins {
-//       paths.push(origin.pathPattern);
-//     }
-//     this.paths = paths.copy();
-//   }
-// }
 
 struct SimReverseProxyResult {
   port: num;
