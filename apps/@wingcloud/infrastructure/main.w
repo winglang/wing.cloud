@@ -165,26 +165,44 @@ let getDomainName = (url: str): str => {
 let proxyUrl = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
     bring "@cdktf/provider-aws" as aws;
-    let cachingDisabledCachePolicyId = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad";
+    // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
+    let cachingOptimizedCachePolicyId = "658327ea-f89d-4fab-a63d-7e88639e58f6";
     let passthroughCachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
       name: "passthrough-cache-policy",
-      defaultTtl: 0,
-      minTtl: 0,
-      maxTtl: 1h.minutes,
+      defaultTtl: 0m.seconds,
+      minTtl: 0m.seconds,
+      maxTtl: 1s.seconds,
       parametersInCacheKeyAndForwardedToOrigin: {
-        // Needed to authenticate the API calls.
         cookiesConfig: {
+          // Needed to authenticate the API calls.
           cookieBehavior: "all"
         },
         headersConfig: {
           headerBehavior: "none",
         },
-        // Needed for many API endpoints.
         queryStringsConfig: {
+          // Needed for many API endpoints.
           queryStringBehavior: "all",
         },
       },
     );
+    let shortCachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
+      name: "short-cache-policy",
+      defaultTtl: 1m.seconds,
+      minTtl: 1m.seconds,
+      maxTtl: 10m.seconds,
+      parametersInCacheKeyAndForwardedToOrigin: {
+        cookiesConfig: {
+          cookieBehavior: "none"
+        },
+        headersConfig: {
+          headerBehavior: "none",
+        },
+        queryStringsConfig: {
+          queryStringBehavior: "none",
+        },
+      },
+    ) as "short-cache-policy";
     let distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
       enabled: true,
       viewerCertificate: {
@@ -233,7 +251,7 @@ let proxyUrl = (() => {
         {
           originId: "landing_dashboard",
           failoverCriteria: {
-            statusCodes: [403, 404],
+            statusCodes: [403],
           },
           member: [
             {
@@ -254,13 +272,21 @@ let proxyUrl = (() => {
           viewerProtocolPolicy: "redirect-to-https",
           cachePolicyId: passthroughCachePolicy.id,
         },
+        {
+          targetOriginId: "landing_dashboard",
+          pathPattern: "/assets/*",
+          allowedMethods: ["GET", "HEAD"],
+          cachedMethods: ["GET", "HEAD"],
+          viewerProtocolPolicy: "redirect-to-https",
+          cachePolicyId: cachingOptimizedCachePolicyId,
+        },
       ],
       defaultCacheBehavior: {
         targetOriginId: "landing_dashboard",
-        allowedMethods: ["GET", "HEAD", "OPTIONS"],
-        cachedMethods: ["GET", "HEAD", "OPTIONS"],
+        allowedMethods: ["GET", "HEAD"],
+        cachedMethods: ["GET", "HEAD"],
         viewerProtocolPolicy: "redirect-to-https",
-        cachePolicyId: cachingDisabledCachePolicyId,
+        cachePolicyId: shortCachePolicy.id,
       },
     );
     return "https://${distribution.domainName}";

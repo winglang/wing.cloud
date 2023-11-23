@@ -21,22 +21,18 @@ pub class ReactAppPatch {
       },
     ]);
 
-    // Set default TTL to 0.
-    distribution?.addOverride("default_cache_behavior.default_ttl", 0);
-    distribution?.addOverride("default_cache_behavior.min_ttl", 0);
+    // Set a short default TTL.
+    distribution?.addOverride("default_cache_behavior.default_ttl", 1m.seconds);
+    distribution?.addOverride("default_cache_behavior.min_ttl", 1m.seconds);
 
     // Cache assets forever.
     distribution?.addOverride("ordered_cache_behavior", {
-      path_pattern: "assets/*",
+      path_pattern: "/assets/*",
       allowed_methods: ["GET", "HEAD"],
       cached_methods: ["GET", "HEAD"],
       target_origin_id: "s3Origin",
-      forwarded_values: {
-        query_string: false,
-        cookies: {
-          forward: "none",
-        },
-      },
+      // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
+      cache_policy_id: "658327ea-f89d-4fab-a63d-7e88639e58f6",
       min_ttl: 1y.seconds,
       default_ttl: 1y.seconds,
       max_ttl: 1y.seconds,
