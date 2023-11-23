@@ -15,21 +15,3 @@ exports.parseLog = (log) => {
     message: match ? match[2] : log,
   };
 };
-
-exports.parseLogs = (logs) => {
-  const parsedLogs = [];
-  let previousTime = "";
-  for (const log of logs) {
-    const parsedLog = this.parseLog(log);
-    if (!parsedLog) {
-      continue;
-    }
-    if (parsedLog.timestamp) {
-      previousTime = parsedLog.timestamp;
-    } else {
-      parsedLog.timestamp = previousTime;
-    }
-    parsedLogs.push(parsedLog);
-  }
-  return parsedLogs;
-};

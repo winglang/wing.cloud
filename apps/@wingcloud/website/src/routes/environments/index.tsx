@@ -3,13 +3,14 @@ import { useLocation, useParams } from "react-router-dom";
 
 import { wrpc } from "../../utils/wrpc.js";
 
-import { RUNTIME_LOGS_ID, RuntimeLogs } from "./components/build-logs.js";
-import {
-  DEPLOYMENT_LOGS_ID,
-  DeploymentLogs,
-} from "./components/deployment-logs.js";
+export const RUNTIME_LOGS_ID = "runtime-logs";
+export const TEST_LOGS_ID = "test-logs";
+export const DEPLOYMENT_LOGS_ID = "deployment-logs";
+
+import { DeploymentLogs } from "./components/deployment-logs.js";
 import { EnvironmentDetails } from "./components/environment-details.js";
-import { TEST_LOGS_ID, TestsLogs } from "./components/tests-logs.js";
+import { RuntimeLogs } from "./components/runtime-logs.js";
+import { TestsLogs } from "./components/tests-logs.js";
 
 export const Component = () => {
   const { appName, branch } = useParams();
@@ -93,6 +94,7 @@ export const Component = () => {
         />
 
         <TestsLogs
+          id={TEST_LOGS_ID}
           isOpen={testLogsOpen}
           setIsOpen={setTestLogsOpen}
           testResults={
@@ -104,6 +106,7 @@ export const Component = () => {
         />
 
         <DeploymentLogs
+          id={DEPLOYMENT_LOGS_ID}
           isOpen={deploymentLogsOpen}
           setIsOpen={setDeploymentLogsOpen}
           logs={logs.data?.deploy || []}
@@ -111,6 +114,7 @@ export const Component = () => {
         />
 
         <RuntimeLogs
+          id={RUNTIME_LOGS_ID}
           isOpen={runtimeLogsOpen}
           setIsOpen={setRuntimeLogsOpen}
           logs={logs.data?.runtime || []}

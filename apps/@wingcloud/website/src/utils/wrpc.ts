@@ -87,6 +87,7 @@ export interface Trace {
 }
 
 export interface TestLog {
+  id: string;
   path: string;
   pass: boolean;
   error: string;

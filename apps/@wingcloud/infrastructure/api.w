@@ -31,7 +31,7 @@ struct TestLog {
 // TODO: https://github.com/winglang/wing/issues/3644
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
-  extern "./util.js" pub static inflight parseLogs(logs: Array<str>): Array<Log>;
+  extern "./util.js" pub static inflight parseLog(log: str): Log?;
 }
 bring "./environment-manager.w" as EnvironmentManager;
 bring "./status-reports.w" as status_reports;
@@ -56,6 +56,28 @@ struct ApiProps {
 struct EnvironmentAction {
   type: str;
   data: Json;
+}
+
+class Logs {
+  pub static inflight parseLogs(messages: Array<str>): Array<Log> {
+    let var parsedLogs = MutArray<Log>[];
+
+    let var previousTime = "";
+    for message in messages {
+      if let var log = Util.parseLog(message) {
+        if (log.timestamp != "") {
+            previousTime = log.timestamp;
+        } else {
+            log = Log {
+                message: log.message,
+                timestamp: previousTime,
+            };
+        }
+        parsedLogs.push(log);
+      }
+    }
+    return parsedLogs.copy();
+  }
 }
 
 pub class Api {
@@ -560,18 +582,11 @@ pub class Api {
       let envId = environment.id;
 
       let deployMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
-      let deployLogs = MutArray<Log>[];
-      // TODO: https://github.com/winglang/wing/issues/3644
-      for log in Util.parseLogs(deployMessages) {
-        deployLogs.push(log);
-      }
+      let deployLogs = Logs.parseLogs(deployMessages);
 
       let runtimeMessages = logs.tryGet("${envId}/runtime.log")?.split("\n") ?? [];
-      let runtimeLogs = MutArray<Log>[];
+      let runtimeLogs = Logs.parseLogs(runtimeMessages);
       // TODO: https://github.com/winglang/wing/issues/3644
-      for log in Util.parseLogs(runtimeMessages) {
-        runtimeLogs.push(log);
-      }
 
       let testEntries = logs.list("${envId}/tests");
       let testLogs = MutArray<TestLog>[];
@@ -583,8 +598,8 @@ pub class Api {
 
       return {
         body: {
-          deploy: deployLogs.copy(),
-          runtime: runtimeLogs.copy(),
+          deploy: deployLogs,
+          runtime: runtimeLogs,
           tests: testLogs.copy()
         },
       };
