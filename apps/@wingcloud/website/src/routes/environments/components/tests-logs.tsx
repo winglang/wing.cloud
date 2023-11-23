@@ -32,6 +32,18 @@ export const TestsLogs = ({
   const [animateLogId, setAnimateLogId] = useState(selectedTestId);
 
   useEffect(() => {
+    if (isOpen && animateLogId) {
+      const element = document.querySelector(`#${selectedTestId}`);
+      console.log(selectedTestId, element);
+
+      element?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [selectedTestId, isOpen]);
+
+  useEffect(() => {
     setAnimateLogId(selectedTestId);
     const timeout = setTimeout(() => {
       // eslint-disable-next-line unicorn/no-useless-undefined
