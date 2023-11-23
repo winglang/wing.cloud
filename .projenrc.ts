@@ -256,7 +256,7 @@ new Turbo(infrastructure, {
     compile: {
       dependsOn: ["^compile"],
       dotEnv: [".env"],
-      inputs: ["!target/**"],
+      inputs: ["**/*", "!node_modules/**", "!target/**"],
       outputs: [
         "target/main.tfaws/**",
         "!target/main.tfaws/.terraform.lock.hcl",
@@ -268,11 +268,9 @@ new Turbo(infrastructure, {
     },
     [planTask.name]: {
       dependsOn: ["compile", terraformInitTask.name],
-      // outputs: ["target/main.tfaws/tfplan"],
       cache: false,
     },
     deploy: {
-      // dependsOn: ["^compile"],
       dependsOn: [planTask.name],
       cache: false,
     },
