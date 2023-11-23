@@ -23,8 +23,6 @@ bring "./patches/react-app.patch.w" as reactAppPatch;
 // And the sun, and the moon, and the stars, and the flowers.
 let appSecret = util.env("APP_SECRET");
 
-let DEFAULT_STAGING_LANDING_DOMAIN = "wing-cloud-staging-dev-only.webflow.io";
-
 let api = new cloud.Api(
   cors: true,
   corsOptions: cloud.ApiCorsOptions {
