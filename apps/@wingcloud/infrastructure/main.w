@@ -290,8 +290,28 @@ let proxyUrl = (() => {
       },
     );
     return "https://${distribution.domainName}";
+  } elif util.env("WING_TARGET") == "sim" {
+    return new ReverseProxy.ReverseProxy(
+      origins: [
+        {
+          pathPattern: "/wrpc/*",
+          domainName: apiDomainName,
+        },
+        {
+          pathPattern: "*",
+          domainName: website.url,
+        },
+      ],
+      port: (): num? => {
+        if util.tryEnv("WING_IS_TEST") == "true" {
+          return nil;
+        } else {
+          return 3900;
+        }
+      }(),
+    ).url;
   } else {
-    return "";
+    throw "Unknown WING_TARGET: ${util.env("WING_TARGET")}";
   }
 })();
 
