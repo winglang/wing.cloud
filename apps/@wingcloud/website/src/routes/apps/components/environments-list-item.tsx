@@ -13,7 +13,6 @@ import { GithubIcon } from "../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import type { Environment } from "../../../utils/wrpc.js";
 import { RUNTIME_LOGS_ID } from "../../environments/components/build-logs.js";
-import { DEPLOYMENT_LOGS_ID } from "../../environments/components/deployment-logs.js";
 import { TEST_LOGS_ID } from "../../environments/components/tests-logs.js";
 
 type ErrorStatus = "failed" | "passed";
