@@ -213,7 +213,7 @@ let proxyUrl = (() => {
             httpPort: 80,
             httpsPort: 443,
             originProtocolPolicy: "https-only",
-            originSslProtocols: ["SSLv3", "TLSv1.2", "TLSv1.1"],
+            originSslProtocols: ["TLSv1.2"],
           },
         },
         {
@@ -223,7 +223,7 @@ let proxyUrl = (() => {
             httpPort: 80,
             httpsPort: 443,
             originProtocolPolicy: "https-only",
-            originSslProtocols: ["SSLv3", "TLSv1.2", "TLSv1.1"],
+            originSslProtocols: ["TLSv1.2"],
           },
         },
       ],
