@@ -15,11 +15,6 @@ bring "./lowkeys-map.w" as lowkeys;
 
 struct Log {
   message: str;
-  time: str;
-}
-
-struct Trace {
-  message: str;
   timestamp: str;
 }
 
@@ -30,7 +25,7 @@ struct TestLog {
   error: str?;
   timestamp: str;
   time: num;
-  traces: Array<Trace>;
+  traces: Array<Log>;
 }
 
 // TODO: https://github.com/winglang/wing/issues/3644
