@@ -1,6 +1,4 @@
 import clsx from "clsx";
-import { useMemo } from "react";
-import { useLocation } from "react-router-dom";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { getTime } from "../../../utils/time.js";
@@ -10,26 +8,23 @@ import { CollapsibleItem } from "./collapsible-item.js";
 export interface RuntimeLogsProps {
   logs: Log[];
   loading?: boolean;
+  defaultOpen?: boolean;
 }
 
 export const RUNTIME_LOGS_ID = "runtime-logs";
 
-export const RuntimeLogs = ({ logs, loading }: RuntimeLogsProps) => {
+export const RuntimeLogs = ({
+  logs,
+  loading,
+  defaultOpen,
+}: RuntimeLogsProps) => {
   const { theme } = useTheme();
-
-  const location = useLocation();
-
-  const locationHash = useMemo(() => {
-    if (location.hash) {
-      return location.hash.slice(1);
-    }
-  }, [location.search]);
 
   return (
     <CollapsibleItem
       id={RUNTIME_LOGS_ID}
       title="Runtime logs"
-      defaultOpen={locationHash === RUNTIME_LOGS_ID}
+      defaultOpen={defaultOpen}
       loading={loading}
       children={
         <div className="text-2xs font-mono py-4 px-3">

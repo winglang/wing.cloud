@@ -1,6 +1,11 @@
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useState, type PropsWithChildren, type ReactNode } from "react";
+import {
+  useState,
+  type PropsWithChildren,
+  type ReactNode,
+  useEffect,
+} from "react";
 
 import { SpinnerLoader } from "../../../components/spinner-loader.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
@@ -23,6 +28,10 @@ export const CollapsibleItem = ({
 }>) => {
   const { theme } = useTheme();
   const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  useEffect(() => {
+    setIsOpen(defaultOpen);
+  }, [defaultOpen]);
 
   return (
     <div

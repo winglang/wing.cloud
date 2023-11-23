@@ -1,11 +1,15 @@
-import { useParams } from "react-router-dom";
+import { useMemo } from "react";
+import { useLocation, useParams } from "react-router-dom";
 
 import { wrpc } from "../../utils/wrpc.js";
 
-import { RuntimeLogs } from "./components/build-logs.js";
-import { DeploymentLogs } from "./components/deployment-logs.js";
+import { RUNTIME_LOGS_ID, RuntimeLogs } from "./components/build-logs.js";
+import {
+  DEPLOYMENT_LOGS_ID,
+  DeploymentLogs,
+} from "./components/deployment-logs.js";
 import { EnvironmentDetails } from "./components/environment-details.js";
-import { TestsLogs } from "./components/tests-logs.js";
+import { TEST_LOGS_ID, TestsLogs } from "./components/tests-logs.js";
 
 export const Component = () => {
   const { appName, branch } = useParams();
@@ -34,6 +38,21 @@ export const Component = () => {
     },
   );
 
+  const location = useLocation();
+
+  const locationHash = useMemo(() => {
+    if (location.hash) {
+      return location.hash.slice(1);
+    }
+  }, [location.search]);
+
+  const openDeploymentLogs = useMemo(() => {
+    return (
+      locationHash === DEPLOYMENT_LOGS_ID ||
+      environment.data?.environment.status === "error"
+    );
+  }, [locationHash, environment.data?.environment.status]);
+
   return (
     <div>
       <div className="space-y-4">
@@ -43,6 +62,7 @@ export const Component = () => {
         />
 
         <TestsLogs
+          defaultOpen={locationHash === TEST_LOGS_ID}
           testResults={
             environment.data?.environment.testResults?.testResults || []
           }
@@ -51,11 +71,16 @@ export const Component = () => {
         />
 
         <DeploymentLogs
+          defaultOpen={openDeploymentLogs}
           logs={logs.data?.deploy || []}
           loading={logs.isLoading}
         />
 
-        <RuntimeLogs logs={logs.data?.runtime || []} loading={logs.isLoading} />
+        <RuntimeLogs
+          defaultOpen={locationHash === RUNTIME_LOGS_ID}
+          logs={logs.data?.runtime || []}
+          loading={logs.isLoading}
+        />
       </div>
     </div>
   );

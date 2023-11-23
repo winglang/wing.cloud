@@ -1,6 +1,3 @@
-import { appendFileSync } from "node:fs";
-import { readFile } from "node:fs/promises";
-
 import { createConsoleApp } from "@wingconsole/app";
 import { type Application } from "express";
 

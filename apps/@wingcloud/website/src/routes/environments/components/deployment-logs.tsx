@@ -1,6 +1,4 @@
 import clsx from "clsx";
-import { useMemo } from "react";
-import { useLocation } from "react-router-dom";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { getTime } from "../../../utils/time.js";
@@ -10,27 +8,23 @@ import { CollapsibleItem } from "./collapsible-item.js";
 export interface DeploymentLogsProps {
   logs: Log[];
   loading?: boolean;
+  defaultOpen?: boolean;
 }
 
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 
-export const DeploymentLogs = ({ logs, loading }: DeploymentLogsProps) => {
+export const DeploymentLogs = ({
+  logs,
+  loading,
+  defaultOpen,
+}: DeploymentLogsProps) => {
   const { theme } = useTheme();
-
-  const location = useLocation();
-
-  const locationHash = useMemo(() => {
-    // url includes an ID with #
-    if (location.hash) {
-      return location.hash.slice(1);
-    }
-  }, [location.search]);
 
   return (
     <CollapsibleItem
       id={DEPLOYMENT_LOGS_ID}
       title="Deployment logs"
-      defaultOpen={locationHash === DEPLOYMENT_LOGS_ID}
+      defaultOpen={defaultOpen}
       loading={loading}
       children={
         <div className="text-2xs font-mono py-4 px-3">

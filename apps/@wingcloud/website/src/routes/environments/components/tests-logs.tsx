@@ -1,11 +1,9 @@
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { getTime } from "../../../utils/time.js";
-import type { Log, TestLog, TestResult } from "../../../utils/wrpc.js";
+import type { TestLog, TestResult } from "../../../utils/wrpc.js";
 
 import { CollapsibleItem } from "./collapsible-item.js";
 
@@ -13,26 +11,24 @@ export interface TestsLogsProps {
   logs: TestLog[];
   testResults: TestResult[];
   loading?: boolean;
+  defaultOpen?: boolean;
 }
 
 export const TEST_LOGS_ID = "test-logs";
 
-export const TestsLogs = ({ logs, testResults, loading }: TestsLogsProps) => {
+export const TestsLogs = ({
+  logs,
+  testResults,
+  loading,
+  defaultOpen,
+}: TestsLogsProps) => {
   const { theme } = useTheme();
-
-  const location = useLocation();
-
-  const locationHash = useMemo(() => {
-    if (location.hash) {
-      return location.hash.slice(1);
-    }
-  }, [location.search]);
 
   return (
     <CollapsibleItem
       id={TEST_LOGS_ID}
       title="Tests"
-      defaultOpen={locationHash === TEST_LOGS_ID}
+      defaultOpen={defaultOpen}
       loading={loading}
       rightOptions={
         <div className="flex gap-2 text-xs">
