@@ -1,7 +1,6 @@
 bring cloud;
 bring util;
 bring http;
-bring "./dnsimple.w" as DNSimple;
 bring "./reverse-proxy.w" as ReverseProxy;
 
 let origins = [

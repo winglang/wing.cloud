@@ -126,37 +126,6 @@ let apiDomainName = (() => {
   return api.url;
 })();
 
-// let proxy = new ReverseProxy.ReverseProxy(
-//   subDomain: subDomain,
-//   zoneName: zoneName,
-//   aliases: ["${subDomain}.${zoneName}"],
-//   origins: [
-//     {
-//       pathPattern: "/wrpc/*",
-//       domainName: apiDomainName,
-//       originId: "wrpc",
-//       originPath: "/prod",
-//     },
-//     {
-//       pathPattern: "*",
-//       domainName: util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN,
-//       originId: "landingPage",
-//     },
-//     {
-//       pathPattern: "",
-//       domainName: website.url.replace("https://", ""),
-//       originId: "website",
-//     },
-//   ],
-//   port: (): num? => {
-//     if util.tryEnv("WING_IS_TEST") == "true" {
-//       return nil;
-//     } else {
-//       return 3900;
-//     }
-//   }()
-// );
-
 let getDomainName = (url: str): str => {
   // See https://github.com/winglang/wing/issues/4688.
   return cdktf.Fn.trimprefix(url, "https://");
@@ -164,9 +133,12 @@ let getDomainName = (url: str): str => {
 
 let proxyUrl = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
+    bring "./dnsimple.w" as DNSimple;
     bring "@cdktf/provider-aws" as aws;
+
     // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
     let cachingOptimizedCachePolicyId = "658327ea-f89d-4fab-a63d-7e88639e58f6";
+
     let passthroughCachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
       name: "passthrough-cache-policy",
       defaultTtl: 0m.seconds,
@@ -186,6 +158,7 @@ let proxyUrl = (() => {
         },
       },
     );
+
     let shortCachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
       name: "short-cache-policy",
       defaultTtl: 1m.seconds,
@@ -203,10 +176,17 @@ let proxyUrl = (() => {
         },
       },
     ) as "short-cache-policy";
+
+    let certificate = new DNSimple.DNSimpleValidatedCertificate(
+      zoneName: zoneName,
+      subDomain: subDomain,
+    );
+
     let distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
       enabled: true,
       viewerCertificate: {
-        cloudfrontDefaultCertificate: true,
+        acmCertificateArn: certificate.certificate.certificate.arn,
+        sslSupportMethod: "sni-only",
       },
       restrictions: {
         geoRestriction: {
@@ -289,6 +269,15 @@ let proxyUrl = (() => {
         cachePolicyId: shortCachePolicy.id,
       },
     );
+
+    let dnsRecord = new DNSimple.DNSimpleZoneRecord(
+      zoneName: zoneName,
+      subDomain: subDomain,
+      recordType: "CNAME",
+      ttl: 1h.seconds,
+      distributionUrl: distribution.domainName,
+    );
+
     return "https://${distribution.domainName}";
   } elif util.env("WING_TARGET") == "sim" {
     return new ReverseProxy.ReverseProxy(

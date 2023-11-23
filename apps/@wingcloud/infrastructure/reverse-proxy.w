@@ -2,7 +2,6 @@ bring cloud;
 bring util;
 bring http;
 bring sim;
-bring "./dnsimple.w" as DNSimple;
 bring "./cloudfront.w" as CloudFront;
 
 pub struct Origin {
