@@ -115,7 +115,7 @@ pub class WebsiteProxy {
         {
           originId: "landing_dashboard",
           failoverCriteria: {
-            statusCodes: [403],
+            statusCodes: [404],
           },
           member: [
             {
