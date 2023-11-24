@@ -1,9 +1,14 @@
-/* eslint-disable unicorn/no-await-expression-member */
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, redirect } from "react-router-dom";
 
 import { NoMatch } from "./components/no-match.js";
 
 export const router = createBrowserRouter([
+  {
+    path: "/",
+    loader: () => {
+      throw redirect("/apps");
+    },
+  },
   {
     path: "/apps",
     lazy: () => import("./routes/index.js"),
