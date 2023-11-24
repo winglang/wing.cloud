@@ -65,7 +65,7 @@ export const Component = () => {
   const [loading, setLoading] = useState(false);
 
   const goToSettings = useCallback(async () => {
-    navigate(`/apps/${app?.appName}/settings`);
+    navigate(`/${user}/${app?.appName}/settings`);
   }, [app?.appName]);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);

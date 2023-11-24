@@ -6,7 +6,6 @@ import { RouterProvider } from "react-router-dom";
 import { NotificationsProvider } from "./design-system/notification.js";
 import { DefaultTheme, ThemeProvider } from "./design-system/theme-provider.js";
 import { router } from "./router.jsx";
-import { UserProvider } from "./services/use-user.js";
 
 const API_URL = new URL(location.origin);
 API_URL.pathname = "/wrpc";
@@ -19,9 +18,7 @@ export const App = () => {
       <WRPCProvider value={{ url: API_URL.toString() }}>
         <ThemeProvider mode="light" theme={DefaultTheme}>
           <NotificationsProvider>
-            <UserProvider>
-              <RouterProvider router={router} />
-            </UserProvider>
+            <RouterProvider router={router} />
           </NotificationsProvider>
         </ThemeProvider>
       </WRPCProvider>

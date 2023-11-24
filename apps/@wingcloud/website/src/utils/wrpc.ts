@@ -169,7 +169,7 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.listSecrets": QueryProcedure<
-    { user: string; appId: string },
+    { appId: string },
     {
       secrets: Array<Secret>;
     }
@@ -227,8 +227,7 @@ export const wrpc = createWRPCReact<{
       installationId: string;
     },
     {
-      appId: string;
-      appName: string;
+      app: App;
     }
   >;
 }>();

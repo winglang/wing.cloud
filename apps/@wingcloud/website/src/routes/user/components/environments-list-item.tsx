@@ -97,7 +97,7 @@ export const EnvironmentsListItem = ({
         <div className="flex justify-between items-center truncate grow">
           <div className="text-xs space-y-1 truncate">
             <Link
-              to={`/apps/${appName}/${environment.branch}`}
+              to={`/${user}/${appName}/${environment.branch}`}
               className={clsx(
                 "font-semibold truncate hover:underline",
                 theme.text1,
@@ -133,7 +133,7 @@ export const EnvironmentsListItem = ({
 
               {testStatus && (
                 <Link
-                  to={`/apps/${appName}/${environment.branch}/#${TEST_LOGS_ID}`}
+                  to={`/${user}/${appName}/${environment.branch}/#${TEST_LOGS_ID}`}
                   className={clsx(
                     "flex items-end gap-x-0.5",
                     "rounded-xl px-1 py-0.5",
@@ -159,7 +159,7 @@ export const EnvironmentsListItem = ({
           <div className="flex gap-x-4 text-xs items-center justify-end">
             {linkEnabled && (
               <Link
-                to={`/${user}/${appName}/${environment.branch}/preview`}
+                to={`/${user}/${appName}/${environment.branch}/console`}
                 className={clsx("text-xs hover:underline ", theme.text1)}
               >
                 Visit Preview
