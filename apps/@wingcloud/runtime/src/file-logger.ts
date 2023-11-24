@@ -3,7 +3,7 @@ import { appendFileSync, existsSync } from "node:fs";
 import { type LoggerInterface } from "./logger.js";
 
 export class FileLogger implements LoggerInterface {
-  logfile: string;
+  protected logfile: string;
 
   constructor({ logfile }: { logfile: string }) {
     this.logfile = logfile;
@@ -23,5 +23,9 @@ export class FileLogger implements LoggerInterface {
       }\n`,
       "utf8",
     );
+  }
+
+  getLogfile() {
+    return this.logfile;
   }
 }

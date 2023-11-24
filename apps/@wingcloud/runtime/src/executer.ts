@@ -19,7 +19,7 @@ export class Executer {
   errfile: number;
   constructor(logger: FileLogger) {
     this.logger = logger;
-    const logfile = logger.logfile;
+    const logfile = logger.getLogfile();
 
     createReadStream(logfile).pipe(process.stdout);
     this.logfile = logfile;

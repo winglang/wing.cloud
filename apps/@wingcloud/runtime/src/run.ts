@@ -58,7 +58,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
 
     return {
       paths,
-      logfile: deployLogger.logfile,
+      logfile: deployLogger.getLogfile(),
       port,
       close: async () => {
         deployLogger.stop();

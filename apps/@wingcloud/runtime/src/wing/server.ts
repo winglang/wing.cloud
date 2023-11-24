@@ -21,13 +21,18 @@ export async function startServer({
 }: StartServerProps) {
   const wingConsole = await import(consolePath);
   const create: typeof createConsoleApp = wingConsole.createConsoleApp;
+
+  const log = (message: string, props?: any[]) => {
+    logger.log(message, props);
+  };
+
   const { port, close } = await create({
     wingfile: entryfilePath,
     requestedPort,
     log: {
-      info: logger.log,
-      error: logger.log,
-      verbose: logger.log,
+      info: log,
+      error: log,
+      verbose: log,
     },
     config: {
       addEventListener(event: any, listener: any) {},
