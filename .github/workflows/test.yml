@@ -111,7 +111,7 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           role-session-name: gh-actions-wingcloud-testing
           aws-region: ${{ env.AWS_REGION }}
-      - name: Test Wing Cloud AWS
+      - name: Compile Wing
         env:
           ## Inflight
           APP_SECRET: ${{ secrets.APP_SECRET }}
@@ -141,7 +141,7 @@ jobs:
         run: terraform init
         working-directory: 'apps/@wingcloud/infrastructure/target/main.tfaws'
       - name: Terraform Apply
-        id: plan
+        id: apply
         env:
           TF_IN_AUTOMATION: true
           # dnsimple provider
