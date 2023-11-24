@@ -135,9 +135,16 @@ pub class EnvironmentManager {
     let environment = this.environments.get(id: options.statusReport.environmentId);
     let app = this.apps.get(appId: environment.appId);
     let status = options.statusReport.status;
-    this.environments.updateStatus(id: environment.id, appId: environment.appId, status: status);
+    let data = options.statusReport.data;
+
+    this.environments.updateStatus(
+      id: environment.id,
+      appId: environment.appId,
+      status: status
+    );
+
     if status == "tests" {
-      let testReport = status_reports.TestResults.fromJson(options.statusReport.data);
+      let testReport = status_reports.TestResults.fromJson(data);
       this.environments.updateTestResults(
         id: environment.id,
         appId: app.appId,

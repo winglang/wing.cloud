@@ -1,4 +1,5 @@
 pub struct TestResult {
+  id: str;
   path: str;
   pass: bool;
 }

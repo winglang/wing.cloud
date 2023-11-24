@@ -6,7 +6,7 @@ import { useTheme } from "../../../design-system/theme-provider.js";
 import { getTime } from "../../../utils/time.js";
 import type { Log } from "../../../utils/wrpc.js";
 
-export interface DeploymentLogsProps {
+export interface RuntimeLogsProps {
   id: string;
   logs: Log[];
   loading?: boolean;
@@ -14,13 +14,13 @@ export interface DeploymentLogsProps {
   setIsOpen: (isOpen: boolean) => void;
 }
 
-export const DeploymentLogs = ({
+export const RuntimeLogs = ({
   id,
   logs,
   loading,
   isOpen,
   setIsOpen,
-}: DeploymentLogsProps) => {
+}: RuntimeLogsProps) => {
   const { theme } = useTheme();
 
   return (
@@ -49,7 +49,7 @@ export const DeploymentLogs = ({
           ) : (
             <ChevronRightIcon className="h-4 w-4" />
           )}
-          <div className="font-medium text-sm">Deployment logs</div>
+          <div className="font-medium text-sm">Runtime logs</div>
         </div>
       </button>
 
@@ -60,11 +60,12 @@ export const DeploymentLogs = ({
               <SpinnerLoader size="sm" />
             </div>
           )}
+
           {!loading && (
             <div className="text-2xs font-mono py-4 px-3">
               {logs.length === 0 ? (
                 <div className={clsx(theme.text2, "w-full py-0.5 text-center")}>
-                  No deployment logs.
+                  No build logs.
                 </div>
               ) : (
                 logs.map((log, index) => (

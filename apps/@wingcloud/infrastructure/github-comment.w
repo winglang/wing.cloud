@@ -55,9 +55,11 @@ pub class GithubComment {
               if !testResult.pass {
                 testRes = "❌ Failed";
               }
+              let testId = testResult.id;
               let testName = testResult.path.split(":").at(-1);
               let testResourcePath = testResult.path.split(":").at(0);
-              testRows = "${testRows}<tr><td>${testName}</td><td>${testResourcePath}</td><td>${testRes}</td></tr>";
+              let link = "<a target=\"_blank\" href=\"${this.siteDomain}/apps/${app.appName}/${environment.branch}/#${testId}\">View</a>";
+              testRows = "${testRows}<tr><td>${testName}</td><td>${testResourcePath}</td><td>${testRes}</td><td>${link}</td></tr>";
               i += 1;
             }
           }
@@ -73,7 +75,7 @@ pub class GithubComment {
           let date = std.Datetime.utcNow();
           let dateStr = "${date.dayOfMonth}-${date.month}-${date.year} ${date.hours}:${date.min} (UTC)";
           let tableRows = "<tr><td>${appNameLink}</td><td>${this.envStatusToString(environment.status, app.appName, environment.branch)}</td><td>${previewUrl}</td><td>${dateStr}</td></tr>";
-          let testsSection = "<details><summary>Tests</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th></tr>${testRows}</table></details>";
+          let testsSection = "<details><summary>Tests</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>${testRows}</table></details>";
 
           commentBody = "${commentBody}${tableRows}</table>";
 

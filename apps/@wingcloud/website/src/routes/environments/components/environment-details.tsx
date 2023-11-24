@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { Button } from "../../../design-system/button.js";
@@ -16,10 +17,17 @@ export interface InfoItemProps {
 export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
   const { theme } = useTheme();
 
+  const statusString = useMemo(() => {
+    if (environment?.status === "tests") {
+      return "Running Tests";
+    }
+    return environment?.status;
+  }, [environment?.status]);
+
   return (
     <div
       className={clsx(
-        "p-6 w-full rounded gap-4 flex border",
+        "p-4 w-full rounded gap-4 flex border",
         theme.bgInput,
         theme.borderInput,
       )}
@@ -69,10 +77,11 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
                       "bg-yellow-300 animate-pulse",
                     environment?.status === "running" && "bg-green-300",
                     environment?.status === "error" && "bg-red-300",
+                    environment?.status === "stopped" && "bg-slate-400",
                   )}
                 />
                 <div className="rounded-xl px-2 py-0.5 capitalize truncate">
-                  {environment?.status}
+                  {statusString}
                 </div>
               </div>
             }
