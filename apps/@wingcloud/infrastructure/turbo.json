@@ -25,6 +25,8 @@
         ".env"
       ],
       "inputs": [
+        "**/*",
+        "!node_modules/**",
         "!target/**"
       ],
       "outputs": [
