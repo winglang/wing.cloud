@@ -53,7 +53,7 @@
     },
     "dev": {
       "dependsOn": [
-        "^compile"
+        "@wingcloud/runtime#compile"
       ]
     },
     "test": {

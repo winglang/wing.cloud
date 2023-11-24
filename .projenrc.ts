@@ -272,7 +272,7 @@ new Turbo(infrastructure, {
       cache: false,
     },
     dev: {
-      dependsOn: ["^compile"],
+      dependsOn: [`${runtime.name}#compile`],
     },
     test: {
       dependsOn: ["compile"],
