@@ -4,7 +4,6 @@ bring http;
 bring ex;
 bring "cdktf" as cdktf;
 
-bring "./reverse-proxy.w" as ReverseProxy;
 bring "./users.w" as Users;
 bring "./apps.w" as Apps;
 bring "./environments.w" as Environments;
@@ -16,7 +15,6 @@ bring "./runtime/runtime.w" as runtime;
 bring "./runtime/runtime-client.w" as runtime_client;
 bring "./probot.w" as probot;
 bring "./probot-adapter.w" as adapter;
-bring "./cloudfront.w" as cloudFront;
 bring "./components/parameter/parameter.w" as parameter;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 
@@ -65,24 +63,26 @@ let rntm = new runtime.RuntimeService(
   logs: bucketLogs,
 );
 
-let websitePort = 5174;
-let website = new ex.ReactApp(
+let dashboardPort = 5174;
+let dashboard = new ex.ReactApp(
   projectPath: "../website",
-  startCommand: "pnpm vite --port ${websitePort}",
+  startCommand: "pnpm vite --port ${dashboardPort}",
   buildCommand: "pnpm vite build",
   buildDir: "dist",
-  localPort: websitePort,
+  localPort: dashboardPort,
 );
 
-reactAppPatch.ReactAppPatch.apply(website);
+reactAppPatch.ReactAppPatch.apply(dashboard);
 
-let subDomain = util.env("PROXY_SUBDOMAIN");
-let zoneName = util.env("PROXY_ZONE_NAME");
-
-let var siteDomain = "https://${subDomain}.${zoneName}";
-if util.env("WING_TARGET") == "sim" {
-  siteDomain = "http://localhost:3900";
-}
+let siteDomainName = (() => {
+  if util.env("WING_TARGET") == "tf-aws" {
+    let subDomain = util.env("PROXY_SUBDOMAIN");
+    let zoneName = util.env("PROXY_ZONE_NAME");
+    return "https://${subDomain}.${zoneName}";
+  } else {
+    return "http://localhost:3900";
+  }
+})();
 
 let environmentManager = new EnvironmentManager.EnvironmentManager(
   apps: apps,
@@ -90,7 +90,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   secrets: secrets,
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
-  siteDomain: siteDomain
+  siteDomain: siteDomainName,
 );
 
 let wingCloudApi = new wingcloud_api.Api(
@@ -113,7 +113,7 @@ let probotApp = new probot.ProbotApp(
   environments: environments,
   apps: apps,
   environmentManager: environmentManager,
-  siteDomain: siteDomain
+  siteDomain: siteDomainName,
 );
 
 let apiDomainName = (() => {
@@ -131,154 +131,25 @@ let getDomainName = (url: str): str => {
 
 let proxyUrl = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
-    bring "./dnsimple.w" as DNSimple;
-    bring "@cdktf/provider-aws" as aws;
+    bring "./website-proxy.w" as website_proxy;
 
-    // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
-    let cachingOptimizedCachePolicyId = "658327ea-f89d-4fab-a63d-7e88639e58f6";
-
-    let passthroughCachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
-      name: "passthrough-cache-policy",
-      defaultTtl: 0m.seconds,
-      minTtl: 0m.seconds,
-      maxTtl: 1s.seconds,
-      parametersInCacheKeyAndForwardedToOrigin: {
-        cookiesConfig: {
-          // Needed to authenticate the API calls.
-          cookieBehavior: "all"
-        },
-        headersConfig: {
-          headerBehavior: "none",
-        },
-        queryStringsConfig: {
-          // Needed for many API endpoints.
-          queryStringBehavior: "all",
-        },
+    let proxy = new website_proxy.WebsiteProxy(
+      apiOrigin: {
+        domainName: apiDomainName,
+        pathPattern: "/wrpc/*",
+        originPath: "/prod",
       },
+      landingDomainName: util.env("LANDING_DOMAIN"),
+      dashboardDomainName: getDomainName(dashboard.url),
+      zoneName: util.env("PROXY_ZONE_NAME"),
+      subDomain: util.env("PROXY_SUBDOMAIN"),
     );
 
-    let shortCachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
-      name: "short-cache-policy",
-      defaultTtl: 1m.seconds,
-      minTtl: 1m.seconds,
-      maxTtl: 10m.seconds,
-      parametersInCacheKeyAndForwardedToOrigin: {
-        cookiesConfig: {
-          cookieBehavior: "none"
-        },
-        headersConfig: {
-          headerBehavior: "none",
-        },
-        queryStringsConfig: {
-          queryStringBehavior: "none",
-        },
-      },
-    ) as "short-cache-policy";
-
-    let certificate = new DNSimple.DNSimpleValidatedCertificate(
-      zoneName: zoneName,
-      subDomain: subDomain,
-    );
-
-    let distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
-      enabled: true,
-      viewerCertificate: {
-        acmCertificateArn: certificate.certificate.certificate.arn,
-        sslSupportMethod: "sni-only",
-      },
-      restrictions: {
-        geoRestriction: {
-          restrictionType: "none",
-        },
-      },
-      origin: [
-        {
-          originId: "api",
-          domainName: apiDomainName,
-          pathPattern: "/wrpc/*",
-          originPath: "/prod",
-          customOriginConfig: {
-            httpPort: 80,
-            httpsPort: 443,
-            originProtocolPolicy: "https-only",
-            originSslProtocols: ["TLSv1.2"],
-          },
-        },
-        {
-          originId: "landing",
-          domainName: util.env("LANDING_DOMAIN"),
-          customOriginConfig: {
-            httpPort: 80,
-            httpsPort: 443,
-            originProtocolPolicy: "https-only",
-            originSslProtocols: ["TLSv1.2"],
-          },
-        },
-        {
-          originId: "dashboard",
-          domainName: getDomainName(website.url),
-          customOriginConfig: {
-            httpPort: 80,
-            httpsPort: 443,
-            originProtocolPolicy: "https-only",
-            originSslProtocols: ["TLSv1.2"],
-          },
-        },
-      ],
-      originGroup: [
-        {
-          originId: "landing_dashboard",
-          failoverCriteria: {
-            statusCodes: [403],
-          },
-          member: [
-            {
-              originId: "landing",
-            },
-            {
-              originId: "dashboard",
-            },
-          ],
-        },
-      ],
-      orderedCacheBehavior: [
-        {
-          targetOriginId: "api",
-          pathPattern: "/wrpc/*",
-          allowedMethods: ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"],
-          cachedMethods: ["GET", "HEAD", "OPTIONS"],
-          viewerProtocolPolicy: "redirect-to-https",
-          cachePolicyId: passthroughCachePolicy.id,
-        },
-        {
-          targetOriginId: "landing_dashboard",
-          pathPattern: "/assets/*",
-          allowedMethods: ["GET", "HEAD"],
-          cachedMethods: ["GET", "HEAD"],
-          viewerProtocolPolicy: "redirect-to-https",
-          cachePolicyId: cachingOptimizedCachePolicyId,
-        },
-      ],
-      defaultCacheBehavior: {
-        targetOriginId: "landing_dashboard",
-        allowedMethods: ["GET", "HEAD"],
-        cachedMethods: ["GET", "HEAD"],
-        viewerProtocolPolicy: "redirect-to-https",
-        cachePolicyId: shortCachePolicy.id,
-      },
-    );
-
-    let dnsRecord = new DNSimple.DNSimpleZoneRecord(
-      zoneName: zoneName,
-      subDomain: subDomain,
-      recordType: "CNAME",
-      ttl: 1h.seconds,
-      distributionUrl: distribution.domainName,
-    );
-
-    return "https://${distribution.domainName}";
+    return proxy.url;
   } elif util.env("WING_TARGET") == "sim" {
-    return new ReverseProxy.ReverseProxy(
+    bring "./reverse-proxy.w" as reverse_proxy;
+
+    let proxy = new reverse_proxy.ReverseProxy(
       origins: [
         {
           pathPattern: "/wrpc/*",
@@ -286,7 +157,7 @@ let proxyUrl = (() => {
         },
         {
           pathPattern: "*",
-          domainName: website.url,
+          domainName: dashboard.url,
         },
       ],
       port: (): num? => {
@@ -296,7 +167,9 @@ let proxyUrl = (() => {
           return 3900;
         }
       }(),
-    ).url;
+    );
+
+    return proxy.url;
   } else {
     throw "Unknown WING_TARGET: ${util.env("WING_TARGET")}";
   }
@@ -336,6 +209,6 @@ new tests.EnvironmentsTest(
 );
 
 new cdktf.TerraformOutput(value: api.url) as "API URL";
-new cdktf.TerraformOutput(value: website.url) as "Website URL";
+new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";
 new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
 new cdktf.TerraformOutput(value: proxyUrl) as "Proxy URL";
