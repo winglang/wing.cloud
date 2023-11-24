@@ -56,7 +56,8 @@ export type EnvironmentStatus =
   | "tests"
   | "deploying"
   | "running"
-  | "error";
+  | "error"
+  | "stopped";
 
 export interface Environment {
   id: string;
@@ -77,7 +78,22 @@ export interface Environment {
 
 export interface Log {
   message: string;
-  timestamp: number;
+  timestamp: string;
+}
+
+export interface Trace {
+  message: string;
+  timestamp: string;
+}
+
+export interface TestLog {
+  id: string;
+  path: string;
+  pass: boolean;
+  error: string;
+  time: number;
+  timestamp: string;
+  traces: Array<Trace>;
 }
 
 export interface Secret {
@@ -147,8 +163,9 @@ export const wrpc = createWRPCReact<{
   "app.environment.logs": QueryProcedure<
     { appName: string; branch: string },
     {
-      build: Log[];
-      tests: Log[];
+      deploy: Log[];
+      runtime: Log[];
+      tests: TestLog[];
     }
   >;
   "app.listSecrets": QueryProcedure<

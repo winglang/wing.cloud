@@ -10,6 +10,20 @@ export const getDateTime = (datetime: string) => {
   });
 };
 
+export const getTime = (datetime: string) => {
+  if (!datetime) {
+    return "";
+  }
+
+  const date = new Date(datetime);
+  return date.toLocaleTimeString(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    fractionalSecondDigits: 3,
+  });
+};
+
 const getTimeFromNow = (datetime: string) => {
   const date = new Date(datetime);
   const now = new Date();

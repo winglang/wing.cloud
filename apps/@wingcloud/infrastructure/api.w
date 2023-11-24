@@ -13,10 +13,47 @@ bring "./environments.w" as Environments;
 bring "./secrets.w" as Secrets;
 bring "./lowkeys-map.w" as lowkeys;
 
+struct Log {
+  message: str;
+  timestamp: str;
+}
+
+struct TestLog {
+  id: str;
+  path: str;
+  pass: bool;
+  error: str?;
+  timestamp: str;
+  time: num;
+  traces: Array<Log>;
+}
+
 // TODO: https://github.com/winglang/wing/issues/3644
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
+  extern "./util.js" pub static inflight parseLog(log: str): Log?;
+
+  pub static inflight parseLogs(messages: Array<str>): Array<Log> {
+    let var parsedLogs = MutArray<Log>[];
+
+    let var previousTime = "";
+    for message in messages {
+      if let var log = Util.parseLog(message) {
+        if (log.timestamp != "") {
+            previousTime = log.timestamp;
+        } else {
+            log = Log {
+                message: log.message,
+                timestamp: previousTime,
+            };
+        }
+        parsedLogs.push(log);
+      }
+    }
+    return parsedLogs.copy();
+  }
 }
+
 bring "./environment-manager.w" as EnvironmentManager;
 bring "./status-reports.w" as status_reports;
 bring "./probot-adapter.w" as adapter;
@@ -36,10 +73,6 @@ struct ApiProps {
   logs: cloud.Bucket;
 }
 
-struct Log {
-  message: str;
-  timestamp: num;
-}
 
 struct EnvironmentAction {
   type: str;
@@ -547,34 +580,25 @@ pub class Api {
 
       let envId = environment.id;
 
-      let buildMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
-      let buildLogs = MutArray<Log>[];
-      for message in buildMessages {
-          buildLogs.push(Log {
-            message: message,
-            // TODO: logs should have timestamps
-            timestamp: 0,
-          });
-      }
+      let deployMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
+      let deployLogs = Util.parseLogs(deployMessages);
+
+      let runtimeMessages = logs.tryGet("${envId}/runtime.log")?.split("\n") ?? [];
+      let runtimeLogs = Util.parseLogs(runtimeMessages);
 
       let testEntries = logs.list("${envId}/tests");
-      let testLogs = MutArray<Log>[];
+      let testLogs = MutArray<TestLog>[];
+
       for entry in testEntries {
-        let log = logs.get(entry);
-        let messages = log.split("\n");
-        for message in messages {
-            testLogs.push(Log {
-              message: message,
-              // TODO: logs should have timestamps
-              timestamp: 0,
-            });
-          }
+        let testResults = logs.getJson(entry);
+        testLogs.push(TestLog.fromJson(testResults));
       }
 
       return {
         body: {
-          build: buildLogs.copy(),
-          tests: testLogs.copy(),
+          deploy: deployLogs,
+          runtime: runtimeLogs,
+          tests: testLogs.copy()
         },
       };
     });

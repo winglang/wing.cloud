@@ -3,12 +3,14 @@ import { mkdtempSync, readFileSync, realpathSync } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+
 import which from "which";
+
 import { Executer } from "../executer.js";
 
 const require = createRequire(import.meta.url);
 
-export async function installWing(cwd: string, e: Executer) {
+export async function installWing(cwd: string, executer: Executer) {
   const getWingPaths = async (cwd: string) => {
     try {
       // run in a different process to ignore caches
@@ -16,7 +18,7 @@ export async function installWing(cwd: string, e: Executer) {
         tmpdir(),
         "test-log-" + randomBytes(8).toString("hex"),
       );
-      await e.exec(
+      await executer.exec(
         "node",
         [
           "-e",
@@ -46,7 +48,7 @@ export async function installWing(cwd: string, e: Executer) {
       return;
     }
   };
-  
+
   // try to find wing locally (if installed by package.json)
   // otherwise try to find it globally
   // otherwise install wing
@@ -59,8 +61,11 @@ export async function installWing(cwd: string, e: Executer) {
 
     if (!paths) {
       const wingDir = mkdtempSync(join(tmpdir(), "wing-"));
-      await e.exec("npm", ["init", "-y"], { cwd: wingDir, throwOnFailure: true });
-      await e.exec("npm", ["install", "winglang"], {
+      await executer.exec("npm", ["init", "-y"], {
+        cwd: wingDir,
+        throwOnFailure: true,
+      });
+      await executer.exec("npm", ["install", "winglang"], {
         cwd: wingDir,
         throwOnFailure: true,
       });
@@ -84,10 +89,6 @@ export async function getGlobalWing() {
     const wing = await which("wing");
     return realpathSync(wing);
   } catch {
-    return undefined;
+    return;
   }
 }
-
-
-
-
