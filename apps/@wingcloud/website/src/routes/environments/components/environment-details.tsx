@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { Button } from "../../../design-system/button.js";
@@ -15,6 +16,13 @@ export interface InfoItemProps {
 
 export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
   const { theme } = useTheme();
+
+  const statusString = useMemo(() => {
+    if (environment?.status === "tests") {
+      return "Running Tests";
+    }
+    return environment?.status;
+  }, [environment?.status]);
 
   return (
     <div
@@ -73,7 +81,7 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
                   )}
                 />
                 <div className="rounded-xl px-2 py-0.5 capitalize truncate">
-                  {environment?.status}
+                  {statusString}
                 </div>
               </div>
             }
