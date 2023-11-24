@@ -39,7 +39,7 @@ class WingLibProject extends NodeProject {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-const winglangVersion = "^0.48.10";
+const winglangVersion = "^0.49.2";
 
 ///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
@@ -223,9 +223,13 @@ const platform = new TypescriptProject({
 platform.addFields({ type: "commonjs" });
 platform.addFields({ types: "./lib/index.d.ts" });
 platform.addFields({ main: "./lib/index.js" });
-platform.addDeps(`@winglang/sdk@${winglangVersion}`);
+platform.addDevDeps(`@winglang/compiler@${winglangVersion}`);
+platform.addDevDeps(`@winglang/sdk@${winglangVersion}`);
+platform.addDevDeps(`cdktf`);
+platform.addDevDeps(`constructs`);
+
 platform.addGitIgnore("**/target/");
-platform.addGitIgnore("wingcloud-platform-*"); // npm pack
+platform.addGitIgnore("tmp/");
 
 ///////////////////////////////////////////////////////////////////////////////
 const infrastructure = new TypescriptProject({

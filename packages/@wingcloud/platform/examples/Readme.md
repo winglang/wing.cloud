@@ -5,12 +5,10 @@ Make sure to build the project
 ```
 cd ..
 pnpm build
-npm pack
 ```
 
 ## Simple
 
 ```
-npm install
-wing compile -t @winglang/wing-platform simple.main.w
+wing compile -t ../lib simple.main.w
 ```
