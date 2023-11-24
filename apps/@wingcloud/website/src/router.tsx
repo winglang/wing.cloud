@@ -17,15 +17,15 @@ export const router = createBrowserRouter([
       },
       {
         path: "/:owner",
-        lazy: () => import("./routes/user/index.js"),
+        lazy: () => import("./routes/owner/index.js"),
       },
       {
         path: "/:owner/:appName",
-        lazy: () => import("./routes/user/app.js"),
+        lazy: () => import("./routes/owner/app.js"),
       },
       {
         path: "/:owner/:appName/settings",
-        lazy: () => import("./routes/user/settings.js"),
+        lazy: () => import("./routes/owner/settings.js"),
       },
       {
         path: "/:owner/:appName/:branch",

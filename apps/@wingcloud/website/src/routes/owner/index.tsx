@@ -113,7 +113,7 @@ export const Component = () => {
                   <AppCard
                     key={app.appId}
                     onClick={() => {
-                      navigate(`/${user}/${app.appName}`);
+                      navigate(`/${owner}/${app.appName}`);
                     }}
                     app={app}
                   />

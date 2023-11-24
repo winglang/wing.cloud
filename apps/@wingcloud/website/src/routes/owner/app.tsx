@@ -24,7 +24,7 @@ export const Component = () => {
   const navigate = useNavigate();
 
   const appQuery = wrpc["app.getByName"].useQuery({
-    user: user!,
+    owner: owner!,
     appName: appName!,
   });
 
@@ -65,7 +65,7 @@ export const Component = () => {
   const [loading, setLoading] = useState(false);
 
   const goToSettings = useCallback(async () => {
-    navigate(`/${user}/${app?.appName}/settings`);
+    navigate(`/${owner}/${app?.appName}/settings`);
   }, [app?.appName]);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -147,11 +147,11 @@ export const Component = () => {
                 <SpinnerLoader className="z-20" />
               </div>
             )}
-            {user && appName && (
+            {owner && appName && (
               <EnvironmentsList
                 environments={environments}
                 loading={environmentsQuery.isLoading}
-                user={user}
+                owner={owner}
                 appName={appName}
                 repoUrl={repoUrl}
               />
