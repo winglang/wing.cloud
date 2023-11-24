@@ -1,7 +1,7 @@
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 
-import { SpinnerLoader } from "../../../components/spinner-loader.js"; // Import if not already there
+import { SpinnerLoader } from "../../../components/spinner-loader.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { getTime } from "../../../utils/time.js";
 import type { Log } from "../../../utils/wrpc.js";

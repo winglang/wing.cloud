@@ -7,7 +7,7 @@ import {
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 
-import { SpinnerLoader } from "../../../components/spinner-loader.js"; // Import if not already there
+import { SpinnerLoader } from "../../../components/spinner-loader.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { getTime } from "../../../utils/time.js";
 import type { TestLog, TestResult } from "../../../utils/wrpc.js";
