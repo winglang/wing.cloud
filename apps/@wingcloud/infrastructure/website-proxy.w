@@ -67,6 +67,7 @@ pub class WebsiteProxy {
 
     let distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
       enabled: true,
+      aliases: ["${props.subDomain}.${props.zoneName}"],
       viewerCertificate: {
         acmCertificateArn: certificate.certificate.certificate.arn,
         sslSupportMethod: "sni-only",
@@ -161,7 +162,6 @@ pub class WebsiteProxy {
       distributionUrl: distribution.domainName,
     );
 
-    // this.url = "https://${distribution.domainName}";
-    this.url = "https://${props.subDomain}.${props.zoneName}";
+    this.url = "https://${distribution.domainName}";
   }
 }

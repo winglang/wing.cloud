@@ -74,7 +74,7 @@ let dashboard = new ex.ReactApp(
 
 reactAppPatch.ReactAppPatch.apply(dashboard);
 
-let siteDomainName = (() => {
+let siteURL = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
     let subDomain = util.env("PROXY_SUBDOMAIN");
     let zoneName = util.env("PROXY_ZONE_NAME");
@@ -90,7 +90,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   secrets: secrets,
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
-  siteDomain: siteDomainName,
+  siteDomain: siteURL,
 );
 
 let wingCloudApi = new wingcloud_api.Api(
@@ -113,7 +113,7 @@ let probotApp = new probot.ProbotApp(
   environments: environments,
   apps: apps,
   environmentManager: environmentManager,
-  siteDomain: siteDomainName,
+  siteDomain: siteURL,
 );
 
 let apiDomainName = (() => {
@@ -212,3 +212,4 @@ new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";
 new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
 new cdktf.TerraformOutput(value: proxyUrl) as "Proxy URL";
+new cdktf.TerraformOutput(value: siteURL) as "Site URL";
