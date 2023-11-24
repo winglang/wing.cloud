@@ -135,6 +135,7 @@ jobs:
           ## Terraform
           DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
           DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
+          WING_ENV: "test"
         run: pnpm wing test --no-clean -t @wingcloud/platform
         working-directory: 'apps/@wingcloud/infrastructure'
       - name: Setup tmate session
