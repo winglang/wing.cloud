@@ -13,7 +13,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
 
   const fullWidthPage = useMemo(() => {
     // Full screen content for the console preview
-    if (/\/apps\/[^/]+\/[^/]+\/console\/?/.test(location.pathname)) {
+    if (/(?:\/[^/]+){3}\/console\/?/.test(location.pathname)) {
       return true;
     }
     return false;
