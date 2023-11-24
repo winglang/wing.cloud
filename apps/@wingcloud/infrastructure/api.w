@@ -123,9 +123,9 @@ pub class Api {
 
     let verifyUser = inflight (request: cloud.ApiRequest): str => {
       let user = getUserFromCookie(request);
-      let username = str.fromJson(user.get("username"));
+      let username = user.get("username")?.tryAsStr();
 
-    if username != request.query.get("user") {
+      if username != request.query.get("user") {
         throw "Unauthorized";
       }
       return str.fromJson(user.get("userId"));
@@ -364,7 +364,6 @@ pub class Api {
         },
       };
     });
-
 
     api.post("/wrpc/app.rename", inflight (request) => {
       let userId = getUserIdFromCookie(request);
