@@ -111,7 +111,6 @@ jobs:
           role-session-name: gh-actions-wingcloud-testing
           aws-region: ${{ env.AWS_REGION }}
       - name: Test Wing Cloud AWS
-        continue-on-error: true
         env:
           ## Inflight
           APP_SECRET: ${{ secrets.APP_SECRET }}
@@ -133,7 +132,7 @@ jobs:
           TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
           TF_BACKEND_STATE_FILE: "${{ github.repository }}/${{ github.base_ref }}/infrastructure/main.tfstate"
           WING_ENV: "test"
-        run: pnpm wing compile -t @wingcloud/platform
+        run: pnpm wing compile -t @wingcloud/platform main.w
         working-directory: 'apps/@wingcloud/infrastructure'
       - name: Terraform Init
         id: init
