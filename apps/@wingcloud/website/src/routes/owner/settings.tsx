@@ -20,11 +20,11 @@ export interface AppProps {
 
 export const Component = () => {
   const { theme } = useTheme();
-  const { user, appName } = useParams();
+  const { owner, appName } = useParams();
   const { showNotification } = useNotifications();
 
   const appQuery = wrpc["app.getByName"].useQuery(
-    { user: user!, appName: appName! },
+    { owner: owner!, appName: appName! },
     { refetchOnMount: true },
   );
 

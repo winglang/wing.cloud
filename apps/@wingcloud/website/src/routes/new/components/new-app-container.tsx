@@ -16,7 +16,7 @@ export const NewAppContainer = ({
   step,
   children,
 }: PropsWithChildren<NewAppContainerProps>) => {
-  const { user } = useParams();
+  const { owner } = useParams();
   const { theme } = useTheme();
 
   return (
@@ -30,7 +30,7 @@ export const NewAppContainer = ({
           )}
         >
           <div className={clsx("flex items-center gap-1", theme.text1)}>
-            <Link to={`/${user}/new`} className={clsx("font-semibold")}>
+            <Link to={`/${owner}/new`} className={clsx("font-semibold")}>
               Create a new App
             </Link>
             {step && (

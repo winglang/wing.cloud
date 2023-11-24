@@ -20,7 +20,7 @@ export interface AppProps {
 export const Component = () => {
   const { theme } = useTheme();
 
-  const { user, appName } = useParams();
+  const { owner, appName } = useParams();
   const navigate = useNavigate();
 
   const appQuery = wrpc["app.getByName"].useQuery({
@@ -33,7 +33,7 @@ export const Component = () => {
   }, [appQuery.data]);
 
   const environmentsQuery = wrpc["app.environments"].useQuery(
-    { user: user!, appId: app?.appId! },
+    { owner: owner!, appId: app?.appId! },
     {
       enabled: app !== undefined,
       // TODO: query invalidation

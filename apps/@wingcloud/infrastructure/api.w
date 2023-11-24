@@ -117,7 +117,7 @@ pub class Api {
       let userId = getUserFromCookie(request);
       let username = users.getUsername(userId: userId);
 
-      if username != request.query.get("user") {
+      if username != request.query.get("owner") {
         throw "Unauthorized";
       }
       return userId;

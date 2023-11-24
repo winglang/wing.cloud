@@ -16,14 +16,14 @@ import { wrpc } from "../../utils/wrpc.js";
 import { AppCard } from "./components/app-card.js";
 
 export const Component = () => {
-  const { user } = useParams();
+  const { owner } = useParams();
   const { theme } = useTheme();
 
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
   const listAppsQuery = wrpc["user.listApps"].useQuery({
-    user: user!,
+    owner: owner!,
   });
 
   const apps = useMemo(() => {

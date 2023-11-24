@@ -20,7 +20,7 @@ export const DeleteModal = ({
   show,
   onClose,
 }: DeleteModalProps) => {
-  const { user } = useParams();
+  const { owner } = useParams();
   const { showNotification } = useNotifications();
 
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ export const DeleteModal = ({
   const deleteApp = wrpc["app.delete"].useMutation({
     onSuccess() {
       showNotification(`App ${appName} deleted`, { type: "success" });
-      navigate(`/${user}`);
+      navigate(`/${owner}`);
     },
     onError(error) {
       if (error instanceof Error) {

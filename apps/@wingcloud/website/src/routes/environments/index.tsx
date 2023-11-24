@@ -13,7 +13,7 @@ import { RuntimeLogs } from "./components/runtime-logs.js";
 import { TestsLogs } from "./components/tests-logs.js";
 
 export const Component = () => {
-  const { user, appName, branch } = useParams();
+  const { owner, appName, branch } = useParams();
 
   const [testLogsOpen, setTestLogsOpen] = useState(false);
   const [runtimeLogsOpen, setRuntimeLogsOpen] = useState(false);
@@ -21,7 +21,7 @@ export const Component = () => {
 
   const environment = wrpc["app.environment"].useQuery(
     {
-      user: user!,
+      owner: owner!,
       appName: appName!,
       branch: branch!,
     },
@@ -33,7 +33,7 @@ export const Component = () => {
 
   const logs = wrpc["app.environment.logs"].useQuery(
     {
-      user: user!,
+      owner: owner!,
       appName: appName!,
       branch: branch!,
     },
