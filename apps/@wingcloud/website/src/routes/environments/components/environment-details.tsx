@@ -114,7 +114,7 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
         </div>
       </div>
       <div className="flex justify-end items-start">
-        <Link to="./preview">
+        <Link to="./console">
           <Button disabled={environment?.status !== "running"}>Visit</Button>
         </Link>
       </div>
