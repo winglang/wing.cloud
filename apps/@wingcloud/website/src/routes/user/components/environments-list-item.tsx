@@ -31,9 +31,11 @@ const getTestStatus = (environment: Environment): ErrorStatus | undefined => {
 };
 
 export const EnvironmentsListItem = ({
+  user,
   appName,
   environment,
 }: {
+  user: string;
   appName: string;
   environment: Environment;
 }) => {
@@ -157,7 +159,7 @@ export const EnvironmentsListItem = ({
           <div className="flex gap-x-4 text-xs items-center justify-end">
             {linkEnabled && (
               <Link
-                to={`/apps/${appName}/${environment.branch}/preview`}
+                to={`/${user}/${appName}/${environment.branch}/preview`}
                 className={clsx("text-xs hover:underline ", theme.text1)}
               >
                 Visit Preview
@@ -176,7 +178,7 @@ export const EnvironmentsListItem = ({
               >
                 {status === "error" && (
                   <Link
-                    to={`/apps/${appName}/${environment.branch}/#${RUNTIME_LOGS_ID}`}
+                    to={`/${user}/${appName}/${environment.branch}/#${RUNTIME_LOGS_ID}`}
                     className="hover:underline"
                   >
                     {statusString}

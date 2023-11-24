@@ -20,17 +20,20 @@ export interface AppProps {
 export const Component = () => {
   const { theme } = useTheme();
 
-  const { appName } = useParams();
+  const { user, appName } = useParams();
   const navigate = useNavigate();
 
-  const appQuery = wrpc["app.getByName"].useQuery({ appName: appName! });
+  const appQuery = wrpc["app.getByName"].useQuery({
+    user: user!,
+    appName: appName!,
+  });
 
   const app = useMemo(() => {
     return appQuery.data?.app;
   }, [appQuery.data]);
 
   const environmentsQuery = wrpc["app.environments"].useQuery(
-    { appId: app?.appId! },
+    { user: user!, appId: app?.appId! },
     {
       enabled: app !== undefined,
       // TODO: query invalidation
@@ -144,12 +147,15 @@ export const Component = () => {
                 <SpinnerLoader className="z-20" />
               </div>
             )}
-            <EnvironmentsList
-              environments={environments}
-              loading={environmentsQuery.isLoading}
-              appName={app.appName}
-              repoUrl={repoUrl}
-            />
+            {user && appName && (
+              <EnvironmentsList
+                environments={environments}
+                loading={environmentsQuery.isLoading}
+                user={user}
+                appName={appName}
+                repoUrl={repoUrl}
+              />
+            )}
           </div>
         </div>
       )}

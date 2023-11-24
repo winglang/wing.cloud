@@ -5,23 +5,26 @@ import {
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-import { SpinnerLoader } from "../components/spinner-loader.js";
-import { Button } from "../design-system/button.js";
-import { Input } from "../design-system/input.js";
-import { useTheme } from "../design-system/theme-provider.js";
-import { wrpc } from "../utils/wrpc.js";
+import { SpinnerLoader } from "../../components/spinner-loader.js";
+import { Button } from "../../design-system/button.js";
+import { Input } from "../../design-system/input.js";
+import { useTheme } from "../../design-system/theme-provider.js";
+import { wrpc } from "../../utils/wrpc.js";
 
-import { AppCard } from "./apps/components/app-card.js";
+import { AppCard } from "./components/app-card.js";
 
 export const Component = () => {
+  const { user } = useParams();
   const { theme } = useTheme();
 
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-  const listAppsQuery = wrpc["user.listApps"].useQuery();
+  const listAppsQuery = wrpc["user.listApps"].useQuery({
+    user: user!,
+  });
 
   const apps = useMemo(() => {
     return listAppsQuery.data?.apps ?? [];
@@ -58,7 +61,7 @@ export const Component = () => {
               primary
               icon={PlusIcon}
               onClick={() => {
-                navigate("new");
+                navigate("/new");
               }}
             />
           )}
@@ -91,7 +94,7 @@ export const Component = () => {
                       primary
                       className="mt-6"
                       onClick={() => {
-                        navigate("new");
+                        navigate("/new");
                       }}
                     />
                   </div>
@@ -110,7 +113,7 @@ export const Component = () => {
                   <AppCard
                     key={app.appId}
                     onClick={() => {
-                      navigate(`/apps/${app.appName}`);
+                      navigate(`/${user}/${app.appName}`);
                     }}
                     app={app}
                   />

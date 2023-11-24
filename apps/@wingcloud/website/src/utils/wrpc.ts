@@ -137,31 +137,31 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.get": QueryProcedure<
-    { appId: string },
+    { user: string; appId: string },
     {
       app: App;
     }
   >;
   "app.getByName": QueryProcedure<
-    { appName: string },
+    { user: string; appName: string },
     {
       app: App;
     }
   >;
   "app.environments": QueryProcedure<
-    { appId: string },
+    { user: string; appId: string },
     {
       environments: Array<Environment>;
     }
   >;
   "app.environment": QueryProcedure<
-    { appName: string; branch: string },
+    { user: string; appName: string; branch: string },
     {
       environment: Environment;
     }
   >;
   "app.environment.logs": QueryProcedure<
-    { appName: string; branch: string },
+    { user: string; appName: string; branch: string },
     {
       deploy: Log[];
       runtime: Log[];
@@ -169,7 +169,7 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.listSecrets": QueryProcedure<
-    { appId: string },
+    { user: string; appId: string },
     {
       secrets: Array<Secret>;
     }
@@ -207,7 +207,9 @@ export const wrpc = createWRPCReact<{
   >;
   "app.delete": MutationProcedure<{ appId: string }, {}>;
   "user.listApps": QueryProcedure<
-    undefined,
+    {
+      user: string;
+    },
     {
       apps: Array<App>;
     }

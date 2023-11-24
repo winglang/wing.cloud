@@ -1,45 +1,39 @@
-import { createBrowserRouter, redirect } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 
 import { NoMatch } from "./components/no-match.js";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    loader: () => {
-      throw redirect("/apps");
-    },
-  },
-  {
-    path: "/apps",
     lazy: () => import("./routes/index.js"),
     children: [
       {
-        path: "",
-        lazy: () => import("./routes/apps.js"),
-      },
-      {
-        path: "new",
+        path: "/new",
         lazy: () => import("./routes/new/index.js"),
       },
       {
-        path: "new/connect",
+        path: "/new/connect",
         lazy: () => import("./routes/new/connect.js"),
       },
       {
-        path: ":appName",
-        lazy: () => import("./routes/apps/app.js"),
+        path: "/:user",
+        lazy: () => import("./routes/user/index.js"),
       },
       {
-        path: ":appName/:branch",
+        path: "/:user/:appName",
+        lazy: () => import("./routes/user/app.js"),
+      },
+      {
+        path: "/:user/:appName/settings",
+        lazy: () => import("./routes/user/settings.js"),
+      },
+      {
+        path: "/:user/:appName/:branch",
         lazy: () => import("./routes/environments/index.js"),
       },
       {
-        path: ":appName/:branch/preview",
+        path: "/:user/:appName/:branch/console",
         lazy: () => import("./routes/environments/console-preview.js"),
-      },
-      {
-        path: ":appName/settings",
-        lazy: () => import("./routes/apps/settings.js"),
       },
     ],
   },

@@ -12,8 +12,8 @@ export const Component = () => {
 
   return (
     <Layout>
-      {pathname === "/apps" && <GithubLogin />}
-      {pathname !== "/apps" && <Outlet />}
+      {pathname === "/" && <GithubLogin />}
+      {pathname !== "/" && <Outlet />}
     </Layout>
   );
 };

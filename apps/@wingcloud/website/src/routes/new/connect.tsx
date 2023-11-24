@@ -8,6 +8,7 @@ import { Button } from "../../design-system/button.js";
 import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
+import { useUser } from "../../services/use-user.js";
 import { usePopupWindow } from "../../utils/popup-window.js";
 import type { Installation } from "../../utils/wrpc.js";
 
@@ -15,6 +16,8 @@ import { GitRepoSelect } from "./components/git-repo-select.js";
 import { NewAppContainer } from "./components/new-app-container.js";
 
 export const Component = () => {
+  const { user } = useUser();
+
   const navigate = useNavigate();
   const { theme } = useTheme();
 
@@ -28,7 +31,7 @@ export const Component = () => {
   }, []);
 
   const onCancel = useCallback(() => {
-    navigate("/apps/new");
+    navigate("/new");
   }, [navigate]);
 
   const {
@@ -63,7 +66,7 @@ export const Component = () => {
     setCreateAppLoading(true);
     try {
       const app = await createApp();
-      navigate(`/apps/${app?.appName}`);
+      navigate(`/${user?.username}/${app?.appName}`);
     } catch (error) {
       setCreateAppLoading(false);
       if (error instanceof Error) {

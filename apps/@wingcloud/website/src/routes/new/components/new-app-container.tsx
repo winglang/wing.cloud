@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { type ForwardRefExoticComponent, type PropsWithChildren } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
 
@@ -16,6 +16,7 @@ export const NewAppContainer = ({
   step,
   children,
 }: PropsWithChildren<NewAppContainerProps>) => {
+  const { user } = useParams();
   const { theme } = useTheme();
 
   return (
@@ -29,7 +30,7 @@ export const NewAppContainer = ({
           )}
         >
           <div className={clsx("flex items-center gap-1", theme.text1)}>
-            <Link to="/apps/new/" className={clsx("font-semibold")}>
+            <Link to={`/${user}/new`} className={clsx("font-semibold")}>
               Create a new App
             </Link>
             {step && (

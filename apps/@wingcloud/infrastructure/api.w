@@ -71,7 +71,6 @@ struct ApiProps {
   githubAppClientSecret: str;
   appSecret: str;
   logs: cloud.Bucket;
-  postSignInRedirectURL: str;
 }
 
 
@@ -108,10 +107,28 @@ pub class Api {
 
     let getUserFromCookie = inflight (request: cloud.ApiRequest) => {
       if let payload = getJWTPayloadFromCookie(request) {
-        return payload.userId;
+        return {
+          userId: payload.userId,
+          username: payload.username,
+        };
       } else {
         throw "Unauthorized";
       }
+    };
+
+    let getUserIdFromCookie = inflight (request: cloud.ApiRequest): str => {
+      let user = getUserFromCookie(request);
+      return str.fromJson(user.get("userId"));
+    };
+
+    let verifyUser = inflight (request: cloud.ApiRequest): str => {
+      let user = getUserFromCookie(request);
+      let username = str.fromJson(user.get("username"));
+
+    if username != request.query.get("user") {
+        throw "Unauthorized";
+      }
+      return str.fromJson(user.get("userId"));
     };
 
     let getAccessTokenFromCookie = inflight (request: cloud.ApiRequest) => {
@@ -122,7 +139,7 @@ pub class Api {
     api.get("/wrpc/auth.check", inflight (request) => {
       if let payload = getJWTPayloadFromCookie(request) {
         // check if the user from the cookie is valid
-        let userId = getUserFromCookie(request);
+        let userId = getUserIdFromCookie(request);
 
         // check if user exists in the db
         let username = users.getUsername(userId: userId);
@@ -175,6 +192,7 @@ pub class Api {
       let jwt = JWT.JWT.sign(
         secret: props.appSecret,
         userId: userId,
+        username: gitHubLogin,
         accessToken: tokens.access_token,
         accessTokenExpiresIn: tokens.expires_in,
         refreshToken: tokens.refresh_token,
@@ -196,7 +214,7 @@ pub class Api {
       return {
         status: 302,
         headers: {
-          Location: props.postSignInRedirectURL,
+          Location: "/${gitHubLogin}",
           "Set-Cookie": authCookie,
         },
       };
@@ -297,7 +315,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.get", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = verifyUser(request);
 
       let appId = request.query.get("appId");
 
@@ -322,7 +340,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.getByName", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = verifyUser(request);
 
       let appName = request.query.get("appName");
 
@@ -349,7 +367,7 @@ pub class Api {
 
 
     api.post("/wrpc/app.rename", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
 
       let input = Json.parse(request.body ?? "");
 
@@ -365,7 +383,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.delete", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
 
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
@@ -383,7 +401,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environments", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = verifyUser(request);
 
       let environments = props.environments.list(
         appId: request.query.get("appId"),
@@ -397,7 +415,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environment", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = verifyUser(request);
 
       let appName = request.query.get("appName");
       let branch = request.query.get("branch");
@@ -420,7 +438,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.listSecrets", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let appId = request.query.get("appId");
       let prodSecrets = props.secrets.list(appId: appId, environmentType: "production");
       let previewSecrets = props.secrets.list(appId: appId, environmentType: "preview");
@@ -434,7 +452,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.decryptSecret", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let secretId = input.get("secretId").asStr();
@@ -451,7 +469,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.createSecret", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let environmentType = input.get("environmentType").asStr();
@@ -489,7 +507,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.deleteSecret", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let environmentType = input.get("environmentType").asStr();
@@ -540,7 +558,7 @@ pub class Api {
 
     api.post("/wrpc/app.updateEntryfile", inflight (request) => {
       log("${Json.stringify(request)}");
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let appName = input.get("appName").asStr();
@@ -564,7 +582,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environment.logs", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = verifyUser(request);
 
       let appName = request.query.get("appName");
       let branch = request.query.get("branch");
@@ -606,7 +624,7 @@ pub class Api {
 
     api.post("/wrpc/user.createApp", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        let userId = getUserFromCookie(request);
+        let userId = getUserIdFromCookie(request);
 
         let input = Json.parse(request.body ?? "");
 
@@ -670,7 +688,7 @@ pub class Api {
     });
 
     api.get("/wrpc/user.listApps", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
 
       let userApps = apps.list(
         userId: userId,

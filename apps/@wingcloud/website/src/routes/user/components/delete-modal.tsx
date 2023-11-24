@@ -1,7 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { Modal } from "../../../design-system/modal.js";
 import { useNotifications } from "../../../design-system/notification.js";
@@ -20,6 +20,7 @@ export const DeleteModal = ({
   show,
   onClose,
 }: DeleteModalProps) => {
+  const { user } = useParams();
   const { showNotification } = useNotifications();
 
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export const DeleteModal = ({
   const deleteApp = wrpc["app.delete"].useMutation({
     onSuccess() {
       showNotification(`App ${appName} deleted`, { type: "success" });
-      navigate("/apps/");
+      navigate(`/${user}`);
     },
     onError(error) {
       if (error instanceof Error) {

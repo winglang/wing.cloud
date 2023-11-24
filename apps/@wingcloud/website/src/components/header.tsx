@@ -2,7 +2,7 @@ import { UserCircleIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
 import { useCallback } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 
 import { Menu } from "../design-system/menu.js";
 import { useTheme } from "../design-system/theme-provider.js";
@@ -58,7 +58,7 @@ export const Header = () => {
       const to = `/${parts.slice(0, index + 1).join("/")}`;
       return {
         label: part,
-        to: `${to}/`,
+        to: `${to}`,
       };
     });
   }, [location.pathname]);
@@ -69,7 +69,7 @@ export const Header = () => {
         <ol role="list" className="flex items-center space-x-2 truncate">
           <li>
             <div>
-              <Link to="/apps/" className={clsx(theme.text1, theme.text1Hover)}>
+              <Link to="/" className={clsx(theme.text1, theme.text1Hover)}>
                 <WingIcon className="h-5 w-auto" />
               </Link>
             </div>
