@@ -3,7 +3,7 @@ name: Pull Request Diff
 on:
   pull_request:
     paths-ignore:
-      - '**/*.md'
+      - "**/*.md"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,12 +11,12 @@ concurrency:
 
 permissions:
   id-token: write # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
+  contents: read # This is required for actions/checkout
   pull-requests: write # This is required for commenting on PRs
 
 env:
   AWS_REGION: "us-east-1"
-  
+
 jobs:
   diff:
     runs-on: ubuntu-latest
@@ -46,7 +46,7 @@ jobs:
       - name: Compile Wing Cloud dependencies
         run: npx turbo compile --filter=!@wingcloud/infrastructure
       - name: Compile Wing Cloud
-        env: 
+        env:
           ## Inflight
           APP_SECRET: ${{ secrets.APP_SECRET }}
           FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
@@ -62,12 +62,13 @@ jobs:
           VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}
           PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
           PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
+          LANDING_DOMAIN: ${{ secrets.LANDING_DOMAIN }}
           TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}
           TF_BACKEND_BUCKET_REGION: ${{ vars.TF_BACKEND_BUCKET_REGION }}
           TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
           TF_BACKEND_STATE_FILE: "${{ github.repository }}/${{ github.base_ref }}/infrastructure/main.tfstate"
         run: pnpm wing compile -t tf-aws main.w --platform s3.backend.js
-        working-directory: 'apps/@wingcloud/infrastructure'        
+        working-directory: "apps/@wingcloud/infrastructure"
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -77,7 +78,7 @@ jobs:
       - name: Terraform Init
         id: init
         run: terraform init
-        working-directory: 'apps/@wingcloud/infrastructure/target/main.tfaws'
+        working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
       - name: Terraform Plan
         id: plan
         env:
@@ -86,8 +87,8 @@ jobs:
         run: |
           terraform plan -lock=false -out=plan.tmp
           terraform show -no-color plan.tmp >${GITHUB_WORKSPACE}/plan.out
-        working-directory: 'apps/@wingcloud/infrastructure/target/main.tfaws'
-      
+        working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
+
       - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
         with:
@@ -109,15 +110,15 @@ jobs:
             const plan_file = fs.readFileSync('plan.out', 'utf8')
             const plan = plan_file.length > 65000 ? plan_file.toString().substring(0, 65000) + " ..." : plan_file
             const truncated_message = plan_file.length > 65000 ? "Output is too long and was truncated. You can read full Plan in " + run_link + "<br /><br />" : ""
-          
+
             const output = `#### Environment 🌎\`staging\`
-            
+
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
 
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-      
+
             <details><summary>Show Plan</summary>
-      
+
             \`\`\`\n
             ${plan}
             \`\`\`
@@ -125,9 +126,9 @@ jobs:
             </details>
 
             ${truncated_message}
-      
+
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
-      
+
             // 3. If we have a comment, update it, otherwise create a new one
             if (botComment) {
               github.rest.issues.updateComment({

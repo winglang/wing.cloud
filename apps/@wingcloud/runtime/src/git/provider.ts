@@ -3,11 +3,11 @@ import { Executer } from "../executer.js";
 export abstract class GitProvider {
   constructor() {}
 
-  public async clone(e: Executer, commit: GitCommit, targetDir: string) {
-    await e.exec("git", ["clone", this.cloneUrl(commit), targetDir], {
+  public async clone(executer: Executer, commit: GitCommit, targetDir: string) {
+    await executer.exec("git", ["clone", this.cloneUrl(commit), targetDir], {
       throwOnFailure: true,
     });
-    await e.exec("git", ["reset", "--hard", commit.sha], {
+    await executer.exec("git", ["reset", "--hard", commit.sha], {
       throwOnFailure: true,
       cwd: targetDir,
     });

@@ -53,13 +53,13 @@ export const Component = () => {
             }}
           />
           {apps.length > 0 && (
-          <Button
-            label="New"
-            primary
-            icon={PlusIcon}
-            onClick={() => {
-              navigate("new");
-            }}
+            <Button
+              label="New"
+              primary
+              icon={PlusIcon}
+              onClick={() => {
+                navigate("new");
+              }}
             />
           )}
         </div>
