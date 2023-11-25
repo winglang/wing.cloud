@@ -23,6 +23,8 @@ export const Component = () => {
   const { appName } = useParams();
   const { showNotification } = useNotifications();
 
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+
   const appQuery = wrpc["app.getByName"].useQuery(
     { appName: appName! },
     { refetchOnMount: true },
