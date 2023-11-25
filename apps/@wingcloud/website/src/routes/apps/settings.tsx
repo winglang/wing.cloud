@@ -14,6 +14,8 @@ import { useTheme } from "../../design-system/theme-provider.js";
 import { wrpc } from "../../utils/wrpc.js";
 import { SecretsList } from "../secrets/components/secrets-list.js";
 
+import { EntrypointUpdateModal } from "./components/entrypoint-update-modal.js";
+
 export interface AppProps {
   appName: string;
 }
@@ -88,8 +90,10 @@ export const Component = () => {
       appQuery.refetch();
       showNotification("Succefully updated the app's entryfile");
       setLoading(false);
+      setConfirmModalOpen(false);
     } catch (error) {
       setLoading(false);
+      setConfirmModalOpen(false);
       if (error instanceof Error) {
         showNotification("Failed to update the app's entryfile", {
           body: error.message,
@@ -141,7 +145,7 @@ export const Component = () => {
               </div>
               <div className="pl-2">
                 <Button
-                  onClick={updateEntryfile}
+                  onClick={() => setConfirmModalOpen(true)}
                   disabled={
                     loading || !entryfile || app.entryfile === entryfile
                   }
@@ -172,6 +176,17 @@ export const Component = () => {
 
           <SecretsList appId={app.appId} />
         </div>
+      )}
+
+      {appName && app?.appId && (
+        <EntrypointUpdateModal
+          appName={appName}
+          show={confirmModalOpen}
+          isIdle={updateEntryfileMutation.isIdle}
+          isPending={loading}
+          onClose={setConfirmModalOpen}
+          onConfirm={updateEntryfile}
+        />
       )}
     </div>
   );
