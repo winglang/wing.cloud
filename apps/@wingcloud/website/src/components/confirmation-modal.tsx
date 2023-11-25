@@ -63,7 +63,7 @@ export const ConfirmationModal = ({
             },
           )}
           disabled={isPending}
-          onClick={() => onConfirm}
+          onClick={() => onConfirm()}
         >
           {!isPending && <span>{confirmButtonText}</span>}
           {isPending && <span>{confirmButtonTextPending}</span>}
