@@ -157,7 +157,7 @@ export const EnvironmentsListItem = ({
           <div className="flex gap-x-4 text-xs items-center justify-end">
             {linkEnabled && (
               <Link
-                to={`/apps/${appName}/${environment.branch}/preview`}
+                to={`/apps/${appName}/${environment.branch}/console`}
                 className={clsx("text-xs hover:underline ", theme.text1)}
               >
                 Visit Preview
