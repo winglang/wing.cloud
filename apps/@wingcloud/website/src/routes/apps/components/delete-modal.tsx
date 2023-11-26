@@ -1,4 +1,4 @@
-import { useMemo } from "React";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ConfirmationModal } from "../../../components/confirmation-modal.js";
