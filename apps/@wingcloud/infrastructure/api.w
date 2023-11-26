@@ -71,6 +71,7 @@ struct ApiProps {
   githubAppClientSecret: str;
   appSecret: str;
   logs: cloud.Bucket;
+  postSignInRedirectURL: str;
 }
 
 
@@ -195,7 +196,7 @@ pub class Api {
       return {
         status: 302,
         headers: {
-          Location: "/apps/",
+          Location: props.postSignInRedirectURL,
           "Set-Cookie": authCookie,
         },
       };

@@ -105,6 +105,7 @@ let wingCloudApi = new wingcloud_api.Api(
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
   appSecret: appSecret,
   logs: bucketLogs,
+  postSignInRedirectURL: "${siteURL}/apps",
 );
 
 let probotApp = new probot.ProbotApp(
@@ -192,7 +193,10 @@ let updateGithubWebhook = inflight () => {
   log("Update your GitHub callback url to: ${proxyUrl}/wrpc/github.callback");
 };
 
-let deploy = new cloud.OnDeploy(updateGithubWebhook);
+// Not sure why, but terraform doesn't seem to like this.
+if util.tryEnv("WING_TARGET") == "sim" {
+  new cloud.OnDeploy(updateGithubWebhook);
+}
 
 bring "./tests/environments.w" as tests;
 new tests.EnvironmentsTest(
