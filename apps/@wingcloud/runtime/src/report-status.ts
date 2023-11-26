@@ -13,7 +13,6 @@ export type EnvironmentStatus =
   | "deploying"
   | "tests"
   | "running"
-  | "endpoints"
   | "error"
   | "stopped";
 

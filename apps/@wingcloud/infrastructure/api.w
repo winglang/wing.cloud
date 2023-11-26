@@ -11,6 +11,7 @@ bring "./apps.w" as Apps;
 bring "./users.w" as Users;
 bring "./environments.w" as Environments;
 bring "./secrets.w" as Secrets;
+bring "./endpoints.w" as Endpoints;
 bring "./lowkeys-map.w" as lowkeys;
 
 // TODO: https://github.com/winglang/wing/issues/3644
@@ -29,6 +30,7 @@ struct ApiProps {
   environments: Environments.Environments;
   environmentManager: EnvironmentManager.EnvironmentManager;
   secrets: Secrets.Secrets;
+  endpoints: Endpoints.Endpoints;
   probotAdapter: adapter.ProbotAdapter;
   githubAppClientId: str;
   githubAppClientSecret: str;
@@ -572,6 +574,31 @@ pub class Api {
         body: {
           build: buildLogs.copy(),
           tests: testLogs.copy(),
+        },
+      };
+    });
+
+    api.get("/wrpc/app.environment.endpoints", inflight (request) => {
+      let userId = getUserFromCookie(request);
+
+      let appName = request.query.get("appName");
+      let branch = request.query.get("branch");
+
+      let appId = apps.getByName(
+        userId: userId,
+        appName: appName,
+      ).appId;
+
+      let environment = props.environments.getByBranch(
+        appId: appId,
+        branch: branch,
+      );
+
+      let endpoints = props.endpoints.list(environmentId: environment.id, runId: environment.runId);
+
+      return {
+        body: {
+          endpoints: endpoints,
         },
       };
     });

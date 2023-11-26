@@ -33,6 +33,7 @@ pub class RuntimeClient {
       entryfile: options.app.entryfile,
       appId: options.app.appId,
       environmentId: options.environment.id,
+      runId: options.environment.runId,
       token: options.token,
       secrets: options.secrets,
     }));

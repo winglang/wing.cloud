@@ -12,7 +12,6 @@
     "jose": "^4.15.4",
     "jsonwebtoken": "^9.0.2",
     "jwk-to-pem": "^2.0.5",
-    "ngrok": "^5.0.0-beta.2",
     "node-fetch": "^3.3.2",
     "which": "^4.0.0",
     "winglang": "^0.48.6"

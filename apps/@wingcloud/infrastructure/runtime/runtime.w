@@ -28,6 +28,7 @@ struct RuntimeStartOptions {
   awsSecretAccessKey: str;
   wingCloudUrl: parameter.IParameter;
   environmentId: str;
+  runId: str;
   secrets: Map<str>;
 }
 
@@ -76,6 +77,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "LOGS_BUCKET_NAME" => util.env(opts.logsBucketName), // get simulator handle for the bucket
       "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
       "ENVIRONMENT_ID" => opts.environmentId,
+      "RUN_ID" => opts.runId,
       "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
     };
 
@@ -133,13 +135,11 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     }];
 
     let env = MutMap<str>{
-      "GIT_REPO" => opts.gitRepo,
-      "GIT_SHA" => opts.gitSha,
-      "ENTRYFILE" => opts.entryfile,
       "WING_TARGET" => util.env("WING_TARGET"),
       "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
       "LOGS_BUCKET_NAME" => opts.logsBucketName,
       "ENVIRONMENT_ID" => opts.environmentId,
+      "RUN_ID" => opts.runId,
       "AWS_ACCESS_KEY_ID" => opts.awsAccessKeyId,
       "AWS_SECRET_ACCESS_KEY" => opts.awsSecretAccessKey,
       "AWS_REGION" => opts.logsBucketRegion,
@@ -149,10 +149,27 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       env.set("GIT_TOKEN", token);
     }
 
+    let createOptions: flyio.ICreateMachineProps = {
+      imageName: this.image.image.imageName, env: env.copy(), memoryMb: 1024, files: files, services: [{
+        protocol: "tcp",
+        internal_port: 3000,
+        ports: [{
+          port: 443,
+          handlers: ["tls"],
+        }]
+      }, {
+        protocol: "tcp",
+        internal_port: 3001,
+        ports: [{
+          port: 3001
+        }]
+      }]
+    };
+  
     if exists {
-      app.update(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024, files: files);
+      app.update(createOptions);
     } else {
-      app.addMachine(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024, files: files);
+      app.addMachine(createOptions);
     }
 
     return app.url();
@@ -175,6 +192,7 @@ pub struct Message {
   entryfile: str;
   appId: str;
   environmentId: str;
+  runId: str;
   token: str?;
   secrets: Map<str>;
 }
@@ -261,6 +279,7 @@ pub class RuntimeService {
           entryfile: msg.entryfile,
           wingCloudUrl: props.wingCloudUrl,
           environmentId: msg.environmentId,
+          runId: msg.runId,
           secrets: msg.secrets,
           logsBucketName: bucketName,
           logsBucketRegion: bucketRegion,

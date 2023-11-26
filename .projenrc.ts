@@ -197,7 +197,6 @@ runtime.addDeps("jwk-to-pem");
 runtime.addDeps("jose");
 runtime.addDeps("node-fetch");
 runtime.addDeps("which");
-runtime.addDeps("ngrok");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/http-proxy");
@@ -327,6 +326,7 @@ infrastructure.addDeps("cookie");
 infrastructure.addDeps("jose");
 infrastructure.addDeps("octokit", "node-fetch");
 infrastructure.addDeps("@aws-sdk/client-kms");
+infrastructure.addDeps("dnsimple");
 
 infrastructure.addDevDeps("@types/cookie");
 infrastructure.addDeps("@aws-sdk/client-ssm");

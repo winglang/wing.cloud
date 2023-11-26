@@ -7,10 +7,21 @@ pub struct File {
   secret_name: str?;
 }
 
-struct IClientCreateMachineProps {
+pub struct IClientCreateMachinePort {
+  port: num;
+  handlers: Array<str>?;
+}
+
+pub struct IClientCreateMachineService {
+  ports: Array<IClientCreateMachinePort>;
+  protocol: str;
+  internal_port: num;
+}
+
+pub struct IClientCreateMachineProps {
   appName: str;
   imageName: str;
-  port: num;
+  services: Array<IClientCreateMachineService>;
   region: str?;
   memoryMb: num?;
   env: Map<str>?;
@@ -173,22 +184,7 @@ pub inflight class Client {
         files: props.files ?? [],
         auto_destroy: true,
         image: props.imageName,
-        services: [
-          {
-            ports: [
-              {
-                port: 443,
-                handlers: ["tls", "http"],
-              },
-              {
-                port: 80,
-                handlers: ["http"],
-              },
-            ],
-            protocol: "tcp",
-            internal_port: props.port,
-          },
-        ],
+        services: props.services,
       },
     }));
     if (!machineRes.ok) {

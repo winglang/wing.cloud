@@ -5,6 +5,7 @@ bring "./status-reports.w" as status_report;
 pub struct Environment {
   id: str;
   appId: str;
+  runId: str;
   type: str;
   repo: str;
   branch: str;
@@ -53,6 +54,11 @@ struct UpdateEnvironmentCommentIdOptions {
   commentId: num;
 }
 
+struct UpdateEnvironmentRunIdOptions {
+  id: str;
+  appId: str;
+}
+
 struct UpdateEnvironmentTestResultsOptions {
   id: str;
   appId: str;
@@ -90,6 +96,7 @@ pub class Environments {
     let environment = Environment {
       id: "environment_${nanoid62.Nanoid62.generate()}",
       appId: options.appId,
+      runId: nanoid62.Nanoid62.generate(),
       type: options.type,
       repo: options.repo,
       branch: options.branch,
@@ -107,6 +114,7 @@ pub class Environments {
         sk: ops.sk,
         id: environment.id,
         appId: environment.appId,
+        runId: environment.runId,
         type: environment.type,
         repo: environment.repo,
         branch: environment.branch,
@@ -153,6 +161,11 @@ pub class Environments {
   }
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
+    // new run
+    if options.status == "initializing" {
+      this.updateRunId(id: options.id, appId: options.appId);
+    }
+
     let branch = this.get(
       id: options.id,
     ).branch;
@@ -384,6 +397,66 @@ pub class Environments {
     ]);
   }
 
+  pub inflight updateRunId(options: UpdateEnvironmentRunIdOptions) {
+    let branch = this.get(
+      id: options.id,
+    ).branch;
+
+    let runId = nanoid62.Nanoid62.generate();
+
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "ENVIRONMENT#${options.id}",
+            sk: "#",
+          },
+          updateExpression: "SET #runId = :runId",
+          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
+          expressionAttributeNames: {
+            "#pk": "pk",
+            "#runId": "runId",
+            "#appId": "appId",
+          },
+          expressionAttributeValues: {
+            ":runId": runId,
+            ":appId": options.appId,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#${options.appId}",
+            sk: "ENVIRONMENT#${options.id}",
+          },
+          updateExpression: "SET #runId = :runId",
+          expressionAttributeNames: {
+            "#runId": "runId",
+          },
+          expressionAttributeValues: {
+            ":runId": runId,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#${options.appId}",
+            sk: "BRANCH#${branch}",
+          },
+          updateExpression: "SET #runId = :runId",
+          expressionAttributeNames: {
+            "#runId": "runId",
+          },
+          expressionAttributeValues: {
+            ":runId": runId,
+          },
+        }
+      },
+    ]);
+  }
+
   pub inflight get(options: GetEnvironmentOptions): Environment {
     let result = this.table.getItem(
       key: {
@@ -396,6 +469,7 @@ pub class Environments {
       return {
         id: item.get("id").asStr(),
         appId: item.get("appId").asStr(),
+        runId: item.get("runId").asStr(),
         type: item.get("type").asStr(),
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),
@@ -426,6 +500,7 @@ pub class Environments {
       return {
         id: item.get("id").asStr(),
         appId: item.get("appId").asStr(),
+        runId: item.get("runId").asStr(),
         type: item.get("type").asStr(),
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),
@@ -457,6 +532,7 @@ pub class Environments {
       environments = environments.concat([{
         id: item.get("id").asStr(),
         appId: item.get("appId").asStr(),
+        runId: item.get("runId").asStr(),
         type: item.get("type").asStr(),
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),

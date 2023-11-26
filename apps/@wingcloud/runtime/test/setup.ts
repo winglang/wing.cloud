@@ -34,11 +34,9 @@ beforeEach(async () => {
   logsBucket = sim.getResource(
     "root/Default/runtime.RuntimeService/deployment logs",
   ) as cloud.IBucketClient;
-  const config = sim.getResourceConfig(
-    "root/Default/cloud.Api",
-  ) as ApiSchema;
+  const config = sim.getResourceConfig("root/Default/cloud.Api") as ApiSchema;
   wingApiUrl = config.attrs.url;
-}, 60000);
+}, 60_000);
 
 afterEach(async () => {
   await sim?.stop();
@@ -68,9 +66,7 @@ export const withTestContext = async (
   const logsBucket = sim.getResource(
     "root/Default/runtime.RuntimeService/deployment logs",
   ) as cloud.IBucketClient;
-  const config = sim.getResourceConfig(
-    "root/Default/cloud.Api",
-  ) as ApiSchema;
+  const config = sim.getResourceConfig("root/Default/cloud.Api") as ApiSchema;
   const wingApiUrl = config.attrs.url;
 
   await cb({ logsBucket, wingApiUrl, examplesDir });

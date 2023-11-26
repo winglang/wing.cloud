@@ -1,4 +1,5 @@
-import { connect } from "ngrok";
+import { createHash } from "node:crypto";
+
 import fetch from "node-fetch";
 
 interface ExplorerItem {
@@ -17,6 +18,7 @@ interface ExplorerTree {
 interface Node {
   result: {
     data: {
+      type: string;
       attributes: {
         url: string;
       };
@@ -24,9 +26,19 @@ interface Node {
   };
 }
 
+interface LocalEndpoint {
+  path: string;
+  url: string;
+  port: number;
+  type: string;
+}
+
 export interface Endpoint {
   path: string;
   url: string;
+  port: number;
+  type: string;
+  digest: string;
 }
 
 const findLocalEndpoints = async ({ port }: { port: number }) => {
@@ -39,7 +51,7 @@ const findLocalEndpoints = async ({ port }: { port: number }) => {
   const wingEndpoints: string[] = [];
   findWingEndpoints(items.result.data, wingEndpoints);
 
-  const endpoints: Endpoint[] = [];
+  const localEndpoints: LocalEndpoint[] = [];
   for (let endpoint of wingEndpoints) {
     const res = await fetch(
       `http://localhost:${port}/trpc/app.node?input=${encodeURIComponent(
@@ -53,26 +65,54 @@ const findLocalEndpoints = async ({ port }: { port: number }) => {
     }
 
     const node: Node = (await res.json()) as any;
-    endpoints.push({ url: node.result.data.attributes.url, path: endpoint });
+    const portParts = node.result.data.attributes.url.split(":");
+    const localPort = Number.parseInt(portParts.at(-1)!, 10);
+    localEndpoints.push({
+      url: node.result.data.attributes.url,
+      path: endpoint,
+      port: localPort,
+      type: node.result.data.type,
+    });
   }
 
-  return endpoints;
+  return localEndpoints;
 };
 
-const createPublicEndpoints = async (endpoints: Endpoint[]) => {
-  const publicEndpoints: Endpoint[] = [];
-  for (let endpoint of endpoints) {
-    const port = endpoint.url.split(":").pop();
-    if (!port) {
-      continue;
-    }
-    const publicUrl = await connect(Number.parseInt(port));
-    const publicEndpoint = { path: endpoint.path, url: publicUrl };
-    publicEndpoints.push(publicEndpoint);
-    console.log("created pulic endpoint", endpoint, publicEndpoint);
-  }
+export const findEndpoints = () => {
+  let endpoints: Array<Endpoint> | undefined;
+  const endpointsByDigest: Record<string, Endpoint> = {};
+  const endpointsByPort: Record<number, Endpoint> = {};
+  return async ({
+    environmentId,
+    port,
+  }: {
+    environmentId: string;
+    port: number;
+  }) => {
+    if (!endpoints) {
+      const localEndpoints = await findLocalEndpoints({ port });
+      endpoints = localEndpoints.map((e) => {
+        const digest = createHash("sha256")
+          .update(`${environmentId}-${e.path}`)
+          .digest("hex")
+          .slice(0, 16);
+        const endpoint = {
+          digest,
+          url: e.url,
+          path: e.path,
+          port: e.port,
+          type: e.type,
+        };
 
-  return publicEndpoints;
+        endpointsByDigest[digest] = endpoint;
+        endpointsByPort[e.port] = endpoint;
+
+        return endpoint;
+      });
+    }
+
+    return { endpoints, endpointsByDigest, endpointsByPort };
+  };
 };
 
 const findWingEndpoints = (item: ExplorerItem, endpoints: string[]) => {
@@ -87,10 +127,4 @@ const findWingEndpoints = (item: ExplorerItem, endpoints: string[]) => {
   for (let child of item.childItems ?? []) {
     findWingEndpoints(child, endpoints);
   }
-};
-
-export const createEndpoints = async ({ port }: { port: number }) => {
-  const localEndpoints = await findLocalEndpoints({ port });
-  const publicEndpoints = await createPublicEndpoints(localEndpoints);
-  return publicEndpoints;
 };

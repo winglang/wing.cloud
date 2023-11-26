@@ -8,6 +8,7 @@ bring "./reverse-proxy.w" as ReverseProxy;
 bring "./users.w" as Users;
 bring "./apps.w" as Apps;
 bring "./environments.w" as Environments;
+bring "./endpoints.w" as Endpoints;
 bring "./environment-manager.w" as EnvironmentManager;
 bring "./secrets.w" as Secrets;
 bring "./api.w" as wingcloud_api;
@@ -18,6 +19,8 @@ bring "./probot.w" as probot;
 bring "./probot-adapter.w" as adapter;
 bring "./cloudfront.w" as cloudFront;
 bring "./components/parameter/parameter.w" as parameter;
+bring "./components/dns/dns.w" as Dns;
+bring "./components/endpoint/endpoint.w" as Endpoint;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 
 // And the sun, and the moon, and the stars, and the flowers.
@@ -50,6 +53,7 @@ let apps = new Apps.Apps(table);
 let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
 let secrets = new Secrets.Secrets();
+let endpoints = new Endpoints.Endpoints(table);
 
 let probotAdapter = new adapter.ProbotAdapter(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
@@ -67,10 +71,27 @@ let rntm = new runtime.RuntimeService(
   logs: bucketLogs,
 );
 
+let dns = new Dns.DNS(token: (): str => {
+  if util.env("WING_TARGET") == "sim" {
+    return "test-token";
+  } else {
+    return util.env("DNSIMPLE_TOKEN");
+  }
+}());
+let endpoint = new Endpoint.Endpoint(dns: dns, domain: (): str => {
+  if util.env("WING_TARGET") == "sim" {
+    return "127.0.0.1";
+  } else {
+    return "wingcloud.io";
+  }
+}());
+
 let environmentManager = new EnvironmentManager.EnvironmentManager(
   apps: apps,
   environments: environments,
   secrets: secrets,
+  endpoints: endpoints,
+  endpoint: endpoint,
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
 );
@@ -82,6 +103,7 @@ let wingCloudApi = new wingcloud_api.Api(
   environments: environments,
   environmentManager: environmentManager,
   secrets: secrets,
+  endpoints: endpoints,
   probotAdapter: probotAdapter,
   githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),

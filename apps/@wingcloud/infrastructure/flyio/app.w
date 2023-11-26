@@ -5,12 +5,12 @@ struct IAppProps {
   name: str;
 }
 
-struct ICreateMachineProps {
+pub struct ICreateMachineProps {
   imageName: str;
   region: str?;
   memoryMb: num?;
   env: Map<str>;
-  port: num;
+  services: Array<client.IClientCreateMachineService>;
   files: Array<client.File>?;
 }
 
@@ -91,11 +91,11 @@ inflight class App {
     let createMachineResult = this.props.client.createMachine({
       appName: this.props.name,
       imageName: props.imageName,
-      port: props.port,
       region: props.region,
       memoryMb: props.memoryMb,
       env: props.env,
       files: props.files,
+      services: props.services,
     });
 
     this.props.client.waitForMachineState(

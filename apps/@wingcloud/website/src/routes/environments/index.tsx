@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { wrpc } from "../../utils/wrpc.js";
 
 import { DeploymentLogs } from "./components/deployment-logs.js";
+import { Endpoints } from "./components/endpoints.js";
 import { EnvironmentDetails } from "./components/environment-details.js";
 import { TestsLogs } from "./components/tests-logs.js";
 
@@ -34,6 +35,18 @@ export const Component = () => {
     },
   );
 
+  const endpoints = wrpc["app.environment.endpoints"].useQuery(
+    {
+      appName: appName!,
+      branch: branch!,
+    },
+    {
+      enabled: appName !== undefined && branch !== undefined,
+      // TODO: query invalidation
+      refetchInterval: 1000 * 10,
+    },
+  );
+
   return (
     <div>
       <div className="space-y-4">
@@ -53,6 +66,11 @@ export const Component = () => {
         <DeploymentLogs
           logs={logs.data?.build || []}
           loading={logs.isLoading}
+        />
+
+        <Endpoints
+          endpoints={endpoints.data?.endpoints || []}
+          loading={endpoints.isLoading}
         />
       </div>
     </div>

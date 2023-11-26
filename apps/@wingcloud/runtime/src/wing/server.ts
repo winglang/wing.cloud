@@ -1,11 +1,12 @@
 import { appendFileSync } from "node:fs";
-import { readFile } from "node:fs/promises";
 
 import { createConsoleApp } from "@wingconsole/app";
 import express, { type Application } from "express";
-import { createProxyServer } from "http-proxy";
+import httpProxy from "http-proxy";
 
 import { type KeyStore } from "../auth/key-store.js";
+
+import { findEndpoints } from "./endpoints.js";
 
 interface ConsoleState {
   result: {
@@ -19,6 +20,10 @@ interface ConsoleError {
   };
 }
 
+export interface PrepareServerProps {
+  environmentId: string;
+}
+
 export interface StartServerProps {
   consolePath: string;
   entryfilePath: string;
@@ -27,11 +32,16 @@ export interface StartServerProps {
   requestedPort?: number;
 }
 
-export async function prepareServer() {
+export async function prepareServer({ environmentId }: PrepareServerProps) {
   let consolePort: number | undefined;
   const app = express();
-  const proxy = createProxyServer({ changeOrigin: true });
-  app.use((req, res, next) => {
+  const proxy = httpProxy.createProxyServer({ changeOrigin: true });
+  proxy.on("error", (error) => {
+    console.error("proxy error", error);
+  });
+
+  const endpointsFn = findEndpoints();
+  app.use(async (req, res, next) => {
     if (!consolePort) {
       return next();
     }
@@ -46,20 +56,40 @@ export async function prepareServer() {
       return next();
     }
 
-    let targetPort: number | undefined;
+    const { endpointsByDigest, endpointsByPort } = await endpointsFn({
+      port: consolePort,
+      environmentId,
+    });
+
+    // check of its a request for a local port by its digest value
+    const domainParts = host.split(".");
+    const digest = domainParts[0]!;
+    const endpoint = endpointsByDigest[digest];
+    if (endpoint !== undefined) {
+      proxy.web(req, res, {
+        target: `http://127.0.0.1:${endpoint.port}`,
+      });
+      return;
+    }
+
+    // check of its a request for a local port by its port value
     const parts = host.split(":");
     if (parts.length > 1) {
-      targetPort = Number.parseInt(parts[1]!, 10);
+      const targetPort = Number.parseInt(parts[1]!, 10);
 
-      // request intended for the console (local)
-      if (targetPort === consolePort) {
-        return next();
+      const endpoint = endpointsByPort[targetPort];
+      if (endpoint !== undefined) {
+        proxy.web(req, res, {
+          target: `http://127.0.0.1:${endpoint.port}`,
+        });
+        return;
       }
 
-      proxy.web(req, res, {
-        target: "https://localhost:" + targetPort,
-      });
+      return next();
     }
+
+    // can't find a match
+    return res.sendStatus(404);
   });
 
   return async ({
@@ -108,10 +138,16 @@ export async function prepareServer() {
 
     await waitForConsole(port);
 
-    console.log(`Console app opened on port ${port} for app ${entryfilePath}`);
+    const { endpoints } = await endpointsFn({ port, environmentId });
+    console.log(
+      `Console app opened on port ${port} for app ${entryfilePath}`,
+      JSON.stringify({
+        endpoints,
+      }),
+    );
     consolePort = port;
-    return { port, close };
-  }
+    return { port, close, endpoints };
+  };
 }
 
 const waitForConsole = async (port: number) => {

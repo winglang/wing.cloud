@@ -9,8 +9,7 @@ import { Executer } from "./executer.js";
 import { useReportStatus } from "./report-status.js";
 import { Setup } from "./setup.js";
 import { fileBucketSync } from "./storage/file-bucket-sync.js";
-import { createEndpoints } from "./wing/endpoints.js";
-import { startServer } from "./wing/server.js";
+import { prepareServer } from "./wing/server.js";
 
 export interface RunProps {
   context: EnvironmentContext;
@@ -28,6 +27,9 @@ export const run = async function ({ context, requestedPort }: RunProps) {
 
   let cancelFileSync;
   try {
+    const startServer = await prepareServer({
+      environmentId: context.environment.id,
+    });
     await report("deploying");
 
     const { cancelSync } = fileBucketSync({
@@ -46,7 +48,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
       ? report("tests", { testResults })
       : report("error", { message: "failed to run tests" }));
 
-    const { port, close } = await startServer({
+    const { port, close, endpoints } = await startServer({
       consolePath: paths["@wingconsole/app"],
       entryfilePath,
       logfile,
@@ -54,15 +56,13 @@ export const run = async function ({ context, requestedPort }: RunProps) {
       requestedPort,
     });
 
-    const endpoints = await createEndpoints({ port });
-    await report("endpoints", { endpoints });
-
-    await report("running");
+    await report("running", { objects: { endpoints } });
 
     return {
       paths,
       logfile,
       port,
+      endpoints,
       close: async () => {
         cancelSync();
         await close();

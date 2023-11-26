@@ -1,6 +1,8 @@
 bring "./environments.w" as environments;
 bring "./apps.w" as apps;
 bring "./secrets.w" as secrets;
+bring "./endpoints.w" as endpoints;
+bring "./components/endpoint/endpoint.w" as endpoint;
 bring "./github-comment.w" as comment;
 bring "./types/octokit-types.w" as octokit;
 bring "./runtime/runtime-client.w" as runtime_client;
@@ -10,6 +12,8 @@ bring "./status-reports.w" as status_reports;
 struct EnvironmentsProps {
   apps: apps.Apps;
   secrets: secrets.Secrets;
+  endpoints: endpoints.Endpoints;
+  endpoint: endpoint.Endpoint;
   environments: environments.Environments;
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
@@ -49,6 +53,8 @@ pub class EnvironmentManager {
   apps: apps.Apps;
   secrets: secrets.Secrets;
   environments: environments.Environments;
+  endpoints: endpoints.Endpoints;
+  endpoint: endpoint.Endpoint;
   githubComment: comment.GithubComment;
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
@@ -57,6 +63,8 @@ pub class EnvironmentManager {
     this.apps = props.apps;
     this.secrets = props.secrets;
     this.environments = props.environments;
+    this.endpoints = props.endpoints;
+    this.endpoint = props.endpoint;
     this.runtimeClient = props.runtimeClient;
     this.probotAdapter = props.probotAdapter;
     this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps);
@@ -127,6 +135,10 @@ pub class EnvironmentManager {
 
     this.runtimeClient.delete(environment: options.environment);
 
+    for endpoint in this.endpoints.list(environmentId: options.environment.id) {
+      this.endpoint.delete(endpoint);
+    }
+
     this.postComment(environmentId: options.environment.id, octokit: octokit);
   }
 
@@ -145,6 +157,25 @@ pub class EnvironmentManager {
 
       if testReport.testResults.length == 0 {
         return;
+      }
+    } elif status == "running" {
+      let running = status_reports.Running.fromJson(options.statusReport.data);
+      for endpoint in running.objects.endpoints {
+        if let url = environment.url {
+          log("creating endpoint ${Json.stringify(endpoint)}");
+          let endpointUrl = this.endpoint.create(url, endpoint);
+          this.endpoints.create(
+            appId: environment.appId,
+            environmentId: environment.id,
+            runId: environment.runId,
+            path: endpoint.path,
+            type: endpoint.type,
+            localUrl: endpoint.url,
+            publicUrl: endpointUrl,
+            port: endpoint.port,
+            digest: endpoint.digest,
+          );
+        }
       }
     }
 

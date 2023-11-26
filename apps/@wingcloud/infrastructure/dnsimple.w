@@ -47,6 +47,11 @@ pub class DNSimpleZoneRecord {
 
   new(props: DNSRecordProps) {
     new DNSimpleProvider();
+    new dnsimple.letsEncryptCertificate.LetsEncryptCertificate({
+      
+    }
+
+    )
     this.record = new dnsimple.zoneRecord.ZoneRecord(
       zoneName: props.zoneName,
       name: props.subDomain, // For the root domain, use an empty string. For subdomains, use the subdomain part (like 'www' for 'www.yourdomain.com')

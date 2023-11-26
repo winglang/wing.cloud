@@ -86,12 +86,38 @@ test("run() - doesn't have access to runtime env vars", async () => {
 test("run() - reporting statuses", async () => {
   const { examplesDir, logsBucket, wingApiUrl } = getContext();
 
+  const stateUrl = `*/trpc/app.state`;
+  const stateHandler = rest.get(stateUrl, (req, res, ctx) => {
+    return res(
+      ctx.body(
+        JSON.stringify({
+          result: {
+            data: "success",
+          },
+        }),
+      ),
+      ctx.status(200),
+    );
+  });
+  const endpointsUrl = `*/trpc/app.explorerTree`;
+  const endpointsHandler = rest.get(endpointsUrl, (req, res, ctx) => {
+    return res(
+      ctx.body(
+        JSON.stringify({
+          result: {
+            data: {},
+          },
+        }),
+      ),
+      ctx.status(200),
+    );
+  });
   const reportUrl = `${wingApiUrl}/environment.report`;
   const restHandler = rest.post(reportUrl, (req, res, ctx) => {
     return res(ctx.status(200));
   });
 
-  const server = setupServer(restHandler);
+  const server = setupServer(stateHandler, endpointsHandler, restHandler);
   server.listen({ onUnhandledRequest: "error" });
 
   const requests: ReportEnvironmentStatusInput[] = [];
@@ -136,6 +162,11 @@ test("run() - reporting statuses", async () => {
       },
     },
     {
+      data: {
+        objects: {
+          endpoints: [],
+        },
+      },
       environmentId: "test-id",
       status: "running",
     },
@@ -163,10 +194,14 @@ test("run() - environment can override wing version", async () => {
   const { examplesDir, logsBucket, wingApiUrl } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
-  const environment = new Environment("test-id", "override-wing-version/main.w", {
-    repo: examplesDirRepo,
-    sha: "main",
-  });
+  const environment = new Environment(
+    "test-id",
+    "override-wing-version/main.w",
+    {
+      repo: examplesDirRepo,
+      sha: "main",
+    },
+  );
   const { paths, close } = await run({
     context: { environment, gitProvider, logsBucket, wingApiUrl },
   });
@@ -228,6 +263,34 @@ test("run() - have multiple tests results", async () => {
       environment.testKey(false, "root/Default/test:will fail"),
     ),
   ).toContain("will fail log");
+
+  await close();
+});
+
+test("run() - access endpoints through reverse proxy", async () => {
+  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const examplesDirRepo = `file://${examplesDir}`;
+  const gitProvider = new LocalGitProvider();
+  const environment = new Environment("test-id", "api/main.w", {
+    repo: examplesDirRepo,
+    sha: "main",
+  });
+  const { close, endpoints, port } = await run({
+    context: { environment, gitProvider, logsBucket, wingApiUrl },
+  });
+
+  expect(endpoints.length).toBe(1);
+  expect(endpoints[0].digest).toBe("d834e1d3d496ef67");
+  expect(endpoints[0].path).toBe("root/Default/cloud.Api");
+
+  const response = await fetch(`http://localhost:${port}`, {
+    headers: {
+      host: `localhost:${endpoints[0].port}`,
+    },
+  });
+
+  expect(response.ok).toBeTruthy();
+  expect(await response.text()).toEqual("OK");
 
   await close();
 });
