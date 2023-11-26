@@ -1,5 +1,6 @@
 bring "./environments.w" as environments;
 bring "./apps.w" as apps;
+bring "./secrets.w" as secrets;
 bring "./github-comment.w" as comment;
 bring "./types/octokit-types.w" as octokit;
 bring "./runtime/runtime-client.w" as runtime_client;
@@ -8,9 +9,11 @@ bring "./status-reports.w" as status_reports;
 
 struct EnvironmentsProps {
   apps: apps.Apps;
+  secrets: secrets.Secrets;
   environments: environments.Environments;
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
+  siteDomain: str;
 }
 
 pub struct CreateEnvironmentOptions {
@@ -45,6 +48,7 @@ struct PostCommentOptions {
 
 pub class EnvironmentManager {
   apps: apps.Apps;
+  secrets: secrets.Secrets;
   environments: environments.Environments;
   githubComment: comment.GithubComment;
   runtimeClient: runtime_client.RuntimeClient;
@@ -52,16 +56,19 @@ pub class EnvironmentManager {
 
   new(props: EnvironmentsProps) {
     this.apps = props.apps;
+    this.secrets = props.secrets;
     this.environments = props.environments;
     this.runtimeClient = props.runtimeClient;
     this.probotAdapter = props.probotAdapter;
-    this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps);
+    this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps, siteDomain: props.siteDomain);
   }
 
   pub inflight create(options: CreateEnvironmentOptions) {
     let octokit = this.auth(options.createEnvironment.installationId);
 
     let environment = this.environments.create(options.createEnvironment);
+
+    let secrets = this.secretsForEnvironment(environment);
 
     this.postComment(environmentId: environment.id, octokit: octokit);
 
@@ -73,6 +80,7 @@ pub class EnvironmentManager {
     this.runtimeClient.create(
       app: options.app,
       environment: environment,
+      secrets: secrets,
       sha: options.sha,
       token: tokenRes.data.token,
     );
@@ -82,6 +90,8 @@ pub class EnvironmentManager {
     let octokit = this.auth(options.environment.installationId);
 
     this.environments.updateStatus(id: options.environment.id, appId: options.app.appId, status: "initializing");
+
+    let secrets = this.secretsForEnvironment(options.environment);
 
     this.postComment(environmentId: options.environment.id, octokit: octokit);
 
@@ -93,6 +103,7 @@ pub class EnvironmentManager {
     this.runtimeClient.create(
       app: options.app,
       environment: options.environment,
+      secrets: secrets,
       sha: options.sha,
       token: tokenRes.data.token,
     );
@@ -124,9 +135,16 @@ pub class EnvironmentManager {
     let environment = this.environments.get(id: options.statusReport.environmentId);
     let app = this.apps.get(appId: environment.appId);
     let status = options.statusReport.status;
-    this.environments.updateStatus(id: environment.id, appId: environment.appId, status: status);
+    let data = options.statusReport.data;
+
+    this.environments.updateStatus(
+      id: environment.id,
+      appId: environment.appId,
+      status: status
+    );
+
     if status == "tests" {
-      let testReport = status_reports.TestResults.fromJson(options.statusReport.data);
+      let testReport = status_reports.TestResults.fromJson(data);
       this.environments.updateTestResults(
         id: environment.id,
         appId: app.appId,
@@ -159,5 +177,14 @@ pub class EnvironmentManager {
 
   inflight auth(installationId: num): octokit.OctoKit {
     return this.probotAdapter.auth(installationId);
+  }
+
+  inflight secretsForEnvironment(environment: environments.Environment): Map<str> {
+    let map = MutMap<str>{};
+    let secrets = this.secrets.list(appId: environment.appId, environmentType: environment.type, decryptValues: true);
+    for secret in secrets {
+      map.set(secret.name, secret.value);
+    }
+    return map.copy();
   }
 }

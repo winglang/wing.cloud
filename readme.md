@@ -27,9 +27,34 @@ Copy the `.env.example` file into `.env`:
 cp .env.example .env
 ```
 
-Complete the missing `.env` variables. You'll need a [GitHub App](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app).
+Complete the missing `.env` variables (commented variables are optional).
 
-Also, remove any commented lines from the `.env` file. It won't be necessary after [#4595](https://github.com/winglang/wing/issues/4595) is completed.
+### Creating the App Secret
+
+For the `APP_SECRET` environment variable, you can generate a random string with the following command:
+
+```sh
+openssl rand -hex 32
+```
+
+### Creating the GitHub App
+
+For the `BOT_GITHUB_*` variables, you'll need a [GitHub App](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app).
+
+- The Homepage URL doesn't matter
+- The Callback URL should be `http://localhost:3900/wrpc/github.callback`
+- Enable `Request user authorization (OAuth) during installation`
+- Enable the Webhook. The URL will be updated after the first deployment
+- Set a Webhook Secret (e.g. `openssl rand -hex 32`). Remember to specify the webhook secret in the `.env` file
+- Enable SSL verification
+- The required permissions are:
+  - Contents: Read Only
+  - Issues: Read & Write
+  - Metadata: Read Only
+  - Pull Requests: Read & Write
+- The required events are:
+  - Pull Request
+  - Push
 
 ## Dev
 

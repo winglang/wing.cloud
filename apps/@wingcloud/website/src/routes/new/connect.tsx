@@ -8,10 +8,10 @@ import { Button } from "../../design-system/button.js";
 import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
+import { usePopupWindow } from "../../utils/popup-window.js";
 import type { Installation } from "../../utils/wrpc.js";
 
 import { GitRepoSelect } from "./components/git-repo-select.js";
-import { MissingRepoButton } from "./components/missing-repo-button.js";
 import { NewAppContainer } from "./components/new-app-container.js";
 
 export const Component = () => {
@@ -78,14 +78,9 @@ export const Component = () => {
     }
   }, [repositoryId]);
 
-  const onMissingRepoClosed = useCallback(() => {
-    // eslint-disable-next-line unicorn/no-useless-undefined
-    setInstallationId(undefined);
-    setInstallations([]);
-    // eslint-disable-next-line unicorn/no-useless-undefined
-    setRepositoryId(undefined);
-    listInstallationsQuery.refetch();
-  }, [listInstallationsQuery.refetch, setInstallationId, setRepositoryId]);
+  const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
+
+  const openPopupWindow = usePopupWindow();
 
   return (
     <NewAppContainer
@@ -96,11 +91,11 @@ export const Component = () => {
     >
       <div className="w-full space-y-2">
         <div className={clsx(theme.text1)}>Select a repository</div>
-        <div className="w-full relative">
+        <div className="w-full relative space-y-2">
           {createAppLoading && (
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <div className="absolute inset-0 bg-white dark:bg-gray-900 opacity-50" />
-              <SpinnerLoader size="sm" className="z-20" />
+              <SpinnerLoader className="z-20" />
             </div>
           )}
           <GitRepoSelect
@@ -113,7 +108,22 @@ export const Component = () => {
             loading={loading}
             disabled={createAppLoading}
           />
-          <MissingRepoButton onClose={onMissingRepoClosed} />
+          <div className="text-xs flex gap-1 items-center">
+            <span className={clsx(theme.text1)}>Missing a repository?</span>
+            <button
+              className="text-sky-600 text-left"
+              onClick={() =>
+                openPopupWindow({
+                  url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
+                  onClose: () => {
+                    listInstallationsQuery.refetch();
+                  },
+                })
+              }
+            >
+              Adjust GitHub App Permissions
+            </button>
+          </div>
           <div className="w-full flex">
             <div className="justify-end flex gap-x-2 grow">
               <Button onClick={onCancel} disabled={createAppLoading}>

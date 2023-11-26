@@ -75,7 +75,10 @@ export const GitRepoSelect = ({
               return (
                 <div className="flex items-center gap-2">
                   <GithubIcon
-                    className={clsx("w-4 h-4 inline-block", theme.text1)}
+                    className={clsx(
+                      "w-4 h-4 inline-block shrink-0",
+                      theme.text1,
+                    )}
                   />
                   {item.label}
                 </div>
@@ -105,8 +108,8 @@ export const GitRepoSelect = ({
       </div>
 
       {loading && (
-        <div className="bg-white p-6 w-full flex items-center justify-center">
-          <SpinnerLoader size="sm" />
+        <div className="p-6 w-full flex items-center justify-center">
+          <SpinnerLoader />
         </div>
       )}
       {!loading && filteredRepos.length === 0 && (
@@ -124,7 +127,7 @@ export const GitRepoSelect = ({
         <div
           className={clsx(
             "flex flex-col max-h-80 overflow-auto rounded",
-            "border divide-y",
+            "border divide-y divide-slate-200 dark:divide-slate-700",
             theme.borderInput,
           )}
         >
@@ -134,7 +137,7 @@ export const GitRepoSelect = ({
               key={repo.id}
               className={clsx(
                 theme.text1,
-                "text-xs px-2.5 py-2 gap-1",
+                "text-xs px-2.5 py-4 gap-1",
                 "w-full text-left flex items-center",
                 "transition-all outline-none focus:outline-none",
                 "focus:bg-slate-50 dark:focus:bg-slate-750",
@@ -142,14 +145,15 @@ export const GitRepoSelect = ({
                   "bg-slate-50 dark:bg-slate-750",
                 repositoryId !== repo.full_name && theme.bgInput,
                 disabled && "opacity-50 cursor-not-allowed",
-                !disabled && theme.bgInputHover,
               )}
             >
               <div className="flex items-center gap-2">
-                <img className="w-4 h-4" src={repo.owner.avatar_url} />
-                <div className="flex gap-1 items-center">
-                  <div>{repo.name}</div>
-                  {repo.private && <LockClosedIcon className="w-3 h-3" />}
+                <img className="w-6 h-6 shrink-0" src={repo.owner.avatar_url} />
+                <div className="flex gap-1 items-center truncate">
+                  <div className="truncate">{repo.name}</div>
+                  {repo.private && (
+                    <LockClosedIcon className="w-3 h-3 shrink-0" />
+                  )}
                 </div>
               </div>
               <div className="flex flex-grow justify-end">

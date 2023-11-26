@@ -80,3 +80,16 @@ test "will not decrypt values by default" {
   let storedSecrets = secrets.list(appId: "app-id", environmentType: "preview",);
   assert(storedSecrets.at(0).value == "***");
 }
+
+test "cant create duplicate secret names for the same environment" {
+  let secret1 = secrets.create(appId: "app-id", environmentType: "production", name: "test-secret", value: "secret-value");
+  let secret2 = secrets.create(appId: "app-id", environmentType: "preview", name: "test-secret", value: "secret-value");
+
+  try {
+    let secret3 = secrets.create(appId: "app-id", environmentType: "production", name: "test-secret", value: "secret-value");
+    assert(false);
+  } catch e {
+    log(e);
+    assert(true);
+  }
+}

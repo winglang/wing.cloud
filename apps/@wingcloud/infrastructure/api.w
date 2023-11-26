@@ -10,12 +10,50 @@ bring "./jwt.w" as JWT;
 bring "./apps.w" as Apps;
 bring "./users.w" as Users;
 bring "./environments.w" as Environments;
+bring "./secrets.w" as Secrets;
 bring "./lowkeys-map.w" as lowkeys;
+
+struct Log {
+  message: str;
+  timestamp: str;
+}
+
+struct TestLog {
+  id: str;
+  path: str;
+  pass: bool;
+  error: str?;
+  timestamp: str;
+  time: num;
+  traces: Array<Log>;
+}
 
 // TODO: https://github.com/winglang/wing/issues/3644
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
+  extern "./util.js" pub static inflight parseLog(log: str): Log?;
+
+  pub static inflight parseLogs(messages: Array<str>): Array<Log> {
+    let var parsedLogs = MutArray<Log>[];
+
+    let var previousTime = "";
+    for message in messages {
+      if let var log = Util.parseLog(message) {
+        if (log.timestamp != "") {
+            previousTime = log.timestamp;
+        } else {
+            log = Log {
+                message: log.message,
+                timestamp: previousTime,
+            };
+        }
+        parsedLogs.push(log);
+      }
+    }
+    return parsedLogs.copy();
+  }
 }
+
 bring "./environment-manager.w" as EnvironmentManager;
 bring "./status-reports.w" as status_reports;
 bring "./probot-adapter.w" as adapter;
@@ -27,11 +65,15 @@ struct ApiProps {
   users: Users.Users;
   environments: Environments.Environments;
   environmentManager: EnvironmentManager.EnvironmentManager;
+  secrets: Secrets.Secrets;
   probotAdapter: adapter.ProbotAdapter;
   githubAppClientId: str;
   githubAppClientSecret: str;
   appSecret: str;
+  logs: cloud.Bucket;
+  postSignInRedirectURL: str;
 }
+
 
 struct EnvironmentAction {
   type: str;
@@ -43,6 +85,7 @@ pub class Api {
     let api = new json_api.JsonApi(api: props.api);
     let apps = props.apps;
     let users = props.users;
+    let logs = props.logs;
     let queue = new cloud.Queue();
 
     let AUTH_COOKIE_NAME = "auth";
@@ -105,6 +148,7 @@ pub class Api {
               secure: true,
               sameSite: "strict",
               expires: 0,
+              path: "/",
             },
           ),
         },
@@ -144,13 +188,15 @@ pub class Api {
           httpOnly: true,
           secure: true,
           sameSite: "strict",
+          path: "/",
+          maxAge: 1h.seconds,
         },
       );
 
       return {
         status: 302,
         headers: {
-          Location: "/apps/",
+          Location: props.postSignInRedirectURL,
           "Set-Cookie": authCookie,
         },
       };
@@ -353,8 +399,17 @@ pub class Api {
     api.get("/wrpc/app.environment", inflight (request) => {
       let userId = getUserFromCookie(request);
 
-      let environment = props.environments.get(
-        id: request.query.get("environmentId"),
+      let appName = request.query.get("appName");
+      let branch = request.query.get("branch");
+
+      let appId = apps.getByName(
+        userId: userId,
+        appName: appName,
+      ).appId;
+
+      let environment = props.environments.getByBranch(
+        appId: appId,
+        branch: branch,
       );
 
       return {
@@ -367,56 +422,86 @@ pub class Api {
     api.get("/wrpc/app.listSecrets", inflight (request) => {
       let userId = getUserFromCookie(request);
       let appId = request.query.get("appId");
-      // get production secrets
-      // get preview secrets
-
-      let secrets = [{
-        id: "secret1",
-        appId: appId,
-        name: "secret1",
-        environmentType: "production",
-        value: "***",
-        createdAt: datetime.utcNow().toIso(),
-        updatedAt: datetime.utcNow().toIso(),
-      }, {
-        id: "secret2",
-        appId: appId,
-        name: "secret2",
-        environmentType: "production",
-        value: "***",
-        createdAt: datetime.utcNow().toIso(),
-        updatedAt: datetime.utcNow().toIso(),
-      }, {
-        id: "secret3",
-        appId: appId,
-        name: "secret3",
-        environmentType: "preview",
-        value: "***",
-        createdAt: datetime.utcNow().toIso(),
-        updatedAt: datetime.utcNow().toIso(),
-      }];
+      let prodSecrets = props.secrets.list(appId: appId, environmentType: "production");
+      let previewSecrets = props.secrets.list(appId: appId, environmentType: "preview");
 
       return {
         body: {
-          secrets: secrets
+          secrets: prodSecrets.concat(previewSecrets)
         },
       };
-      
+
     });
 
     api.post("/wrpc/app.decryptSecret", inflight (request) => {
-      log("${Json.stringify(request)}");
       let userId = getUserFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let secretId = input.get("secretId").asStr();
       let environmentType = input.get("environmentType").asStr();
 
+      let secret = props.secrets.get(id: secretId, appId: appId, environmentType: environmentType, decryptValue: true);
+
       return {
         status: 200,
         body: {
-          value: "secret value",
+          value: secret.value,
         },
+      };
+    });
+
+    api.post("/wrpc/app.createSecret", inflight (request) => {
+      let userId = getUserFromCookie(request);
+      let input = Json.parse(request.body ?? "");
+      let appId = input.get("appId").asStr();
+      let environmentType = input.get("environmentType").asStr();
+      if environmentType != "production" && environmentType != "preview" {
+        return {
+          status: 400,
+          body: { error: "invalid environment type" }
+        };
+      }
+
+      let name = input.get("name").asStr();
+      if name == "" {
+        return {
+          status: 400,
+          body: { error: "invalid name" }
+        };
+      }
+
+      let value = input.get("value").asStr();
+      if value == "" {
+        return {
+          status: 400,
+          body: { error: "invalid value" }
+        };
+      }
+
+      let secret = props.secrets.create(appId: appId, environmentType: environmentType, name: name, value: value);
+
+      return {
+        status: 200,
+        body: {
+          secretId: secret.id
+        }
+      };
+    });
+
+    api.post("/wrpc/app.deleteSecret", inflight (request) => {
+      let userId = getUserFromCookie(request);
+      let input = Json.parse(request.body ?? "");
+      let appId = input.get("appId").asStr();
+      let environmentType = input.get("environmentType").asStr();
+      let secretId = input.get("secretId").asStr();
+
+      props.secrets.delete(id: secretId, appId: appId, environmentType: environmentType);
+
+      return {
+        status: 200,
+        body: {
+          secretId: secretId
+        }
       };
     });
 
@@ -464,7 +549,7 @@ pub class Api {
       apps.updateEntrypoint(appId: appId, appName: appName, repository: repoId, userId: userId, entryfile: entryfile);
 
       let app = apps.get(appId: appId);
-      queue.push(Json.stringify(EnvironmentAction{ 
+      queue.push(Json.stringify(EnvironmentAction{
         type: "restartAll",
         data: EnvironmentManager.RestartAllEnvironmentOptions {
           app: app,
@@ -474,6 +559,47 @@ pub class Api {
         status: 200,
         body: {
           appId: appId,
+        },
+      };
+    });
+
+    api.get("/wrpc/app.environment.logs", inflight (request) => {
+      let userId = getUserFromCookie(request);
+
+      let appName = request.query.get("appName");
+      let branch = request.query.get("branch");
+
+      let appId = apps.getByName(
+        userId: userId,
+        appName: appName,
+      ).appId;
+
+      let environment = props.environments.getByBranch(
+        appId: appId,
+        branch: branch,
+      );
+
+      let envId = environment.id;
+
+      let deployMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
+      let deployLogs = Util.parseLogs(deployMessages);
+
+      let runtimeMessages = logs.tryGet("${envId}/runtime.log")?.split("\n") ?? [];
+      let runtimeLogs = Util.parseLogs(runtimeMessages);
+
+      let testEntries = logs.list("${envId}/tests");
+      let testLogs = MutArray<TestLog>[];
+
+      for entry in testEntries {
+        let testResults = logs.getJson(entry);
+        testLogs.push(TestLog.fromJson(testResults));
+      }
+
+      return {
+        body: {
+          deploy: deployLogs,
+          runtime: runtimeLogs,
+          tests: testLogs.copy()
         },
       };
     });
@@ -514,7 +640,7 @@ pub class Api {
         );
 
         let installationId = num.fromStr(input.get("installationId").asStr());
-        queue.push(Json.stringify(EnvironmentAction{ 
+        queue.push(Json.stringify(EnvironmentAction{
           type: "create",
           data: EnvironmentManager.CreateEnvironmentOptions {
             createEnvironment: {

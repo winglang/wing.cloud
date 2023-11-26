@@ -23,7 +23,7 @@ pub class DockerImage {
       numeric: true,
     );
 
-    let appName = "wing-cloud-image-${props.name}-${randomString.result}";
+    let appName = "wing-cloud-image-do-not-delete-${props.name}-${randomString.result}";
 
     let image = new docker.image.Image(
       name: "registry.fly.io/${appName}:${util.nanoid(alphabet: "0123456789abcdefghijklmnopqrstuvwxyz", size: 10)}",

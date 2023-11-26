@@ -1,12 +1,26 @@
 import { useEffect, useState } from "react";
 
-const getDateTime = (datetime: string) => {
+export const getDateTime = (datetime: string) => {
   const date = new Date(datetime);
   return date.toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
     hour: "numeric",
     minute: "numeric",
+  });
+};
+
+export const getTime = (datetime: string) => {
+  if (!datetime) {
+    return "";
+  }
+
+  const date = new Date(datetime);
+  return date.toLocaleTimeString(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    fractionalSecondDigits: 3,
   });
 };
 
@@ -23,11 +37,13 @@ const getTimeFromNow = (datetime: string) => {
   }
 
   if (hours > 0) {
-    return `${hours} hours ago`;
+    const label = hours === 1 ? "hour" : "hours";
+    return `${hours} ${label} ago`;
   }
 
   if (minutes > 0) {
-    return `${minutes} minutes ago`;
+    const label = minutes === 1 ? "minute" : "minutes";
+    return `${minutes} ${label} ago`;
   }
 
   return "just now";

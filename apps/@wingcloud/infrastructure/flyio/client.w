@@ -1,6 +1,12 @@
 bring http;
 bring util;
 
+pub struct File {
+  guest_path: str;
+  raw_value: str?;
+  secret_name: str?;
+}
+
 struct IClientCreateMachineProps {
   appName: str;
   imageName: str;
@@ -8,6 +14,7 @@ struct IClientCreateMachineProps {
   region: str?;
   memoryMb: num?;
   env: Map<str>?;
+  files: Array<File>?;
 }
 
 pub struct IMachineNode {
@@ -154,35 +161,6 @@ pub inflight class Client {
   }
 
   pub createMachine(props: IClientCreateMachineProps): ICreateMachineResult {
-    let json = Json.stringify({
-      region: props.region,
-      config: {
-        guest: {
-          cpus: 1,
-          cpu_kind: "shared",
-          memory_mb: props.memoryMb ?? 512,
-        },
-        env: props.env ?? {},
-        auto_destroy: true,
-        image: props.imageName,
-        services: [
-          {
-            ports: [
-              {
-                port: 443,
-                handlers: ["tls", "http"],
-              },
-              {
-                port: 80,
-                handlers: ["http"],
-              },
-            ],
-            protocol: "tcp",
-            internal_port: props.port,
-          },
-        ],
-      },
-    });
     let machineRes = http.post("${this.apiUrl}/apps/${props.appName}/machines", headers: this._headers(), body: Json.stringify({
       region: props.region,
       config: {
@@ -192,6 +170,7 @@ pub inflight class Client {
           memory_mb: props.memoryMb ?? 512,
         },
         env: props.env ?? {},
+        files: props.files ?? [],
         auto_destroy: true,
         image: props.imageName,
         services: [
@@ -271,6 +250,30 @@ pub inflight class Client {
 
     let notFoundError = this.checkForNotFoundError(Json.parse(res.body));
     return !notFoundError;
+  }
+
+  pub createSecrets(appName: str, secrets: Map<str>) {
+    let secretsArray = MutArray<Json>[];
+    for secret in secrets.keys() {
+      secretsArray.push({
+        key: secret,
+        value: secrets.get(secret)
+      });
+    }
+
+    let res = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
+      query: "mutation Secrets(\$input:SetSecretsInput!) { setSecrets(input: \$input) { app { id } } }",
+      variables: {
+        "input": {
+          "appId": "${appName}",
+          "secrets": secretsArray.copy()
+        }
+      },
+    }));
+
+    if (!res.ok) {
+      throw "failed to create secrets ${appName}: ${res.body}";
+    }
   }
 
   verifyJsonResponse(response: Json): Json {

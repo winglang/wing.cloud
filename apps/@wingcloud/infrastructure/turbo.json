@@ -25,6 +25,8 @@
         ".env"
       ],
       "inputs": [
+        "**/*",
+        "!node_modules/**",
         "!target/**"
       ],
       "outputs": [
@@ -51,7 +53,7 @@
     },
     "dev": {
       "dependsOn": [
-        "^compile"
+        "@wingcloud/runtime#compile"
       ]
     },
     "test": {

@@ -6,6 +6,7 @@ bring "./types/octokit-types.w" as octokit;
 struct GithubCommentProps {
   environments: environments.Environments;
   apps: apps.Apps;
+  siteDomain: str;
 }
 
 struct GithubCommentCreateProps {
@@ -17,39 +18,48 @@ struct GithubCommentCreateProps {
 pub class GithubComment {
   environments: environments.Environments;
   apps: apps.Apps;
+  siteDomain: str;
 
   new(props: GithubCommentProps) {
     this.environments = props.environments;
     this.apps = props.apps;
+    this.siteDomain = props.siteDomain;
   }
 
-  inflight envStatusToString(status: str): str {
+  inflight envStatusToString(status: str, appName: str, branch: str): str {
+    let inspect = "<a target=\"_blank\" href=\"${this.siteDomain}/apps/${appName}/${branch}\">Inspect</a>";
     if status == "tests" {
       return "Running Tests";
+    }
+    if status == "running" {
+      return "✅ Ready (${inspect})";
+    }
+    if status == "error" {
+      return "❌ Failed (${inspect})";
     }
     return status.at(0).uppercase() + status.substring(1);
   }
 
   pub inflight createOrUpdate(props: GithubCommentCreateProps): num {
-    let wingIdentifier = "[wing]: wing";
     let var commentId: num? = nil;
-    let var commentBody = "${wingIdentifier}
-
-| App         | Status | Preview | Tests | Updated (UTC) |
-| --------------- | ------ | ------- | ----- | -------------- |";
+    let tableHeader = "<tr><th>App</th><th>Status</th><th>Console</th><th>Updated (UTC)</th></tr>";
+    let var commentBody = "<table>${tableHeader}";
     for app in this.apps.listByRepository(repository: props.repo) {
       for environment in this.environments.list(appId: app.appId) {
         if environment.repo == props.repo && environment.prNumber == props.prNumber {
-          let var testsString = "---";
+          let var testRows = "";
           if let testResults = environment.testResults {
-            testsString = "";
             let var i = 0;
             for testResult in testResults.testResults {
-              let var icon = "✅";
+              let var testRes = "✅ Passed";
               if !testResult.pass {
-                icon = "❌";
+                testRes = "❌ Failed";
               }
-              testsString = "${icon} ${testResult.path}<br> ${testsString}";
+              let testId = testResult.id;
+              let testName = testResult.path.split(":").at(-1);
+              let testResourcePath = testResult.path.split(":").at(0);
+              let link = "<a target=\"_blank\" href=\"${this.siteDomain}/apps/${app.appName}/${environment.branch}/#${testId}\">View</a>";
+              testRows = "${testRows}<tr><td>${testName}</td><td>${testResourcePath}</td><td>${testRes}</td><td>${link}</td></tr>";
               i += 1;
             }
           }
@@ -57,15 +67,21 @@ pub class GithubComment {
           let var previewUrl = "";
           let shouldDisplayUrl = environment.status == "running";
           if(shouldDisplayUrl) {
-            previewUrl = "[Visit](${environment.url})";
+            previewUrl = "<a target=\"_blank\" href=\"${this.siteDomain}/apps/${app.appName}/${environment.branch}/console\">Visit</a>";
           }
 
-          let entryfile = "[${app.appName}](https://github.com/${environment.repo}/blob/${environment.branch}/${app.entryfile})";
+          let appNameLink = "<a target=\"_blank\" href=\"${this.siteDomain}/apps/${app.appName}\">${app.appName}</a>";
 
-          let date = std.Datetime.utcNow().toIso();
-          let tableRows = "| ${entryfile} | ${this.envStatusToString(environment.status)} | ${previewUrl} | ${testsString} | ${date} |";
+          let date = std.Datetime.utcNow();
+          let dateStr = "${date.dayOfMonth}-${date.month}-${date.year} ${date.hours}:${date.min} (UTC)";
+          let tableRows = "<tr><td>${appNameLink}</td><td>${this.envStatusToString(environment.status, app.appName, environment.branch)}</td><td>${previewUrl}</td><td>${dateStr}</td></tr>";
+          let testsSection = "<details><summary>Tests</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>${testRows}</table></details>";
 
-          commentBody = "${commentBody}\n${tableRows}";
+          commentBody = "${commentBody}${tableRows}</table>";
+
+          if testRows != "" {
+            commentBody = "${commentBody}<br>${testsSection}";
+          }
 
           if !commentId? && environment.commentId? {
             commentId = environment.commentId;

@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import {
-  type PropsWithChildren,
+  PropsWithChildren,
   forwardRef,
   type ForwardRefExoticComponent,
 } from "react";
@@ -49,10 +49,8 @@ export const Button = forwardRef<
         id={id}
         ref={ref}
         type={type}
-        aria-disabled={disabled}
         className={clsx(
           "inline-flex gap-2 items-center text-xs font-medium outline-none rounded",
-          "transition-all",
           theme.focusInput,
           primary &&
             !transparent && [
@@ -70,8 +68,7 @@ export const Button = forwardRef<
           {
             [theme.borderInput]: !primary,
             "border-sky-700": primary,
-            "px-2.5": (label || children) && !small,
-            "px-1": (label || children) && small,
+            "px-2.5": label || children,
             "py-1.5": !small,
             "cursor-not-allowed opacity-50": disabled,
           },

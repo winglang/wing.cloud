@@ -39,9 +39,6 @@ class WingLibProject extends NodeProject {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-const winglangVersion = "^0.48.6";
-
-///////////////////////////////////////////////////////////////////////////////
 const monorepo = new MonorepoProject({
   devDeps: ["@skyrpex/wingen"],
   name: "@wingcloud/monorepo",
@@ -111,7 +108,7 @@ const website = new NodeProject({
   name: "@wingcloud/website",
   outdir: "apps/@wingcloud/website",
 });
-website.addDevDeps("typescript", "@types/node@18");
+website.addDevDeps("typescript", "@types/node@20");
 new TypescriptConfig(website, {
   include: ["src/**/*"],
 });
@@ -146,6 +143,7 @@ website.addDeps("clsx");
 website.addDeps("@headlessui/react");
 website.addDeps("@heroicons/react");
 website.addDeps("react-popper");
+website.addDeps("@wingconsole/ui");
 
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 
@@ -176,17 +174,17 @@ const runtime = new TypescriptProject({
     entry: ["src/**/*.ts"],
     outDir: "lib",
     format: ["esm"],
-    target: "node18",
+    target: "node20",
     dts: true,
     bundle: false,
     clean: true,
   },
 });
 
-runtime.addDeps(`winglang@${winglangVersion}`);
-runtime.addDeps(`@winglang/sdk@${winglangVersion}`);
-runtime.addDeps(`@winglang/compiler@${winglangVersion}`);
-runtime.addDeps(`@wingconsole/app@${winglangVersion}`);
+runtime.addDeps("winglang");
+runtime.addDeps("@winglang/sdk");
+runtime.addDeps("@winglang/compiler");
+runtime.addDeps("@wingconsole/app");
 runtime.addDeps("express");
 runtime.addDeps("jsonwebtoken");
 runtime.addDeps("jwk-to-pem");
@@ -198,7 +196,7 @@ runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/jsonwebtoken");
 runtime.addDevDeps("@types/jwk-to-pem");
 runtime.addDevDeps("simple-git");
-runtime.addDevDeps("msw");
+runtime.addDevDeps("msw@1");
 runtime.addDevDeps("@types/which");
 
 runtime.addGitIgnore("target/");
@@ -217,7 +215,7 @@ infrastructure.addGitIgnore("/.env.*");
 infrastructure.addGitIgnore("!/.env.example");
 
 infrastructure.addGitIgnore("**/target/");
-infrastructure.addDeps(`winglang@${winglangVersion}`);
+infrastructure.addDeps("winglang");
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
@@ -255,7 +253,7 @@ new Turbo(infrastructure, {
     compile: {
       dependsOn: ["^compile"],
       dotEnv: [".env"],
-      inputs: ["!target/**"],
+      inputs: ["**/*", "!node_modules/**", "!target/**"],
       outputs: [
         "target/main.tfaws/**",
         "!target/main.tfaws/.terraform.lock.hcl",
@@ -267,16 +265,14 @@ new Turbo(infrastructure, {
     },
     [planTask.name]: {
       dependsOn: ["compile", terraformInitTask.name],
-      // outputs: ["target/main.tfaws/tfplan"],
       cache: false,
     },
     deploy: {
-      // dependsOn: ["^compile"],
       dependsOn: [planTask.name],
       cache: false,
     },
     dev: {
-      dependsOn: ["^compile"],
+      dependsOn: [`${runtime.name}#compile`],
     },
     test: {
       dependsOn: ["compile"],
@@ -317,12 +313,11 @@ infrastructure.addDeps(
   "@cdktf/provider-random",
 );
 
-infrastructure.addDeps("cookie");
-infrastructure.addDeps("jose");
+infrastructure.addDeps("cookie-es");
+infrastructure.addDeps("jose@4");
 infrastructure.addDeps("octokit", "node-fetch");
 infrastructure.addDeps("@aws-sdk/client-kms");
 
-infrastructure.addDevDeps("@types/cookie");
 infrastructure.addDeps("@aws-sdk/client-ssm");
 
 infrastructure.addDevDeps("@octokit/rest");

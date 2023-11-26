@@ -1,25 +1,27 @@
-import { useCallback, useMemo, useState } from "react";
+import clsx from "clsx";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { Menu } from "../../design-system/menu.js";
-import { useNotifications } from "../../design-system/notification.js";
+import { useTheme } from "../../design-system/theme-provider.js";
 import { GithubIcon } from "../../icons/github-icon.js";
 import { MenuIcon } from "../../icons/menu-icon.js";
 import { wrpc } from "../../utils/wrpc.js";
-import { EnvironmentsList } from "../environments/components/environments-list.js";
 
 import { DeleteModal } from "./components/delete-modal.js";
+import { EnvironmentsList } from "./components/environments-list.js";
 
 export interface AppProps {
   appName: string;
 }
 
 export const Component = () => {
+  const { theme } = useTheme();
+
   const { appName } = useParams();
   const navigate = useNavigate();
-  const { showNotification } = useNotifications();
 
   const appQuery = wrpc["app.getByName"].useQuery({ appName: appName! });
 
@@ -31,6 +33,7 @@ export const Component = () => {
     { appId: app?.appId! },
     {
       enabled: app !== undefined,
+      // TODO: query invalidation
       refetchInterval: 1000 * 10,
     },
   );
@@ -58,27 +61,14 @@ export const Component = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const deleteAppMutation = wrpc["app.delete"].useMutation();
-  const deleteApp = useCallback(async () => {
-    try {
-      setLoading(true);
-      await deleteAppMutation.mutateAsync({ appId: app?.appId! });
-      navigate("/apps/");
-    } catch (error) {
-      setLoading(false);
-      if (error instanceof Error) {
-        showNotification("Failed to delete the app", {
-          body: error.message,
-          type: "error",
-        });
-      }
-    }
-  }, [app?.appId, deleteAppMutation]);
+  const goToSettings = useCallback(async () => {
+    navigate(`/apps/${app?.appName}/settings`);
+  }, [app?.appName]);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   return (
-    <>
+    <div>
       {!app && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
@@ -86,14 +76,24 @@ export const Component = () => {
       )}
 
       {app && (
-        <>
-          <div className="flex gap-x-2 bg-white rounded p-4 shadow">
+        <div className="space-y-4">
+          <div
+            className={clsx(
+              "flex gap-x-2 rounded p-4 border",
+              theme.bgInput,
+              theme.borderInput,
+            )}
+          >
             <img src={app.imageUrl} alt="" className="w-14 h-14 rounded-full" />
             <div className="space-y-1 pt-2 truncate ml-2">
-              <div className="text-slate-700 text-xl self-center truncate">
+              <div
+                className={clsx("text-xl self-center truncate", theme.text1)}
+              >
                 {app.appName}
               </div>
-              <div className="text-slate-500 text-xs self-center truncate">
+              <div
+                className={clsx("text-xs self-center truncate", theme.text2)}
+              >
                 {app.description === "" ? (
                   <div className="space-x-1 flex items-center truncate">
                     <GithubIcon className="h-3 w-3 shrink-0" />
@@ -112,11 +112,15 @@ export const Component = () => {
                 <Menu
                   items={[
                     {
+                      label: "Settings",
+                      onClick: goToSettings,
+                    },
+                    {
                       label: "Delete App",
                       onClick: () => setDeleteModalOpen(true),
                     },
                   ]}
-                  icon={<MenuIcon className="h-4 w-4 text-slate-700" />}
+                  icon={<MenuIcon className={clsx("h-4 w-4", theme.text1)} />}
                 />
 
                 <a href={repoUrl} target="_blank">
@@ -131,8 +135,13 @@ export const Component = () => {
           <div className="w-full relative">
             {loading && (
               <div className="absolute inset-0 flex items-center justify-center z-10">
-                <div className="absolute inset-0 bg-white dark:bg-gray-900 opacity-50" />
-                <SpinnerLoader size="sm" className="z-20" />
+                <div
+                  className={clsx(
+                    "absolute inset-0 opacity-50 rounded",
+                    theme.bgInput,
+                  )}
+                />
+                <SpinnerLoader className="z-20" />
               </div>
             )}
             <EnvironmentsList
@@ -142,7 +151,7 @@ export const Component = () => {
               repoUrl={repoUrl}
             />
           </div>
-        </>
+        </div>
       )}
 
       {appName && app?.appId && (
@@ -153,6 +162,6 @@ export const Component = () => {
           onClose={setDeleteModalOpen}
         />
       )}
-    </>
+    </div>
   );
 };
