@@ -1,10 +1,9 @@
-import { appendFileSync } from "node:fs";
-
 import { createConsoleApp } from "@wingconsole/app";
 import express, { type Application } from "express";
 import httpProxy from "http-proxy";
 
 import { type KeyStore } from "../auth/key-store.js";
+import type { LoggerInterface } from "../logger.js";
 
 import { findEndpoints } from "./endpoints.js";
 
@@ -27,7 +26,7 @@ export interface PrepareServerProps {
 export interface StartServerProps {
   consolePath: string;
   entryfilePath: string;
-  logfile: string;
+  logger: LoggerInterface;
   keyStore: KeyStore;
   requestedPort?: number;
 }
@@ -36,7 +35,7 @@ export async function prepareServer({ environmentId }: PrepareServerProps) {
   let consolePort: number | undefined;
   const app = express();
   const proxy = httpProxy.createProxyServer({ changeOrigin: true });
-  proxy.on("error", (error) => {
+  proxy.on("error", (error: string) => {
     console.error("proxy error", error);
   });
 
@@ -95,27 +94,23 @@ export async function prepareServer({ environmentId }: PrepareServerProps) {
   return async ({
     consolePath,
     entryfilePath,
-    logfile,
+    logger,
     keyStore,
     requestedPort,
   }: StartServerProps) => {
     const wingConsole = await import(consolePath);
     const create: typeof createConsoleApp = wingConsole.createConsoleApp;
-    const writeMessageToFile = (message: any, ...props: any) => {
-      appendFileSync(
-        logfile,
-        `${message}${props.length > 0 ? ":" + props.join(",") : ""}\n`,
-        "utf8",
-      );
+    const log = (message: string, props?: any[]) => {
+      logger.log(message, props);
     };
+
     const { port, close } = await create({
-      expressApp: app,
       wingfile: entryfilePath,
       requestedPort,
       log: {
-        info: writeMessageToFile,
-        error: writeMessageToFile,
-        verbose: writeMessageToFile,
+        info: log,
+        error: log,
+        verbose: log,
       },
       config: {
         addEventListener(event: any, listener: any) {},

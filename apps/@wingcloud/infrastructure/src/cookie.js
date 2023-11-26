@@ -1,1 +1,1 @@
-export { parse, serialize } from "cookie";
+export { parse, serialize } from "cookie-es";

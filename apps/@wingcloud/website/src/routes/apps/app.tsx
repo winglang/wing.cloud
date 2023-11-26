@@ -136,7 +136,10 @@ export const Component = () => {
             {loading && (
               <div className="absolute inset-0 flex items-center justify-center z-10">
                 <div
-                  className={clsx("absolute inset-0 opacity-50", theme.bgInput)}
+                  className={clsx(
+                    "absolute inset-0 opacity-50 rounded",
+                    theme.bgInput,
+                  )}
                 />
                 <SpinnerLoader className="z-20" />
               </div>

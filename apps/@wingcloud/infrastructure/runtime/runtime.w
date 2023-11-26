@@ -227,7 +227,7 @@ pub class RuntimeService {
       bucketName = "BUCKET_HANDLE_${bucketAddr.substring(bucketAddr.length - 8, bucketAddr.length)}";
     } else {
       let awsUser = new aws.iamUser.IamUser(name: "${this.node.addr}-user");
-      let bucket: awsprovider.s3Bucket.S3Bucket = unsafeCast(this.logs).bucket;
+      let bucket: awsprovider.s3Bucket.S3Bucket = unsafeCast(this.logs)?.bucket;
       let bucketArn: str = bucket.arn;
       bucketName = bucket.bucket;
       bucketRegion = bucket.region;

@@ -4,7 +4,6 @@ bring http;
 bring ex;
 bring "cdktf" as cdktf;
 
-bring "./reverse-proxy.w" as ReverseProxy;
 bring "./users.w" as Users;
 bring "./apps.w" as Apps;
 bring "./environments.w" as Environments;
@@ -17,7 +16,6 @@ bring "./runtime/runtime.w" as runtime;
 bring "./runtime/runtime-client.w" as runtime_client;
 bring "./probot.w" as probot;
 bring "./probot-adapter.w" as adapter;
-bring "./cloudfront.w" as cloudFront;
 bring "./components/parameter/parameter.w" as parameter;
 bring "./components/dns/dns.w" as Dns;
 bring "./components/endpoint/endpoint.w" as Endpoint;
@@ -25,8 +23,6 @@ bring "./patches/react-app.patch.w" as reactAppPatch;
 
 // And the sun, and the moon, and the stars, and the flowers.
 let appSecret = util.env("APP_SECRET");
-
-let DEFAULT_STAGING_LANDING_DOMAIN = "wing-cloud-staging-dev-only.webflow.io";
 
 let api = new cloud.Api(
   cors: true,
@@ -71,6 +67,27 @@ let rntm = new runtime.RuntimeService(
   logs: bucketLogs,
 );
 
+let dashboardPort = 5174;
+let dashboard = new ex.ReactApp(
+  projectPath: "../website",
+  startCommand: "pnpm vite --port ${dashboardPort}",
+  buildCommand: "pnpm vite build",
+  buildDir: "dist",
+  localPort: dashboardPort,
+);
+
+reactAppPatch.ReactAppPatch.apply(dashboard);
+
+let siteURL = (() => {
+  if util.env("WING_TARGET") == "tf-aws" {
+    let subDomain = util.env("PROXY_SUBDOMAIN");
+    let zoneName = util.env("PROXY_ZONE_NAME");
+    return "https://${subDomain}.${zoneName}";
+  } else {
+    return "http://localhost:3900";
+  }
+})();
+
 let dns = new Dns.DNS(token: (): str => {
   if util.env("WING_TARGET") == "sim" {
     return "test-token";
@@ -94,6 +111,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   endpoint: endpoint,
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
+  siteDomain: siteURL,
 );
 
 let wingCloudApi = new wingcloud_api.Api(
@@ -109,18 +127,8 @@ let wingCloudApi = new wingcloud_api.Api(
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
   appSecret: appSecret,
   logs: bucketLogs,
+  postSignInRedirectURL: "${siteURL}/apps",
 );
-
-let websitePort = 5174;
-let website = new ex.ReactApp(
-  projectPath: "../website",
-  startCommand: "pnpm vite --port ${websitePort}",
-  buildCommand: "pnpm vite build",
-  buildDir: "dist",
-  localPort: websitePort,
-);
-
-reactAppPatch.ReactAppPatch.apply(website);
 
 let probotApp = new probot.ProbotApp(
   probotAdapter: probotAdapter,
@@ -137,55 +145,61 @@ let apiDomainName = (() => {
   }
   return api.url;
 })();
-let subDomain = util.env("PROXY_SUBDOMAIN");
-let zoneName = util.env("PROXY_ZONE_NAME");
-//https://github.com/winglang/wing/issues/221
-let origins = (() => {
-  let originsArray = MutArray<cloudFront.Origin>[
-    {
-      pathPattern: "/wrpc/*",
-      domainName: apiDomainName,
-      originId: "wrpc",
-      originPath: "/prod",
-    },
-  ];
-  if util.env("WING_TARGET") == "sim" {
-    originsArray.push({
-      pathPattern: "",
-      domainName: website.url.replace("https://", ""),
-      originId: "website",
-    });
+
+let getDomainName = (url: str): str => {
+  // See https://github.com/winglang/wing/issues/4688.
+  return cdktf.Fn.trimprefix(url, "https://");
+};
+
+let proxyUrl = (() => {
+  if util.env("WING_TARGET") == "tf-aws" {
+    bring "./website-proxy.w" as website_proxy;
+
+    let proxy = new website_proxy.WebsiteProxy(
+      apiOrigin: {
+        domainName: apiDomainName,
+        pathPattern: "/wrpc/*",
+        originPath: "/prod",
+      },
+      landingDomainName: util.env("LANDING_DOMAIN"),
+      dashboardDomainName: getDomainName(dashboard.url),
+      zoneName: util.env("PROXY_ZONE_NAME"),
+      subDomain: util.env("PROXY_SUBDOMAIN"),
+    );
+
+    return proxy.url;
+  } elif util.env("WING_TARGET") == "sim" {
+    bring "./reverse-proxy.w" as reverse_proxy;
+
+    let proxy = new reverse_proxy.ReverseProxy(
+      origins: [
+        {
+          pathPattern: "/wrpc/*",
+          domainName: apiDomainName,
+        },
+        {
+          pathPattern: "*",
+          domainName: dashboard.url,
+        },
+      ],
+      port: (): num? => {
+        if util.tryEnv("WING_IS_TEST") == "true" {
+          return nil;
+        } else {
+          return 3900;
+        }
+      }(),
+    );
+
+    return proxy.url;
   } else {
-    originsArray.push({
-      pathPattern: "/apps/*",
-      domainName: website.url.replace("https://", ""),
-      originId: "website",
-    });
-    originsArray.push({
-      pathPattern: "",
-      domainName: util.tryEnv("STAGING_LANDING_DOMAIN") ?? DEFAULT_STAGING_LANDING_DOMAIN,
-      originId: "landingPage",
-    });
+    throw "Unknown WING_TARGET: ${util.env("WING_TARGET")}";
   }
-  return originsArray.copy();
 })();
-let proxy = new ReverseProxy.ReverseProxy(
-  subDomain: subDomain,
-  zoneName: zoneName,
-  aliases: ["${subDomain}.${zoneName}"],
-  origins: origins,
-  port: (): num? => {
-    if util.tryEnv("WING_IS_TEST") == "true" {
-      return nil;
-    } else {
-      return 3900;
-    }
-  }()
-);
 
 let var webhookUrl = probotApp.githubApp.webhookUrl;
 if util.tryEnv("WING_TARGET") == "sim" {
-  bring "./ngrok.w" as ngrok;
+  bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
 
   let devNgrok = new ngrok.Ngrok(
     url: webhookUrl,
@@ -197,10 +211,13 @@ if util.tryEnv("WING_TARGET") == "sim" {
 
 let updateGithubWebhook = inflight () => {
   probotApp.githubApp.updateWebhookUrl("${webhookUrl}/webhook");
-  log("Update your GitHub callback url to: ${proxy.url}/wrpc/github.callback");
+  log("Update your GitHub callback url to: ${proxyUrl}/wrpc/github.callback");
 };
 
-let deploy = new cloud.OnDeploy(updateGithubWebhook);
+// Not sure why, but terraform doesn't seem to like this.
+if util.tryEnv("WING_TARGET") == "sim" {
+  new cloud.OnDeploy(updateGithubWebhook);
+}
 
 bring "./tests/environments.w" as tests;
 new tests.EnvironmentsTest(
@@ -217,6 +234,7 @@ new tests.EnvironmentsTest(
 );
 
 new cdktf.TerraformOutput(value: api.url) as "API URL";
-new cdktf.TerraformOutput(value: website.url) as "Website URL";
+new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";
 new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
-new cdktf.TerraformOutput(value: proxy.url) as "Proxy URL";
+new cdktf.TerraformOutput(value: proxyUrl) as "Proxy URL";
+new cdktf.TerraformOutput(value: siteURL) as "Site URL";

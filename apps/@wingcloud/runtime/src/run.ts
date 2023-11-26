@@ -1,14 +1,9 @@
-import { randomBytes } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-
 import { createKeyStore } from "./auth/key-store.js";
+import { BucketLogger } from "./bucket-logger.js";
 import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
 import { useReportStatus } from "./report-status.js";
 import { Setup } from "./setup.js";
-import { fileBucketSync } from "./storage/file-bucket-sync.js";
 import { prepareServer } from "./wing/server.js";
 
 export interface RunProps {
@@ -17,32 +12,42 @@ export interface RunProps {
 }
 
 export const run = async function ({ context, requestedPort }: RunProps) {
-  const logfile = join(tmpdir(), "log-" + randomBytes(8).toString("hex"));
-  console.log(`Setup preview runtime. logfile ${logfile}`);
-
   const keyStore = await createKeyStore(context.environment.id);
   const report = useReportStatus(context, keyStore);
 
-  const e = new Executer(logfile);
+  const deployLogger = new BucketLogger({
+    key: context.environment.deploymentKey(),
+    bucket: context.logsBucket,
+  });
 
-  let cancelFileSync;
+  const runtimeLogger = new BucketLogger({
+    key: context.environment.runtimeKey(),
+    bucket: context.logsBucket,
+  });
+
+  const executer = new Executer(deployLogger);
+  const setup = new Setup({
+    executer,
+    context,
+  });
+
+  let wingPaths;
   try {
     const startServer = await prepareServer({
       environmentId: context.environment.id,
     });
     await report("deploying");
 
-    const { cancelSync } = fileBucketSync({
-      file: logfile,
-      key: context.environment.deploymentKey(),
-      bucket: context.logsBucket,
-    });
-    cancelFileSync = cancelSync;
+    const { paths, entryfilePath } = await setup.run();
+    wingPaths = paths;
+    const testResults = await setup.runWingTest(paths, entryfilePath);
 
-    const { paths, entryfilePath, testResults } = await new Setup({
-      e,
-      context,
-    }).setup();
+    if (testResults) {
+      await report("tests", { testResults });
+    } else {
+      await report("error", { message: "failed to run tests" });
+      deployLogger.log("failed to run tests");
+    }
 
     await (testResults
       ? report("tests", { testResults })
@@ -51,7 +56,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
     const { port, close, endpoints } = await startServer({
       consolePath: paths["@wingconsole/app"],
       entryfilePath,
-      logfile,
+      logger: runtimeLogger,
       keyStore,
       requestedPort,
     });
@@ -60,23 +65,35 @@ export const run = async function ({ context, requestedPort }: RunProps) {
 
     return {
       paths,
-      logfile,
+      logfile: deployLogger.getLogfile(),
       port,
       endpoints,
       close: async () => {
-        cancelSync();
+        deployLogger.stop();
+        runtimeLogger.stop();
         await close();
       },
     };
   } catch (error: any) {
-    console.error(
-      "preview runtime error",
-      error,
-      readFileSync(logfile, "utf8"),
-    );
-    await report("error", { message: error.toString() });
-    cancelFileSync?.();
+    if (wingPaths) {
+      const wingCompiler = await import(wingPaths["@winglang/compiler"]);
+      if (error instanceof wingCompiler.CompileError) {
+        // TODO: Use @wingconsole/server/src/utils/format-wing-error.ts to format the error
+        let errorMessage = error.diagnostics
+          .map((diagnostic: any) => diagnostic.message)
+          .join("\n");
 
+        runtimeLogger.log(`Error: ${errorMessage}`);
+      } else {
+        deployLogger.log(error.message);
+      }
+    } else {
+      deployLogger.log(error.message);
+    }
+    await report("error", { message: error.message });
+
+    deployLogger.stop();
+    runtimeLogger.stop();
     throw error;
   }
 };

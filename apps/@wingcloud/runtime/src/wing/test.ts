@@ -11,10 +11,15 @@ export interface WingTestProps {
   bucketWrite: (key: string, contents: string) => Promise<void>;
 }
 
-async function wingCompile(wingCompilerPath: string, entryfilePath: string) {
+export async function wingCompile(
+  wingCompilerPath: string,
+  entryfilePath: string,
+) {
   const wingCompiler = await import(wingCompilerPath);
   const compile: typeof compileFn = wingCompiler.compile;
-  const simfile = await compile(entryfilePath, { platform: [BuiltinPlatform.SIM] });
+  const simfile = await compile(entryfilePath, {
+    platform: [BuiltinPlatform.SIM],
+  });
   return simfile;
 }
 
@@ -23,19 +28,33 @@ async function wingTestOne(
   testResourcePath: string,
   props: WingTestProps,
 ) {
+  const timestamp = new Date().toISOString();
+
+  const startTime = Date.now();
   const result = await testRunner.runTest(testResourcePath);
-  const traces = result.traces
-    .map((t) => {
-      return t.type === "log" ? (t.data.message as string) : undefined;
-    })
-    .filter((t) => !!t)
-    .join("\n");
-  const logs = result.error ? `${result.error}\n${traces}` : (traces || "<no logs>");
+  const time = Date.now() - startTime;
+
+  const id = testResourcePath.replaceAll(/[^\dA-Za-z]/g, "");
+  const testResult = {
+    ...result,
+    id,
+    timestamp,
+    time,
+    traces: result.traces
+      .filter((t) => t.type === "log")
+      .map((t) => {
+        return {
+          message: t.data.message,
+          timestamp: t.timestamp,
+        };
+      }),
+  };
+
   await props.bucketWrite(
     props.environment.testKey(result.pass, testResourcePath),
-    logs,
+    JSON.stringify(testResult),
   );
-  return { path: result.path, pass: result.pass };
+  return { id, path: result.path, pass: result.pass };
 }
 
 export async function wingTest(props: WingTestProps) {
@@ -46,9 +65,10 @@ export async function wingTest(props: WingTestProps) {
 
   try {
     const wingSdk = await import(props.wingSdkPath);
-    const simulator: simulator.Simulator = await new wingSdk.simulator.Simulator({
-      simfile,
-    });
+    const simulator: simulator.Simulator =
+      await new wingSdk.simulator.Simulator({
+        simfile,
+      });
     await simulator.start();
 
     const client = simulator.getResource(
