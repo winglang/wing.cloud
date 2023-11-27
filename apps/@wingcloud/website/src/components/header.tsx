@@ -43,7 +43,7 @@ const UserMenu = ({ avatarUrl }: { avatarUrl?: string }) => {
               className={clsx(
                 "h-8 w-8 rounded-full",
                 "border-2",
-                "text-slate-500 dark:text-slate-400",
+                theme.borderInput,
                 theme.focusInput,
               )}
               src={avatarUrl}
