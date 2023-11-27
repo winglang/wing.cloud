@@ -70,8 +70,6 @@ pub class WebsiteProxy {
     let removeTrailingSlashes = new aws_provider.cloudfrontFunction.CloudfrontFunction(
       name: "RemoveTrailingSlashes-${this.node.addr.substring(0, 8)}",
       runtime: "cloudfront-js-1.0",
-      // // Wing fails to compile with multi-line strings.
-      // code: "function handler(e)\{var t=e.request,n=t.uri;return'/'!=n&&n.endsWith('/')?\{statusCode:301,headers:\{location:\{value:n.substring(0,n.length-1)}}}:t}",
       code: [
         "function handler(event) \{",
         "  var request = event.request;",
