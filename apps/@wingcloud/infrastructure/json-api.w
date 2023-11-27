@@ -13,12 +13,10 @@ struct JsonApiResponse {
 pub class JsonApi {
   api: cloud.Api;
   pub url: str;
-  var handlerCount: num;
 
   new(props: JsonApiProps) {
     this.api = props.api;
     this.url = this.api.url;
-    this.handlerCount = 0;
   }
 
   wrapHandler(handler: inflight (cloud.ApiRequest): JsonApiResponse): inflight (cloud.ApiRequest): cloud.ApiResponse {
@@ -66,8 +64,7 @@ pub class JsonApi {
         }
       }
     }
-    this.handlerCount += 1;
-    return new MyHandler() as "Handler{this.handlerCount}";
+    return new MyHandler() as "Handler";
   }
 
   pub get(path: str, handler: inflight (cloud.ApiRequest): JsonApiResponse) {
