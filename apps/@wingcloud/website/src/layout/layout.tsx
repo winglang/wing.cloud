@@ -13,13 +13,13 @@ export const Layout = ({ children }: PropsWithChildren) => {
 
   const fullWidthPage = useMemo(() => {
     // Full screen content for the console preview
-    if (/\/apps\/[^/]+\/[^/]+\/console\/?/.test(location.pathname)) {
+    if (/(?:\/[^/]+){3}\/console\/?/.test(location.pathname)) {
       return true;
     }
     return false;
   }, [location.pathname]);
 
-  if (location.pathname !== "/apps") {
+  if (location.pathname !== "/") {
     try {
       authCheck = wrpc["auth.check"].useQuery(undefined, {
         throwOnError: true,
@@ -27,7 +27,7 @@ export const Layout = ({ children }: PropsWithChildren) => {
       });
     } catch (error) {
       console.log(error);
-      window.location.href = "/apps";
+      window.location.href = "/";
     }
   }
 

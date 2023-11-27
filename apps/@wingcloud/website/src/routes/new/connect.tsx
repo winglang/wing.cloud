@@ -28,7 +28,7 @@ export const Component = () => {
   }, []);
 
   const onCancel = useCallback(() => {
-    navigate("/apps/new");
+    navigate("/new");
   }, [navigate]);
 
   const {
@@ -63,7 +63,7 @@ export const Component = () => {
     setCreateAppLoading(true);
     try {
       const app = await createApp();
-      navigate(`/apps/${app?.appName}`);
+      navigate(`/${app?.app.repoOwner}/${app?.app.appName}`);
     } catch (error) {
       setCreateAppLoading(false);
       if (error instanceof Error) {

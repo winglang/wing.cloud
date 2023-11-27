@@ -30,13 +30,17 @@ const getTestStatus = (environment: Environment): ErrorStatus | undefined => {
   return "passed";
 };
 
-export const EnvironmentsListItem = ({
-  appName,
-  environment,
-}: {
+export interface EnvironmentsListItemProps {
+  owner: string;
   appName: string;
   environment: Environment;
-}) => {
+}
+
+export const EnvironmentsListItem = ({
+  owner,
+  appName,
+  environment,
+}: EnvironmentsListItemProps) => {
   const { theme } = useTheme();
 
   const status = useMemo(() => {
@@ -95,7 +99,7 @@ export const EnvironmentsListItem = ({
         <div className="flex justify-between items-center truncate grow">
           <div className="text-xs space-y-1 truncate">
             <Link
-              to={`/apps/${appName}/${environment.branch}`}
+              to={`/${owner}/${appName}/${environment.branch}`}
               className={clsx(
                 "font-semibold truncate hover:underline",
                 theme.text1,
@@ -131,7 +135,7 @@ export const EnvironmentsListItem = ({
 
               {testStatus && (
                 <Link
-                  to={`/apps/${appName}/${environment.branch}/#${TEST_LOGS_ID}`}
+                  to={`/${owner}/${appName}/${environment.branch}/#${TEST_LOGS_ID}`}
                   className={clsx(
                     "flex items-end gap-x-0.5",
                     "rounded-xl px-1 py-0.5",
@@ -157,7 +161,7 @@ export const EnvironmentsListItem = ({
           <div className="flex gap-x-4 text-xs items-center justify-end">
             {linkEnabled && (
               <Link
-                to={`/apps/${appName}/${environment.branch}/console`}
+                to={`/${owner}/${appName}/${environment.branch}/console`}
                 className={clsx("text-xs hover:underline ", theme.text1)}
               >
                 Visit Preview
@@ -176,7 +180,7 @@ export const EnvironmentsListItem = ({
               >
                 {status === "error" && (
                   <Link
-                    to={`/apps/${appName}/${environment.branch}/#${RUNTIME_LOGS_ID}`}
+                    to={`/${owner}/${appName}/${environment.branch}/#${RUNTIME_LOGS_ID}`}
                     className="hover:underline"
                   >
                     {statusString}

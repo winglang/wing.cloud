@@ -22,13 +22,13 @@ export interface AppProps {
 
 export const Component = () => {
   const { theme } = useTheme();
-  const { appName } = useParams();
+  const { owner, appName } = useParams();
   const { showNotification } = useNotifications();
 
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
   const appQuery = wrpc["app.getByName"].useQuery(
-    { appName: appName! },
+    { owner: owner!, appName: appName! },
     { refetchOnMount: true },
   );
 

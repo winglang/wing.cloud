@@ -52,13 +52,15 @@ export const Header = () => {
   const { theme } = useTheme();
   const location = useLocation();
 
+  const user = wrpc["auth.check"].useQuery();
+
   const breadcrumbs = useMemo(() => {
     const parts = location.pathname.split("/").filter((part) => part !== "");
     return parts.map((part, index) => {
       const to = `/${parts.slice(0, index + 1).join("/")}`;
       return {
         label: part,
-        to: `${to}/`,
+        to: `${to}`,
       };
     });
   }, [location.pathname]);
@@ -69,7 +71,11 @@ export const Header = () => {
         <ol role="list" className="flex items-center space-x-2 truncate">
           <li>
             <div>
-              <Link to="/apps/" className={clsx(theme.text1, theme.text1Hover)}>
+              <Link
+                to={`/${user.data?.username}`}
+                aria-disabled={!user.data?.username}
+                className={clsx(theme.text1, theme.text1Hover)}
+              >
                 <WingIcon className="h-5 w-auto" />
               </Link>
             </div>
