@@ -677,7 +677,7 @@ pub class Api {
     });
 
     api.get("/wrpc/user.listApps", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = verifyUser(request);
 
       let userApps = apps.list(
         userId: userId,
