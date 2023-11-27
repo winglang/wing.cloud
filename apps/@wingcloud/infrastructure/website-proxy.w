@@ -1,5 +1,4 @@
 bring cloud;
-bring aws;
 bring "@cdktf/provider-aws" as aws_provider;
 bring "./dnsimple.w" as dnsimple;
 
