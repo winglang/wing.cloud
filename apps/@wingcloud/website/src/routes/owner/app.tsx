@@ -87,7 +87,6 @@ export const Component = () => {
               theme.borderInput,
             )}
           >
-            <img src={app.imageUrl} alt="" className="w-14 h-14 rounded-full" />
             <div className="space-y-1 pt-2 truncate ml-2">
               <div
                 className={clsx("text-xl self-center truncate", theme.text1)}
@@ -97,16 +96,7 @@ export const Component = () => {
               <div
                 className={clsx("text-xs self-center truncate", theme.text2)}
               >
-                {app.description === "" ? (
-                  <div className="space-x-1 flex items-center truncate">
-                    <GithubIcon className="h-3 w-3 shrink-0" />
-                    <span className="truncate" title={app.lastCommitMessage}>
-                      {app.lastCommitMessage?.split("\n")[0]}
-                    </span>
-                  </div>
-                ) : (
-                  app.description
-                )}
+                {app.description}
               </div>
             </div>
 

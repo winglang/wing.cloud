@@ -688,7 +688,6 @@ pub class Api {
           repoId: repoId,
           repoName: repoName,
           repoOwner: repoOwner,
-          imageUrl: input.get("imageUrl").asStr(),
           userId: user.userId,
           entryfile: entryfile,
           createdAt: datetime.utcNow().toIso(),

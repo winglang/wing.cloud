@@ -269,7 +269,6 @@ pub class EnvironmentsTest {
               repoOwner: repo.owner,
               repoName: repo.repo,
               appName: "test-app",
-              imageUrl: "",
               entryfile: "main.w",
               installationId: "${installationId}",
             }),
