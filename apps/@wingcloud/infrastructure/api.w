@@ -119,15 +119,12 @@ pub class Api {
     };
 
     let getUserFromCookie = inflight (request: cloud.ApiRequest): UserFromCookie => {
-      if let payload = getJWTPayloadFromCookie(request) {
-        let username = users.getUsername(userId: payload.userId);
-        return {
-          userId: payload.userId,
-          username: username,
-        };
-      } else {
-        throw "Unauthorized";
-      }
+      let userId = getUserIdFromCookie(request);
+      let username = users.getUsername(userId: userId);
+      return {
+        userId: userId,
+        username: username,
+      };
     };
 
     let verifyUser = inflight (request: cloud.ApiRequest): str => {
