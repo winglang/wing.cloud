@@ -42,7 +42,7 @@ pub class GithubComment {
 
   pub inflight createOrUpdate(props: GithubCommentCreateProps): num {
     let var commentId: num? = nil;
-    let tableHeader = "<tr><th>App</th><th>Status</th><th>Preview</th><th>Updated (UTC)</th></tr>";
+    let tableHeader = "<tr><th>App</th><th>Status</th><th>Console</th><th>Updated (UTC)</th></tr>";
     let var commentBody = "<table>${tableHeader}";
     for app in this.apps.listByRepository(repository: props.repo) {
       for environment in this.environments.list(appId: app.appId) {
@@ -67,7 +67,7 @@ pub class GithubComment {
           let var previewUrl = "";
           let shouldDisplayUrl = environment.status == "running";
           if(shouldDisplayUrl) {
-            previewUrl = "<a target=\"_blank\" href=\"${this.siteDomain}/${app.repoOwner}/${app.appName}/${environment.branch}/console\">Visit Preview</a>";
+            previewUrl = "<a target=\"_blank\" href=\"${this.siteDomain}/${app.repoOwner}/${app.appName}/${environment.branch}/console\">Visit</a>";
           }
 
           let appNameLink = "<a target=\"_blank\" href=\"${this.siteDomain}/${app.repoOwner}/${app.appName}\">${app.appName}</a>";
