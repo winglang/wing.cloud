@@ -88,6 +88,18 @@ pub class Apps {
   }
 
   pub inflight create(options: CreateAppOptions): App {
+    // check if app name exists
+    let existingApp = this.table.getItem(
+      key: {
+        pk: "USER#${options.userId}",
+        sk: "APP_NAME#${options.appName}",
+      },
+    );
+
+    if let item = existingApp.item {
+      throw "App name ${options.appName} already exists";
+    }
+
     let appId = "app_${nanoid62.Nanoid62.generate()}";
 
     // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
@@ -283,7 +295,7 @@ pub class Apps {
       };
     }
 
-    throw "App name [${options.appName}] not found";
+    throw "App name ${options.appName} not found";
   }
 
   pub inflight list(options: ListAppsOptions): Array<App> {
