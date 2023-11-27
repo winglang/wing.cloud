@@ -14,7 +14,7 @@ export const Component = () => {
       return;
     }
     navigate(`/${user.data.username}`);
-  }, [user, navigate]);
+  }, [user.data, navigate]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center">
