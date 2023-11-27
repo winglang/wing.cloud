@@ -89,16 +89,16 @@ pub class DNSimpleValidatedCertificate {
     this.certificate = new Certificate(domainName: "${props.subDomain}.${props.zoneName}");
     let dnsRecord = new DNSimpleZoneRecord(
       subDomain: "replaced",
-      recordType: "\${each.value.type}",
+      recordType: "$\{each.value.type}",
       distributionUrl: "replaced",
       ttl: 60,
       zoneName: props.zoneName
     ) as "${props.zoneName}.dnsimple.zoneRecord.ZoneRecord";
 
-    dnsRecord.record.addOverride("name", "\${replace(each.value.name, \".${props.zoneName}.\", \"\")}");
-    dnsRecord.record.addOverride("value", "\${replace(each.value.record, \"acm-validations.aws.\", \"acm-validations.aws\")}");
-    dnsRecord.record.addOverride("for_each", "\${{
-        for dvo in ${this.certificate.certificate.fqn}.domain_validation_options : dvo.domain_name => {
+    dnsRecord.record.addOverride("name", "$\{replace(each.value.name, \".{props.zoneName}.\", \"\")}");
+    dnsRecord.record.addOverride("value", "$\{replace(each.value.record, \"acm-validations.aws.\", \"acm-validations.aws\")}");
+    dnsRecord.record.addOverride("for_each", "$\{\{
+        for dvo in ${this.certificate.certificate.fqn}.domain_validation_options : dvo.domain_name => \{
           name   = dvo.resource_record_name
           record = dvo.resource_record_value
           type   = dvo.resource_record_type
@@ -110,6 +110,6 @@ pub class DNSimpleValidatedCertificate {
       certificateArn: this.certificate.certificate.arn
     )as "${props.zoneName}.aws.acmCertificateValidation.AcmCertificateValidation";
 
-    certValidation.addOverride("validation_record_fqdns", "\${[for record in ${dnsRecord.record.fqn} : record.qualified_name]}");
+    certValidation.addOverride("validation_record_fqdns", "$\{[for record in ${dnsRecord.record.fqn} : record.qualified_name]}");
   }
 }

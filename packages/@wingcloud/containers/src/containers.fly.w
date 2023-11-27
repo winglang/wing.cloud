@@ -75,7 +75,7 @@ pub class FlyContainers impl types.IContainers {
         "Content-Type" => "application/json",
       },
       body: Json.stringify({
-        query: "mutation(\$input: AllocateIPAddressInput!) { allocateIpAddress(input: \$input) { ipAddress { id address type region createdAt } } }",
+        query: "mutation($input: AllocateIPAddressInput!) \{ allocateIpAddress(input: $input) \{ ipAddress \{ id address type region createdAt } } }",
         variables: {
           input: {
             appId: containerID.value,
@@ -155,7 +155,7 @@ pub class FlyContainers impl types.IContainers {
         "Content-Type" => "application/json"
       },
       body: Json.stringify({
-        query: "mutation Delete(\$input:ID!) { deleteApp(appId: \$input) { organization { id } } }",
+        query: "mutation Delete($input:ID!) \{ deleteApp(appId: $input) \{ organization \{ id } } }",
         variables: {
           input: containerID.value,
         },

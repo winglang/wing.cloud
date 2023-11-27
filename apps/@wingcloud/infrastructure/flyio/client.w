@@ -107,7 +107,7 @@ pub inflight class Client {
 
   pub apps(): IAppsResult {
     let appsRespone = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
-      query: "query getapps { apps { nodes{ id machines { nodes { id instanceId state } totalCount } createdAt } totalCount } }",
+      query: "query getapps \{ apps \{ nodes \{ id machines \{ nodes \{ id instanceId state } totalCount } createdAt } totalCount } }",
     }));
     if (!appsRespone.ok) {
       throw "failed to get apps ${appsRespone.body}";
@@ -118,7 +118,7 @@ pub inflight class Client {
 
   pub appsCount(): num {
     let countRes = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
-      query: "query getapps { apps { totalCount } }",
+      query: "query getapps \{ apps \{ totalCount } }",
     }));
     if (!countRes.ok) {
       throw "failed to get app count ${countRes.body}";
@@ -140,23 +140,23 @@ pub inflight class Client {
 
   pub deleteApp(appName: str) {
     let deleteRes = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
-      query: "mutation Delete(\$input:ID!) { deleteApp(appId: \$input) { organization { id } } }",
+      query: "mutation Delete($input:ID!) \{ deleteApp(appId: $input) \{ organization \{ id } } }",
       variables: {
         input: appName,
       },
     }));
     if (!deleteRes.ok) {
-      throw "failed to delete app ${appName}: ${deleteRes.body}";
+      throw "failed to delete app {appName}: {deleteRes.body}";
     }
   }
 
   pub allocateIpAddress(appName: str) {
     let ipRes = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
-      query: "mutation(\$input: AllocateIPAddressInput!) { allocateIpAddress(input: \$input) { ipAddress { id address type region createdAt } } }",
+      query: "mutation($input: AllocateIPAddressInput!) \{ allocateIpAddress(input: $input) \{ ipAddress \{ id address type region createdAt } } }",
         variables: { input: { appId: appName, type: "shared_v4" } },
     }));
     if (!ipRes.ok) {
-      throw "failed to create shared ip: ${appName} + ${ipRes.body}";
+      throw "failed to create shared ip: {appName} + {ipRes.body}";
     }
   }
 
@@ -225,7 +225,7 @@ pub inflight class Client {
 
   pub getApp(appName: str): IGetAppResult {
     let res = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
-      query: "query getapp(\$input:String) { app(name:\$input) { id machines { nodes { id instanceId state } totalCount } createdAt } }",
+      query: "query getapp($input:String) \{ app(name: $input) \{ id machines \{ nodes \{ id instanceId state } totalCount } createdAt } }",
       variables: {
         input: appName,
       },
@@ -239,7 +239,7 @@ pub inflight class Client {
 
   pub isAppExists(appName: str): bool {
     let res = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
-      query: "query getapp(\$input:String) { app(name:\$input) { id machines { nodes { id instanceId state } totalCount } createdAt } }",
+      query: "query getapp($input:String) \{ app(name: $input) \{ id machines \{ nodes \{ id instanceId state } totalCount } createdAt } }",
       variables: {
         input: appName,
       },
@@ -262,7 +262,7 @@ pub inflight class Client {
     }
 
     let res = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
-      query: "mutation Secrets(\$input:SetSecretsInput!) { setSecrets(input: \$input) { app { id } } }",
+      query: "mutation Secrets($input: SetSecretsInput!) \{ setSecrets(input: $input) \{ app \{ id } } }",
       variables: {
         "input": {
           "appId": "${appName}",
