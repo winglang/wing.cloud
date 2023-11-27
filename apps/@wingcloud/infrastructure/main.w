@@ -19,6 +19,7 @@ bring "./probot-adapter.w" as adapter;
 bring "./components/parameter/parameter.w" as parameter;
 bring "./components/dns/dns.w" as Dns;
 bring "./components/endpoint/endpoint.w" as Endpoint;
+bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 
 // And the sun, and the moon, and the stars, and the flowers.
@@ -103,12 +104,36 @@ let endpoint = new Endpoint.Endpoint(dns: dns, domain: (): str => {
   }
 }());
 
+let environmentServerCertificate = new certificate.Certificate(
+  privateKeyFile: (): str => {
+    if util.env("WING_TARGET") == "sim" {
+      return util.env("ENVIRONMENT_SERVER_PRIVATE_KEY_FILE");
+    }
+  }(),
+  certificateFile: (): str => {
+    if util.env("WING_TARGET") == "sim" {
+      return util.env("ENVIRONMENT_SERVER_CERTIFICATE_FILE");
+    }
+  }(),
+  certificateId: (): num => {
+    if util.env("WING_TARGET") != "sim" {
+      return num.fromStr(util.env("ENVIRONMENT_SERVER_CERTIFICATE_ID"));
+    }
+  }(),
+  domain: (): str => {
+    if util.env("WING_TARGET") != "sim" {
+      return util.env("ENVIRONMENT_SERVER_ZONE_NAME");
+    }
+  }(),
+);
+
 let environmentManager = new EnvironmentManager.EnvironmentManager(
   apps: apps,
   environments: environments,
   secrets: secrets,
   endpoints: endpoints,
   endpoint: endpoint,
+  certificate: environmentServerCertificate,
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
@@ -136,6 +161,7 @@ let probotApp = new probot.ProbotApp(
   environments: environments,
   apps: apps,
   environmentManager: environmentManager,
+  siteDomain: siteURL,
 );
 
 let apiDomainName = (() => {

@@ -10,13 +10,19 @@ bring "./runtime-docker.w" as runtimeDocker;
 bring "../environments.w" as environments;
 bring "@cdktf/provider-aws" as awsprovider;
 bring "../components/parameter/iparameter.w" as parameter;
+bring "../components/certificate/icertificate.w" as certificate;
 bring "../nanoid62.w" as nanoid62;
 
 class Consts {
   pub static inflight secretsPath(): str {
     return "/root/.wing/secrets.json";
   }
+
+  pub static inflight certificatePath(): str {
+    return "/root/.ssl";
+  }
 }
+
 struct RuntimeStartOptions {
   gitToken: str?;
   gitRepo: str;
@@ -30,6 +36,7 @@ struct RuntimeStartOptions {
   environmentId: str;
   runId: str;
   secrets: Map<str>;
+  certificate: certificate.Certificate;
 }
 
 struct RuntimeStopOptions {
@@ -68,6 +75,14 @@ class RuntimeHandler_sim impl IRuntimeHandler {
     let secretsFile = fs.join(fs.mkdtemp("secrets-"), nanoid62.Nanoid62.generate());
     fs.writeFile(secretsFile, Json.stringify(opts.secrets), encoding: "utf8");
     volumes.set(secretsFile, Consts.secretsPath());
+
+    // write wing certificate
+    let privateKeyFile = fs.join(fs.mkdtemp("pk-"), nanoid62.Nanoid62.generate());
+    fs.writeFile(privateKeyFile, Json.stringify(opts.certificate.privateKey), encoding: "utf8");
+    volumes.set(privateKeyFile, "${Consts.certificatePath()}/cert.key");
+    let certificateFile = fs.join(fs.mkdtemp("cert-"), nanoid62.Nanoid62.generate());
+    fs.writeFile(certificateFile, Json.stringify(opts.certificate.certificate), encoding: "utf8");
+    volumes.set(certificateFile, "${Consts.certificatePath()}/cert.pem");
 
     let env = MutMap<str>{
       "GIT_REPO" => repo,
@@ -126,12 +141,20 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     }
 
     app.addSecrets({
-      "WING_SECRETS": util.base64Encode(Json.stringify(opts.secrets))
+      "WING_SECRETS": util.base64Encode(Json.stringify(opts.secrets)),
+      "SSL_PRIVATE_KEY": util.base64Encode(Json.stringify(opts.certificate.privateKey)),
+      "SSL_CERTIFICATE": util.base64Encode(Json.stringify(opts.certificate.certificate))
     });
 
     let files = Array<flyio.File>[{
       guest_path: Consts.secretsPath(),
       secret_name: "WING_SECRETS"
+    }, {
+      guest_path: "${Consts.certificatePath()}/cert.key",
+      secret_name: "SSL_PRIVATE_KEY"
+    }, {
+      guest_path: "${Consts.certificatePath()}/cert.pem",
+      secret_name: "SSL_CERTIFICATE"
     }];
 
     let env = MutMap<str>{
@@ -154,14 +177,14 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
         protocol: "tcp",
         internal_port: 3000,
         ports: [{
-          port: 443,
+          port: 3000,
           handlers: ["tls"],
         }]
       }, {
         protocol: "tcp",
         internal_port: 3001,
         ports: [{
-          port: 3001
+          port: 443
         }]
       }]
     };
@@ -195,6 +218,7 @@ pub struct Message {
   runId: str;
   token: str?;
   secrets: Map<str>;
+  certificate: certificate.Certificate;
 }
 
 struct RuntimeServiceProps {
@@ -281,6 +305,7 @@ pub class RuntimeService {
           environmentId: msg.environmentId,
           runId: msg.runId,
           secrets: msg.secrets,
+          certificate: msg.certificate,
           logsBucketName: bucketName,
           logsBucketRegion: bucketRegion,
           awsAccessKeyId: awsAccessKeyId,

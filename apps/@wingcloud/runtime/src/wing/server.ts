@@ -1,3 +1,8 @@
+import { readFileSync } from "node:fs";
+import https from "node:https";
+import { homedir } from "node:os";
+import { join } from "node:path";
+
 import { createConsoleApp } from "@wingconsole/app";
 import express, { type Application } from "express";
 import httpProxy from "http-proxy";
@@ -35,7 +40,7 @@ export async function prepareServer({ environmentId }: PrepareServerProps) {
   let consolePort: number | undefined;
   const app = express();
   const proxy = httpProxy.createProxyServer({ changeOrigin: true });
-  proxy.on("error", (error: string) => {
+  proxy.on("error", (error: any) => {
     console.error("proxy error", error);
   });
 
@@ -89,6 +94,17 @@ export async function prepareServer({ environmentId }: PrepareServerProps) {
 
     // can't find a match
     return res.sendStatus(404);
+  });
+
+  const sslDir = join(homedir(), ".ssl");
+  const options = {
+    key: readFileSync(join(sslDir, "./cert.key")),
+    cert: readFileSync(join(sslDir, "./cert.pem")),
+  };
+
+  const sslServer = https.createServer(options, app);
+  sslServer.listen(3001, () => {
+    console.log("SSL server is listening on port 3001");
   });
 
   return async ({

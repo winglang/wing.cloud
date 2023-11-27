@@ -164,7 +164,7 @@ pub inflight class Client {
   pub allocateIpAddress(appName: str) {
     let ipRes = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
       query: "mutation(\$input: AllocateIPAddressInput!) { allocateIpAddress(input: \$input) { ipAddress { id address type region createdAt } } }",
-        variables: { input: { appId: appName, type: "shared_v4" } },
+        variables: { input: { appId: appName, type: "v4" } },
     }));
     if (!ipRes.ok) {
       throw "failed to create shared ip: ${appName} + ${ipRes.body}";

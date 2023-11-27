@@ -2,6 +2,7 @@ bring http;
 bring "../apps.w" as apps;
 bring "../environments.w" as environments;
 bring "./runtime.w" as runtime;
+bring "../components/certificate/icertificate.w" as certificate;
 
 struct RuntimeClientProps {
   runtimeUrl: str;
@@ -11,6 +12,7 @@ struct RuntimeClientCreateOptions {
   app: apps.App;
   environment: environments.Environment;
   secrets: Map<str>;
+  certificate: certificate.Certificate;
   token: str;
   sha: str;
 }
@@ -36,6 +38,7 @@ pub class RuntimeClient {
       runId: options.environment.runId,
       token: options.token,
       secrets: options.secrets,
+      certificate: options.certificate,
     }));
 
     if !res.ok {

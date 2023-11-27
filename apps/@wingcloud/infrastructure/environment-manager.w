@@ -3,6 +3,7 @@ bring "./apps.w" as apps;
 bring "./secrets.w" as secrets;
 bring "./endpoints.w" as endpoints;
 bring "./components/endpoint/endpoint.w" as endpoint;
+bring "./components/certificate/icertificate.w" as certificate;
 bring "./github-comment.w" as comment;
 bring "./types/octokit-types.w" as octokit;
 bring "./runtime/runtime-client.w" as runtime_client;
@@ -14,6 +15,7 @@ struct EnvironmentsProps {
   secrets: secrets.Secrets;
   endpoints: endpoints.Endpoints;
   endpoint: endpoint.Endpoint;
+  certificate: certificate.ICertificate;
   environments: environments.Environments;
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
@@ -56,6 +58,7 @@ pub class EnvironmentManager {
   environments: environments.Environments;
   endpoints: endpoints.Endpoints;
   endpoint: endpoint.Endpoint;
+  certificate: certificate.ICertificate;
   githubComment: comment.GithubComment;
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
@@ -66,6 +69,7 @@ pub class EnvironmentManager {
     this.environments = props.environments;
     this.endpoints = props.endpoints;
     this.endpoint = props.endpoint;
+    this.certificate = props.certificate;
     this.runtimeClient = props.runtimeClient;
     this.probotAdapter = props.probotAdapter;
     this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps, siteDomain: props.siteDomain);
@@ -89,6 +93,7 @@ pub class EnvironmentManager {
       app: options.app,
       environment: environment,
       secrets: secrets,
+      certificate: this.certificate.certificate(),
       sha: options.sha,
       token: tokenRes.data.token,
     );
@@ -112,6 +117,7 @@ pub class EnvironmentManager {
       app: options.app,
       environment: options.environment,
       secrets: secrets,
+      certificate: this.certificate.certificate(),
       sha: options.sha,
       token: tokenRes.data.token,
     );

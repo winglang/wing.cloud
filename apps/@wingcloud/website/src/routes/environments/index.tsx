@@ -6,6 +6,7 @@ import { wrpc } from "../../utils/wrpc.js";
 export const RUNTIME_LOGS_ID = "runtime-logs";
 export const TEST_LOGS_ID = "test-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
+export const ENDPOINTS_ID = "endpoints";
 
 import { DeploymentLogs } from "./components/deployment-logs.js";
 import { Endpoints } from "./components/endpoints.js";
@@ -135,6 +136,9 @@ export const Component = () => {
         />
 
         <Endpoints
+          id={RUNTIME_LOGS_ID}
+          isOpen={runtimeLogsOpen}
+          setIsOpen={setRuntimeLogsOpen}
           endpoints={endpoints.data?.endpoints || []}
           loading={endpoints.isLoading}
         />
