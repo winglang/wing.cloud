@@ -227,7 +227,8 @@ export const wrpc = createWRPCReact<{
       installationId: string;
     },
     {
-      app: App;
+      appId: string;
+      appUri: string;
     }
   >;
 }>();

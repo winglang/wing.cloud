@@ -106,11 +106,10 @@ pub class EnvironmentsTest {
 
         try {
           let userId = props.users.create(gitHubLogin: "fake-login");
-          let app = props.apps.create(
+          let appId = props.apps.create(
             appName: "test-app",
             description: "test app",
             createdAt: "0",
-            createdBy: userId,
             repoId: "${repo.owner}/${repo.repo}",
             repoName: repo.repo,
             repoOwner: repo.owner,
@@ -158,7 +157,7 @@ pub class EnvironmentsTest {
 
           // verify environment created
           let isRunning = util.waitUntil(inflight () => {
-            let envs = props.environments.list(appId: app.appId);
+            let envs = props.environments.list(appId: appId);
             if let env = envs.tryAt(0) {
               if env.status == "running" {
                 return true;
@@ -171,7 +170,7 @@ pub class EnvironmentsTest {
           assert(isRunning);
 
           // make sure its responding
-          let env = props.environments.list(appId: app.appId).at(0);
+          let env = props.environments.list(appId: appId).at(0);
           if let url = env.url {
             util.waitUntil(inflight () => {
               try {

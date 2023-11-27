@@ -11,11 +11,6 @@ pub struct App {
   userId: str;
   entryfile: str;
   createdAt: str;
-  createdBy: str;
-  updatedAt: str;
-  updatedBy: str;
-  imageUrl: str?;
-  lastCommitMessage: str?;
 }
 
 struct Item extends App {
@@ -32,9 +27,6 @@ struct CreateAppOptions {
   userId: str;
   entryfile: str;
   createdAt: str;
-  createdBy: str;
-  imageUrl: str?;
-  lastCommitMessage: str?;
 }
 
 struct RenameAppOptions {
@@ -87,8 +79,8 @@ pub class Apps {
     this.table = table;
   }
 
-  pub inflight create(options: CreateAppOptions): App {
-    let appId = "app_${nanoid62.Nanoid62.generate()}";
+  pub inflight create(options: CreateAppOptions): str {
+    let appId = "app_{nanoid62.Nanoid62.generate()}";
 
     // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
     let makeItem = (ops: MakeItemOptions): Item => {
@@ -98,17 +90,12 @@ pub class Apps {
         appId: ops.appId,
         appName: options.appName,
         description: options.description,
-        imageUrl: options.imageUrl,
         repoId: options.repoId,
         repoOwner: options.repoOwner,
         repoName: options.repoName,
         userId: options.userId,
         entryfile: options.entryfile,
         createdAt: options.createdAt,
-        createdBy: options.createdBy,
-        updatedAt: options.createdAt,
-        updatedBy: options.createdBy,
-        lastCommitMessage: options.lastCommitMessage,
       };
     };
 
@@ -154,22 +141,7 @@ pub class Apps {
 
     ]);
 
-    return {
-      appId: appId,
-      appName: options.appName,
-      description: options.description,
-      imageUrl: options.imageUrl,
-      repoId: options.repoId,
-      repoOwner: options.repoOwner,
-      repoName: options.repoName,
-      userId: options.userId,
-      entryfile: options.entryfile,
-      createdAt: options.createdAt,
-      createdBy: options.createdBy,
-      updatedAt: options.createdAt,
-      updatedBy: options.createdBy,
-      lastCommitMessage: options.lastCommitMessage,
-    };
+    return appId;
   }
 
   pub inflight rename(options: RenameAppOptions): void {
@@ -239,17 +211,12 @@ pub class Apps {
         appId: item.get("appId").asStr(),
         appName: item.get("appName").asStr(),
         description: item.tryGet("description")?.tryAsStr(),
-        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
         repoId: item.get("repoId").asStr(),
         repoOwner: item.get("repoOwner").asStr(),
         repoName: item.get("repoName").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
         createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       };
     }
 
@@ -269,17 +236,12 @@ pub class Apps {
         appId: item.get("appId").asStr(),
         appName: item.get("appName").asStr(),
         description: item.tryGet("description")?.tryAsStr(),
-        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
         repoId: item.get("repoId").asStr(),
         repoOwner: item.get("repoOwner").asStr(),
         repoName: item.get("repoName").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
         createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       };
     }
 
@@ -300,17 +262,12 @@ pub class Apps {
         appId: item.get("appId").asStr(),
         appName: item.get("appName").asStr(),
         description: item.tryGet("description")?.tryAsStr(),
-        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
         repoId: item.get("repoId").asStr(),
         repoOwner: item.get("repoOwner").asStr(),
         repoName: item.get("repoName").asStr(),
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
         createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       }]);
     }
     return apps;
@@ -398,10 +355,10 @@ pub class Apps {
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
         createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
+        // createdBy: item.get("createdBy").asStr(),
+        // updatedAt: item.get("updatedAt").asStr(),
+        // updatedBy: item.get("updatedBy").asStr(),
+        // lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       }]);
     }
     return apps;

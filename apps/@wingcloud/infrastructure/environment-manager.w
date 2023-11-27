@@ -18,18 +18,21 @@ struct EnvironmentsProps {
 
 pub struct CreateEnvironmentOptions {
   createEnvironment: environments.CreateEnvironmentOptions;
-  app: apps.App;
+  appId: str;
+  entryfile: str;
   sha: str;
 }
 
 pub struct RestartEnvironmentOptions {
   environment: environments.Environment;
-  app: apps.App;
+  appId: str;
+  entryfile: str;
   sha: str;
 }
 
 pub struct RestartAllEnvironmentOptions {
-  app: apps.App;
+  appId: str;
+  entryfile: str;
 }
 
 pub struct StopEnvironmentOptions {
@@ -78,7 +81,8 @@ pub class EnvironmentManager {
     }
 
     this.runtimeClient.create(
-      app: options.app,
+      appId: options.appId,
+      entryfile: options.entryfile,
       environment: environment,
       secrets: secrets,
       sha: options.sha,
@@ -89,7 +93,7 @@ pub class EnvironmentManager {
   pub inflight restart(options: RestartEnvironmentOptions) {
     let octokit = this.auth(options.environment.installationId);
 
-    this.environments.updateStatus(id: options.environment.id, appId: options.app.appId, status: "initializing");
+    this.environments.updateStatus(id: options.environment.id, appId: options.appId, status: "initializing");
 
     let secrets = this.secretsForEnvironment(options.environment);
 
@@ -101,7 +105,8 @@ pub class EnvironmentManager {
     }
 
     this.runtimeClient.create(
-      app: options.app,
+      appId: options.appId,
+      entryfile: options.entryfile,
       environment: options.environment,
       secrets: secrets,
       sha: options.sha,
@@ -110,14 +115,14 @@ pub class EnvironmentManager {
   }
 
   pub inflight restartAll(options: RestartAllEnvironmentOptions) {
-    let environments = this.environments.list(appId: options.app.appId);
+    let environments = this.environments.list(appId: options.appId);
     for environment in environments {
       let octokit = this.auth(environment.installationId);
       let owner = environment.repo.split("/").at(0);
       let repo = environment.repo.split("/").at(1);
       let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/${environment.branch}");
 
-      this.restart(app: options.app, environment: environment, sha: ref.data.object.sha);
+      this.restart(appId: options.appId, entryfile: options.entryfile, environment: environment, sha: ref.data.object.sha);
     }
   }
 

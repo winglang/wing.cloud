@@ -110,7 +110,8 @@ pub class ProbotApp {
               prNumber: context.payload.pull_request.number,
               prTitle: context.payload.pull_request.title,
             },
-            app: app,
+            appId: app.appId,
+            entryfile: app.entryfile,
             sha: context.payload.pull_request.head.sha,
           );
         } else {
@@ -159,7 +160,8 @@ pub class ProbotApp {
 
           this.environmentManager.restart(
             environment: environment,
-            app: app,
+            appId: app.appId,
+            entryfile: app.entryfile,
             sha: context.payload.pull_request.head.sha,
           );
         }
@@ -178,7 +180,8 @@ pub class ProbotApp {
 
           this.environmentManager.restart(
             environment: environment,
-            app: app,
+            appId: app.appId,
+            entryfile: app.entryfile,
             sha: context.payload.after,
           );
         }
