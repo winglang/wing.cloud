@@ -4,12 +4,12 @@ const GITHUB_APP_CLIENT_ID = import.meta.env.VITE_GITHUB_APP_CLIENT_ID;
 const AUTHORIZE_URL = (() => {
   const url = new URL("https://github.com/login/oauth/authorize");
   url.searchParams.append("client_id", GITHUB_APP_CLIENT_ID);
-  if (import.meta.env.DEV) {
-    url.searchParams.append(
-      "redirect_uri",
-      "http://localhost:3900/wrpc/github.callback",
-    );
-  }
+  // if (import.meta.env.DEV) {
+  //   url.searchParams.append(
+  //     "redirect_uri",
+  //     "http://localhost:3900/wrpc/github.callback",
+  //   );
+  // }
   return url.toString();
 })();
 

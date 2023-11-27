@@ -1,5 +1,7 @@
+bring cloud;
+bring aws;
+bring "@cdktf/provider-aws" as aws_provider;
 bring "./dnsimple.w" as dnsimple;
-bring "@cdktf/provider-aws" as aws;
 
 pub struct WebsiteProxyOrigin {
   domainName: str;
@@ -27,7 +29,7 @@ pub class WebsiteProxy {
     // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
     let cachingOptimizedCachePolicyId = "658327ea-f89d-4fab-a63d-7e88639e58f6";
 
-    let passthroughCachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
+    let passthroughCachePolicy = new aws_provider.cloudfrontCachePolicy.CloudfrontCachePolicy(
       name: "PassthroughCache-${this.node.addr}",
       defaultTtl: 0m.seconds,
       minTtl: 0m.seconds,
@@ -47,7 +49,7 @@ pub class WebsiteProxy {
       },
     ) as "passthrough-cache-policy";
 
-    let shortLivedCachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
+    let shortLivedCachePolicy = new aws_provider.cloudfrontCachePolicy.CloudfrontCachePolicy(
       name: "ShortLivedCache-${this.node.addr}",
       defaultTtl: 1m.seconds,
       minTtl: 1m.seconds,
@@ -65,7 +67,40 @@ pub class WebsiteProxy {
       },
     ) as "short-cache-policy";
 
-    let distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
+    let removeTrailingSlashes = new cloud.Function(inflight (event): Json => {
+      let request = unsafeCast(event)?.request;
+      let uri: str = request?.uri;
+
+      // let requestCopy = MutJson {};
+      // for entry in Json.entries(request) {
+      //   requestCopy.set(entry.key, entry.value);
+      // }
+
+      // if uri != "/" && uri.endsWith("/") {
+      //   return {
+      //     statusCode: 30,
+      //     // statusDescription: 'Found',
+      //     headers: {
+      //       location: { "value": uri.substring(0, uri.length - 1) },
+      //     },
+      //   };
+      //   requestCopy.set("uri", uri.substring(0, uri.length - 1));
+      // }
+
+      if uri != "/" && uri.endsWith("/") {
+        return {
+          statusCode: 30,
+          // statusDescription: 'Found',
+          headers: {
+            location: { "value": uri.substring(0, uri.length - 1) },
+          },
+        };
+      }
+
+      return request;
+    });
+
+    let distribution = new aws_provider.cloudfrontDistribution.CloudfrontDistribution(
       enabled: true,
       aliases: ["${props.subDomain}.${props.zoneName}"],
       viewerCertificate: {
@@ -151,6 +186,12 @@ pub class WebsiteProxy {
         cachedMethods: ["GET", "HEAD"],
         viewerProtocolPolicy: "redirect-to-https",
         cachePolicyId: shortLivedCachePolicy.id,
+        functionAssociation: [
+          {
+            eventType: "viewer-request",
+            functionArn: aws.Function.from(removeTrailingSlashes)?.functionArn,
+          },
+        ],
       },
     );
 
