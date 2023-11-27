@@ -64,7 +64,7 @@ pub class JsonApi {
         }
       }
     }
-    return new MyHandler() as "Handler";
+    return new MyHandler();
   }
 
   pub get(path: str, handler: inflight (cloud.ApiRequest): JsonApiResponse) {
