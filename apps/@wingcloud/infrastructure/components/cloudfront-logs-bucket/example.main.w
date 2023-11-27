@@ -16,7 +16,7 @@ let asset = new cdktf.TerraformAsset(
 
 new aws.s3Object.S3Object(
   bucket: logBucket.name(),
-  key: "${logPrefix}/E2MPJ4K4OATN7G.2023-11-14-12.e71351af.gz",
+  key: "{logPrefix}/E2MPJ4K4OATN7G.2023-11-14-12.e71351af.gz",
   source: asset.path,
   etag: asset.assetHash,
 );
@@ -52,19 +52,19 @@ let distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
   },
   origin: [{
     domainName: distBucket.bucketDomainName,
-    originId: "default"    
+    originId: "default"
   }],
   loggingConfig: {
     bucket: logBucket.domainName(),
     includeCookies: true,
     prefix: logPrefix
   },
-  
+
   // make sure the distribution is deployed after the bucket
   // with all secondary resources, i.e. the ACLs
   dependsOn: [logBucket.dependable]
 );
 
-test "logs bucket is deployed" { 
+test "logs bucket is deployed" {
   assert(true);
 }

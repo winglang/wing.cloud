@@ -38,7 +38,7 @@ pub class Github {
       variables: {
         "openid_connect_provider_arn" => provider.get("openid_connect_provider.arn"),
         "repo" => "winglang/wing.cloud",
-        "role_name" => "wing-cloud-repo-${environment}",
+        "role_name" => "wing-cloud-repo-{environment}",
         "github_environments" => [environment],
         "default_conditions" => ["allow_environment"],
         "role_policy_arns" => [admin.policy.arn]
@@ -66,7 +66,7 @@ pub class Github {
       variables: {
         "openid_connect_provider_arn" => provider.get("openid_connect_provider.arn"),
         "repo" => "winglang/wing.cloud",
-        "role_name" => "wing-cloud-repo-${environment}-read-only",
+        "role_name" => "wing-cloud-repo-{environment}-read-only",
         "default_conditions" => ["allow_environment"],
         "github_environments" => [environment],
         "role_policy_arns" => [readOnly.arn, readOnlyAdditional.policy.arn]

@@ -100,7 +100,7 @@ pub inflight class Client {
    */
   _headers(): Map<str> {
     return {
-      "Authorization" => "Bearer ${this.token}",
+      "Authorization" => "Bearer {this.token}",
       "Content-Type" => "application/json"
     };
   }
@@ -110,7 +110,7 @@ pub inflight class Client {
       query: "query getapps \{ apps \{ nodes \{ id machines \{ nodes \{ id instanceId state } totalCount } createdAt } totalCount } }",
     }));
     if (!appsRespone.ok) {
-      throw "failed to get apps ${appsRespone.body}";
+      throw "failed to get apps {appsRespone.body}";
     }
 
     return IAppsResult.fromJson(this.verifyJsonResponse(Json.parse(appsRespone.body)));
@@ -121,7 +121,7 @@ pub inflight class Client {
       query: "query getapps \{ apps \{ totalCount } }",
     }));
     if (!countRes.ok) {
-      throw "failed to get app count ${countRes.body}";
+      throw "failed to get app count {countRes.body}";
     }
 
     let count = ICountResult.fromJson(this.verifyJsonResponse(Json.parse(countRes.body)));
@@ -129,12 +129,12 @@ pub inflight class Client {
   }
 
   pub createApp(appName: str) {
-    let appRes = http.post("${this.apiUrl}/apps", headers: this._headers(), body: Json.stringify({
+    let appRes = http.post("{this.apiUrl}/apps", headers: this._headers(), body: Json.stringify({
       app_name: appName,
       org_slug: this.orgSlug,
     }));
     if (!appRes.ok) {
-      throw "failed to create app ${appName}: ${appRes.body}" + appName;
+      throw "failed to create app {appName}: {appRes.body}" + appName;
     }
   }
 
@@ -161,7 +161,7 @@ pub inflight class Client {
   }
 
   pub createMachine(props: IClientCreateMachineProps): ICreateMachineResult {
-    let machineRes = http.post("${this.apiUrl}/apps/${props.appName}/machines", headers: this._headers(), body: Json.stringify({
+    let machineRes = http.post("{this.apiUrl}/apps/{props.appName}/machines", headers: this._headers(), body: Json.stringify({
       region: props.region,
       config: {
         guest: {
@@ -192,7 +192,7 @@ pub inflight class Client {
       },
     }));
     if (!machineRes.ok) {
-      throw "failed to create machine ${props.appName}: ${machineRes.body}";
+      throw "failed to create machine {props.appName}: {machineRes.body}";
     }
 
     let rdata = IRuntimeCreateMachineResult.fromJson(this.verifyJsonResponse(Json.parse(machineRes.body)));
@@ -201,15 +201,15 @@ pub inflight class Client {
       instanceId: rdata.instance_id,
     };
     if (data.id == "" || data.instanceId == "") {
-      throw "unexpected create machine data: ${data}";
+      throw "unexpected create machine data: {data}";
     }
     return data;
   }
 
   pub deleteMachine(appName: str, id: str) {
-    let machineRes = http.delete("${this.apiUrl}/apps/${appName}/machines/${id}?force=true", headers: this._headers());
+    let machineRes = http.delete("{this.apiUrl}/apps/{appName}/machines/{id}?force=true", headers: this._headers());
     if (!machineRes.ok) {
-      throw "failed to delete machine ${appName}: ${machineRes.body}";
+      throw "failed to delete machine {appName}: {machineRes.body}";
     }
   }
 
@@ -217,9 +217,9 @@ pub inflight class Client {
     appName: str,
     machineResult: ICreateMachineResult,
   ) {
-    let waitRes = http.get("${this.apiUrl}/apps/${appName}/machines/${machineResult.id}/wait?instance_id=${machineResult.instanceId}", headers: this._headers());
+    let waitRes = http.get("{this.apiUrl}/apps/{appName}/machines/{machineResult.id}/wait?instance_id={machineResult.instanceId}", headers: this._headers());
     if (!waitRes.ok) {
-      throw "failed to wait for machine ${appName} ${machineResult.id}: ${waitRes.body}";
+      throw "failed to wait for machine {appName} {machineResult.id}: {waitRes.body}";
     }
   }
 
@@ -231,7 +231,7 @@ pub inflight class Client {
       },
     }));
     if (!res.ok) {
-      throw "failed to get app ${appName}: ${res.body}";
+      throw "failed to get app {appName}: {res.body}";
     }
 
     return IGetAppResult.fromJson(this.verifyJsonResponse(Json.parse(res.body)));
@@ -245,7 +245,7 @@ pub inflight class Client {
       },
     }));
     if (!res.ok) {
-      throw "failed to check if app existts ${appName}: ${res.body}";
+      throw "failed to check if app existts {appName}: {res.body}";
     }
 
     let notFoundError = this.checkForNotFoundError(Json.parse(res.body));
@@ -265,20 +265,20 @@ pub inflight class Client {
       query: "mutation Secrets($input: SetSecretsInput!) \{ setSecrets(input: $input) \{ app \{ id } } }",
       variables: {
         "input": {
-          "appId": "${appName}",
+          "appId": "{appName}",
           "secrets": secretsArray.copy()
         }
       },
     }));
 
     if (!res.ok) {
-      throw "failed to create secrets ${appName}: ${res.body}";
+      throw "failed to create secrets {appName}: {res.body}";
     }
   }
 
   verifyJsonResponse(response: Json): Json {
     if let errors = response.tryGet("errors") {
-      throw "respone with errors: ${errors}";
+      throw "respone with errors: {errors}";
     }
 
     return response;
@@ -291,7 +291,7 @@ pub inflight class Client {
           return true;
         }
       }
-      throw "checkForNotFoundError: unexpected error ${errors}";
+      throw "checkForNotFoundError: unexpected error {errors}";
     } else {
       return false;
     }
