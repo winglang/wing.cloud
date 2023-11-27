@@ -12,16 +12,11 @@ export const Component = () => {
   const { theme, mode } = useTheme();
   const { owner, appName, branch } = useParams();
 
-  const environment = wrpc["app.environment"].useQuery(
-    {
-      owner: owner!,
-      appName: appName!,
-      branch: branch!,
-    },
-    {
-      enabled: !!appName && !!branch,
-    },
-  );
+  const environment = wrpc["app.environment"].useQuery({
+    owner: owner!,
+    appName: appName!,
+    branch: branch!,
+  });
 
   const url = useMemo(() => {
     return environment.data?.environment.url ?? "";

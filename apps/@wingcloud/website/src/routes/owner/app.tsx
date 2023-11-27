@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { Header } from "../../components/header.js";

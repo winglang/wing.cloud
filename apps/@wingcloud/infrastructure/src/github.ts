@@ -6,7 +6,7 @@ export const getLoginFromAccessToken = async (accessToken: string) => {
     auth: accessToken,
   });
   const { data: user } = await octokit.request("GET /user");
-  return user.login;
+  return user;
 };
 
 export const listUserInstallations = async (token: string) => {

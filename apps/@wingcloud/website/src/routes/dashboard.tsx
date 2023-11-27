@@ -7,7 +7,7 @@ import { wrpc } from "../utils/wrpc.js";
 export const Component = () => {
   const navigate = useNavigate();
 
-  const user = wrpc["auth.check"].useQuery();
+  const user = wrpc["user.get"].useQuery();
   useEffect(() => {
     if (!user?.data?.username) {
       navigate("/");

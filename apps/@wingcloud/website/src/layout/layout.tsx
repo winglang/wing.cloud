@@ -1,34 +1,31 @@
-import { useMemo, type PropsWithChildren } from "react";
+import { type PropsWithChildren, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 import { SpinnerLoader } from "../components/spinner-loader.js";
 import { wrpc } from "../utils/wrpc.js";
 
 export const Layout = ({ children }: PropsWithChildren) => {
-  let authCheck;
+  try {
+    const location = useLocation();
 
-  const location = useLocation();
+    const userQuery = wrpc["user.get"].useQuery(undefined, {
+      retry: false,
+      throwOnError: true,
+      enabled: location.pathname !== "/",
+    });
 
-  if (location.pathname !== "/") {
-    try {
-      authCheck = wrpc["auth.check"].useQuery(undefined, {
-        throwOnError: true,
-        retry: false,
-      });
-    } catch (error) {
-      console.log(error);
-      window.location.href = "/";
-    }
+    return (
+      <>
+        {userQuery?.isLoading && (
+          <div className="fixed inset-0 flex items-center justify-center">
+            <SpinnerLoader />
+          </div>
+        )}
+        {!userQuery?.isLoading && children}
+      </>
+    );
+  } catch (error) {
+    console.error(error);
+    window.location.href = "/";
   }
-
-  return (
-    <>
-      {authCheck?.isLoading && (
-        <div className="fixed inset-0 flex items-center justify-center">
-          <SpinnerLoader />
-        </div>
-      )}
-      {!authCheck?.isLoading && children}
-    </>
-  );
 };

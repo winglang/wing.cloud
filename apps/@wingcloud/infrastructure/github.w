@@ -75,6 +75,12 @@ struct PullRequest {
   body: str;
 }
 
+struct GitHubUser {
+  id: num;
+  login: str;
+  avatar_url: str;
+}
+
 pub class Exchange {
   pub static inflight codeForTokens(options: ExchangeCodeForTokensOptions): AuthTokens {
     let response = http.post("https://github.com/login/oauth/access_token", {
@@ -97,7 +103,7 @@ pub class Exchange {
     return AuthTokens.fromJson(Json.parse(response.body));
   }
 
-  extern "./src/github.ts" pub static inflight getLoginFromAccessToken(accessToken: str): str;
+  extern "./src/github.ts" pub static inflight getLoginFromAccessToken(accessToken: str): GitHubUser;
 }
 
 pub class Client {

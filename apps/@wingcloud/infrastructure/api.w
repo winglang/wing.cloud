@@ -115,9 +115,9 @@ pub class Api {
 
     let verifyUser = inflight (request: cloud.ApiRequest): str => {
       let userId = getUserFromCookie(request);
-      let username = users.getUsername(userId: userId);
+      let user = users.get(userId: userId);
 
-      if username != request.query.get("owner") {
+      if user.username != request.query.get("owner") {
         throw "Unauthorized";
       }
       return userId;
@@ -127,24 +127,6 @@ pub class Api {
       let payload = getJWTPayloadFromCookie(request);
       return payload?.accessToken;
     };
-
-    api.get("/wrpc/auth.check", inflight (request) => {
-      if let payload = getJWTPayloadFromCookie(request) {
-        // check if the user from the cookie is valid
-        let userId = getUserFromCookie(request);
-
-        // check if user exists in the db
-        let username = users.getUsername(userId: userId);
-
-        return {
-          body: {
-            userId: payload.userId,
-            username: username,
-          },
-        };
-      }
-      throw "Unauthorized";
-    });
 
     api.post("/wrpc/auth.signout", inflight (request) => {
       return {
@@ -176,14 +158,17 @@ pub class Api {
       );
       log("tokens = ${Json.stringify(tokens)}");
 
-      let gitHubLogin = GitHub.Exchange.getLoginFromAccessToken(tokens.access_token);
-      log("gitHubLogin = ${gitHubLogin}");
-      let userId = users.getOrCreate(gitHubLogin: gitHubLogin);
-      log("userId = ${userId}");
+      let githubUser = GitHub.Exchange.getLoginFromAccessToken(tokens.access_token);
+      log("gitHubLogin = ${githubUser.login}");
+      let user = users.getOrCreate(
+        username: githubUser.login,
+        avatar_url: githubUser.avatar_url,
+      );
+      log("userId = ${user.id}");
 
       let jwt = JWT.JWT.sign(
         secret: props.appSecret,
-        userId: userId,
+        userId: user.id,
         accessToken: tokens.access_token,
         accessTokenExpiresIn: tokens.expires_in,
         refreshToken: tokens.refresh_token,
@@ -205,7 +190,7 @@ pub class Api {
       return {
         status: 302,
         headers: {
-          Location: "/${gitHubLogin}",
+          Location: "/${user.username}",
           "Set-Cookie": authCookie,
         },
       };
@@ -612,13 +597,30 @@ pub class Api {
       };
     });
 
+    api.get("/wrpc/user.get", inflight (request) => {
+      if let payload = getJWTPayloadFromCookie(request) {
+        // check if the user from the cookie is valid
+        let userId = getUserFromCookie(request);
+
+        // check if user exists in the db
+        let user = users.get(userId: userId);
+
+        return {
+          body: {
+            user: user,
+          },
+        };
+      }
+      throw "Unauthorized";
+    });
+
     api.post("/wrpc/user.createApp", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
         let userId = getUserFromCookie(request);
 
         let input = Json.parse(request.body ?? "");
 
-        let gitHubLogin = users.getUsername(userId: userId);
+        let user = users.get(userId: userId);
 
         let defaultBranch = input.get("default_branch").asStr();
         let repoId = input.get("repoId").asStr();
@@ -643,7 +645,7 @@ pub class Api {
           userId: userId,
           entryfile: input.get("entryfile").asStr(),
           createdAt: datetime.utcNow().toIso(),
-          createdBy: gitHubLogin,
+          createdBy: user.username,
           lastCommitMessage: commitData?.commit?.message ?? "",
         );
 

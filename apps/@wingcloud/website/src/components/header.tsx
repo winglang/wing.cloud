@@ -14,7 +14,8 @@ export interface Breadcrumb {
   to: string;
 }
 
-const UserMenu = () => {
+const UserMenu = ({ avatarUrl }: { avatarUrl?: string }) => {
+  const { theme } = useTheme();
   const signOutMutation = wrpc["auth.signout"].useMutation();
 
   const signOut = useCallback(() => {
@@ -36,13 +37,25 @@ const UserMenu = () => {
         },
       ]}
       icon={
-        <UserCircleIcon
-          className={clsx(
-            "w-8 h-8 text-slate-400",
-            "group-hover:text-slate-500 transition-all",
-            "group-focus:text-slate-500",
+        <>
+          {avatarUrl && (
+            <img
+              className={clsx(
+                "h-8 w-8 rounded-full",
+                "border-2",
+                "text-slate-500 dark:text-slate-400",
+                theme.focusInput,
+              )}
+              src={avatarUrl}
+              alt="User avatar"
+            />
           )}
-        />
+          {!avatarUrl && (
+            <UserCircleIcon
+              className={clsx(theme.text2, theme.focusInput, "w-8 h-8")}
+            />
+          )}
+        </>
       }
     />
   );
@@ -52,7 +65,7 @@ export const Header = () => {
   const { theme } = useTheme();
   const location = useLocation();
 
-  const user = wrpc["auth.check"].useQuery();
+  const userQuery = wrpc["user.get"].useQuery();
 
   const breadcrumbs = useMemo(() => {
     const parts = location.pathname.split("/").filter((part) => part !== "");
@@ -72,8 +85,8 @@ export const Header = () => {
           <li>
             <div>
               <Link
-                to={`/${user.data?.username}`}
-                aria-disabled={!user.data?.username}
+                to={`/${userQuery.data?.user.username}`}
+                aria-disabled={!userQuery.data?.user.username}
                 className={clsx(theme.text1, theme.text1Hover)}
               >
                 <WingIcon className="h-5 w-auto" />
@@ -104,7 +117,7 @@ export const Header = () => {
         </ol>
 
         <div className="flex grow justify-end gap-x-12">
-          <UserMenu />
+          <UserMenu avatarUrl={userQuery.data?.user.avatar_url} />
         </div>
       </nav>
     </header>
