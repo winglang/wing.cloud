@@ -20,17 +20,6 @@ export const Component = () => {
 
   const { showNotification } = useNotifications();
 
-  const onError = useCallback((error: Error) => {
-    showNotification("Failed to create the app", {
-      body: error.message,
-      type: "error",
-    });
-  }, []);
-
-  const onCancel = useCallback(() => {
-    navigate("/new");
-  }, [navigate]);
-
   const {
     createApp,
     listInstallationsQuery,
@@ -41,6 +30,18 @@ export const Component = () => {
     setRepositoryId,
     loading,
   } = useCreateAppFromRepo();
+
+  const onError = useCallback((error: Error) => {
+    showNotification("Failed to create the app", {
+      body: error.message,
+      type: "error",
+    });
+    setRepositoryId("");
+  }, []);
+
+  const onCancel = useCallback(() => {
+    navigate("/new");
+  }, [navigate]);
 
   const [createAppLoading, setCreateAppLoading] = useState(false);
   const [installations, setInstallations] = useState<Installation[]>([]);
