@@ -2,7 +2,7 @@ import { UserCircleIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
 import { useCallback } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import { Menu } from "../design-system/menu.js";
 import { useTheme } from "../design-system/theme-provider.js";
@@ -73,6 +73,7 @@ export const Header = () => {
             <div>
               <Link
                 to={`/${user.data?.username}`}
+                aria-disabled={!user.data?.username}
                 className={clsx(theme.text1, theme.text1Hover)}
               >
                 <WingIcon className="h-5 w-auto" />
