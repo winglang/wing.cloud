@@ -1,5 +1,6 @@
-bring "./dnsimple.w" as dnsimple;
+bring cloud;
 bring "@cdktf/provider-aws" as aws;
+bring "./dnsimple.w" as dnsimple;
 
 pub struct WebsiteProxyOrigin {
   domainName: str;
@@ -64,6 +65,26 @@ pub class WebsiteProxy {
         },
       },
     ) as "short-cache-policy";
+
+    let removeTrailingSlashes = new aws.cloudfrontFunction.CloudfrontFunction(
+      name: "RemoveTrailingSlashes-${this.node.addr.substring(0, 8)}",
+      runtime: "cloudfront-js-1.0",
+      code: [
+        "function handler(event) \{",
+        "  var request = event.request;",
+        "  var uri = request.uri;",
+        "  if (uri != '/' && uri.endsWith('/')) \{",
+        "    return \{",
+        "      statusCode: 301,",
+        "      headers: \{",
+        "        location: \{ value: uri.substring(0, uri.length - 1) },",
+        "      },",
+        "    };",
+        "  }",
+        "  return request;",
+        "}",
+      ].join("\n"),
+    ) as "RemoveTrailingSlashes";
 
     let distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
       enabled: true,
@@ -151,6 +172,12 @@ pub class WebsiteProxy {
         cachedMethods: ["GET", "HEAD"],
         viewerProtocolPolicy: "redirect-to-https",
         cachePolicyId: shortLivedCachePolicy.id,
+        functionAssociation: [
+          {
+            eventType: "viewer-request",
+            functionArn: removeTrailingSlashes.arn,
+          },
+        ],
       },
     );
 
