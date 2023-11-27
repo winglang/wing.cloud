@@ -71,26 +71,9 @@ pub class WebsiteProxy {
       let request = unsafeCast(event)?.request;
       let uri: str = request?.uri;
 
-      // let requestCopy = MutJson {};
-      // for entry in Json.entries(request) {
-      //   requestCopy.set(entry.key, entry.value);
-      // }
-
-      // if uri != "/" && uri.endsWith("/") {
-      //   return {
-      //     statusCode: 30,
-      //     // statusDescription: 'Found',
-      //     headers: {
-      //       location: { "value": uri.substring(0, uri.length - 1) },
-      //     },
-      //   };
-      //   requestCopy.set("uri", uri.substring(0, uri.length - 1));
-      // }
-
       if uri != "/" && uri.endsWith("/") {
         return {
-          statusCode: 30,
-          // statusDescription: 'Found',
+          statusCode: 301,
           headers: {
             location: { "value": uri.substring(0, uri.length - 1) },
           },
