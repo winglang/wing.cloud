@@ -103,10 +103,10 @@ pub class Exchange {
     return AuthTokens.fromJson(Json.parse(response.body));
   }
 
-  extern "./src/github.ts" pub static inflight getLoginFromAccessToken(accessToken: str): GitHubUser;
 }
 
 pub class Client {
+  extern "./src/github.ts" pub static inflight getUser(accessToken: str): GitHubUser;
   extern "./src/github.ts" pub static inflight listUserInstallations(token: str): Array<UserInstallation>;
   extern "./src/github.ts" pub static inflight listInstallationRepos(token: str, installationId: num): Array<InstallationRepository>;
   extern "./src/github.ts" pub static inflight getLastCommit(options: GetLastCommitOptions): CommitResponse;

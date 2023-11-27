@@ -158,8 +158,9 @@ pub class Api {
       );
       log("tokens = ${Json.stringify(tokens)}");
 
-      let githubUser = GitHub.Exchange.getLoginFromAccessToken(tokens.access_token);
+      let githubUser = GitHub.Client.getUser(tokens.access_token);
       log("gitHubLogin = ${githubUser.login}");
+
       let user = users.getOrCreate(
         username: githubUser.login,
         avatar_url: githubUser.avatar_url,
