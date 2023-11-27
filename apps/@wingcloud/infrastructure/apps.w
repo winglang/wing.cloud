@@ -355,10 +355,6 @@ pub class Apps {
         userId: item.get("userId").asStr(),
         entryfile: item.get("entryfile").asStr(),
         createdAt: item.get("createdAt").asStr(),
-        // createdBy: item.get("createdBy").asStr(),
-        // updatedAt: item.get("updatedAt").asStr(),
-        // updatedBy: item.get("updatedBy").asStr(),
-        // lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
       }]);
     }
     return apps;
