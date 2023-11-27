@@ -67,43 +67,26 @@ pub class WebsiteProxy {
       },
     ) as "short-cache-policy";
 
-    // let removeTrailingSlashes = new cloud.Function(inflight (event): Json => {
-    //   let request = unsafeCast(event)?.request;
-    //   let uri: str = request?.uri;
-
-    //   if uri != "/" && uri.endsWith("/") {
-    //     return {
-    //       statusCode: 301,
-    //       headers: {
-    //         location: { "value": uri.substring(0, uri.length - 1) },
-    //       },
-    //     };
-    //   }
-
-    //   return request;
-    // });
-
-    // let backslash = "\\"
     let removeTrailingSlashes = new aws_provider.cloudfrontFunction.CloudfrontFunction(
       name: "RemoveTrailingSlashes-${this.node.addr.substring(0, 8)}",
       runtime: "cloudfront-js-1.0",
-      // code: "function handler(event) { return event.request; }",
-      code: "function handler(e)\{var t=e.request,n=t.uri;return'/'!=n&&n.endsWith('/')?\{statusCode:301,headers:\{location:\{value:n.substring(0,n.length-1)}}}:t}",
-      // code: "
-      // function handler(event) \{
-      //   var request = event.request;
-      //   var uri = request.uri;
-      //   if (uri != '/' && uri.endsWith('/')) \{
-      //     return \{
-      //       statusCode: 301,
-      //       headers: \{
-      //         location: \{ value: uri.substring(0, uri.length - 1) },
-      //       },
-      //     };
-      //   }
-      //   return request;
-      // }
-      // ",
+      // // Wing fails to compile with multi-line strings.
+      // code: "function handler(e)\{var t=e.request,n=t.uri;return'/'!=n&&n.endsWith('/')?\{statusCode:301,headers:\{location:\{value:n.substring(0,n.length-1)}}}:t}",
+      code: [
+        "function handler(event) \{",
+        "  var request = event.request;",
+        "  var uri = request.uri;",
+        "  if (uri != '/' && uri.endsWith('/')) \{",
+        "    return \{",
+        "      statusCode: 301,",
+        "      headers: \{",
+        "        location: \{ value: uri.substring(0, uri.length - 1) },",
+        "      },",
+        "    };",
+        "  }",
+        "  return request;",
+        "}",
+      ].join("\n"),
     ) as "RemoveTrailingSlashes";
 
     let distribution = new aws_provider.cloudfrontDistribution.CloudfrontDistribution(
@@ -195,7 +178,6 @@ pub class WebsiteProxy {
         functionAssociation: [
           {
             eventType: "viewer-request",
-            // functionArn: aws.Function.from(removeTrailingSlashes)?.functionArn,
             functionArn: removeTrailingSlashes.arn,
           },
         ],
