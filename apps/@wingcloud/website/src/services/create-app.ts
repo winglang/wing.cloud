@@ -49,7 +49,11 @@ export const useCreateAppFromRepo = () => {
       {
         onError: (error) => {
           setCreateAppLoading(false);
-          throw error;
+          let error_ = error as Error;
+          if ((error as Error).message.includes("ConditionalCheckFailed")) {
+            error_.message = `App name ${repo.name} already exists`;
+          }
+          throw error_;
         },
       },
     );

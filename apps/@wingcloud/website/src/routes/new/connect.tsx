@@ -32,7 +32,7 @@ export const Component = () => {
   } = useCreateAppFromRepo();
 
   const onError = useCallback((error: Error) => {
-    showNotification("Failed to create the app", {
+    showNotification("Failed to create app", {
       body: error.message,
       type: "error",
     });
