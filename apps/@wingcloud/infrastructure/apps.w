@@ -88,18 +88,6 @@ pub class Apps {
   }
 
   pub inflight create(options: CreateAppOptions): App {
-    // check if app name exists
-    let existingApp = this.table.getItem(
-      key: {
-        pk: "USER#${options.userId}",
-        sk: "APP_NAME#${options.appName}",
-      },
-    );
-
-    if let item = existingApp.item {
-      throw "App name ${options.appName} already exists";
-    }
-
     let appId = "app_${nanoid62.Nanoid62.generate()}";
 
     // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
@@ -124,47 +112,55 @@ pub class Apps {
       };
     };
 
-    this.table.transactWriteItems(transactItems: [
-      {
-        put: {
-          item: makeItem(
-            appId: appId,
-            pk: "APP#${appId}",
-            sk: "#",
-          ),
-          conditionExpression: "attribute_not_exists(pk)"
+    try {
+      this.table.transactWriteItems(transactItems: [
+        {
+          put: {
+            item: makeItem(
+              appId: appId,
+              pk: "APP#${appId}",
+              sk: "#",
+            ),
+            conditionExpression: "attribute_not_exists(pk)"
+          },
         },
-      },
-      {
-        put: {
-          item: makeItem(
-            appId: appId,
-            pk: "USER#${options.userId}",
-            sk: "APP_NAME#${options.appName}",
-          ),
-          conditionExpression: "attribute_not_exists(pk)"
+        {
+          put: {
+            item: makeItem(
+              appId: appId,
+              pk: "USER#${options.userId}",
+              sk: "APP_NAME#${options.appName}",
+            ),
+            conditionExpression: "attribute_not_exists(pk)"
+          },
         },
-      },
-      {
-        put: {
-          item: makeItem(
-            appId: appId,
-            pk: "USER#${options.userId}",
-            sk: "APP#${appId}",
-          ),
+        {
+          put: {
+            item: makeItem(
+              appId: appId,
+              pk: "USER#${options.userId}",
+              sk: "APP#${appId}",
+            ),
+          },
         },
-      },
-      {
-        put: {
-          item: makeItem(
-            appId: appId,
-            pk: "REPOSITORY#${options.repoId}",
-            sk: "APP#${appId}",
-          ),
+        {
+          put: {
+            item: makeItem(
+              appId: appId,
+              pk: "REPOSITORY#${options.repoId}",
+              sk: "APP#${appId}",
+            ),
+          },
         },
-      },
 
-    ]);
+      ]);
+    } catch error {
+      if error.contains("ConditionalCheckFailed") {
+        throw "App name ${options.appName} already exists";
+      } else {
+        throw error;
+      }
+    }
 
     return {
       appId: appId,
