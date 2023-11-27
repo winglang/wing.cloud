@@ -1,5 +1,5 @@
 bring cloud;
-bring "@cdktf/provider-aws" as aws_provider;
+bring "@cdktf/provider-aws" as aws;
 bring "./dnsimple.w" as dnsimple;
 
 pub struct WebsiteProxyOrigin {
@@ -28,7 +28,7 @@ pub class WebsiteProxy {
     // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
     let cachingOptimizedCachePolicyId = "658327ea-f89d-4fab-a63d-7e88639e58f6";
 
-    let passthroughCachePolicy = new aws_provider.cloudfrontCachePolicy.CloudfrontCachePolicy(
+    let passthroughCachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
       name: "PassthroughCache-${this.node.addr}",
       defaultTtl: 0m.seconds,
       minTtl: 0m.seconds,
@@ -48,7 +48,7 @@ pub class WebsiteProxy {
       },
     ) as "passthrough-cache-policy";
 
-    let shortLivedCachePolicy = new aws_provider.cloudfrontCachePolicy.CloudfrontCachePolicy(
+    let shortLivedCachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
       name: "ShortLivedCache-${this.node.addr}",
       defaultTtl: 1m.seconds,
       minTtl: 1m.seconds,
@@ -66,7 +66,7 @@ pub class WebsiteProxy {
       },
     ) as "short-cache-policy";
 
-    let removeTrailingSlashes = new aws_provider.cloudfrontFunction.CloudfrontFunction(
+    let removeTrailingSlashes = new aws.cloudfrontFunction.CloudfrontFunction(
       name: "RemoveTrailingSlashes-${this.node.addr.substring(0, 8)}",
       runtime: "cloudfront-js-1.0",
       code: [
@@ -86,7 +86,7 @@ pub class WebsiteProxy {
       ].join("\n"),
     ) as "RemoveTrailingSlashes";
 
-    let distribution = new aws_provider.cloudfrontDistribution.CloudfrontDistribution(
+    let distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
       enabled: true,
       aliases: ["${props.subDomain}.${props.zoneName}"],
       viewerCertificate: {
