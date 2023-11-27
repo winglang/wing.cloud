@@ -9,10 +9,11 @@ import { wrpc } from "../../utils/wrpc.js";
 
 export const Component = () => {
   const { theme, mode } = useTheme();
-  const { appName, branch } = useParams();
+  const { owner, appName, branch } = useParams();
 
   const environment = wrpc["app.environment"].useQuery(
     {
+      owner: owner!,
       appName: appName!,
       branch: branch!,
     },

@@ -1,6 +1,6 @@
 import { LinkIcon, SquaresPlusIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { Button } from "../../design-system/button.js";
 import { useTheme } from "../../design-system/theme-provider.js";
@@ -10,6 +10,7 @@ import { NewAppContainer } from "./components/new-app-container.js";
 
 export const Component = () => {
   const navigate = useNavigate();
+  const { owner } = useParams();
   const { theme } = useTheme();
 
   return (
@@ -21,7 +22,7 @@ export const Component = () => {
           description="Connect to an existing repository"
           icon={<LinkIcon className="w-5 h-5" />}
           onClick={() => {
-            navigate("/apps/new/connect/");
+            navigate(`/new/connect`);
           }}
         />
         <AppConfigurationListItem
@@ -35,7 +36,7 @@ export const Component = () => {
           <div className="justify-end flex gap-x-2 grow">
             <Button
               onClick={() => {
-                navigate("/apps/");
+                navigate(`/${owner}`);
               }}
             >
               Back

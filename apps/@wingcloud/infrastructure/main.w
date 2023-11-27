@@ -105,7 +105,6 @@ let wingCloudApi = new wingcloud_api.Api(
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
   appSecret: appSecret,
   logs: bucketLogs,
-  postSignInRedirectURL: "{siteURL}/apps",
 );
 
 let probotApp = new probot.ProbotApp(

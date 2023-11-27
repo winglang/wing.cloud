@@ -20,17 +20,20 @@ export interface AppProps {
 export const Component = () => {
   const { theme } = useTheme();
 
-  const { appName } = useParams();
+  const { owner, appName } = useParams();
   const navigate = useNavigate();
 
-  const appQuery = wrpc["app.getByName"].useQuery({ appName: appName! });
+  const appQuery = wrpc["app.getByName"].useQuery({
+    owner: owner!,
+    appName: appName!,
+  });
 
   const app = useMemo(() => {
     return appQuery.data?.app;
   }, [appQuery.data]);
 
   const environmentsQuery = wrpc["app.environments"].useQuery(
-    { appId: app?.appId! },
+    { owner: owner!, appId: app?.appId! },
     {
       enabled: app !== undefined,
       // TODO: query invalidation
@@ -62,7 +65,7 @@ export const Component = () => {
   const [loading, setLoading] = useState(false);
 
   const goToSettings = useCallback(async () => {
-    navigate(`/apps/${app?.appName}/settings`);
+    navigate(`/${owner}/${app?.appName}/settings`);
   }, [app?.appName]);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -144,12 +147,15 @@ export const Component = () => {
                 <SpinnerLoader className="z-20" />
               </div>
             )}
-            <EnvironmentsList
-              environments={environments}
-              loading={environmentsQuery.isLoading}
-              appName={app.appName}
-              repoUrl={repoUrl}
-            />
+            {owner && appName && (
+              <EnvironmentsList
+                environments={environments}
+                loading={environmentsQuery.isLoading}
+                owner={owner}
+                appName={appName}
+                repoUrl={repoUrl}
+              />
+            )}
           </div>
         </div>
       )}

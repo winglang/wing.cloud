@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { ConfirmationModal } from "../../../components/confirmation-modal.js";
 import { useNotifications } from "../../../design-system/notification.js";
@@ -18,6 +18,7 @@ export const DeleteModal = ({
   show,
   onClose,
 }: DeleteModalProps) => {
+  const { owner } = useParams();
   const { showNotification } = useNotifications();
 
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export const DeleteModal = ({
   const deleteApp = wrpc["app.delete"].useMutation({
     onSuccess() {
       showNotification(`App ${appName} deleted`, { type: "success" });
-      navigate("/apps/");
+      navigate(`/${owner}`);
     },
     onError(error) {
       if (error instanceof Error) {

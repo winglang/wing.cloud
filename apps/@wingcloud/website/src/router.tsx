@@ -5,41 +5,39 @@ import { NoMatch } from "./components/no-match.js";
 export const router = createBrowserRouter([
   {
     path: "/",
-    loader: () => {
-      throw redirect("/apps");
-    },
-  },
-  {
-    path: "/apps",
     lazy: () => import("./routes/index.js"),
     children: [
       {
-        path: "",
-        lazy: () => import("./routes/apps.js"),
-      },
-      {
-        path: "new",
+        path: "/new",
         lazy: () => import("./routes/new/index.js"),
       },
       {
-        path: "new/connect",
+        path: "/dashboard",
+        lazy: () => import("./routes/dashboard.js"),
+      },
+      {
+        path: "/new/connect",
         lazy: () => import("./routes/new/connect.js"),
       },
       {
-        path: ":appName",
-        lazy: () => import("./routes/apps/app.js"),
+        path: "/:owner",
+        lazy: () => import("./routes/owner/index.js"),
       },
       {
-        path: ":appName/:branch",
+        path: "/:owner/:appName",
+        lazy: () => import("./routes/owner/app.js"),
+      },
+      {
+        path: "/:owner/:appName/settings",
+        lazy: () => import("./routes/owner/settings.js"),
+      },
+      {
+        path: "/:owner/:appName/:branch",
         lazy: () => import("./routes/environments/index.js"),
       },
       {
-        path: ":appName/:branch/console",
+        path: "/:owner/:appName/:branch/console",
         lazy: () => import("./routes/environments/console-preview.js"),
-      },
-      {
-        path: ":appName/settings",
-        lazy: () => import("./routes/apps/settings.js"),
       },
     ],
   },
