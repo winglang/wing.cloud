@@ -124,47 +124,55 @@ pub class Apps {
       };
     };
 
-    this.table.transactWriteItems(transactItems: [
-      {
-        put: {
-          item: makeItem(
-            appId: appId,
-            pk: "APP#${appId}",
-            sk: "#",
-          ),
-          conditionExpression: "attribute_not_exists(pk)"
+    try {
+      this.table.transactWriteItems(transactItems: [
+        {
+          put: {
+            item: makeItem(
+              appId: appId,
+              pk: "APP#${appId}",
+              sk: "#",
+            ),
+            conditionExpression: "attribute_not_exists(pk)"
+          },
         },
-      },
-      {
-        put: {
-          item: makeItem(
-            appId: appId,
-            pk: "USER#${options.userId}",
-            sk: "APP_NAME#${options.appName}",
-          ),
-          conditionExpression: "attribute_not_exists(pk)"
+        {
+          put: {
+            item: makeItem(
+              appId: appId,
+              pk: "USER#${options.userId}",
+              sk: "APP_NAME#${options.appName}",
+            ),
+            conditionExpression: "attribute_not_exists(pk)"
+          },
         },
-      },
-      {
-        put: {
-          item: makeItem(
-            appId: appId,
-            pk: "USER#${options.userId}",
-            sk: "APP#${appId}",
-          ),
+        {
+          put: {
+            item: makeItem(
+              appId: appId,
+              pk: "USER#${options.userId}",
+              sk: "APP#${appId}",
+            ),
+          },
         },
-      },
-      {
-        put: {
-          item: makeItem(
-            appId: appId,
-            pk: "REPOSITORY#${options.repoId}",
-            sk: "APP#${appId}",
-          ),
+        {
+          put: {
+            item: makeItem(
+              appId: appId,
+              pk: "REPOSITORY#${options.repoId}",
+              sk: "APP#${appId}",
+            ),
+          },
         },
-      },
 
-    ]);
+      ]);
+    } catch error {
+      if error.contains("ConditionalCheckFailed") {
+        throw "App name ${options.appName} already exists";
+      } else {
+        throw error;
+      }
+    }
 
     return {
       appId: appId,
