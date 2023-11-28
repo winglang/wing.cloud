@@ -162,8 +162,9 @@ pub class Api {
       log("gitHubLogin = ${githubUser.login}");
 
       let user = users.getOrCreate(
+        name: githubUser.name,
         username: githubUser.login,
-        avatar_url: githubUser.avatar_url,
+        avatarUrl: githubUser.avatar_url,
       );
       log("userId = ${user.id}");
 

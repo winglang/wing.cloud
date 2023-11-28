@@ -3,13 +3,15 @@ bring "./nanoid62.w" as Nanoid62;
 
 struct User {
   id: str;
+  name: str;
   username: str;
-  avatar_url: str;
+  avatarUrl: str;
 }
 
 struct CreateOptions {
+  name: str;
   username: str;
-  avatar_url: str?;
+  avatarUrl: str?;
 }
 
 struct FromLoginOptions {
@@ -17,8 +19,9 @@ struct FromLoginOptions {
 }
 
 struct GetOrCreateOptions {
+  name: str;
   username: str;
-  avatar_url: str?;
+  avatarUrl: str?;
 }
 
 struct GetUsernameOptions {
@@ -44,6 +47,9 @@ pub class Users {
               pk: "LOGIN#${options.username}",
               sk: "#",
               id: userId,
+              name: options.name,
+              username: options.username,
+              avatarUrl: options.avatarUrl,
             },
             conditionExpression: "attribute_not_exists(pk)",
           },
@@ -54,8 +60,9 @@ pub class Users {
               pk: "USER#${userId}",
               sk: "#",
               id: userId,
+              name: options.name,
               username: options.username,
-              avatar_url: options.avatar_url,
+              avatarUrl: options.avatarUrl,
             },
           }
         }
@@ -64,8 +71,9 @@ pub class Users {
 
     return User {
       id: userId,
+      name: options.name,
       username: options.username,
-      avatar_url: options.avatar_url ?? "",
+      avatarUrl: options.avatarUrl ?? "",
     };
   }
 
@@ -77,15 +85,16 @@ pub class Users {
       },
     );
 
-    return User.tryFromJson(result.item);
+    return User.fromJson(result.item);
   }
 
   pub inflight getOrCreate(options: GetOrCreateOptions): User {
     let user = this.fromLogin(username: options.username);
 
     return user ?? this.create(
+      name: options.name,
       username: options.username,
-      avatar_url: options.avatar_url
+      avatarUrl: options.avatarUrl
     );
   }
 

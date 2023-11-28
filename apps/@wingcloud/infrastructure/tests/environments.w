@@ -105,7 +105,7 @@ pub class EnvironmentsTest {
         let repo = createRepo(octokit);
 
         try {
-          let user = props.users.create(username: "fake-login");
+          let user = props.users.create(name:"name", username: "fake-login");
           let app = props.apps.create(
             appName: "test-app",
             description: "test app",
@@ -223,7 +223,7 @@ pub class EnvironmentsTest {
             );
           }
 
-          let user = props.users.create(username: "fake-login");
+          let user = props.users.create(name: "name", username: "fake-login");
 
           let jwt = JWT.JWT.sign(
             secret: props.appSecret,

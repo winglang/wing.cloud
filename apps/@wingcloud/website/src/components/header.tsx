@@ -117,7 +117,7 @@ export const Header = () => {
         </ol>
 
         <div className="flex grow justify-end gap-x-12">
-          <UserMenu avatarUrl={userQuery.data?.user.avatar_url} />
+          <UserMenu avatarUrl={userQuery.data?.user.avatarUrl} />
         </div>
       </nav>
     </header>

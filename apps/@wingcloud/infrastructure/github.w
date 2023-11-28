@@ -26,7 +26,7 @@ struct InstallationRepository {
 
 struct Owner {
   login: str;
-  avatar_url: str;
+  avatarUrl: str;
 }
 
 struct Repository {
@@ -76,7 +76,7 @@ struct PullRequest {
 }
 
 struct GitHubUser {
-  id: num;
+  name: str;
   login: str;
   avatar_url: str;
 }
