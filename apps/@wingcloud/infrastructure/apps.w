@@ -1,6 +1,6 @@
 bring ex;
-bring "./nanoid62.w" as nanoid62;
 bring "./http-error.w" as httpError;
+bring "./nanoid62.w" as nanoid62;
 
 pub struct App {
   appId: str;
@@ -158,7 +158,7 @@ pub class Apps {
       return App.fromJson(item);
     }
 
-    throw httpError.HttpError.throwNotFound("App [{options.appId}] not found");
+    throw httpError.HttpError.throwNotFound("App {options.appId} not found");
   }
 
   pub inflight getByName(options: GetAppByNameOptions): App {
@@ -173,7 +173,7 @@ pub class Apps {
       return App.fromJson(item);
     }
 
-    throw httpError.HttpError.throwNotFound("App [{options.appName}] not found");
+    throw httpError.HttpError.throwNotFound("App {options.appName} not found");
   }
 
   pub inflight list(options: ListAppsOptions): Array<App> {
