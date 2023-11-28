@@ -21,6 +21,58 @@ env:
   AWS_REGION: "us-east-1"
 
 jobs:
+  simulator:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    environment: testing
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Setup ngrok CLI
+        run: |
+          wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+          tar xvzf ./ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin
+          rm ./ngrok-v3-stable-linux-amd64.tgz
+          ngrok config add-authtoken ${{ secrets.NGROK_AUTH_TOKEN }}}
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Compile Wing Cloud dependencies
+        run: npx turbo compile --filter=!@wingcloud/infrastructure
+      - name: Test Wing Cloud Simulator
+        env:
+          ## Inflight
+          APP_SECRET: ${{ secrets.APP_SECRET }}
+          FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
+          FLY_TOKEN: ${{ secrets.FLY_TOKEN }}
+          BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
+          BOT_GITHUB_CLIENT_ID: ${{ secrets.BOT_GITHUB_CLIENT_ID }}
+          BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
+          BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}
+          BOT_GITHUB_WEBHOOK_SECRET: ${{ secrets.BOT_GITHUB_WEBHOOK_SECRET }}
+          TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}
+          NGROK_DOMAIN: ${{ vars.NGROK_DOMAIN }}
+
+          ## Preflight
+          VITE_GITHUB_APP_CLIENT_ID: ${{ secrets.VITE_GITHUB_APP_CLIENT_ID }}
+          VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}
+          PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
+          PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
+        run: pnpm wing test --debug --no-color --no-update-check --no-analytics main.w
+        working-directory: 'apps/@wingcloud/infrastructure'
   aws:
     timeout-minutes: 60
     runs-on: ubuntu-latest
