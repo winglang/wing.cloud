@@ -10,7 +10,7 @@ struct JsonApiResponse {
   body: Json?;
 }
 
-struct HttpError {
+struct HttpErrorResponse {
   code: num;
   message: str;
 }
@@ -46,7 +46,7 @@ pub class JsonApi {
             body: bodyStr,
           };
         } catch err {
-          if let error = HttpError.tryFromJson(Json.tryParse(err)) {
+          if let error = HttpErrorResponse.tryFromJson(Json.tryParse(err)) {
             return {
               status: error.code,
               headers: {
