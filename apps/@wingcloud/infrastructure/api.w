@@ -192,7 +192,7 @@ pub class Api {
       return {
         status: 302,
         headers: {
-          Location: "/${user.username}",
+          Location: "/{user.username}",
           "Set-Cookie": authCookie,
         },
       };
