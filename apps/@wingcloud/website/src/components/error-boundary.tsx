@@ -12,7 +12,6 @@ import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 import { ErrorPage } from "./error-page.js";
 
 const FallbackComponent = ({ error }: { error: Error }) => {
-  console.log("FallbackComponent", error);
   const errorData = useMemo(() => {
     if (error instanceof UnauthorizedError) {
       return {
