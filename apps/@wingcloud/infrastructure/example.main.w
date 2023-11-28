@@ -20,7 +20,7 @@ new cloud.Service(inflight () => {
     port: 8080,
     readiness: "/",
   );
-  log("containerID = ${container.containerID.value}, containerURL = ${container.url}");
+  log("containerID = {container.containerID.value}, containerURL = {container.url}");
 }) as "Create a container";
 
 probot_.onPullRequestOpened(inflight (context) => {
@@ -30,9 +30,9 @@ probot_.onPullRequestOpened(inflight (context) => {
 	let repository = context.payload.repository.full_name;
 	let pullRequestNumber = context.payload.pull_request.number;
 
-	log("branch = ${branch}");
-	log("repository = ${repository}");
-	log("pullRequestNumber = ${pullRequestNumber}");
+	log("branch = {branch}");
+	log("repository = {repository}");
+	log("pullRequestNumber = {pullRequestNumber}");
 });
 
 probot_.onPullRequestClosed(inflight (context) => {
@@ -41,8 +41,8 @@ probot_.onPullRequestClosed(inflight (context) => {
 	let branch = context.payload.pull_request.head.ref;
 	let repository = context.payload.repository.full_name;
 
-	log("branch = ${branch}");
-	log("repository = ${repository}");
+	log("branch = {branch}");
+	log("repository = {repository}");
 });
 
 probot_.onPush(inflight (context) => {
@@ -51,8 +51,8 @@ probot_.onPush(inflight (context) => {
 	let branch = context.payload.ref;
 	let repository = context.payload.repository.full_name;
 
-	log("branch = ${branch}");
-	log("repository = ${repository}");
+	log("branch = {branch}");
+	log("repository = {repository}");
 });
 
 if util.tryEnv("WING_TARGET") == "sim" {
@@ -62,6 +62,6 @@ if util.tryEnv("WING_TARGET") == "sim" {
 		domain: util.tryEnv("NGROK_DOMAIN"),
 	);
 	new cloud.Service(inflight () => {
-		log("ngrok.url = ${ngrok_.url} -> ${probot_.url}");
+		log("ngrok.url = {ngrok_.url} -> {probot_.url}");
 	}) as "Report ngrok URL";
 }

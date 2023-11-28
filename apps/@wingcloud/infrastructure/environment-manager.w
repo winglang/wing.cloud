@@ -120,7 +120,7 @@ pub class EnvironmentManager {
       let octokit = this.auth(environment.installationId);
       let owner = environment.repo.split("/").at(0);
       let repo = environment.repo.split("/").at(1);
-      let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/${environment.branch}");
+      let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/{environment.branch}");
 
       this.restart(appId: options.appId, entryfile: options.entryfile, environment: environment, sha: ref.data.object.sha);
     }

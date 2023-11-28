@@ -17,15 +17,15 @@ pub class CloudfrontLogsTable {
       configuration: {
         publishCloudwatchMetricsEnabled: true,
         resultConfiguration: {
-          outputLocation: "s3://${queryResultBucket.bucket}/"
+          outputLocation: "s3://{queryResultBucket.bucket}/"
         }
       }
     );
 
     let db = new aws.athenaDatabase.AthenaDatabase(
       name: "cloudfront_logs",
-      bucket: queryResultBucket.bucket,            
-      forceDestroy: isTestEnvironment,      
+      bucket: queryResultBucket.bucket,
+      forceDestroy: isTestEnvironment,
     );
 
     new aws.athenaNamedQuery.AthenaNamedQuery(
@@ -44,13 +44,13 @@ pub class CloudfrontLogsTable {
         "skip.header.line.count": "2"
       },
       storageDescriptor: {
-        location: "s3://${bucketName}/${prefix}/",
+        location: "s3://{bucketName}/{prefix}/",
         inputFormat: "org.apache.hadoop.mapred.TextInputFormat",
         outputFormat: "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat",
         serDeInfo: {
           name: "serde",
           serializationLibrary: "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe",
-  
+
           parameters: {
             "field.delim": "\t",
             "serialization.format": "\t"
@@ -189,8 +189,8 @@ pub class CloudfrontLogsTable {
             name: "sc_range_end",
             type: "bigint",
           }
-        ]              
+        ]
       }
-    );    
+    );
   }
 }

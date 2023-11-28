@@ -187,12 +187,12 @@ pub class Api {
         clientId: props.githubAppClientId,
         clientSecret: props.githubAppClientSecret,
       );
-      log("tokens = ${Json.stringify(tokens)}");
+      log("tokens = {Json.stringify(tokens)}");
 
       let gitHubLogin = GitHub.Exchange.getLoginFromAccessToken(tokens.access_token);
-      log("gitHubLogin = ${gitHubLogin}");
+      log("gitHubLogin = {gitHubLogin}");
       let userId = users.getOrCreate(gitHubLogin: gitHubLogin);
-      log("userId = ${userId}");
+      log("userId = {userId}");
 
       let jwt = JWT.JWT.sign(
         secret: props.appSecret,
@@ -218,7 +218,7 @@ pub class Api {
       return {
         status: 302,
         headers: {
-          Location: "/${gitHubLogin}",
+          Location: "/{gitHubLogin}",
           "Set-Cookie": authCookie,
         },
       };
@@ -226,11 +226,11 @@ pub class Api {
 
     api.get("/wrpc/github.listInstallations", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = ${accessToken}");
+        log("accessToken = {accessToken}");
 
         let installations = GitHub.Client.listUserInstallations(accessToken);
 
-        log("installations = ${Json.stringify(installations)}");
+        log("installations = {Json.stringify(installations)}");
 
         return {
           body: {
@@ -246,13 +246,13 @@ pub class Api {
 
     api.get("/wrpc/github.listRepositories", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = ${accessToken}");
+        log("accessToken = {accessToken}");
 
         let installationId = num.fromStr(request.query.get("installationId"));
 
         let repositories = GitHub.Client.listInstallationRepos(accessToken, installationId);
 
-        log("repositories = ${Json.stringify(repositories)}");
+        log("repositories = {Json.stringify(repositories)}");
 
         return {
           body: {
@@ -268,7 +268,7 @@ pub class Api {
 
     api.get("/wrpc/github.getRepository", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = ${accessToken}");
+        log("accessToken = {accessToken}");
 
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
@@ -293,7 +293,7 @@ pub class Api {
 
     api.get("/wrpc/github.getPullRequest", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = ${accessToken}");
+        log("accessToken = {accessToken}");
 
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
@@ -528,14 +528,14 @@ pub class Api {
 
     api.get("/wrpc/app.listEntryfiles", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = ${accessToken}");
+        log("accessToken = {accessToken}");
 
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
         let defaultBranch = request.query.get("default_branch");
 
         let octokit = Octokit.octokit(accessToken);
-        let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/${defaultBranch}");
+        let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/{defaultBranch}");
         let tree = octokit.git.getTree(owner: owner, repo: repo, tree_sha: ref.data.object.sha, recursive: "true");
 
         let entryfiles = MutArray<str>[];
@@ -602,13 +602,13 @@ pub class Api {
 
       let envId = environment.id;
 
-      let deployMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
+      let deployMessages = logs.tryGet("{envId}/deployment.log")?.split("\n") ?? [];
       let deployLogs = Util.parseLogs(deployMessages);
 
-      let runtimeMessages = logs.tryGet("${envId}/runtime.log")?.split("\n") ?? [];
+      let runtimeMessages = logs.tryGet("{envId}/runtime.log")?.split("\n") ?? [];
       let runtimeLogs = Util.parseLogs(runtimeMessages);
 
-      let testEntries = logs.list("${envId}/tests");
+      let testEntries = logs.list("{envId}/tests");
       let testLogs = MutArray<TestLog>[];
 
       for entry in testEntries {
@@ -734,7 +734,7 @@ pub class Api {
 
     api.post("/environment.report", inflight (req) => {
       if let event = req.body {
-        log("report status: ${event}");
+        log("report status: {event}");
         let data = Json.parse(event);
         let statusReport = status_reports.StatusReport.fromJson(data);
         props.environmentManager.updateStatus(statusReport: statusReport);
@@ -750,16 +750,16 @@ pub class Api {
       try {
         let action = EnvironmentAction.parseJson(event);
         if action.type == "create" {
-          log("create new environment event: ${event}");
+          log("create new environment event: {event}");
           let createOptions = EnvironmentManager.CreateEnvironmentOptions.fromJson(action.data);
           props.environmentManager.create(createOptions);
         } elif action.type == "restartAll" {
-          log("restart all environments event: ${event}");
+          log("restart all environments event: {event}");
           let restartAllOptions = EnvironmentManager.RestartAllEnvironmentOptions.fromJson(action.data);
           props.environmentManager.restartAll(restartAllOptions);
         }
       } catch err {
-        log("failed to execute environment action ${err}");
+        log("failed to execute environment action {err}");
       }
     });
   }

@@ -8,7 +8,7 @@ pub class Parameter impl i.IParameter {
 
   new(props: i.ParameterProps) {
     this.state = new cloud.Bucket();
-    this.key = "/config/${props.name}";
+    this.key = "/config/{props.name}";
     this.state.addObject(this.key, props.value);
   }
 

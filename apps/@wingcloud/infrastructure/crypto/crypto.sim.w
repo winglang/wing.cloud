@@ -20,7 +20,7 @@ pub class Crypto impl icrypto.ICrypto {
   pub inflight encrypt(data: str): icrypto.EncryptedData {
     let tempKey = util.nanoid();
     let key = icrypto.encrypt(this.key, tempKey);
-    let encryptedKey = "${key.iv}***${key.text}";
+    let encryptedKey = "{key.iv}***{key.text}";
     let encryptedData = icrypto.encrypt(tempKey, data);
     return {
       encryptedKey: encryptedKey,

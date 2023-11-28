@@ -1,7 +1,7 @@
 import { UserCircleIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
-import { useCallback } from "react";
+import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import { Menu } from "../design-system/menu.js";
@@ -15,14 +15,11 @@ export interface Breadcrumb {
 }
 
 const UserMenu = () => {
-  const signOutMutation = wrpc["auth.signout"].useMutation();
-
-  const signOut = useCallback(() => {
-    // eslint-disable-next-line unicorn/no-useless-undefined
-    signOutMutation.mutateAsync(undefined).then(() => {
+  const signOut = wrpc["auth.signout"].useMutation({
+    onSuccess(d) {
       location.href = "/";
-    });
-  }, [signOutMutation]);
+    },
+  });
 
   return (
     <Menu
@@ -31,7 +28,7 @@ const UserMenu = () => {
         {
           label: "Sign out",
           onClick: () => {
-            signOut();
+            signOut.mutate(undefined);
           },
         },
       ]}
@@ -52,8 +49,6 @@ export const Header = () => {
   const { theme } = useTheme();
   const location = useLocation();
 
-  const user = wrpc["auth.check"].useQuery();
-
   const breadcrumbs = useMemo(() => {
     const parts = location.pathname.split("/").filter((part) => part !== "");
     return parts.map((part, index) => {
@@ -65,6 +60,16 @@ export const Header = () => {
     });
   }, [location.pathname]);
 
+  const authCheck = wrpc["auth.check"].useQuery(undefined, {
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (authCheck.isError) {
+      window.location.href = "/";
+    }
+  }, [authCheck.isError]);
+
   return (
     <header className={clsx("p-6 shadow z-10", theme.bgInput)}>
       <nav className="flex" aria-label="Breadcrumb">
@@ -72,8 +77,9 @@ export const Header = () => {
           <li>
             <div>
               <Link
-                to={`/${user.data?.username}`}
-                aria-disabled={!user.data?.username}
+                to={
+                  authCheck.data ? `/${authCheck.data.username}` : "/dashboard"
+                }
                 className={clsx(theme.text1, theme.text1Hover)}
               >
                 <WingIcon className="h-5 w-auto" />

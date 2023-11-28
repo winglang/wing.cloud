@@ -24,7 +24,7 @@ pub class Ngrok {
 			"ngrok",
 			args.copy(),
 			onData: inflight (data) => {
-				log("[ngrok] ${data}");
+				log("[ngrok] {data}");
 			},
 		);
 		let state = new sim.State();
@@ -35,10 +35,10 @@ pub class Ngrok {
         let var retries = 3;
         while retries > 0 {
           try {
-            let json = Json.parse(http.get("http://127.0.0.1:${ngrokAPIPort}/api/tunnels").body);
+            let json = Json.parse(http.get("http://127.0.0.1:{ngrokAPIPort}/api/tunnels").body);
             for tunnel in Json.values(json.get("tunnels")) {
               let address = tunnel.get("config").get("addr").asStr();
-              log("Checking ${address}");
+              log("Checking {address}");
               if address == props.url {
                 state.set("url", tunnel.get("public_url").asStr());
                 return nil;
@@ -51,7 +51,7 @@ pub class Ngrok {
         }
         ngrokAPIPort += 1;
       }
-			throw "Couldn't find the ngrok tunnel for ${props.url}";
+			throw "Couldn't find the ngrok tunnel for {props.url}";
 		});
 		urlRetriever.node.addDependency(ngrok);
 	}

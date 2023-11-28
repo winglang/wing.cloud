@@ -9,8 +9,8 @@ let secrets = new Secrets.Secrets();
 test "not storing sensitive data" {
   let secret = secrets.create(appId: "app-id", environmentType: "production", name: "test-secret", value: "secret-value");
   let item = secrets.table.getItem(key: {
-    pk: "APP#${secret.appId}",
-    sk: "SECRET#TYPE#production#SECRET#${secret.id}",
+    pk: "APP#{secret.appId}",
+    sk: "SECRET#TYPE#production#SECRET#{secret.id}",
   });
   let encryptedValue = item.item?.get("value");
   let value = Json secret.value;
@@ -38,7 +38,7 @@ test "can list secrets" {
   let secret1 = secrets.create(appId: "app-id", environmentType: "preview", name: "test-secret", value: "secret-value");
   let secret2 = secrets.create(appId: "app-id", environmentType: "preview", name: "test-secret-2", value: "secret-value-2");
   let secret3 = secrets.create(appId: "app-id", environmentType: "production", name: "test-secret-3", value: "secret-value-3");
-  
+
   let expected1 = Secrets.Secret{
     id: secret1.id,
     appId: "app-id",
@@ -57,7 +57,7 @@ test "can list secrets" {
     createdAt: secret2.createdAt,
     updatedAt: secret2.updatedAt,
   };
-  
+
   // with envType and envId
   let storedSecrets = secrets.list(appId: "app-id", environmentType: "preview", decryptValues: true);
   assert(storedSecrets.length == 2);

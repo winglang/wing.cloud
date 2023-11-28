@@ -27,14 +27,14 @@ inflight class App {
    * Get the hostname of this app (e.g. app-name.fly.dev).
    */
   pub hostname(): str {
-    return "${this.props.name}.fly.dev";
+    return "{this.props.name}.fly.dev";
   }
 
   /**
    * Get the public url of this app (e.g. https://app-name.fly.dev).
    */
   pub url(): str {
-    return "https://${this.hostname()}";
+    return "https://{this.hostname()}";
   }
 
   /**
