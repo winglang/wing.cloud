@@ -9,7 +9,7 @@ pub class Parameter impl i.IParameter {
   arn: str;
 
   new(props: i.ParameterProps) {
-    this.key = "/wing-cloud/apps/config/${props.name}";
+    this.key = "/wing-cloud/apps/config/{props.name}";
     let parameter = new tfaws.ssmParameter.SsmParameter(
       name: this.key,
       type: "String",
@@ -23,7 +23,7 @@ pub class Parameter impl i.IParameter {
   }
 
   pub onLift(host: std.IInflightHost, ops: Array<str>) {
-    log("onLift called on Config with ops ${ops} ${host}");
+    log("onLift called on Config with ops {ops} {host}");
     if let host = aws.Function.from(host) {
       host.addPolicyStatements(aws.PolicyStatement {
         actions: ["ssm:GetParameter"],

@@ -44,7 +44,7 @@ pub class DockerContainers impl types.IContainers {
     let args = MutArray<str>["run"];
     args.push("--detach");
     args.push("--publish");
-    args.push("${options.port}");
+    args.push("{options.port}");
     args.push("--name");
     args.push(containerID.value);
     if let env = options?.env {
@@ -57,7 +57,7 @@ pub class DockerContainers impl types.IContainers {
         }
 
         args.push("--env");
-        args.push("${key}=${value}");
+        args.push("{key}={value}");
       }
     }
     args.push(options.image);
@@ -69,7 +69,7 @@ pub class DockerContainers impl types.IContainers {
     let containerURL = this.findContainerURL(containerID, options.port);
 
     if let readiness = options.readiness {
-      let readinessURL = "${containerURL}${readiness}";
+      let readinessURL = "{containerURL}{readiness}";
       let success = util.waitUntil(inflight () => {
         try {
           let response = http.get(readinessURL);
@@ -79,7 +79,7 @@ pub class DockerContainers impl types.IContainers {
         }
       }, interval: 0.5s, timeout: 2m);
       if !success {
-        throw "Container [${containerID.value}] failed readiness check [${readinessURL}]";
+        throw "Container [{containerID.value}] failed readiness check [{readinessURL}]";
       }
     }
 
@@ -96,16 +96,16 @@ pub class DockerContainers impl types.IContainers {
 
   inflight findHostPort(containerID: types.ContainerID, port: num): str {
     let inspectResult = Json.parse(DockerContainers.exec("docker", ["inspect", containerID.value]));
-    if let port = inspectResult.tryGetAt(0)?.tryGet("NetworkSettings")?.tryGet("Ports")?.tryGet("${port}/tcp")?.tryGetAt(0)?.tryGet("HostPort") {
+    if let port = inspectResult.tryGetAt(0)?.tryGet("NetworkSettings")?.tryGet("Ports")?.tryGet("{port}/tcp")?.tryGetAt(0)?.tryGet("HostPort") {
       return port.asStr();
     } else {
-      throw "Unable to find port [${port}] for container [${containerID.value}]";
+      throw "Unable to find port [{port}] for container [{containerID.value}]";
     }
   }
 
   inflight findContainerURL(containerID: types.ContainerID, port: num): str {
     let hostPort = this.findHostPort(containerID, port);
-    return "http://localhost:${hostPort}";
+    return "http://localhost:{hostPort}";
   }
 
   pub inflight destroy(containerID: types.ContainerID): void {

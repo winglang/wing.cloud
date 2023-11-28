@@ -43,7 +43,6 @@ export const useCreateAppFromRepo = () => {
         repoOwner: repo.owner.login,
         entryfile: "main.w",
         default_branch: repo.default_branch,
-        imageUrl: repo.owner.avatar_url,
         installationId: installationId,
       },
       {

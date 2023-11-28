@@ -61,7 +61,7 @@ pub class Endpoints {
   pub inflight create(options: CreateEndpointOptions): Endpoint {
     let createdAt = datetime.utcNow().toIso();
     let endpoint = Endpoint {
-      id: "endpoint${nanoid62.Nanoid62.generate()}",
+      id: "endpoint_{nanoid62.Nanoid62.generate()}",
       appId: options.appId,
       environmentId: options.environmentId,
       path: options.path,
@@ -97,7 +97,7 @@ pub class Endpoints {
     this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: makeItem(pk: "ENVIRONMENT#${endpoint.environmentId}", sk: "ENDPOINT#${endpoint.id}"),
+          item: makeItem(pk: "ENVIRONMENT#{endpoint.environmentId}", sk: "ENDPOINT#{endpoint.id}"),
           conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
         },
       },
@@ -109,8 +109,8 @@ pub class Endpoints {
   pub inflight get(options: GetEndpointOptions): Endpoint {
     let result = this.table.getItem(
       key: {
-        pk: "ENVIRONMENT#${options.environmentId}",
-        sk: "ENDPOINT#${options.id}",
+        pk: "ENVIRONMENT#{options.environmentId}",
+        sk: "ENDPOINT#{options.id}",
       },
     );
 
@@ -118,14 +118,14 @@ pub class Endpoints {
       return this.fromDB(item);
     }
 
-    throw "Endpoint [${options.id}] not found";
+    throw "Endpoint [{options.id}] not found";
   }
 
   pub inflight delete(options: DeleteEndpointOptions): Endpoint {
     let result = this.table.deleteItem(
       key: {
-        pk: "ENVIRONMENT#${options.environmentId}",
-        sk: "ENDPOINT#${options.id}",
+        pk: "ENVIRONMENT#{options.environmentId}",
+        sk: "ENDPOINT#{options.id}",
       },
     );
   }
@@ -134,7 +134,7 @@ pub class Endpoints {
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
-        ":pk": "ENVIRONMENT#${options.environmentId}",
+        ":pk": "ENVIRONMENT#{options.environmentId}",
         ":sk": "ENDPOINT#",
       },
     );

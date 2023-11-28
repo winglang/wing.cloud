@@ -29,6 +29,11 @@ struct TestLog {
   traces: Array<Log>;
 }
 
+struct UserFromCookie {
+  userId: str;
+  username: str;
+}
+
 // TODO: https://github.com/winglang/wing/issues/3644
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
@@ -73,7 +78,6 @@ struct ApiProps {
   githubAppClientSecret: str;
   appSecret: str;
   logs: cloud.Bucket;
-  postSignInRedirectURL: str;
 }
 
 
@@ -108,12 +112,30 @@ pub class Api {
       }
     };
 
-    let getUserFromCookie = inflight (request: cloud.ApiRequest) => {
+    let getUserIdFromCookie = inflight (request: cloud.ApiRequest) => {
       if let payload = getJWTPayloadFromCookie(request) {
         return payload.userId;
       } else {
         throw "Unauthorized";
       }
+    };
+
+    let getUserFromCookie = inflight (request: cloud.ApiRequest): UserFromCookie => {
+      let userId = getUserIdFromCookie(request);
+      let user = users.get(userId: userId);
+      return {
+        userId: userId,
+        username: user.username,
+      };
+    };
+
+    let verifyUser = inflight (request: cloud.ApiRequest): str => {
+      let user = getUserFromCookie(request);
+
+      if user.username != request.query.get("owner") {
+        throw "Unauthorized";
+      }
+      return user.userId;
     };
 
     let getAccessTokenFromCookie = inflight (request: cloud.ApiRequest) => {
@@ -124,15 +146,14 @@ pub class Api {
     api.get("/wrpc/auth.check", inflight (request) => {
       if let payload = getJWTPayloadFromCookie(request) {
         // check if the user from the cookie is valid
-        let userId = getUserFromCookie(request);
+        let userId = getUserIdFromCookie(request);
 
         // check if user exists in the db
-        let username = users.getUsername(userId: userId);
+        let user = users.get(userId: userId);
 
         return {
           body: {
-            userId: payload.userId,
-            username: username,
+            user: user
           },
         };
       }
@@ -167,16 +188,21 @@ pub class Api {
         clientId: props.githubAppClientId,
         clientSecret: props.githubAppClientSecret,
       );
-      log("tokens = ${Json.stringify(tokens)}");
+      log("tokens = {Json.stringify(tokens)}");
 
-      let gitHubLogin = GitHub.Exchange.getLoginFromAccessToken(tokens.access_token);
-      log("gitHubLogin = ${gitHubLogin}");
-      let userId = users.getOrCreate(gitHubLogin: gitHubLogin);
-      log("userId = ${userId}");
+      let githubUser = GitHub.Client.getUser(tokens.access_token);
+      log("gitHubLogin = {githubUser.login}");
+
+      let user = users.getOrCreate(
+        displayName: githubUser.name,
+        username: githubUser.login,
+        avatarUrl: githubUser.avatar_url,
+      );
+      log("userId = {user.id}");
 
       let jwt = JWT.JWT.sign(
         secret: props.appSecret,
-        userId: userId,
+        userId: user.id,
         accessToken: tokens.access_token,
         accessTokenExpiresIn: tokens.expires_in,
         refreshToken: tokens.refresh_token,
@@ -198,7 +224,7 @@ pub class Api {
       return {
         status: 302,
         headers: {
-          Location: props.postSignInRedirectURL,
+          Location: "/{user.username}",
           "Set-Cookie": authCookie,
         },
       };
@@ -206,11 +232,11 @@ pub class Api {
 
     api.get("/wrpc/github.listInstallations", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = ${accessToken}");
+        log("accessToken = {accessToken}");
 
         let installations = GitHub.Client.listUserInstallations(accessToken);
 
-        log("installations = ${Json.stringify(installations)}");
+        log("installations = {Json.stringify(installations)}");
 
         return {
           body: {
@@ -226,13 +252,13 @@ pub class Api {
 
     api.get("/wrpc/github.listRepositories", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = ${accessToken}");
+        log("accessToken = {accessToken}");
 
         let installationId = num.fromStr(request.query.get("installationId"));
 
         let repositories = GitHub.Client.listInstallationRepos(accessToken, installationId);
 
-        log("repositories = ${Json.stringify(repositories)}");
+        log("repositories = {Json.stringify(repositories)}");
 
         return {
           body: {
@@ -248,7 +274,7 @@ pub class Api {
 
     api.get("/wrpc/github.getRepository", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = ${accessToken}");
+        log("accessToken = {accessToken}");
 
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
@@ -273,7 +299,7 @@ pub class Api {
 
     api.get("/wrpc/github.getPullRequest", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = ${accessToken}");
+        log("accessToken = {accessToken}");
 
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
@@ -299,7 +325,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.get", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = verifyUser(request);
 
       let appId = request.query.get("appId");
 
@@ -324,7 +350,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.getByName", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = verifyUser(request);
 
       let appName = request.query.get("appName");
 
@@ -349,25 +375,8 @@ pub class Api {
       };
     });
 
-
-    api.post("/wrpc/app.rename", inflight (request) => {
-      let userId = getUserFromCookie(request);
-
-      let input = Json.parse(request.body ?? "");
-
-      apps.rename(
-        appId: input.get("appId").asStr(),
-        appName: input.get("appName").asStr(),
-        userId: userId,
-        repository: input.get("repository").asStr(),
-      );
-
-      return {
-      };
-    });
-
     api.post("/wrpc/app.delete", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
 
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
@@ -385,7 +394,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environments", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = verifyUser(request);
 
       let environments = props.environments.list(
         appId: request.query.get("appId"),
@@ -399,7 +408,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environment", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = verifyUser(request);
 
       let appName = request.query.get("appName");
       let branch = request.query.get("branch");
@@ -422,7 +431,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.listSecrets", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let appId = request.query.get("appId");
       let prodSecrets = props.secrets.list(appId: appId, environmentType: "production");
       let previewSecrets = props.secrets.list(appId: appId, environmentType: "preview");
@@ -436,7 +445,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.decryptSecret", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let secretId = input.get("secretId").asStr();
@@ -453,7 +462,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.createSecret", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let environmentType = input.get("environmentType").asStr();
@@ -491,7 +500,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.deleteSecret", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let environmentType = input.get("environmentType").asStr();
@@ -509,14 +518,14 @@ pub class Api {
 
     api.get("/wrpc/app.listEntryfiles", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = ${accessToken}");
+        log("accessToken = {accessToken}");
 
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
         let defaultBranch = request.query.get("default_branch");
 
         let octokit = Octokit.octokit(accessToken);
-        let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/${defaultBranch}");
+        let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/{defaultBranch}");
         let tree = octokit.git.getTree(owner: owner, repo: repo, tree_sha: ref.data.object.sha, recursive: "true");
 
         let entryfiles = MutArray<str>[];
@@ -541,8 +550,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.updateEntryfile", inflight (request) => {
-      log("${Json.stringify(request)}");
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let appName = input.get("appName").asStr();
@@ -554,7 +562,8 @@ pub class Api {
       queue.push(Json.stringify(EnvironmentAction{
         type: "restartAll",
         data: EnvironmentManager.RestartAllEnvironmentOptions {
-          app: app,
+          appId: appId,
+          entryfile: app.entryfile,
       }}));
 
       return {
@@ -566,7 +575,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environment.logs", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = verifyUser(request);
 
       let appName = request.query.get("appName");
       let branch = request.query.get("branch");
@@ -583,13 +592,13 @@ pub class Api {
 
       let envId = environment.id;
 
-      let deployMessages = logs.tryGet("${envId}/deployment.log")?.split("\n") ?? [];
+      let deployMessages = logs.tryGet("{envId}/deployment.log")?.split("\n") ?? [];
       let deployLogs = Util.parseLogs(deployMessages);
 
-      let runtimeMessages = logs.tryGet("${envId}/runtime.log")?.split("\n") ?? [];
+      let runtimeMessages = logs.tryGet("{envId}/runtime.log")?.split("\n") ?? [];
       let runtimeLogs = Util.parseLogs(runtimeMessages);
 
-      let testEntries = logs.list("${envId}/tests");
+      let testEntries = logs.list("{envId}/tests");
       let testLogs = MutArray<TestLog>[];
 
       for entry in testEntries {
@@ -607,13 +616,13 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environment.endpoints", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let user = getUserFromCookie(request);
 
       let appName = request.query.get("appName");
       let branch = request.query.get("branch");
 
       let appId = apps.getByName(
-        userId: userId,
+        userId: user.userId,
         appName: appName,
       ).appId;
 
@@ -631,62 +640,91 @@ pub class Api {
       };
     });
 
+    let productionEnvironmentQueue = new cloud.Queue() as "Production Environment Queue";
+    productionEnvironmentQueue.setConsumer(inflight (event) => {
+      let input = Json.parse(event);
+
+      let appId = input.get("appId").asStr();
+      let entryfile = input.get("entryfile").asStr();
+      let repoId = input.get("repoId").asStr();
+      let defaultBranch = input.get("default_branch").asStr();
+
+      let commitData = GitHub.Client.getLastCommit(
+        token: input.get("accessToken").asStr(),
+        owner:  input.get("repoOwner").asStr(),
+        repo: input.get("repoName").asStr(),
+        default_branch: defaultBranch,
+      );
+
+      let installationId = input.get("installationId").asNum();
+      queue.push(Json.stringify(EnvironmentAction {
+        type: "create",
+        data: EnvironmentManager.CreateEnvironmentOptions {
+          createEnvironment: {
+            branch: defaultBranch,
+            appId: appId,
+            type: "production",
+            prTitle: defaultBranch,
+            repo: repoId,
+            status: "initializing",
+            installationId: installationId,
+          },
+          appId: appId,
+          entryfile: entryfile,
+          sha: commitData.sha,
+      }}));
+    });
+
     api.post("/wrpc/user.createApp", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        let userId = getUserFromCookie(request);
+        let user = getUserFromCookie(request);
 
         let input = Json.parse(request.body ?? "");
 
-        let gitHubLogin = users.getUsername(userId: userId);
-
         let defaultBranch = input.get("default_branch").asStr();
         let repoId = input.get("repoId").asStr();
-
-        let commitData = GitHub.Client.getLastCommit(
-          token: accessToken,
-          owner:  input.get("repoOwner").asStr(),
-          repo: input.get("repoName").asStr(),
-          default_branch: input.get("default_branch").asStr(),
-        );
+        let repoOwner = input.get("repoOwner").asStr();
+        let repoName = input.get("repoName").asStr();
+        let entryfile = input.get("entryfile").asStr();
 
         // TODO: https://github.com/winglang/wing/issues/3644
-        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9]+", "-");
+        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9-]+", "*");
+        if appName.contains("*") {
+          return {
+            status: 422,
+            body: {
+              message: "Invalid app name. Must consist of alphanumeric characters and hiphens only.",
+            },
+          };
+        }
 
-        let app = apps.create(
+        let appId = apps.create(
           appName: appName,
           description: input.tryGet("description")?.tryAsStr() ?? "",
-          repoId: input.get("repoId").asStr(),
-          repoName: input.get("repoName").asStr(),
-          repoOwner: input.get("repoOwner").asStr(),
-          imageUrl: input.get("imageUrl").asStr(),
-          userId: userId,
-          entryfile: input.get("entryfile").asStr(),
+          repoId: repoId,
+          repoName: repoName,
+          repoOwner: repoOwner,
+          userId: user.userId,
+          entryfile: entryfile,
           createdAt: datetime.utcNow().toIso(),
-          createdBy: gitHubLogin,
-          lastCommitMessage: commitData?.commit?.message ?? "",
         );
 
-        let installationId = num.fromStr(input.get("installationId").asStr());
-        queue.push(Json.stringify(EnvironmentAction{
-          type: "create",
-          data: EnvironmentManager.CreateEnvironmentOptions {
-            createEnvironment: {
-              branch: defaultBranch,
-              appId: app.appId,
-              type: "production",
-              prTitle: defaultBranch,
-              repo: repoId,
-              status: "initializing",
-              installationId: installationId,
-            },
-            app: app,
-            sha: commitData.sha,
-        }}));
+        productionEnvironmentQueue.push(Json.stringify({
+          accessToken: accessToken,
+          repoId: repoId,
+          repoOwner: repoOwner,
+          repoName: repoName,
+          default_branch: defaultBranch,
+          installationId: num.fromStr(input.get("installationId").asStr()),
+          appId: appId,
+          entryfile: entryfile,
+        }));
 
         return {
           body: {
-            appId: app.appId,
-            appName: app.appName,
+            appId: appId,
+            appName: appName,
+            appUri: "{user.username}/{appName}",
           },
         };
       } else {
@@ -697,7 +735,7 @@ pub class Api {
     });
 
     api.get("/wrpc/user.listApps", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = verifyUser(request);
 
       let userApps = apps.list(
         userId: userId,
@@ -712,7 +750,7 @@ pub class Api {
 
     api.post("/environment.report", inflight (req) => {
       if let event = req.body {
-        log("report status: ${event}");
+        log("report status: {event}");
         let data = Json.parse(event);
         let statusReport = status_reports.StatusReport.fromJson(data);
         props.environmentManager.updateStatus(statusReport: statusReport);
@@ -728,16 +766,16 @@ pub class Api {
       try {
         let action = EnvironmentAction.parseJson(event);
         if action.type == "create" {
-          log("create new environment event: ${event}");
+          log("create new environment event: {event}");
           let createOptions = EnvironmentManager.CreateEnvironmentOptions.fromJson(action.data);
           props.environmentManager.create(createOptions);
         } elif action.type == "restartAll" {
-          log("restart all environments event: ${event}");
+          log("restart all environments event: {event}");
           let restartAllOptions = EnvironmentManager.RestartAllEnvironmentOptions.fromJson(action.data);
           props.environmentManager.restartAll(restartAllOptions);
         }
       } catch err {
-        log("failed to execute environment action ${err}");
+        log("failed to execute environment action {err}");
       }
     });
   }

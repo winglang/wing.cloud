@@ -25,7 +25,7 @@ pub inflight class PublicEndpoint impl iendpoint.IPublicEndpoint {
     this.dns.createRecords([{
       zone: this.domain,
       type: "CNAME",
-      name: "${this.port}",
+      name: "{this.port}",
       content: this.targetUrl
     }]);
   }
@@ -35,6 +35,6 @@ pub inflight class PublicEndpoint impl iendpoint.IPublicEndpoint {
   }
 
   pub inflight url(): str {
-    return "http://${this.domain}:${this.port}";
+    return "http://{this.domain}:{this.port}";
   }
 }

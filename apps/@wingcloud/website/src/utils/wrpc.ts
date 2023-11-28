@@ -4,6 +4,12 @@ import {
   type QueryProcedure,
 } from "@wingcloud/wrpc";
 
+export interface User {
+  id: string;
+  username: string;
+  avatarUrl: string;
+}
+
 export interface Installation {
   id: number;
   account: { login: string };
@@ -24,17 +30,11 @@ export interface App {
   appId: string;
   appName: string;
   description: string;
-  imageUrl?: string;
   repoId: string;
   repoName: string;
   repoOwner: string;
   userId: string;
   entryfile: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  lastCommitMessage?: string;
 }
 
 export interface TestResult {
@@ -127,8 +127,7 @@ export const wrpc = createWRPCReact<{
   "auth.check": QueryProcedure<
     undefined,
     {
-      userId: string;
-      username: string;
+      user: User;
     }
   >;
   "auth.signout": MutationProcedure;
@@ -152,31 +151,31 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.get": QueryProcedure<
-    { appId: string },
+    { owner: string; appId: string },
     {
       app: App;
     }
   >;
   "app.getByName": QueryProcedure<
-    { appName: string },
+    { owner: string; appName: string },
     {
       app: App;
     }
   >;
   "app.environments": QueryProcedure<
-    { appId: string },
+    { owner: string; appId: string },
     {
       environments: Array<Environment>;
     }
   >;
   "app.environment": QueryProcedure<
-    { appName: string; branch: string },
+    { owner: string; appName: string; branch: string },
     {
       environment: Environment;
     }
   >;
   "app.environment.logs": QueryProcedure<
-    { appName: string; branch: string },
+    { owner: string; appName: string; branch: string },
     {
       deploy: Log[];
       runtime: Log[];
@@ -222,13 +221,11 @@ export const wrpc = createWRPCReact<{
     { appId: string; appName: string; repoId: string; entryfile: string },
     {}
   >;
-  "app.rename": MutationProcedure<
-    { appId: string; appName: string; repository: string },
-    {}
-  >;
   "app.delete": MutationProcedure<{ appId: string }, {}>;
   "user.listApps": QueryProcedure<
-    undefined,
+    {
+      owner: string;
+    },
     {
       apps: Array<App>;
     }
@@ -242,12 +239,11 @@ export const wrpc = createWRPCReact<{
       default_branch: string;
       appName: string;
       entryfile: string;
-      imageUrl?: string;
       installationId: string;
     },
     {
       appId: string;
-      appName: string;
+      appUri: string;
     }
   >;
 }>();

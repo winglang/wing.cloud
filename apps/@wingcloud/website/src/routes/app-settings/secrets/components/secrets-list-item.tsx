@@ -6,10 +6,10 @@ import {
 import clsx from "clsx";
 import { useCallback, useState } from "react";
 
-import { Button } from "../../../design-system/button.js";
-import { useTheme } from "../../../design-system/theme-provider.js";
-import { useTimeAgo } from "../../../utils/time.js";
-import type { Secret } from "../../../utils/wrpc.js";
+import { Button } from "../../../../design-system/button.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
+import { useTimeAgo } from "../../../../utils/time.js";
+import type { Secret } from "../../../../utils/wrpc.js";
 
 const EmptySecret = "•••••••••••••••";
 

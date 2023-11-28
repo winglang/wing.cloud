@@ -14,8 +14,6 @@ export const AppCard = ({
 }) => {
   const { theme } = useTheme();
 
-  const updatedAt = useTimeAgo(app.updatedAt);
-
   return (
     <button
       onClick={onClick}
@@ -28,37 +26,14 @@ export const AppCard = ({
       )}
     >
       <div className="space-y-4 w-full">
-        <div className="flex gap-x-2">
-          {app.imageUrl && (
-            <img src={app.imageUrl} className="w-10 h-10 rounded-full" />
-          )}
-          {!app.imageUrl && (
-            <div className="w-10 h-10 rounded-full bg-sky-50 flex justify-center items-center">
-              <div className={clsx(theme.text1)}>{app.appName[0]}</div>
-            </div>
-          )}
-        </div>
-
         <div className="w-full truncate space-y-1">
           <div className={clsx("text-lg", theme.text1)}>{app.appName}</div>
           <div className={clsx("text-xs flex gap-x-1", theme.text2)}>
-            {app.lastCommitMessage && (
-              <GithubIcon className={clsx("h-4 w-4 shrink-0", theme.text1)} />
-            )}
-            <div className="truncate" title={app.lastCommitMessage}>
-              {app.lastCommitMessage?.split("\n")[0] || app.entryfile}
+            <div className="truncate" title={app.entryfile}>
+              {app.entryfile}
             </div>
           </div>
         </div>
-      </div>
-
-      <div
-        className={clsx(
-          "w-full truncate text-xs mt-3 h-full items-end",
-          theme.text2,
-        )}
-      >
-        {`Updated ${updatedAt} by ${app.updatedBy}`}
       </div>
     </button>
   );

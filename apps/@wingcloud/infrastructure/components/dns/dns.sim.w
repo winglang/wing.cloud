@@ -20,7 +20,7 @@ pub class DNS impl idns.IDNS {
     this.state = new sim.State();
     this.svc = new cloud.Service(inflight () => {
       let result = Util.startServer();
-      this.state.set("url", "http://localhost:${result.port}");
+      this.state.set("url", "http://localhost:{result.port}");
       return () => {
         result.close();
       };
@@ -34,7 +34,7 @@ pub class DNS impl idns.IDNS {
       let fromPort = this.portFromUrl(record.name);
       let zone = record.zone;
       let toPort = this.portFromUrl(record.content);
-      http.get("${url}?fromPort=${fromPort}&host=${zone}&toPort=${toPort}");
+      http.get("{url}?fromPort={fromPort}&host={zone}&toPort={toPort}");
     }
   }
 

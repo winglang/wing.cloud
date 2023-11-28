@@ -41,6 +41,6 @@ pub inflight class PublicEndpoint impl iendpoint.IPublicEndpoint {
   }
 
   pub inflight url(): str {
-    return "https://${this.digest}.${this.domain}";
+    return "https://{this.digest}.{this.domain}";
   }
 }

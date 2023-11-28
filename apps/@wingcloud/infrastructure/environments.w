@@ -5,7 +5,6 @@ bring "./status-reports.w" as status_report;
 pub struct Environment {
   id: str;
   appId: str;
-  runId: str;
   type: str;
   repo: str;
   branch: str;
@@ -54,11 +53,6 @@ struct UpdateEnvironmentCommentIdOptions {
   commentId: num;
 }
 
-struct UpdateEnvironmentRunIdOptions {
-  id: str;
-  appId: str;
-}
-
 struct UpdateEnvironmentTestResultsOptions {
   id: str;
   appId: str;
@@ -94,9 +88,8 @@ pub class Environments {
   pub inflight create(options: CreateEnvironmentOptions): Environment {
     let createdAt = datetime.utcNow().toIso();
     let environment = Environment {
-      id: "environment_${nanoid62.Nanoid62.generate()}",
+      id: "environment_{nanoid62.Nanoid62.generate()}",
       appId: options.appId,
-      runId: nanoid62.Nanoid62.generate(),
       type: options.type,
       repo: options.repo,
       branch: options.branch,
@@ -114,7 +107,6 @@ pub class Environments {
         sk: ops.sk,
         id: environment.id,
         appId: environment.appId,
-        runId: environment.runId,
         type: environment.type,
         repo: environment.repo,
         branch: environment.branch,
@@ -135,23 +127,23 @@ pub class Environments {
     this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: makeItem(pk: "ENVIRONMENT#${environment.id}", sk: "#"),
+          item: makeItem(pk: "ENVIRONMENT#{environment.id}", sk: "#"),
           conditionExpression: "attribute_not_exists(pk)"
         },
       },
       {
         put: {
           item: makeItem(
-            pk: "APP#${environment.appId}",
-            sk: "ENVIRONMENT#${environment.id}"
+            pk: "APP#{environment.appId}",
+            sk: "ENVIRONMENT#{environment.id}"
           ),
         },
       },
       {
         put: {
           item: makeItem(
-            pk: "APP#${environment.appId}",
-            sk: "BRANCH#${environment.branch}"
+            pk: "APP#{environment.appId}",
+            sk: "BRANCH#{environment.branch}"
           ),
         },
       },
@@ -161,11 +153,6 @@ pub class Environments {
   }
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
-    // new run
-    if options.status == "initializing" {
-      this.updateRunId(id: options.id, appId: options.appId);
-    }
-
     let branch = this.get(
       id: options.id,
     ).branch;
@@ -174,7 +161,7 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "ENVIRONMENT#${options.id}",
+            pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
           updateExpression: "SET #status = :status",
@@ -193,8 +180,8 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "APP#${options.appId}",
-            sk: "ENVIRONMENT#${options.id}",
+            pk: "APP#{options.appId}",
+            sk: "ENVIRONMENT#{options.id}",
           },
           updateExpression: "SET #status = :status",
           expressionAttributeNames: {
@@ -208,8 +195,8 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "APP#${options.appId}",
-            sk: "BRANCH#${branch}",
+            pk: "APP#{options.appId}",
+            sk: "BRANCH#{branch}",
           },
           updateExpression: "SET #status = :status",
           expressionAttributeNames: {
@@ -232,7 +219,7 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "ENVIRONMENT#${options.id}",
+            pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
           updateExpression: "SET #url = :url",
@@ -251,8 +238,8 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "APP#${options.appId}",
-            sk: "ENVIRONMENT#${options.id}",
+            pk: "APP#{options.appId}",
+            sk: "ENVIRONMENT#{options.id}",
           },
           updateExpression: "SET #url = :url",
           expressionAttributeNames: {
@@ -266,8 +253,8 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "APP#${options.appId}",
-            sk: "BRANCH#${branch}",
+            pk: "APP#{options.appId}",
+            sk: "BRANCH#{branch}",
           },
           updateExpression: "SET #url = :url",
           expressionAttributeNames: {
@@ -290,7 +277,7 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "ENVIRONMENT#${options.id}",
+            pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
           updateExpression: "SET #commentId = :commentId",
@@ -309,8 +296,8 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "APP#${options.appId}",
-            sk: "ENVIRONMENT#${options.id}",
+            pk: "APP#{options.appId}",
+            sk: "ENVIRONMENT#{options.id}",
           },
           updateExpression: "SET #commentId = :commentId",
           expressionAttributeNames: {
@@ -324,8 +311,8 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "APP#${options.appId}",
-            sk: "BRANCH#${branch}",
+            pk: "APP#{options.appId}",
+            sk: "BRANCH#{branch}",
           },
           updateExpression: "SET #commentId = :commentId",
           expressionAttributeNames: {
@@ -348,7 +335,7 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "ENVIRONMENT#${options.id}",
+            pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
           updateExpression: "SET #testResults = :testResults",
@@ -367,8 +354,8 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "APP#${options.appId}",
-            sk: "ENVIRONMENT#${options.id}",
+            pk: "APP#{options.appId}",
+            sk: "ENVIRONMENT#{options.id}",
           },
           updateExpression: "SET #testResults = :testResults",
           expressionAttributeNames: {
@@ -382,8 +369,8 @@ pub class Environments {
       {
         update: {
           key: {
-            pk: "APP#${options.appId}",
-            sk: "BRANCH#${branch}",
+            pk: "APP#{options.appId}",
+            sk: "BRANCH#{branch}",
           },
           updateExpression: "SET #testResults = :testResults",
           expressionAttributeNames: {
@@ -397,70 +384,10 @@ pub class Environments {
     ]);
   }
 
-  pub inflight updateRunId(options: UpdateEnvironmentRunIdOptions) {
-    let branch = this.get(
-      id: options.id,
-    ).branch;
-
-    let runId = nanoid62.Nanoid62.generate();
-
-    this.table.transactWriteItems(transactItems: [
-      {
-        update: {
-          key: {
-            pk: "ENVIRONMENT#${options.id}",
-            sk: "#",
-          },
-          updateExpression: "SET #runId = :runId",
-          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
-          expressionAttributeNames: {
-            "#pk": "pk",
-            "#runId": "runId",
-            "#appId": "appId",
-          },
-          expressionAttributeValues: {
-            ":runId": runId,
-            ":appId": options.appId,
-          },
-        }
-      },
-      {
-        update: {
-          key: {
-            pk: "APP#${options.appId}",
-            sk: "ENVIRONMENT#${options.id}",
-          },
-          updateExpression: "SET #runId = :runId",
-          expressionAttributeNames: {
-            "#runId": "runId",
-          },
-          expressionAttributeValues: {
-            ":runId": runId,
-          },
-        }
-      },
-      {
-        update: {
-          key: {
-            pk: "APP#${options.appId}",
-            sk: "BRANCH#${branch}",
-          },
-          updateExpression: "SET #runId = :runId",
-          expressionAttributeNames: {
-            "#runId": "runId",
-          },
-          expressionAttributeValues: {
-            ":runId": runId,
-          },
-        }
-      },
-    ]);
-  }
-
   pub inflight get(options: GetEnvironmentOptions): Environment {
     let result = this.table.getItem(
       key: {
-        pk: "ENVIRONMENT#${options.id}",
+        pk: "ENVIRONMENT#{options.id}",
         sk: "#",
       },
     );
@@ -469,7 +396,6 @@ pub class Environments {
       return {
         id: item.get("id").asStr(),
         appId: item.get("appId").asStr(),
-        runId: item.get("runId").asStr(),
         type: item.get("type").asStr(),
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),
@@ -485,14 +411,14 @@ pub class Environments {
       };
     }
 
-    throw "Environment [${options.id}] not found";
+    throw "Environment [{options.id}] not found";
   }
 
   pub inflight getByBranch(options: GetEnvironmentByBranchOptions): Environment {
     let result = this.table.getItem(
       key: {
-        pk: "APP#${options.appId}",
-        sk: "BRANCH#${options.branch}",
+        pk: "APP#{options.appId}",
+        sk: "BRANCH#{options.branch}",
       },
     );
 
@@ -500,7 +426,6 @@ pub class Environments {
       return {
         id: item.get("id").asStr(),
         appId: item.get("appId").asStr(),
-        runId: item.get("runId").asStr(),
         type: item.get("type").asStr(),
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),
@@ -516,14 +441,14 @@ pub class Environments {
       };
     }
 
-    throw "Environment [${options.branch}] not found";
+    throw "Environment [{options.branch}] not found";
   }
 
   pub inflight list(options: ListEnvironmentOptions): Array<Environment> {
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
-        ":pk": "APP#${options.appId}",
+        ":pk": "APP#{options.appId}",
         ":sk": "ENVIRONMENT#",
       },
     );
@@ -532,7 +457,6 @@ pub class Environments {
       environments = environments.concat([{
         id: item.get("id").asStr(),
         appId: item.get("appId").asStr(),
-        runId: item.get("runId").asStr(),
         type: item.get("type").asStr(),
         repo: item.get("repo").asStr(),
         branch: item.get("branch").asStr(),

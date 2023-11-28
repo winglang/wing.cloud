@@ -34,7 +34,6 @@ struct RuntimeStartOptions {
   awsSecretAccessKey: str;
   wingCloudUrl: parameter.IParameter;
   environmentId: str;
-  runId: str;
   secrets: Map<str>;
   certificate: certificate.Certificate;
 }
@@ -79,10 +78,10 @@ class RuntimeHandler_sim impl IRuntimeHandler {
     // write wing certificate
     let privateKeyFile = fs.join(fs.mkdtemp("pk-"), nanoid62.Nanoid62.generate());
     fs.writeFile(privateKeyFile, opts.certificate.privateKey, encoding: "utf8");
-    volumes.set(privateKeyFile, "${Consts.certificatePath()}/cert.key");
+    volumes.set(privateKeyFile, "{Consts.certificatePath()}/cert.key");
     let certificateFile = fs.join(fs.mkdtemp("cert-"), nanoid62.Nanoid62.generate());
     fs.writeFile(certificateFile, opts.certificate.certificate, encoding: "utf8");
-    volumes.set(certificateFile, "${Consts.certificatePath()}/cert.pem");
+    volumes.set(certificateFile, "{Consts.certificatePath()}/cert.pem");
 
     let env = MutMap<str>{
       "GIT_REPO" => repo,
@@ -92,7 +91,6 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "LOGS_BUCKET_NAME" => util.env(opts.logsBucketName), // get simulator handle for the bucket
       "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
       "ENVIRONMENT_ID" => opts.environmentId,
-      "RUN_ID" => opts.runId,
       "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
     };
 
@@ -128,7 +126,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   }
 
   inflight appNameFromEnvironment(environmentId: str): str {
-    return "wing-preview-${util.sha256(environmentId).substring(0, 8)}";
+    return "wing-preview-{util.sha256(environmentId).substring(0, 8)}";
   }
 
   pub inflight start(opts: RuntimeStartOptions): str {
@@ -150,10 +148,10 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       guest_path: Consts.secretsPath(),
       secret_name: "WING_SECRETS"
     }, {
-      guest_path: "${Consts.certificatePath()}/cert.key",
+      guest_path: "{Consts.certificatePath()}/cert.key",
       secret_name: "SSL_PRIVATE_KEY"
     }, {
-      guest_path: "${Consts.certificatePath()}/cert.pem",
+      guest_path: "{Consts.certificatePath()}/cert.pem",
       secret_name: "SSL_CERTIFICATE"
     }];
 
@@ -165,7 +163,6 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
       "LOGS_BUCKET_NAME" => opts.logsBucketName,
       "ENVIRONMENT_ID" => opts.environmentId,
-      "RUN_ID" => opts.runId,
       "AWS_ACCESS_KEY_ID" => opts.awsAccessKeyId,
       "AWS_SECRET_ACCESS_KEY" => opts.awsSecretAccessKey,
       "AWS_REGION" => opts.logsBucketRegion,
@@ -218,7 +215,6 @@ pub struct Message {
   entryfile: str;
   appId: str;
   environmentId: str;
-  runId: str;
   token: str?;
   secrets: Map<str>;
   certificate: certificate.Certificate;
@@ -251,9 +247,9 @@ pub class RuntimeService {
     if util.tryEnv("WING_TARGET") == "sim" {
       this.runtimeHandler = new RuntimeHandler_sim();
       let bucketAddr = this.logs.node.addr;
-      bucketName = "BUCKET_HANDLE_${bucketAddr.substring(bucketAddr.length - 8, bucketAddr.length)}";
+      bucketName = "BUCKET_HANDLE_{bucketAddr.substring(bucketAddr.length - 8, bucketAddr.length)}";
     } else {
-      let awsUser = new aws.iamUser.IamUser(name: "${this.node.addr}-user");
+      let awsUser = new aws.iamUser.IamUser(name: "{this.node.addr}-user");
       let bucket: awsprovider.s3Bucket.S3Bucket = unsafeCast(this.logs)?.bucket;
       let bucketArn: str = bucket.arn;
       bucketName = bucket.bucket;
@@ -267,7 +263,7 @@ pub class RuntimeService {
             {
               Action: ["s3:*"],
               Effect: "Allow",
-              Resource: "${bucketArn}/*",
+              Resource: "{bucketArn}/*",
             },
           ],
         }),
@@ -297,7 +293,7 @@ pub class RuntimeService {
 
         let msg = Message.fromJson(Json.parse(message));
 
-        log("wing url: ${props.wingCloudUrl}");
+        log("wing url: {props.wingCloudUrl}");
 
         let url = this.runtimeHandler.start(
           gitToken: msg.token,
@@ -306,7 +302,6 @@ pub class RuntimeService {
           entryfile: msg.entryfile,
           wingCloudUrl: props.wingCloudUrl,
           environmentId: msg.environmentId,
-          runId: msg.runId,
           secrets: msg.secrets,
           certificate: msg.certificate,
           logsBucketName: bucketName,
@@ -315,7 +310,7 @@ pub class RuntimeService {
           awsSecretAccessKey: awsSecretAccessKey,
         );
 
-        log("preview environment url: ${url}");
+        log("preview environment url: {url}");
 
         props.environments.updateUrl(
           id: msg.environmentId,
@@ -344,7 +339,7 @@ pub class RuntimeService {
         environmentId: environmentId,
       );
 
-      log("preview environment deleted: ${environmentId}");
+      log("preview environment deleted: {environmentId}");
 
       return {
         status: 200,
