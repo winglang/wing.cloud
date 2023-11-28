@@ -356,22 +356,6 @@ pub class Api {
       };
     });
 
-    api.post("/wrpc/app.rename", inflight (request) => {
-      let userId = getUserFromCookie(request);
-
-      let input = Json.parse(request.body ?? "");
-
-      apps.rename(
-        appId: input.get("appId").asStr(),
-        appName: input.get("appName").asStr(),
-        userId: userId,
-        repository: input.get("repository").asStr(),
-      );
-
-      return {
-      };
-    });
-
     api.post("/wrpc/app.delete", inflight (request) => {
       let userId = getUserFromCookie(request);
 
