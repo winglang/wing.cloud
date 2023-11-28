@@ -4,6 +4,12 @@ import {
   type QueryProcedure,
 } from "@wingcloud/wrpc";
 
+export interface User {
+  id: string;
+  username: string;
+  avatarUrl: string;
+}
+
 export interface Installation {
   id: number;
   account: { login: string };
@@ -106,8 +112,7 @@ export const wrpc = createWRPCReact<{
   "auth.check": QueryProcedure<
     undefined,
     {
-      userId: string;
-      username: string;
+      user: User;
     }
   >;
   "auth.signout": MutationProcedure;

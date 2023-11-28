@@ -7,6 +7,7 @@ import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { Input } from "../../design-system/input.js";
@@ -32,15 +33,20 @@ export const Component = () => {
 
   const filteredApps = useMemo(() => {
     return apps.filter((app) =>
-      `${app.appName}${app.lastCommitMessage}`
-        .toLocaleLowerCase()
-        .includes(search.toLocaleLowerCase()),
+      `${app.appName}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
     );
   }, [listAppsQuery.data, search]);
 
   return (
-    <div>
-      <div className="space-y-4">
+    <div className="flex flex-col">
+      <Header />
+      <div
+        className={clsx(
+          "w-full flex-grow overflow-auto",
+          "max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6",
+          "space-y-4",
+        )}
+      >
         <div className="flex gap-x-2">
           <Input
             type="text"

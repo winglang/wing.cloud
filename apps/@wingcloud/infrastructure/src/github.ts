@@ -1,12 +1,12 @@
 // import fetch from "node-fetch";
 import { Octokit } from "octokit";
 
-export const getLoginFromAccessToken = async (accessToken: string) => {
+export const getUser = async (accessToken: string) => {
   const octokit = new Octokit({
     auth: accessToken,
   });
   const { data: user } = await octokit.request("GET /user");
-  return user.login;
+  return user;
 };
 
 export const listUserInstallations = async (token: string) => {

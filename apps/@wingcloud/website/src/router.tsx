@@ -29,7 +29,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/:owner/:appName/settings",
-        lazy: () => import("./routes/owner/settings.js"),
+        lazy: () => import("./routes/app-settings/index.js"),
       },
       {
         path: "/:owner/:appName/:branch",

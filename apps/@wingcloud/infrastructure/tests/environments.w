@@ -105,7 +105,7 @@ pub class EnvironmentsTest {
         let repo = createRepo(octokit);
 
         try {
-          let userId = props.users.create(gitHubLogin: "fake-login");
+          let user = props.users.create(displayName: "name", username: "fake-login");
           let appId = props.apps.create(
             appName: "test-app",
             description: "test app",
@@ -113,7 +113,7 @@ pub class EnvironmentsTest {
             repoId: "{repo.owner}/{repo.repo}",
             repoName: repo.repo,
             repoOwner: repo.owner,
-            userId: userId,
+            userId: user.id,
             entryfile: "main.w"
           );
 
@@ -222,11 +222,11 @@ pub class EnvironmentsTest {
             );
           }
 
-          let userId = props.users.create(gitHubLogin: "fake-login");
+          let user = props.users.create(displayName: "name", username: "fake-login");
 
           let jwt = JWT.JWT.sign(
             secret: props.appSecret,
-            userId: userId,
+            userId: user.id,
             accessToken: githubToken,
             accessTokenExpiresIn: 1000,
             refreshToken: githubToken,

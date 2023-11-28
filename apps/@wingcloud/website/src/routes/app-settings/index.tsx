@@ -12,9 +12,9 @@ import { useNotifications } from "../../design-system/notification.js";
 import { Select } from "../../design-system/select.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { wrpc } from "../../utils/wrpc.js";
-import { SecretsList } from "../secrets/components/secrets-list.js";
+import { EntrypointUpdateModal } from "../owner/components/entrypoint-update-modal.js";
 
-import { EntrypointUpdateModal } from "./components/entrypoint-update-modal.js";
+import { SecretsList } from "./secrets/components/secrets-list.js";
 
 export interface AppProps {
   appName: string;

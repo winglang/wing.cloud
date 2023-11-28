@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { type ForwardRefExoticComponent, type PropsWithChildren } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { Header } from "../../../components/header.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 
 export interface NewAppContainerProps {
@@ -20,8 +21,15 @@ export const NewAppContainer = ({
   const { theme } = useTheme();
 
   return (
-    <div>
-      <div className="flex justify-center transition-all">
+    <div className="flex flex-col">
+      <Header />
+      <div
+        className={clsx(
+          "w-full flex-grow overflow-auto",
+          "max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6",
+          "space-y-4",
+        )}
+      >
         <div
           className={clsx(
             "w-full rounded p-6 space-y-4 border",

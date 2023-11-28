@@ -1,6 +1,8 @@
+import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 
+import { Header } from "../../components/header.js";
 import { wrpc } from "../../utils/wrpc.js";
 
 export const RUNTIME_LOGS_ID = "runtime-logs";
@@ -86,8 +88,15 @@ export const Component = () => {
   }, [environment.data?.environment?.status]);
 
   return (
-    <div>
-      <div className="space-y-4">
+    <div className="flex flex-col">
+      <Header />
+      <div
+        className={clsx(
+          "w-full flex-grow overflow-auto",
+          "max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6",
+          "space-y-4",
+        )}
+      >
         <EnvironmentDetails
           loading={environment.isLoading}
           environment={environment.data?.environment}

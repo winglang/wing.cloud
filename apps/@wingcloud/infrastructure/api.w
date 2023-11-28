@@ -120,10 +120,10 @@ pub class Api {
 
     let getUserFromCookie = inflight (request: cloud.ApiRequest): UserFromCookie => {
       let userId = getUserIdFromCookie(request);
-      let username = users.getUsername(userId: userId);
+      let user = users.get(userId: userId);
       return {
         userId: userId,
-        username: username,
+        username: user.username,
       };
     };
 
@@ -147,12 +147,11 @@ pub class Api {
         let userId = getUserIdFromCookie(request);
 
         // check if user exists in the db
-        let username = users.getUsername(userId: userId);
+        let user = users.get(userId: userId);
 
         return {
           body: {
-            userId: payload.userId,
-            username: username,
+            user: user
           },
         };
       }
@@ -189,14 +188,19 @@ pub class Api {
       );
       log("tokens = {Json.stringify(tokens)}");
 
-      let gitHubLogin = GitHub.Exchange.getLoginFromAccessToken(tokens.access_token);
-      log("gitHubLogin = {gitHubLogin}");
-      let userId = users.getOrCreate(gitHubLogin: gitHubLogin);
-      log("userId = {userId}");
+      let githubUser = GitHub.Client.getUser(tokens.access_token);
+      log("gitHubLogin = {githubUser.login}");
+
+      let user = users.getOrCreate(
+        displayName: githubUser.name,
+        username: githubUser.login,
+        avatarUrl: githubUser.avatar_url,
+      );
+      log("userId = {user.id}");
 
       let jwt = JWT.JWT.sign(
         secret: props.appSecret,
-        userId: userId,
+        userId: user.id,
         accessToken: tokens.access_token,
         accessTokenExpiresIn: tokens.expires_in,
         refreshToken: tokens.refresh_token,
@@ -218,7 +222,7 @@ pub class Api {
       return {
         status: 302,
         headers: {
-          Location: "/{gitHubLogin}",
+          Location: "/{user.username}",
           "Set-Cookie": authCookie,
         },
       };
@@ -643,6 +647,7 @@ pub class Api {
           sha: commitData.sha,
       }}));
     });
+
     api.post("/wrpc/user.createApp", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
         let user = getUserFromCookie(request);

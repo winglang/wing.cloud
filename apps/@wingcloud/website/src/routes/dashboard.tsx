@@ -7,14 +7,14 @@ import { wrpc } from "../utils/wrpc.js";
 export const Component = () => {
   const navigate = useNavigate();
 
-  const user = wrpc["auth.check"].useQuery();
+  const userQuery = wrpc["auth.check"].useQuery();
   useEffect(() => {
-    if (!user?.data?.username) {
+    if (!userQuery?.data?.user.username) {
       navigate("/");
       return;
     }
-    navigate(`/${user.data.username}`);
-  }, [user.data, navigate]);
+    navigate(`/${userQuery.data.user.username}`);
+  }, [userQuery.data, navigate]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center">

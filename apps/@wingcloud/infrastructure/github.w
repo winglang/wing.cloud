@@ -26,7 +26,7 @@ struct InstallationRepository {
 
 struct Owner {
   login: str;
-  avatar_url: str;
+  avatarUrl: str;
 }
 
 struct Repository {
@@ -75,6 +75,12 @@ struct PullRequest {
   body: str;
 }
 
+struct GitHubUser {
+  name: str;
+  login: str;
+  avatar_url: str;
+}
+
 pub class Exchange {
   pub static inflight codeForTokens(options: ExchangeCodeForTokensOptions): AuthTokens {
     let response = http.post("https://github.com/login/oauth/access_token", {
@@ -97,10 +103,10 @@ pub class Exchange {
     return AuthTokens.fromJson(Json.parse(response.body));
   }
 
-  extern "./src/github.ts" pub static inflight getLoginFromAccessToken(accessToken: str): str;
 }
 
 pub class Client {
+  extern "./src/github.ts" pub static inflight getUser(accessToken: str): GitHubUser;
   extern "./src/github.ts" pub static inflight listUserInstallations(token: str): Array<UserInstallation>;
   extern "./src/github.ts" pub static inflight listInstallationRepos(token: str, installationId: num): Array<InstallationRepository>;
   extern "./src/github.ts" pub static inflight getLastCommit(options: GetLastCommitOptions): CommitResponse;

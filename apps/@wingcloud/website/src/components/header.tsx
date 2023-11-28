@@ -14,7 +14,9 @@ export interface Breadcrumb {
   to: string;
 }
 
-const UserMenu = () => {
+const UserMenu = ({ avatarUrl }: { avatarUrl?: string }) => {
+  const { theme } = useTheme();
+
   const signOut = wrpc["auth.signout"].useMutation({
     onSuccess(d) {
       location.href = "/";
@@ -33,13 +35,25 @@ const UserMenu = () => {
         },
       ]}
       icon={
-        <UserCircleIcon
-          className={clsx(
-            "w-8 h-8 text-slate-400",
-            "group-hover:text-slate-500 transition-all",
-            "group-focus:text-slate-500",
+        <>
+          {avatarUrl && (
+            <img
+              className={clsx(
+                "h-8 w-8 rounded-full",
+                "border-2",
+                theme.borderInput,
+                theme.focusInput,
+              )}
+              src={avatarUrl}
+              alt="User avatar"
+            />
           )}
-        />
+          {!avatarUrl && (
+            <UserCircleIcon
+              className={clsx(theme.text2, theme.focusInput, "w-8 h-8")}
+            />
+          )}
+        </>
       }
     />
   );
@@ -60,15 +74,15 @@ export const Header = () => {
     });
   }, [location.pathname]);
 
-  const authCheck = wrpc["auth.check"].useQuery(undefined, {
+  const userQuery = wrpc["auth.check"].useQuery(undefined, {
     retry: false,
   });
 
   useEffect(() => {
-    if (authCheck.isError) {
+    if (userQuery.isError) {
       window.location.href = "/";
     }
-  }, [authCheck.isError]);
+  }, [userQuery.isError]);
 
   return (
     <header className={clsx("p-6 shadow z-10", theme.bgInput)}>
@@ -78,7 +92,9 @@ export const Header = () => {
             <div>
               <Link
                 to={
-                  authCheck.data ? `/${authCheck.data.username}` : "/dashboard"
+                  userQuery.data
+                    ? `/${userQuery.data.user.username}`
+                    : "/dashboard"
                 }
                 className={clsx(theme.text1, theme.text1Hover)}
               >
@@ -110,7 +126,7 @@ export const Header = () => {
         </ol>
 
         <div className="flex grow justify-end gap-x-12">
-          <UserMenu />
+          <UserMenu avatarUrl={userQuery.data?.user.avatarUrl} />
         </div>
       </nav>
     </header>
