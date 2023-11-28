@@ -45,6 +45,35 @@ export async function prepareServer({ environmentId }: PrepareServerProps) {
   });
 
   const endpointsFn = findEndpoints();
+
+  const proxyToPort = async (host: string, consolePort: number) => {
+    const { endpointsByDigest, endpointsByPort } = await endpointsFn({
+      port: consolePort,
+      environmentId,
+    });
+
+    // check of its a request for a local port by its digest value
+    const domainParts = host.split(".");
+    const digest = domainParts[0]!;
+    const endpoint = endpointsByDigest[digest];
+    if (endpoint !== undefined) {
+      return endpoint.url;
+    }
+
+    // check of its a request for a local port by its port value
+    const parts = host.split(":");
+    if (parts.length > 1) {
+      const targetPort = Number.parseInt(parts[1]!, 10);
+
+      const endpoint = endpointsByPort[targetPort];
+      if (endpoint !== undefined) {
+        return endpoint.url;
+      }
+    }
+
+    return;
+  };
+
   app.use(async (req, res, next) => {
     if (!consolePort) {
       return next();
@@ -60,40 +89,14 @@ export async function prepareServer({ environmentId }: PrepareServerProps) {
       return next();
     }
 
-    const { endpointsByDigest, endpointsByPort } = await endpointsFn({
-      port: consolePort,
-      environmentId,
-    });
-
-    // check of its a request for a local port by its digest value
-    const domainParts = host.split(".");
-    const digest = domainParts[0]!;
-    const endpoint = endpointsByDigest[digest];
-    if (endpoint !== undefined) {
+    const proxyUrl = await proxyToPort(host, consolePort);
+    if (proxyUrl) {
       proxy.web(req, res, {
-        target: `http://127.0.0.1:${endpoint.port}`,
+        target: proxyUrl,
       });
-      return;
+    } else {
+      next();
     }
-
-    // check of its a request for a local port by its port value
-    const parts = host.split(":");
-    if (parts.length > 1) {
-      const targetPort = Number.parseInt(parts[1]!, 10);
-
-      const endpoint = endpointsByPort[targetPort];
-      if (endpoint !== undefined) {
-        proxy.web(req, res, {
-          target: `http://127.0.0.1:${endpoint.port}`,
-        });
-        return;
-      }
-
-      return next();
-    }
-
-    // can't find a match
-    return res.sendStatus(404);
   });
 
   const sslDir = join(homedir(), ".ssl");
@@ -109,6 +112,27 @@ export async function prepareServer({ environmentId }: PrepareServerProps) {
   };
 
   const sslServer = https.createServer(options, app);
+
+  sslServer.on("upgrade", async (req, socket, head) => {
+    if (!consolePort) {
+      console.error("console port not found");
+      return;
+    }
+
+    const host = req.headers.host;
+    if (!host) {
+      console.error("host header not found");
+      return;
+    }
+
+    const proxyUrl = await proxyToPort(host, consolePort);
+    if (proxyUrl) {
+      proxy.ws(req, socket, head, {
+        target: proxyUrl,
+      });
+    }
+  });
+
   sslServer.listen(3001, () => {
     console.log("SSL server is listening on port 3001");
   });
