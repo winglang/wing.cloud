@@ -3,18 +3,25 @@ bring "./nanoid62.w" as Nanoid62;
 
 struct User {
   id: str;
+  displayName: str;
+  username: str;
+  avatarUrl: str;
 }
 
 struct CreateOptions {
-  gitHubLogin: str;
+  displayName: str;
+  username: str;
+  avatarUrl: str?;
 }
 
 struct FromLoginOptions {
-  gitHubLogin: str;
+  username: str;
 }
 
 struct GetOrCreateOptions {
-  gitHubLogin: str;
+  displayName: str;
+  username: str;
+  avatarUrl: str?;
 }
 
 struct GetUsernameOptions {
@@ -28,18 +35,21 @@ pub class Users {
     this.table = table;
   }
 
-  pub inflight create(options: CreateOptions): str {
-    let userId = "user_${Nanoid62.Nanoid62.generate()}";
-    log("userId = ${userId}");
+  pub inflight create(options: CreateOptions): User {
+    let userId = "user_{Nanoid62.Nanoid62.generate()}";
+    log("userId = {userId}");
 
     this.table.transactWriteItems(
       transactItems: [
         {
           put: {
             item: {
-              pk: "LOGIN#${options.gitHubLogin}",
+              pk: "LOGIN#{options.username}",
               sk: "#",
               id: userId,
+              displayName: options.displayName,
+              username: options.username,
+              avatarUrl: options.avatarUrl,
             },
             conditionExpression: "attribute_not_exists(pk)",
           },
@@ -47,46 +57,57 @@ pub class Users {
         {
           put: {
             item: {
-              pk: "USER#${userId}",
+              pk: "USER#{userId}",
               sk: "#",
               id: userId,
-              gitHubLogin: options.gitHubLogin,
+              displayName: options.displayName,
+              username: options.username,
+              avatarUrl: options.avatarUrl,
             },
           }
         }
       ],
     );
 
-    return userId;
+    return User {
+      id: userId,
+      displayName: options.displayName,
+      username: options.username,
+      avatarUrl: options.avatarUrl ?? "",
+    };
   }
 
-  pub inflight fromLogin(options: FromLoginOptions): str? {
+  pub inflight fromLogin(options: FromLoginOptions): User? {
     let result = this.table.getItem(
       key: {
-        pk: "LOGIN#${options.gitHubLogin}",
+        pk: "LOGIN#{options.username}",
         sk: "#",
       },
     );
 
-    return result.item?.tryGet("id")?.tryAsStr();
+    return User.fromJson(result.item);
   }
 
-  pub inflight getOrCreate(options: GetOrCreateOptions): str {
-    let userId = this.fromLogin(gitHubLogin: options.gitHubLogin);
+  pub inflight getOrCreate(options: GetOrCreateOptions): User {
+    let user = this.fromLogin(username: options.username);
 
-    return userId ?? this.create(gitHubLogin: options.gitHubLogin);
+    return user ?? this.create(
+      displayName: options.displayName,
+      username: options.username,
+      avatarUrl: options.avatarUrl
+    );
   }
 
-  pub inflight getUsername(options: GetUsernameOptions): str {
+  pub inflight get(options: GetUsernameOptions): User {
     let result = this.table.getItem(
       key: {
-        pk: "USER#${options.userId}",
+        pk: "USER#{options.userId}",
         sk: "#",
       },
     );
 
-    if let username = result.item?.tryGet("gitHubLogin")?.tryAsStr() {
-      return username;
+    if let user = User.tryFromJson(result.item) {
+      return user;
     } else {
       throw "User not found";
     }

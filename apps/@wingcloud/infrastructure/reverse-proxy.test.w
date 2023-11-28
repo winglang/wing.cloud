@@ -28,8 +28,8 @@ struct TestsResults {
 }
 
 test "get reverse proxy url and paths" {
-  log("Domain name: ${reverseProxy.url}");
-  log("Urls: ${Json.stringify(origins)}");
+  log("Domain name: {reverseProxy.url}");
+  log("Urls: {Json.stringify(origins)}");
   let results = MutArray<TestsResults>[];
   let var failure = false;
   let paths = ["/api", "/dashboard", "/"];
@@ -44,6 +44,6 @@ test "get reverse proxy url and paths" {
       status: response.status,
     });
   }
-  log("Tests results: ${Json.stringify(results)}");
+  log("Tests results: {Json.stringify(results)}");
   assert(!failure);
 }

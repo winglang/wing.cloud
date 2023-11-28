@@ -11,11 +11,6 @@ pub struct App {
   userId: str;
   entryfile: str;
   createdAt: str;
-  createdBy: str;
-  updatedAt: str;
-  updatedBy: str;
-  imageUrl: str?;
-  lastCommitMessage: str?;
 }
 
 struct Item extends App {
@@ -32,16 +27,6 @@ struct CreateAppOptions {
   userId: str;
   entryfile: str;
   createdAt: str;
-  createdBy: str;
-  imageUrl: str?;
-  lastCommitMessage: str?;
-}
-
-struct RenameAppOptions {
-  appId: str;
-  appName: str;
-  userId: str;
-  repository: str;
 }
 
 struct GetAppOptions {
@@ -87,8 +72,8 @@ pub class Apps {
     this.table = table;
   }
 
-  pub inflight create(options: CreateAppOptions): App {
-    let appId = "app_${nanoid62.Nanoid62.generate()}";
+  pub inflight create(options: CreateAppOptions): str {
+    let appId = "app_{nanoid62.Nanoid62.generate()}";
 
     // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
     let makeItem = (ops: MakeItemOptions): Item => {
@@ -98,220 +83,109 @@ pub class Apps {
         appId: ops.appId,
         appName: options.appName,
         description: options.description,
-        imageUrl: options.imageUrl,
         repoId: options.repoId,
         repoOwner: options.repoOwner,
         repoName: options.repoName,
         userId: options.userId,
         entryfile: options.entryfile,
         createdAt: options.createdAt,
-        createdBy: options.createdBy,
-        updatedAt: options.createdAt,
-        updatedBy: options.createdBy,
-        lastCommitMessage: options.lastCommitMessage,
       };
     };
 
-    this.table.transactWriteItems(transactItems: [
-      {
-        put: {
-          item: makeItem(
-            appId: appId,
-            pk: "APP#${appId}",
-            sk: "#",
-          ),
-          conditionExpression: "attribute_not_exists(pk)"
+    try {
+      this.table.transactWriteItems(transactItems: [
+        {
+          put: {
+            item: makeItem(
+              appId: appId,
+              pk: "APP#{appId}",
+              sk: "#",
+            ),
+            conditionExpression: "attribute_not_exists(pk)"
+          },
         },
-      },
-      {
-        put: {
-          item: makeItem(
-            appId: appId,
-            pk: "USER#${options.userId}",
-            sk: "APP_NAME#${options.appName}",
-          ),
-          conditionExpression: "attribute_not_exists(pk)"
+        {
+          put: {
+            item: makeItem(
+              appId: appId,
+              pk: "USER#{options.userId}",
+              sk: "APP_NAME#{options.appName}",
+            ),
+            conditionExpression: "attribute_not_exists(pk)"
+          },
         },
-      },
-      {
-        put: {
-          item: makeItem(
-            appId: appId,
-            pk: "USER#${options.userId}",
-            sk: "APP#${appId}",
-          ),
+        {
+          put: {
+            item: makeItem(
+              appId: appId,
+              pk: "USER#{options.userId}",
+              sk: "APP#{appId}",
+            ),
+          },
         },
-      },
-      {
-        put: {
-          item: makeItem(
-            appId: appId,
-            pk: "REPOSITORY#${options.repoId}",
-            sk: "APP#${appId}",
-          ),
+        {
+          put: {
+            item: makeItem(
+              appId: appId,
+              pk: "REPOSITORY#{options.repoId}",
+              sk: "APP#{appId}",
+            ),
+          },
         },
-      },
 
-    ]);
+      ]);
+    } catch error {
+      if error.contains("ConditionalCheckFailed") {
+        throw "App name {options.appName} already exists";
+      } else {
+        throw error;
+      }
+    }
 
-    return {
-      appId: appId,
-      appName: options.appName,
-      description: options.description,
-      imageUrl: options.imageUrl,
-      repoId: options.repoId,
-      repoOwner: options.repoOwner,
-      repoName: options.repoName,
-      userId: options.userId,
-      entryfile: options.entryfile,
-      createdAt: options.createdAt,
-      createdBy: options.createdBy,
-      updatedAt: options.createdAt,
-      updatedBy: options.createdBy,
-      lastCommitMessage: options.lastCommitMessage,
-    };
-  }
-
-  pub inflight rename(options: RenameAppOptions): void {
-    this.table.transactWriteItems(transactItems: [
-      {
-        update: {
-          key: {
-            pk: "APP#${options.appId}",
-            sk: "#",
-          },
-          updateExpression: "SET #appName = :appName",
-          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
-          expressionAttributeNames: {
-            "#pk": "pk",
-            "#appName": "appName",
-            "#userId": "userId",
-          },
-          expressionAttributeValues: {
-            ":appName": options.appName,
-            ":userId": options.userId,
-          },
-        }
-      },
-      {
-        update: {
-          key: {
-            pk: "USER#${options.userId}",
-            sk: "APP#${options.appId}",
-          },
-          updateExpression: "SET #appName = :appName",
-          expressionAttributeNames: {
-            "#appName": "appName",
-          },
-          expressionAttributeValues: {
-            ":appName": options.appName,
-          },
-        }
-      },
-      {
-        update: {
-          key: {
-            pk: "REPOSITORY#${options.repository}",
-            sk: "APP#${options.appId}",
-          },
-          updateExpression: "SET #appName = :appName",
-          expressionAttributeNames: {
-            "#appName": "appName",
-          },
-          expressionAttributeValues: {
-            ":appName": options.appName,
-          },
-        }
-      },
-    ]);
+    return appId;
   }
 
   pub inflight get(options: GetAppOptions): App {
     let result = this.table.getItem(
       key: {
-        pk: "APP#${options.appId}",
+        pk: "APP#{options.appId}",
         sk: "#",
       },
     );
 
     if let item = result.item {
-      return {
-        appId: item.get("appId").asStr(),
-        appName: item.get("appName").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
-        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
-        repoId: item.get("repoId").asStr(),
-        repoOwner: item.get("repoOwner").asStr(),
-        repoName: item.get("repoName").asStr(),
-        userId: item.get("userId").asStr(),
-        entryfile: item.get("entryfile").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
-      };
+      return App.fromJson(item);
     }
 
-    throw "App [${options.appId}] not found";
+    throw "App [{options.appId}] not found";
   }
 
   pub inflight getByName(options: GetAppByNameOptions): App {
     let result = this.table.getItem(
       key: {
-        pk: "USER#${options.userId}",
-        sk: "APP_NAME#${options.appName}",
+        pk: "USER#{options.userId}",
+        sk: "APP_NAME#{options.appName}",
       },
     );
 
     if let item = result.item {
-      return {
-        appId: item.get("appId").asStr(),
-        appName: item.get("appName").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
-        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
-        repoId: item.get("repoId").asStr(),
-        repoOwner: item.get("repoOwner").asStr(),
-        repoName: item.get("repoName").asStr(),
-        userId: item.get("userId").asStr(),
-        entryfile: item.get("entryfile").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
-      };
+      return App.fromJson(item);
     }
 
-    throw "App name [${options.appName}] not found";
+    throw "App name {options.appName} not found";
   }
 
   pub inflight list(options: ListAppsOptions): Array<App> {
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
-        ":pk": "USER#${options.userId}",
+        ":pk": "USER#{options.userId}",
         ":sk": "APP#",
       },
     );
     let var apps: Array<App> = [];
     for item in result.items {
-      apps = apps.concat([App {
-        appId: item.get("appId").asStr(),
-        appName: item.get("appName").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
-        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
-        repoId: item.get("repoId").asStr(),
-        repoOwner: item.get("repoOwner").asStr(),
-        repoName: item.get("repoName").asStr(),
-        userId: item.get("userId").asStr(),
-        entryfile: item.get("entryfile").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
-      }]);
+      apps = apps.concat([App.fromJson(item)]);
     }
     return apps;
   }
@@ -320,7 +194,7 @@ pub class Apps {
 
     let result = this.table.getItem(
       key: {
-        pk: "APP#${options.appId}",
+        pk: "APP#{options.appId}",
         sk: "#",
       },
     );
@@ -334,7 +208,7 @@ pub class Apps {
           {
             delete: {
               key: {
-                pk: "APP#${options.appId}",
+                pk: "APP#{options.appId}",
                 sk: "#",
               },
               conditionExpression: "#userId = :userId",
@@ -349,24 +223,24 @@ pub class Apps {
           {
             delete: {
               key: {
-                pk: "USER#${options.userId}",
-                sk: "APP#${options.appId}",
+                pk: "USER#{options.userId}",
+                sk: "APP#{options.appId}",
               },
             },
           },
           {
             delete: {
               key: {
-                pk: "USER#${options.userId}",
-                sk: "APP_NAME#${appName}",
+                pk: "USER#{options.userId}",
+                sk: "APP_NAME#{appName}",
               },
             },
           },
           {
             delete: {
               key: {
-                pk: "REPOSITORY#${repoId}",
-                sk: "APP#${options.appId}",
+                pk: "REPOSITORY#{repoId}",
+                sk: "APP#{options.appId}",
               },
             },
           },
@@ -382,27 +256,13 @@ pub class Apps {
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
-        ":pk": "REPOSITORY#${options.repository}",
+        ":pk": "REPOSITORY#{options.repository}",
         ":sk": "APP#",
       },
     );
     let var apps: Array<App> = [];
     for item in result.items {
-      apps = apps.concat([App {
-        appId: item.get("appId").asStr(),
-        appName: item.get("appName").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
-        repoId: item.get("repoId").asStr(),
-        repoOwner: item.get("repoOwner").asStr(),
-        repoName: item.get("repoName").asStr(),
-        userId: item.get("userId").asStr(),
-        entryfile: item.get("entryfile").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
-      }]);
+      apps = apps.concat([App.fromJson(item)]);
     }
     return apps;
   }
@@ -412,7 +272,7 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "APP#${options.appId}",
+            pk: "APP#{options.appId}",
             sk: "#",
           },
           updateExpression: "SET #entryfile = :entryfile",
@@ -431,8 +291,8 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "USER#${options.userId}",
-            sk: "APP#${options.appId}",
+            pk: "USER#{options.userId}",
+            sk: "APP#{options.appId}",
           },
           updateExpression: "SET #entryfile = :entryfile",
           expressionAttributeNames: {
@@ -446,8 +306,8 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "USER#${options.userId}",
-            sk: "APP_NAME#${options.appName}",
+            pk: "USER#{options.userId}",
+            sk: "APP_NAME#{options.appName}",
           },
           updateExpression: "SET #entryfile = :entryfile",
           expressionAttributeNames: {
@@ -461,8 +321,8 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "REPOSITORY#${options.repository}",
-            sk: "APP#${options.appId}",
+            pk: "REPOSITORY#{options.repository}",
+            sk: "APP#{options.appId}",
           },
           updateExpression: "SET #entryfile = :entryfile",
           expressionAttributeNames: {

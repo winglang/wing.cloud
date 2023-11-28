@@ -12,9 +12,9 @@ import { useNotifications } from "../../design-system/notification.js";
 import { Select } from "../../design-system/select.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { wrpc } from "../../utils/wrpc.js";
-import { SecretsList } from "../secrets/components/secrets-list.js";
+import { EntrypointUpdateModal } from "../owner/components/entrypoint-update-modal.js";
 
-import { EntrypointUpdateModal } from "./components/entrypoint-update-modal.js";
+import { SecretsList } from "./secrets/components/secrets-list.js";
 
 export interface AppProps {
   appName: string;
@@ -22,13 +22,13 @@ export interface AppProps {
 
 export const Component = () => {
   const { theme } = useTheme();
-  const { appName } = useParams();
+  const { owner, appName } = useParams();
   const { showNotification } = useNotifications();
 
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
   const appQuery = wrpc["app.getByName"].useQuery(
-    { appName: appName! },
+    { owner: owner!, appName: appName! },
     { refetchOnMount: true },
   );
 

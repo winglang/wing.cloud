@@ -1,7 +1,7 @@
 import { UserCircleIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
-import { useCallback } from "react";
+import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import { Menu } from "../design-system/menu.js";
@@ -14,15 +14,14 @@ export interface Breadcrumb {
   to: string;
 }
 
-const UserMenu = () => {
-  const signOutMutation = wrpc["auth.signout"].useMutation();
+const UserMenu = ({ avatarUrl }: { avatarUrl?: string }) => {
+  const { theme } = useTheme();
 
-  const signOut = useCallback(() => {
-    // eslint-disable-next-line unicorn/no-useless-undefined
-    signOutMutation.mutateAsync(undefined).then(() => {
+  const signOut = wrpc["auth.signout"].useMutation({
+    onSuccess(d) {
       location.href = "/";
-    });
-  }, [signOutMutation]);
+    },
+  });
 
   return (
     <Menu
@@ -31,18 +30,30 @@ const UserMenu = () => {
         {
           label: "Sign out",
           onClick: () => {
-            signOut();
+            signOut.mutate(undefined);
           },
         },
       ]}
       icon={
-        <UserCircleIcon
-          className={clsx(
-            "w-8 h-8 text-slate-400",
-            "group-hover:text-slate-500 transition-all",
-            "group-focus:text-slate-500",
+        <>
+          {avatarUrl && (
+            <img
+              className={clsx(
+                "h-8 w-8 rounded-full",
+                "border-2",
+                theme.borderInput,
+                theme.focusInput,
+              )}
+              src={avatarUrl}
+              alt="User avatar"
+            />
           )}
-        />
+          {!avatarUrl && (
+            <UserCircleIcon
+              className={clsx(theme.text2, theme.focusInput, "w-8 h-8")}
+            />
+          )}
+        </>
       }
     />
   );
@@ -58,10 +69,20 @@ export const Header = () => {
       const to = `/${parts.slice(0, index + 1).join("/")}`;
       return {
         label: part,
-        to: `${to}/`,
+        to: `${to}`,
       };
     });
   }, [location.pathname]);
+
+  const userQuery = wrpc["auth.check"].useQuery(undefined, {
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (userQuery.isError) {
+      window.location.href = "/";
+    }
+  }, [userQuery.isError]);
 
   return (
     <header className={clsx("p-6 shadow z-10", theme.bgInput)}>
@@ -69,7 +90,14 @@ export const Header = () => {
         <ol role="list" className="flex items-center space-x-2 truncate">
           <li>
             <div>
-              <Link to="/apps/" className={clsx(theme.text1, theme.text1Hover)}>
+              <Link
+                to={
+                  userQuery.data
+                    ? `/${userQuery.data.user.username}`
+                    : "/dashboard"
+                }
+                className={clsx(theme.text1, theme.text1Hover)}
+              >
                 <WingIcon className="h-5 w-auto" />
               </Link>
             </div>
@@ -98,7 +126,7 @@ export const Header = () => {
         </ol>
 
         <div className="flex grow justify-end gap-x-12">
-          <UserMenu />
+          <UserMenu avatarUrl={userQuery.data?.user.avatarUrl} />
         </div>
       </nav>
     </header>
