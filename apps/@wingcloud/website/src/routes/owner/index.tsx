@@ -33,9 +33,7 @@ export const Component = () => {
 
   const filteredApps = useMemo(() => {
     return apps.filter((app) =>
-      `${app.appName}${app.lastCommitMessage}`
-        .toLocaleLowerCase()
-        .includes(search.toLocaleLowerCase()),
+      `${app.appName}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
     );
   }, [listAppsQuery.data, search]);
 

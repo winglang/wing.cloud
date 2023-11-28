@@ -11,11 +11,6 @@ pub struct App {
   userId: str;
   entryfile: str;
   createdAt: str;
-  createdBy: str;
-  updatedAt: str;
-  updatedBy: str;
-  imageUrl: str?;
-  lastCommitMessage: str?;
 }
 
 struct Item extends App {
@@ -32,16 +27,6 @@ struct CreateAppOptions {
   userId: str;
   entryfile: str;
   createdAt: str;
-  createdBy: str;
-  imageUrl: str?;
-  lastCommitMessage: str?;
-}
-
-struct RenameAppOptions {
-  appId: str;
-  appName: str;
-  userId: str;
-  repository: str;
 }
 
 struct GetAppOptions {
@@ -87,7 +72,7 @@ pub class Apps {
     this.table = table;
   }
 
-  pub inflight create(options: CreateAppOptions): App {
+  pub inflight create(options: CreateAppOptions): str {
     let appId = "app_{nanoid62.Nanoid62.generate()}";
 
     // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
@@ -98,17 +83,12 @@ pub class Apps {
         appId: ops.appId,
         appName: options.appName,
         description: options.description,
-        imageUrl: options.imageUrl,
         repoId: options.repoId,
         repoOwner: options.repoOwner,
         repoName: options.repoName,
         userId: options.userId,
         entryfile: options.entryfile,
         createdAt: options.createdAt,
-        createdBy: options.createdBy,
-        updatedAt: options.createdAt,
-        updatedBy: options.createdBy,
-        lastCommitMessage: options.lastCommitMessage,
       };
     };
 
@@ -162,76 +142,7 @@ pub class Apps {
       }
     }
 
-    return {
-      appId: appId,
-      appName: options.appName,
-      description: options.description,
-      imageUrl: options.imageUrl,
-      repoId: options.repoId,
-      repoOwner: options.repoOwner,
-      repoName: options.repoName,
-      userId: options.userId,
-      entryfile: options.entryfile,
-      createdAt: options.createdAt,
-      createdBy: options.createdBy,
-      updatedAt: options.createdAt,
-      updatedBy: options.createdBy,
-      lastCommitMessage: options.lastCommitMessage,
-    };
-  }
-
-  pub inflight rename(options: RenameAppOptions): void {
-    this.table.transactWriteItems(transactItems: [
-      {
-        update: {
-          key: {
-            pk: "APP#{options.appId}",
-            sk: "#",
-          },
-          updateExpression: "SET #appName = :appName",
-          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
-          expressionAttributeNames: {
-            "#pk": "pk",
-            "#appName": "appName",
-            "#userId": "userId",
-          },
-          expressionAttributeValues: {
-            ":appName": options.appName,
-            ":userId": options.userId,
-          },
-        }
-      },
-      {
-        update: {
-          key: {
-            pk: "USER#{options.userId}",
-            sk: "APP#{options.appId}",
-          },
-          updateExpression: "SET #appName = :appName",
-          expressionAttributeNames: {
-            "#appName": "appName",
-          },
-          expressionAttributeValues: {
-            ":appName": options.appName,
-          },
-        }
-      },
-      {
-        update: {
-          key: {
-            pk: "REPOSITORY#{options.repository}",
-            sk: "APP#{options.appId}",
-          },
-          updateExpression: "SET #appName = :appName",
-          expressionAttributeNames: {
-            "#appName": "appName",
-          },
-          expressionAttributeValues: {
-            ":appName": options.appName,
-          },
-        }
-      },
-    ]);
+    return appId;
   }
 
   pub inflight get(options: GetAppOptions): App {
@@ -243,22 +154,7 @@ pub class Apps {
     );
 
     if let item = result.item {
-      return {
-        appId: item.get("appId").asStr(),
-        appName: item.get("appName").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
-        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
-        repoId: item.get("repoId").asStr(),
-        repoOwner: item.get("repoOwner").asStr(),
-        repoName: item.get("repoName").asStr(),
-        userId: item.get("userId").asStr(),
-        entryfile: item.get("entryfile").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
-      };
+      return App.fromJson(item);
     }
 
     throw "App [{options.appId}] not found";
@@ -273,22 +169,7 @@ pub class Apps {
     );
 
     if let item = result.item {
-      return {
-        appId: item.get("appId").asStr(),
-        appName: item.get("appName").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
-        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
-        repoId: item.get("repoId").asStr(),
-        repoOwner: item.get("repoOwner").asStr(),
-        repoName: item.get("repoName").asStr(),
-        userId: item.get("userId").asStr(),
-        entryfile: item.get("entryfile").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
-      };
+      return App.fromJson(item);
     }
 
     throw "App name {options.appName} not found";
@@ -304,22 +185,7 @@ pub class Apps {
     );
     let var apps: Array<App> = [];
     for item in result.items {
-      apps = apps.concat([App {
-        appId: item.get("appId").asStr(),
-        appName: item.get("appName").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
-        imageUrl: item.tryGet("imageUrl")?.tryAsStr(),
-        repoId: item.get("repoId").asStr(),
-        repoOwner: item.get("repoOwner").asStr(),
-        repoName: item.get("repoName").asStr(),
-        userId: item.get("userId").asStr(),
-        entryfile: item.get("entryfile").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
-      }]);
+      apps = apps.concat([App.fromJson(item)]);
     }
     return apps;
   }
@@ -396,21 +262,7 @@ pub class Apps {
     );
     let var apps: Array<App> = [];
     for item in result.items {
-      apps = apps.concat([App {
-        appId: item.get("appId").asStr(),
-        appName: item.get("appName").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
-        repoId: item.get("repoId").asStr(),
-        repoOwner: item.get("repoOwner").asStr(),
-        repoName: item.get("repoName").asStr(),
-        userId: item.get("userId").asStr(),
-        entryfile: item.get("entryfile").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-        createdBy: item.get("createdBy").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-        updatedBy: item.get("updatedBy").asStr(),
-        lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
-      }]);
+      apps = apps.concat([App.fromJson(item)]);
     }
     return apps;
   }

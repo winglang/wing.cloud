@@ -7,12 +7,7 @@ export const Component = () => {
 
   return (
     <>
-      {location.pathname === "/" && (
-        <div className="p-8">
-          <GithubLogin />
-        </div>
-      )}
-
+      {location.pathname === "/" && <GithubLogin />}
       {location.pathname !== "/" && <Outlet />}
     </>
   );

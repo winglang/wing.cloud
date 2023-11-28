@@ -30,17 +30,11 @@ export interface App {
   appId: string;
   appName: string;
   description: string;
-  imageUrl?: string;
   repoId: string;
   repoName: string;
   repoOwner: string;
   userId: string;
   entryfile: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  lastCommitMessage?: string;
 }
 
 export interface TestResult {
@@ -206,10 +200,6 @@ export const wrpc = createWRPCReact<{
     { appId: string; appName: string; repoId: string; entryfile: string },
     {}
   >;
-  "app.rename": MutationProcedure<
-    { appId: string; appName: string; repository: string },
-    {}
-  >;
   "app.delete": MutationProcedure<{ appId: string }, {}>;
   "user.listApps": QueryProcedure<
     {
@@ -228,11 +218,11 @@ export const wrpc = createWRPCReact<{
       default_branch: string;
       appName: string;
       entryfile: string;
-      imageUrl?: string;
       installationId: string;
     },
     {
-      app: App;
+      appId: string;
+      appUri: string;
     }
   >;
 }>();
