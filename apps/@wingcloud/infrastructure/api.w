@@ -131,7 +131,7 @@ pub class Api {
       let user = getUserFromCookie(request);
 
       if user.username != request.query.get("owner") {
-        throw "Unauthorized";
+        throw "Forbidden";
       }
       return user.userId;
     };
@@ -142,20 +142,22 @@ pub class Api {
     };
 
     api.get("/wrpc/auth.check", inflight (request) => {
-      if let payload = getJWTPayloadFromCookie(request) {
-        // check if the user from the cookie is valid
-        let userId = getUserIdFromCookie(request);
+      try {
+        let payload = getJWTPayloadFromCookie(request);
+      // check if the user from the cookie is valid
+      let userId = getUserIdFromCookie(request);
 
-        // check if user exists in the db
-        let user = users.get(userId: userId);
+      // check if user exists in the db
+      let user = users.get(userId: userId);
 
-        return {
-          body: {
-            user: user
-          },
-        };
+      return {
+        body: {
+          user: user
+        },
+      };
+      } catch {
+        throw "Unauthorized";
       }
-      throw "Unauthorized";
     });
 
     api.post("/wrpc/auth.signout", inflight (request) => {

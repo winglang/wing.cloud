@@ -19,9 +19,7 @@ export const App = () => {
       <WRPCProvider value={{ url: API_URL.toString() }}>
         <ThemeProvider mode="light" theme={DefaultTheme}>
           <NotificationsProvider>
-            <ErrorBoundary>
-              <RouterProvider router={router} />
-            </ErrorBoundary>
+            <RouterProvider router={router} />
           </NotificationsProvider>
         </ThemeProvider>
       </WRPCProvider>
