@@ -7,6 +7,11 @@ pub struct File {
   secret_name: str?;
 }
 
+pub struct IClientPageInfo {
+  endCursor: str;
+  hasNextPage: bool;
+}
+
 pub struct IClientCreateMachinePort {
   port: num;
   handlers: Array<str>?;
@@ -48,6 +53,7 @@ struct IApp {
 struct IGetAppResultDataApps {
   nodes: Array<IApp>;
   totalCount: num;
+  pageInfo: IClientPageInfo;
 }
 
 struct IGetAppResultData {
@@ -116,9 +122,9 @@ pub inflight class Client {
     };
   }
 
-  pub apps(): IAppsResult {
+  pub apps(cursor: str?): IAppsResult {
     let appsRespone = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
-      query: "query getapps { apps { nodes{ id machines { nodes { id instanceId state } totalCount } createdAt } totalCount } }",
+      query: "query getapps { apps(after: \"${cursor}\") { nodes{ id machines { nodes { id instanceId state } totalCount } createdAt } pageInfo { endCursor hasNextPage } totalCount } }",
     }));
     if (!appsRespone.ok) {
       throw "failed to get apps ${appsRespone.body}";

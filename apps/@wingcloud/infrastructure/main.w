@@ -18,7 +18,7 @@ bring "./probot.w" as probot;
 bring "./probot-adapter.w" as adapter;
 bring "./components/parameter/parameter.w" as parameter;
 bring "./components/dns/dns.w" as Dns;
-bring "./components/endpoint/endpoint.w" as Endpoint;
+bring "./components/public-endpoint/public-endpoint.w" as PublicEndpoint;
 bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 
@@ -96,7 +96,7 @@ let dns = new Dns.DNS(token: (): str => {
     return util.env("DNSIMPLE_TOKEN");
   }
 }());
-let endpoint = new Endpoint.Endpoint(dns: dns, domain: (): str => {
+let endpointProvider = new PublicEndpoint.PublicEndpointProvider(dns: dns, domain: (): str => {
   if util.env("WING_TARGET") == "sim" {
     return "127.0.0.1";
   } else {
@@ -132,7 +132,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   environments: environments,
   secrets: secrets,
   endpoints: endpoints,
-  endpoint: endpoint,
+  endpointProvider: endpointProvider,
   certificate: environmentServerCertificate,
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,

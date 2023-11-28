@@ -98,8 +98,14 @@ export async function prepareServer({ environmentId }: PrepareServerProps) {
 
   const sslDir = join(homedir(), ".ssl");
   const options = {
-    key: readFileSync(join(sslDir, "./cert.key")),
-    cert: readFileSync(join(sslDir, "./cert.pem")),
+    key: readFileSync(join(sslDir, "./cert.key"), "utf8").replaceAll(
+      "\\n",
+      "\n",
+    ),
+    cert: readFileSync(join(sslDir, "./cert.pem"), "utf8").replaceAll(
+      "\\n",
+      "\n",
+    ),
   };
 
   const sslServer = https.createServer(options, app);
@@ -122,6 +128,7 @@ export async function prepareServer({ environmentId }: PrepareServerProps) {
 
     const { port, close } = await create({
       wingfile: entryfilePath,
+      expressApp: app,
       requestedPort,
       log: {
         info: log,

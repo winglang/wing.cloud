@@ -1,4 +1,3 @@
-import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
 import { useLocation } from "react-router-dom";
@@ -12,13 +11,11 @@ export interface EndpointsProps {
   isOpen: boolean;
   endpoints: Endpoint[];
   loading?: boolean;
-  setIsOpen: (isOpen: boolean) => void;
 }
 
 export const Endpoints = ({
   id,
   isOpen,
-  setIsOpen,
   endpoints,
   loading,
 }: EndpointsProps) => {
@@ -51,15 +48,9 @@ export const Endpoints = ({
           theme.textInput,
           loading && "cursor-not-allowed opacity-50",
         )}
-        onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center flex-grow gap-2">
-          {isOpen ? (
-            <ChevronDownIcon className="h-4 w-4" />
-          ) : (
-            <ChevronRightIcon className="h-4 w-4" />
-          )}
-          <div className="font-medium text-sm">Deployment logs</div>
+          <div className="font-medium text-sm">Endpoints</div>
         </div>
       </button>
 
@@ -78,7 +69,10 @@ export const Endpoints = ({
                 </div>
               )}
               {endpoints.map((endpoint, index) => (
-                <div className="flex flex-grow flex-row gap-4 sm:gap-6 transition-all w-full mb-2">
+                <div
+                  key={index}
+                  className="flex flex-grow flex-row m-4 gap-4 sm:gap-6 transition-all w-full mb-2"
+                >
                   <div className="flex flex-col gap-1 truncate w-1/3">
                     <div className={clsx("text-xs", theme.text2)}>Type</div>
                     <div

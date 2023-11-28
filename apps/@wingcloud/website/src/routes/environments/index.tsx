@@ -107,6 +107,13 @@ export const Component = () => {
           environment={environment.data?.environment}
         />
 
+        <Endpoints
+          id={ENDPOINTS_ID}
+          isOpen={true}
+          endpoints={endpoints.data?.endpoints || []}
+          loading={endpoints.isLoading}
+        />
+
         <TestsLogs
           id={TEST_LOGS_ID}
           isOpen={testLogsOpen}
@@ -133,14 +140,6 @@ export const Component = () => {
           setIsOpen={setRuntimeLogsOpen}
           logs={logs.data?.runtime || []}
           loading={logs.isLoading}
-        />
-
-        <Endpoints
-          id={RUNTIME_LOGS_ID}
-          isOpen={runtimeLogsOpen}
-          setIsOpen={setRuntimeLogsOpen}
-          endpoints={endpoints.data?.endpoints || []}
-          loading={endpoints.isLoading}
         />
       </div>
     </div>

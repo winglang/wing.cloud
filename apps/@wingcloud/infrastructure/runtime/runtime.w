@@ -78,10 +78,10 @@ class RuntimeHandler_sim impl IRuntimeHandler {
 
     // write wing certificate
     let privateKeyFile = fs.join(fs.mkdtemp("pk-"), nanoid62.Nanoid62.generate());
-    fs.writeFile(privateKeyFile, Json.stringify(opts.certificate.privateKey), encoding: "utf8");
+    fs.writeFile(privateKeyFile, opts.certificate.privateKey, encoding: "utf8");
     volumes.set(privateKeyFile, "${Consts.certificatePath()}/cert.key");
     let certificateFile = fs.join(fs.mkdtemp("cert-"), nanoid62.Nanoid62.generate());
-    fs.writeFile(certificateFile, Json.stringify(opts.certificate.certificate), encoding: "utf8");
+    fs.writeFile(certificateFile, opts.certificate.certificate, encoding: "utf8");
     volumes.set(certificateFile, "${Consts.certificatePath()}/cert.pem");
 
     let env = MutMap<str>{
@@ -142,8 +142,8 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
 
     app.addSecrets({
       "WING_SECRETS": util.base64Encode(Json.stringify(opts.secrets)),
-      "SSL_PRIVATE_KEY": util.base64Encode(Json.stringify(opts.certificate.privateKey)),
-      "SSL_CERTIFICATE": util.base64Encode(Json.stringify(opts.certificate.certificate))
+      "SSL_PRIVATE_KEY": util.base64Encode(opts.certificate.privateKey),
+      "SSL_CERTIFICATE": util.base64Encode(opts.certificate.certificate)
     });
 
     let files = Array<flyio.File>[{
@@ -158,6 +158,9 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     }];
 
     let env = MutMap<str>{
+      "GIT_REPO" => opts.gitRepo,
+      "GIT_SHA" => opts.gitSha,
+      "ENTRYFILE" => opts.entryfile,
       "WING_TARGET" => util.env("WING_TARGET"),
       "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
       "LOGS_BUCKET_NAME" => opts.logsBucketName,

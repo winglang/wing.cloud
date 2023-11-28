@@ -5,7 +5,6 @@ bring "./status-reports.w" as status_report;
 pub struct Endpoint {
   id: str;
   appId: str;
-  runId: str;
   environmentId: str;
   path: str;
   type: str;
@@ -24,7 +23,6 @@ struct Item extends Endpoint {
 
 pub struct CreateEndpointOptions {
   appId: str;
-  runId: str;
   environmentId: str;
   path: str;
   type: str;
@@ -37,12 +35,15 @@ pub struct CreateEndpointOptions {
 struct GetEndpointOptions {
   id: str;
   environmentId: str;
-  runId: str;
+}
+
+struct DeleteEndpointOptions {
+  id: str;
+  environmentId: str;
 }
 
 struct ListEndpointsOptions {
   environmentId: str;
-  runId: str?;
 }
 
 struct MakeItemOptions {
@@ -63,7 +64,6 @@ pub class Endpoints {
       id: "endpoint${nanoid62.Nanoid62.generate()}",
       appId: options.appId,
       environmentId: options.environmentId,
-      runId: options.runId,
       path: options.path,
       type: options.type,
       localUrl: options.localUrl,
@@ -81,7 +81,6 @@ pub class Endpoints {
         id: endpoint.id,
         appId: endpoint.appId,
         environmentId: endpoint.environmentId,
-        runId: endpoint.runId,
         path: endpoint.path,
         type: endpoint.type,
         localUrl: endpoint.localUrl,
@@ -98,7 +97,7 @@ pub class Endpoints {
     this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: makeItem(pk: "ENVIRONMENT#${endpoint.environmentId}", sk: "ENDPOINT#RUN#${endpoint.runId}#ENDPOINT#${endpoint.id}"),
+          item: makeItem(pk: "ENVIRONMENT#${endpoint.environmentId}", sk: "ENDPOINT#${endpoint.id}"),
           conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
         },
       },
@@ -111,7 +110,7 @@ pub class Endpoints {
     let result = this.table.getItem(
       key: {
         pk: "ENVIRONMENT#${options.environmentId}",
-        sk: "ENDPOINT#RUN#${options.runId}#ENDPOINT#${options.id}",
+        sk: "ENDPOINT#${options.id}",
       },
     );
 
@@ -122,16 +121,21 @@ pub class Endpoints {
     throw "Endpoint [${options.id}] not found";
   }
 
+  pub inflight delete(options: DeleteEndpointOptions): Endpoint {
+    let result = this.table.deleteItem(
+      key: {
+        pk: "ENVIRONMENT#${options.environmentId}",
+        sk: "ENDPOINT#${options.id}",
+      },
+    );
+  }
+
   pub inflight list(options: ListEndpointsOptions): Array<Endpoint> {
-    let var sk = "ENDPOINT#RUN#";
-    if options.runId? {
-      sk = "ENDPOINT#RUN#${options.runId}#ENDPOINT#";
-    }
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
         ":pk": "ENVIRONMENT#${options.environmentId}",
-        ":sk": sk,
+        ":sk": "ENDPOINT#",
       },
     );
     let var endpoints: Array<Endpoint> = [];
@@ -146,7 +150,6 @@ pub class Endpoints {
       id: item.get("id").asStr(),
       appId: item.get("appId").asStr(),
       environmentId: item.get("environmentId").asStr(),
-      runId: item.get("runId").asStr(),
       path: item.get("path").asStr(),
       type: item.get("type").asStr(),
       localUrl: item.get("localUrl").asStr(),

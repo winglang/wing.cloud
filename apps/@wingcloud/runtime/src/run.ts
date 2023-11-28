@@ -49,10 +49,6 @@ export const run = async function ({ context, requestedPort }: RunProps) {
       deployLogger.log("failed to run tests");
     }
 
-    await (testResults
-      ? report("tests", { testResults })
-      : report("error", { message: "failed to run tests" }));
-
     const { port, close, endpoints } = await startServer({
       consolePath: paths["@wingconsole/app"],
       entryfilePath,

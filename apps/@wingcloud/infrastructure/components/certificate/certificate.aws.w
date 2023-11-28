@@ -13,13 +13,13 @@ pub class Certificate impl icert.ICertificate {
   certificateParam: parameter.Parameter;
   new(props: CertificateProps) {
     let cert = new dnsimple.dataDnsimpleCertificate.DataDnsimpleCertificate(domain: props.domain, certificateId: props.certificateId);
-    this.privateKeyParam = new parameter.Parameter(name: "environment-server-private-key", value: cert.privateKey);
-    this.certificateParam = new parameter.Parameter(name: "environment-server-certificate", value: cert.serverCertificate);
+    this.privateKeyParam = new parameter.Parameter(name: "environment-server-private-key", value: cert.privateKey) as "private-key";
+    this.certificateParam = new parameter.Parameter(name: "environment-server-certificate", value: cert.serverCertificate) as "certificate";
   }
 
   pub inflight certificate(): icert.Certificate {
     return {
-      privateKey: this.certificateParam.get(),
+      privateKey: this.privateKeyParam.get(),
       certificate: this.certificateParam.get(),
     };
   }

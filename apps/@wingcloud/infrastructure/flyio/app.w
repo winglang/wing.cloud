@@ -154,11 +154,24 @@ inflight class App {
   }
 
   pub listApps(): Array<App> {
-    let res = this.client.apps();
+    let queryApps = (cursor: str, apps: MutArray<App>): client.IClientPageInfo => {
+      let res = this.client.apps(cursor);
+      for app in res.data.apps.nodes {
+        apps.push(new App(client: this.client, name: app.id));
+      }
+      return res.data.apps.pageInfo;
+    };
+
     let apps = MutArray<App>[];
-    for app in res.data.apps.nodes {
-      apps.push(new App(client: this.client, name: app.id));
+    let var cursor = "";
+    while (true) {
+      let pageInfo = queryApps(cursor, apps);
+      if !pageInfo.hasNextPage {
+        break;
+      }
+      cursor = pageInfo.endCursor;
     }
+  
     return apps.copy();
   }
 }

@@ -622,7 +622,7 @@ pub class Api {
         branch: branch,
       );
 
-      let endpoints = props.endpoints.list(environmentId: environment.id, runId: environment.runId);
+      let endpoints = props.endpoints.list(environmentId: environment.id);
 
       return {
         body: {
