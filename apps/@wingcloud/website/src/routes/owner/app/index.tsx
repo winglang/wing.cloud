@@ -2,13 +2,13 @@ import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Header } from "../../components/header.js";
-import { SpinnerLoader } from "../../components/spinner-loader.js";
-import { Button } from "../../design-system/button.js";
-import { Menu } from "../../design-system/menu.js";
-import { useTheme } from "../../design-system/theme-provider.js";
-import { MenuIcon } from "../../icons/menu-icon.js";
-import { wrpc } from "../../utils/wrpc.js";
+import { Header } from "../../../components/header.js";
+import { SpinnerLoader } from "../../../components/spinner-loader.js";
+import { Button } from "../../../design-system/button.js";
+import { Menu } from "../../../design-system/menu.js";
+import { useTheme } from "../../../design-system/theme-provider.js";
+import { MenuIcon } from "../../../icons/menu-icon.js";
+import { wrpc } from "../../../utils/wrpc.js";
 
 import { DeleteModal } from "./components/delete-modal.js";
 import { EnvironmentsList } from "./components/environments-list.js";

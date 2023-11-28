@@ -1,4 +1,4 @@
-import { createBrowserRouter, redirect } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 
 import { NoMatch } from "./components/no-match.js";
 
@@ -25,19 +25,19 @@ export const router = createBrowserRouter([
       },
       {
         path: "/:owner/:appName",
-        lazy: () => import("./routes/owner/app.js"),
+        lazy: () => import("./routes/owner/app/index.js"),
       },
       {
         path: "/:owner/:appName/settings",
-        lazy: () => import("./routes/app-settings/index.js"),
+        lazy: () => import("./routes/owner/app/settings/index.js"),
       },
       {
         path: "/:owner/:appName/:branch",
-        lazy: () => import("./routes/environments/index.js"),
+        lazy: () => import("./routes/owner/app/environments/index.js"),
       },
       {
         path: "/:owner/:appName/:branch/console",
-        lazy: () => import("./routes/environments/console-preview.js"),
+        lazy: () => import("./routes/owner/app/environments/console/index.js"),
       },
     ],
   },

@@ -66,6 +66,13 @@ export const createWRPCReact = <
               }
             }
             return useQuery({
+              retry(failureCount, error) {
+                if (true) {
+                  console.log(failureCount, error);
+                  return false;
+                }
+              },
+              throwOnError: true,
               ...options,
               queryKey: [route, input],
               queryFn: async () => await fetcher("GET", url),

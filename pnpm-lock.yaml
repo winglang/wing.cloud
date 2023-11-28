@@ -110,8 +110,8 @@ importers:
         version: 0.50.6(constructs@10.3.0)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.338
-        version: 0.0.338(eslint@8.54.0)
+        specifier: ^0.0.335
+        version: 0.0.335(eslint@8.54.0)
       '@octokit/rest':
         specifier: ^20.0.2
         version: 20.0.2
@@ -207,8 +207,8 @@ importers:
         version: 0.50.6(constructs@10.2.70)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.338
-        version: 0.0.338(eslint@8.54.0)
+        specifier: ^0.0.335
+        version: 0.0.335(eslint@8.54.0)
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -293,6 +293,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      react-error-boundary:
+        specifier: ^4.0.11
+        version: 4.0.11(react@18.2.0)
       react-popper:
         specifier: ^2.3.0
         version: 2.3.0(@popperjs/core@2.11.8)(react-dom@18.2.0)(react@18.2.0)
@@ -307,8 +310,8 @@ importers:
         specifier: ^3.460.0
         version: 3.460.0
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.338
-        version: 0.0.338(eslint@8.54.0)
+        specifier: ^0.0.335
+        version: 0.0.335(eslint@8.54.0)
       '@ibm/plex':
         specifier: ^6.3.0
         version: 6.3.0
@@ -430,8 +433,8 @@ importers:
   packages/@wingcloud/wrpc:
     devDependencies:
       '@cloudy-ts/eslint-plugin':
-        specifier: ^0.0.338
-        version: 0.0.338(eslint@8.54.0)
+        specifier: ^0.0.335
+        version: 0.0.335(eslint@8.54.0)
       '@tanstack/react-query':
         specifier: ^5.8.9
         version: 5.8.9(react-dom@18.2.0)(react@18.2.0)
@@ -2158,6 +2161,13 @@ packages:
       js-tokens: 4.0.0
     dev: true
 
+  /@babel/runtime@7.23.4:
+    resolution: {integrity: sha512-2Yv65nlWnWlSpe3fXEyX5i7fx5kIKo4Qbcj+hMO0odwaneFjfXw5fdum+4yL20O0QiaHpia0cYQ9xpNMqrBwHg==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      regenerator-runtime: 0.14.0
+    dev: false
+
   /@cdktf/provider-aws@18.0.7(cdktf@0.19.1)(constructs@10.3.0):
     resolution: {integrity: sha512-Qd5wrchI84YasFOxGOUHQ+p6vthN9IvicetOpdXmkOQ38oQgLgB3dJgg5bRD1fJR6A7etErulj5gal9u39WkkQ==}
     engines: {node: '>= 18.12.0'}
@@ -2213,8 +2223,8 @@ packages:
       constructs: 10.3.0
     dev: false
 
-  /@cloudy-ts/eslint-plugin@0.0.338(eslint@8.54.0):
-    resolution: {integrity: sha512-Bdw+ezcufyAt4CJ5ZgML8m7HYTYwq+Nus3R/FNJoE1bQUk3NtY5CoId+XktZZ6m3KIUEArQEKdk/FUZ9YdQASA==}
+  /@cloudy-ts/eslint-plugin@0.0.335(eslint@8.54.0):
+    resolution: {integrity: sha512-NkvN8vg6PN0atI/HuQtvgfN0lseZyi1LJC6C4472rsf/PiSkFXNqGQ+ulO27lR8+5teSxtXHpvfP6G/1zT6NXg==}
     engines: {node: '>= 18.16.0'}
     peerDependencies:
       eslint: ^8.54.0
@@ -9850,6 +9860,15 @@ packages:
       react: 18.2.0
       scheduler: 0.23.0
 
+  /react-error-boundary@4.0.11(react@18.2.0):
+    resolution: {integrity: sha512-U13ul67aP5DOSPNSCWQ/eO0AQEYzEFkVljULQIjMV0KlffTAhxuDoBKdO0pb/JZ8mDhMKFZ9NZi0BmLGUiNphw==}
+    peerDependencies:
+      react: '>=16.13.1'
+    dependencies:
+      '@babel/runtime': 7.23.4
+      react: 18.2.0
+    dev: false
+
   /react-fast-compare@3.2.2:
     resolution: {integrity: sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==}
     dev: false
@@ -10031,6 +10050,10 @@ packages:
     engines: {node: '>=4'}
     dependencies:
       redis-errors: 1.2.0
+
+  /regenerator-runtime@0.14.0:
+    resolution: {integrity: sha512-srw17NI0TUWHuGa5CFGGmhfNIeja30WMBfbslPNhf6JrqQlLN5gcrvig1oqPxiVaXb0oW0XRKtH6Nngs5lKCIA==}
+    dev: false
 
   /regexp-tree@0.1.27:
     resolution: {integrity: sha512-iETxpjK6YoRWJG5o6hXLwvjYAoW+FEZn9os0PD/b6AP6xQwsa/Y7lCVgIixBbUPMfhu+i2LtdeAqVTgGlQarfA==}

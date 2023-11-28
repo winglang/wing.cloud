@@ -2,11 +2,11 @@ import { LinkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 
-import { SpinnerLoader } from "../../../components/spinner-loader.js";
-import { Input } from "../../../design-system/input.js";
-import { useTheme } from "../../../design-system/theme-provider.js";
-import { BranchIcon } from "../../../icons/branch-icon.js";
-import type { Environment } from "../../../utils/wrpc.js";
+import { SpinnerLoader } from "../../../../components/spinner-loader.js";
+import { Input } from "../../../../design-system/input.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
+import type { Environment } from "../../../../utils/wrpc.js";
 
 import { EnvironmentsListItem } from "./environments-list-item.js";
 

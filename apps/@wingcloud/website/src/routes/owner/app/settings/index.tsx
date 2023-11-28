@@ -6,15 +6,15 @@ import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { SpinnerLoader } from "../../components/spinner-loader.js";
-import { Button } from "../../design-system/button.js";
-import { useNotifications } from "../../design-system/notification.js";
-import { Select } from "../../design-system/select.js";
-import { useTheme } from "../../design-system/theme-provider.js";
-import { wrpc } from "../../utils/wrpc.js";
-import { EntrypointUpdateModal } from "../owner/components/entrypoint-update-modal.js";
+import { SpinnerLoader } from "../../../../components/spinner-loader.js";
+import { Button } from "../../../../design-system/button.js";
+import { useNotifications } from "../../../../design-system/notification.js";
+import { Select } from "../../../../design-system/select.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
+import { wrpc } from "../../../../utils/wrpc.js";
 
-import { SecretsList } from "./secrets/components/secrets-list.js";
+import { EntrypointUpdateModal } from "./components/entrypoint-update-modal.js";
+import { SecretsList } from "./components/secrets-list.js";
 
 export interface AppProps {
   appName: string;

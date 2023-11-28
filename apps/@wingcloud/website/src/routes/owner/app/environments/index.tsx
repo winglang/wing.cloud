@@ -2,8 +2,8 @@ import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 
-import { Header } from "../../components/header.js";
-import { wrpc } from "../../utils/wrpc.js";
+import { Header } from "../../../../components/header.js";
+import { wrpc } from "../../../../utils/wrpc.js";
 
 export const RUNTIME_LOGS_ID = "runtime-logs";
 export const TEST_LOGS_ID = "test-logs";

@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { ConfirmationModal } from "../../../components/confirmation-modal.js";
-import { useNotifications } from "../../../design-system/notification.js";
-import { wrpc } from "../../../utils/wrpc.js";
+import { ConfirmationModal } from "../../../../components/confirmation-modal.js";
+import { useNotifications } from "../../../../design-system/notification.js";
+import { wrpc } from "../../../../utils/wrpc.js";
 
 export interface DeleteModalProps {
   appId: string;

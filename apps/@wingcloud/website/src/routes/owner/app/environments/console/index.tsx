@@ -3,10 +3,10 @@ import clsx from "clsx";
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 
-import { Header } from "../../components/header.js";
-import { SpinnerLoader } from "../../components/spinner-loader.js";
-import { useTheme } from "../../design-system/theme-provider.js";
-import { wrpc } from "../../utils/wrpc.js";
+import { Header } from "../../../../../components/header.js";
+import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
+import { useTheme } from "../../../../../design-system/theme-provider.js";
+import { wrpc } from "../../../../../utils/wrpc.js";
 
 export const Component = () => {
   const { theme, mode } = useTheme();

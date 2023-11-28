@@ -11,32 +11,39 @@ import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { Input } from "../../design-system/input.js";
 import { useTheme } from "../../design-system/theme-provider.js";
-import type { App } from "../../utils/wrpc.js";
+import { wrpc } from "../../utils/wrpc.js";
 
 import { AppCard } from "./components/app-card.js";
 
-export interface OwnerPageProps {
-  loading?: boolean;
-  apps: App[];
-}
-
-export const OwnerPage = ({ loading = false, apps = [] }: OwnerPageProps) => {
+export const OwnerPage = () => {
   const { owner } = useParams();
   const { theme } = useTheme();
 
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
+  const listAppsQuery = wrpc["user.listApps"].useQuery({
+    owner: owner!,
+  });
+
+  const apps = useMemo(() => {
+    return listAppsQuery.data?.apps ?? [];
+  }, [listAppsQuery.data]);
+
   const filteredApps = useMemo(() => {
     return apps.filter((app) =>
-      `${app.appName}${app.lastCommitMessage}`
-        .toLocaleLowerCase()
-        .includes(search.toLocaleLowerCase()),
+      `${app.appName}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
     );
-  }, [apps, search]);
+  }, [listAppsQuery.data, search]);
 
   return (
-    <div className="space-y-4">
+    <div
+      className={clsx(
+        "w-full flex-grow overflow-auto",
+        "max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6",
+        "space-y-4",
+      )}
+    >
       <div className="flex gap-x-2">
         <Input
           type="text"
@@ -63,12 +70,12 @@ export const OwnerPage = ({ loading = false, apps = [] }: OwnerPageProps) => {
         )}
       </div>
 
-      {loading && (
+      {listAppsQuery.isLoading && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
         </div>
       )}
-      {!loading && (
+      {!listAppsQuery.isLoading && (
         <>
           {filteredApps.length === 0 && (
             <div className="text-center">
