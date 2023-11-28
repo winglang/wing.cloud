@@ -207,17 +207,7 @@ pub class Apps {
     );
 
     if let item = result.item {
-      return {
-        appId: item.get("appId").asStr(),
-        appName: item.get("appName").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
-        repoId: item.get("repoId").asStr(),
-        repoOwner: item.get("repoOwner").asStr(),
-        repoName: item.get("repoName").asStr(),
-        userId: item.get("userId").asStr(),
-        entryfile: item.get("entryfile").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-      };
+      return App.fromJson(item);
     }
 
     throw "App [${options.appId}] not found";
@@ -232,17 +222,7 @@ pub class Apps {
     );
 
     if let item = result.item {
-      return {
-        appId: item.get("appId").asStr(),
-        appName: item.get("appName").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
-        repoId: item.get("repoId").asStr(),
-        repoOwner: item.get("repoOwner").asStr(),
-        repoName: item.get("repoName").asStr(),
-        userId: item.get("userId").asStr(),
-        entryfile: item.get("entryfile").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-      };
+      return App.fromJson(item);
     }
 
     throw "App name ${options.appName} not found";
@@ -258,17 +238,7 @@ pub class Apps {
     );
     let var apps: Array<App> = [];
     for item in result.items {
-      apps = apps.concat([App {
-        appId: item.get("appId").asStr(),
-        appName: item.get("appName").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
-        repoId: item.get("repoId").asStr(),
-        repoOwner: item.get("repoOwner").asStr(),
-        repoName: item.get("repoName").asStr(),
-        userId: item.get("userId").asStr(),
-        entryfile: item.get("entryfile").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-      }]);
+      apps = apps.concat([App.fromJson(item)]);
     }
     return apps;
   }
@@ -345,17 +315,7 @@ pub class Apps {
     );
     let var apps: Array<App> = [];
     for item in result.items {
-      apps = apps.concat([App {
-        appId: item.get("appId").asStr(),
-        appName: item.get("appName").asStr(),
-        description: item.tryGet("description")?.tryAsStr(),
-        repoId: item.get("repoId").asStr(),
-        repoOwner: item.get("repoOwner").asStr(),
-        repoName: item.get("repoName").asStr(),
-        userId: item.get("userId").asStr(),
-        entryfile: item.get("entryfile").asStr(),
-        createdAt: item.get("createdAt").asStr(),
-      }]);
+      apps = apps.concat([App.fromJson(item)]);
     }
     return apps;
   }
