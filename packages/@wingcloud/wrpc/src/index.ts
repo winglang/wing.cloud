@@ -1,10 +1,11 @@
 import {
-  useQuery,
   useMutation,
+  useSuspenseQuery,
   type UseMutationOptions,
   type UseQueryOptions,
   type UseQueryResult,
   type UseMutationResult,
+  useQuery,
 } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 
@@ -66,6 +67,7 @@ export const createWRPCReact = <
               }
             }
             return useQuery({
+              throwOnError: true,
               ...options,
               queryKey: [route, input],
               queryFn: async () => await fetcher("GET", url),

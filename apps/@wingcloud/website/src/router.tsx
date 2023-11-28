@@ -1,4 +1,4 @@
-import { createBrowserRouter, redirect } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 
 import { NoMatch } from "./components/no-match.js";
 
@@ -38,6 +38,8 @@ export const router = createBrowserRouter([
       {
         path: "/:owner/:appName/:branch/console",
         lazy: () => import("./routes/environments/console-preview.js"),
+          },
+        ],
       },
     ],
   },
