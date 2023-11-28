@@ -23,7 +23,7 @@ export const Component = () => {
   }, [environment.data?.environment.url]);
 
   return (
-    <div className="absolute inset-0 flex flex-col">
+    <div className="flex flex-col">
       <Header />
       <div className={clsx("w-full flex-grow overflow-auto")}>
         {environment.isLoading && (

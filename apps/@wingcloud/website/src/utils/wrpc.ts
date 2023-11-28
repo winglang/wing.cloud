@@ -109,7 +109,7 @@ export interface Secret {
 export type EnvironmentType = "produciton" | "preview";
 
 export const wrpc = createWRPCReact<{
-  "user.get": QueryProcedure<
+  "auth.check": QueryProcedure<
     undefined,
     {
       user: User;

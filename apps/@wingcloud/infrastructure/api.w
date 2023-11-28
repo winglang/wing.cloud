@@ -141,6 +141,23 @@ pub class Api {
       return payload?.accessToken;
     };
 
+    api.get("/wrpc/auth.check", inflight (request) => {
+      if let payload = getJWTPayloadFromCookie(request) {
+        // check if the user from the cookie is valid
+        let userId = getUserIdFromCookie(request);
+
+        // check if user exists in the db
+        let user = users.get(userId: userId);
+
+        return {
+          body: {
+            user: user
+          },
+        };
+      }
+      throw "Unauthorized";
+    });
+
     api.post("/wrpc/auth.signout", inflight (request) => {
       return {
         headers: {
@@ -629,23 +646,6 @@ pub class Api {
           entryfile: entryfile,
           sha: commitData.sha,
       }}));
-    });
-
-    api.get("/wrpc/user.get", inflight (request) => {
-      if let payload = getJWTPayloadFromCookie(request) {
-        // check if the user from the cookie is valid
-        let userId = getUserIdFromCookie(request);
-
-        // check if user exists in the db
-        let user = users.get(userId: userId);
-
-        return {
-          body: {
-            user: user
-          },
-        };
-      }
-      throw "Unauthorized";
     });
 
     api.post("/wrpc/user.createApp", inflight (request) => {

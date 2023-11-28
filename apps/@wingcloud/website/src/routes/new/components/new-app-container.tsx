@@ -21,7 +21,7 @@ export const NewAppContainer = ({
   const { theme } = useTheme();
 
   return (
-    <div className="absolute inset-0 flex flex-col">
+    <div className="flex flex-col">
       <Header />
       <div
         className={clsx(

@@ -71,7 +71,7 @@ export const Component = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   return (
-    <div className="absolute inset-0 flex flex-col">
+    <div className="flex flex-col">
       <Header />
       <div
         className={clsx(
