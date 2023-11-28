@@ -29,13 +29,6 @@ struct CreateAppOptions {
   createdAt: str;
 }
 
-struct RenameAppOptions {
-  appId: str;
-  appName: str;
-  userId: str;
-  repository: str;
-}
-
 struct GetAppOptions {
   appId: str;
 }
@@ -150,60 +143,6 @@ pub class Apps {
     }
 
     return appId;
-  }
-
-  pub inflight rename(options: RenameAppOptions): void {
-    this.table.transactWriteItems(transactItems: [
-      {
-        update: {
-          key: {
-            pk: "APP#{options.appId}",
-            sk: "#",
-          },
-          updateExpression: "SET #appName = :appName",
-          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
-          expressionAttributeNames: {
-            "#pk": "pk",
-            "#appName": "appName",
-            "#userId": "userId",
-          },
-          expressionAttributeValues: {
-            ":appName": options.appName,
-            ":userId": options.userId,
-          },
-        }
-      },
-      {
-        update: {
-          key: {
-            pk: "USER#{options.userId}",
-            sk: "APP#{options.appId}",
-          },
-          updateExpression: "SET #appName = :appName",
-          expressionAttributeNames: {
-            "#appName": "appName",
-          },
-          expressionAttributeValues: {
-            ":appName": options.appName,
-          },
-        }
-      },
-      {
-        update: {
-          key: {
-            pk: "REPOSITORY#{options.repository}",
-            sk: "APP#{options.appId}",
-          },
-          updateExpression: "SET #appName = :appName",
-          expressionAttributeNames: {
-            "#appName": "appName",
-          },
-          expressionAttributeValues: {
-            ":appName": options.appName,
-          },
-        }
-      },
-    ]);
   }
 
   pub inflight get(options: GetAppOptions): App {
