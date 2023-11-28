@@ -24,7 +24,7 @@ pub class Containers impl types.IContainers {
 				region: util.tryEnv("CONTAINERS_FLY_REGION"),
 			);
 		} else {
-			throw "Unknown CONTAINERS_DRIVER: ${driver}";
+			throw "Unknown CONTAINERS_DRIVER: {driver}";
 		}
   }
 

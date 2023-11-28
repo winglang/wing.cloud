@@ -159,10 +159,10 @@ pub class Probot {
 			}
 		}
 		this.handlerIndex += 1;
-		let handlerWrapper = new Handler() as "onMessage-${this.handlerIndex}";
+		let handlerWrapper = new Handler() as "onMessage-{this.handlerIndex}";
 		std.Node.of(handlerWrapper).hidden = true;
 		let listener = this.topic.onMessage(handlerWrapper);
-		std.Node.of(listener).title = "on: ${name}";
+		std.Node.of(listener).title = "on: {name}";
 	}
 
 	pub onPullRequestOpened(handler: inflight (PullRequestOpenedContext): void) {

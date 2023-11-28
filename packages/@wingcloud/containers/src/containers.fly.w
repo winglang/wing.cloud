@@ -56,9 +56,9 @@ pub class FlyContainers impl types.IContainers {
     };
 
     let response = http.post(
-      "${this.apiURL}/apps",
+      "{this.apiURL}/apps",
       headers: {
-        "Authorization" => "Bearer ${this.token}",
+        "Authorization" => "Bearer {this.token}",
         "Content-Type" => "application/json",
       },
       body: Json.stringify({
@@ -71,11 +71,11 @@ pub class FlyContainers impl types.IContainers {
     http.post(
       this.graphqlURL,
       headers: {
-        "Authorization" => "Bearer ${this.token}",
+        "Authorization" => "Bearer {this.token}",
         "Content-Type" => "application/json",
       },
       body: Json.stringify({
-        query: "mutation(\$input: AllocateIPAddressInput!) { allocateIpAddress(input: \$input) { ipAddress { id address type region createdAt } } }",
+        query: "mutation($input: AllocateIPAddressInput!) \{ allocateIpAddress(input: $input) \{ ipAddress \{ id address type region createdAt } } }",
         variables: {
           input: {
             appId: containerID.value,
@@ -100,9 +100,9 @@ pub class FlyContainers impl types.IContainers {
       };
     }
     http.post(
-      "${this.apiURL}/apps/${containerID.value}/machines",
+      "{this.apiURL}/apps/{containerID.value}/machines",
       headers: {
-        "Authorization" => "Bearer ${this.token}",
+        "Authorization" => "Bearer {this.token}",
         "Content-Type" => "application/json",
       },
       body: Json.stringify({
@@ -139,7 +139,7 @@ pub class FlyContainers impl types.IContainers {
 
     let container = types.Container {
       containerID: containerID,
-      url: "https://${containerID.value}.fly.dev",
+      url: "https://{containerID.value}.fly.dev",
     };
     this.containers?.insert(container.containerID.value, {
       containerID: containerID.value,
@@ -151,11 +151,11 @@ pub class FlyContainers impl types.IContainers {
     http.post(
       this.graphqlURL,
       headers: {
-        "Authorization" => "Bearer ${this.token}",
+        "Authorization" => "Bearer {this.token}",
         "Content-Type" => "application/json"
       },
       body: Json.stringify({
-        query: "mutation Delete(\$input:ID!) { deleteApp(appId: \$input) { organization { id } } }",
+        query: "mutation Delete($input:ID!) \{ deleteApp(appId: $input) \{ organization \{ id } } }",
         variables: {
           input: containerID.value,
         },

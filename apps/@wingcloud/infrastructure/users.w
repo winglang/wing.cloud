@@ -29,15 +29,15 @@ pub class Users {
   }
 
   pub inflight create(options: CreateOptions): str {
-    let userId = "user_${Nanoid62.Nanoid62.generate()}";
-    log("userId = ${userId}");
+    let userId = "user_{Nanoid62.Nanoid62.generate()}";
+    log("userId = {userId}");
 
     this.table.transactWriteItems(
       transactItems: [
         {
           put: {
             item: {
-              pk: "LOGIN#${options.gitHubLogin}",
+              pk: "LOGIN#{options.gitHubLogin}",
               sk: "#",
               id: userId,
             },
@@ -47,7 +47,7 @@ pub class Users {
         {
           put: {
             item: {
-              pk: "USER#${userId}",
+              pk: "USER#{userId}",
               sk: "#",
               id: userId,
               gitHubLogin: options.gitHubLogin,
@@ -63,7 +63,7 @@ pub class Users {
   pub inflight fromLogin(options: FromLoginOptions): str? {
     let result = this.table.getItem(
       key: {
-        pk: "LOGIN#${options.gitHubLogin}",
+        pk: "LOGIN#{options.gitHubLogin}",
         sk: "#",
       },
     );
@@ -80,7 +80,7 @@ pub class Users {
   pub inflight getUsername(options: GetUsernameOptions): str {
     let result = this.table.getItem(
       key: {
-        pk: "USER#${options.userId}",
+        pk: "USER#{options.userId}",
         sk: "#",
       },
     );

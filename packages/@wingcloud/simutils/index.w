@@ -46,7 +46,7 @@ pub class Port {
 		let state = new sim.State();
 		this.port = state.token("port");
 		new cloud.Service(inflight () => {
-			state.set("port", "${Port.findPort()}");
+			state.set("port", "{Port.findPort()}");
 		});
 	}
 	extern "./index.js" static inflight findPort(): num;
