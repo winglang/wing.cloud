@@ -28,6 +28,11 @@ struct TestLog {
   traces: Array<Log>;
 }
 
+struct UserFromCookie {
+  userId: str;
+  username: str;
+}
+
 // TODO: https://github.com/winglang/wing/issues/3644
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
@@ -105,7 +110,7 @@ pub class Api {
       }
     };
 
-    let getUserFromCookie = inflight (request: cloud.ApiRequest) => {
+    let getUserIdFromCookie = inflight (request: cloud.ApiRequest) => {
       if let payload = getJWTPayloadFromCookie(request) {
         return payload.userId;
       } else {
@@ -113,14 +118,22 @@ pub class Api {
       }
     };
 
-    let verifyUser = inflight (request: cloud.ApiRequest): str => {
-      let userId = getUserFromCookie(request);
+    let getUserFromCookie = inflight (request: cloud.ApiRequest): UserFromCookie => {
+      let userId = getUserIdFromCookie(request);
       let username = users.getUsername(userId: userId);
+      return {
+        userId: userId,
+        username: username,
+      };
+    };
 
-      if username != request.query.get("owner") {
+    let verifyUser = inflight (request: cloud.ApiRequest): str => {
+      let user = getUserFromCookie(request);
+
+      if user.username != request.query.get("owner") {
         throw "Unauthorized";
       }
-      return userId;
+      return user.userId;
     };
 
     let getAccessTokenFromCookie = inflight (request: cloud.ApiRequest) => {
@@ -131,7 +144,7 @@ pub class Api {
     api.get("/wrpc/auth.check", inflight (request) => {
       if let payload = getJWTPayloadFromCookie(request) {
         // check if the user from the cookie is valid
-        let userId = getUserFromCookie(request);
+        let userId = getUserIdFromCookie(request);
 
         // check if user exists in the db
         let username = users.getUsername(userId: userId);
@@ -357,7 +370,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.delete", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
 
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
@@ -412,7 +425,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.listSecrets", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let appId = request.query.get("appId");
       let prodSecrets = props.secrets.list(appId: appId, environmentType: "production");
       let previewSecrets = props.secrets.list(appId: appId, environmentType: "preview");
@@ -426,7 +439,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.decryptSecret", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let secretId = input.get("secretId").asStr();
@@ -443,7 +456,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.createSecret", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let environmentType = input.get("environmentType").asStr();
@@ -481,7 +494,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.deleteSecret", inflight (request) => {
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let environmentType = input.get("environmentType").asStr();
@@ -531,8 +544,7 @@ pub class Api {
     });
 
     api.post("/wrpc/app.updateEntryfile", inflight (request) => {
-      log("{Json.stringify(request)}");
-      let userId = getUserFromCookie(request);
+      let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
       let appName = input.get("appName").asStr();
@@ -544,7 +556,8 @@ pub class Api {
       queue.push(Json.stringify(EnvironmentAction{
         type: "restartAll",
         data: EnvironmentManager.RestartAllEnvironmentOptions {
-          app: app,
+          appId: appId,
+          entryfile: app.entryfile,
       }}));
 
       return {
@@ -596,61 +609,90 @@ pub class Api {
       };
     });
 
+    let productionEnvironmentQueue = new cloud.Queue() as "Production Environment Queue";
+    productionEnvironmentQueue.setConsumer(inflight (event) => {
+      let input = Json.parse(event);
+
+      let appId = input.get("appId").asStr();
+      let entryfile = input.get("entryfile").asStr();
+      let repoId = input.get("repoId").asStr();
+      let defaultBranch = input.get("default_branch").asStr();
+
+      let commitData = GitHub.Client.getLastCommit(
+        token: input.get("accessToken").asStr(),
+        owner:  input.get("repoOwner").asStr(),
+        repo: input.get("repoName").asStr(),
+        default_branch: defaultBranch,
+      );
+
+      let installationId = input.get("installationId").asNum();
+      queue.push(Json.stringify(EnvironmentAction {
+        type: "create",
+        data: EnvironmentManager.CreateEnvironmentOptions {
+          createEnvironment: {
+            branch: defaultBranch,
+            appId: appId,
+            type: "production",
+            prTitle: defaultBranch,
+            repo: repoId,
+            status: "initializing",
+            installationId: installationId,
+          },
+          appId: appId,
+          entryfile: entryfile,
+          sha: commitData.sha,
+      }}));
+    });
     api.post("/wrpc/user.createApp", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        let userId = getUserFromCookie(request);
+        let user = getUserFromCookie(request);
 
         let input = Json.parse(request.body ?? "");
 
-        let gitHubLogin = users.getUsername(userId: userId);
-
         let defaultBranch = input.get("default_branch").asStr();
         let repoId = input.get("repoId").asStr();
-
-        let commitData = GitHub.Client.getLastCommit(
-          token: accessToken,
-          owner:  input.get("repoOwner").asStr(),
-          repo: input.get("repoName").asStr(),
-          default_branch: input.get("default_branch").asStr(),
-        );
+        let repoOwner = input.get("repoOwner").asStr();
+        let repoName = input.get("repoName").asStr();
+        let entryfile = input.get("entryfile").asStr();
 
         // TODO: https://github.com/winglang/wing/issues/3644
-        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9]+", "-");
+        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9-]+", "*");
+        if appName.contains("*") {
+          return {
+            status: 422,
+            body: {
+              message: "Invalid app name. Must consist of alphanumeric characters and hiphens only.",
+            },
+          };
+        }
 
-        let app = apps.create(
+        let appId = apps.create(
           appName: appName,
           description: input.tryGet("description")?.tryAsStr() ?? "",
-          repoId: input.get("repoId").asStr(),
-          repoName: input.get("repoName").asStr(),
-          repoOwner: input.get("repoOwner").asStr(),
-          imageUrl: input.get("imageUrl").asStr(),
-          userId: userId,
-          entryfile: input.get("entryfile").asStr(),
+          repoId: repoId,
+          repoName: repoName,
+          repoOwner: repoOwner,
+          userId: user.userId,
+          entryfile: entryfile,
           createdAt: datetime.utcNow().toIso(),
-          createdBy: gitHubLogin,
-          lastCommitMessage: commitData?.commit?.message ?? "",
         );
 
-        let installationId = num.fromStr(input.get("installationId").asStr());
-        queue.push(Json.stringify(EnvironmentAction{
-          type: "create",
-          data: EnvironmentManager.CreateEnvironmentOptions {
-            createEnvironment: {
-              branch: defaultBranch,
-              appId: app.appId,
-              type: "production",
-              prTitle: defaultBranch,
-              repo: repoId,
-              status: "initializing",
-              installationId: installationId,
-            },
-            app: app,
-            sha: commitData.sha,
-        }}));
+        productionEnvironmentQueue.push(Json.stringify({
+          accessToken: accessToken,
+          repoId: repoId,
+          repoOwner: repoOwner,
+          repoName: repoName,
+          default_branch: defaultBranch,
+          installationId: num.fromStr(input.get("installationId").asStr()),
+          appId: appId,
+          entryfile: entryfile,
+        }));
 
         return {
           body: {
-            app: app,
+            appId: appId,
+            appName: appName,
+            appUri: "{user.username}/{appName}",
           },
         };
       } else {
