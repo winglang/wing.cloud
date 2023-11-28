@@ -33,7 +33,6 @@ export const NewSecret = ({
     await onCreate(name, value, environmentType!);
     setName("");
     setValue("");
-    // eslint-disable-next-line unicorn/no-useless-undefined
     setEnvironmentType(undefined);
   }, [name, value, environmentType]);
 

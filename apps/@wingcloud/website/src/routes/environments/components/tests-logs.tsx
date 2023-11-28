@@ -52,7 +52,6 @@ export const TestsLogs = ({
   useEffect(() => {
     setAnimateLogId(selectedTestId);
     const timeout = setTimeout(() => {
-      // eslint-disable-next-line unicorn/no-useless-undefined
       setAnimateLogId(undefined);
     }, 2000);
     return () => clearTimeout(timeout);

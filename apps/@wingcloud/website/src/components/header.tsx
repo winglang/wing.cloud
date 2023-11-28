@@ -30,7 +30,6 @@ const UserMenu = ({ avatarUrl }: { avatarUrl?: string }) => {
         {
           label: "Sign out",
           onClick: () => {
-            // eslint-disable-next-line unicorn/no-useless-undefined
             signOut.mutate(undefined);
           },
         },

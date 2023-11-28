@@ -3,13 +3,13 @@ bring "./nanoid62.w" as Nanoid62;
 
 struct User {
   id: str;
-  name: str;
+  displayName: str;
   username: str;
   avatarUrl: str;
 }
 
 struct CreateOptions {
-  name: str;
+  displayName: str;
   username: str;
   avatarUrl: str?;
 }
@@ -19,7 +19,7 @@ struct FromLoginOptions {
 }
 
 struct GetOrCreateOptions {
-  name: str;
+  displayName: str;
   username: str;
   avatarUrl: str?;
 }
@@ -47,7 +47,7 @@ pub class Users {
               pk: "LOGIN#${options.username}",
               sk: "#",
               id: userId,
-              name: options.name,
+              displayName: options.displayName,
               username: options.username,
               avatarUrl: options.avatarUrl,
             },
@@ -60,7 +60,7 @@ pub class Users {
               pk: "USER#{userId}",
               sk: "#",
               id: userId,
-              name: options.name,
+              displayName: options.displayName,
               username: options.username,
               avatarUrl: options.avatarUrl,
             },
@@ -71,7 +71,7 @@ pub class Users {
 
     return User {
       id: userId,
-      name: options.name,
+      displayName: options.displayName,
       username: options.username,
       avatarUrl: options.avatarUrl ?? "",
     };
@@ -92,7 +92,7 @@ pub class Users {
     let user = this.fromLogin(username: options.username);
 
     return user ?? this.create(
-      name: options.name,
+      displayName: options.displayName,
       username: options.username,
       avatarUrl: options.avatarUrl
     );
