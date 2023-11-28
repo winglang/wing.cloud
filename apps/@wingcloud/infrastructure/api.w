@@ -450,21 +450,21 @@ pub class Api {
       let environmentType = input.get("environmentType").asStr();
       if environmentType != "production" && environmentType != "preview" {
         throw httpError.HttpError.throwBadRequest(
-          "invalid environment type",
+          "Invalid environment type",
         );
       }
 
       let name = input.get("name").asStr();
       if name == "" {
         throw httpError.HttpError.throwBadRequest(
-          "invalid name",
+          "Invalid name",
         );
       }
 
       let value = input.get("value").asStr();
       if value == "" {
         throw httpError.HttpError.throwBadRequest(
-          "invalid value",
+          "Invalid value",
         );
       }
 
