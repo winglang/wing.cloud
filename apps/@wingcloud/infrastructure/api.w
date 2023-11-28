@@ -189,14 +189,14 @@ pub class Api {
       log("tokens = {Json.stringify(tokens)}");
 
       let githubUser = GitHub.Client.getUser(tokens.access_token);
-      log("gitHubLogin = ${githubUser.login}");
+      log("gitHubLogin = {githubUser.login}");
 
       let user = users.getOrCreate(
         displayName: githubUser.name,
         username: githubUser.login,
         avatarUrl: githubUser.avatar_url,
       );
-      log("userId = ${user.id}");
+      log("userId = {user.id}");
 
       let jwt = JWT.JWT.sign(
         secret: props.appSecret,

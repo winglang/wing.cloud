@@ -36,15 +36,15 @@ pub class Users {
   }
 
   pub inflight create(options: CreateOptions): User {
-    let userId = "user_${Nanoid62.Nanoid62.generate()}";
-    log("userId = ${userId}");
+    let userId = "user_{Nanoid62.Nanoid62.generate()}";
+    log("userId = {userId}");
 
     this.table.transactWriteItems(
       transactItems: [
         {
           put: {
             item: {
-              pk: "LOGIN#${options.username}",
+              pk: "LOGIN#{options.username}",
               sk: "#",
               id: userId,
               displayName: options.displayName,
@@ -80,7 +80,7 @@ pub class Users {
   pub inflight fromLogin(options: FromLoginOptions): User? {
     let result = this.table.getItem(
       key: {
-        pk: "LOGIN#${options.username}",
+        pk: "LOGIN#{options.username}",
         sk: "#",
       },
     );

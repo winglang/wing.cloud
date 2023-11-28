@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 
@@ -12,8 +13,6 @@ import { DeploymentLogs } from "./components/deployment-logs.js";
 import { EnvironmentDetails } from "./components/environment-details.js";
 import { RuntimeLogs } from "./components/runtime-logs.js";
 import { TestsLogs } from "./components/tests-logs.js";
-
-import clsx from "clsx";
 
 export const Component = () => {
   const { owner, appName, branch } = useParams();
