@@ -4,7 +4,7 @@ bring "./dns.sim.w" as sim;
 bring "./dns.aws.w" as aws;
 
 pub struct DNSProps {
-  token: str;
+  token: str?;
 }
 
 pub class DNS impl idns.IDNS {
@@ -13,7 +13,11 @@ pub class DNS impl idns.IDNS {
     if util.env("WING_TARGET") == "sim" {
       this.inner = new sim.DNS();
     } else {
-      this.inner = new aws.DNS(token: props.token);
+      if let token = props.token {
+        this.inner = new aws.DNS(token: token);
+      } else {
+        throw "new dns: missing token parameter";
+      }
     }
   }
 

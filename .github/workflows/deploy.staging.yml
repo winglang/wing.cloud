@@ -54,6 +54,7 @@ jobs:
           APP_SECRET: ${{ secrets.APP_SECRET }}
           FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
           FLY_TOKEN: ${{ secrets.FLY_TOKEN }}
+          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
           BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
           BOT_GITHUB_CLIENT_ID: ${{ secrets.BOT_GITHUB_CLIENT_ID }}
           BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
@@ -66,7 +67,6 @@ jobs:
           PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
           PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
           LANDING_DOMAIN: ${{ secrets.LANDING_DOMAIN }}
-          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
           ENVIRONMENT_SERVER_ZONE_NAME:  ${{ vars.ENVIRONMENT_SERVER_ZONE_NAME }}
           ENVIRONMENT_SERVER_CERTIFICATE_ID:  ${{ vars.ENVIRONMENT_SERVER_CERTIFICATE_ID }}
           TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}

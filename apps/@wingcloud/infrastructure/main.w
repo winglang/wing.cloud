@@ -89,11 +89,11 @@ let siteURL = (() => {
   }
 })();
 
-let dns = new Dns.DNS(token: (): str => {
-  if util.env("WING_TARGET") == "sim" {
-    return "test-token";
-  } else {
+let dns = new Dns.DNS(token: (): str? => {
+  if util.env("WING_TARGET") != "sim" {
     return util.env("DNSIMPLE_TOKEN");
+  } else {
+    return nil;
   }
 }());
 let endpointProvider = new PublicEndpoint.PublicEndpointProvider(dns: dns, domain: (): str => {
