@@ -33,7 +33,9 @@ export const Component = () => {
         )}
 
         {url && (
-          <div className={clsx("w-full h-full border", theme.borderInput)}>
+          <div
+            className={clsx("w-full h-full border absolute", theme.borderInput)}
+          >
             <Console
               trpcUrl={`${url}/trpc`}
               wsUrl={`${url.startsWith("http:") ? "ws://" : "wss://"}${
