@@ -14,18 +14,16 @@ class Util {
 
 pub class DNS impl idns.IDNS {
   url: str;
-  state: sim.State;
-  svc: cloud.Service;
   new() {
-    this.state = new sim.State();
-    this.svc = new cloud.Service(inflight () => {
+    let state = new sim.State();
+    new cloud.Service(inflight () => {
       let result = Util.startServer();
-      this.state.set("url", "http://localhost:{result.port}");
+      state.set("url", "http://localhost:{result.port}");
       return () => {
         result.close();
       };
     });
-    this.url = this.state.token("url");
+    this.url = state.token("url");
   }
 
   pub inflight createRecords(records: Array<idns.Record>) {

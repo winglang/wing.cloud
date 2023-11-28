@@ -98,7 +98,7 @@ pub class Endpoints {
       {
         put: {
           item: makeItem(pk: "ENVIRONMENT#{endpoint.environmentId}", sk: "ENDPOINT#{endpoint.id}"),
-          conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
+          conditionExpression: "attribute_not_exists(pk)"
         },
       },
     ]);

@@ -21,15 +21,6 @@ export const Endpoints = ({
 }: EndpointsProps) => {
   const { theme } = useTheme();
 
-  const location = useLocation();
-
-  const locationHash = useMemo(() => {
-    // url includes an ID with #
-    if (location.hash) {
-      return location.hash.slice(1);
-    }
-  }, [location.search]);
-
   return (
     <div
       className={clsx(
