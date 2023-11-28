@@ -10,6 +10,11 @@ struct JsonApiResponse {
   body: Json?;
 }
 
+struct HttpError {
+  code: num;
+  message: str;
+}
+
 pub class JsonApi {
   api: cloud.Api;
   pub url: str;
@@ -40,26 +45,15 @@ pub class JsonApi {
             headers: headers?.copy(),
             body: bodyStr,
           };
-        } catch error {
-          // TODO: This is a hack to get around the fact that errors are just strings
-          if error == "Bad credentials" || error == "Unauthorized" {
+        } catch err {
+          if let error = HttpError.tryFromJson(Json.tryParse(err)) {
             return {
-              status: 401,
+              status: error.code,
               headers: {
                 "content-type": "application/json",
               },
               body: Json.stringify({
-                error: error,
-              }),
-            };
-          } if error == "Forbidden" {
-            return {
-              status: 403,
-              headers: {
-                "content-type": "application/json",
-              },
-              body: Json.stringify({
-                error: error,
+                error: error.message,
               }),
             };
           }
@@ -70,7 +64,7 @@ pub class JsonApi {
               "content-type": "application/json",
             },
             body: Json.stringify({
-              error: error,
+              error: err,
             }),
           };
         }

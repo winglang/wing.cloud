@@ -1,5 +1,6 @@
 bring ex;
 bring "./nanoid62.w" as nanoid62;
+bring "./http-error.w" as httpError;
 
 pub struct App {
   appId: str;
@@ -136,9 +137,9 @@ pub class Apps {
       ]);
     } catch error {
       if error.contains("ConditionalCheckFailed") {
-        throw "App name {options.appName} already exists";
+        throw httpError.HttpError.throwForbidden("App {options.appName} already exists");
       } else {
-        throw error;
+        throw httpError.HttpError.throwError(error);
       }
     }
 
@@ -157,7 +158,7 @@ pub class Apps {
       return App.fromJson(item);
     }
 
-    throw "App [{options.appId}] not found";
+    throw httpError.HttpError.throwNotFound("App [{options.appId}] not found");
   }
 
   pub inflight getByName(options: GetAppByNameOptions): App {
@@ -172,7 +173,7 @@ pub class Apps {
       return App.fromJson(item);
     }
 
-    throw "App name {options.appName} not found";
+    throw httpError.HttpError.throwNotFound("App [{options.appName}] not found");
   }
 
   pub inflight list(options: ListAppsOptions): Array<App> {
@@ -249,7 +250,7 @@ pub class Apps {
       return;
     }
 
-    throw "App not found";
+    throw httpError.HttpError.throwNotFound("App not found");
   }
 
   pub inflight listByRepository(options: ListAppByRepositoryOptions): Array<App> {

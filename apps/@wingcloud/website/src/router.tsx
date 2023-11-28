@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { NoMatch } from "./components/no-match.js";
+import { ErrorPage } from "./components/error-page.js";
 
 export const router = createBrowserRouter([
   {
@@ -43,6 +43,12 @@ export const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <NoMatch />,
+    element: (
+      <ErrorPage
+        code={404}
+        title="Page not found"
+        message="Sorry, we couldn’t find the page you’re looking for."
+      />
+    ),
   },
 ]);

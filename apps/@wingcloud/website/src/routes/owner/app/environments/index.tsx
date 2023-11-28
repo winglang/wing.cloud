@@ -5,7 +5,7 @@ import { EnvironmentPage } from "./environment-page.js";
 
 export const Component = () => {
   return (
-    <div>
+    <div className="flex flex-col">
       <Header />
       <ErrorBoundary>
         <EnvironmentPage />

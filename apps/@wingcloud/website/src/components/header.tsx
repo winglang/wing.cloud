@@ -30,7 +30,7 @@ const UserMenu = ({ avatarUrl }: { avatarUrl?: string }) => {
         {
           label: "Sign out",
           onClick: () => {
-            signOut.mutate();
+            signOut.mutate(undefined);
           },
         },
       ]}

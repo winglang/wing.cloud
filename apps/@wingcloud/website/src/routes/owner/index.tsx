@@ -5,7 +5,7 @@ import { OwnerPage } from "./owner-page.js";
 
 export const Component = () => {
   return (
-    <div>
+    <div className="flex flex-col">
       <Header />
       <ErrorBoundary>
         <OwnerPage />

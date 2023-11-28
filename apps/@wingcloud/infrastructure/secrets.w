@@ -1,6 +1,8 @@
 bring ex;
 bring "./crypto/crypto.w" as crypto;
 bring "./crypto/icrypto.w" as icrypto;
+bring "./http-error.w" as httpError;
+
 
 pub struct Secret {
   id: str;
@@ -108,7 +110,7 @@ pub class Secrets {
       return Secret.fromJson(this.fromDB(item, options.decryptValue ?? false));
     }
 
-    throw "Secret [{options.id}] not found";
+    throw httpError.HttpError.throwNotFound("Secret [{options.id}] not found");
   }
 
   pub inflight list(options: ListSecretsOptions): Array<Secret> {

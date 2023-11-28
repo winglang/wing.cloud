@@ -12,6 +12,7 @@ bring "./users.w" as Users;
 bring "./environments.w" as Environments;
 bring "./secrets.w" as Secrets;
 bring "./lowkeys-map.w" as lowkeys;
+bring "./http-error.w" as httpError;
 
 struct Log {
   message: str;
@@ -113,9 +114,8 @@ pub class Api {
     let getUserIdFromCookie = inflight (request: cloud.ApiRequest) => {
       if let payload = getJWTPayloadFromCookie(request) {
         return payload.userId;
-      } else {
-        throw "Unauthorized";
       }
+      throw httpError.HttpError.throwUnauthorized();
     };
 
     let getUserFromCookie = inflight (request: cloud.ApiRequest): UserFromCookie => {
@@ -129,9 +129,10 @@ pub class Api {
 
     let verifyUser = inflight (request: cloud.ApiRequest): str => {
       let user = getUserFromCookie(request);
+      let owner = request.query.get("owner");
 
-      if user.username != request.query.get("owner") {
-        throw "Forbidden";
+      if user.username != owner {
+        throw httpError.HttpError.throwNotFound("User [{owner}] not found");
       }
       return user.userId;
     };
@@ -156,7 +157,7 @@ pub class Api {
         },
       };
       } catch {
-        throw "Unauthorized";
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
@@ -244,9 +245,7 @@ pub class Api {
           },
         };
       } else {
-        return {
-          status: 401,
-        };
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
@@ -266,9 +265,7 @@ pub class Api {
           },
         };
       } else {
-        return {
-          status: 401,
-        };
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
@@ -291,9 +288,7 @@ pub class Api {
           },
         };
       } else {
-        return {
-          status: 401,
-        };
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
@@ -318,9 +313,7 @@ pub class Api {
           },
         };
       } else {
-        return {
-          status: 401,
-        };
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
@@ -334,17 +327,12 @@ pub class Api {
       );
 
       if app.userId != userId {
-        return {
-          status: 403,
-          body: {
-            error: "Forbidden",
-          },
-        };
+        throw httpError.HttpError.throwNotFound("App not found");
       }
 
       return {
         body: {
-            app: app,
+          app: app,
         },
       };
     });
@@ -360,17 +348,12 @@ pub class Api {
       );
 
       if app.userId != userId {
-        return {
-          status: 403,
-          body: {
-            error: "Forbidden",
-          },
-        };
+        throw httpError.HttpError.throwNotFound("App not found");
       }
 
       return {
         body: {
-            app: app,
+          app: app,
         },
       };
     });
@@ -454,7 +437,6 @@ pub class Api {
       let secret = props.secrets.get(id: secretId, appId: appId, environmentType: environmentType, decryptValue: true);
 
       return {
-        status: 200,
         body: {
           value: secret.value,
         },
@@ -467,32 +449,28 @@ pub class Api {
       let appId = input.get("appId").asStr();
       let environmentType = input.get("environmentType").asStr();
       if environmentType != "production" && environmentType != "preview" {
-        return {
-          status: 400,
-          body: { error: "invalid environment type" }
-        };
+        throw httpError.HttpError.throwBadRequest(
+          "invalid environment type",
+        );
       }
 
       let name = input.get("name").asStr();
       if name == "" {
-        return {
-          status: 400,
-          body: { error: "invalid name" }
-        };
+        throw httpError.HttpError.throwBadRequest(
+          "invalid name",
+        );
       }
 
       let value = input.get("value").asStr();
       if value == "" {
-        return {
-          status: 400,
-          body: { error: "invalid value" }
-        };
+        throw httpError.HttpError.throwBadRequest(
+          "invalid value",
+        );
       }
 
       let secret = props.secrets.create(appId: appId, environmentType: environmentType, name: name, value: value);
 
       return {
-        status: 200,
         body: {
           secretId: secret.id
         }
@@ -509,7 +487,6 @@ pub class Api {
       props.secrets.delete(id: secretId, appId: appId, environmentType: environmentType);
 
       return {
-        status: 200,
         body: {
           secretId: secretId
         }
@@ -543,9 +520,7 @@ pub class Api {
           },
         };
       } else {
-        return {
-          status: 401,
-        };
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
@@ -567,7 +542,6 @@ pub class Api {
       }}));
 
       return {
-        status: 200,
         body: {
           appId: appId,
         },
@@ -703,9 +677,7 @@ pub class Api {
           },
         };
       } else {
-        return {
-          status: 401,
-        };
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
