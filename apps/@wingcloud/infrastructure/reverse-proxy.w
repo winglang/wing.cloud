@@ -26,7 +26,7 @@ pub class ReverseProxy {
       let inner = new ReverseProxy_sim(props);
       this.url = inner.url;
     } else {
-      throw "ReverseProxy is not implemented for ${util.env("WING_TARGET")}";
+      throw "ReverseProxy is not implemented for {util.env("WING_TARGET")}";
     }
   }
 }
@@ -45,7 +45,7 @@ class ReverseProxy_sim {
     let state = new sim.State();
     new cloud.Service(inflight () => {
       let result = ReverseProxy_sim.startReverseProxyServer(origins: props.origins, port: props.port);
-      state.set("url", "http://localhost:${result.port}");
+      state.set("url", "http://localhost:{result.port}");
       return inflight () => {
         result.close();
       };

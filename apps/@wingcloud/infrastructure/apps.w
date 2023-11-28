@@ -88,7 +88,7 @@ pub class Apps {
   }
 
   pub inflight create(options: CreateAppOptions): App {
-    let appId = "app_${nanoid62.Nanoid62.generate()}";
+    let appId = "app_{nanoid62.Nanoid62.generate()}";
 
     // TODO: use spread operator when it's supported https://github.com/winglang/wing/issues/3855
     let makeItem = (ops: MakeItemOptions): Item => {
@@ -118,7 +118,7 @@ pub class Apps {
           put: {
             item: makeItem(
               appId: appId,
-              pk: "APP#${appId}",
+              pk: "APP#{appId}",
               sk: "#",
             ),
             conditionExpression: "attribute_not_exists(pk)"
@@ -128,8 +128,8 @@ pub class Apps {
           put: {
             item: makeItem(
               appId: appId,
-              pk: "USER#${options.userId}",
-              sk: "APP_NAME#${options.appName}",
+              pk: "USER#{options.userId}",
+              sk: "APP_NAME#{options.appName}",
             ),
             conditionExpression: "attribute_not_exists(pk)"
           },
@@ -138,8 +138,8 @@ pub class Apps {
           put: {
             item: makeItem(
               appId: appId,
-              pk: "USER#${options.userId}",
-              sk: "APP#${appId}",
+              pk: "USER#{options.userId}",
+              sk: "APP#{appId}",
             ),
           },
         },
@@ -147,8 +147,8 @@ pub class Apps {
           put: {
             item: makeItem(
               appId: appId,
-              pk: "REPOSITORY#${options.repoId}",
-              sk: "APP#${appId}",
+              pk: "REPOSITORY#{options.repoId}",
+              sk: "APP#{appId}",
             ),
           },
         },
@@ -156,7 +156,7 @@ pub class Apps {
       ]);
     } catch error {
       if error.contains("ConditionalCheckFailed") {
-        throw "App name ${options.appName} already exists";
+        throw "App name {options.appName} already exists";
       } else {
         throw error;
       }
@@ -185,7 +185,7 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "APP#${options.appId}",
+            pk: "APP#{options.appId}",
             sk: "#",
           },
           updateExpression: "SET #appName = :appName",
@@ -204,8 +204,8 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "USER#${options.userId}",
-            sk: "APP#${options.appId}",
+            pk: "USER#{options.userId}",
+            sk: "APP#{options.appId}",
           },
           updateExpression: "SET #appName = :appName",
           expressionAttributeNames: {
@@ -219,8 +219,8 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "REPOSITORY#${options.repository}",
-            sk: "APP#${options.appId}",
+            pk: "REPOSITORY#{options.repository}",
+            sk: "APP#{options.appId}",
           },
           updateExpression: "SET #appName = :appName",
           expressionAttributeNames: {
@@ -237,7 +237,7 @@ pub class Apps {
   pub inflight get(options: GetAppOptions): App {
     let result = this.table.getItem(
       key: {
-        pk: "APP#${options.appId}",
+        pk: "APP#{options.appId}",
         sk: "#",
       },
     );
@@ -261,14 +261,14 @@ pub class Apps {
       };
     }
 
-    throw "App [${options.appId}] not found";
+    throw "App [{options.appId}] not found";
   }
 
   pub inflight getByName(options: GetAppByNameOptions): App {
     let result = this.table.getItem(
       key: {
-        pk: "USER#${options.userId}",
-        sk: "APP_NAME#${options.appName}",
+        pk: "USER#{options.userId}",
+        sk: "APP_NAME#{options.appName}",
       },
     );
 
@@ -291,14 +291,14 @@ pub class Apps {
       };
     }
 
-    throw "App name ${options.appName} not found";
+    throw "App name {options.appName} not found";
   }
 
   pub inflight list(options: ListAppsOptions): Array<App> {
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
-        ":pk": "USER#${options.userId}",
+        ":pk": "USER#{options.userId}",
         ":sk": "APP#",
       },
     );
@@ -328,7 +328,7 @@ pub class Apps {
 
     let result = this.table.getItem(
       key: {
-        pk: "APP#${options.appId}",
+        pk: "APP#{options.appId}",
         sk: "#",
       },
     );
@@ -342,7 +342,7 @@ pub class Apps {
           {
             delete: {
               key: {
-                pk: "APP#${options.appId}",
+                pk: "APP#{options.appId}",
                 sk: "#",
               },
               conditionExpression: "#userId = :userId",
@@ -357,24 +357,24 @@ pub class Apps {
           {
             delete: {
               key: {
-                pk: "USER#${options.userId}",
-                sk: "APP#${options.appId}",
+                pk: "USER#{options.userId}",
+                sk: "APP#{options.appId}",
               },
             },
           },
           {
             delete: {
               key: {
-                pk: "USER#${options.userId}",
-                sk: "APP_NAME#${appName}",
+                pk: "USER#{options.userId}",
+                sk: "APP_NAME#{appName}",
               },
             },
           },
           {
             delete: {
               key: {
-                pk: "REPOSITORY#${repoId}",
-                sk: "APP#${options.appId}",
+                pk: "REPOSITORY#{repoId}",
+                sk: "APP#{options.appId}",
               },
             },
           },
@@ -390,7 +390,7 @@ pub class Apps {
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
-        ":pk": "REPOSITORY#${options.repository}",
+        ":pk": "REPOSITORY#{options.repository}",
         ":sk": "APP#",
       },
     );
@@ -420,7 +420,7 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "APP#${options.appId}",
+            pk: "APP#{options.appId}",
             sk: "#",
           },
           updateExpression: "SET #entryfile = :entryfile",
@@ -439,8 +439,8 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "USER#${options.userId}",
-            sk: "APP#${options.appId}",
+            pk: "USER#{options.userId}",
+            sk: "APP#{options.appId}",
           },
           updateExpression: "SET #entryfile = :entryfile",
           expressionAttributeNames: {
@@ -454,8 +454,8 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "USER#${options.userId}",
-            sk: "APP_NAME#${options.appName}",
+            pk: "USER#{options.userId}",
+            sk: "APP_NAME#{options.appName}",
           },
           updateExpression: "SET #entryfile = :entryfile",
           expressionAttributeNames: {
@@ -469,8 +469,8 @@ pub class Apps {
       {
         update: {
           key: {
-            pk: "REPOSITORY#${options.repository}",
-            sk: "APP#${options.appId}",
+            pk: "REPOSITORY#{options.repository}",
+            sk: "APP#{options.appId}",
           },
           updateExpression: "SET #entryfile = :entryfile",
           expressionAttributeNames: {

@@ -76,7 +76,7 @@ pub class EnvironmentsTest {
 
     let createRepo = inflight (octokit: octokit.OctoKit): CreateRepoResult => {
       // create a new repo
-      let repoName = "wing-test-${util.nanoid(alphabet: "abcdefghijk0123456789", size: 8)}";
+      let repoName = "wing-test-{util.nanoid(alphabet: "abcdefghijk0123456789", size: 8)}";
 
       let var owner = "";
       let var isOrg = true;
@@ -111,7 +111,7 @@ pub class EnvironmentsTest {
             description: "test app",
             createdAt: "0",
             createdBy: userId,
-            repoId: "${repo.owner}/${repo.repo}",
+            repoId: "{repo.owner}/{repo.repo}",
             repoName: repo.repo,
             repoOwner: repo.owner,
             userId: userId,
@@ -133,7 +133,7 @@ pub class EnvironmentsTest {
           octokit.git.createRef(
             owner: repo.owner,
             repo: repo.repo,
-            ref: "refs/heads/${branchName}",
+            ref: "refs/heads/{branchName}",
             sha: ref.data.object.sha,
           );
 
@@ -143,7 +143,7 @@ pub class EnvironmentsTest {
               repo: repo.repo,
               branch: branchName,
               path: entry.key,
-              message: "add ${entry.key}",
+              message: "add {entry.key}",
               content: util.base64Encode(entry.value.asStr())
             );
           }
@@ -218,7 +218,7 @@ pub class EnvironmentsTest {
               repo: repo.repo,
               branch: "main",
               path: entry.key,
-              message: "add ${entry.key}",
+              message: "add {entry.key}",
               content: util.base64Encode(entry.value.asStr())
             );
           }
@@ -260,19 +260,19 @@ pub class EnvironmentsTest {
           }
 
           if !installationId? {
-            throw "failed to find installation for owner ${repo.owner}";
+            throw "failed to find installation for owner {repo.owner}";
           }
 
-          let createRes = http.post("${props.wingCloudUrl.get()}/wrpc/user.createApp",
+          let createRes = http.post("{props.wingCloudUrl.get()}/wrpc/user.createApp",
             body: Json.stringify({
               default_branch: "main",
-              repoId: "${repo.owner}/${repo.repo}",
+              repoId: "{repo.owner}/{repo.repo}",
               repoOwner: repo.owner,
               repoName: repo.repo,
               appName: "test-app",
               imageUrl: "",
               entryfile: "main.w",
-              installationId: "${installationId}",
+              installationId: "{installationId}",
             }),
             headers: {
               "cookie": authCookie
@@ -280,7 +280,7 @@ pub class EnvironmentsTest {
           );
 
           if createRes.status < 200 || createRes.status >= 300 {
-            throw "failed to create app ${createRes.status} ${createRes.body}";
+            throw "failed to create app {createRes.status} {createRes.body}";
           }
 
           if let appId = Json.tryParse(createRes.body)?.tryGet("appId")?.tryAsStr() {

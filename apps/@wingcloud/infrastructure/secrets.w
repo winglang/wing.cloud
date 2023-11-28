@@ -73,8 +73,8 @@ pub class Secrets {
     };
 
     let item = MutJson {
-      pk: "APP#${secret.appId}",
-      sk: "SECRET#TYPE#${secret.environmentType}#SECRET#${secret.id}",
+      pk: "APP#{secret.appId}",
+      sk: "SECRET#TYPE#{secret.environmentType}#SECRET#{secret.id}",
       id: secret.id,
       appId: secret.appId,
       environmentType: secret.environmentType,
@@ -99,8 +99,8 @@ pub class Secrets {
   pub inflight get(options: GetSecretOptions): Secret {
     let result = this.table.getItem(
       key: {
-        pk: "APP#${options.appId}",
-        sk: "SECRET#TYPE#${options.environmentType}#SECRET#${options.id}",
+        pk: "APP#{options.appId}",
+        sk: "SECRET#TYPE#{options.environmentType}#SECRET#{options.id}",
       },
     );
 
@@ -108,7 +108,7 @@ pub class Secrets {
       return Secret.fromJson(this.fromDB(item, options.decryptValue ?? false));
     }
 
-    throw "Secret [${options.id}] not found";
+    throw "Secret [{options.id}] not found";
   }
 
   pub inflight list(options: ListSecretsOptions): Array<Secret> {
@@ -117,8 +117,8 @@ pub class Secrets {
     let result = this.table.query(
       keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
       expressionAttributeValues: {
-        ":pk": "APP#${options.appId}",
-        ":sk": "SECRET#TYPE#${options.environmentType}#"
+        ":pk": "APP#{options.appId}",
+        ":sk": "SECRET#TYPE#{options.environmentType}#"
       },
     );
 
@@ -137,8 +137,8 @@ pub class Secrets {
     let item = this.get(id: options.id, appId: options.appId, environmentType: options.environmentType);
 
     let res = this.table.deleteItem(key: {
-      pk: "APP#${item.appId}",
-      sk: "SECRET#TYPE#${item.environmentType}#SECRET#${item.id}",
+      pk: "APP#{item.appId}",
+      sk: "SECRET#TYPE#{item.environmentType}#SECRET#{item.id}",
     });
   }
 
@@ -157,7 +157,7 @@ pub class Secrets {
     } else {
       temp.set("value", "***");
     }
-    
+
     return Secret.fromJson(temp);
   }
 }

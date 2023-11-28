@@ -29,7 +29,7 @@ pub class WebsiteProxy {
     let cachingOptimizedCachePolicyId = "658327ea-f89d-4fab-a63d-7e88639e58f6";
 
     let passthroughCachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
-      name: "PassthroughCache-${this.node.addr}",
+      name: "PassthroughCache-{this.node.addr}",
       defaultTtl: 0m.seconds,
       minTtl: 0m.seconds,
       maxTtl: 1s.seconds,
@@ -49,7 +49,7 @@ pub class WebsiteProxy {
     ) as "passthrough-cache-policy";
 
     let shortLivedCachePolicy = new aws.cloudfrontCachePolicy.CloudfrontCachePolicy(
-      name: "ShortLivedCache-${this.node.addr}",
+      name: "ShortLivedCache-{this.node.addr}",
       defaultTtl: 1m.seconds,
       minTtl: 1m.seconds,
       maxTtl: 10m.seconds,
@@ -67,7 +67,7 @@ pub class WebsiteProxy {
     ) as "short-cache-policy";
 
     let removeTrailingSlashes = new aws.cloudfrontFunction.CloudfrontFunction(
-      name: "RemoveTrailingSlashes-${this.node.addr.substring(0, 8)}",
+      name: "RemoveTrailingSlashes-{this.node.addr.substring(0, 8)}",
       runtime: "cloudfront-js-1.0",
       code: [
         "function handler(event) \{",
@@ -88,7 +88,7 @@ pub class WebsiteProxy {
 
     let distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
       enabled: true,
-      aliases: ["${props.subDomain}.${props.zoneName}"],
+      aliases: ["{props.subDomain}.{props.zoneName}"],
       viewerCertificate: {
         acmCertificateArn: certificate.certificate.certificate.arn,
         sslSupportMethod: "sni-only",
@@ -189,6 +189,6 @@ pub class WebsiteProxy {
       distributionUrl: distribution.domainName,
     );
 
-    this.url = "https://${distribution.domainName}";
+    this.url = "https://{distribution.domainName}";
   }
 }

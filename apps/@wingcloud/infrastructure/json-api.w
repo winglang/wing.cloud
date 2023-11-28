@@ -67,7 +67,7 @@ pub class JsonApi {
       }
     }
     this.handlerCount += 1;
-    return new MyHandler() as "Handler${this.handlerCount}";
+    return new MyHandler() as "Handler{this.handlerCount}";
   }
 
   pub get(path: str, handler: inflight (cloud.ApiRequest): JsonApiResponse) {

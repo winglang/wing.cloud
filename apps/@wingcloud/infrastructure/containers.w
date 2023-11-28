@@ -35,7 +35,7 @@ pub class Container_sim {
   urlKey: str;
 
   new(opts: ContainerOpts) {
-    this.containerNameBase = "wing-${opts.name}-${this.node.addr}";
+    this.containerNameBase = "wing-{opts.name}-{this.node.addr}";
 
     this.appDir = Container_sim.entrypointDir(this);
     this.opts = opts;
@@ -57,7 +57,7 @@ pub class Container_sim {
     let var tag = image;
 
     // if this a reference to a local directory, build the image from a docker file
-    log("image: ${image}");
+    log("image: {image}");
     if image.startsWith("./") || image.startsWith("../") || image.startsWith("/") {
       tag = this.containerNameBase;
 
@@ -69,13 +69,13 @@ pub class Container_sim {
       if let args = this.opts.args {
         for arg in args.keys() {
           shellArgs.push("--build-arg");
-          shellArgs.push("${arg}=${args.get(arg)}");
+          shellArgs.push("{arg}={args.get(arg)}");
         }
       }
 
       shellArgs.push(image);
 
-      log("building locally from ${image}, tagging ${tag} and args ${shellArgs}...");
+      log("building locally from {image}, tagging {tag} and args {shellArgs}...");
       Container_sim.shell("docker", shellArgs.copy(), this.appDir);
     } else {
       Container_sim.shell("docker", ["pull", this.opts.image]);
@@ -90,14 +90,14 @@ pub class Container_sim {
       }
     }
 
-    let containerName = "${this.containerNameBase}-${util.sha256(opts.name).substring(0, 8)}";
+    let containerName = "{this.containerNameBase}-{util.sha256(opts.name).substring(0, 8)}";
     args.push("--detach");
     args.push("--name");
     args.push(containerName);
 
     if let port = this.opts.port {
       args.push("-p");
-      args.push("${port}");
+      args.push("{port}");
     }
 
     if let env = opts?.env {
@@ -110,9 +110,9 @@ pub class Container_sim {
             value = value.replace("http://127.0.0.1", "http://host.docker.internal");
           }
 
-          log("env ${k} ${k}=${value}");
+          log("env {k} {k}={value}");
           args.push("-e");
-          args.push("${k}=${value}");
+          args.push("{k}={value}");
         }
       }
     }
@@ -120,7 +120,7 @@ pub class Container_sim {
     if let volumes = opts?.volumes {
       for volume in volumes.keys() {
         args.push("-v");
-        args.push("${volume}:${volumes.get(volume)}");
+        args.push("{volume}:{volumes.get(volume)}");
       }
     }
 
@@ -131,15 +131,15 @@ pub class Container_sim {
     let out = Json.parse(Container_sim.shell("docker", ["inspect", containerName]));
 
     if let port = this.opts.port {
-      let hostPort = out.getAt(0).get("NetworkSettings").get("Ports").get("${port}/tcp").getAt(0).get("HostPort");
-      let url = "http://localhost:${hostPort.asStr()}";
-      log("container ${containerName}: ${url}");
+      let hostPort = out.getAt(0).get("NetworkSettings").get("Ports").get("{port}/tcp").getAt(0).get("HostPort");
+      let url = "http://localhost:{hostPort.asStr()}";
+      log("container {containerName}: {url}");
       this.table.upsert(containerName, { name: containerName });
 
       if let readiness = this.opts.readiness {
-        let readinessUrl = "${url}${readiness}";
+        let readinessUrl = "{url}{readiness}";
         let success = util.waitUntil(inflight () => {
-          log("checking readiness ${readinessUrl}...");
+          log("checking readiness {readinessUrl}...");
           try {
             let res = http.get(readinessUrl);
             return res.ok;
@@ -147,7 +147,7 @@ pub class Container_sim {
             return false;
           }
         }, interval: 0.5s, timeout: 2m);
-        log("container ${this.opts.name}: status ${success}");
+        log("container {this.opts.name}: status {success}");
       }
 
       return url;
@@ -157,7 +157,7 @@ pub class Container_sim {
   }
 
   pub inflight stop(options: ContainerStopOpts) {
-    let containerName = "${this.containerNameBase}-${util.sha256(options.name).substring(0, 8)}";
+    let containerName = "{this.containerNameBase}-{util.sha256(options.name).substring(0, 8)}";
     this.stopContainer(containerName);
   }
 
@@ -169,7 +169,7 @@ pub class Container_sim {
   }
 
   inflight stopContainer(containerName: str) {
-    log("stopping container ${containerName}");
+    log("stopping container {containerName}");
     Container_sim.shell("docker", ["rm", "-f", containerName]);
     this.table.delete(containerName);
   }
