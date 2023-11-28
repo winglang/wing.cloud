@@ -6,7 +6,6 @@ import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Header } from "../../../../components/header.js";
 import { SpinnerLoader } from "../../../../components/spinner-loader.js";
 import { Button } from "../../../../design-system/button.js";
 import { useNotifications } from "../../../../design-system/notification.js";
