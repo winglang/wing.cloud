@@ -2,12 +2,12 @@ import { LockClosedIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useState, useMemo, useCallback } from "react";
 
-import { SpinnerLoader } from "../../../components/spinner-loader.js";
-import { useNotifications } from "../../../design-system/notification.js";
-import { useTheme } from "../../../design-system/theme-provider.js";
-import { type App, type Secret } from "../../../utils/wrpc.js";
-import { wrpc } from "../../../utils/wrpc.js";
-import type { EnvironmentType } from "../../../utils/wrpc.js";
+import { SpinnerLoader } from "../../../../components/spinner-loader.js";
+import { useNotifications } from "../../../../design-system/notification.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
+import { type App, type Secret } from "../../../../utils/wrpc.js";
+import { wrpc } from "../../../../utils/wrpc.js";
+import type { EnvironmentType } from "../../../../utils/wrpc.js";
 
 import { NewSecret } from "./new-secret.js";
 import { SecretsListItem } from "./secrets-list-item.js";

@@ -12,6 +12,7 @@ import { EnvironmentsListItem } from "./environments-list-item.js";
 
 export interface EnvironmentsListProps {
   environments: Environment[];
+  owner: string;
   appName: string;
   repoUrl: string;
   loading?: boolean;
@@ -19,6 +20,7 @@ export interface EnvironmentsListProps {
 
 export const EnvironmentsList = ({
   environments,
+  owner,
   appName,
   repoUrl,
   loading,
@@ -104,6 +106,7 @@ export const EnvironmentsList = ({
               {productionEnvs.map((environment) => (
                 <EnvironmentsListItem
                   key={environment.id}
+                  owner={owner}
                   appName={appName}
                   environment={environment}
                 />
@@ -135,6 +138,7 @@ export const EnvironmentsList = ({
             {filteredPreviewEnvs.map((environment) => (
               <EnvironmentsListItem
                 key={environment.id}
+                owner={owner}
                 appName={appName}
                 environment={environment}
               />
@@ -143,7 +147,7 @@ export const EnvironmentsList = ({
             {filteredPreviewEnvs.length === 0 && (
               <div
                 className={clsx(
-                  "p-4 w-full border text-center",
+                  "p-4 w-full border text-center rounded",
                   theme.bgInput,
                   theme.borderInput,
                   theme.text1,

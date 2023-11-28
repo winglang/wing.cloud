@@ -23,19 +23,19 @@ pub class DockerImage {
       numeric: true,
     );
 
-    let appName = "wing-cloud-image-${props.name}-${randomString.result}";
+    let appName = "wing-cloud-image-do-not-delete-{props.name}-{randomString.result}";
 
     let image = new docker.image.Image(
-      name: "registry.fly.io/${appName}:${util.nanoid(alphabet: "0123456789abcdefghijklmnopqrstuvwxyz", size: 10)}",
+      name: "registry.fly.io/{appName}:{util.nanoid(alphabet: "0123456789abcdefghijklmnopqrstuvwxyz", size: 10)}",
       buildAttribute: props.build,
     );
 
     let resource = new nullProvider.resource.Resource(triggers: { "changed": util.nanoid() }) as "create image";
     resource.addOverride("provisioner.local-exec.environment", {"FLY_APP_NAME": appName});
     resource.addOverride("provisioner.local-exec.command", "
-flyctl status -a \$FLY_APP_NAME || flyctl launch --copy-config --no-deploy --name \$FLY_APP_NAME -o ${props.org} -r iad -y
+flyctl status -a $FLY_APP_NAME || flyctl launch --copy-config --no-deploy --name $FLY_APP_NAME -o {props.org} -r iad -y
 flyctl auth docker
-docker push ${image.name}
+docker push {image.name}
     ");
 
     // FIXME: We'll have to find another way to do this. Can't reference other resources here. Also, there are drawbacks
@@ -44,7 +44,7 @@ docker push ${image.name}
     // let destroy = new nullProvider.resource.Resource() as "delete image";
     // destroy.addOverride("provisioner.local-exec.when", "destroy");
     // destroy.addOverride("provisioner.local-exec.environment", {"FLY_APP_NAME": appName});
-    // destroy.addOverride("provisioner.local-exec.command", "flyctl status -a \$FLY_APP_NAME && flyctl apps destroy \$FLY_APP_NAME -y");
+    // destroy.addOverride("provisioner.local-exec.command", "flyctl status -a $FLY_APP_NAME && flyctl apps destroy $FLY_APP_NAME -y");
 
     this.imageName = image.name;
   }

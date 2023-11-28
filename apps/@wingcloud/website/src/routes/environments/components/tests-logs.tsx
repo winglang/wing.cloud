@@ -1,38 +1,90 @@
-import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import {
+  CheckCircleIcon,
+  XCircleIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 
+import { SpinnerLoader } from "../../../components/spinner-loader.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
-import type { Log, TestResult } from "../../../utils/wrpc.js";
-
-import { CollapsibleItem } from "./collapsible-item.js";
+import { getTime } from "../../../utils/time.js";
+import type { TestLog, TestResult } from "../../../utils/wrpc.js";
 
 export interface TestsLogsProps {
-  logs: Log[];
+  id: string;
+  logs: TestLog[];
   testResults: TestResult[];
   loading?: boolean;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  selectedTestId?: string;
 }
 
-export const TestsLogs = ({ logs, testResults, loading }: TestsLogsProps) => {
+export const TEST_LOGS_ID = "test-logs";
+
+export const TestsLogs = ({
+  id,
+  logs,
+  testResults,
+  loading,
+  isOpen,
+  setIsOpen,
+  selectedTestId,
+}: TestsLogsProps) => {
   const { theme } = useTheme();
 
-  const location = useLocation();
+  const [animateLogId, setAnimateLogId] = useState(selectedTestId);
 
-  const locationHash = useMemo(() => {
-    // url includes an ID with #
-    if (location.hash) {
-      return location.hash.slice(1);
+  useEffect(() => {
+    if (isOpen && animateLogId) {
+      const element = document.querySelector(`#${selectedTestId}`);
+      console.log(selectedTestId, element);
+
+      element?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     }
-  }, [location.search]);
+  }, [selectedTestId, isOpen]);
+
+  useEffect(() => {
+    setAnimateLogId(selectedTestId);
+    const timeout = setTimeout(() => {
+      setAnimateLogId(undefined);
+    }, 2000);
+    return () => clearTimeout(timeout);
+  }, [selectedTestId]);
 
   return (
-    <CollapsibleItem
-      id="tests"
-      title="Tests"
-      defaultOpen={locationHash === "tests"}
-      loading={loading}
-      rightOptions={
+    <div
+      className={clsx(
+        "w-full rounded border",
+        theme.bgInput,
+        theme.borderInput,
+      )}
+    >
+      <button
+        id={id}
+        className={clsx(
+          "flex items-center justify-between w-full text-left p-4 outline-none",
+          isOpen && "border-b rounded-t shadow-sm",
+          !isOpen && "rounded",
+          theme.borderInput,
+          theme.textInput,
+          loading && "cursor-not-allowed opacity-50",
+        )}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div className="flex items-center flex-grow gap-2">
+          {isOpen ? (
+            <ChevronDownIcon className="h-4 w-4" />
+          ) : (
+            <ChevronRightIcon className="h-4 w-4" />
+          )}
+          <div className="font-medium text-sm">Tests</div>
+        </div>
         <div className="flex gap-2 text-xs">
           <div className="flex gap-0.5">
             <span>{testResults.filter((test) => test.pass).length}</span>
@@ -43,24 +95,77 @@ export const TestsLogs = ({ logs, testResults, loading }: TestsLogsProps) => {
             <XCircleIcon className="w-4 h-4 text-red-400" />
           </div>
         </div>
-      }
-      children={
-        <div className="text-2xs font-mono">
-          {logs.length === 0 && (
-            <div className={clsx(theme.text2, "w-full py-0.5 text-center")}>
-              No test logs.
+      </button>
+
+      {isOpen && (
+        <>
+          {loading && (
+            <div className="flex items-center justify-center p-4">
+              <SpinnerLoader size="sm" />
             </div>
           )}
-          {logs.map((log, index) => (
-            <div
-              key={index}
-              className={clsx(theme.text1, theme.bgInputHover, "w-full py-0.5")}
-            >
-              {log.message}
+          {!loading && (
+            <div className="text-2xs font-mono px-3 py-4">
+              {logs.length === 0 && (
+                <div className={clsx(theme.text2, "w-full py-0.5 text-center")}>
+                  No test logs.
+                </div>
+              )}
+              {logs.map((log) => (
+                <div
+                  id={log.id}
+                  key={log.path}
+                  className={clsx(
+                    "px-1",
+                    theme.bgInputHover,
+                    animateLogId === log.id && [
+                      theme.bg3,
+                      "animate-pulse transition-all",
+                    ],
+                    selectedTestId === log.id && theme.bg3,
+                  )}
+                >
+                  <div className="flex gap-1 items-center">
+                    <div className="grow gap-y-0.5">
+                      <div className="flex gap-2">
+                        <div className="self-center">
+                          {log.pass ? (
+                            <CheckCircleIcon className="w-4 h-4 text-green-400" />
+                          ) : (
+                            <XCircleIcon className="w-4 h-4 text-red-400" />
+                          )}
+                        </div>
+                        <div className={clsx(theme.text2)}>
+                          {getTime(log.timestamp)}
+                        </div>
+                        <div className="flex gap-1">
+                          <div className={clsx(theme.text1)}>
+                            {log.path.split("/").pop()}
+                          </div>
+                          <div className={clsx(theme.text2)}>
+                            ({log.time}ms)
+                          </div>
+                        </div>
+                      </div>
+
+                      {log.traces.map((trace, index) => (
+                        <div key={index} className="flex gap-2 pl-6 py-0.5">
+                          <div className={clsx(theme.text2)}>
+                            {getTime(trace.timestamp)}
+                          </div>
+                          <div className={clsx(theme.text2)}>
+                            {trace.message}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      }
-    />
+          )}
+        </>
+      )}
+    </div>
   );
 };

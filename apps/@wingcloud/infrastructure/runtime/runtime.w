@@ -111,7 +111,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   }
 
   inflight appNameFromEnvironment(environmentId: str): str {
-    return "wing-preview-${util.sha256(environmentId).substring(0, 8)}";
+    return "wing-preview-{util.sha256(environmentId).substring(0, 8)}";
   }
 
   pub inflight start(opts: RuntimeStartOptions): str {
@@ -206,10 +206,10 @@ pub class RuntimeService {
     if util.tryEnv("WING_TARGET") == "sim" {
       this.runtimeHandler = new RuntimeHandler_sim();
       let bucketAddr = this.logs.node.addr;
-      bucketName = "BUCKET_HANDLE_${bucketAddr.substring(bucketAddr.length - 8, bucketAddr.length)}";
+      bucketName = "BUCKET_HANDLE_{bucketAddr.substring(bucketAddr.length - 8, bucketAddr.length)}";
     } else {
-      let awsUser = new aws.iamUser.IamUser(name: "${this.node.addr}-user");
-      let bucket: awsprovider.s3Bucket.S3Bucket = unsafeCast(this.logs).bucket;
+      let awsUser = new aws.iamUser.IamUser(name: "{this.node.addr}-user");
+      let bucket: awsprovider.s3Bucket.S3Bucket = unsafeCast(this.logs)?.bucket;
       let bucketArn: str = bucket.arn;
       bucketName = bucket.bucket;
       bucketRegion = bucket.region;
@@ -222,7 +222,7 @@ pub class RuntimeService {
             {
               Action: ["s3:*"],
               Effect: "Allow",
-              Resource: "${bucketArn}/*",
+              Resource: "{bucketArn}/*",
             },
           ],
         }),
@@ -252,7 +252,7 @@ pub class RuntimeService {
 
         let msg = Message.fromJson(Json.parse(message));
 
-        log("wing url: ${props.wingCloudUrl}");
+        log("wing url: {props.wingCloudUrl}");
 
         let url = this.runtimeHandler.start(
           gitToken: msg.token,
@@ -268,7 +268,7 @@ pub class RuntimeService {
           awsSecretAccessKey: awsSecretAccessKey,
         );
 
-        log("preview environment url: ${url}");
+        log("preview environment url: {url}");
 
         props.environments.updateUrl(
           id: msg.environmentId,
@@ -297,7 +297,7 @@ pub class RuntimeService {
         environmentId: environmentId,
       );
 
-      log("preview environment deleted: ${environmentId}");
+      log("preview environment deleted: {environmentId}");
 
       return {
         status: 200,

@@ -21,6 +21,10 @@ export class Environment {
     return this.bucketKey("deployment");
   }
 
+  runtimeKey() {
+    return this.bucketKey("runtime");
+  }
+
   private bucketKey(key: string) {
     return `${this.id}/${key}.log`;
   }

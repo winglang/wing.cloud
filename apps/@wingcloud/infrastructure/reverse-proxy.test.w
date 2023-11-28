@@ -1,36 +1,25 @@
 bring cloud;
 bring util;
 bring http;
-bring "./dnsimple.w" as DNSimple;
-bring "./cloudfront.w" as CloudFront;
 bring "./reverse-proxy.w" as ReverseProxy;
 
-let zoneName = "wingcloud.io";
-let subDomain = "dev";
-
-let origins = Array<CloudFront.Origin>[
-  {
-    domainName: "site-demo-eta.vercel.app",
-    originId: "site-demo-eta",
-    pathPattern: "",
-  },
-  {
+let origins = [
+  ReverseProxy.Origin {
     domainName: "site-api.vercel.app",
-    originId: "api.demo.site",
     pathPattern: "/api",
   },
-  {
+  ReverseProxy.Origin {
     domainName: "site-dashboard-phi.vercel.app",
-    originId: "dashboard.demo.site",
     pathPattern: "/dashboard",
-  }
+  },
+  ReverseProxy.Origin {
+    domainName: "site-demo-eta.vercel.app",
+    pathPattern: "*",
+  },
 ];
 
 let reverseProxy = new ReverseProxy.ReverseProxy(
   origins: origins,
-  subDomain: subDomain,
-  zoneName: zoneName,
-  aliases: ["${subDomain}.${zoneName}"],
 );
 
 struct TestsResults {
@@ -39,20 +28,22 @@ struct TestsResults {
 }
 
 test "get reverse proxy url and paths" {
-  log("Domain name: ${reverseProxy.url}");
-  log("Urls: ${Json.stringify(reverseProxy.paths)}");
+  log("Domain name: {reverseProxy.url}");
+  log("Urls: {Json.stringify(origins)}");
   let results = MutArray<TestsResults>[];
   let var failure = false;
-  for path in reverseProxy.paths {
-    let response = http.get(reverseProxy.url + path);
+  let paths = ["/api", "/dashboard", "/"];
+  for path in paths {
+    let url = reverseProxy.url + path;
+    let response = http.get(url);
     if response.status != 200 {
       failure = true;
     }
     results.push({
-      url: reverseProxy.url + path,
+      url: url,
       status: response.status,
     });
   }
-  log("Tests results: ${Json.stringify(results)}");
+  log("Tests results: {Json.stringify(results)}");
   assert(!failure);
 }

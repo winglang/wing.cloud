@@ -29,7 +29,7 @@ pub class GithubApp {
       "https://api.github.com/app/hook/config",
       headers: {
         "Accept" => "application/vnd.github+json",
-        "Authorization" => "Bearer ${jwt}",
+        "Authorization" => "Bearer {jwt}",
         "X-GitHub-Api-Version" => "2022-11-28"
       },
       body: Json.stringify({
@@ -38,11 +38,11 @@ pub class GithubApp {
     );
 
     if (res.status == 200) {
-      log("GitHub app: webhook url updated: ${url}");
+      log("GitHub app: webhook url updated: {url}");
     }
     else {
-      log("GitHub app: failed to update the webhook url: ${res.body}");
-      log("You have to manually update your webhook URL to ${url}");
+      log("GitHub app: failed to update the webhook url: {res.body}");
+      log("You have to manually update your webhook URL to {url}");
     }
   }
 }

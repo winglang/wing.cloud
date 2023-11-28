@@ -1,15 +1,13 @@
-import { appendFileSync } from "node:fs";
-import { readFile } from "node:fs/promises";
-
 import { createConsoleApp } from "@wingconsole/app";
 import { type Application } from "express";
 
 import { type KeyStore } from "../auth/key-store.js";
+import type { LoggerInterface } from "../logger.js";
 
 export interface StartServerProps {
   consolePath: string;
   entryfilePath: string;
-  logfile: string;
+  logger: LoggerInterface;
   keyStore: KeyStore;
   requestedPort?: number;
 }
@@ -17,26 +15,24 @@ export interface StartServerProps {
 export async function startServer({
   consolePath,
   entryfilePath,
-  logfile,
+  logger,
   keyStore,
   requestedPort,
 }: StartServerProps) {
   const wingConsole = await import(consolePath);
   const create: typeof createConsoleApp = wingConsole.createConsoleApp;
-  const writeMessageToFile = (message: any, ...props: any) => {
-    appendFileSync(
-      logfile,
-      `${message}${props.length > 0 ? ":" + props.join(",") : ""}\n`,
-      "utf8",
-    );
+
+  const log = (message: string, props?: any[]) => {
+    logger.log(message, props);
   };
+
   const { port, close } = await create({
     wingfile: entryfilePath,
     requestedPort,
     log: {
-      info: writeMessageToFile,
-      error: writeMessageToFile,
-      verbose: writeMessageToFile,
+      info: log,
+      error: log,
+      verbose: log,
     },
     config: {
       addEventListener(event: any, listener: any) {},

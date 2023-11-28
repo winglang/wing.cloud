@@ -17,7 +17,7 @@ struct ICreateMachineProps {
 /**
  * Represent a Fly.io app
  */
-inflight class App {
+inflight class FlyApp {
   pub props: IAppProps;
   new(props: IAppProps) {
     this.props = props;
@@ -27,14 +27,14 @@ inflight class App {
    * Get the hostname of this app (e.g. app-name.fly.dev).
    */
   pub hostname(): str {
-    return "${this.props.name}.fly.dev";
+    return "{this.props.name}.fly.dev";
   }
 
   /**
    * Get the public url of this app (e.g. https://app-name.fly.dev).
    */
   pub url(): str {
-    return "https://${this.hostname()}";
+    return "https://{this.hostname()}";
   }
 
   /**
@@ -149,15 +149,15 @@ inflight class App {
     this.client = client;
   }
 
-  pub app(name: str): App {
-    return new App(name: name, client: this.client);
+  pub app(name: str): FlyApp {
+    return new FlyApp(name: name, client: this.client);
   }
 
-  pub listApps(): Array<App> {
+  pub listApps(): Array<FlyApp> {
     let res = this.client.apps();
-    let apps = MutArray<App>[];
+    let apps = MutArray<FlyApp>[];
     for app in res.data.apps.nodes {
-      apps.push(new App(client: this.client, name: app.id));
+      apps.push(new FlyApp(client: this.client, name: app.id));
     }
     return apps.copy();
   }

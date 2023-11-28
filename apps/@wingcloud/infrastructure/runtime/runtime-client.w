@@ -8,7 +8,8 @@ struct RuntimeClientProps {
 }
 
 struct RuntimeClientCreateOptions {
-  app: apps.App;
+  appId: str;
+  entryfile: str;
   environment: environments.Environment;
   secrets: Map<str>;
   token: str;
@@ -30,15 +31,15 @@ pub class RuntimeClient {
     let res = http.post(this.runtimeUrl, body: Json.stringify(runtime.Message {
       repo: options.environment.repo,
       sha: options.sha,
-      entryfile: options.app.entryfile,
-      appId: options.app.appId,
+      entryfile: options.entryfile,
+      appId: options.appId,
       environmentId: options.environment.id,
       token: options.token,
       secrets: options.secrets,
     }));
 
     if !res.ok {
-      throw "runtime client: create error ${res.body}";
+      throw "runtime client: create error {res.body}";
     }
   }
 
@@ -48,7 +49,7 @@ pub class RuntimeClient {
     }));
 
     if !res.ok {
-      throw "runtime client: delete error ${res.body}";
+      throw "runtime client: delete error {res.body}";
     }
   }
 }
