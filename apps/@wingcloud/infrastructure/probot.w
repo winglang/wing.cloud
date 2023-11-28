@@ -58,7 +58,7 @@ pub class ProbotApp {
     );
 
     queue.setConsumer(inflight (message) => {
-      log("receive message: ${message}");
+      log("receive message: {message}");
       let props = probot.VerifyAndReceieveProps.fromJson(Json.parse(message));
       this.listen(props);
       }, { timeout: 1m });

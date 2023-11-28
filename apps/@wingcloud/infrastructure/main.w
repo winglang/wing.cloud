@@ -66,7 +66,7 @@ let rntm = new runtime.RuntimeService(
 let dashboardPort = 5174;
 let dashboard = new ex.ReactApp(
   projectPath: "../website",
-  startCommand: "pnpm vite --port ${dashboardPort}",
+  startCommand: "pnpm vite --port {dashboardPort}",
   buildCommand: "pnpm vite build",
   buildDir: "dist",
   localPort: dashboardPort,
@@ -78,7 +78,7 @@ let siteURL = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
     let subDomain = util.env("PROXY_SUBDOMAIN");
     let zoneName = util.env("PROXY_ZONE_NAME");
-    return "https://${subDomain}.${zoneName}";
+    return "https://{subDomain}.{zoneName}";
   } else {
     return "http://localhost:3900";
   }
@@ -171,7 +171,7 @@ let proxyUrl = (() => {
 
     return proxy.url;
   } else {
-    throw "Unknown WING_TARGET: ${util.env("WING_TARGET")}";
+    throw "Unknown WING_TARGET: {util.env("WING_TARGET")}";
   }
 })();
 
@@ -188,8 +188,8 @@ if util.tryEnv("WING_TARGET") == "sim" {
 }
 
 let updateGithubWebhook = inflight () => {
-  probotApp.githubApp.updateWebhookUrl("${webhookUrl}/webhook");
-  log("Update your GitHub callback url to: ${proxyUrl}/wrpc/github.callback");
+  probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
+  log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
 };
 
 // Not sure why, but terraform doesn't seem to like this.

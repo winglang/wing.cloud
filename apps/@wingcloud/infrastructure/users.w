@@ -57,7 +57,7 @@ pub class Users {
         {
           put: {
             item: {
-              pk: "USER#${userId}",
+              pk: "USER#{userId}",
               sk: "#",
               id: userId,
               name: options.name,
@@ -101,7 +101,7 @@ pub class Users {
   pub inflight get(options: GetUsernameOptions): User {
     let result = this.table.getItem(
       key: {
-        pk: "USER#${options.userId}",
+        pk: "USER#{options.userId}",
         sk: "#",
       },
     );

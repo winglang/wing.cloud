@@ -29,7 +29,7 @@ pub class Crypto impl icrypto.ICrypto {
     if let host = awsutils.Function.from(host) {
       host.addPolicyStatements(awsutils.PolicyStatement {
         actions: ["kms:GenerateDataKey", "kms:Decrypt"],
-        resources: ["${this.keyArn}"],
+        resources: ["{this.keyArn}"],
         effect: awsutils.Effect.ALLOW,
       });
     }

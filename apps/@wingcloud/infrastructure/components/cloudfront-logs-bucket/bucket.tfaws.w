@@ -15,7 +15,7 @@ pub class CloudfrontLogsBucket {
     let isTestEnvironment = util.tryEnv("WING_IS_TEST") != nil;
 
     this.tfBucket = new aws.s3Bucket.S3Bucket(
-      bucketPrefix: "cloudfront-logs-${name}",
+      bucketPrefix: "cloudfront-logs-{name}",
       forceDestroy: isTestEnvironment,
     );
 

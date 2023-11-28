@@ -99,7 +99,7 @@ pub class Exchange {
       throw "Failed to exchange code for tokens";
     }
 
-    log("oauth = ${response.body}");
+    log("oauth = {response.body}");
     return AuthTokens.fromJson(Json.parse(response.body));
   }
 

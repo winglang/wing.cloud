@@ -38,7 +38,7 @@ pub class RuntimeClient {
     }));
 
     if !res.ok {
-      throw "runtime client: create error ${res.body}";
+      throw "runtime client: create error {res.body}";
     }
   }
 
@@ -48,7 +48,7 @@ pub class RuntimeClient {
     }));
 
     if !res.ok {
-      throw "runtime client: delete error ${res.body}";
+      throw "runtime client: delete error {res.body}";
     }
   }
 }
