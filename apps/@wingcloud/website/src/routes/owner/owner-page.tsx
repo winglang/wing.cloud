@@ -40,7 +40,7 @@ export const OwnerPage = () => {
     <div
       className={clsx(
         "w-full flex-grow overflow-auto",
-        "max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6",
+        "max-w-5xl mx-auto p-4 sm:p-6",
         "space-y-4",
       )}
     >

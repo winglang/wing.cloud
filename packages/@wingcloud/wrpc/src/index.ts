@@ -12,6 +12,20 @@ const WRPCContext = createContext({ url: "" });
 
 export const WRPCProvider = WRPCContext.Provider;
 
+export class ForbiddenError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = "ForbiddenError";
+  }
+}
+
+export class UnauthorizedError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = "UnauthorizedError";
+  }
+}
+
 export type QueryProcedure<
   Input = undefined,
   Output = unknown,
@@ -45,7 +59,13 @@ const fetcher = async (method: string, url: URL, input?: any) => {
   });
   if (!response.ok) {
     const { error } = await response.json();
-    throw new Error(error);
+    if (response.status === 403) {
+      throw new ForbiddenError(error.message);
+    } else if (response.status === 401) {
+      throw new UnauthorizedError(error.message);
+    } else {
+      throw new Error(error);
+    }
   }
   return response.json();
 };
@@ -68,7 +88,7 @@ export const createWRPCReact = <
             return useQuery({
               retry(failureCount, error) {
                 if (true) {
-                  console.log(failureCount, error);
+                  console.log(error);
                   return false;
                 }
               },

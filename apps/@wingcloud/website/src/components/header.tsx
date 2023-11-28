@@ -75,6 +75,7 @@ export const Header = () => {
   }, [location.pathname]);
 
   const userQuery = wrpc["auth.check"].useQuery(undefined, {
+    throwOnError: false,
     retry: false,
   });
 
