@@ -207,6 +207,7 @@ new tests.EnvironmentsTest(
   appSecret: appSecret,
   wingCloudUrl: apiUrlParam,
   githubToken: util.tryEnv("TESTS_GITHUB_TOKEN"),
+  // either githubOrg or githubUser must be set
   githubOrg: util.tryEnv("TESTS_GITHUB_ORG"),
   githubUser: util.tryEnv("TESTS_GITHUB_USER"),
 );
