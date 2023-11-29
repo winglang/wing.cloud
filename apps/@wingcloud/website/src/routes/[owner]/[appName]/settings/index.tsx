@@ -6,21 +6,19 @@ import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { SpinnerLoader } from "../../components/spinner-loader.js";
-import { Button } from "../../design-system/button.js";
-import { useNotifications } from "../../design-system/notification.js";
-import { Select } from "../../design-system/select.js";
-import { useTheme } from "../../design-system/theme-provider.js";
-import { wrpc } from "../../utils/wrpc.js";
-import { EntrypointUpdateModal } from "../owner/components/entrypoint-update-modal.js";
+import { ErrorBoundary } from "../../../../components/error-boundary.js";
+import { Header } from "../../../../components/header.js";
+import { SpinnerLoader } from "../../../../components/spinner-loader.js";
+import { Button } from "../../../../design-system/button.js";
+import { useNotifications } from "../../../../design-system/notification.js";
+import { Select } from "../../../../design-system/select.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
+import { wrpc } from "../../../../utils/wrpc.js";
 
-import { SecretsList } from "./secrets/components/secrets-list.js";
+import { EntrypointUpdateModal } from "./_components/entrypoint-update-modal.js";
+import { SecretsList } from "./_components/secrets-list.js";
 
-export interface AppProps {
-  appName: string;
-}
-
-export const Component = () => {
+const SettingsPage = () => {
   const { theme } = useTheme();
   const { owner, appName } = useParams();
   const { showNotification } = useNotifications();
@@ -104,7 +102,12 @@ export const Component = () => {
   }, [app?.appId, entryfile, updateEntryfileMutation]);
 
   return (
-    <div>
+    <div
+      className={clsx(
+        "w-full flex-grow overflow-auto",
+        "max-w-5xl mx-auto p-4 sm:p-6",
+      )}
+    >
       {!app && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
@@ -188,6 +191,17 @@ export const Component = () => {
           onConfirm={updateEntryfile}
         />
       )}
+    </div>
+  );
+};
+
+export const Component = () => {
+  return (
+    <div className="flex flex-col">
+      <Header />
+      <ErrorBoundary>
+        <SettingsPage />
+      </ErrorBoundary>
     </div>
   );
 };

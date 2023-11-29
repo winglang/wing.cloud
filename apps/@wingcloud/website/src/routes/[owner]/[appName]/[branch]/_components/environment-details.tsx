@@ -2,10 +2,10 @@ import clsx from "clsx";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
-import { Button } from "../../../design-system/button.js";
-import { useTheme } from "../../../design-system/theme-provider.js";
-import { getDateTime } from "../../../utils/time.js";
-import type { Environment } from "../../../utils/wrpc.js";
+import { Button } from "../../../../../design-system/button.js";
+import { useTheme } from "../../../../../design-system/theme-provider.js";
+import { getDateTime } from "../../../../../utils/time.js";
+import type { Environment } from "../../../../../utils/wrpc.js";
 
 import { InfoItem } from "./info-item.js";
 

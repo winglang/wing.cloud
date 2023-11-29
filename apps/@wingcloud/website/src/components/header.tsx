@@ -65,16 +65,18 @@ export const Header = () => {
 
   const breadcrumbs = useMemo(() => {
     const parts = location.pathname.split("/").filter((part) => part !== "");
+
     return parts.map((part, index) => {
       const to = `/${parts.slice(0, index + 1).join("/")}`;
       return {
-        label: part,
+        label: decodeURIComponent(part),
         to: `${to}`,
       };
     });
   }, [location.pathname]);
 
   const userQuery = wrpc["auth.check"].useQuery(undefined, {
+    throwOnError: false,
     retry: false,
   });
 
@@ -91,11 +93,7 @@ export const Header = () => {
           <li>
             <div>
               <Link
-                to={
-                  userQuery.data
-                    ? `/${userQuery.data.user.username}`
-                    : "/dashboard"
-                }
+                to="/dashboard"
                 className={clsx(theme.text1, theme.text1Hover)}
               >
                 <WingIcon className="h-5 w-auto" />

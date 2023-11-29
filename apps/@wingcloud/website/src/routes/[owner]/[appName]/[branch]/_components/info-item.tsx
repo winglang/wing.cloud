@@ -1,8 +1,8 @@
 import clsx from "clsx";
 import type { ReactNode } from "react";
 
-import { SkeletonLoader } from "../../../design-system/skeleton-loader.js";
-import { useTheme } from "../../../design-system/theme-provider.js";
+import { SkeletonLoader } from "../../../../../design-system/skeleton-loader.js";
+import { useTheme } from "../../../../../design-system/theme-provider.js";
 
 export const InfoItem = ({
   label,

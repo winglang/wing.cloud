@@ -7,36 +7,45 @@ import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { ErrorBoundary } from "../../components/error-boundary.js";
+import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { Input } from "../../design-system/input.js";
 import { useTheme } from "../../design-system/theme-provider.js";
-import type { App } from "../../utils/wrpc.js";
+import { wrpc } from "../../utils/wrpc.js";
 
-import { AppCard } from "./components/app-card.js";
+import { AppCard } from "./_components/app-card.js";
 
-export interface OwnerPageProps {
-  loading?: boolean;
-  apps: App[];
-}
-
-export const OwnerPage = ({ loading = false, apps = [] }: OwnerPageProps) => {
+const OwnerPage = () => {
   const { owner } = useParams();
   const { theme } = useTheme();
 
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
+  const listAppsQuery = wrpc["user.listApps"].useQuery({
+    owner: owner!,
+  });
+
+  const apps = useMemo(() => {
+    return listAppsQuery.data?.apps ?? [];
+  }, [listAppsQuery.data]);
+
   const filteredApps = useMemo(() => {
     return apps.filter((app) =>
-      `${app.appName}${app.lastCommitMessage}`
-        .toLocaleLowerCase()
-        .includes(search.toLocaleLowerCase()),
+      `${app.appName}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
     );
-  }, [apps, search]);
+  }, [listAppsQuery.data, search]);
 
   return (
-    <div className="space-y-4">
+    <div
+      className={clsx(
+        "w-full flex-grow overflow-auto",
+        "max-w-5xl mx-auto p-4 sm:p-6",
+        "space-y-4",
+      )}
+    >
       <div className="flex gap-x-2">
         <Input
           type="text"
@@ -63,19 +72,19 @@ export const OwnerPage = ({ loading = false, apps = [] }: OwnerPageProps) => {
         )}
       </div>
 
-      {loading && (
+      {listAppsQuery.isLoading && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
         </div>
       )}
-      {!loading && (
+      {!listAppsQuery.isLoading && (
         <>
           {filteredApps.length === 0 && (
             <div className="text-center">
               <FolderPlusIcon
                 className={clsx("w-12 h-12 mx-auto", theme.text2)}
               />
-              <h3 className={clsx("mt-2 text-sm font-semibold", theme.text1)}>
+              <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
                 No apps found.
               </h3>
 
@@ -118,6 +127,17 @@ export const OwnerPage = ({ loading = false, apps = [] }: OwnerPageProps) => {
           )}
         </>
       )}
+    </div>
+  );
+};
+
+export const Component = () => {
+  return (
+    <div className="flex flex-col">
+      <Header />
+      <ErrorBoundary>
+        <OwnerPage />
+      </ErrorBoundary>
     </div>
   );
 };
