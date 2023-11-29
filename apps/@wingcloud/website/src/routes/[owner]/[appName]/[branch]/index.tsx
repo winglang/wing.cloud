@@ -134,7 +134,7 @@ const EnvironmentPage = () => {
 
 export const Component = () => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full">
       <Header />
       <ErrorBoundary>
         <EnvironmentPage />
