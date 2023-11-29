@@ -1,7 +1,9 @@
 name: Deploy Production
 
 on:
-  pull_request:
+  push:
+    branches:
+      - production
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
