@@ -1,0 +1,129 @@
+name: Deploy Production
+
+on:
+#   workflow_dispatch:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: write # This is required for actions/checkout
+
+env:
+  AWS_REGION: "us-east-1"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://production.wingcloud.io
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.5.7"
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Create a new tag
+        id: create_tag
+        run: |
+          echo "Fetching the latest tag..."
+          git fetch --tags
+          LATEST_TAG=$(git tag --sort=-taggerdate | grep 'production-v' | head -1)
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No latest tag found. Setting it to empty..."
+            LATEST_TAG="production-v0"
+          fi
+          echo "Latest tag: ${LATEST_TAG}"
+          echo "Extracting version number from the latest tag..."
+          VERSION_NUMBER=$(echo ${LATEST_TAG} | grep -o -E '[0-9]+')
+          if [ -z "$VERSION_NUMBER" ]; then
+            echo "No version number found. Setting it to 0..."
+            VERSION_NUMBER=0
+          fi
+          echo "Version number: ${VERSION_NUMBER}"
+          echo "Incrementing the version number..."
+          NEW_VERSION_NUMBER=$((VERSION_NUMBER + 1))
+          echo "New version number: ${NEW_VERSION_NUMBER}"
+          NEW_TAG="production-v${NEW_VERSION_NUMBER}"
+          echo "New tag: ${NEW_TAG}"
+          echo "Writing new tag to GITHUB_OUTPUT..."
+          echo "new_tag=${NEW_TAG}" >> "$GITHUB_OUTPUT"
+          if [ $? -ne 0 ]; then
+            echo "Failed to write new tag to GITHUB_OUTPUT"
+            exit 1
+          fi
+      - name: Push the new tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git tag ${{ steps.create_tag.outputs.new_tag }}
+          git push origin ${{ steps.create_tag.outputs.new_tag }}
+      - name: Compile Wing Cloud dependencies
+        run: npx turbo compile --filter=!@wingcloud/infrastructure
+      - name: Compile Wing Cloud
+        env:
+          ## Inflight
+          APP_SECRET: ${{ secrets.APP_SECRET }}
+          FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
+          FLY_TOKEN: ${{ secrets.FLY_TOKEN }}
+          BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
+          BOT_GITHUB_CLIENT_ID: ${{ secrets.BOT_GITHUB_CLIENT_ID }}
+          BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
+          BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}
+          BOT_GITHUB_WEBHOOK_SECRET: ${{ secrets.BOT_GITHUB_WEBHOOK_SECRET }}
+          TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}
+          ## Preflight
+          VITE_GITHUB_APP_CLIENT_ID: ${{ secrets.VITE_GITHUB_APP_CLIENT_ID }}
+          VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}
+          PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
+          PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
+          LANDING_DOMAIN: ${{ secrets.LANDING_DOMAIN }}
+          TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}
+          TF_BACKEND_BUCKET_REGION: ${{ vars.TF_BACKEND_BUCKET_REGION }}
+          TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
+          TF_BACKEND_STATE_FILE: "${{ github.repository }}/production/infrastructure/main.tfstate"
+        run: pnpm wing compile -t tf-aws main.w --platform s3.backend.js
+        working-directory: "apps/@wingcloud/infrastructure"
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          role-session-name: gh-actions-wingcloud-production
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
+      - name: Terraform Apply
+        id: plan
+        env:
+          TF_IN_AUTOMATION: true
+          # dnsimple provider
+          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
+          DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
+          # for `flyctl auth docker` in terraform
+          FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}
+        run: |
+          terraform apply -auto-approve
+        working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
