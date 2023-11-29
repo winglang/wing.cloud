@@ -1,4 +1,3 @@
-import { ArrowSmallLeftIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
@@ -48,13 +47,11 @@ export const HttpErrorPage = ({
           <Link
             to="/dashboard"
             className={clsx(
-              "text-sm font-semibold",
-              "flex gap-0.5 items-center",
+              "text-sm font-semibold hover:underline",
               theme.text1,
             )}
           >
-            <ArrowSmallLeftIcon className="w-4 h-4" />
-            <span>Back to home</span>
+            Back to home
           </Link>
         </div>
       </div>
