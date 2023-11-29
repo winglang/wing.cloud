@@ -2,6 +2,7 @@ bring cloud;
 bring util;
 bring fs;
 bring http;
+bring expect;
 bring "../octokit.w" as ok;
 bring "./dir.w" as dir;
 bring "../users.w" as users;
@@ -82,11 +83,11 @@ pub class EnvironmentsTest {
       let var isOrg = true;
       if let org = props.githubOrg {
         let res = octokit.repos.createInOrg(name: repoName, org: org, private: true, auto_init: true);
-        assert(res.status >= 200 && res.status < 300);
+        expect.equal(true, res.status >= 200 && res.status < 300);
         owner = org;
       } elif let user = props.githubUser {
         let res = octokit.repos.createForAuthenticatedUser(name: repoName, private: true, auto_init: true);
-        assert(res.status >= 200 && res.status < 300);
+        expect.equal(true, res.status >= 200 && res.status < 300);
         owner = user;
         isOrg = false;
       } else {
@@ -167,7 +168,7 @@ pub class EnvironmentsTest {
             return false;
           }, timeout: 10m);
 
-          assert(isRunning);
+          expect.equal(true, isRunning);
 
           // make sure its responding
           let env = props.environments.list(appId: appId).at(0);
@@ -185,12 +186,12 @@ pub class EnvironmentsTest {
             assert(false);
           }
 
-          assert(env.type == "preview");
+          expect.equal("preview", env.type);
 
           // verify tests passed
-          assert(env.testResults?.testResults?.length == 1);
-          assert(env.testResults?.testResults?.at(0)?.path == "root/Default/test:Hello, world!");
-          assert(env.testResults?.testResults?.at(0)?.pass == true);
+          expect.equal(1, env.testResults?.testResults?.length);
+          expect.equal("root/Default/test:Hello, world!", env.testResults?.testResults?.at(0)?.path);
+          expect.equal(true, env.testResults?.testResults?.at(0)?.pass);
         } finally {
           octokit.repos.delete(owner: repo.owner, repo: repo.repo);
         }
@@ -295,10 +296,10 @@ pub class EnvironmentsTest {
               return false;
             }, timeout: 10m);
 
-            assert(isRunning);
+            expect.equal(true, isRunning);
 
             let env = props.environments.list(appId: app.appId).at(0);
-            assert(env.type == "production");
+            expect.equal("production", env.type);
           }
         } finally {
           octokit.repos.delete(owner: repo.owner, repo: repo.repo);
