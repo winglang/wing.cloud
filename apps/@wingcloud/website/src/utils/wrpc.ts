@@ -115,7 +115,7 @@ export const wrpc = createWRPCReact<{
       user: User;
     }
   >;
-  "auth.signout": MutationProcedure;
+  "auth.signOut": MutationProcedure;
   "github.callback": QueryProcedure<{ code: string }, {}>;
   "github.listInstallations": QueryProcedure<
     undefined,

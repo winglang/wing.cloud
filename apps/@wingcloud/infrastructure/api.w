@@ -172,7 +172,7 @@ pub class Api {
       }
     });
 
-    api.post("/wrpc/auth.signout", inflight (request) => {
+    api.post("/wrpc/auth.signOut", inflight (request) => {
       return {
         headers: {
           "Set-Cookie": Cookie.Cookie.serialize(
