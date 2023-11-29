@@ -682,7 +682,7 @@ pub class Api {
           body: {
             appId: appId,
             appName: appName,
-            appUri: "{user.username}/{appName}",
+            appFullName: "{user.username}/{appName}",
           },
         };
       } else {
