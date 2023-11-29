@@ -156,17 +156,17 @@ pub class Api {
     api.get("/wrpc/auth.check", inflight (request) => {
       try {
         let payload = getJWTPayloadFromCookie(request);
-      // check if the user from the cookie is valid
-      let userId = getUserIdFromCookie(request);
+        // check if the user from the cookie is valid
+        let userId = getUserIdFromCookie(request);
 
-      // check if user exists in the db
-      let user = users.get(userId: userId);
+        // check if user exists in the db
+        let user = users.get(userId: userId);
 
-      return {
-        body: {
-          user: user
-        },
-      };
+        return {
+          body: {
+            user: user
+          },
+        };
       } catch {
         throw httpError.HttpError.throwUnauthorized();
       }
