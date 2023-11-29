@@ -2,19 +2,20 @@ import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 
-import { Header } from "../../components/header.js";
-import { wrpc } from "../../utils/wrpc.js";
+import { ErrorBoundary } from "../../../../components/error-boundary.js";
+import { Header } from "../../../../components/header.js";
+import { wrpc } from "../../../../utils/wrpc.js";
 
 export const RUNTIME_LOGS_ID = "runtime-logs";
 export const TEST_LOGS_ID = "test-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 
-import { DeploymentLogs } from "./components/deployment-logs.js";
-import { EnvironmentDetails } from "./components/environment-details.js";
-import { RuntimeLogs } from "./components/runtime-logs.js";
-import { TestsLogs } from "./components/tests-logs.js";
+import { DeploymentLogs } from "./_components/deployment-logs.js";
+import { EnvironmentDetails } from "./_components/environment-details.js";
+import { RuntimeLogs } from "./_components/runtime-logs.js";
+import { TestsLogs } from "./_components/tests-logs.js";
 
-export const Component = () => {
+const EnvironmentPage = () => {
   const { owner, appName, branch } = useParams();
 
   const [testLogsOpen, setTestLogsOpen] = useState(false);
@@ -88,48 +89,56 @@ export const Component = () => {
   }, [environment.data?.environment?.status]);
 
   return (
+    <div
+      className={clsx(
+        "w-full flex-grow overflow-auto",
+        "max-w-5xl mx-auto p-4 sm:p-6",
+        "space-y-4",
+      )}
+    >
+      <EnvironmentDetails
+        loading={environment.isLoading}
+        environment={environment.data?.environment}
+      />
+
+      <TestsLogs
+        id={TEST_LOGS_ID}
+        isOpen={testLogsOpen}
+        setIsOpen={setTestLogsOpen}
+        testResults={
+          environment.data?.environment.testResults?.testResults || []
+        }
+        selectedTestId={selectedTestId}
+        logs={logs.data?.tests || []}
+        loading={logs.isLoading}
+      />
+
+      <DeploymentLogs
+        id={DEPLOYMENT_LOGS_ID}
+        isOpen={deploymentLogsOpen}
+        setIsOpen={setDeploymentLogsOpen}
+        logs={logs.data?.deploy || []}
+        loading={logs.isLoading}
+      />
+
+      <RuntimeLogs
+        id={RUNTIME_LOGS_ID}
+        isOpen={runtimeLogsOpen}
+        setIsOpen={setRuntimeLogsOpen}
+        logs={logs.data?.runtime || []}
+        loading={logs.isLoading}
+      />
+    </div>
+  );
+};
+
+export const Component = () => {
+  return (
     <div className="flex flex-col">
       <Header />
-      <div
-        className={clsx(
-          "w-full flex-grow overflow-auto",
-          "max-w-5xl mx-auto py-4 px-4 sm:px-6 sm:py-6",
-          "space-y-4",
-        )}
-      >
-        <EnvironmentDetails
-          loading={environment.isLoading}
-          environment={environment.data?.environment}
-        />
-
-        <TestsLogs
-          id={TEST_LOGS_ID}
-          isOpen={testLogsOpen}
-          setIsOpen={setTestLogsOpen}
-          testResults={
-            environment.data?.environment.testResults?.testResults || []
-          }
-          selectedTestId={selectedTestId}
-          logs={logs.data?.tests || []}
-          loading={logs.isLoading}
-        />
-
-        <DeploymentLogs
-          id={DEPLOYMENT_LOGS_ID}
-          isOpen={deploymentLogsOpen}
-          setIsOpen={setDeploymentLogsOpen}
-          logs={logs.data?.deploy || []}
-          loading={logs.isLoading}
-        />
-
-        <RuntimeLogs
-          id={RUNTIME_LOGS_ID}
-          isOpen={runtimeLogsOpen}
-          setIsOpen={setRuntimeLogsOpen}
-          logs={logs.data?.runtime || []}
-          loading={logs.isLoading}
-        />
-      </div>
+      <ErrorBoundary>
+        <EnvironmentPage />
+      </ErrorBoundary>
     </div>
   );
 };

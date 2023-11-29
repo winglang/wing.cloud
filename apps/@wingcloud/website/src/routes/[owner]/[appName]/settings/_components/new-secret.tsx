@@ -2,11 +2,11 @@ import { ExclamationCircleIcon, TagIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 
-import { Button } from "../../../../design-system/button.js";
-import { Input } from "../../../../design-system/input.js";
-import { Select } from "../../../../design-system/select.js";
-import { useTheme } from "../../../../design-system/theme-provider.js";
-import type { EnvironmentType } from "../../../../utils/wrpc.js";
+import { Button } from "../../../../../design-system/button.js";
+import { Input } from "../../../../../design-system/input.js";
+import { Select } from "../../../../../design-system/select.js";
+import { useTheme } from "../../../../../design-system/theme-provider.js";
+import type { EnvironmentType } from "../../../../../utils/wrpc.js";
 
 const environmentTypes = [
   { value: "production", label: "production" },
@@ -30,10 +30,12 @@ export const NewSecret = ({
   const [value, setValue] = useState("");
 
   const create = useCallback(async () => {
-    await onCreate(name, value, environmentType!);
-    setName("");
-    setValue("");
-    setEnvironmentType(undefined);
+    try {
+      await onCreate(name, value, environmentType!);
+      setName("");
+      setValue("");
+      setEnvironmentType(undefined);
+    } catch {}
   }, [name, value, environmentType]);
 
   const isSaveDisabled = useMemo(() => {

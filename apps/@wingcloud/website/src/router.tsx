@@ -1,6 +1,6 @@
-import { createBrowserRouter, redirect } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 
-import { NoMatch } from "./components/no-match.js";
+import { HttpErrorPage } from "./components/http-error-page.js";
 
 export const router = createBrowserRouter([
   {
@@ -21,28 +21,35 @@ export const router = createBrowserRouter([
       },
       {
         path: "/:owner",
-        lazy: () => import("./routes/owner/index.js"),
+        lazy: () => import("./routes/[owner]/index.js"),
       },
       {
         path: "/:owner/:appName",
-        lazy: () => import("./routes/owner/app.js"),
+        lazy: () => import("./routes/[owner]/[appName]/index.js"),
       },
       {
         path: "/:owner/:appName/settings",
-        lazy: () => import("./routes/app-settings/index.js"),
+        lazy: () => import("./routes/[owner]/[appName]/settings/index.js"),
       },
       {
         path: "/:owner/:appName/:branch",
-        lazy: () => import("./routes/environments/index.js"),
+        lazy: () => import("./routes/[owner]/[appName]/[branch]/index.js"),
       },
       {
         path: "/:owner/:appName/:branch/console",
-        lazy: () => import("./routes/environments/console-preview.js"),
+        lazy: () =>
+          import("./routes/[owner]/[appName]/[branch]/console/index.js"),
       },
     ],
   },
   {
     path: "*",
-    element: <NoMatch />,
+    element: (
+      <HttpErrorPage
+        code={404}
+        title="Page not found"
+        message="Sorry, we couldn’t find the page you’re looking for."
+      />
+    ),
   },
 ]);

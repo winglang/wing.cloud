@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { ConfirmationModal } from "../../../components/confirmation-modal.js";
+import { ConfirmationModal } from "../../../../../components/confirmation-modal.js";
 
 export interface EntrypointUpdateModalProps {
   appName: string;

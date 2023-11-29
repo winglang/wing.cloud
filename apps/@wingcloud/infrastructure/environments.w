@@ -1,6 +1,7 @@
 bring ex;
 bring "./nanoid62.w" as nanoid62;
 bring "./status-reports.w" as status_report;
+bring "./http-error.w" as httpError;
 
 pub struct Environment {
   id: str;
@@ -411,7 +412,7 @@ pub class Environments {
       };
     }
 
-    throw "Environment [{options.id}] not found";
+    throw httpError.HttpError.throwNotFound("Environment '{options.id}' not found");
   }
 
   pub inflight getByBranch(options: GetEnvironmentByBranchOptions): Environment {
@@ -441,7 +442,7 @@ pub class Environments {
       };
     }
 
-    throw "Environment [{options.branch}] not found";
+    throw httpError.HttpError.throwNotFound("Environment '{options.branch}' not found");
   }
 
   pub inflight list(options: ListEnvironmentOptions): Array<Environment> {

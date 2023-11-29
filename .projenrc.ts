@@ -133,6 +133,7 @@ website.addDeps("react", "react-dom");
 website.addDevDeps("@types/react", "@types/react-dom");
 
 website.addDeps("react-router-dom");
+website.addDeps("react-error-boundary");
 
 website.addDevDeps(vite.name);
 

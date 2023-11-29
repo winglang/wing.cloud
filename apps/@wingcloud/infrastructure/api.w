@@ -12,6 +12,7 @@ bring "./users.w" as Users;
 bring "./environments.w" as Environments;
 bring "./secrets.w" as Secrets;
 bring "./lowkeys-map.w" as lowkeys;
+bring "./http-error.w" as httpError;
 
 struct Log {
   message: str;
@@ -113,9 +114,8 @@ pub class Api {
     let getUserIdFromCookie = inflight (request: cloud.ApiRequest) => {
       if let payload = getJWTPayloadFromCookie(request) {
         return payload.userId;
-      } else {
-        throw "Unauthorized";
       }
+      throw httpError.HttpError.throwUnauthorized();
     };
 
     let getUserFromCookie = inflight (request: cloud.ApiRequest): UserFromCookie => {
@@ -127,13 +127,19 @@ pub class Api {
       };
     };
 
-    let verifyUser = inflight (request: cloud.ApiRequest): str => {
+    let checkOwnerAccessRights = inflight (request, owner: str): str => {
       let user = getUserFromCookie(request);
-
-      if user.username != request.query.get("owner") {
-        throw "Unauthorized";
+      // TODO: Currently we only allow the signed in user to access their own resources.
+      if user.username != owner {
+        throw httpError.HttpError.throwNotFound("User '{owner}' not found");
       }
-      return user.userId;
+    };
+
+    let checkAppAccessRights = inflight (userId: str, app: Apps.App): Apps.App => {
+      if userId != app.userId {
+        throw httpError.HttpError.throwNotFound("App not found");
+      }
+      return app;
     };
 
     let getAccessTokenFromCookie = inflight (request: cloud.ApiRequest) => {
@@ -142,20 +148,22 @@ pub class Api {
     };
 
     api.get("/wrpc/auth.check", inflight (request) => {
-      if let payload = getJWTPayloadFromCookie(request) {
-        // check if the user from the cookie is valid
-        let userId = getUserIdFromCookie(request);
+      try {
+        let payload = getJWTPayloadFromCookie(request);
+      // check if the user from the cookie is valid
+      let userId = getUserIdFromCookie(request);
 
-        // check if user exists in the db
-        let user = users.get(userId: userId);
+      // check if user exists in the db
+      let user = users.get(userId: userId);
 
-        return {
-          body: {
-            user: user
-          },
-        };
+      return {
+        body: {
+          user: user
+        },
+      };
+      } catch {
+        throw httpError.HttpError.throwUnauthorized();
       }
-      throw "Unauthorized";
     });
 
     api.post("/wrpc/auth.signout", inflight (request) => {
@@ -242,9 +250,7 @@ pub class Api {
           },
         };
       } else {
-        return {
-          status: 401,
-        };
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
@@ -264,9 +270,7 @@ pub class Api {
           },
         };
       } else {
-        return {
-          status: 401,
-        };
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
@@ -289,9 +293,7 @@ pub class Api {
           },
         };
       } else {
-        return {
-          status: 401,
-        };
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
@@ -316,14 +318,13 @@ pub class Api {
           },
         };
       } else {
-        return {
-          status: 401,
-        };
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
     api.get("/wrpc/app.get", inflight (request) => {
-      let userId = verifyUser(request);
+      let userId = getUserIdFromCookie(request);
+      checkOwnerAccessRights(request, request.query.get("owner"));
 
       let appId = request.query.get("appId");
 
@@ -331,24 +332,18 @@ pub class Api {
         appId: appId,
       );
 
-      if app.userId != userId {
-        return {
-          status: 403,
-          body: {
-            error: "Forbidden",
-          },
-        };
-      }
+      checkAppAccessRights(userId, app);
 
       return {
         body: {
-            app: app,
+          app: app,
         },
       };
     });
 
     api.get("/wrpc/app.getByName", inflight (request) => {
-      let userId = verifyUser(request);
+      let userId = getUserIdFromCookie(request);
+      checkOwnerAccessRights(request, request.query.get("owner"));
 
       let appName = request.query.get("appName");
 
@@ -357,18 +352,9 @@ pub class Api {
         appName: appName,
       );
 
-      if app.userId != userId {
-        return {
-          status: 403,
-          body: {
-            error: "Forbidden",
-          },
-        };
-      }
-
       return {
         body: {
-            app: app,
+          app: app,
         },
       };
     });
@@ -392,7 +378,8 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environments", inflight (request) => {
-      let userId = verifyUser(request);
+      let userId = getUserIdFromCookie(request);
+      checkOwnerAccessRights(request, request.query.get("owner"));
 
       let environments = props.environments.list(
         appId: request.query.get("appId"),
@@ -406,7 +393,8 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environment", inflight (request) => {
-      let userId = verifyUser(request);
+      let userId = getUserIdFromCookie(request);
+      checkOwnerAccessRights(request, request.query.get("owner"));
 
       let appName = request.query.get("appName");
       let branch = request.query.get("branch");
@@ -431,6 +419,12 @@ pub class Api {
     api.get("/wrpc/app.listSecrets", inflight (request) => {
       let userId = getUserIdFromCookie(request);
       let appId = request.query.get("appId");
+
+      let app = apps.get(
+        appId: appId,
+      );
+      checkAppAccessRights(userId, app);
+
       let prodSecrets = props.secrets.list(appId: appId, environmentType: "production");
       let previewSecrets = props.secrets.list(appId: appId, environmentType: "preview");
 
@@ -439,20 +433,24 @@ pub class Api {
           secrets: prodSecrets.concat(previewSecrets)
         },
       };
-
     });
 
     api.post("/wrpc/app.decryptSecret", inflight (request) => {
       let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
+
       let appId = input.get("appId").asStr();
+      let app = apps.get(
+        appId: appId,
+      );
+      checkAppAccessRights(userId, app);
+
       let secretId = input.get("secretId").asStr();
       let environmentType = input.get("environmentType").asStr();
 
       let secret = props.secrets.get(id: secretId, appId: appId, environmentType: environmentType, decryptValue: true);
 
       return {
-        status: 200,
         body: {
           value: secret.value,
         },
@@ -463,34 +461,36 @@ pub class Api {
       let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
+
+      let app = apps.get(
+        appId: appId,
+      );
+      checkAppAccessRights(userId, app);
+
       let environmentType = input.get("environmentType").asStr();
       if environmentType != "production" && environmentType != "preview" {
-        return {
-          status: 400,
-          body: { error: "invalid environment type" }
-        };
+        throw httpError.HttpError.throwBadRequest(
+          "Invalid environment type",
+        );
       }
 
       let name = input.get("name").asStr();
       if name == "" {
-        return {
-          status: 400,
-          body: { error: "invalid name" }
-        };
+        throw httpError.HttpError.throwBadRequest(
+          "Invalid name",
+        );
       }
 
       let value = input.get("value").asStr();
       if value == "" {
-        return {
-          status: 400,
-          body: { error: "invalid value" }
-        };
+        throw httpError.HttpError.throwBadRequest(
+          "Invalid value",
+        );
       }
 
       let secret = props.secrets.create(appId: appId, environmentType: environmentType, name: name, value: value);
 
       return {
-        status: 200,
         body: {
           secretId: secret.id
         }
@@ -501,13 +501,18 @@ pub class Api {
       let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
+
+      let app = apps.get(
+        appId: appId,
+      );
+      checkAppAccessRights(userId, app);
+
       let environmentType = input.get("environmentType").asStr();
       let secretId = input.get("secretId").asStr();
 
       props.secrets.delete(id: secretId, appId: appId, environmentType: environmentType);
 
       return {
-        status: 200,
         body: {
           secretId: secretId
         }
@@ -541,9 +546,7 @@ pub class Api {
           },
         };
       } else {
-        return {
-          status: 401,
-        };
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
@@ -551,6 +554,7 @@ pub class Api {
       let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
+
       let appName = input.get("appName").asStr();
       let repoId = input.get("repoId").asStr();
       let entryfile = input.get("entryfile").asStr();
@@ -565,7 +569,6 @@ pub class Api {
       }}));
 
       return {
-        status: 200,
         body: {
           appId: appId,
         },
@@ -573,7 +576,8 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environment.logs", inflight (request) => {
-      let userId = verifyUser(request);
+      let userId = getUserIdFromCookie(request);
+      checkOwnerAccessRights(request, request.query.get("owner"));
 
       let appName = request.query.get("appName");
       let branch = request.query.get("branch");
@@ -701,14 +705,13 @@ pub class Api {
           },
         };
       } else {
-        return {
-          status: 401,
-        };
+        throw httpError.HttpError.throwUnauthorized();
       }
     });
 
     api.get("/wrpc/user.listApps", inflight (request) => {
-      let userId = verifyUser(request);
+      let userId = getUserIdFromCookie(request);
+      checkOwnerAccessRights(request, request.query.get("owner"));
 
       let userApps = apps.list(
         userId: userId,

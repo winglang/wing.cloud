@@ -9,6 +9,10 @@ export const Component = () => {
 
   const userQuery = wrpc["auth.check"].useQuery();
   useEffect(() => {
+    if (userQuery.isLoading) {
+      return;
+    }
+
     if (!userQuery?.data?.user.username) {
       navigate("/");
       return;
