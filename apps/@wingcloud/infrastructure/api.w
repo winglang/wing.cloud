@@ -239,11 +239,7 @@ pub class Api {
 
     api.get("/wrpc/github.listInstallations", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = {accessToken}");
-
         let installations = GitHub.Client.listUserInstallations(accessToken);
-
-        log("installations = {Json.stringify(installations)}");
 
         return {
           body: {
@@ -257,13 +253,9 @@ pub class Api {
 
     api.get("/wrpc/github.listRepositories", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = {accessToken}");
-
         let installationId = num.fromStr(request.query.get("installationId"));
 
         let repositories = GitHub.Client.listInstallationRepos(accessToken, installationId);
-
-        log("repositories = {Json.stringify(repositories)}");
 
         return {
           body: {
@@ -277,8 +269,6 @@ pub class Api {
 
     api.get("/wrpc/github.getRepository", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = {accessToken}");
-
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
 
