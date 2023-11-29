@@ -44,6 +44,10 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
       - name: Compile Wing Cloud dependencies
         run: npx turbo compile --filter=!@wingcloud/infrastructure
       - name: Compile Wing Cloud
