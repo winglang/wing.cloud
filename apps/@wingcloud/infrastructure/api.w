@@ -127,14 +127,19 @@ pub class Api {
       };
     };
 
-    let verifyUser = inflight (request: cloud.ApiRequest): str => {
+    let checkOwnerAccessRights = inflight (request, owner: str): str => {
       let user = getUserFromCookie(request);
-      let owner = request.query.get("owner");
-
+      // TODO: Currently we only allow the signed in user to access their own resources.
       if user.username != owner {
         throw httpError.HttpError.throwNotFound("User '{owner}' not found");
       }
-      return user.userId;
+    };
+
+    let checkAppAccessRights = inflight (userId: str, app: Apps.App): Apps.App => {
+      if userId != app.userId {
+        throw httpError.HttpError.throwNotFound("App not found");
+      }
+      return app;
     };
 
     let getAccessTokenFromCookie = inflight (request: cloud.ApiRequest) => {
@@ -318,7 +323,8 @@ pub class Api {
     });
 
     api.get("/wrpc/app.get", inflight (request) => {
-      let userId = verifyUser(request);
+      let userId = getUserIdFromCookie(request);
+      checkOwnerAccessRights(request, request.query.get("owner"));
 
       let appId = request.query.get("appId");
 
@@ -326,9 +332,7 @@ pub class Api {
         appId: appId,
       );
 
-      if app.userId != userId {
-        throw httpError.HttpError.throwNotFound("App not found");
-      }
+      checkAppAccessRights(userId, app);
 
       return {
         body: {
@@ -338,7 +342,8 @@ pub class Api {
     });
 
     api.get("/wrpc/app.getByName", inflight (request) => {
-      let userId = verifyUser(request);
+      let userId = getUserIdFromCookie(request);
+      checkOwnerAccessRights(request, request.query.get("owner"));
 
       let appName = request.query.get("appName");
 
@@ -346,10 +351,6 @@ pub class Api {
         userId: userId,
         appName: appName,
       );
-
-      if app.userId != userId {
-        throw httpError.HttpError.throwNotFound("App '{appName}' not found");
-      }
 
       return {
         body: {
@@ -377,7 +378,8 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environments", inflight (request) => {
-      let userId = verifyUser(request);
+      let userId = getUserIdFromCookie(request);
+      checkOwnerAccessRights(request, request.query.get("owner"));
 
       let environments = props.environments.list(
         appId: request.query.get("appId"),
@@ -391,7 +393,8 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environment", inflight (request) => {
-      let userId = verifyUser(request);
+      let userId = getUserIdFromCookie(request);
+      checkOwnerAccessRights(request, request.query.get("owner"));
 
       let appName = request.query.get("appName");
       let branch = request.query.get("branch");
@@ -416,6 +419,12 @@ pub class Api {
     api.get("/wrpc/app.listSecrets", inflight (request) => {
       let userId = getUserIdFromCookie(request);
       let appId = request.query.get("appId");
+
+      let app = apps.get(
+        appId: appId,
+      );
+      checkAppAccessRights(userId, app);
+
       let prodSecrets = props.secrets.list(appId: appId, environmentType: "production");
       let previewSecrets = props.secrets.list(appId: appId, environmentType: "preview");
 
@@ -424,13 +433,18 @@ pub class Api {
           secrets: prodSecrets.concat(previewSecrets)
         },
       };
-
     });
 
     api.post("/wrpc/app.decryptSecret", inflight (request) => {
       let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
+
       let appId = input.get("appId").asStr();
+      let app = apps.get(
+        appId: appId,
+      );
+      checkAppAccessRights(userId, app);
+
       let secretId = input.get("secretId").asStr();
       let environmentType = input.get("environmentType").asStr();
 
@@ -447,6 +461,12 @@ pub class Api {
       let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
+
+      let app = apps.get(
+        appId: appId,
+      );
+      checkAppAccessRights(userId, app);
+
       let environmentType = input.get("environmentType").asStr();
       if environmentType != "production" && environmentType != "preview" {
         throw httpError.HttpError.throwBadRequest(
@@ -481,6 +501,12 @@ pub class Api {
       let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
+
+      let app = apps.get(
+        appId: appId,
+      );
+      checkAppAccessRights(userId, app);
+
       let environmentType = input.get("environmentType").asStr();
       let secretId = input.get("secretId").asStr();
 
@@ -528,6 +554,7 @@ pub class Api {
       let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
+
       let appName = input.get("appName").asStr();
       let repoId = input.get("repoId").asStr();
       let entryfile = input.get("entryfile").asStr();
@@ -549,7 +576,8 @@ pub class Api {
     });
 
     api.get("/wrpc/app.environment.logs", inflight (request) => {
-      let userId = verifyUser(request);
+      let userId = getUserIdFromCookie(request);
+      checkOwnerAccessRights(request, request.query.get("owner"));
 
       let appName = request.query.get("appName");
       let branch = request.query.get("branch");
@@ -682,7 +710,8 @@ pub class Api {
     });
 
     api.get("/wrpc/user.listApps", inflight (request) => {
-      let userId = verifyUser(request);
+      let userId = getUserIdFromCookie(request);
+      checkOwnerAccessRights(request, request.query.get("owner"));
 
       let userApps = apps.list(
         userId: userId,
