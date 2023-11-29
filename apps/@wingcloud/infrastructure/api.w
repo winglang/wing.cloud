@@ -290,8 +290,6 @@ pub class Api {
 
     api.get("/wrpc/github.getPullRequest", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = {accessToken}");
-
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
         let pullNumber = request.query.get("pullNumber");
@@ -311,25 +309,6 @@ pub class Api {
       } else {
         throw httpError.HttpError.throwUnauthorized();
       }
-    });
-
-    api.get("/wrpc/app.get", inflight (request) => {
-      let userId = getUserIdFromCookie(request);
-      checkOwnerAccessRights(request, request.query.get("owner"));
-
-      let appId = request.query.get("appId");
-
-      let app = apps.get(
-        appId: appId,
-      );
-
-      checkAppAccessRights(userId, app);
-
-      return {
-        body: {
-          app: app,
-        },
-      };
     });
 
     api.get("/wrpc/app.getByName", inflight (request) => {

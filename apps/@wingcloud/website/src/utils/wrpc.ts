@@ -135,12 +135,6 @@ export const wrpc = createWRPCReact<{
       repository: Repository;
     }
   >;
-  "app.get": QueryProcedure<
-    { owner: string; appId: string },
-    {
-      app: App;
-    }
-  >;
   "app.getByName": QueryProcedure<
     { owner: string; appName: string },
     {
