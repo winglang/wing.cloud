@@ -3,6 +3,9 @@ bring ex;
 
 bring "./github.w" as github;
 
+/**
+ * A table that stores Github access tokens.
+ */
 pub class GithubAccessTokensTable {
   table: ex.Table;
 
