@@ -17,10 +17,6 @@ class Consts {
   pub static inflight secretsPath(): str {
     return "/root/.wing/secrets.json";
   }
-
-  pub static inflight certificatePath(): str {
-    return "/root/.ssl";
-  }
 }
 
 struct RuntimeStartOptions {
@@ -75,14 +71,6 @@ class RuntimeHandler_sim impl IRuntimeHandler {
     fs.writeFile(secretsFile, Json.stringify(opts.secrets), encoding: "utf8");
     volumes.set(secretsFile, Consts.secretsPath());
 
-    // write wing certificate
-    let privateKeyFile = fs.join(fs.mkdtemp("pk-"), nanoid62.Nanoid62.generate());
-    fs.writeFile(privateKeyFile, opts.certificate.privateKey, encoding: "utf8");
-    volumes.set(privateKeyFile, "{Consts.certificatePath()}/cert.key");
-    let certificateFile = fs.join(fs.mkdtemp("cert-"), nanoid62.Nanoid62.generate());
-    fs.writeFile(certificateFile, opts.certificate.certificate, encoding: "utf8");
-    volumes.set(certificateFile, "{Consts.certificatePath()}/cert.pem");
-
     let env = MutMap<str>{
       "GIT_REPO" => repo,
       "GIT_SHA" => opts.gitSha,
@@ -92,6 +80,8 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
       "ENVIRONMENT_ID" => opts.environmentId,
       "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
+      "SSL_PRIVATE_KEY" => util.base64Encode(opts.certificate.privateKey),
+      "SSL_CERTIFICATE" => util.base64Encode(opts.certificate.certificate)
     };
 
     if let token = opts.gitToken {
@@ -147,12 +137,6 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     let files = Array<flyio.File>[{
       guest_path: Consts.secretsPath(),
       secret_name: "WING_SECRETS"
-    }, {
-      guest_path: "{Consts.certificatePath()}/cert.key",
-      secret_name: "SSL_PRIVATE_KEY"
-    }, {
-      guest_path: "{Consts.certificatePath()}/cert.pem",
-      secret_name: "SSL_CERTIFICATE"
     }];
 
     let env = MutMap<str>{
@@ -195,7 +179,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       app.addMachine(createOptions);
     }
 
-    return app.url();
+    return "{app.url()}:3000";
   }
 
   pub inflight stop(opts: RuntimeStopOptions) {

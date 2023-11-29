@@ -1,3 +1,4 @@
+bring http;
 bring "../dns/idns.w" as idns;
 bring "./ipublic-endpoint.w" as iendpoint;
 bring "../../status-reports.w" as status;
@@ -23,16 +24,17 @@ pub inflight class PublicEndpoint impl iendpoint.IPublicEndpoint {
   }
 
   pub inflight create() {
+    let url = http.parseUrl(this.targetUrl);
     this.dns.createRecords([{
       zone: this.domain,
       type: "CNAME",
       name: this.digest,
-      content: this.targetUrl.replace("https://", "")
+      content: url.hostname
     }]);
   }
 
   pub inflight delete() {
-    this.dns.createRecords([{
+    this.dns.deleteRecords([{
       zone: this.domain,
       type: "CNAME",
       name: this.digest,

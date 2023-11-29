@@ -15,15 +15,21 @@ export const createRecords = async (token: string, records: Record[]) => {
   const { data } = await client.identity.whoami();
 
   for (let record of records) {
-    const res = await client.zones.createZoneRecord(
-      data.account.id,
-      record.zone,
-      {
-        name: record.name,
-        type: record.type,
-        content: record.content,
-      },
-    );
+    try {
+      const res = await client.zones.createZoneRecord(
+        data.account.id,
+        record.zone,
+        {
+          name: record.name,
+          type: record.type,
+          content: record.content,
+        },
+      );
+      console.log("record created", res);
+    } catch (error) {
+      console.log(`create records: error ${error}`);
+      throw error;
+    }
   }
 };
 

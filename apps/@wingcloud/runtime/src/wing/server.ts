@@ -1,7 +1,4 @@
-import { readFileSync } from "node:fs";
 import https from "node:https";
-import { homedir } from "node:os";
-import { join } from "node:path";
 
 import { createConsoleApp } from "@wingconsole/app";
 import express, { type Application } from "express";
@@ -9,6 +6,7 @@ import httpProxy from "http-proxy";
 
 import { type KeyStore } from "../auth/key-store.js";
 import type { LoggerInterface } from "../logger.js";
+import { loadCertificate } from "../ssl/ssl.js";
 
 import { findEndpoints } from "./endpoints.js";
 
@@ -99,19 +97,7 @@ export async function prepareServer({ environmentId }: PrepareServerProps) {
     }
   });
 
-  const sslDir = join(homedir(), ".ssl");
-  const options = {
-    key: readFileSync(join(sslDir, "./cert.key"), "utf8").replaceAll(
-      "\\n",
-      "\n",
-    ),
-    cert: readFileSync(join(sslDir, "./cert.pem"), "utf8").replaceAll(
-      "\\n",
-      "\n",
-    ),
-  };
-
-  const sslServer = https.createServer(options, app);
+  const sslServer = https.createServer(loadCertificate(), app);
 
   sslServer.on("upgrade", async (req, socket, head) => {
     if (!consolePort) {

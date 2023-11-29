@@ -1,5 +1,6 @@
 import { createKeyStore } from "./auth/key-store.js";
 import { BucketLogger } from "./bucket-logger.js";
+import { cleanEnvironment } from "./clean.js";
 import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
 import { useReportStatus } from "./report-status.js";
@@ -40,6 +41,10 @@ export const run = async function ({ context, requestedPort }: RunProps) {
 
     const { paths, entryfilePath } = await setup.run();
     wingPaths = paths;
+
+    // clean environment from secrets and environment variables
+    cleanEnvironment();
+
     const testResults = await setup.runWingTest(paths, entryfilePath);
 
     if (testResults) {
