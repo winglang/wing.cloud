@@ -86,14 +86,22 @@ pub class Secrets {
       updatedAt: createdAt,
     };
 
-    this.table.transactWriteItems(transactItems: [
-      {
-        put: {
-          item: Json.deepCopy(item),
-          conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
+    try {
+      this.table.transactWriteItems(transactItems: [
+        {
+          put: {
+            item: Json.deepCopy(item),
+            conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
+          },
         },
-      },
-    ]);
+      ]);
+    } catch error {
+    if error.contains("ConditionalCheckFailed") {
+      throw httpError.HttpError.throwForbidden("Secret {options.name} already exists for the environment {options.environmentType}");
+    } else {
+      throw httpError.HttpError.throwError(error);
+    }
+  }
 
     return secret;
   }

@@ -132,7 +132,7 @@ pub class Api {
       let owner = request.query.get("owner");
 
       if user.username != owner {
-        throw httpError.HttpError.throwNotFound("User {owner} not found");
+        throw httpError.HttpError.throwNotFound("User '{owner}' not found");
       }
       return user.userId;
     };
@@ -348,7 +348,7 @@ pub class Api {
       );
 
       if app.userId != userId {
-        throw httpError.HttpError.throwNotFound("App not found");
+        throw httpError.HttpError.throwNotFound("App '{appName}' not found");
       }
 
       return {

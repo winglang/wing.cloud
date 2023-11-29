@@ -25,17 +25,17 @@ export const NewSecret = ({
   ) => Promise<void>;
 }) => {
   const { theme } = useTheme();
-  const [environmentType, setEnvironmentType] = useState<
-    EnvironmentType | undefined
-  >();
+  const [environmentType, setEnvironmentType] = useState<EnvironmentType>();
   const [name, setName] = useState("");
   const [value, setValue] = useState("");
 
   const create = useCallback(async () => {
-    await onCreate(name, value, environmentType!);
-    setName("");
-    setValue("");
-    setEnvironmentType();
+    try {
+      await onCreate(name, value, environmentType!);
+      setName("");
+      setValue("");
+      setEnvironmentType(undefined);
+    } catch {}
   }, [name, value, environmentType]);
 
   const isSaveDisabled = useMemo(() => {

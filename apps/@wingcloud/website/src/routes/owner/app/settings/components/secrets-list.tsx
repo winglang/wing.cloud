@@ -52,6 +52,7 @@ export const SecretsList = ({ appId }: { appId: string }) => {
             type: "error",
           });
         }
+        throw error;
       } finally {
         setUpdatingSecrets(false);
       }
