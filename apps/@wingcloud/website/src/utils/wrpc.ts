@@ -191,7 +191,7 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.updateEntryfile": MutationProcedure<
-    { appId: string; appName: string; repoId: string; entryfile: string },
+    { appId: string; entryfile: string },
     {}
   >;
   "app.delete": MutationProcedure<{ appId: string }, {}>;

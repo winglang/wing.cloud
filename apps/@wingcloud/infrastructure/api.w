@@ -528,12 +528,18 @@ pub class Api {
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
 
-      let appName = input.get("appName").asStr();
-      let repoId = input.get("repoId").asStr();
-      let entryfile = input.get("entryfile").asStr();
-      apps.updateEntrypoint(appId: appId, appName: appName, repository: repoId, userId: userId, entryfile: entryfile);
-
       let app = apps.get(appId: appId);
+      checkAppAccessRights(userId, app);
+
+      let entryfile = input.get("entryfile").asStr();
+      apps.updateEntrypoint(
+        appId: appId,
+        appName: app.appName,
+        repository: app.repoId,
+        userId: userId,
+        entryfile: entryfile,
+      );
+
       queue.push(Json.stringify(EnvironmentAction{
         type: "restartAll",
         data: EnvironmentManager.RestartAllEnvironmentOptions {
