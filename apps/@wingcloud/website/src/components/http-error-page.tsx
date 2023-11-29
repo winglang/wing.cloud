@@ -48,18 +48,16 @@ export const HttpErrorPage = ({
           <Link
             to="/dashboard"
             className={clsx(
-              "text-sm font-semibold leading-7 relative",
+              "text-sm font-semibold",
+              "flex gap-0.5 items-center",
+              "hover:underline",
               theme.text1,
             )}
           >
-            <ArrowSmallLeftIcon
-              className={clsx(
-                "w-4 h-4",
-                "absolute -left-5 top-1/2 transform -translate-y-1/2",
-                theme.text1,
-              )}
-            />
-            Go back home
+            <span>
+              <ArrowSmallLeftIcon className="w-4 h-4" />
+            </span>
+            <span>Back to home</span>
           </Link>
         </div>
       </div>
