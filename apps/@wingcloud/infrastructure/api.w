@@ -5,6 +5,7 @@ bring util;
 
 bring "./json-api.w" as json_api;
 bring "./cookie.w" as Cookie;
+bring "./github-tokens-table.w" as github_tokens_table;
 bring "./github.w" as GitHub;
 bring "./jwt.w" as JWT;
 bring "./apps.w" as Apps;
@@ -85,51 +86,6 @@ struct EnvironmentAction {
   data: Json;
 }
 
-class GithubAccessTokensTable {
-  table: ex.Table;
-
-  new() {
-    this.table = new ex.Table(
-      name: "github-access-tokens",
-      primaryKey: "userId",
-      columns: {
-        userId: ex.ColumnType.STRING,
-        accessToken: ex.ColumnType.STRING,
-        expiresIn: ex.ColumnType.NUMBER,
-        refreshToken: ex.ColumnType.STRING,
-        refreshTokenExpiresIn: ex.ColumnType.NUMBER,
-        tokenType: ex.ColumnType.STRING,
-        scope: ex.ColumnType.STRING,
-      },
-    );
-  }
-
-  pub inflight set(userId: str, tokens: GitHub.AuthTokens) {
-    this.table.upsert(userId, {
-      userId: userId,
-      accessToken: tokens.access_token,
-      expiresIn: tokens.expires_in,
-      refreshToken: tokens.refresh_token,
-      refreshTokenExpiresIn: tokens.refresh_token_expires_in,
-      tokenType: tokens.token_type,
-      scope: tokens.scope,
-    });
-  }
-
-  pub inflight get(userId: str): GitHub.AuthTokens? {
-    if let item = this.table.tryGet(userId) {
-      return {
-        access_token: item.get("accessToken").asStr(),
-        expires_in: item.get("expiresIn").asNum(),
-        refresh_token: item.get("refreshToken").asStr(),
-        refresh_token_expires_in: item.get("refreshTokenExpiresIn").asNum(),
-        token_type: item.get("tokenType").asStr(),
-        scope: item.get("scope").asStr(),
-      };
-    }
-  }
-}
-
 pub class Api {
   new(props: ApiProps) {
     let api = new json_api.JsonApi(api: props.api);
@@ -140,7 +96,7 @@ pub class Api {
 
     let AUTH_COOKIE_NAME = "auth";
 
-    let githubAccessTokens = new GithubAccessTokensTable();
+    let githubAccessTokens = new github_tokens_table.GithubAccessTokensTable();
 
     let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
       let headers = lowkeys.LowkeysMap.fromMap(request.headers ?? {});
