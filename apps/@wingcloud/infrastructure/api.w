@@ -496,8 +496,6 @@ pub class Api {
 
     api.get("/wrpc/app.listEntryfiles", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        log("accessToken = {accessToken}");
-
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
         let defaultBranch = request.query.get("default_branch");
