@@ -79,7 +79,9 @@ export const RuntimeLogs = ({
                     <div className={clsx(theme.text2)}>
                       {getTime(log.timestamp)}
                     </div>
-                    <div className={clsx(theme.text1)}>{log.message}</div>
+                    <div className={clsx(theme.text1, "break-all")}>
+                      {log.message}
+                    </div>
                   </div>
                 ))
               )}
