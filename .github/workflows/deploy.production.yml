@@ -97,7 +97,7 @@ jobs:
           VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}
           PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
           PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
-          LANDING_DOMAIN: ${{ secrets.LANDING_DOMAIN }}
+          LANDING_DOMAIN: ${{ vars.LANDING_DOMAIN }}
           TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}
           TF_BACKEND_BUCKET_REGION: ${{ vars.TF_BACKEND_BUCKET_REGION }}
           TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
