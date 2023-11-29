@@ -639,10 +639,10 @@ pub class Api {
         let input = Json.parse(request.body ?? "");
 
         let defaultBranch = input.get("default_branch").asStr();
-        let repoId = input.get("repoId").asStr();
         let repoOwner = input.get("repoOwner").asStr();
         let repoName = input.get("repoName").asStr();
         let entryfile = input.get("entryfile").asStr();
+        let repoId = "{repoOwner}/{repoName}";
 
         // TODO: https://github.com/winglang/wing/issues/3644
         let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9-]+", "*");

@@ -205,7 +205,6 @@ export const wrpc = createWRPCReact<{
   >;
   "user.createApp": MutationProcedure<
     {
-      repoId: string;
       description: string;
       repoName: string;
       repoOwner: string;

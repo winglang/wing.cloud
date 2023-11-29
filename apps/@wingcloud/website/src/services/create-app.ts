@@ -38,7 +38,6 @@ export const useCreateAppFromRepo = () => {
       {
         appName: repo.name,
         description: repo.description ?? "",
-        repoId: repo.full_name.toString(),
         repoName: repo.name,
         repoOwner: repo.owner.login,
         entryfile: "main.w",
