@@ -112,7 +112,7 @@ export const EnvironmentsListItem = ({
               {environment.prTitle}
             </Link>
 
-            <div className="truncate flex gap-x-5">
+            <div className="truncate flex gap-x-2 sm:gap-x-5">
               <div className={clsx("flex gap-x-1 items-center", theme.text2)}>
                 <GithubIcon className="w-3 h-3 inline-block" />
                 <a

@@ -91,15 +91,11 @@ export const AppPage = () => {
               theme.borderInput,
             )}
           >
-            <div className="space-y-1 pt-2 truncate ml-2">
-              <div
-                className={clsx("text-xl self-center truncate", theme.text1)}
-              >
+            <div className="truncate flex flex-col justify-between">
+              <div className={clsx("text-xl truncate", theme.text1)}>
                 {app.appName}
               </div>
-              <div
-                className={clsx("text-xs self-center truncate", theme.text2)}
-              >
+              <div className={clsx("text-xs truncate", theme.text2)}>
                 {app.description}
               </div>
             </div>
