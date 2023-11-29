@@ -85,6 +85,51 @@ struct EnvironmentAction {
   data: Json;
 }
 
+class GithubAccessTokensTable {
+  table: ex.Table;
+
+  new() {
+    this.table = new ex.Table(
+      name: "github-access-tokens",
+      primaryKey: "userId",
+      columns: {
+        userId: ex.ColumnType.STRING,
+        accessToken: ex.ColumnType.STRING,
+        expiresIn: ex.ColumnType.NUMBER,
+        refreshToken: ex.ColumnType.STRING,
+        refreshTokenExpiresIn: ex.ColumnType.NUMBER,
+        tokenType: ex.ColumnType.STRING,
+        scope: ex.ColumnType.STRING,
+      },
+    );
+  }
+
+  pub inflight set(userId: str, tokens: GitHub.AuthTokens) {
+    this.table.upsert(userId, {
+      userId: userId,
+      accessToken: tokens.access_token,
+      expiresIn: tokens.expires_in,
+      refreshToken: tokens.refresh_token,
+      refreshTokenExpiresIn: tokens.refresh_token_expires_in,
+      tokenType: tokens.token_type,
+      scope: tokens.scope,
+    });
+  }
+
+  pub inflight get(userId: str): GitHub.AuthTokens? {
+    if let item = this.table.tryGet(userId) {
+      return {
+        access_token: item.get("accessToken").asStr(),
+        expires_in: item.get("expiresIn").asNum(),
+        refresh_token: item.get("refreshToken").asStr(),
+        refresh_token_expires_in: item.get("refreshTokenExpiresIn").asNum(),
+        token_type: item.get("tokenType").asStr(),
+        scope: item.get("scope").asStr(),
+      };
+    }
+  }
+}
+
 pub class Api {
   new(props: ApiProps) {
     let api = new json_api.JsonApi(api: props.api);
@@ -94,6 +139,8 @@ pub class Api {
     let queue = new cloud.Queue();
 
     let AUTH_COOKIE_NAME = "auth";
+
+    let githubAccessTokens = new GithubAccessTokensTable();
 
     let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
       let headers = lowkeys.LowkeysMap.fromMap(request.headers ?? {});
@@ -143,8 +190,9 @@ pub class Api {
     };
 
     let getAccessTokenFromCookie = inflight (request: cloud.ApiRequest) => {
-      let payload = getJWTPayloadFromCookie(request);
-      return payload?.accessToken;
+      if let payload = getJWTPayloadFromCookie(request) {
+        return githubAccessTokens.get(payload.userId)?.access_token;
+      }
     };
 
     api.get("/wrpc/auth.check", inflight (request) => {
@@ -194,25 +242,21 @@ pub class Api {
         clientId: props.githubAppClientId,
         clientSecret: props.githubAppClientSecret,
       );
-      log("tokens = {Json.stringify(tokens)}");
 
       let githubUser = GitHub.Client.getUser(tokens.access_token);
-      log("gitHubLogin = {githubUser.login}");
 
       let user = users.getOrCreate(
         displayName: githubUser.name,
         username: githubUser.login,
         avatarUrl: githubUser.avatar_url,
       );
-      log("userId = {user.id}");
+
+      githubAccessTokens.set(user.id, tokens);
 
       let jwt = JWT.JWT.sign(
         secret: props.appSecret,
         userId: user.id,
-        accessToken: tokens.access_token,
-        accessTokenExpiresIn: tokens.expires_in,
-        refreshToken: tokens.refresh_token,
-        refreshTokenExpiresIn: tokens.refresh_token_expires_in,
+        username: githubUser.login,
       );
 
       let authCookie = Cookie.Cookie.serialize(

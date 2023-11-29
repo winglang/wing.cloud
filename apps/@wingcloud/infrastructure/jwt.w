@@ -4,10 +4,7 @@ bring "./github.w" as GitHub;
 struct SignOptions {
   secret: str;
   userId: str;
-  accessToken: str;
-  accessTokenExpiresIn: num;
-  refreshToken: str;
-  refreshTokenExpiresIn: num;
+  username: str;
 }
 
 struct VerifyOptions {
@@ -17,10 +14,7 @@ struct VerifyOptions {
 
 pub struct JWTPayload {
   userId: str;
-  accessToken: str;
-  accessTokenExpiresIn: num;
-  refreshToken: str;
-  refreshTokenExpiresIn: num;
+  username: str;
 }
 
 pub class JWT {
