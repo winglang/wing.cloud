@@ -43,7 +43,8 @@ export const createTable = async (client, props) => {
       BillingMode: "PAY_PER_REQUEST",
       StreamSpecification: {
         StreamEnabled: true,
-        StreamViewType: "NEW_AND_OLD_IMAGES",
+        // StreamViewType: "NEW_AND_OLD_IMAGES",
+        StreamViewType: "NEW_IMAGE",
       },
     }),
   );
@@ -128,15 +129,16 @@ export const processRecords = async (props) => {
     endpoint: props.endpoint,
   });
 
-  const {
-    Streams: [{ StreamArn }],
-  } = await client.send(
+  const { Streams } = await client.send(
     new ListStreamsCommand({
       TableName: props.tableName,
     }),
   );
 
-  processStreamRecords(client, StreamArn);
+  console.log({ Streams });
+  for (const { StreamArn } of Streams) {
+    await processStreamRecords(client, StreamArn);
+  }
 
   // const {
   //   Streams: [{ StreamArn }],
@@ -163,4 +165,8 @@ export const processRecords = async (props) => {
   // );
 
   // console.log(records);
+};
+
+export const processRecordsAsync = (props) => {
+  processRecords(props);
 };
