@@ -561,13 +561,14 @@ pub class Api {
       let appName = request.query.get("appName");
       let branch = request.query.get("branch");
 
-      let appId = apps.getByName(
+      let app = apps.getByName(
         userId: userId,
         appName: appName,
-      ).appId;
+      );
+      checkAppAccessRights(userId, app);
 
       let environment = props.environments.getByBranch(
-        appId: appId,
+        appId: app.appId,
         branch: branch,
       );
 
