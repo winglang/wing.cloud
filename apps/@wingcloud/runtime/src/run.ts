@@ -10,9 +10,14 @@ import { prepareServer } from "./wing/server.js";
 export interface RunProps {
   context: EnvironmentContext;
   requestedPort?: number;
+  requestedSSLPort?: number;
 }
 
-export const run = async function ({ context, requestedPort }: RunProps) {
+export const run = async function ({
+  context,
+  requestedPort,
+  requestedSSLPort,
+}: RunProps) {
   const keyStore = await createKeyStore(context.environment.id);
   const report = useReportStatus(context, keyStore);
 
@@ -33,10 +38,11 @@ export const run = async function ({ context, requestedPort }: RunProps) {
   });
 
   let wingPaths;
+  const { startServer, closeSSL } = await prepareServer({
+    environmentId: context.environment.id,
+    requestedSSLPort,
+  });
   try {
-    const startServer = await prepareServer({
-      environmentId: context.environment.id,
-    });
     await report("deploying");
 
     const { paths, entryfilePath } = await setup.run();
@@ -73,6 +79,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
         deployLogger.stop();
         runtimeLogger.stop();
         await close();
+        closeSSL();
       },
     };
   } catch (error: any) {
@@ -95,6 +102,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
 
     deployLogger.stop();
     runtimeLogger.stop();
+    closeSSL();
     throw error;
   }
 };

@@ -31,7 +31,7 @@ test("run() - installs npm packages and run tests", async () => {
   await sleep(200);
 
   const files = await logsBucket.list();
-  expect(files.length).toBe(2);
+  expect(files.length).toBe(3);
 
   const deploymentLogs = await logsBucket.get(environment.deploymentKey());
   expect(deploymentLogs).toContain("Running npm install\n\nadded 1 package");
@@ -155,6 +155,7 @@ test("run() - reporting statuses", async () => {
       data: {
         testResults: [
           {
+            id: "rootDefaulttestHelloworld",
             pass: true,
             path: "root/Default/test:Hello, world!",
           },
@@ -246,13 +247,18 @@ test("run() - have multiple tests results", async () => {
   });
 
   const files = await logsBucket.list();
-  expect(files.length).toBe(4);
+  expect(files.length).toBe(5);
 
   expect(
     await logsBucket.get(
       environment.testKey(true, "root/Default/test:will succeed"),
     ),
-  ).toContain("will succeed first log\nwill succeed second log");
+  ).toContain("will succeed first log");
+  expect(
+    await logsBucket.get(
+      environment.testKey(true, "root/Default/test:will succeed"),
+    ),
+  ).toContain("will succeed second log");
   expect(
     await logsBucket.exists(
       environment.testKey(true, "root/Default/test:will succeed 2"),

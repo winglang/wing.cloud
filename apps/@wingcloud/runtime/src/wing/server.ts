@@ -24,6 +24,7 @@ interface ConsoleError {
 
 export interface PrepareServerProps {
   environmentId: string;
+  requestedSSLPort?: number;
 }
 
 export interface StartServerProps {
@@ -34,7 +35,10 @@ export interface StartServerProps {
   requestedPort?: number;
 }
 
-export async function prepareServer({ environmentId }: PrepareServerProps) {
+export async function prepareServer({
+  environmentId,
+  requestedSSLPort,
+}: PrepareServerProps) {
   let consolePort: number | undefined;
   const app = express();
   const proxy = httpProxy.createProxyServer({ changeOrigin: true });
@@ -119,62 +123,68 @@ export async function prepareServer({ environmentId }: PrepareServerProps) {
     }
   });
 
-  sslServer.listen(3001, () => {
-    console.log("SSL server is listening on port 3001");
+  const sslPort = requestedSSLPort || Math.floor(Math.random() * 1000 + 3000);
+  sslServer.listen(sslPort, () => {
+    console.log(`SSL server is listening on port ${sslPort}`);
   });
 
-  return async ({
-    consolePath,
-    entryfilePath,
-    logger,
-    keyStore,
-    requestedPort,
-  }: StartServerProps) => {
-    const wingConsole = await import(consolePath);
-    const create: typeof createConsoleApp = wingConsole.createConsoleApp;
-    const log = (message: string, props?: any[]) => {
-      logger.log(message, props);
-    };
-
-    const { port, close } = await create({
-      wingfile: entryfilePath,
-      expressApp: app,
+  return {
+    closeSSL: () => {
+      sslServer.close();
+    },
+    startServer: async ({
+      consolePath,
+      entryfilePath,
+      logger,
+      keyStore,
       requestedPort,
-      log: {
-        info: log,
-        error: log,
-        verbose: log,
-      },
-      config: {
-        addEventListener(event: any, listener: any) {},
-        removeEventListener(event: any, listener: any) {},
-        get(key: any) {
-          return key;
+    }: StartServerProps) => {
+      const wingConsole = await import(consolePath);
+      const create: typeof createConsoleApp = wingConsole.createConsoleApp;
+      const log = (message: string, props?: any[]) => {
+        logger.log(message, props);
+      };
+
+      const { port, close } = await create({
+        wingfile: entryfilePath,
+        expressApp: app,
+        requestedPort,
+        log: {
+          info: log,
+          error: log,
+          verbose: log,
         },
-        set(key: any, value: any) {},
-      },
-      onExpressCreated: (app: Application) => {
-        app.get("/public-key", async (req, res) => {
-          const data = keyStore.publicKey();
-          res.send(data);
-        });
-        app.get("/health", async (req, res) => {
-          res.sendStatus(200);
-        });
-      },
-    });
+        config: {
+          addEventListener(event: any, listener: any) {},
+          removeEventListener(event: any, listener: any) {},
+          get(key: any) {
+            return key;
+          },
+          set(key: any, value: any) {},
+        },
+        onExpressCreated: (app: Application) => {
+          app.get("/public-key", async (req, res) => {
+            const data = keyStore.publicKey();
+            res.send(data);
+          });
+          app.get("/health", async (req, res) => {
+            res.sendStatus(200);
+          });
+        },
+      });
 
-    await waitForConsole(port);
+      await waitForConsole(port);
 
-    const { endpoints } = await endpointsFn({ port, environmentId });
-    console.log(
-      `Console app opened on port ${port} for app ${entryfilePath}`,
-      JSON.stringify({
-        endpoints,
-      }),
-    );
-    consolePort = port;
-    return { port, close, endpoints };
+      const { endpoints } = await endpointsFn({ port, environmentId });
+      console.log(
+        `Console app opened on port ${port} for app ${entryfilePath}`,
+        JSON.stringify({
+          endpoints,
+        }),
+      );
+      consolePort = port;
+      return { port, close, endpoints };
+    },
   };
 }
 
