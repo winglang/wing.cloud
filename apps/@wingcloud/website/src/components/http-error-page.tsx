@@ -50,13 +50,10 @@ export const HttpErrorPage = ({
             className={clsx(
               "text-sm font-semibold",
               "flex gap-0.5 items-center",
-              "hover:underline",
               theme.text1,
             )}
           >
-            <span>
-              <ArrowSmallLeftIcon className="w-4 h-4" />
-            </span>
+            <ArrowSmallLeftIcon className="w-4 h-4" />
             <span>Back to home</span>
           </Link>
         </div>
