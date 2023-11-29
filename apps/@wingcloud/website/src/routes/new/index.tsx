@@ -10,7 +10,6 @@ import { NewAppContainer } from "./_components/new-app-container.js";
 
 export const Component = () => {
   const navigate = useNavigate();
-  const { owner } = useParams();
   const { theme } = useTheme();
 
   return (
@@ -36,7 +35,7 @@ export const Component = () => {
           <div className="justify-end flex gap-x-2 grow">
             <Button
               onClick={() => {
-                navigate(`/${owner}`);
+                navigate("/dashboard");
               }}
             >
               Back
