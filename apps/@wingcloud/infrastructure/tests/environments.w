@@ -227,7 +227,6 @@ pub class EnvironmentsTest {
           let jwt = JWT.JWT.sign(
             secret: props.appSecret,
             userId: user.id,
-            username: user.id,
           );
 
           let authCookie = Cookie.Cookie.serialize(

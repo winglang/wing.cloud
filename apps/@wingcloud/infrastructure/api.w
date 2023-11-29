@@ -212,7 +212,6 @@ pub class Api {
       let jwt = JWT.JWT.sign(
         secret: props.appSecret,
         userId: user.id,
-        username: githubUser.login,
       );
 
       let authCookie = Cookie.Cookie.serialize(

@@ -5,13 +5,10 @@ const JWT_EXPIRATION_TIME = "1h";
 export interface SignOptions {
   secret: string;
   userId: string;
-  username: string;
 }
 
 export const sign = async (options: SignOptions) => {
-  return await new jose.SignJWT({
-    username: options.username,
-  })
+  return await new jose.SignJWT({})
     .setSubject(options.userId)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -37,10 +34,5 @@ export const verify = async (options: VerifyOptions) => {
 
   return {
     userId: payload.sub,
-    username: payload.username,
-    // accessToken: payload.accessToken,
-    // accessTokenExpiresIn: payload.accessTokenExpiresIn,
-    // refreshToken: payload.refreshToken,
-    // refreshTokenExpiresIn: payload.refreshTokenExpiresIn,
   };
 };
