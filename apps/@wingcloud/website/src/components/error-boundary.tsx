@@ -9,7 +9,7 @@ import type { PropsWithChildren } from "react";
 import { useMemo } from "react";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
 
-import { ErrorPage } from "./error-page.js";
+import { HttpErrorPage } from "./http-error-page.js";
 
 const FallbackComponent = ({ error }: { error: Error }) => {
   const errorData = useMemo(() => {
@@ -43,7 +43,7 @@ const FallbackComponent = ({ error }: { error: Error }) => {
   }, [error]);
 
   return (
-    <ErrorPage
+    <HttpErrorPage
       title={errorData.title}
       code={errorData.code}
       message={errorData.message}

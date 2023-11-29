@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { ErrorPage } from "./components/error-page.js";
+import { HttpErrorPage } from "./components/http-error-page.js";
 
 export const router = createBrowserRouter([
   {
@@ -44,7 +44,7 @@ export const router = createBrowserRouter([
   {
     path: "*",
     element: (
-      <ErrorPage
+      <HttpErrorPage
         code={404}
         title="Page not found"
         message="Sorry, we couldn’t find the page you’re looking for."
