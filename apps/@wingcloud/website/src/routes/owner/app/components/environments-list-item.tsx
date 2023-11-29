@@ -104,7 +104,7 @@ export const EnvironmentsListItem = ({
             <Link
               to={`/${owner}/${appName}/${environment.branch}`}
               className={clsx(
-                "font-semibold truncate hover:underline",
+                "font-medium truncate hover:underline",
                 theme.text1,
               )}
               rel="noopener noreferrer"

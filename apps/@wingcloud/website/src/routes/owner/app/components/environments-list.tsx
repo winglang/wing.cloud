@@ -71,7 +71,7 @@ export const EnvironmentsList = ({
           )}
         >
           <LinkIcon className={clsx("w-8 h-8 mx-auto", theme.text2)} />
-          <h3 className={clsx("mt-2 text-sm font-semibold", theme.text1)}>
+          <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
             No preview environments found.
           </h3>
 
@@ -154,7 +154,7 @@ export const EnvironmentsList = ({
                 )}
               >
                 <BranchIcon className="w-12 h-12 mx-auto text-gray-400" />
-                <h3 className="mt-2 text-sm font-semibold text-gray-900">
+                <h3 className="mt-2 text-sm font-medium text-gray-900">
                   No previews found.
                 </h3>
               </div>
