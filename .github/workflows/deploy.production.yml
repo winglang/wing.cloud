@@ -48,7 +48,8 @@ jobs:
         id: create_tag
         run: |
           echo "Fetching the latest tag..."
-          LATEST_TAG=$(git tag --sort=-creatordate | grep 'production-v' | head -1)
+          git fetch --tags
+          LATEST_TAG=$(git tag --sort=-taggerdate | grep 'production-v' | head -1)
           echo "Latest tag: ${LATEST_TAG}"
           echo "Extracting version number from the latest tag..."
           VERSION_NUMBER=$(echo ${LATEST_TAG} | grep -o -E '[0-9]+')
