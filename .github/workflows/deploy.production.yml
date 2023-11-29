@@ -50,14 +50,18 @@ jobs:
           echo "Fetching the latest tag..."
           git fetch --tags
           LATEST_TAG=$(git tag --sort=-taggerdate | grep 'production-v' | head -1)
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No latest tag found. Setting it to empty..."
+            LATEST_TAG=""
+          fi
           echo "Latest tag: ${LATEST_TAG}"
           echo "Extracting version number from the latest tag..."
           VERSION_NUMBER=$(echo ${LATEST_TAG} | grep -o -E '[0-9]+')
-          echo "Version number: ${VERSION_NUMBER}"
           if [ -z "$VERSION_NUMBER" ]; then
             echo "No version number found. Setting it to 0..."
             VERSION_NUMBER=0
           fi
+          echo "Version number: ${VERSION_NUMBER}"
           echo "Incrementing the version number..."
           NEW_VERSION_NUMBER=$((VERSION_NUMBER + 1))
           echo "New version number: ${NEW_VERSION_NUMBER}"
