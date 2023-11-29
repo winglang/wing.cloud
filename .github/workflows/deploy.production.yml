@@ -77,13 +77,13 @@ jobs:
           VERSION_NUMBER=$(echo ${LATEST_TAG} | grep -o -E '[0-9]+')
           NEW_VERSION_NUMBER=$((VERSION_NUMBER + 1))
           NEW_TAG="production-v${NEW_VERSION_NUMBER}"
-          echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
+          echo "new_tag=${NEW_TAG}" >> "$GITHUB_OUTPUT"
       - name: Push the new tag
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git tag ${{ env.NEW_TAG }}
-          git push origin ${{ env.NEW_TAG }}
+          git tag ${{ steps.create_tag.outputs.new_tag }}
+          git push origin ${{ steps.create_tag.outputs.new_tag }}
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
