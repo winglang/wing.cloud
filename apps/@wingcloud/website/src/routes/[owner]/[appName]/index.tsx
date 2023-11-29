@@ -29,7 +29,7 @@ const AppPage = () => {
     return appQuery.data?.app;
   }, [appQuery.data]);
 
-  const environmentsQuery = wrpc["app.environments"].useQuery(
+  const environmentsQuery = wrpc["app.listEnvironments"].useQuery(
     { owner: owner!, appId: app?.appId! },
     {
       enabled: app !== undefined,

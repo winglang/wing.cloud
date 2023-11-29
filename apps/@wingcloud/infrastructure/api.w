@@ -347,7 +347,7 @@ pub class Api {
       };
     });
 
-    api.get("/wrpc/app.environments", inflight (request) => {
+    api.get("/wrpc/app.listEnvironments", inflight (request) => {
       let userId = getUserIdFromCookie(request);
       checkOwnerAccessRights(request, request.query.get("owner"));
 

@@ -141,7 +141,7 @@ export const wrpc = createWRPCReact<{
       app: App;
     }
   >;
-  "app.environments": QueryProcedure<
+  "app.listEnvironments": QueryProcedure<
     { owner: string; appId: string },
     {
       environments: Array<Environment>;
