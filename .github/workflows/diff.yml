@@ -17,8 +17,8 @@ jobs:
   diff:
     runs-on: ubuntu-latest
     environment:
-      name: ${{ vars.ENVIRONMENT_NAME }}
-      url: https://${{ vars.PROXY_SUBDOMAIN }}.${{ vars.PROXY_ZONE_NAME }}
+      name: ${{ inputs.ENVIRONMENT_NAME }}
+      url: https://${{ inputs.ENVIRONMENT_NAME }}.wingcloud.io
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -64,7 +64,7 @@ jobs:
           TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}
           TF_BACKEND_BUCKET_REGION: ${{ vars.TF_BACKEND_BUCKET_REGION }}
           TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
-          TF_BACKEND_STATE_FILE: "${{ vars.TF_BACKEND_STATE_FILE }}"
+          TF_BACKEND_STATE_FILE: "${{ inputs.TF_BACKEND_STATE_FILE }}"
         run: pnpm wing compile -t tf-aws main.w --platform s3.backend.js
         working-directory: "apps/@wingcloud/infrastructure"
       - name: Configure AWS credentials
@@ -72,7 +72,7 @@ jobs:
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN_READ_ONLY }}
           role-session-name: gh-actions-wingcloud-staging
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ inputs.AWS_REGION }}
       - name: Terraform Init
         id: init
         run: terraform init

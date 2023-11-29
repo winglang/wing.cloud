@@ -17,6 +17,7 @@ permissions:
 
 jobs:
   diff:
+    name: Diff Staging
     uses: ./.github/workflows/diff.yml
     with:
       TF_BACKEND_STATE_FILE: "${{ github.repository }}/${{ github.base_ref }}/infrastructure/main.tfstate"
