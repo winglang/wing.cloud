@@ -351,8 +351,12 @@ pub class Api {
       let userId = getUserIdFromCookie(request);
       checkOwnerAccessRights(request, request.query.get("owner"));
 
+      let appId = request.query.get("appId");
+      let app = props.apps.get(appId: appId);
+      checkAppAccessRights(userId, app);
+
       let environments = props.environments.list(
-        appId: request.query.get("appId"),
+        appId: appId,
       );
 
       return {
