@@ -3,13 +3,21 @@ bring ex;
 
 bring "./github.w" as github;
 
+pub struct GithubAccessTokensTableProps {
+  encryptionKey: str;
+}
+
 /**
  * A table that stores Github access tokens.
  */
 pub class GithubAccessTokensTable {
+  encryptionKey: str;
+
   table: ex.Table;
 
-  new() {
+  new(props: GithubAccessTokensTableProps) {
+    this.encryptionKey = props.encryptionKey;
+
     this.table = new ex.Table(
       name: "github-access-tokens",
       primaryKey: "userId",
@@ -28,9 +36,9 @@ pub class GithubAccessTokensTable {
   pub inflight set(userId: str, tokens: github.AuthTokens) {
     this.table.upsert(userId, {
       userId: userId,
-      accessToken: tokens.access_token,
+      accessToken: GithubAccessTokensTable.encrypt(tokens.access_token, this.encryptionKey),
       expiresIn: tokens.expires_in,
-      refreshToken: tokens.refresh_token,
+      refreshToken: GithubAccessTokensTable.encrypt(tokens.refresh_token, this.encryptionKey),
       refreshTokenExpiresIn: tokens.refresh_token_expires_in,
       tokenType: tokens.token_type,
       scope: tokens.scope,
@@ -40,13 +48,16 @@ pub class GithubAccessTokensTable {
   pub inflight get(userId: str): github.AuthTokens? {
     if let item = this.table.tryGet(userId) {
       return {
-        access_token: item.get("accessToken").asStr(),
+        access_token: GithubAccessTokensTable.decrypt(item.get("accessToken").asStr(), this.encryptionKey),
         expires_in: item.get("expiresIn").asNum(),
-        refresh_token: item.get("refreshToken").asStr(),
+        refresh_token:GithubAccessTokensTable.decrypt( item.get("refreshToken").asStr(), this.encryptionKey),
         refresh_token_expires_in: item.get("refreshTokenExpiresIn").asNum(),
         token_type: item.get("tokenType").asStr(),
         scope: item.get("scope").asStr(),
       };
     }
   }
+
+  extern "./github-tokens-table.mts" static inflight encrypt(text: str, key: str): str;
+  extern "./github-tokens-table.mts" static inflight decrypt(text: str, key: str): str;
 }

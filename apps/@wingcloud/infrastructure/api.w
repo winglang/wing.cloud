@@ -96,7 +96,9 @@ pub class Api {
 
     let AUTH_COOKIE_NAME = "auth";
 
-    let githubAccessTokens = new github_tokens_table.GithubAccessTokensTable();
+    let githubAccessTokens = new github_tokens_table.GithubAccessTokensTable(
+      encryptionKey: props.appSecret,
+    );
 
     let getJWTPayloadFromCookie = inflight (request: cloud.ApiRequest): JWT.JWTPayload? => {
       let headers = lowkeys.LowkeysMap.fromMap(request.headers ?? {});

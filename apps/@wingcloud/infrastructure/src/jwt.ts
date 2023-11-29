@@ -13,7 +13,7 @@ export const sign = async (options: SignOptions) => {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(JWT_EXPIRATION_TIME)
-    .sign(new TextEncoder().encode(options.secret));
+    .sign(Buffer.from(options.secret, "hex"));
 };
 
 export interface VerifyOptions {
@@ -24,7 +24,7 @@ export interface VerifyOptions {
 export const verify = async (options: VerifyOptions) => {
   const result = await jose.compactVerify(
     options.jwt,
-    new TextEncoder().encode(options.secret),
+    Buffer.from(options.secret, "hex"),
     {
       algorithms: ["HS256"],
     },
