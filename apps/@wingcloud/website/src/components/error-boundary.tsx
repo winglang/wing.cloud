@@ -36,7 +36,7 @@ const FallbackComponent = ({ error }: { error: Error }) => {
     } else {
       return {
         code: 500,
-        title: "Error",
+        title: "Server Error",
         message: error.message,
       };
     }

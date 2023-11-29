@@ -15,7 +15,7 @@ export const HttpErrorPage = ({
 }) => {
   const { theme } = useTheme();
 
-  const parsedMessage = useMemo(() => {
+  const formattedMessage = useMemo(() => {
     if (!message.endsWith(".")) {
       return message + ".";
     }
@@ -41,7 +41,7 @@ export const HttpErrorPage = ({
             theme.text1,
           )}
         >
-          {parsedMessage}
+          {formattedMessage}
         </p>
         <div className="mt-8 flex justify-center items-center">
           <Link
