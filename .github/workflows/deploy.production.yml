@@ -97,7 +97,7 @@ jobs:
           TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}
           TF_BACKEND_BUCKET_REGION: ${{ vars.TF_BACKEND_BUCKET_REGION }}
           TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
-          TF_BACKEND_STATE_FILE: "${{ github.repository }}/production-${{ github.run_id }}/infrastructure/main.tfstate"
+          TF_BACKEND_STATE_FILE: "${{ github.repository }}/production/infrastructure/main.tfstate"
         run: pnpm wing compile -t tf-aws main.w --platform s3.backend.js
         working-directory: "apps/@wingcloud/infrastructure"
       - name: Configure AWS credentials
