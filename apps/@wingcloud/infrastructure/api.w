@@ -691,18 +691,22 @@ pub class Api {
     });
 
     api.get("/wrpc/user.listApps", inflight (request) => {
-      let userId = getUserIdFromCookie(request);
-      checkOwnerAccessRights(request, request.query.get("owner"));
+      let owner = request.query.get("owner");
+      checkOwnerAccessRights(request, owner);
 
-      let userApps = apps.list(
-        userId: userId,
-      );
+      if let user = props.users.fromLogin(username: owner) {
+        let userApps = apps.list(
+          userId: user.id,
+        );
 
-      return {
-        body: {
-          apps: userApps,
-        },
-      };
+        return {
+          body: {
+            apps: userApps,
+          },
+        };
+      }
+
+      throw httpError.HttpError.throwNotFound();
     });
 
     api.post("/environment.report", inflight (req) => {
