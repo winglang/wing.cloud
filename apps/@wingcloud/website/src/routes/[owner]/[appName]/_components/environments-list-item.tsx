@@ -12,10 +12,7 @@ import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../../utils/time.js";
 import type { Environment } from "../../../../utils/wrpc.js";
-import {
-  RUNTIME_LOGS_ID,
-  TEST_LOGS_ID,
-} from "../environments/environment-page.js";
+import { RUNTIME_LOGS_ID, TEST_LOGS_ID } from "../[branch]/index.js";
 
 type ErrorStatus = "failed" | "passed";
 

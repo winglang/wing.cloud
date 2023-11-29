@@ -7,15 +7,17 @@ import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { ErrorBoundary } from "../../components/error-boundary.js";
+import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { Input } from "../../design-system/input.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { wrpc } from "../../utils/wrpc.js";
 
-import { AppCard } from "./components/app-card.js";
+import { AppCard } from "./_components/app-card.js";
 
-export const OwnerPage = () => {
+const OwnerPage = () => {
   const { owner } = useParams();
   const { theme } = useTheme();
 
@@ -125,6 +127,17 @@ export const OwnerPage = () => {
           )}
         </>
       )}
+    </div>
+  );
+};
+
+export const Component = () => {
+  return (
+    <div className="flex flex-col">
+      <Header />
+      <ErrorBoundary>
+        <OwnerPage />
+      </ErrorBoundary>
     </div>
   );
 };

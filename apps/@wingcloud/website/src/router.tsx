@@ -21,23 +21,24 @@ export const router = createBrowserRouter([
       },
       {
         path: "/:owner",
-        lazy: () => import("./routes/owner/index.js"),
+        lazy: () => import("./routes/[owner]/index.js"),
       },
       {
         path: "/:owner/:appName",
-        lazy: () => import("./routes/owner/app/index.js"),
+        lazy: () => import("./routes/[owner]/[appName]/index.js"),
       },
       {
         path: "/:owner/:appName/settings",
-        lazy: () => import("./routes/owner/app/settings/index.js"),
+        lazy: () => import("./routes/[owner]/[appName]/settings/index.js"),
       },
       {
         path: "/:owner/:appName/:branch",
-        lazy: () => import("./routes/owner/app/environments/index.js"),
+        lazy: () => import("./routes/[owner]/[appName]/[branch]/index.js"),
       },
       {
         path: "/:owner/:appName/:branch/console",
-        lazy: () => import("./routes/owner/app/environments/console/index.js"),
+        lazy: () =>
+          import("./routes/[owner]/[appName]/[branch]/console/index.js"),
       },
     ],
   },

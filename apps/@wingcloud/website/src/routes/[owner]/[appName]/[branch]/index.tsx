@@ -2,18 +2,20 @@ import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 
+import { ErrorBoundary } from "../../../../components/error-boundary.js";
+import { Header } from "../../../../components/header.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 
 export const RUNTIME_LOGS_ID = "runtime-logs";
 export const TEST_LOGS_ID = "test-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 
-import { DeploymentLogs } from "./components/deployment-logs.js";
-import { EnvironmentDetails } from "./components/environment-details.js";
-import { RuntimeLogs } from "./components/runtime-logs.js";
-import { TestsLogs } from "./components/tests-logs.js";
+import { DeploymentLogs } from "./_components/deployment-logs.js";
+import { EnvironmentDetails } from "./_components/environment-details.js";
+import { RuntimeLogs } from "./_components/runtime-logs.js";
+import { TestsLogs } from "./_components/tests-logs.js";
 
-export const EnvironmentPage = () => {
+const EnvironmentPage = () => {
   const { owner, appName, branch } = useParams();
 
   const [testLogsOpen, setTestLogsOpen] = useState(false);
@@ -126,6 +128,17 @@ export const EnvironmentPage = () => {
         logs={logs.data?.runtime || []}
         loading={logs.isLoading}
       />
+    </div>
+  );
+};
+
+export const Component = () => {
+  return (
+    <div className="flex flex-col">
+      <Header />
+      <ErrorBoundary>
+        <EnvironmentPage />
+      </ErrorBoundary>
     </div>
   );
 };

@@ -3,12 +3,13 @@ import clsx from "clsx";
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 
+import { ErrorBoundary } from "../../../../../components/error-boundary.js";
 import { Header } from "../../../../../components/header.js";
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { wrpc } from "../../../../../utils/wrpc.js";
 
-export const ConsolePage = () => {
+const ConsolePage = () => {
   const { theme, mode } = useTheme();
   const { owner, appName, branch } = useParams();
 
@@ -47,6 +48,17 @@ export const ConsolePage = () => {
           />
         </div>
       )}
+    </div>
+  );
+};
+
+export const Component = () => {
+  return (
+    <div className="flex flex-col">
+      <Header />
+      <ErrorBoundary>
+        <ConsolePage />
+      </ErrorBoundary>
     </div>
   );
 };

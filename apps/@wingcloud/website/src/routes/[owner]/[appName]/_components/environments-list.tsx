@@ -10,7 +10,7 @@ import type { Environment } from "../../../../utils/wrpc.js";
 
 import { EnvironmentsListItem } from "./environments-list-item.js";
 
-export interface EnvironmentsListProps {
+interface EnvironmentsListProps {
   environments: Environment[];
   owner: string;
   appName: string;

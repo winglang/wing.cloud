@@ -97,7 +97,7 @@ pub class Secrets {
       ]);
     } catch error {
     if error.contains("ConditionalCheckFailed") {
-      throw httpError.HttpError.throwForbidden("Secret {options.name} already exists for the environment {options.environmentType}");
+      throw httpError.HttpError.throwForbidden("Secret '{options.name}' already exists for the environment '{options.environmentType}'");
     } else {
       throw httpError.HttpError.throwError(error);
     }
@@ -118,7 +118,7 @@ pub class Secrets {
       return Secret.fromJson(this.fromDB(item, options.decryptValue ?? false));
     }
 
-    throw httpError.HttpError.throwNotFound("Secret {options.id} not found");
+    throw httpError.HttpError.throwNotFound("Secret '{options.id}' not found");
   }
 
   pub inflight list(options: ListSecretsOptions): Array<Secret> {

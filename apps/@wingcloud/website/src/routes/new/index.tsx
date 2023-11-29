@@ -5,8 +5,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../design-system/button.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 
-import { AppConfigurationListItem } from "./components/app-configuration-list-item.js";
-import { NewAppContainer } from "./components/new-app-container.js";
+import { AppConfigurationListItem } from "./_components/app-configuration-list-item.js";
+import { NewAppContainer } from "./_components/new-app-container.js";
 
 export const Component = () => {
   const navigate = useNavigate();
