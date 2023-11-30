@@ -39,7 +39,7 @@ const ConsolePage = () => {
             trpcUrl={`${url}/trpc`}
             wsUrl={`${
               url.startsWith("http:") ? "ws://" : "wss://"
-            }${url.replace("http://", "")}/trpc`}
+            }${url.replace(/^https?:\/\//, "")}/trpc`}
             layout={5}
             theme={mode}
             onTrace={(trace) => {
