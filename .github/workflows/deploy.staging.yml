@@ -5,6 +5,7 @@ on:
     paths-ignore:
       - "**/*.md"
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,7 +16,16 @@ permissions:
   contents: read # This is required for actions/checkout
 
 jobs:
-  diff:
+  only_on_main:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Fail if branch is not main
+        if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+        run: |
+          echo "This workflow should not be triggered with workflow_dispatch on a branch other than main"
+          exit 1
+  deploy:
+    needs: only_on_main
     name: Deploy Staging
     uses: ./.github/workflows/deploy.yml
     with:
