@@ -9,6 +9,7 @@ bring "./lowkeys-map.w" as lowkeys;
 bring "./github-app.w" as github;
 bring "./environments.w" as environments;
 bring "./environment-manager.w" as environment_manager;
+bring "./users.w" as users;
 bring "./apps.w" as apps;
 bring "./status-reports.w" as status_reports;
 bring "./github-comment.w" as comment;
@@ -22,6 +23,7 @@ struct ProbotAppProps {
   runtimeUrl: str;
   environments: environments.Environments;
   environmentManager: environment_manager.EnvironmentManager;
+  users: users.Users;
   apps: apps.Apps;
   siteDomain: str;
 }
@@ -41,9 +43,14 @@ pub class ProbotApp {
     this.environments = props.environments;
     this.environmentManager = props.environmentManager;
     this.apps = props.apps;
-    this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps, siteDomain: props.siteDomain);
+    this.githubComment = new comment.GithubComment(
+      environments: props.environments,
+      users: props.users,
+      apps: props.apps,
+      siteDomain: props.siteDomain
+    );
 
-    let queue = new cloud.Queue();
+    let queue = new cloud.Queue(timeout: 6m);
     this.githubApp = new github.GithubApp(
       this.adapter.appId,
       this.adapter.secretKey,
@@ -61,7 +68,7 @@ pub class ProbotApp {
       log("receive message: {message}");
       let props = probot.VerifyAndReceieveProps.fromJson(Json.parse(message));
       this.listen(props);
-      }, { timeout: 1m });
+    });
   }
 
   inflight getVerifyAndReceievePropsProps(req: cloud.ApiRequest): probot.VerifyAndReceieveProps {

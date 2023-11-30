@@ -1,4 +1,4 @@
-name: Pull Request Diff
+name: Pull Request Diff (production)
 
 on:
   pull_request:

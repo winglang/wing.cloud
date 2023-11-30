@@ -1,10 +1,12 @@
 bring "./environments.w" as environments;
+bring "./users.w" as users;
 bring "./apps.w" as apps;
 bring "./status-reports.w" as status_reports;
 bring "./types/octokit-types.w" as octokit;
 
 struct GithubCommentProps {
   environments: environments.Environments;
+  users: users.Users;
   apps: apps.Apps;
   siteDomain: str;
 }
@@ -17,11 +19,13 @@ struct GithubCommentCreateProps {
 
 pub class GithubComment {
   environments: environments.Environments;
+  users: users.Users;
   apps: apps.Apps;
   siteDomain: str;
 
   new(props: GithubCommentProps) {
     this.environments = props.environments;
+    this.users = props.users;
     this.apps = props.apps;
     this.siteDomain = props.siteDomain;
   }
@@ -37,6 +41,9 @@ pub class GithubComment {
     if status == "error" {
       return "❌ Failed ({inspect})";
     }
+    if status == "initializing" {
+      return "Deploying";
+    }
     return status.at(0).uppercase() + status.substring(1);
   }
 
@@ -45,6 +52,8 @@ pub class GithubComment {
     let tableHeader = "<tr><th>App</th><th>Status</th><th>Console</th><th>Updated (UTC)</th></tr>";
     let var commentBody = "<table>{tableHeader}";
     for app in this.apps.listByRepository(repository: props.repo) {
+      let user = this.users.get(userId: app.userId);
+      let appOwner = user.username;
       for environment in this.environments.list(appId: app.appId) {
         if environment.repo == props.repo && environment.prNumber == props.prNumber {
           let var testRows = "";
@@ -58,7 +67,7 @@ pub class GithubComment {
               let testId = testResult.id;
               let testName = testResult.path.split(":").at(-1);
               let testResourcePath = testResult.path.split(":").at(0);
-              let link = "<a target=\"_blank\" href=\"{this.siteDomain}/{app.repoOwner}/{app.appName}/{environment.branch}/#{testId}\">View</a>";
+              let link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{app.appName}/{environment.branch}/#{testId}\">View</a>";
               testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
               i += 1;
             }
@@ -67,14 +76,14 @@ pub class GithubComment {
           let var previewUrl = "";
           let shouldDisplayUrl = environment.status == "running";
           if(shouldDisplayUrl) {
-            previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{app.repoOwner}/{app.appName}/{environment.branch}/console\">Visit</a>";
+            previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{app.appName}/{environment.branch}/console\">Visit</a>";
           }
 
-          let appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{app.repoOwner}/{app.appName}\">{app.appName}</a>";
+          let appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{app.appName}\">{app.appName}</a>";
 
           let date = std.Datetime.utcNow();
           let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
-          let tableRows = "<tr><td>{appNameLink}</td><td>{this.envStatusToString(environment.status, app.repoOwner, app.appName, environment.branch)}</td><td>{previewUrl}</td><td>{dateStr}</td></tr>";
+          let tableRows = "<tr><td>{appNameLink}</td><td>{this.envStatusToString(environment.status, appOwner, app.appName, environment.branch)}</td><td>{previewUrl}</td><td>{dateStr}</td></tr>";
           let testsSection = "<details><summary>Tests</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
 
           commentBody = "{commentBody}{tableRows}</table>";
