@@ -87,3 +87,40 @@ Check latest versions of dependencies:
 pnpm up -riL
 projen
 ```
+
+## Deployments
+
+Find all AWS environments over here: https://wingcloud.awsapps.com/start
+
+```mermaid
+graph TD
+    A[main] -->|Continuous Deployment| B[staging]
+    A --> C[Create release branch]
+    C --> D[Pull Request to production]
+    D --> E[production]
+    E -->|Eventually mirrors main| A
+```
+
+### Staging
+
+The [staging](https://staging.wingcloud.io) environment is deployed continously from the `main` branch. Pull requests targeting `main` will automatically create a Terraform diff and post it on the pull request itself. Please make sure it's reflecting what you're intending to change before merging to `main`.
+
+### Production
+
+The [production](https://production.wingcloud.io) environment is *not* continously deployed from `main` at the moment. Deployments are based on the `production` branch.
+
+The `production` branch is supposed to eventually mirror `main`. This means, make sure that all new features / fixes are going through `main`.
+
+#### Release Process
+
+- make sure your on the `main` branch and it's up2date
+- `git checkout -b release/my-new-release`
+- `git push --set-upstream origin release/my-new-release`
+- create a new pull request, change the base branch to `production`
+- name the pull request: "release: my new release"
+- wait for the Terraform production diff to be commented on the PR
+- make sure the Terraform plan applies cleanly and reflects the intended changes
+- Squash merge the pull request into `production`
+
+![base](./docs/pr-base-branch.png)
+![diff](./docs/pr-diff-comment.png)
