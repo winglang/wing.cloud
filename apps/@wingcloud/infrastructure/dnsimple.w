@@ -17,7 +17,7 @@ class Dummy {}
 class Once {
   new(uid: str, block: (): void) {
     let root = std.Node.of(this).root;
-    let exists = root.tryFindChild(uid);
+    let exists = root.node.tryFindChild(uid);
     if exists? {
       return this;
     }
