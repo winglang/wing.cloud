@@ -1,4 +1,4 @@
-name: Pull Request Diff
+name: Pull Request Diff (staging)
 
 on:
   pull_request:
