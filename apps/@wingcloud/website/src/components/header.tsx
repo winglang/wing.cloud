@@ -17,7 +17,7 @@ export interface Breadcrumb {
 const UserMenu = ({ avatarUrl }: { avatarUrl?: string }) => {
   const { theme } = useTheme();
 
-  const signOut = wrpc["auth.signout"].useMutation({
+  const signOut = wrpc["auth.signOut"].useMutation({
     onSuccess(d) {
       location.href = "/";
     },

@@ -64,7 +64,7 @@ export const Component = () => {
     setCreateAppLoading(true);
     try {
       const app = await createApp();
-      navigate(`/${app?.appUri}`);
+      navigate(`/${app?.appFullName}`);
     } catch (error) {
       setCreateAppLoading(false);
       if (error instanceof Error) {
