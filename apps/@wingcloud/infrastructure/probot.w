@@ -43,7 +43,7 @@ pub class ProbotApp {
     this.apps = props.apps;
     this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps, siteDomain: props.siteDomain);
 
-    let queue = new cloud.Queue();
+    let queue = new cloud.Queue(timeout: 1m);
     this.githubApp = new github.GithubApp(
       this.adapter.appId,
       this.adapter.secretKey,
@@ -61,7 +61,7 @@ pub class ProbotApp {
       log("receive message: {message}");
       let props = probot.VerifyAndReceieveProps.fromJson(Json.parse(message));
       this.listen(props);
-      }, { timeout: 1m });
+    });
   }
 
   inflight getVerifyAndReceievePropsProps(req: cloud.ApiRequest): probot.VerifyAndReceieveProps {
