@@ -682,9 +682,9 @@ pub class Api {
     deleteAppQueue.setConsumer(inflight (event) => {
       let input = Json.parse(event);
 
+      let userId = input.get("userId").asStr();
       let appId = input.get("appId").asStr();
       let appName = input.get("appName").asStr();
-      let repoOwner = input.get("repoOwner").asStr();
 
       let environments = props.environments.list(
         appId: appId,
@@ -692,9 +692,9 @@ pub class Api {
 
       for environment in environments {
         props.environmentManager.stop(
+          userId: userId,
           appId: appId,
           appName: appName,
-          repoOwner: repoOwner,
           environment: environment,
         );
         props.environments.delete(appId: appId, environmentId: environment.id);
@@ -719,7 +719,7 @@ pub class Api {
       deleteAppQueue.push(Json.stringify({
         appId: appId,
         appName: app.appName,
-        repoOwner: app.repoOwner,
+        userId: app.userId,
       }));
 
       return {
