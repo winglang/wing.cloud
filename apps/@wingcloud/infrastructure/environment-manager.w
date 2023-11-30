@@ -1,4 +1,5 @@
 bring "./environments.w" as environments;
+bring "./users.w" as users;
 bring "./apps.w" as apps;
 bring "./secrets.w" as secrets;
 bring "./github-comment.w" as comment;
@@ -8,6 +9,7 @@ bring "./probot-adapter.w" as adapter;
 bring "./status-reports.w" as status_reports;
 
 struct EnvironmentsProps {
+  users: users.Users;
   apps: apps.Apps;
   secrets: secrets.Secrets;
   environments: environments.Environments;
@@ -63,7 +65,12 @@ pub class EnvironmentManager {
     this.environments = props.environments;
     this.runtimeClient = props.runtimeClient;
     this.probotAdapter = props.probotAdapter;
-    this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps, siteDomain: props.siteDomain);
+    this.githubComment = new comment.GithubComment(
+      environments: props.environments,
+      users: props.users,
+      apps: props.apps,
+      siteDomain: props.siteDomain
+    );
   }
 
   pub inflight create(options: CreateEnvironmentOptions) {

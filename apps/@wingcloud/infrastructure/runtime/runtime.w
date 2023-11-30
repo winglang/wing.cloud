@@ -150,8 +150,10 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     }
 
     if exists {
+      log("updating machine in app ${app.props.name}");
       app.update(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024, files: files);
     } else {
+      log("adding machine to app ${app.props.name}");
       app.addMachine(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024, files: files);
     }
 
@@ -244,7 +246,7 @@ pub class RuntimeService {
       }
     }
 
-    let queue = new cloud.Queue();
+    let queue = new cloud.Queue(timeout: 15m);
     queue.setConsumer(inflight (message) => {
       try {
         // hack to get bucket in this environment
@@ -278,7 +280,7 @@ pub class RuntimeService {
       } catch error {
         log(error);
       }
-    }, { timeout: 5m });
+    }, timeout: 5m);
 
     this.api = new cloud.Api();
     this.api.post("/", inflight (req) => {

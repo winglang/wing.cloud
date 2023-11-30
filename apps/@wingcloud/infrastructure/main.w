@@ -85,6 +85,7 @@ let siteURL = (() => {
 })();
 
 let environmentManager = new EnvironmentManager.EnvironmentManager(
+  users: users,
   apps: apps,
   environments: environments,
   secrets: secrets,
@@ -111,6 +112,7 @@ let probotApp = new probot.ProbotApp(
   probotAdapter: probotAdapter,
   runtimeUrl: rntm.api.url,
   environments: environments,
+  users: users,
   apps: apps,
   environmentManager: environmentManager,
   siteDomain: siteURL,
