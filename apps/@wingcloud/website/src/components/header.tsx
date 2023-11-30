@@ -123,7 +123,7 @@ export const Header = () => {
           })}
         </ol>
 
-        <div className="flex grow justify-end gap-x-12">
+        <div className="flex grow justify-end gap-x-12 shrink-0">
           <UserMenu avatarUrl={userQuery.data?.user.avatarUrl} />
         </div>
       </nav>
