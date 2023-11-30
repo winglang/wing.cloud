@@ -77,11 +77,12 @@ pub class GithubComment {
         }
 
         let var previewUrl = "";
+        let var appNameLink = props.appName;
+
         if shouldDisplayUrl {
           previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/console\">Visit</a>";
+          appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}\">{props.appName}</a>";
         }
-
-        let appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}\">{props.appName}</a>";
 
         let date = std.Datetime.utcNow();
         let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
