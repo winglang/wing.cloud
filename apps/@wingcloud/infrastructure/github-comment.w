@@ -52,7 +52,6 @@ pub class GithubComment {
     let var commentBody = "<table>{tableHeader}";
 
     let var appOwner = "";
-    let var appExists = false;
     try {
       let app = this.apps.get(appId: props.appId);
       appOwner = (this.users.get(userId: app.userId)).username;
