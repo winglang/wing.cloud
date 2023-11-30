@@ -1,4 +1,4 @@
-name: Terraform Diff
+name: Terraform Deploy
 
 on:
   workflow_call:
