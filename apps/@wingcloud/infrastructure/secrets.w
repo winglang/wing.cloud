@@ -1,6 +1,8 @@
 bring ex;
 bring "./crypto/crypto.w" as crypto;
 bring "./crypto/icrypto.w" as icrypto;
+bring "./http-error.w" as httpError;
+
 
 pub struct Secret {
   id: str;
@@ -84,14 +86,22 @@ pub class Secrets {
       updatedAt: createdAt,
     };
 
-    this.table.transactWriteItems(transactItems: [
-      {
-        put: {
-          item: Json.deepCopy(item),
-          conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
+    try {
+      this.table.transactWriteItems(transactItems: [
+        {
+          put: {
+            item: Json.deepCopy(item),
+            conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
+          },
         },
-      },
-    ]);
+      ]);
+    } catch error {
+    if error.contains("ConditionalCheckFailed") {
+      throw httpError.HttpError.throwForbidden("Secret '{options.name}' already exists for the environment '{options.environmentType}'");
+    } else {
+      throw httpError.HttpError.throwError(error);
+    }
+  }
 
     return secret;
   }
@@ -108,7 +118,7 @@ pub class Secrets {
       return Secret.fromJson(this.fromDB(item, options.decryptValue ?? false));
     }
 
-    throw "Secret [{options.id}] not found";
+    throw httpError.HttpError.throwNotFound("Secret '{options.id}' not found");
   }
 
   pub inflight list(options: ListSecretsOptions): Array<Secret> {

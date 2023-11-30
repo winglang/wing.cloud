@@ -3,6 +3,7 @@ import { WRPCProvider } from "@wingcloud/wrpc";
 import { useState } from "react";
 import { RouterProvider } from "react-router-dom";
 
+import { ErrorBoundary } from "./components/error-boundary.js";
 import { NotificationsProvider } from "./design-system/notification.js";
 import { DefaultTheme, ThemeProvider } from "./design-system/theme-provider.js";
 import { router } from "./router.jsx";

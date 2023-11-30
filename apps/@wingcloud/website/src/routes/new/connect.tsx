@@ -11,8 +11,8 @@ import { useCreateAppFromRepo } from "../../services/create-app.js";
 import { usePopupWindow } from "../../utils/popup-window.js";
 import type { Installation } from "../../utils/wrpc.js";
 
-import { GitRepoSelect } from "./components/git-repo-select.js";
-import { NewAppContainer } from "./components/new-app-container.js";
+import { GitRepoSelect } from "./_components/git-repo-select.js";
+import { NewAppContainer } from "./_components/new-app-container.js";
 
 export const Component = () => {
   const navigate = useNavigate();
@@ -64,7 +64,7 @@ export const Component = () => {
     setCreateAppLoading(true);
     try {
       const app = await createApp();
-      navigate(`/${app?.appUri}`);
+      navigate(`/${app?.appFullName}`);
     } catch (error) {
       setCreateAppLoading(false);
       if (error instanceof Error) {

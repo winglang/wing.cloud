@@ -12,6 +12,14 @@ const WRPCContext = createContext({ url: "" });
 
 export const WRPCProvider = WRPCContext.Provider;
 
+export class ControlledError extends Error {}
+
+export class UnauthorizedError extends ControlledError {}
+
+export class ForbiddenError extends ControlledError {}
+
+export class NotFoundError extends ControlledError {}
+
 export type QueryProcedure<
   Input = undefined,
   Output = unknown,
@@ -45,7 +53,20 @@ const fetcher = async (method: string, url: URL, input?: any) => {
   });
   if (!response.ok) {
     const { error } = await response.json();
-    throw new Error(error);
+    switch (response.status) {
+      case 401: {
+        throw new UnauthorizedError(error);
+      }
+      case 403: {
+        throw new ForbiddenError(error);
+      }
+      case 404: {
+        throw new NotFoundError(error);
+      }
+      default: {
+        throw new Error(error);
+      }
+    }
   }
   return response.json();
 };
@@ -66,6 +87,13 @@ export const createWRPCReact = <
               }
             }
             return useQuery({
+              retry(failureCount, error) {
+                if (error instanceof ControlledError) {
+                  return false;
+                }
+                return failureCount < 3;
+              },
+              throwOnError: true,
               ...options,
               queryKey: [route, input],
               queryFn: async () => await fetcher("GET", url),

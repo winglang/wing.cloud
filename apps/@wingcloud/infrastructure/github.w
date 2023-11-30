@@ -1,6 +1,6 @@
 bring http;
 
-struct AuthTokens {
+pub struct AuthTokens {
   access_token: str;
   expires_in: num;
   refresh_token: str;

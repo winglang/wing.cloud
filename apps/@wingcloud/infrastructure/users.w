@@ -1,5 +1,6 @@
 bring ex;
 bring "./nanoid62.w" as Nanoid62;
+bring "./http-error.w" as httpError;
 
 struct User {
   id: str;
@@ -104,12 +105,13 @@ pub class Users {
         pk: "USER#{options.userId}",
         sk: "#",
       },
+      projectionExpression: "id, displayName, username, avatarUrl",
     );
 
     if let user = User.tryFromJson(result.item) {
       return user;
     } else {
-      throw "User not found";
+      throw httpError.HttpError.throwNotFound("User not found");
     }
   }
 }

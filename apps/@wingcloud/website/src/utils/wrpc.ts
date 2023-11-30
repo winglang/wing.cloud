@@ -130,7 +130,7 @@ export const wrpc = createWRPCReact<{
       user: User;
     }
   >;
-  "auth.signout": MutationProcedure;
+  "auth.signOut": MutationProcedure;
   "github.callback": QueryProcedure<{ code: string }, {}>;
   "github.listInstallations": QueryProcedure<
     undefined,
@@ -150,20 +150,14 @@ export const wrpc = createWRPCReact<{
       repository: Repository;
     }
   >;
-  "app.get": QueryProcedure<
-    { owner: string; appId: string },
-    {
-      app: App;
-    }
-  >;
   "app.getByName": QueryProcedure<
     { owner: string; appName: string },
     {
       app: App;
     }
   >;
-  "app.environments": QueryProcedure<
-    { owner: string; appId: string },
+  "app.listEnvironments": QueryProcedure<
+    { owner: string; appName: string },
     {
       environments: Array<Environment>;
     }
@@ -218,7 +212,7 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.updateEntryfile": MutationProcedure<
-    { appId: string; appName: string; repoId: string; entryfile: string },
+    { appId: string; entryfile: string },
     {}
   >;
   "app.delete": MutationProcedure<{ appId: string }, {}>;
@@ -232,7 +226,6 @@ export const wrpc = createWRPCReact<{
   >;
   "user.createApp": MutationProcedure<
     {
-      repoId: string;
       description: string;
       repoName: string;
       repoOwner: string;
@@ -243,7 +236,7 @@ export const wrpc = createWRPCReact<{
     },
     {
       appId: string;
-      appUri: string;
+      appFullName: string;
     }
   >;
 }>();
