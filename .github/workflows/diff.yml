@@ -71,7 +71,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN_READ_ONLY }}
-          role-session-name: gh-actions-wingcloud-staging
+          role-session-name: gh-actions-wingcloud-${{ inputs.ENVIRONMENT_NAME}}
           aws-region: ${{ inputs.AWS_REGION }}
       - name: Terraform Init
         id: init
@@ -109,7 +109,7 @@ jobs:
             const plan = plan_file.length > 65000 ? plan_file.toString().substring(0, 65000) + " ..." : plan_file
             const truncated_message = plan_file.length > 65000 ? "Output is too long and was truncated. You can read full Plan in " + run_link + "<br /><br />" : ""
 
-            const output = `#### Environment 🌎\`staging\`
+            const output = `#### Environment 🌎\`${{ inputs.ENVIRONMENT_NAME }}\`
 
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
 

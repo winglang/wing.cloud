@@ -349,46 +349,52 @@ pub class Api {
 
     api.get("/wrpc/app.listEnvironments", inflight (request) => {
       let userId = getUserIdFromCookie(request);
-      checkOwnerAccessRights(request, request.query.get("owner"));
 
-      let appId = request.query.get("appId");
-      let app = props.apps.get(appId: appId);
-      checkAppAccessRights(userId, app);
+      if let owner = props.users.fromLogin(username: request.query.get("owner")) {
+        let appName = request.query.get("appName");
+        let app = props.apps.getByName(appName: appName, userId: owner.id);
+        checkAppAccessRights(userId, app);
 
-      let environments = props.environments.list(
-        appId: appId,
-      );
+        let environments = props.environments.list(
+          appId: app.appId,
+        );
 
-      return {
-        body: {
-          environments: environments,
-        },
-      };
+        return {
+          body: {
+            environments: environments,
+          },
+        };
+      }
+
+      throw httpError.HttpError.throwNotFound();
     });
 
     api.get("/wrpc/app.environment", inflight (request) => {
       let userId = getUserIdFromCookie(request);
-      checkOwnerAccessRights(request, request.query.get("owner"));
 
-      let appName = request.query.get("appName");
-      let branch = request.query.get("branch");
+      if let owner = props.users.fromLogin(username: request.query.get("owner")) {
+        let appName = request.query.get("appName");
+        let branch = request.query.get("branch");
 
-      let app = apps.getByName(
-        userId: userId,
-        appName: appName,
-      );
-      checkAppAccessRights(userId, app);
+        let app = apps.getByName(
+          userId: owner.id,
+          appName: appName,
+        );
+        checkAppAccessRights(userId, app);
 
-      let environment = props.environments.getByBranch(
-        appId: app.appId,
-        branch: branch,
-      );
+        let environment = props.environments.getByBranch(
+          appId: app.appId,
+          branch: branch,
+        );
 
-      return {
-        body: {
-          environment: environment,
-        },
-      };
+        return {
+          body: {
+            environment: environment,
+          },
+        };
+      }
+
+      throw httpError.HttpError.throwNotFound();
     });
 
     api.get("/wrpc/app.listSecrets", inflight (request) => {
