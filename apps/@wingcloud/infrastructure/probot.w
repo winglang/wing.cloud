@@ -50,7 +50,7 @@ pub class ProbotApp {
       siteDomain: props.siteDomain
     );
 
-    let queue = new cloud.Queue();
+    let queue = new cloud.Queue(timeout: 6m);
     this.githubApp = new github.GithubApp(
       this.adapter.appId,
       this.adapter.secretKey,
@@ -68,7 +68,7 @@ pub class ProbotApp {
       log("receive message: {message}");
       let props = probot.VerifyAndReceieveProps.fromJson(Json.parse(message));
       this.listen(props);
-      }, { timeout: 1m });
+    });
   }
 
   inflight getVerifyAndReceievePropsProps(req: cloud.ApiRequest): probot.VerifyAndReceieveProps {
