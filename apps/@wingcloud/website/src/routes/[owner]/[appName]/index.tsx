@@ -29,7 +29,7 @@ const AppPage = () => {
     return appQuery.data?.app;
   }, [appQuery.data]);
 
-  const environmentsQuery = wrpc["app.environments"].useQuery(
+  const environmentsQuery = wrpc["app.listEnvironments"].useQuery(
     { owner: owner!, appId: app?.appId! },
     {
       enabled: app !== undefined,
@@ -162,7 +162,7 @@ const AppPage = () => {
 
 export const Component = () => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full">
       <Header />
       <ErrorBoundary>
         <AppPage />

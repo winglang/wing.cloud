@@ -93,14 +93,14 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
             value={environment && getDateTime(environment?.createdAt)}
           />
 
-          <div className="col-span-2 sm:col-span-3 transition-all">
+          <div className="col-span-2 sm:col-span-5 transition-all">
             <InfoItem
               label="URLs"
               loading={loading}
               value={
                 <div className="truncate">
                   <a
-                    className="hover:underline truncate font-mono"
+                    className="hover:underline truncate"
                     href={`https://github.com/${environment?.repo}`}
                     target="_blank"
                     rel="noopener noreferrer"

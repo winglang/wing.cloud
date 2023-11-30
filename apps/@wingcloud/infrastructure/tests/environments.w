@@ -228,10 +228,6 @@ pub class EnvironmentsTest {
           let jwt = JWT.JWT.sign(
             secret: props.appSecret,
             userId: user.id,
-            accessToken: githubToken,
-            accessTokenExpiresIn: 1000,
-            refreshToken: githubToken,
-            refreshTokenExpiresIn: 1000,
           );
 
           let authCookie = Cookie.Cookie.serialize(

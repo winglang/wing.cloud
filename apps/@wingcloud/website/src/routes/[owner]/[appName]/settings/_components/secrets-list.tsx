@@ -134,7 +134,7 @@ export const SecretsList = ({ appId }: { appId: string }) => {
       )}
     >
       <div className={clsx("truncate", theme.text1)}>Secrets</div>
-      <div className="flex flex-col">
+      <div className="flex flex-col h-full">
         <NewSecret loading={updatingSecrets} onCreate={onCreate} />
         <div className="w-full flex flex-col gap-2 relative py-4">
           {(loading || updatingSecrets) && (

@@ -17,7 +17,7 @@ export interface Breadcrumb {
 const UserMenu = ({ avatarUrl }: { avatarUrl?: string }) => {
   const { theme } = useTheme();
 
-  const signOut = wrpc["auth.signout"].useMutation({
+  const signOut = wrpc["auth.signOut"].useMutation({
     onSuccess(d) {
       location.href = "/";
     },
@@ -123,7 +123,7 @@ export const Header = () => {
           })}
         </ol>
 
-        <div className="flex grow justify-end gap-x-12">
+        <div className="flex grow justify-end gap-x-12 shrink-0">
           <UserMenu avatarUrl={userQuery.data?.user.avatarUrl} />
         </div>
       </nav>

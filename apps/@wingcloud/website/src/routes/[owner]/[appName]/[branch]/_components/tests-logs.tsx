@@ -116,7 +116,7 @@ export const TestsLogs = ({
                   id={log.id}
                   key={log.path}
                   className={clsx(
-                    "px-1",
+                    "px-1 truncate",
                     theme.bgInputHover,
                     animateLogId === log.id && [
                       theme.bg3,
@@ -125,9 +125,9 @@ export const TestsLogs = ({
                     selectedTestId === log.id && theme.bg3,
                   )}
                 >
-                  <div className="flex gap-1 items-center">
-                    <div className="grow gap-y-0.5">
-                      <div className="flex gap-2">
+                  <div className="flex gap-1 items-center truncate">
+                    <div className="grow gap-y-0.5 truncate">
+                      <div className="flex gap-2 truncate">
                         <div className="self-center">
                           {log.pass ? (
                             <CheckCircleIcon className="w-4 h-4 text-green-400" />
@@ -138,11 +138,11 @@ export const TestsLogs = ({
                         <div className={clsx(theme.text2)}>
                           {getTime(log.timestamp)}
                         </div>
-                        <div className="flex gap-1">
-                          <div className={clsx(theme.text1)}>
+                        <div className="flex gap-1 truncate">
+                          <div className={clsx(theme.text1, "truncate")}>
                             {log.path.split("/").pop()}
                           </div>
-                          <div className={clsx(theme.text2)}>
+                          <div className={clsx(theme.text2, "truncate")}>
                             ({log.time}ms)
                           </div>
                         </div>
@@ -153,7 +153,7 @@ export const TestsLogs = ({
                           <div className={clsx(theme.text2)}>
                             {getTime(trace.timestamp)}
                           </div>
-                          <div className={clsx(theme.text2)}>
+                          <div className={clsx(theme.text2, "truncate")}>
                             {trace.message}
                           </div>
                         </div>

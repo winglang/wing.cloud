@@ -81,8 +81,6 @@ const SettingsPage = () => {
       setLoading(true);
       await updateEntryfileMutation.mutateAsync({
         appId: app?.appId!,
-        appName: app?.appName!,
-        repoId: app?.repoId!,
         entryfile: entryfile!,
       });
       appQuery.refetch();
@@ -197,7 +195,7 @@ const SettingsPage = () => {
 
 export const Component = () => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full">
       <Header />
       <ErrorBoundary>
         <SettingsPage />

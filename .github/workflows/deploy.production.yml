@@ -1,0 +1,38 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - production
+    paths-ignore:
+      - "**/*.md"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  only_on_production:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Fail if branch is not production
+        if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/production'
+        run: |
+          echo "This workflow should not be triggered with workflow_dispatch on a branch other than production"
+          exit 1
+
+  deploy:
+    needs: only_on_production
+    name: Deploy Production
+    uses: ./.github/workflows/deploy.yml
+    with:
+      TF_BACKEND_STATE_FILE: "${{ github.repository }}/production/infrastructure/main.tfstate"
+      AWS_REGION: "us-east-1"
+      ENVIRONMENT_NAME: "production"
+    secrets: inherit
+

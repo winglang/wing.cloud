@@ -1,0 +1,92 @@
+name: Terraform Deploy
+
+on:
+  workflow_call:
+    inputs:
+      TF_BACKEND_STATE_FILE:
+        required: true
+        type: string
+      AWS_REGION:
+        required: true
+        type: string
+      ENVIRONMENT_NAME:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.ENVIRONMENT_NAME }}
+      url: https://${{ inputs.ENVIRONMENT_NAME }}.wingcloud.io
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.5.7"
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Compile Wing Cloud dependencies
+        run: npx turbo compile --filter=!@wingcloud/infrastructure
+      - name: Compile Wing Cloud
+        env:
+          ## Inflight
+          APP_SECRET: ${{ secrets.APP_SECRET }}
+          FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
+          FLY_TOKEN: ${{ secrets.FLY_TOKEN }}
+          BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
+          BOT_GITHUB_CLIENT_ID: ${{ secrets.BOT_GITHUB_CLIENT_ID }}
+          BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
+          BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}
+          BOT_GITHUB_WEBHOOK_SECRET: ${{ secrets.BOT_GITHUB_WEBHOOK_SECRET }}
+          TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}
+          ## Preflight
+          VITE_GITHUB_APP_CLIENT_ID: ${{ secrets.VITE_GITHUB_APP_CLIENT_ID }}
+          VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}
+          PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
+          PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
+          LANDING_DOMAIN: ${{ vars.LANDING_DOMAIN }}
+          TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}
+          TF_BACKEND_BUCKET_REGION: ${{ vars.TF_BACKEND_BUCKET_REGION }}
+          TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
+          TF_BACKEND_STATE_FILE: ${{ inputs.TF_BACKEND_STATE_FILE }}
+        run: pnpm wing compile -t tf-aws main.w --platform s3.backend.js
+        working-directory: "apps/@wingcloud/infrastructure"
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          role-session-name: gh-actions-wingcloud-staging
+          aws-region: ${{ inputs.AWS_REGION }}
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
+      - name: Terraform Apply
+        id: plan
+        env:
+          TF_IN_AUTOMATION: true
+          # dnsimple provider
+          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
+          DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
+          # for `flyctl auth docker` in terraform
+          FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}
+        run: |
+          terraform apply -auto-approve
+        working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
