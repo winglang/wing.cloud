@@ -5,8 +5,6 @@ import { useLocation, useParams } from "react-router-dom";
 import { ErrorBoundary } from "../../../../components/error-boundary.js";
 import { Header } from "../../../../components/header.js";
 import { wrpc } from "../../../../utils/wrpc.js";
-
-export const RUNTIME_LOGS_ID = "runtime-logs";
 export const TEST_LOGS_ID = "test-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 
@@ -18,7 +16,6 @@ const EnvironmentPage = () => {
   const { owner, appName, branch } = useParams();
 
   const [testLogsOpen, setTestLogsOpen] = useState(false);
-  const [runtimeLogsOpen, setRuntimeLogsOpen] = useState(false);
   const [deploymentLogsOpen, setDeploymentLogsOpen] = useState(false);
 
   const environment = wrpc["app.environment"].useQuery(
@@ -68,11 +65,6 @@ const EnvironmentPage = () => {
 
         break;
       }
-      case RUNTIME_LOGS_ID: {
-        setRuntimeLogsOpen(true);
-
-        break;
-      }
       default: {
         if (selectedTestId) {
           setTestLogsOpen(true);
@@ -80,12 +72,6 @@ const EnvironmentPage = () => {
       }
     }
   }, [locationHash, logs.data?.tests]);
-
-  useEffect(() => {
-    if (environment.data?.environment?.status === "error") {
-      setRuntimeLogsOpen(true);
-    }
-  }, [environment.data?.environment?.status]);
 
   return (
     <div

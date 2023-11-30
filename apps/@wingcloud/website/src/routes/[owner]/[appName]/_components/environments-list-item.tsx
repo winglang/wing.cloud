@@ -12,7 +12,7 @@ import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../../utils/time.js";
 import type { Environment } from "../../../../utils/wrpc.js";
-import { RUNTIME_LOGS_ID, TEST_LOGS_ID } from "../[branch]/index.js";
+import { DEPLOYMENT_LOGS_ID, TEST_LOGS_ID } from "../[branch]/index.js";
 
 type ErrorStatus = "failed" | "passed";
 
@@ -164,7 +164,7 @@ export const EnvironmentsListItem = ({
                 to={`/${owner}/${appName}/${environment.branch}/console`}
                 className={clsx("text-xs hover:underline ", theme.text1)}
               >
-                Visit Preview
+                Visit Console
               </Link>
             )}
             {!linkEnabled && (
@@ -180,7 +180,7 @@ export const EnvironmentsListItem = ({
               >
                 {status === "error" && (
                   <Link
-                    to={`/${owner}/${appName}/${environment.branch}/#${RUNTIME_LOGS_ID}`}
+                    to={`/${owner}/${appName}/${environment.branch}/#${DEPLOYMENT_LOGS_ID}`}
                     className="hover:underline"
                   >
                     {statusString}
