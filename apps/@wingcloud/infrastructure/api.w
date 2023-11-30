@@ -371,27 +371,30 @@ pub class Api {
 
     api.get("/wrpc/app.environment", inflight (request) => {
       let userId = getUserIdFromCookie(request);
-      checkOwnerAccessRights(request, request.query.get("owner"));
 
-      let appName = request.query.get("appName");
-      let branch = request.query.get("branch");
+      if let owner = props.users.fromLogin(username: request.query.get("owner")) {
+        let appName = request.query.get("appName");
+        let branch = request.query.get("branch");
 
-      let app = apps.getByName(
-        userId: userId,
-        appName: appName,
-      );
-      checkAppAccessRights(userId, app);
+        let app = apps.getByName(
+          userId: owner.id,
+          appName: appName,
+        );
+        checkAppAccessRights(userId, app);
 
-      let environment = props.environments.getByBranch(
-        appId: app.appId,
-        branch: branch,
-      );
+        let environment = props.environments.getByBranch(
+          appId: app.appId,
+          branch: branch,
+        );
 
-      return {
-        body: {
-          environment: environment,
-        },
-      };
+        return {
+          body: {
+            environment: environment,
+          },
+        };
+      }
+
+      throw httpError.HttpError.throwNotFound();
     });
 
     api.get("/wrpc/app.listSecrets", inflight (request) => {
