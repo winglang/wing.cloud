@@ -15,7 +15,6 @@ struct GithubCommentCreateProps {
   octokit: octokit.OctoKit;
   prNumber: num;
   repo: str;
-  userId: str;
   appId: str;
   appName: str;
 }
@@ -51,11 +50,19 @@ pub class GithubComment {
     let var commentId: num? = nil;
     let tableHeader = "<tr><th>App</th><th>Status</th><th>Console</th><th>Updated (UTC)</th></tr>";
     let var commentBody = "<table>{tableHeader}";
+
+    let var appOwner = "";
+    let var appExists = false;
+    try {
+      let app = this.apps.get(appId: props.appId);
+      appOwner = (this.users.get(userId: app.userId)).username;
+    } catch {
+    }
+
     for environment in this.environments.list(appId: props.appId) {
       let shouldDisplayUrl = environment.status == "running";
 
       if environment.repo == props.repo && environment.prNumber == props.prNumber {
-        let appOwner = (this.users.get(userId: props.userId)).username;
         let var testRows = "";
         if let testResults = environment.testResults {
           let var i = 0;
@@ -68,7 +75,7 @@ pub class GithubComment {
             let testName = testResult.path.split(":").at(-1);
             let testResourcePath = testResult.path.split(":").at(0);
             let var link = "";
-            if shouldDisplayUrl {
+            if environment.status == "running" && appOwner != "" {
               link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/console?testId={testId}\">Logs</a>";
             }
             testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
@@ -79,9 +86,11 @@ pub class GithubComment {
         let var previewUrl = "";
         let var appNameLink = props.appName;
 
-        if shouldDisplayUrl {
-          previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/console\">Visit</a>";
+        if appOwner != "" {
           appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}\">{props.appName}</a>";
+          if environment.status == "running" {
+            previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/console\">Visit</a>";
+          }
         }
 
         let date = std.Datetime.utcNow();

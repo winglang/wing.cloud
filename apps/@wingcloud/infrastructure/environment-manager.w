@@ -38,7 +38,6 @@ pub struct RestartAllEnvironmentOptions {
 }
 
 pub struct StopEnvironmentOptions {
-  userId: str;
   appId: str;
   appName: str;
   environment: environments.Environment;
@@ -51,7 +50,6 @@ pub struct UpdateEnvironmentStatusOptions {
 struct PostCommentOptions {
   environmentId: str;
   octokit: octokit.OctoKit;
-  userId: str;
   appId: str;
   appName: str;
 }
@@ -88,7 +86,6 @@ pub class EnvironmentManager {
     let app = this.apps.get(appId: environment.appId);
 
     this.postComment(
-      userId: app.userId,
       appId: app.appId,
       appName: app.appName,
       environmentId: environment.id,
@@ -120,7 +117,6 @@ pub class EnvironmentManager {
     let app = this.apps.get(appId: options.appId);
 
     this.postComment(
-      userId: app.userId,
       appId: app.appId,
       appName: app.appName,
       environmentId: options.environment.id,
@@ -164,7 +160,6 @@ pub class EnvironmentManager {
     this.postComment(
       environmentId: options.environment.id,
       octokit: octokit,
-      userId: options.userId,
       appId: options.appId,
       appName: options.appName,
     );
@@ -198,7 +193,6 @@ pub class EnvironmentManager {
     let octokit = this.probotAdapter.auth(environment.installationId);
 
     this.postComment(
-      userId: app.userId,
       appId: app.appId,
       appName: app.appName,
       environmentId: environment.id,
@@ -213,7 +207,6 @@ pub class EnvironmentManager {
         octokit: props.octokit,
         prNumber: prNumber,
         repo: environment.repo,
-        userId: props.userId,
         appId: props.appId,
         appName: props.appName,
       );

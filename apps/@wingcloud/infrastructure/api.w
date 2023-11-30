@@ -692,7 +692,6 @@ pub class Api {
 
       for environment in environments {
         props.environmentManager.stop(
-          userId: userId,
           appId: appId,
           appName: appName,
           environment: environment,
