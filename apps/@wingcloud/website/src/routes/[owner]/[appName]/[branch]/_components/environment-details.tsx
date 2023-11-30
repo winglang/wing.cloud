@@ -21,6 +21,12 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
     if (environment?.status === "tests") {
       return "Running Tests";
     }
+    if (
+      environment?.status === "initializing" ||
+      environment?.status === "deploying"
+    ) {
+      return "Deploying";
+    }
     return environment?.status;
   }, [environment?.status]);
 
@@ -70,7 +76,7 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
                     "w-2.5 h-2.5",
                     "rounded-full shrink-0",
                     environment?.status === "initializing" &&
-                      "bg-slate-400 animate-pulse",
+                      "bg-yellow-300 animate-pulse",
                     environment?.status === "tests" &&
                       "bg-yellow-300 animate-pulse",
                     environment?.status === "deploying" &&
