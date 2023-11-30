@@ -81,8 +81,6 @@ const SettingsPage = () => {
       setLoading(true);
       await updateEntryfileMutation.mutateAsync({
         appId: app?.appId!,
-        appName: app?.appName!,
-        repoId: app?.repoId!,
         entryfile: entryfile!,
       });
       appQuery.refetch();
