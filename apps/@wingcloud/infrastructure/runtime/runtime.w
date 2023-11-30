@@ -246,7 +246,7 @@ pub class RuntimeService {
       }
     }
 
-    let queue = new cloud.Queue(timeout: 30m);
+    let queue = new cloud.Queue(timeout: 15m);
     queue.setConsumer(inflight (message) => {
       try {
         // hack to get bucket in this environment
