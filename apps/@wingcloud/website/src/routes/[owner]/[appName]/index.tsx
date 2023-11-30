@@ -40,7 +40,10 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
     );
   }, [environmentsQuery.data]);
 
-  const repoUrl = "???";
+  const repoUrl = useMemo(() => {
+    if (!app.data) return;
+    return `https://github.com/${app.data?.app.repoOwner}/${app.data?.app.repoName}`;
+  }, [app.data]);
 
   const [loading, setLoading] = useState(false);
 
@@ -118,7 +121,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
                 <SpinnerLoader className="z-20" />
               </div>
             )}
-            {owner && appName && (
+            {owner && appName && repoUrl && (
               <EnvironmentsList
                 environments={environments}
                 loading={environmentsQuery.isLoading}
