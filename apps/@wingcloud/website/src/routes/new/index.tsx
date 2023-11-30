@@ -15,7 +15,6 @@ export const Component = () => {
   return (
     <NewAppContainer>
       <div className="space-y-2">
-        <div className={clsx(theme.text1)}>Select a configuration</div>
         <AppConfigurationListItem
           name="Connect"
           description="Connect to an existing repository"

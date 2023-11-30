@@ -1,10 +1,10 @@
-name: Pull Request Diff (staging)
+name: Pull Request Diff (production)
 
 on:
   pull_request:
     paths-ignore:
       - "**/*.md"
-    branches: [main]
+    branches: [production]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,11 +17,10 @@ permissions:
 
 jobs:
   diff:
-    name: Diff Staging
+    name: Diff Production
     uses: ./.github/workflows/diff.yml
     with:
-      TF_BACKEND_STATE_FILE: "${{ github.repository }}/${{ github.base_ref }}/infrastructure/main.tfstate"
+      TF_BACKEND_STATE_FILE: "${{ github.repository }}/production/infrastructure/main.tfstate"
       AWS_REGION: "us-east-1"
-      ENVIRONMENT_NAME: "staging"
+      ENVIRONMENT_NAME: "production"
     secrets: inherit
-

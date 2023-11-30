@@ -14,25 +14,19 @@ import { wrpc } from "../../../utils/wrpc.js";
 import { DeleteModal } from "./_components/delete-modal.js";
 import { EnvironmentsList } from "./_components/environments-list.js";
 
-const AppPage = () => {
+const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
   const { theme } = useTheme();
 
-  const { owner, appName } = useParams();
   const navigate = useNavigate();
 
-  const appQuery = wrpc["app.getByName"].useQuery({
-    owner: owner!,
-    appName: appName!,
+  const app = wrpc["app.getByName"].useQuery({
+    owner,
+    appName,
   });
 
-  const app = useMemo(() => {
-    return appQuery.data?.app;
-  }, [appQuery.data]);
-
   const environmentsQuery = wrpc["app.listEnvironments"].useQuery(
-    { owner: owner!, appId: app?.appId! },
+    { owner, appName },
     {
-      enabled: app !== undefined,
       // TODO: query invalidation
       refetchInterval: 1000 * 10,
     },
@@ -46,24 +40,13 @@ const AppPage = () => {
     );
   }, [environmentsQuery.data]);
 
-  const repositoryQuery = wrpc["github.getRepository"].useQuery(
-    {
-      owner: app?.repoOwner || "",
-      repo: app?.repoName || "",
-    },
-    {
-      enabled: app != undefined,
-    },
-  );
-  const repoUrl = useMemo(() => {
-    return repositoryQuery.data?.repository.html_url || "";
-  }, [repositoryQuery.data]);
+  const repoUrl = "???";
 
   const [loading, setLoading] = useState(false);
 
   const goToSettings = useCallback(async () => {
-    navigate(`/${owner}/${app?.appName}/settings`);
-  }, [app?.appName]);
+    navigate(`/${owner}/${appName}/settings`);
+  }, [owner, appName]);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
@@ -74,13 +57,13 @@ const AppPage = () => {
         "max-w-5xl mx-auto p-4 sm:p-6",
       )}
     >
-      {!app && (
+      {app.isLoading && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
         </div>
       )}
 
-      {app && (
+      {app.data && (
         <div className="space-y-4">
           <div
             className={clsx(
@@ -91,10 +74,10 @@ const AppPage = () => {
           >
             <div className="truncate flex flex-col justify-between">
               <div className={clsx("text-xl truncate", theme.text1)}>
-                {app.appName}
+                {appName}
               </div>
               <div className={clsx("text-xs truncate", theme.text2)}>
-                {app.description}
+                {app.data.app.description}
               </div>
             </div>
 
@@ -148,9 +131,9 @@ const AppPage = () => {
         </div>
       )}
 
-      {appName && app?.appId && (
+      {appName && app.data?.app.appId && (
         <DeleteModal
-          appId={app.appId}
+          appId={app.data?.app.appId}
           appName={appName}
           show={deleteModalOpen}
           onClose={setDeleteModalOpen}
@@ -161,11 +144,13 @@ const AppPage = () => {
 };
 
 export const Component = () => {
+  const { owner, appName } = useParams();
+
   return (
     <div className="flex flex-col h-full">
       <Header />
       <ErrorBoundary>
-        <AppPage />
+        <AppPage owner={owner!} appName={appName!} />
       </ErrorBoundary>
     </div>
   );
