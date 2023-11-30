@@ -194,7 +194,7 @@ export const wrpc = createWRPCReact<{
     { appId: string; entryfile: string },
     {}
   >;
-  "app.delete": MutationProcedure<{ appId: string }, {}>;
+  "user.deleteApp": MutationProcedure<{ appId: string }, {}>;
   "user.listApps": QueryProcedure<
     {
       owner: string;

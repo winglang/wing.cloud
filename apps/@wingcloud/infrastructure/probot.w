@@ -141,8 +141,10 @@ pub class ProbotApp {
           }
 
           this.environmentManager.stop(
+            appId: app.appId,
+            appName: app.appName,
+            repoOwner: app.repoOwner,
             environment: environment,
-            app: app,
           );
         }
       }

@@ -92,7 +92,7 @@ pub class Api {
     let apps = props.apps;
     let users = props.users;
     let logs = props.logs;
-    let queue = new cloud.Queue();
+    let environmentsQueue = new cloud.Queue() as "Environments Queue";
 
     let AUTH_COOKIE_NAME = "auth";
 
@@ -329,24 +329,6 @@ pub class Api {
       };
     });
 
-    api.post("/wrpc/app.delete", inflight (request) => {
-      let userId = getUserIdFromCookie(request);
-
-      let input = Json.parse(request.body ?? "");
-      let appId = input.get("appId").asStr();
-
-      apps.delete(
-        appId: appId,
-        userId: userId,
-      );
-
-      return {
-        body: {
-          appId: appId,
-        },
-      };
-    });
-
     api.get("/wrpc/app.listEnvironments", inflight (request) => {
       let userId = getUserIdFromCookie(request);
       checkOwnerAccessRights(request, request.query.get("owner"));
@@ -540,7 +522,7 @@ pub class Api {
         entryfile: entryfile,
       );
 
-      queue.push(Json.stringify(EnvironmentAction{
+      environmentsQueue.push(Json.stringify(EnvironmentAction{
         type: "restartAll",
         data: EnvironmentManager.RestartAllEnvironmentOptions {
           appId: appId,
@@ -614,7 +596,7 @@ pub class Api {
       );
 
       let installationId = input.get("installationId").asNum();
-      queue.push(Json.stringify(EnvironmentAction {
+      environmentsQueue.push(Json.stringify(EnvironmentAction {
         type: "create",
         data: EnvironmentManager.CreateEnvironmentOptions {
           createEnvironment: {
@@ -690,6 +672,57 @@ pub class Api {
       }
     });
 
+    let deleteAppQueue = new cloud.Queue() as "Delete App Queue";
+    deleteAppQueue.setConsumer(inflight (event) => {
+      let input = Json.parse(event);
+
+      let appId = input.get("appId").asStr();
+      let appName = input.get("appName").asStr();
+      let repoOwner = input.get("repoOwner").asStr();
+
+      let environments = props.environments.list(
+        appId: appId,
+      );
+
+      for environment in environments {
+        props.environmentManager.stop(
+          appId: appId,
+          appName: appName,
+          repoOwner: repoOwner,
+          environment: environment,
+        );
+        props.environments.delete(appId: appId, environmentId: environment.id);
+      }
+    });
+
+    api.post("/wrpc/user.deleteApp", inflight (request) => {
+      let userId = getUserIdFromCookie(request);
+
+      let input = Json.parse(request.body ?? "");
+      let appId = input.get("appId").asStr();
+
+      let app = apps.get(
+        appId: appId,
+      );
+
+      apps.delete(
+        appId: appId,
+        userId: userId,
+      );
+
+      deleteAppQueue.push(Json.stringify({
+        appId: appId,
+        appName: app.appName,
+        repoOwner: app.repoOwner,
+      }));
+
+      return {
+        body: {
+          appId: appId,
+        },
+      };
+    });
+
     api.get("/wrpc/user.listApps", inflight (request) => {
       let owner = request.query.get("owner");
       checkOwnerAccessRights(request, owner);
@@ -722,8 +755,7 @@ pub class Api {
       };
     });
 
-    // queue for environment actions
-    queue.setConsumer(inflight (event) => {
+    environmentsQueue.setConsumer(inflight (event) => {
       try {
         let action = EnvironmentAction.parseJson(event);
         if action.type == "create" {

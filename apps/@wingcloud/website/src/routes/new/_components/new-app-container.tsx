@@ -38,7 +38,7 @@ export const NewAppContainer = ({
           )}
         >
           <div className={clsx("flex items-center gap-1", theme.text1)}>
-            <Link to={`/${owner}/new`} className={clsx("font-semibold")}>
+            <Link to="/dashboard" className={clsx("font-semibold")}>
               Create a new App
             </Link>
             {step && (

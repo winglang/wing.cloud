@@ -78,6 +78,10 @@ struct MakeItemOptions {
   sk: str;
 }
 
+struct DeleteEnvironmentOptions {
+  appId: str;
+  environmentId: str;
+}
 
 pub class Environments {
   table: ex.DynamodbTable;
@@ -474,5 +478,43 @@ pub class Environments {
       }]);
     }
     return environments;
+  }
+
+  pub inflight delete(options: DeleteEnvironmentOptions): void {
+    let result = this.table.getItem(
+      key: {
+        pk: "ENVIRONMENT#{options.environmentId}",
+        sk: "#",
+      },
+    );
+
+
+    if let app = result.item {
+      let result = this.table.transactWriteItems(transactItems: [
+        {
+          delete: {
+            key: {
+              pk: "ENVIRONMENT#{options.environmentId}",
+              sk: "#",
+            },
+            conditionExpression: "attribute_exists(#pk)",
+            expressionAttributeNames: {
+              "#pk": "pk",
+            },
+          }
+        },
+        {
+          delete: {
+            key: {
+              pk: "APP#{options.appId}",
+              sk: "ENVIRONMENT#{options.environmentId}",
+            },
+          }
+        },
+      ]);
+      return;
+    }
+
+    throw httpError.HttpError.throwNotFound("Environment '{options.environmentId}' not found");
   }
 }

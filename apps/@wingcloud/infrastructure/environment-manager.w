@@ -36,8 +36,10 @@ pub struct RestartAllEnvironmentOptions {
 }
 
 pub struct StopEnvironmentOptions {
+  appId: str;
+  appName: str;
+  repoOwner: str;
   environment: environments.Environment;
-  app: apps.App;
 }
 
 pub struct UpdateEnvironmentStatusOptions {
@@ -47,6 +49,9 @@ pub struct UpdateEnvironmentStatusOptions {
 struct PostCommentOptions {
   environmentId: str;
   octokit: octokit.OctoKit;
+  appId: str;
+  appName: str;
+  repoOwner: str;
 }
 
 pub class EnvironmentManager {
@@ -73,7 +78,15 @@ pub class EnvironmentManager {
 
     let secrets = this.secretsForEnvironment(environment);
 
-    this.postComment(environmentId: environment.id, octokit: octokit);
+    let app = this.apps.get(appId: environment.appId);
+
+    this.postComment(
+      appId: app.appId,
+      appName: app.appName,
+      repoOwner: app.repoOwner,
+      environmentId: environment.id,
+      octokit: octokit
+    );
 
     let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: environment.installationId);
     if tokenRes.status >= 300 || tokenRes.status < 200 {
@@ -97,7 +110,15 @@ pub class EnvironmentManager {
 
     let secrets = this.secretsForEnvironment(options.environment);
 
-    this.postComment(environmentId: options.environment.id, octokit: octokit);
+    let app = this.apps.get(appId: options.appId);
+
+    this.postComment(
+      appId: app.appId,
+      appName: app.appName,
+      repoOwner: app.repoOwner,
+      environmentId: options.environment.id,
+      octokit: octokit
+    );
 
     let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: options.environment.installationId);
     if tokenRes.status >= 300 || tokenRes.status < 200 {
@@ -129,11 +150,17 @@ pub class EnvironmentManager {
   pub inflight stop(options: StopEnvironmentOptions) {
     let octokit = this.auth(options.environment.installationId);
 
-    this.environments.updateStatus(id: options.environment.id, appId: options.app.appId, status: "stopped");
+    this.environments.updateStatus(id: options.environment.id, appId: options.appId, status: "stopped");
 
     this.runtimeClient.delete(environment: options.environment);
 
-    this.postComment(environmentId: options.environment.id, octokit: octokit);
+    this.postComment(
+      environmentId: options.environment.id,
+      octokit: octokit,
+      appId: options.appId,
+      appName: options.appName,
+      repoOwner: options.repoOwner
+    );
   }
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
@@ -162,7 +189,14 @@ pub class EnvironmentManager {
     }
 
     let octokit = this.probotAdapter.auth(environment.installationId);
-    this.postComment(environmentId: environment.id, octokit: octokit);
+
+    this.postComment(
+      appId: app.appId,
+      appName: app.appName,
+      repoOwner: app.repoOwner,
+      environmentId: environment.id,
+      octokit: octokit
+    );
   }
 
   inflight postComment(props: PostCommentOptions) {
@@ -171,7 +205,10 @@ pub class EnvironmentManager {
       let commentId = this.githubComment.createOrUpdate(
         octokit: props.octokit,
         prNumber: prNumber,
-        repo: environment.repo
+        repo: environment.repo,
+        appId: props.appId,
+        appName: props.appName,
+        repoOwner: props.repoOwner,
       );
 
       if !environment.commentId? {
