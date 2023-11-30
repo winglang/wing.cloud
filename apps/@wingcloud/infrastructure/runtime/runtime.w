@@ -246,7 +246,7 @@ pub class RuntimeService {
       }
     }
 
-    let queue = new cloud.Queue(timeout: 5m);
+    let queue = new cloud.Queue(timeout: 30m);
     queue.setConsumer(inflight (message) => {
       try {
         // hack to get bucket in this environment
@@ -280,7 +280,7 @@ pub class RuntimeService {
       } catch error {
         log(error);
       }
-    });
+    }, timeout: 5m);
 
     this.api = new cloud.Api();
     this.api.post("/", inflight (req) => {

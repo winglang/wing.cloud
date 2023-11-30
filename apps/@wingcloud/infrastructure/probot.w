@@ -43,7 +43,7 @@ pub class ProbotApp {
     this.apps = props.apps;
     this.githubComment = new comment.GithubComment(environments: props.environments, apps: props.apps, siteDomain: props.siteDomain);
 
-    let queue = new cloud.Queue(timeout: 1m);
+    let queue = new cloud.Queue(timeout: 6m);
     this.githubApp = new github.GithubApp(
       this.adapter.appId,
       this.adapter.secretKey,
