@@ -61,6 +61,9 @@ export const EnvironmentsListItem = ({
     if (status === "tests") {
       return "Running Tests";
     }
+    if (status === "initializing" || status === "deploying") {
+      return "Deploying";
+    }
     return status;
   }, [status]);
 
@@ -88,7 +91,7 @@ export const EnvironmentsListItem = ({
               "absolute -top-1.5 -right-1.5",
               "w-2.5 h-2.5",
               "rounded-full",
-              status === "initializing" && "bg-slate-400 animate-pulse",
+              status === "initializing" && "bg-yellow-300 animate-pulse",
               status === "deploying" && "bg-yellow-300 animate-pulse",
               status === "running" && "bg-green-300",
               status === "error" && "bg-red-300",
@@ -170,7 +173,7 @@ export const EnvironmentsListItem = ({
             {!linkEnabled && (
               <div
                 className={clsx(
-                  status === "initializing" && theme.bg3,
+                  status === "initializing" && "text-yellow-600 bg-yellow-100",
                   status === "tests" && "text-yellow-600 bg-yellow-100",
                   status === "deploying" && "text-yellow-600 bg-yellow-100",
                   status === "error" && "text-red-600 bg-red-100",
