@@ -49,18 +49,21 @@ pub class GithubComment {
     return status.at(0).uppercase() + status.substring(1);
   }
 
+  pub inflight getAppOwner(appId: str): str? {
+    try {
+      let app = this.apps.get(appId: appId);
+      return (this.users.get(userId: app.userId)).username;
+    } catch {
+      return nil;
+    }
+  }
+
   pub inflight createOrUpdate(props: GithubCommentCreateProps): num {
     let var commentId: num? = nil;
     let tableHeader = "<tr><th>App</th><th>Status</th><th>Console</th><th>Updated (UTC)</th></tr>";
     let var commentBody = "<table>{tableHeader}";
 
-    let var appOwner = "";
-    try {
-      let app = this.apps.get(appId: props.appId);
-      appOwner = (this.users.get(userId: app.userId)).username;
-    } catch {
-    }
-
+    let appOwner = this.getAppOwner(props.appId);
     for environment in this.environments.list(appId: props.appId) {
       let shouldDisplayUrl = environment.status == "running";
 
@@ -77,8 +80,8 @@ pub class GithubComment {
             let testName = testResult.path.split(":").at(-1);
             let testResourcePath = testResult.path.split(":").at(0);
             let var link = "";
-            if environment.status == "running" && appOwner != "" {
-              link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/console?testId={testId}\">Logs</a>";
+            if environment.status == "running" && appOwner? {
+              link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}?testId={testId}\">Logs</a>";
             }
             testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
             i += 1;
@@ -86,10 +89,12 @@ pub class GithubComment {
         }
 
         let var previewUrl = "";
+        let var envStatus = "";
         let var appNameLink = props.appName;
 
-        if appOwner != "" {
+        if appOwner? {
           appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}\">{props.appName}</a>";
+          envStatus = this.envStatusToString(environment.status, appOwner ?? "", props.appName, environment.branch);
           if environment.status == "running" {
             previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/console\">Visit</a>";
           }
@@ -97,7 +102,7 @@ pub class GithubComment {
 
         let date = std.Datetime.utcNow();
         let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
-        let tableRows = "<tr><td>{appNameLink}</td><td>{this.envStatusToString(environment.status, appOwner, props.appName, environment.branch)}</td><td>{previewUrl}</td><td>{dateStr}</td></tr>";
+        let tableRows = "<tr><td>{appNameLink}</td><td>{envStatus}</td><td>{previewUrl}</td><td>{dateStr}</td></tr>";
         let testsSection = "<details><summary>Tests</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
 
         commentBody = "{commentBody}{tableRows}</table>";
