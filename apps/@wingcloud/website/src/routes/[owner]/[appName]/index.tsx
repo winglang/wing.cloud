@@ -128,16 +128,16 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
                 loading={environmentsQuery.isLoading}
                 owner={owner}
                 appName={appName}
-                repoUrl={repoUrl}
+                repoUrl={repoUrl || ""}
               />
             )}
           </div>
         </div>
       )}
 
-      {appName && app.data?.app.appId && (
+      {appName && owner && (
         <DeleteModal
-          appId={app.data?.app.appId}
+          owner={owner}
           appName={appName}
           show={deleteModalOpen}
           onClose={setDeleteModalOpen}

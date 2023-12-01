@@ -87,6 +87,7 @@ export const EnvironmentsList = ({
               href={`${repoUrl}/compare`}
               target="_blank"
               rel="noopener noreferrer"
+              aria-disabled={repoUrl === ""}
             >
               opening a Pull Request
             </a>
