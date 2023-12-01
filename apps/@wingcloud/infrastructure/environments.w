@@ -488,7 +488,6 @@ pub class Environments {
       },
     );
 
-
     if let app = result.item {
       let result = this.table.transactWriteItems(transactItems: [
         {
