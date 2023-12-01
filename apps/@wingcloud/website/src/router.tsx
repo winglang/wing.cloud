@@ -8,16 +8,16 @@ export const router = createBrowserRouter([
     lazy: () => import("./routes/index.js"),
     children: [
       {
-        path: "/new",
-        lazy: () => import("./routes/new/index.js"),
+        path: "/add",
+        lazy: () => import("./routes/add/index.js"),
       },
       {
         path: "/dashboard",
         lazy: () => import("./routes/dashboard.js"),
       },
       {
-        path: "/new/connect",
-        lazy: () => import("./routes/new/connect.js"),
+        path: "/add/connect",
+        lazy: () => import("./routes/add/connect.js"),
       },
       {
         path: "/:owner",
