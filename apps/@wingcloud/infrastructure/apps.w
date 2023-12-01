@@ -137,9 +137,9 @@ pub class Apps {
       ]);
     } catch error {
       if error.contains("ConditionalCheckFailed") {
-        throw httpError.HttpError.throwForbidden("App '{options.appName}' already exists");
+        throw httpError.HttpError.forbidden("App '{options.appName}' already exists");
       } else {
-        throw httpError.HttpError.throwError(error);
+        throw httpError.HttpError.error(error);
       }
     }
 
@@ -158,7 +158,7 @@ pub class Apps {
       return App.fromJson(item);
     }
 
-    throw httpError.HttpError.throwNotFound("App '{options.appId}' not found");
+    throw httpError.HttpError.notFound("App '{options.appId}' not found");
   }
 
   pub inflight getByName(options: GetAppByNameOptions): App {
@@ -173,7 +173,7 @@ pub class Apps {
       return App.fromJson(item);
     }
 
-    throw httpError.HttpError.throwNotFound("App '{options.appName}' not found");
+    throw httpError.HttpError.notFound("App '{options.appName}' not found");
   }
 
   pub inflight list(options: ListAppsOptions): Array<App> {
@@ -249,7 +249,7 @@ pub class Apps {
       return;
     }
 
-    throw httpError.HttpError.throwNotFound("App '{options.appId}' not found");
+    throw httpError.HttpError.notFound("App '{options.appId}' not found");
   }
 
   pub inflight listByRepository(options: ListAppByRepositoryOptions): Array<App> {

@@ -148,8 +148,9 @@ pub class ProbotApp {
           }
 
           this.environmentManager.stop(
+            appId: app.appId,
+            appName: app.appName,
             environment: environment,
-            app: app,
           );
         }
       }

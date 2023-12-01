@@ -18,42 +18,31 @@ export const useCreateAppFromRepo = () => {
     },
   );
 
-  const createAppMutation = wrpc["user.createApp"].useMutation();
+  const createAppMutation = wrpc["app.create"].useMutation();
 
-  const createApp = useCallback(async () => {
-    const repos = listReposQuery.data?.repositories;
-    if (!repos) {
-      return;
-    }
-    const repo = repos.find(
-      (repo) => repo.full_name.toString() === repositoryId,
-    );
-    if (!repo || !installationId) {
-      return;
-    }
-
-    setCreateAppLoading(true);
-    setRepositoryId(repo.full_name.toString());
-    const response = await createAppMutation.mutateAsync(
-      {
-        appName: repo.name,
-        description: repo.description ?? "",
-        repoName: repo.name,
-        repoOwner: repo.owner.login,
-        entryfile: "main.w",
-        default_branch: repo.default_branch,
-        installationId: installationId,
-      },
-      {
+  const createApp = useCallback(
+    async (params: {
+      owner: string;
+      appName: string;
+      description: string;
+      repoName: string;
+      repoOwner: string;
+      entryfile: string;
+      defaultBranch: string;
+      installationId: string;
+    }) => {
+      setCreateAppLoading(true);
+      const response = await createAppMutation.mutateAsync(params, {
         onError: (error) => {
           setCreateAppLoading(false);
           throw error;
         },
-      },
-    );
-    setCreateAppLoading(false);
-    return response;
-  }, [createAppMutation, installationId, listReposQuery.data, repositoryId]);
+      });
+      setCreateAppLoading(false);
+      return response;
+    },
+    [createAppMutation],
+  );
 
   useEffect(() => {
     const installations = listInstallationsQuery.data?.installations;
