@@ -89,12 +89,10 @@ pub class GithubComment {
         }
 
         let var previewUrl = "";
-        let var envStatus = "";
         let var appNameLink = props.appName;
 
         if appOwner? {
           appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}\">{props.appName}</a>";
-          envStatus = this.envStatusToString(environment.status, appOwner ?? "", props.appName, environment.branch);
           if environment.status == "running" {
             previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/console\">Visit</a>";
           }
@@ -102,6 +100,7 @@ pub class GithubComment {
 
         let date = std.Datetime.utcNow();
         let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
+        let envStatus = this.envStatusToString(environment.status, appOwner ?? "", props.appName, environment.branch);
         let tableRows = "<tr><td>{appNameLink}</td><td>{envStatus}</td><td>{previewUrl}</td><td>{dateStr}</td></tr>";
         let testsSection = "<details><summary>Tests</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
 
