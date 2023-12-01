@@ -94,7 +94,7 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
           />
 
           <InfoItem
-            label="Created"
+            label="Updated"
             loading={loading}
             value={environment && getDateTime(environment?.createdAt)}
           />
@@ -121,7 +121,7 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
       </div>
       <div className="flex justify-end items-start">
         <Link to="./console">
-          <Button disabled={environment?.status !== "running"}>Visit</Button>
+          <Button disabled={environment?.status !== "running"}>Console</Button>
         </Link>
       </div>
     </div>

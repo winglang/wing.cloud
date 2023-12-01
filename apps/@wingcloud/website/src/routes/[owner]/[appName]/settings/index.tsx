@@ -169,7 +169,7 @@ const SettingsPage = () => {
                   href="https://www.winglang.io/docs/language-reference#112-execution-model"
                   target="_blank"
                 >
-                  Wing entrypoints
+                  Entrypoints
                 </a>{" "}
               </span>
             </div>
