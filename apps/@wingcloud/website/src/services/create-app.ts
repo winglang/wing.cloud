@@ -21,19 +21,10 @@ export const useCreateAppFromRepo = () => {
   const createAppMutation = wrpc["app.create"].useMutation();
 
   const createApp = useCallback(
-    async ({
-      owner,
-      appName,
-      description = "",
-      repoName,
-      repoOwner,
-      entryfile = "main.w",
-      defaultBranch,
-      installationId,
-    }: {
+    async (params: {
       owner: string;
       appName: string;
-      description?: string;
+      description: string;
       repoName: string;
       repoOwner: string;
       entryfile: string;
@@ -41,28 +32,16 @@ export const useCreateAppFromRepo = () => {
       installationId: string;
     }) => {
       setCreateAppLoading(true);
-      const response = await createAppMutation.mutateAsync(
-        {
-          owner,
-          appName,
-          description,
-          repoName,
-          repoOwner,
-          entryfile,
-          defaultBranch,
-          installationId,
+      const response = await createAppMutation.mutateAsync(params, {
+        onError: (error) => {
+          setCreateAppLoading(false);
+          throw error;
         },
-        {
-          onError: (error) => {
-            setCreateAppLoading(false);
-            throw error;
-          },
-        },
-      );
+      });
       setCreateAppLoading(false);
       return response;
     },
-    [createAppMutation, installationId, listReposQuery.data, repositoryId],
+    [createAppMutation],
   );
 
   useEffect(() => {
