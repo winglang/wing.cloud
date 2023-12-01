@@ -41,7 +41,7 @@ struct DeleteAppMessage {
   userId: str;
 }
 
-struct ProductionEnvironmentMessage {
+struct CreateProductionEnvironmentMessage {
   accessToken: str;
   repoId: str;
   repoOwner: str;
@@ -604,7 +604,7 @@ pub class Api {
 
     let productionEnvironmentQueue = new cloud.Queue() as "Production Environment Queue";
     productionEnvironmentQueue.setConsumer(inflight (event) => {
-      let input = ProductionEnvironmentMessage.fromJson(Json.parse(event));
+      let input = CreateProductionEnvironmentMessage.fromJson(Json.parse(event));
 
       let commitData = GitHub.Client.getLastCommit(
         token: input.accessToken,
@@ -666,7 +666,7 @@ pub class Api {
           createdAt: datetime.utcNow().toIso(),
         );
 
-        productionEnvironmentQueue.push(Json.stringify(ProductionEnvironmentMessage {
+        productionEnvironmentQueue.push(Json.stringify(CreateProductionEnvironmentMessage {
           // TODO: https://github.com/winglang/wing.cloud/issues/282
           accessToken: accessToken,
           repoId: repoId,
