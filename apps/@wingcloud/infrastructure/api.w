@@ -328,6 +328,27 @@ pub class Api {
       }
     });
 
+    let deleteAppQueue = new cloud.Queue() as "Delete App Queue";
+    deleteAppQueue.setConsumer(inflight (event) => {
+      let input = DeleteAppMessage.fromJson(Json.parse(event));
+
+      let environments = props.environments.list(
+        appId: input.appId,
+      );
+
+      for environment in environments {
+        props.environmentManager.stop(
+          appId: input.appId,
+          appName: input.appName,
+          environment: environment,
+        );
+        props.environments.delete(
+          appId: input.appId,
+          environmentId: environment.id
+        );
+      }
+    });
+
     api.post("/wrpc/app.delete", inflight (request) => {
       let userId = getUserIdFromCookie(request);
 
@@ -715,27 +736,6 @@ pub class Api {
         };
       } else {
         throw httpError.HttpError.throwUnauthorized();
-      }
-    });
-
-    let deleteAppQueue = new cloud.Queue() as "Delete App Queue";
-    deleteAppQueue.setConsumer(inflight (event) => {
-      let input = DeleteAppMessage.fromJson(Json.parse(event));
-
-      let environments = props.environments.list(
-        appId: input.appId,
-      );
-
-      for environment in environments {
-        props.environmentManager.stop(
-          appId: input.appId,
-          appName: input.appName,
-          environment: environment,
-        );
-        props.environments.delete(
-          appId: input.appId,
-          environmentId: environment.id
-        );
       }
     });
 
