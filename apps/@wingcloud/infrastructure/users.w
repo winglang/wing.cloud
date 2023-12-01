@@ -89,6 +89,14 @@ pub class Users {
     return User.fromJson(result.item);
   }
 
+  pub inflight fromLoginOrFail(options: FromLoginOptions): User {
+    if let user = this.fromLogin(username: options.username) {
+      return user;
+    }
+    throw httpError.HttpError.notFound("User not found");
+  }
+
+
   pub inflight getOrCreate(options: GetOrCreateOptions): User {
     let user = this.fromLogin(username: options.username);
 
@@ -111,7 +119,7 @@ pub class Users {
     if let user = User.tryFromJson(result.item) {
       return user;
     } else {
-      throw httpError.HttpError.throwNotFound("User not found");
+      throw httpError.HttpError.notFound("User not found");
     }
   }
 }
