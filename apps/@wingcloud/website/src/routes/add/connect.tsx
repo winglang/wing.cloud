@@ -9,7 +9,7 @@ import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
 import { usePopupWindow } from "../../utils/popup-window.js";
-import type { Installation } from "../../utils/wrpc.js";
+import { wrpc, type Installation } from "../../utils/wrpc.js";
 
 import { AddAppContainer } from "./_components/add-app-container.js";
 import { GitRepoSelect } from "./_components/git-repo-select.js";
@@ -30,6 +30,8 @@ export const Component = () => {
     setRepositoryId,
     loading,
   } = useCreateAppFromRepo();
+
+  const user = wrpc["auth.check"].useQuery();
 
   const onError = useCallback((error: Error) => {
     showNotification("Failed to create the app", {
@@ -63,7 +65,9 @@ export const Component = () => {
   const onCreate = useCallback(async () => {
     setCreateAppLoading(true);
     try {
-      const app = await createApp();
+      const app = await createApp({
+        owner: user.data?.user?.username!,
+      });
       navigate(`/${app?.appFullName}`);
     } catch (error) {
       setCreateAppLoading(false);

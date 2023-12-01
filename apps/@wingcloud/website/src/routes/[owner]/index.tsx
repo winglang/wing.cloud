@@ -24,7 +24,7 @@ const OwnerPage = () => {
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-  const listAppsQuery = wrpc["user.listApps"].useQuery({
+  const listAppsQuery = wrpc["app.list"].useQuery({
     owner: owner!,
   });
 

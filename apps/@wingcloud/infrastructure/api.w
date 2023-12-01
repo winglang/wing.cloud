@@ -328,6 +328,118 @@ pub class Api {
       }
     });
 
+    let productionEnvironmentQueue = new cloud.Queue() as "Production Environment Queue";
+    productionEnvironmentQueue.setConsumer(inflight (event) => {
+      let input = CreateProductionEnvironmentMessage.fromJson(Json.parse(event));
+
+      let commitData = GitHub.Client.getLastCommit(
+        token: input.accessToken,
+        owner:  input.repoOwner,
+        repo: input.repoName,
+        default_branch: input.defaultBranch,
+      );
+
+      let installationId = input.installationId;
+      environmentsQueue.push(Json.stringify(EnvironmentAction {
+        type: "create",
+        data: EnvironmentManager.CreateEnvironmentOptions {
+          createEnvironment: {
+            branch: input.defaultBranch,
+            appId: input.appId,
+            type: "production",
+            prTitle: input.defaultBranch,
+            repo: input.repoId,
+            status: "initializing",
+            installationId: installationId,
+          },
+          appId: input.appId,
+          entryfile: input.entryfile,
+          sha: commitData.sha,
+      }}));
+    });
+
+    api.post("/wrpc/app.create", inflight (request) => {
+      if let accessToken = getAccessTokenFromCookie(request) {
+        let user = getUserFromCookie(request);
+
+        let input = Json.parse(request.body ?? "");
+        let owner = users.fromLoginOrFail(username: input.get("owner").asStr());
+
+        if user.username != owner.username {
+          throw httpError.HttpError.throwUnauthorized();
+        }
+
+        let defaultBranch = input.get("default_branch").asStr();
+        let repoOwner = input.get("repoOwner").asStr();
+        let repoName = input.get("repoName").asStr();
+        let entryfile = input.get("entryfile").asStr();
+        let repoId = "{repoOwner}/{repoName}";
+
+        // TODO: https://github.com/winglang/wing/issues/3644
+        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9-]+", "*");
+        if appName.contains("*") {
+          return {
+            status: 422,
+            body: {
+              message: "Invalid app name. Must consist of alphanumeric characters and hiphens only.",
+            },
+          };
+        }
+
+        let appId = apps.create(
+          appName: appName,
+          description: input.tryGet("description")?.tryAsStr() ?? "",
+          repoId: repoId,
+          repoName: repoName,
+          repoOwner: repoOwner,
+          userId: owner.id,
+          entryfile: entryfile,
+          createdAt: datetime.utcNow().toIso(),
+        );
+
+        productionEnvironmentQueue.push(Json.stringify(CreateProductionEnvironmentMessage {
+          // TODO: https://github.com/winglang/wing.cloud/issues/282
+          accessToken: accessToken,
+          repoId: repoId,
+          repoOwner: repoOwner,
+          repoName: repoName,
+          defaultBranch: defaultBranch,
+          installationId: num.fromStr(input.get("installationId").asStr()),
+          appId: appId,
+          entryfile: entryfile,
+        }));
+
+        return {
+          body: {
+            appId: appId,
+            appName: appName,
+            appFullName: "{user.username}/{appName}",
+          },
+        };
+      } else {
+        throw httpError.HttpError.throwUnauthorized();
+      }
+    });
+
+    api.get("/wrpc/app.list", inflight (request) => {
+      let owner = request.query.get("owner");
+      checkOwnerAccessRights(request, owner);
+
+      if let user = props.users.fromLogin(username: owner) {
+        let userApps = apps.list(
+          userId: user.id,
+        );
+
+        return {
+          body: {
+            apps: userApps,
+          },
+        };
+      }
+
+      throw httpError.HttpError.throwNotFound();
+    });
+
     let deleteAppQueue = new cloud.Queue() as "Delete App Queue";
     deleteAppQueue.setConsumer(inflight (event) => {
       let input = DeleteAppMessage.fromJson(Json.parse(event));
@@ -350,29 +462,34 @@ pub class Api {
     });
 
     api.post("/wrpc/app.delete", inflight (request) => {
+
       let userId = getUserIdFromCookie(request);
-
       let input = Json.parse(request.body ?? "");
-      let appId = input.get("appId").asStr();
 
-      let app = apps.get(
-        appId: appId,
+      let owner = input.get("owner").asStr();
+      let appName = input.get("appName").asStr();
+
+      checkOwnerAccessRights(request, owner);
+
+      let app = apps.getByName(
+        userId: userId,
+        appName: appName,
       );
 
       apps.delete(
-        appId: appId,
+        appId: app.appId,
         userId: userId,
       );
 
       deleteAppQueue.push(Json.stringify(DeleteAppMessage {
-        appId: appId,
+        appId: app.appId,
         appName: app.appName,
         userId: app.userId,
       }));
 
       return {
         body: {
-          appId: appId,
+          appId: app.appId,
         },
       };
     });
@@ -649,113 +766,6 @@ pub class Api {
           tests: testLogs.copy()
         },
       };
-    });
-
-    let productionEnvironmentQueue = new cloud.Queue() as "Production Environment Queue";
-    productionEnvironmentQueue.setConsumer(inflight (event) => {
-      let input = CreateProductionEnvironmentMessage.fromJson(Json.parse(event));
-
-      let commitData = GitHub.Client.getLastCommit(
-        token: input.accessToken,
-        owner:  input.repoOwner,
-        repo: input.repoName,
-        default_branch: input.defaultBranch,
-      );
-
-      let installationId = input.installationId;
-      environmentsQueue.push(Json.stringify(EnvironmentAction {
-        type: "create",
-        data: EnvironmentManager.CreateEnvironmentOptions {
-          createEnvironment: {
-            branch: input.defaultBranch,
-            appId: input.appId,
-            type: "production",
-            prTitle: input.defaultBranch,
-            repo: input.repoId,
-            status: "initializing",
-            installationId: installationId,
-          },
-          appId: input.appId,
-          entryfile: input.entryfile,
-          sha: commitData.sha,
-      }}));
-    });
-
-    api.post("/wrpc/user.createApp", inflight (request) => {
-      if let accessToken = getAccessTokenFromCookie(request) {
-        let user = getUserFromCookie(request);
-
-        let input = Json.parse(request.body ?? "");
-
-        let defaultBranch = input.get("default_branch").asStr();
-        let repoOwner = input.get("repoOwner").asStr();
-        let repoName = input.get("repoName").asStr();
-        let entryfile = input.get("entryfile").asStr();
-        let repoId = "{repoOwner}/{repoName}";
-
-        // TODO: https://github.com/winglang/wing/issues/3644
-        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9-]+", "*");
-        if appName.contains("*") {
-          return {
-            status: 422,
-            body: {
-              message: "Invalid app name. Must consist of alphanumeric characters and hiphens only.",
-            },
-          };
-        }
-
-        let appId = apps.create(
-          appName: appName,
-          description: input.tryGet("description")?.tryAsStr() ?? "",
-          repoId: repoId,
-          repoName: repoName,
-          repoOwner: repoOwner,
-          userId: user.userId,
-          entryfile: entryfile,
-          createdAt: datetime.utcNow().toIso(),
-        );
-
-        productionEnvironmentQueue.push(Json.stringify(CreateProductionEnvironmentMessage {
-          // TODO: https://github.com/winglang/wing.cloud/issues/282
-          accessToken: accessToken,
-          repoId: repoId,
-          repoOwner: repoOwner,
-          repoName: repoName,
-          defaultBranch: defaultBranch,
-          installationId: num.fromStr(input.get("installationId").asStr()),
-          appId: appId,
-          entryfile: entryfile,
-        }));
-
-        return {
-          body: {
-            appId: appId,
-            appName: appName,
-            appFullName: "{user.username}/{appName}",
-          },
-        };
-      } else {
-        throw httpError.HttpError.throwUnauthorized();
-      }
-    });
-
-    api.get("/wrpc/user.listApps", inflight (request) => {
-      let owner = request.query.get("owner");
-      checkOwnerAccessRights(request, owner);
-
-      if let user = props.users.fromLogin(username: owner) {
-        let userApps = apps.list(
-          userId: user.id,
-        );
-
-        return {
-          body: {
-            apps: userApps,
-          },
-        };
-      }
-
-      throw httpError.HttpError.throwNotFound();
     });
 
     api.post("/environment.report", inflight (req) => {
