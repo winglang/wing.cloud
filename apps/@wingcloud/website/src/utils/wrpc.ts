@@ -210,7 +210,7 @@ export const wrpc = createWRPCReact<{
       description: string;
       repoName: string;
       repoOwner: string;
-      default_branch: string;
+      defaultBranch: string;
       entryfile: string;
       installationId: string;
     },

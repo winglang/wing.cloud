@@ -369,7 +369,7 @@ pub class Api {
           throw httpError.HttpError.throwUnauthorized();
         }
 
-        let defaultBranch = input.get("default_branch").asStr();
+        let defaultBranch = input.get("defaultBranch").asStr();
         let repoOwner = input.get("repoOwner").asStr();
         let repoName = input.get("repoName").asStr();
         let entryfile = input.get("entryfile").asStr();
