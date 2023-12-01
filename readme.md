@@ -120,7 +120,7 @@ The `production` branch is supposed to eventually mirror `main`. This means, mak
 - name the pull request: "release: my new release"
 - wait for the Terraform production diff to be commented on the PR
 - make sure the Terraform plan applies cleanly and reflects the intended changes
-- Squash merge the pull request into `production`
+- Merge with a *Merge Commit* - don't squash - the pull request into `production`
 
 ![base](./docs/pr-base-branch.png)
 ![diff](./docs/pr-diff-comment.png)
