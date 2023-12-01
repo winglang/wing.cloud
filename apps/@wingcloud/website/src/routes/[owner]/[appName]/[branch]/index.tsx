@@ -12,6 +12,8 @@ import { DeploymentLogs } from "./_components/deployment-logs.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
 import { TestsLogs } from "./_components/tests-logs.js";
 
+import { useQuery } from "@tanstack/react-query";
+
 const EnvironmentPage = () => {
   const { owner, appName, branch } = useParams();
 
@@ -49,9 +51,14 @@ const EnvironmentPage = () => {
     if (!logs.data?.tests) {
       return;
     }
-    const testId = decodeURIComponent(locationHash);
+    const params = new URLSearchParams(location.search);
+    const testId = params.get("testId");
+    if (!testId) {
+      return;
+    }
+
     return logs.data?.tests.find((test) => test.id === testId)?.id;
-  }, [logs.data?.tests, locationHash]);
+  }, [logs.data?.tests, location.search]);
 
   useEffect(() => {
     switch (locationHash) {
@@ -71,7 +78,7 @@ const EnvironmentPage = () => {
         }
       }
     }
-  }, [locationHash, logs.data?.tests]);
+  }, [locationHash, logs.data?.tests, selectedTestId]);
 
   return (
     <div
