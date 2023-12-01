@@ -23,7 +23,7 @@ export const DeleteModal = ({
 
   const navigate = useNavigate();
 
-  const deleteApp = wrpc["user.deleteApp"].useMutation({
+  const deleteApp = wrpc["app.delete"].useMutation({
     onSuccess() {
       showNotification(`App ${appName} deleted`, { type: "success" });
       navigate(`/${owner}`);

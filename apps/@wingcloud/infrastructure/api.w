@@ -328,6 +328,34 @@ pub class Api {
       }
     });
 
+    api.post("/wrpc/app.delete", inflight (request) => {
+      let userId = getUserIdFromCookie(request);
+
+      let input = Json.parse(request.body ?? "");
+      let appId = input.get("appId").asStr();
+
+      let app = apps.get(
+        appId: appId,
+      );
+
+      apps.delete(
+        appId: appId,
+        userId: userId,
+      );
+
+      deleteAppQueue.push(Json.stringify(DeleteAppMessage {
+        appId: appId,
+        appName: app.appName,
+        userId: app.userId,
+      }));
+
+      return {
+        body: {
+          appId: appId,
+        },
+      };
+    });
+
     api.get("/wrpc/app.getByName", inflight (request) => {
       let userId = getUserIdFromCookie(request);
       checkOwnerAccessRights(request, request.query.get("owner"));
@@ -709,34 +737,6 @@ pub class Api {
           environmentId: environment.id
         );
       }
-    });
-
-    api.post("/wrpc/user.deleteApp", inflight (request) => {
-      let userId = getUserIdFromCookie(request);
-
-      let input = Json.parse(request.body ?? "");
-      let appId = input.get("appId").asStr();
-
-      let app = apps.get(
-        appId: appId,
-      );
-
-      apps.delete(
-        appId: appId,
-        userId: userId,
-      );
-
-      deleteAppQueue.push(Json.stringify(DeleteAppMessage {
-        appId: appId,
-        appName: app.appName,
-        userId: app.userId,
-      }));
-
-      return {
-        body: {
-          appId: appId,
-        },
-      };
     });
 
     api.get("/wrpc/user.listApps", inflight (request) => {
