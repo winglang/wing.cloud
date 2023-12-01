@@ -35,6 +35,23 @@ struct UserFromCookie {
   username: str;
 }
 
+struct DeleteAppMessage {
+  appId: str;
+  appName: str;
+  userId: str;
+}
+
+struct ProductionEnvironmentMessage {
+  accessToken: str;
+  repoId: str;
+  repoOwner: str;
+  repoName: str;
+  defaultBranch: str;
+  installationId: num;
+  appId: str;
+  entryfile: str;
+}
+
 // TODO: https://github.com/winglang/wing/issues/3644
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
@@ -587,35 +604,30 @@ pub class Api {
 
     let productionEnvironmentQueue = new cloud.Queue() as "Production Environment Queue";
     productionEnvironmentQueue.setConsumer(inflight (event) => {
-      let input = Json.parse(event);
-
-      let appId = input.get("appId").asStr();
-      let entryfile = input.get("entryfile").asStr();
-      let repoId = input.get("repoId").asStr();
-      let defaultBranch = input.get("default_branch").asStr();
+      let input = ProductionEnvironmentMessage.fromJson(Json.parse(event));
 
       let commitData = GitHub.Client.getLastCommit(
-        token: input.get("accessToken").asStr(),
-        owner:  input.get("repoOwner").asStr(),
-        repo: input.get("repoName").asStr(),
-        default_branch: defaultBranch,
+        token: input.accessToken,
+        owner:  input.repoOwner,
+        repo: input.repoName,
+        default_branch: input.defaultBranch,
       );
 
-      let installationId = input.get("installationId").asNum();
+      let installationId = input.installationId;
       environmentsQueue.push(Json.stringify(EnvironmentAction {
         type: "create",
         data: EnvironmentManager.CreateEnvironmentOptions {
           createEnvironment: {
-            branch: defaultBranch,
-            appId: appId,
+            branch: input.defaultBranch,
+            appId: input.appId,
             type: "production",
-            prTitle: defaultBranch,
-            repo: repoId,
+            prTitle: input.defaultBranch,
+            repo: input.repoId,
             status: "initializing",
             installationId: installationId,
           },
-          appId: appId,
-          entryfile: entryfile,
+          appId: input.appId,
+          entryfile: input.entryfile,
           sha: commitData.sha,
       }}));
     });
@@ -654,13 +666,13 @@ pub class Api {
           createdAt: datetime.utcNow().toIso(),
         );
 
-        productionEnvironmentQueue.push(Json.stringify({
+        productionEnvironmentQueue.push(Json.stringify(ProductionEnvironmentMessage {
           // TODO: https://github.com/winglang/wing.cloud/issues/282
           accessToken: accessToken,
           repoId: repoId,
           repoOwner: repoOwner,
           repoName: repoName,
-          default_branch: defaultBranch,
+          defaultBranch: defaultBranch,
           installationId: num.fromStr(input.get("installationId").asStr()),
           appId: appId,
           entryfile: entryfile,
@@ -680,23 +692,22 @@ pub class Api {
 
     let deleteAppQueue = new cloud.Queue() as "Delete App Queue";
     deleteAppQueue.setConsumer(inflight (event) => {
-      let input = Json.parse(event);
-
-      let userId = input.get("userId").asStr();
-      let appId = input.get("appId").asStr();
-      let appName = input.get("appName").asStr();
+      let input = DeleteAppMessage.fromJson(Json.parse(event));
 
       let environments = props.environments.list(
-        appId: appId,
+        appId: input.appId,
       );
 
       for environment in environments {
         props.environmentManager.stop(
-          appId: appId,
-          appName: appName,
+          appId: input.appId,
+          appName: input.appName,
           environment: environment,
         );
-        props.environments.delete(appId: appId, environmentId: environment.id);
+        props.environments.delete(
+          appId: input.appId,
+          environmentId: environment.id
+        );
       }
     });
 
@@ -715,7 +726,7 @@ pub class Api {
         userId: userId,
       );
 
-      deleteAppQueue.push(Json.stringify({
+      deleteAppQueue.push(Json.stringify(DeleteAppMessage {
         appId: appId,
         appName: app.appName,
         userId: app.userId,
