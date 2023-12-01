@@ -93,7 +93,7 @@ pub class Users {
     if let user = this.fromLogin(username: options.username) {
       return user;
     }
-    throw httpError.HttpError.throwNotFound("User not found");
+    throw httpError.HttpError.notFound("User not found");
   }
 
 
@@ -119,7 +119,7 @@ pub class Users {
     if let user = User.tryFromJson(result.item) {
       return user;
     } else {
-      throw httpError.HttpError.throwNotFound("User not found");
+      throw httpError.HttpError.notFound("User not found");
     }
   }
 }

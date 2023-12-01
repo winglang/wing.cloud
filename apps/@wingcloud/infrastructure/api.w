@@ -137,7 +137,7 @@ pub class Api {
       if let payload = getJWTPayloadFromCookie(request) {
         return payload.userId;
       }
-      throw httpError.HttpError.throwUnauthorized();
+      throw httpError.HttpError.unauthorized();
     };
 
     let getUserFromCookie = inflight (request: cloud.ApiRequest): UserFromCookie => {
@@ -153,13 +153,13 @@ pub class Api {
       let user = getUserFromCookie(request);
       // TODO: Currently we only allow the signed in user to access their own resources.
       if user.username != owner {
-        throw httpError.HttpError.throwNotFound("User '{owner}' not found");
+        throw httpError.HttpError.notFound("User '{owner}' not found");
       }
     };
 
     let checkAppAccessRights = inflight (userId: str, app: Apps.App): Apps.App => {
       if userId != app.userId {
-        throw httpError.HttpError.throwNotFound("App not found");
+        throw httpError.HttpError.notFound("App not found");
       }
       return app;
     };
@@ -185,7 +185,7 @@ pub class Api {
           },
         };
       } catch {
-        throw httpError.HttpError.throwUnauthorized();
+        throw httpError.HttpError.unauthorized();
       }
     });
 
@@ -264,7 +264,7 @@ pub class Api {
           },
         };
       } else {
-        throw httpError.HttpError.throwUnauthorized();
+        throw httpError.HttpError.unauthorized();
       }
     });
 
@@ -280,7 +280,7 @@ pub class Api {
           },
         };
       } else {
-        throw httpError.HttpError.throwUnauthorized();
+        throw httpError.HttpError.unauthorized();
       }
     });
 
@@ -301,7 +301,7 @@ pub class Api {
           },
         };
       } else {
-        throw httpError.HttpError.throwUnauthorized();
+        throw httpError.HttpError.unauthorized();
       }
     });
 
@@ -324,7 +324,7 @@ pub class Api {
           },
         };
       } else {
-        throw httpError.HttpError.throwUnauthorized();
+        throw httpError.HttpError.unauthorized();
       }
     });
 
@@ -366,7 +366,7 @@ pub class Api {
         let owner = users.fromLoginOrFail(username: input.get("owner").asStr());
 
         if user.username != owner.username {
-          throw httpError.HttpError.throwUnauthorized();
+          throw httpError.HttpError.unauthorized();
         }
 
         let defaultBranch = input.get("defaultBranch").asStr();
@@ -417,7 +417,7 @@ pub class Api {
           },
         };
       } else {
-        throw httpError.HttpError.throwUnauthorized();
+        throw httpError.HttpError.unauthorized();
       }
     });
 
@@ -437,7 +437,7 @@ pub class Api {
         };
       }
 
-      throw httpError.HttpError.throwNotFound();
+      throw httpError.HttpError.notFound();
     });
 
     let deleteAppQueue = new cloud.Queue() as "Delete App Queue";
@@ -531,7 +531,7 @@ pub class Api {
         };
       }
 
-      throw httpError.HttpError.throwNotFound();
+      throw httpError.HttpError.notFound();
     });
 
     api.get("/wrpc/app.environment", inflight (request) => {
@@ -559,7 +559,7 @@ pub class Api {
         };
       }
 
-      throw httpError.HttpError.throwNotFound();
+      throw httpError.HttpError.notFound();
     });
 
     api.get("/wrpc/app.listSecrets", inflight (request) => {
@@ -615,21 +615,21 @@ pub class Api {
 
       let environmentType = input.get("environmentType").asStr();
       if environmentType != "production" && environmentType != "preview" {
-        throw httpError.HttpError.throwBadRequest(
+        throw httpError.HttpError.badRequest(
           "Invalid environment type",
         );
       }
 
       let name = input.get("name").asStr();
       if name == "" {
-        throw httpError.HttpError.throwBadRequest(
+        throw httpError.HttpError.badRequest(
           "Invalid name",
         );
       }
 
       let value = input.get("value").asStr();
       if value == "" {
-        throw httpError.HttpError.throwBadRequest(
+        throw httpError.HttpError.badRequest(
           "Invalid value",
         );
       }
@@ -690,7 +690,7 @@ pub class Api {
           },
         };
       } else {
-        throw httpError.HttpError.throwUnauthorized();
+        throw httpError.HttpError.unauthorized();
       }
     });
 

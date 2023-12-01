@@ -416,7 +416,7 @@ pub class Environments {
       };
     }
 
-    throw httpError.HttpError.throwNotFound("Environment '{options.id}' not found");
+    throw httpError.HttpError.notFound("Environment '{options.id}' not found");
   }
 
   pub inflight getByBranch(options: GetEnvironmentByBranchOptions): Environment {
@@ -446,7 +446,7 @@ pub class Environments {
       };
     }
 
-    throw httpError.HttpError.throwNotFound("Environment '{options.branch}' not found");
+    throw httpError.HttpError.notFound("Environment '{options.branch}' not found");
   }
 
   pub inflight list(options: ListEnvironmentOptions): Array<Environment> {
@@ -514,6 +514,6 @@ pub class Environments {
       return;
     }
 
-    throw httpError.HttpError.throwNotFound("Environment '{options.environmentId}' not found");
+    throw httpError.HttpError.notFound("Environment '{options.environmentId}' not found");
   }
 }
