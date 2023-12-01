@@ -43,6 +43,9 @@ pub class GithubComment {
     if status == "error" {
       return "❌ Failed ({inspect})";
     }
+    if status == "initializing" {
+      return "Deploying";
+    }
     return status.at(0).uppercase() + status.substring(1);
   }
 
