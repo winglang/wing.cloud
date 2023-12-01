@@ -192,7 +192,6 @@ pub class Apps {
   }
 
   pub inflight delete(options: DeleteAppOptions): void {
-
     let result = this.table.getItem(
       key: {
         pk: "APP#{options.appId}",

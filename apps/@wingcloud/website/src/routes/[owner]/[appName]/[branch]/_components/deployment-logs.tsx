@@ -49,7 +49,7 @@ export const DeploymentLogs = ({
           ) : (
             <ChevronRightIcon className="h-4 w-4" />
           )}
-          <div className="font-medium text-sm">Deployment logs</div>
+          <div className="font-medium text-sm">Deployment</div>
         </div>
       </button>
 

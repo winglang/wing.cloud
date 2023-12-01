@@ -12,7 +12,7 @@ import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../../utils/time.js";
 import type { Environment } from "../../../../utils/wrpc.js";
-import { RUNTIME_LOGS_ID, TEST_LOGS_ID } from "../[branch]/index.js";
+import { DEPLOYMENT_LOGS_ID, TEST_LOGS_ID } from "../[branch]/index.js";
 
 type ErrorStatus = "failed" | "passed";
 
@@ -61,6 +61,9 @@ export const EnvironmentsListItem = ({
     if (status === "tests") {
       return "Running Tests";
     }
+    if (status === "initializing" || status === "deploying") {
+      return "Deploying";
+    }
     return status;
   }, [status]);
 
@@ -88,7 +91,7 @@ export const EnvironmentsListItem = ({
               "absolute -top-1.5 -right-1.5",
               "w-2.5 h-2.5",
               "rounded-full",
-              status === "initializing" && "bg-slate-400 animate-pulse",
+              status === "initializing" && "bg-yellow-300 animate-pulse",
               status === "deploying" && "bg-yellow-300 animate-pulse",
               status === "running" && "bg-green-300",
               status === "error" && "bg-red-300",
@@ -164,13 +167,13 @@ export const EnvironmentsListItem = ({
                 to={`/${owner}/${appName}/${environment.branch}/console`}
                 className={clsx("text-xs hover:underline ", theme.text1)}
               >
-                Visit Preview
+                Visit Console
               </Link>
             )}
             {!linkEnabled && (
               <div
                 className={clsx(
-                  status === "initializing" && theme.bg3,
+                  status === "initializing" && "text-yellow-600 bg-yellow-100",
                   status === "tests" && "text-yellow-600 bg-yellow-100",
                   status === "deploying" && "text-yellow-600 bg-yellow-100",
                   status === "error" && "text-red-600 bg-red-100",
@@ -180,7 +183,7 @@ export const EnvironmentsListItem = ({
               >
                 {status === "error" && (
                   <Link
-                    to={`/${owner}/${appName}/${environment.branch}/#${RUNTIME_LOGS_ID}`}
+                    to={`/${owner}/${appName}/${environment.branch}/#${DEPLOYMENT_LOGS_ID}`}
                     className="hover:underline"
                   >
                     {statusString}

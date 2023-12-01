@@ -81,8 +81,6 @@ const SettingsPage = () => {
       setLoading(true);
       await updateEntryfileMutation.mutateAsync({
         appId: app?.appId!,
-        appName: app?.appName!,
-        repoId: app?.repoId!,
         entryfile: entryfile!,
       });
       appQuery.refetch();
@@ -171,7 +169,7 @@ const SettingsPage = () => {
                   href="https://www.winglang.io/docs/language-reference#112-execution-model"
                   target="_blank"
                 >
-                  Wing entrypoints
+                  Entrypoints
                 </a>{" "}
               </span>
             </div>

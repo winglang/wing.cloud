@@ -11,8 +11,8 @@ import { useCreateAppFromRepo } from "../../services/create-app.js";
 import { usePopupWindow } from "../../utils/popup-window.js";
 import type { Installation } from "../../utils/wrpc.js";
 
+import { AddAppContainer } from "./_components/add-app-container.js";
 import { GitRepoSelect } from "./_components/git-repo-select.js";
-import { NewAppContainer } from "./_components/new-app-container.js";
 
 export const Component = () => {
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ export const Component = () => {
   }, []);
 
   const onCancel = useCallback(() => {
-    navigate("/new");
+    navigate("/add");
   }, [navigate]);
 
   const [createAppLoading, setCreateAppLoading] = useState(false);
@@ -64,7 +64,7 @@ export const Component = () => {
     setCreateAppLoading(true);
     try {
       const app = await createApp();
-      navigate(`/${app?.appUri}`);
+      navigate(`/${app?.appFullName}`);
     } catch (error) {
       setCreateAppLoading(false);
       if (error instanceof Error) {
@@ -84,7 +84,7 @@ export const Component = () => {
   const openPopupWindow = usePopupWindow();
 
   return (
-    <NewAppContainer
+    <AddAppContainer
       step={{
         name: "Connect",
         icon: LinkIcon,
@@ -134,6 +134,6 @@ export const Component = () => {
           </div>
         </div>
       </div>
-    </NewAppContainer>
+    </AddAppContainer>
   );
 };

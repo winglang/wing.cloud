@@ -1,22 +1,22 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { type ForwardRefExoticComponent, type PropsWithChildren } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { Header } from "../../../components/header.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 
-export interface NewAppContainerProps {
+export interface AddAppContainerProps {
   step?: {
     name: string;
     icon: ForwardRefExoticComponent<any>;
   };
 }
 
-export const NewAppContainer = ({
+export const AddAppContainer = ({
   step,
   children,
-}: PropsWithChildren<NewAppContainerProps>) => {
+}: PropsWithChildren<AddAppContainerProps>) => {
   const { owner } = useParams();
   const { theme } = useTheme();
 
@@ -38,9 +38,7 @@ export const NewAppContainer = ({
           )}
         >
           <div className={clsx("flex items-center gap-1", theme.text1)}>
-            <Link to={`/${owner}/new`} className={clsx("font-semibold")}>
-              Create a new App
-            </Link>
+            Add an app
             {step && (
               <>
                 <ChevronRightIcon className="h-4 w-4 flex-shrink-0" />
