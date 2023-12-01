@@ -62,11 +62,11 @@ const OwnerPage = () => {
         />
         {apps.length > 0 && (
           <Button
-            label="New"
+            label="Add"
             primary
             icon={PlusIcon}
             onClick={() => {
-              navigate("/new");
+              navigate("/add");
             }}
           />
         )}
@@ -91,15 +91,15 @@ const OwnerPage = () => {
               {apps.length === 0 && (
                 <div>
                   <p className={clsx("mt-1 text-sm", theme.text2)}>
-                    Get started by creating a new app.
+                    Get started by adding an app.
                   </p>
                   <Button
-                    label="New App"
+                    label="Add app"
                     icon={PlusIcon}
                     primary
                     className="mt-6"
                     onClick={() => {
-                      navigate("/new");
+                      navigate("/add");
                     }}
                   />
                 </div>
