@@ -104,8 +104,20 @@ export const Header = (props: HeaderProps) => {
               to={dashboardLink}
               className="rounded hover:bg-slate-100 px-2 py-1 text-sm text-slate-800 font-medium flex items-center gap-1.5"
             >
-              <Avatar avatarURL={user.data?.user.avatarUrl} />
-              <span>{user.data?.user.username}</span>
+              {!user.data && (
+                <>
+                  <span className="w-5 h-5 rounded bg-slate-300 animate-pulse"></span>
+                  <span className="w-32 bg-slate-300 animate-pulse rounded">
+                    &nbsp;
+                  </span>
+                </>
+              )}
+              {user.data && (
+                <>
+                  <Avatar avatarURL={user.data.user.avatarUrl} />
+                  <span>{user.data?.user.username}</span>
+                </>
+              )}
             </Link>
           </div>
           {props.breadcrumbs?.map((breadcrumb, index) => (
