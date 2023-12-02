@@ -4,6 +4,7 @@ import { useLocation, useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../../../components/error-boundary.js";
 import { Header } from "../../../../components/header.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 export const TEST_LOGS_ID = "test-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
@@ -11,8 +12,6 @@ export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 import { DeploymentLogs } from "./_components/deployment-logs.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
 import { TestsLogs } from "./_components/tests-logs.js";
-
-import { useQuery } from "@tanstack/react-query";
 
 const EnvironmentPage = () => {
   const { owner, appName, branch } = useParams();
@@ -117,9 +116,19 @@ const EnvironmentPage = () => {
 };
 
 export const Component = () => {
+  const { owner, appName, branch } = useParams();
   return (
     <div className="flex flex-col h-full">
-      <Header />
+      <Header
+        breadcrumbs={[
+          { label: appName!, to: `/${owner}/${appName}` },
+          {
+            label: branch!,
+            to: `/${owner}/${appName}/${branch}`,
+            icon: <BranchIcon className="w-4 h-4 text-slate-700" />,
+          },
+        ]}
+      />
       <ErrorBoundary>
         <EnvironmentPage />
       </ErrorBoundary>

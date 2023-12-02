@@ -2,6 +2,7 @@ import {
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
+import { Cog6ToothIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -194,9 +195,20 @@ const SettingsPage = () => {
 };
 
 export const Component = () => {
+  const { owner, appName } = useParams();
+
   return (
     <div className="flex flex-col h-full">
-      <Header />
+      <Header
+        breadcrumbs={[
+          { label: appName!, to: `/${owner}/${appName}` },
+          {
+            label: "Settings",
+            to: `/${owner}/${appName}/settings`,
+            icon: <Cog6ToothIcon className="w-4 h-4 text-slate-500" />,
+          },
+        ]}
+      />
       <ErrorBoundary>
         <SettingsPage />
       </ErrorBoundary>
