@@ -156,7 +156,7 @@ const SettingsPage = () => {
                 </Button>
               </div>
             </div>
-            <hr className="h-px mt-4 mb-2 bg-gray-200 border-0 dark:bg-gray-700" />
+            <hr className="h-px mt-4 mb-2 bg-slate-200 border-0 dark:bg-slate-700" />
             <div className="flex flex-row gap-2">
               <ExclamationCircleIcon
                 className={clsx("h-4 w-4 flex-shrink-0", theme.text2)}
