@@ -59,9 +59,11 @@
     "test": "projen test",
     "example": "node ./bin/wing.mjs it example.main.w",
     "default": "projen default",
+    "compile": "projen compile",
     "build": "projen build",
     "dev": "projen dev",
     "lint": "projen lint",
+    "test-aws": "projen test-aws",
     "terraformInit": "projen terraformInit",
     "plan": "projen plan",
     "deploy": "projen deploy"
