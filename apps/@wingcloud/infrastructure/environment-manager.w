@@ -27,20 +27,20 @@ struct EnvironmentsProps {
 pub struct CreateEnvironmentOptions {
   createEnvironment: environments.CreateEnvironmentOptions;
   appId: str;
-  entryfile: str;
+  entrypoint: str;
   sha: str;
 }
 
 pub struct RestartEnvironmentOptions {
   environment: environments.Environment;
   appId: str;
-  entryfile: str;
+  entrypoint: str;
   sha: str;
 }
 
 pub struct RestartAllEnvironmentOptions {
   appId: str;
-  entryfile: str;
+  entrypoint: str;
 }
 
 pub struct StopEnvironmentOptions {
@@ -111,7 +111,7 @@ pub class EnvironmentManager {
 
     this.runtimeClient.create(
       appId: options.appId,
-      entryfile: options.entryfile,
+      entrypoint: options.entrypoint,
       environment: environment,
       secrets: secrets,
       certificate: this.certificate.certificate(),
@@ -143,7 +143,7 @@ pub class EnvironmentManager {
 
     this.runtimeClient.create(
       appId: options.appId,
-      entryfile: options.entryfile,
+      entrypoint: options.entrypoint,
       environment: options.environment,
       secrets: secrets,
       certificate: this.certificate.certificate(),
@@ -160,7 +160,7 @@ pub class EnvironmentManager {
       let repo = environment.repo.split("/").at(1);
       let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/{environment.branch}");
 
-      this.restart(appId: options.appId, entryfile: options.entryfile, environment: environment, sha: ref.data.object.sha);
+      this.restart(appId: options.appId, entrypoint: options.entrypoint, environment: environment, sha: ref.data.object.sha);
     }
   }
 

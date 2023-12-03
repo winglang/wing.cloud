@@ -7,7 +7,7 @@ import { type GitCommit, GitProvider } from "./git/provider.js";
 export class Environment {
   constructor(
     public id: string,
-    public entryfile: string,
+    public entrypoint: string,
     public commit: GitCommit,
   ) {}
 

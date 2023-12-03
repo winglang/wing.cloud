@@ -23,12 +23,7 @@
     },
     "compile": {
       "name": "compile",
-      "description": "Only compile",
-      "steps": [
-        {
-          "exec": "node ./bin/wing.mjs compile main.w -t tf-aws"
-        }
-      ]
+      "description": "Only compile"
     },
     "default": {
       "name": "default",
@@ -122,14 +117,6 @@
       "steps": [
         {
           "exec": "node ./bin/wing.mjs test main.w"
-        }
-      ]
-    },
-    "test-aws": {
-      "name": "test-aws",
-      "steps": [
-        {
-          "exec": "node ./bin/wing.mjs test -t tf-aws main.w"
         }
       ]
     }

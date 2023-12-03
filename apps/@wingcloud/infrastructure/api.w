@@ -50,7 +50,7 @@ struct CreateProductionEnvironmentMessage {
   defaultBranch: str;
   installationId: num;
   appId: str;
-  entryfile: str;
+  entrypoint: str;
 }
 
 // TODO: https://github.com/winglang/wing/issues/3644
@@ -355,7 +355,7 @@ pub class Api {
             installationId: installationId,
           },
           appId: input.appId,
-          entryfile: input.entryfile,
+          entrypoint: input.entrypoint,
           sha: commitData.sha,
       }}));
     });
@@ -374,7 +374,7 @@ pub class Api {
         let defaultBranch = input.get("defaultBranch").asStr();
         let repoOwner = input.get("repoOwner").asStr();
         let repoName = input.get("repoName").asStr();
-        let entryfile = input.get("entryfile").asStr();
+        let entrypoint = input.get("entrypoint").asStr();
         let repoId = "{repoOwner}/{repoName}";
 
         // TODO: https://github.com/winglang/wing/issues/3644
@@ -395,7 +395,7 @@ pub class Api {
           repoName: repoName,
           repoOwner: repoOwner,
           userId: owner.id,
-          entryfile: entryfile,
+          entrypoint: entrypoint,
           createdAt: datetime.utcNow().toIso(),
         );
 
@@ -408,7 +408,7 @@ pub class Api {
           defaultBranch: defaultBranch,
           installationId: num.fromStr(input.get("installationId").asStr()),
           appId: appId,
-          entryfile: entryfile,
+          entrypoint: entrypoint,
         }));
 
         return {
@@ -667,7 +667,7 @@ pub class Api {
       };
     });
 
-    api.get("/wrpc/app.listEntryfiles", inflight (request) => {
+    api.get("/wrpc/app.listEntrypoints", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
@@ -677,18 +677,18 @@ pub class Api {
         let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/{defaultBranch}");
         let tree = octokit.git.getTree(owner: owner, repo: repo, tree_sha: ref.data.object.sha, recursive: "true");
 
-        let entryfiles = MutArray<str>[];
+        let entrypoints = MutArray<str>[];
         for item in tree.data.tree {
           if let path = item.path {
             if item.type == "blob" && path.endsWith("main.w") {
-              entryfiles.push(path);
+              entrypoints.push(path);
             }
           }
         }
 
         return {
           body: {
-            entryfiles: entryfiles.copy()
+            entrypoints: entrypoints.copy()
           },
         };
       } else {
@@ -696,7 +696,7 @@ pub class Api {
       }
     });
 
-    api.post("/wrpc/app.updateEntryfile", inflight (request) => {
+    api.post("/wrpc/app.updateEntrypoint", inflight (request) => {
       let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
       let appId = input.get("appId").asStr();
@@ -704,20 +704,20 @@ pub class Api {
       let app = apps.get(appId: appId);
       checkAppAccessRights(userId, app);
 
-      let entryfile = input.get("entryfile").asStr();
+      let entrypoint = input.get("entrypoint").asStr();
       apps.updateEntrypoint(
         appId: appId,
         appName: app.appName,
         repository: app.repoId,
         userId: userId,
-        entryfile: entryfile,
+        entrypoint: entrypoint,
       );
 
       environmentsQueue.push(Json.stringify(EnvironmentAction{
         type: "restartAll",
         data: EnvironmentManager.RestartAllEnvironmentOptions {
           appId: appId,
-          entryfile: app.entryfile,
+          entrypoint: app.entrypoint,
       }}));
 
       return {

@@ -6,18 +6,18 @@ import { Environment } from "../environment.js";
 export interface WingTestProps {
   wingCompilerPath: string;
   wingSdkPath: string;
-  entryfilePath: string;
+  entrypointPath: string;
   environment: Environment;
   bucketWrite: (key: string, contents: string) => Promise<void>;
 }
 
 export async function wingCompile(
   wingCompilerPath: string,
-  entryfilePath: string,
+  entrypointPath: string,
 ) {
   const wingCompiler = await import(wingCompilerPath);
   const compile: typeof compileFn = wingCompiler.compile;
-  const simfile = await compile(entryfilePath, {
+  const simfile = await compile(entrypointPath, {
     platform: [BuiltinPlatform.SIM],
   });
   return simfile;
@@ -60,7 +60,7 @@ async function wingTestOne(
 export async function wingTest(props: WingTestProps) {
   const simfile = await wingCompile(
     props.wingCompilerPath,
-    props.entryfilePath,
+    props.entrypointPath,
   );
 
   try {
