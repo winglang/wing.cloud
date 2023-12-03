@@ -27,6 +27,9 @@ export const createRecords = async (token: string, records: Record[]) => {
       );
       console.log("record created", res);
     } catch (error) {
+      if (JSON.stringify(error).includes("record already exists")) {
+        continue;
+      }
       console.log(`create records: error ${error}`);
       throw error;
     }
