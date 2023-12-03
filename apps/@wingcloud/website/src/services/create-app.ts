@@ -65,7 +65,7 @@ export const useCreateAppFromRepo = () => {
 
   const loading = useMemo(() => {
     return listInstallationsQuery.isLoading || listReposQuery.isLoading;
-  }, [listInstallationsQuery, listReposQuery]);
+  }, [listInstallationsQuery.isLoading, listReposQuery.isLoading]);
 
   return {
     createApp,

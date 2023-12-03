@@ -85,7 +85,7 @@ export const Component = () => {
     }
   }, [repositoryId]);
 
-  // if installation id was changed, refetch repos
+  // If installation id was changed, refetch repos. Needed in case the user didn't have access to any repo before.
   useEffect(() => {
     if (installationId) {
       listReposQuery.refetch();
