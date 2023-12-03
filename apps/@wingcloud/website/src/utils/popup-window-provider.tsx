@@ -74,10 +74,9 @@ export const PopupWindowContext = createContext<PopupWindowContext>({
 export const PopupWindowProvider = ({ children }: PropsWithChildren) => {
   const openPopupWindow = usePopupWindow();
 
-  // prevent popup windows from loading the app
+  // Prevent popup windows from loading Wing Cloud web app after reloading the page
   useEffect(() => {
     if (window.opener) {
-      console.log("closing window");
       window.close();
     }
   }, []);
