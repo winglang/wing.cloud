@@ -5,12 +5,12 @@ struct IAppProps {
   name: str;
 }
 
-struct ICreateMachineProps {
+pub struct ICreateMachineProps {
   imageName: str;
   region: str?;
   memoryMb: num?;
   env: Map<str>;
-  port: num;
+  services: Array<client.IClientCreateMachineService>;
   files: Array<client.File>?;
 }
 
@@ -91,11 +91,11 @@ inflight class FlyApp {
     let createMachineResult = this.props.client.createMachine({
       appName: this.props.name,
       imageName: props.imageName,
-      port: props.port,
       region: props.region,
       memoryMb: props.memoryMb,
       env: props.env,
       files: props.files,
+      services: props.services,
     });
 
     this.props.client.waitForMachineState(
@@ -154,11 +154,24 @@ inflight class FlyApp {
   }
 
   pub listApps(): Array<FlyApp> {
-    let res = this.client.apps();
+    let queryApps = (cursor: str, apps: MutArray<FlyApp>): client.IClientPageInfo => {
+      let res = this.client.apps(cursor);
+      for app in res.data.apps.nodes {
+        apps.push(new FlyApp(client: this.client, name: app.id));
+      }
+      return res.data.apps.pageInfo;
+    };
+
     let apps = MutArray<FlyApp>[];
-    for app in res.data.apps.nodes {
-      apps.push(new FlyApp(client: this.client, name: app.id));
+    let var cursor = "";
+    while (true) {
+      let pageInfo = queryApps(cursor, apps);
+      if !pageInfo.hasNextPage {
+        break;
+      }
+      cursor = pageInfo.endCursor;
     }
+  
     return apps.copy();
   }
 }

@@ -7,8 +7,10 @@ import { Header } from "../../../../components/header.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 export const TEST_LOGS_ID = "test-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
+export const ENDPOINTS_ID = "endpoints";
 
 import { DeploymentLogs } from "./_components/deployment-logs.js";
+import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
 import { TestsLogs } from "./_components/tests-logs.js";
 
@@ -39,6 +41,18 @@ const EnvironmentPage = () => {
       branch: branch!,
     },
     {
+      // TODO: query invalidation
+      refetchInterval: 1000 * 10,
+    },
+  );
+
+  const endpoints = wrpc["app.environment.endpoints"].useQuery(
+    {
+      appName: appName!,
+      branch: branch!,
+    },
+    {
+      enabled: appName !== undefined && branch !== undefined,
       // TODO: query invalidation
       refetchInterval: 1000 * 10,
     },
@@ -91,6 +105,13 @@ const EnvironmentPage = () => {
       <EnvironmentDetails
         loading={environment.isLoading}
         environment={environment.data?.environment}
+      />
+
+      <Endpoints
+        id={ENDPOINTS_ID}
+        isOpen={true}
+        endpoints={endpoints.data?.endpoints || []}
+        loading={endpoints.isLoading}
       />
 
       <DeploymentLogs

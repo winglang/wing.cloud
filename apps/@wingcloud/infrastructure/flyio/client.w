@@ -7,10 +7,26 @@ pub struct File {
   secret_name: str?;
 }
 
-struct IClientCreateMachineProps {
+pub struct IClientPageInfo {
+  endCursor: str;
+  hasNextPage: bool;
+}
+
+pub struct IClientCreateMachinePort {
+  port: num;
+  handlers: Array<str>?;
+}
+
+pub struct IClientCreateMachineService {
+  ports: Array<IClientCreateMachinePort>;
+  protocol: str;
+  internal_port: num;
+}
+
+pub struct IClientCreateMachineProps {
   appName: str;
   imageName: str;
-  port: num;
+  services: Array<IClientCreateMachineService>;
   region: str?;
   memoryMb: num?;
   env: Map<str>?;
@@ -37,6 +53,7 @@ struct IApp {
 struct IGetAppResultDataApps {
   nodes: Array<IApp>;
   totalCount: num;
+  pageInfo: IClientPageInfo;
 }
 
 struct IGetAppResultData {
@@ -105,9 +122,9 @@ pub inflight class Client {
     };
   }
 
-  pub apps(): IAppsResult {
+  pub apps(cursor: str?): IAppsResult {
     let appsRespone = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
-      query: "query getapps \{ apps \{ nodes \{ id machines \{ nodes \{ id instanceId state } totalCount } createdAt } totalCount } }",
+      query: "query getapps \{ apps(after: \"{cursor}\") \{ nodes\{ id machines \{ nodes \{ id instanceId state } totalCount } createdAt } pageInfo \{ endCursor hasNextPage } totalCount } }",
     }));
     if (!appsRespone.ok) {
       throw "failed to get apps {appsRespone.body}";
@@ -153,7 +170,7 @@ pub inflight class Client {
   pub allocateIpAddress(appName: str) {
     let ipRes = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
       query: "mutation($input: AllocateIPAddressInput!) \{ allocateIpAddress(input: $input) \{ ipAddress \{ id address type region createdAt } } }",
-        variables: { input: { appId: appName, type: "shared_v4" } },
+        variables: { input: { appId: appName, type: "v4" } },
     }));
     if (!ipRes.ok) {
       throw "failed to create shared ip: {appName} + {ipRes.body}";
@@ -173,22 +190,7 @@ pub inflight class Client {
         files: props.files ?? [],
         auto_destroy: true,
         image: props.imageName,
-        services: [
-          {
-            ports: [
-              {
-                port: 443,
-                handlers: ["tls", "http"],
-              },
-              {
-                port: 80,
-                handlers: ["http"],
-              },
-            ],
-            protocol: "tcp",
-            internal_port: props.port,
-          },
-        ],
+        services: props.services,
       },
     }));
     if (!machineRes.ok) {
