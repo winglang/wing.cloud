@@ -147,9 +147,7 @@ export const SecretsList = ({ appId }: { appId: string }) => {
               <LockClosedIcon
                 className={clsx("w-5 h-5 rounded-full", theme.text2)}
               />
-              <span className={clsx("font-bold", theme.text1)}>
-                No secrets.
-              </span>
+              <span className={clsx("font-bold", theme.text1)}>No secrets</span>
             </div>
           )}
           {!loading &&
@@ -185,7 +183,7 @@ export const SecretsList = ({ appId }: { appId: string }) => {
           href="https://www.winglang.io/docs/standard-library/cloud/secret"
           target="_blank"
         >
-          Wing Secrets
+          Secrets
         </a>{" "}
       </span>
     </div>

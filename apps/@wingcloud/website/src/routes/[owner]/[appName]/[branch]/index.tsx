@@ -5,8 +5,6 @@ import { useLocation, useParams } from "react-router-dom";
 import { ErrorBoundary } from "../../../../components/error-boundary.js";
 import { Header } from "../../../../components/header.js";
 import { wrpc } from "../../../../utils/wrpc.js";
-
-export const RUNTIME_LOGS_ID = "runtime-logs";
 export const TEST_LOGS_ID = "test-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 export const ENDPOINTS_ID = "endpoints";
@@ -14,14 +12,14 @@ export const ENDPOINTS_ID = "endpoints";
 import { DeploymentLogs } from "./_components/deployment-logs.js";
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
-import { RuntimeLogs } from "./_components/runtime-logs.js";
 import { TestsLogs } from "./_components/tests-logs.js";
+
+import { useQuery } from "@tanstack/react-query";
 
 const EnvironmentPage = () => {
   const { owner, appName, branch } = useParams();
 
   const [testLogsOpen, setTestLogsOpen] = useState(false);
-  const [runtimeLogsOpen, setRuntimeLogsOpen] = useState(false);
   const [deploymentLogsOpen, setDeploymentLogsOpen] = useState(false);
 
   const environment = wrpc["app.environment"].useQuery(
@@ -67,9 +65,14 @@ const EnvironmentPage = () => {
     if (!logs.data?.tests) {
       return;
     }
-    const testId = decodeURIComponent(locationHash);
+    const params = new URLSearchParams(location.search);
+    const testId = params.get("testId");
+    if (!testId) {
+      return;
+    }
+
     return logs.data?.tests.find((test) => test.id === testId)?.id;
-  }, [logs.data?.tests, locationHash]);
+  }, [logs.data?.tests, location.search]);
 
   useEffect(() => {
     switch (locationHash) {
@@ -83,24 +86,13 @@ const EnvironmentPage = () => {
 
         break;
       }
-      case RUNTIME_LOGS_ID: {
-        setRuntimeLogsOpen(true);
-
-        break;
-      }
       default: {
         if (selectedTestId) {
           setTestLogsOpen(true);
         }
       }
     }
-  }, [locationHash, logs.data?.tests]);
-
-  useEffect(() => {
-    if (environment.data?.environment?.status === "error") {
-      setRuntimeLogsOpen(true);
-    }
-  }, [environment.data?.environment?.status]);
+  }, [locationHash, logs.data?.tests, selectedTestId]);
 
   return (
     <div
@@ -122,6 +114,14 @@ const EnvironmentPage = () => {
         loading={endpoints.isLoading}
       />
 
+      <DeploymentLogs
+        id={DEPLOYMENT_LOGS_ID}
+        isOpen={deploymentLogsOpen}
+        setIsOpen={setDeploymentLogsOpen}
+        logs={logs.data?.deploy || []}
+        loading={logs.isLoading}
+      />
+
       <TestsLogs
         id={TEST_LOGS_ID}
         isOpen={testLogsOpen}
@@ -131,22 +131,6 @@ const EnvironmentPage = () => {
         }
         selectedTestId={selectedTestId}
         logs={logs.data?.tests || []}
-        loading={logs.isLoading}
-      />
-
-      <DeploymentLogs
-        id={DEPLOYMENT_LOGS_ID}
-        isOpen={deploymentLogsOpen}
-        setIsOpen={setDeploymentLogsOpen}
-        logs={logs.data?.deploy || []}
-        loading={logs.isLoading}
-      />
-
-      <RuntimeLogs
-        id={RUNTIME_LOGS_ID}
-        isOpen={runtimeLogsOpen}
-        setIsOpen={setRuntimeLogsOpen}
-        logs={logs.data?.runtime || []}
         loading={logs.isLoading}
       />
     </div>
