@@ -1,6 +1,7 @@
 import { LinkIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { awscdk } from "projen";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { SpinnerLoader } from "../../components/spinner-loader.js";
@@ -8,7 +9,10 @@ import { Button } from "../../design-system/button.js";
 import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
-import { usePopupWindow } from "../../utils/popup-window.js";
+import {
+  PopupWindowContext,
+  usePopupWindow,
+} from "../../utils/popup-window-provider.js";
 import { wrpc } from "../../utils/wrpc.js";
 
 import { AddAppContainer } from "./_components/add-app-container.js";
@@ -19,8 +23,8 @@ export const Component = () => {
 
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const openPopupWindow = usePopupWindow();
   const { showNotification } = useNotifications();
+  const { openPopupWindow } = useContext(PopupWindowContext);
 
   const {
     createApp,
@@ -81,6 +85,13 @@ export const Component = () => {
     }
   }, [repositoryId]);
 
+  // if installation id was changed, refetch repos
+  useEffect(() => {
+    if (installationId) {
+      listReposQuery.refetch();
+    }
+  }, [installationId]);
+
   return (
     <AddAppContainer
       step={{
@@ -114,8 +125,11 @@ export const Component = () => {
               onClick={() =>
                 openPopupWindow({
                   url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
-                  onClose: () => {
-                    listInstallationsQuery.refetch();
+                  onClose: async () => {
+                    await listInstallationsQuery.refetch();
+                    if (installationId) {
+                      listReposQuery.refetch();
+                    }
                   },
                 })
               }
