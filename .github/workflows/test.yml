@@ -10,10 +10,8 @@ on:
       - '**/*.md'
 
 concurrency:
-  # we can't run unique across the repo, pending builds
-  # will be cancelled when a new one is started which
-  # is not what we want in this case. Can't be configured otherwise.
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # this is a singleton build group, so only one build can run at a time
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 permissions:
