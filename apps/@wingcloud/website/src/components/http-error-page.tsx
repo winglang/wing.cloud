@@ -22,7 +22,7 @@ export const HttpErrorPage = ({
   }, [message]);
 
   return (
-    <div className="grid min-h-full place-items-center items-center px-6 py-24 sm:py-32 lg:px-8 h-full">
+    <div className="px-6 py-24 sm:py-32 lg:px-8">
       <div className="text-center items-center">
         <p className={clsx("text-base font-semibold font-mono", theme.text1)}>
           {code}

@@ -182,11 +182,14 @@ const runtime = new TypescriptProject({
   },
 });
 
+runtime.devTask.exec(`tsup --watch --onSuccess "node lib/entrypoint-local.js"`);
+
 runtime.addDeps("winglang");
 runtime.addDeps("@winglang/sdk");
 runtime.addDeps("@winglang/compiler");
 runtime.addDeps("@wingconsole/app");
 runtime.addDeps("express");
+runtime.addDeps("http-proxy");
 runtime.addDeps("jsonwebtoken");
 runtime.addDeps("jwk-to-pem");
 runtime.addDeps("jose");
@@ -194,6 +197,7 @@ runtime.addDeps("node-fetch");
 runtime.addDeps("which");
 
 runtime.addDevDeps("@types/express");
+runtime.addDevDeps("@types/http-proxy");
 runtime.addDevDeps("@types/jsonwebtoken");
 runtime.addDevDeps("@types/jwk-to-pem");
 runtime.addDevDeps("simple-git");
@@ -346,6 +350,7 @@ infrastructure.addDeps("cookie-es");
 infrastructure.addDeps("jose@4");
 infrastructure.addDeps("octokit", "node-fetch");
 infrastructure.addDeps("@aws-sdk/client-kms");
+infrastructure.addDeps("dnsimple");
 
 infrastructure.addDeps("@aws-sdk/client-ssm");
 

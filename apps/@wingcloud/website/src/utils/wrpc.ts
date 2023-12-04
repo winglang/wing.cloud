@@ -108,6 +108,21 @@ export interface Secret {
 
 export type EnvironmentType = "produciton" | "preview";
 
+export interface Endpoint {
+  id: string;
+  appId: string;
+  runId: string;
+  environmentId: string;
+  path: string;
+  type: string;
+  localUrl: string;
+  publicUrl: string;
+  port: number;
+  digest: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const wrpc = createWRPCReact<{
   "auth.check": QueryProcedure<
     undefined,
@@ -161,6 +176,12 @@ export const wrpc = createWRPCReact<{
       tests: TestLog[];
     }
   >;
+  "app.environment.endpoints": QueryProcedure<
+    { appName: string; branch: string },
+    {
+      endpoints: Endpoint[];
+    }
+  >;
   "app.listSecrets": QueryProcedure<
     { appId: string },
     {
@@ -194,8 +215,8 @@ export const wrpc = createWRPCReact<{
     { appId: string; entryfile: string },
     {}
   >;
-  "app.delete": MutationProcedure<{ appId: string }, {}>;
-  "user.listApps": QueryProcedure<
+  "app.delete": MutationProcedure<{ owner: string; appName: string }, {}>;
+  "app.list": QueryProcedure<
     {
       owner: string;
     },
@@ -203,13 +224,14 @@ export const wrpc = createWRPCReact<{
       apps: Array<App>;
     }
   >;
-  "user.createApp": MutationProcedure<
+  "app.create": MutationProcedure<
     {
+      owner: string;
+      appName: string;
       description: string;
       repoName: string;
       repoOwner: string;
-      default_branch: string;
-      appName: string;
+      defaultBranch: string;
       entryfile: string;
       installationId: string;
     },

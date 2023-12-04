@@ -7,10 +7,14 @@ import { Header } from "../../../../components/header.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 export const TEST_LOGS_ID = "test-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
+export const ENDPOINTS_ID = "endpoints";
 
 import { DeploymentLogs } from "./_components/deployment-logs.js";
+import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
 import { TestsLogs } from "./_components/tests-logs.js";
+
+import { useQuery } from "@tanstack/react-query";
 
 const EnvironmentPage = () => {
   const { owner, appName, branch } = useParams();
@@ -42,6 +46,18 @@ const EnvironmentPage = () => {
     },
   );
 
+  const endpoints = wrpc["app.environment.endpoints"].useQuery(
+    {
+      appName: appName!,
+      branch: branch!,
+    },
+    {
+      enabled: appName !== undefined && branch !== undefined,
+      // TODO: query invalidation
+      refetchInterval: 1000 * 10,
+    },
+  );
+
   const location = useLocation();
   const locationHash = useMemo(() => location.hash.slice(1), [location.hash]);
 
@@ -49,9 +65,14 @@ const EnvironmentPage = () => {
     if (!logs.data?.tests) {
       return;
     }
-    const testId = decodeURIComponent(locationHash);
+    const params = new URLSearchParams(location.search);
+    const testId = params.get("testId");
+    if (!testId) {
+      return;
+    }
+
     return logs.data?.tests.find((test) => test.id === testId)?.id;
-  }, [logs.data?.tests, locationHash]);
+  }, [logs.data?.tests, location.search]);
 
   useEffect(() => {
     switch (locationHash) {
@@ -71,7 +92,7 @@ const EnvironmentPage = () => {
         }
       }
     }
-  }, [locationHash, logs.data?.tests]);
+  }, [locationHash, logs.data?.tests, selectedTestId]);
 
   return (
     <div
@@ -84,6 +105,13 @@ const EnvironmentPage = () => {
       <EnvironmentDetails
         loading={environment.isLoading}
         environment={environment.data?.environment}
+      />
+
+      <Endpoints
+        id={ENDPOINTS_ID}
+        isOpen={true}
+        endpoints={endpoints.data?.endpoints || []}
+        loading={endpoints.isLoading}
       />
 
       <DeploymentLogs

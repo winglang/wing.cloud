@@ -9,15 +9,17 @@ import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
 import { usePopupWindow } from "../../utils/popup-window.js";
-import type { Installation } from "../../utils/wrpc.js";
+import { wrpc } from "../../utils/wrpc.js";
 
 import { AddAppContainer } from "./_components/add-app-container.js";
 import { GitRepoSelect } from "./_components/git-repo-select.js";
 
 export const Component = () => {
-  const navigate = useNavigate();
-  const { theme } = useTheme();
+  const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
 
+  const { theme } = useTheme();
+  const navigate = useNavigate();
+  const openPopupWindow = usePopupWindow();
   const { showNotification } = useNotifications();
 
   const {
@@ -31,57 +33,53 @@ export const Component = () => {
     loading,
   } = useCreateAppFromRepo();
 
-  const onError = useCallback((error: Error) => {
-    showNotification("Failed to create the app", {
-      body: error.message,
-      type: "error",
-    });
-    setRepositoryId("");
-  }, []);
-
-  const onCancel = useCallback(() => {
-    navigate("/add");
-  }, [navigate]);
+  const user = wrpc["auth.check"].useQuery();
 
   const [createAppLoading, setCreateAppLoading] = useState(false);
-  const [installations, setInstallations] = useState<Installation[]>([]);
 
-  useEffect(() => {
-    if (!listInstallationsQuery.data) {
+  const selectedRepo = useMemo(() => {
+    if (!listReposQuery.data?.repositories || !repositoryId) {
       return;
     }
-    setInstallations(listInstallationsQuery.data.installations);
-  }, [listInstallationsQuery.data]);
-
-  const repos = useMemo(() => {
-    if (!listReposQuery.data || installationId === "") {
-      return [];
-    }
-    return listReposQuery.data.repositories;
-  }, [listReposQuery.data]);
+    return listReposQuery.data?.repositories.find(
+      (repo) => repo.full_name.toString() === repositoryId,
+    );
+  }, [listReposQuery.data?.repositories, repositoryId]);
 
   const onCreate = useCallback(async () => {
+    if (!installationId || !selectedRepo || !user.data?.user) {
+      return;
+    }
     setCreateAppLoading(true);
     try {
-      const app = await createApp();
+      const app = await createApp({
+        owner: user.data.user.username,
+        appName: selectedRepo.name,
+        description: selectedRepo.description ?? "",
+        repoName: selectedRepo.name,
+        repoOwner: selectedRepo.owner.login,
+        entryfile: "main.w",
+        defaultBranch: selectedRepo.default_branch,
+        installationId,
+      });
       navigate(`/${app?.appFullName}`);
     } catch (error) {
       setCreateAppLoading(false);
       if (error instanceof Error) {
-        onError(error);
+        showNotification("Failed to create the app", {
+          body: error.message,
+          type: "error",
+        });
+        setRepositoryId("");
       }
     }
-  }, [createApp, onError, navigate]);
+  }, [createApp, navigate]);
 
   useEffect(() => {
     if (repositoryId) {
       onCreate();
     }
   }, [repositoryId]);
-
-  const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
-
-  const openPopupWindow = usePopupWindow();
 
   return (
     <AddAppContainer
@@ -104,8 +102,8 @@ export const Component = () => {
             setInstallationId={setInstallationId}
             repositoryId={repositoryId || ""}
             setRepositoryId={setRepositoryId}
-            installations={installations}
-            repos={repos}
+            installations={listInstallationsQuery.data?.installations ?? []}
+            repos={listReposQuery.data?.repositories ?? []}
             loading={loading}
             disabled={createAppLoading}
           />
@@ -127,7 +125,12 @@ export const Component = () => {
           </div>
           <div className="w-full flex">
             <div className="justify-end flex gap-x-2 grow">
-              <Button onClick={onCancel} disabled={createAppLoading}>
+              <Button
+                onClick={() => {
+                  navigate("/add");
+                }}
+                disabled={createAppLoading}
+              >
                 Back
               </Button>
             </div>

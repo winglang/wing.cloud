@@ -5,10 +5,12 @@ export const createGithubAppJwt = async (appId: string, privateKey: string) => {
   const expiration = now + 60 * 10; // JWT expiration time (10 minute maximum)
 
   const payload = {
-    "iat": now,
-    "exp": expiration,
-    "iss": appId,
-  }
+    iat: now,
+    exp: expiration,
+    iss: appId,
+  };
 
-  return jwt.sign(payload, privateKey.trim().replace(/\\n/g, "\n", ), { algorithm: "RS256" });
+  return jwt.sign(payload, privateKey.trim().replaceAll("\\n", "\n"), {
+    algorithm: "RS256",
+  });
 };

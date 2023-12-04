@@ -2,6 +2,9 @@ bring "./environments.w" as environments;
 bring "./users.w" as users;
 bring "./apps.w" as apps;
 bring "./secrets.w" as secrets;
+bring "./endpoints.w" as endpoints;
+bring "./components/public-endpoint/public-endpoint.w" as publicEndpoint;
+bring "./components/certificate/icertificate.w" as certificate;
 bring "./github-comment.w" as comment;
 bring "./types/octokit-types.w" as octokit;
 bring "./runtime/runtime-client.w" as runtime_client;
@@ -12,6 +15,9 @@ struct EnvironmentsProps {
   users: users.Users;
   apps: apps.Apps;
   secrets: secrets.Secrets;
+  endpoints: endpoints.Endpoints;
+  endpointProvider: publicEndpoint.PublicEndpointProvider;
+  certificate: certificate.ICertificate;
   environments: environments.Environments;
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
@@ -38,8 +44,9 @@ pub struct RestartAllEnvironmentOptions {
 }
 
 pub struct StopEnvironmentOptions {
+  appId: str;
+  appName: str;
   environment: environments.Environment;
-  app: apps.App;
 }
 
 pub struct UpdateEnvironmentStatusOptions {
@@ -49,12 +56,17 @@ pub struct UpdateEnvironmentStatusOptions {
 struct PostCommentOptions {
   environmentId: str;
   octokit: octokit.OctoKit;
+  appId: str;
+  appName: str;
 }
 
 pub class EnvironmentManager {
   apps: apps.Apps;
   secrets: secrets.Secrets;
   environments: environments.Environments;
+  endpoints: endpoints.Endpoints;
+  endpointProvider: publicEndpoint.PublicEndpointProvider;
+  certificate: certificate.ICertificate;
   githubComment: comment.GithubComment;
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
@@ -63,6 +75,9 @@ pub class EnvironmentManager {
     this.apps = props.apps;
     this.secrets = props.secrets;
     this.environments = props.environments;
+    this.endpoints = props.endpoints;
+    this.endpointProvider = props.endpointProvider;
+    this.certificate = props.certificate;
     this.runtimeClient = props.runtimeClient;
     this.probotAdapter = props.probotAdapter;
     this.githubComment = new comment.GithubComment(
@@ -80,7 +95,14 @@ pub class EnvironmentManager {
 
     let secrets = this.secretsForEnvironment(environment);
 
-    this.postComment(environmentId: environment.id, octokit: octokit);
+    let app = this.apps.get(appId: environment.appId);
+
+    this.postComment(
+      appId: app.appId,
+      appName: app.appName,
+      environmentId: environment.id,
+      octokit: octokit
+    );
 
     let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: environment.installationId);
     if tokenRes.status >= 300 || tokenRes.status < 200 {
@@ -92,6 +114,7 @@ pub class EnvironmentManager {
       entryfile: options.entryfile,
       environment: environment,
       secrets: secrets,
+      certificate: this.certificate.certificate(),
       sha: options.sha,
       token: tokenRes.data.token,
     );
@@ -104,7 +127,14 @@ pub class EnvironmentManager {
 
     let secrets = this.secretsForEnvironment(options.environment);
 
-    this.postComment(environmentId: options.environment.id, octokit: octokit);
+    let app = this.apps.get(appId: options.appId);
+
+    this.postComment(
+      appId: app.appId,
+      appName: app.appName,
+      environmentId: options.environment.id,
+      octokit: octokit
+    );
 
     let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: options.environment.installationId);
     if tokenRes.status >= 300 || tokenRes.status < 200 {
@@ -116,6 +146,7 @@ pub class EnvironmentManager {
       entryfile: options.entryfile,
       environment: options.environment,
       secrets: secrets,
+      certificate: this.certificate.certificate(),
       sha: options.sha,
       token: tokenRes.data.token,
     );
@@ -136,11 +167,23 @@ pub class EnvironmentManager {
   pub inflight stop(options: StopEnvironmentOptions) {
     let octokit = this.auth(options.environment.installationId);
 
-    this.environments.updateStatus(id: options.environment.id, appId: options.app.appId, status: "stopped");
+    this.environments.updateStatus(id: options.environment.id, appId: options.appId, status: "stopped");
 
     this.runtimeClient.delete(environment: options.environment);
 
-    this.postComment(environmentId: options.environment.id, octokit: octokit);
+    for endpoint in this.endpoints.list(environmentId: options.environment.id) {
+      this.endpointProvider.from(
+        digest: endpoint.digest,
+        port: endpoint.port,
+        targetUrl: "{options.environment.url}").delete();
+    }
+    
+    this.postComment(
+      environmentId: options.environment.id,
+      octokit: octokit,
+      appId: options.appId,
+      appName: options.appName,
+    );
   }
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
@@ -166,10 +209,19 @@ pub class EnvironmentManager {
       if testReport.testResults.length == 0 {
         return;
       }
+    } elif status == "running" {
+      let running = status_reports.Running.fromJson(options.statusReport.data);
+      this.reconcileEndpoints(environment, running.objects.endpoints);
     }
 
     let octokit = this.probotAdapter.auth(environment.installationId);
-    this.postComment(environmentId: environment.id, octokit: octokit);
+
+    this.postComment(
+      appId: app.appId,
+      appName: app.appName,
+      environmentId: environment.id,
+      octokit: octokit
+    );
   }
 
   inflight postComment(props: PostCommentOptions) {
@@ -178,7 +230,9 @@ pub class EnvironmentManager {
       let commentId = this.githubComment.createOrUpdate(
         octokit: props.octokit,
         prNumber: prNumber,
-        repo: environment.repo
+        repo: environment.repo,
+        appId: props.appId,
+        appName: props.appName,
       );
 
       if !environment.commentId? {
@@ -198,5 +252,71 @@ pub class EnvironmentManager {
       map.set(secret.name, secret.value);
     }
     return map.copy();
+  }
+
+  inflight reconcileEndpoints(environment: environments.Environment, endpoints: Array<status_reports.Endpoint>) {
+    if let url = environment.url {
+      let existingEndpoints = this.endpoints.list(environmentId: environment.id);
+      for endpoint in endpoints {
+        let publicEndpoint = this.endpointProvider.from(
+          digest: endpoint.digest,
+          port: endpoint.port,
+          targetUrl: url);
+
+
+        // check if we already created this public endpoint 
+        let var found = false;
+        for existingEndpoint in existingEndpoints {
+          if existingEndpoint.publicUrl == publicEndpoint.url() {
+            found = true;
+            break;
+          }
+        }
+
+        if found {
+          continue;
+        }
+
+        log("creating endpoint {Json.stringify(endpoint)}");
+        publicEndpoint.create();
+        this.endpoints.create(
+          appId: environment.appId,
+          environmentId: environment.id,
+          path: endpoint.path,
+          type: endpoint.type,
+          localUrl: endpoint.url,
+          publicUrl: publicEndpoint.url(),
+          port: endpoint.port,
+          digest: endpoint.digest,
+        );
+      }
+
+      // public endpoints needs to be deleted when they no longer appear in the environment
+      for existingEndpoint in existingEndpoints {
+        let var found = false;
+        for endpoint in endpoints {
+          let publicEndpoint = this.endpointProvider.from(
+            digest: endpoint.digest,
+            port: endpoint.port,
+            targetUrl: url);
+          if existingEndpoint.publicUrl == publicEndpoint.url() {
+            found = true;
+            break;
+          }
+        }
+
+        if found {
+          continue;
+        }
+
+        let publicEndpoint = this.endpointProvider.from(
+          digest: existingEndpoint.digest,
+          port: existingEndpoint.port,
+          targetUrl: url);
+        log("deleting endpoint {Json.stringify(publicEndpoint)}");
+        publicEndpoint.delete();
+        this.endpoints.delete(id: existingEndpoint.id, environmentId: existingEndpoint.environmentId);
+      }
+    }
   }
 }

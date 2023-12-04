@@ -6,19 +6,18 @@ import { useNotifications } from "../../../../design-system/notification.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 
 export interface DeleteModalProps {
-  appId: string;
+  owner: string;
   appName: string;
   show: boolean;
   onClose: (value: boolean) => void;
 }
 
 export const DeleteModal = ({
-  appId,
+  owner,
   appName,
   show,
   onClose,
 }: DeleteModalProps) => {
-  const { owner } = useParams();
   const { showNotification } = useNotifications();
 
   const navigate = useNavigate();
@@ -58,7 +57,7 @@ export const DeleteModal = ({
       isIdle={deleteApp.isIdle}
       isPending={deleteApp.isPending}
       onClose={onClose}
-      onConfirm={() => deleteApp.mutate({ appId })}
+      onConfirm={() => deleteApp.mutate({ owner, appName })}
       modalTitle={"Delete App"}
       modalBody={dialogBody}
     />

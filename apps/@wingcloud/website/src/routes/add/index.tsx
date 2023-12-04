@@ -1,6 +1,5 @@
 import { LinkIcon, SquaresPlusIcon } from "@heroicons/react/24/outline";
-import clsx from "clsx";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "../../design-system/button.js";
 import { useTheme } from "../../design-system/theme-provider.js";
@@ -10,7 +9,6 @@ import { AppConfigurationListItem } from "./_components/app-configuration-list-i
 
 export const Component = () => {
   const navigate = useNavigate();
-  const { theme } = useTheme();
 
   return (
     <AddAppContainer>
