@@ -73,5 +73,20 @@ describe('Platform', () => {
         billing_mode: 'PAY_PER_REQUEST',
       });
     });
+
+    test('aws_lambda_function', async () => {
+      const template = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
+      const functions = template.resource['aws_lambda_function'];
+
+      console.log({functions})
+
+      expect(Object.values(functions).length).toEqual(1);
+      expect(functions['cloudBucket_oncreate-OnMessage0_0B1CA993']).toBeDefined();
+      expect(functions['cloudBucket_oncreate-OnMessage0_0B1CA993']).toMatchObject({
+        tracing_config: {
+          mode: 'Active',
+        }
+      });
+    });
   });
 });

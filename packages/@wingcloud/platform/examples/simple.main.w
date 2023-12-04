@@ -12,6 +12,10 @@ let table = new ex.DynamodbTable({
   rangeKey: "sk",
 });
 
+bucket.onCreate(inflight () => {
+  log("hello world");
+});
+
 test "hello world" {
   assert(!bucket.exists("/hello/world"));
 }
