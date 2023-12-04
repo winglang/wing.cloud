@@ -3,10 +3,10 @@ import { WRPCProvider } from "@wingcloud/wrpc";
 import { useState } from "react";
 import { RouterProvider } from "react-router-dom";
 
-import { ErrorBoundary } from "./components/error-boundary.js";
 import { NotificationsProvider } from "./design-system/notification.js";
 import { DefaultTheme, ThemeProvider } from "./design-system/theme-provider.js";
 import { router } from "./router.jsx";
+import { PopupWindowProvider } from "./utils/popup-window-provider.js";
 
 const API_URL = new URL(location.origin);
 API_URL.pathname = "/wrpc";
@@ -19,7 +19,9 @@ export const App = () => {
       <WRPCProvider value={{ url: API_URL.toString() }}>
         <ThemeProvider mode="light" theme={DefaultTheme}>
           <NotificationsProvider>
-            <RouterProvider router={router} />
+            <PopupWindowProvider>
+              <RouterProvider router={router} />
+            </PopupWindowProvider>
           </NotificationsProvider>
         </ThemeProvider>
       </WRPCProvider>
