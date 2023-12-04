@@ -8,10 +8,7 @@ import { Button } from "../../design-system/button.js";
 import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
-import {
-  PopupWindowContext,
-  usePopupWindow,
-} from "../../utils/popup-window-provider.js";
+import { PopupWindowContext } from "../../utils/popup-window-provider.js";
 import { wrpc } from "../../utils/wrpc.js";
 
 import { AddAppContainer } from "./_components/add-app-container.js";
@@ -61,7 +58,6 @@ export const Component = () => {
         description: selectedRepo.description ?? "",
         repoName: selectedRepo.name,
         repoOwner: selectedRepo.owner.login,
-        entryfile: "main.w",
         defaultBranch: selectedRepo.default_branch,
         installationId,
       });
