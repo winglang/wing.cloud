@@ -717,7 +717,7 @@ pub class Api {
         type: "restartAll",
         data: EnvironmentManager.RestartAllEnvironmentOptions {
           appId: appId,
-          entryfile: app.entryfile,
+          entryfile: entryfile,
       }}));
 
       return {
