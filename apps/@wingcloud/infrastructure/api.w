@@ -12,6 +12,7 @@ bring "./apps.w" as Apps;
 bring "./users.w" as Users;
 bring "./environments.w" as Environments;
 bring "./secrets.w" as Secrets;
+bring "./endpoints.w" as Endpoints;
 bring "./lowkeys-map.w" as lowkeys;
 bring "./http-error.w" as httpError;
 
@@ -90,6 +91,7 @@ struct ApiProps {
   environments: Environments.Environments;
   environmentManager: EnvironmentManager.EnvironmentManager;
   secrets: Secrets.Secrets;
+  endpoints: Endpoints.Endpoints;
   probotAdapter: adapter.ProbotAdapter;
   githubAppClientId: str;
   githubAppClientSecret: str;
@@ -715,7 +717,7 @@ pub class Api {
         type: "restartAll",
         data: EnvironmentManager.RestartAllEnvironmentOptions {
           appId: appId,
-          entryfile: app.entryfile,
+          entryfile: entryfile,
       }}));
 
       return {
@@ -764,6 +766,31 @@ pub class Api {
           deploy: deployLogs,
           runtime: runtimeLogs,
           tests: testLogs.copy()
+        },
+      };
+    });
+
+    api.get("/wrpc/app.environment.endpoints", inflight (request) => {
+      let user = getUserFromCookie(request);
+
+      let appName = request.query.get("appName");
+      let branch = request.query.get("branch");
+
+      let appId = apps.getByName(
+        userId: user.userId,
+        appName: appName,
+      ).appId;
+
+      let environment = props.environments.getByBranch(
+        appId: appId,
+        branch: branch,
+      );
+
+      let endpoints = props.endpoints.list(environmentId: environment.id);
+
+      return {
+        body: {
+          endpoints: endpoints,
         },
       };
     });
