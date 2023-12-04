@@ -27,7 +27,6 @@ export const useCreateAppFromRepo = () => {
       description: string;
       repoName: string;
       repoOwner: string;
-      entryfile: string;
       defaultBranch: string;
       installationId: string;
     }) => {
@@ -64,8 +63,13 @@ export const useCreateAppFromRepo = () => {
   }, [installationId, repositoryId]);
 
   const loading = useMemo(() => {
-    return listInstallationsQuery.isLoading || listReposQuery.isLoading;
-  }, [listInstallationsQuery.isLoading, listReposQuery.isLoading]);
+    return (
+      listInstallationsQuery.isLoading ||
+      listReposQuery.isLoading ||
+      listReposQuery.isFetching ||
+      listInstallationsQuery.isFetching
+    );
+  }, [listInstallationsQuery, listReposQuery]);
 
   return {
     createApp,

@@ -1,17 +1,23 @@
 import { createKeyStore } from "./auth/key-store.js";
 import { BucketLogger } from "./bucket-logger.js";
+import { cleanEnvironment } from "./clean.js";
 import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
 import { useReportStatus } from "./report-status.js";
 import { Setup } from "./setup.js";
-import { startServer } from "./wing/server.js";
+import { prepareServer } from "./wing/server.js";
 
 export interface RunProps {
   context: EnvironmentContext;
   requestedPort?: number;
+  requestedSSLPort?: number;
 }
 
-export const run = async function ({ context, requestedPort }: RunProps) {
+export const run = async function ({
+  context,
+  requestedPort,
+  requestedSSLPort,
+}: RunProps) {
   const keyStore = await createKeyStore(context.environment.id);
   const report = useReportStatus(context, keyStore);
 
@@ -32,11 +38,19 @@ export const run = async function ({ context, requestedPort }: RunProps) {
   });
 
   let wingPaths;
+  const { startServer, closeSSL } = await prepareServer({
+    environmentId: context.environment.id,
+    requestedSSLPort,
+  });
   try {
     await report("deploying");
 
     const { paths, entryfilePath } = await setup.run();
     wingPaths = paths;
+
+    // clean environment from secrets and environment variables
+    cleanEnvironment();
+
     const testResults = await setup.runWingTest(paths, entryfilePath);
 
     if (testResults) {
@@ -46,7 +60,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
       deployLogger.log("failed to run tests");
     }
 
-    const { port, close } = await startServer({
+    const { port, close, endpoints } = await startServer({
       consolePath: paths["@wingconsole/app"],
       entryfilePath,
       logger: runtimeLogger,
@@ -54,16 +68,18 @@ export const run = async function ({ context, requestedPort }: RunProps) {
       requestedPort,
     });
 
-    await report("running");
+    await report("running", { objects: { endpoints } });
 
     return {
       paths,
       logfile: deployLogger.getLogfile(),
       port,
+      endpoints,
       close: async () => {
         deployLogger.stop();
         runtimeLogger.stop();
         await close();
+        closeSSL();
       },
     };
   } catch (error: any) {
@@ -86,6 +102,7 @@ export const run = async function ({ context, requestedPort }: RunProps) {
 
     deployLogger.stop();
     runtimeLogger.stop();
+    closeSSL();
     throw error;
   }
 };

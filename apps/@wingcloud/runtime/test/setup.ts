@@ -1,4 +1,4 @@
-import { mkdtempSync, cpSync } from "node:fs";
+import { mkdtempSync, cpSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,19 +26,28 @@ beforeAll(async () => {
   await git.commit("initial commit");
 });
 
+const privateKeyFile = process.env["ENVIRONMENT_SERVER_PRIVATE_KEY_FILE"]!;
+const certificateFile = process.env["ENVIRONMENT_SERVER_CERTIFICATE_FILE"]!;
 beforeEach(async () => {
+  process.env["SSL_PRIVATE_KEY"] = Buffer.from(
+    readFileSync(privateKeyFile, "utf8"),
+    "utf8",
+  ).toString("base64");
+  process.env["SSL_CERTIFICATE"] = Buffer.from(
+    readFileSync(certificateFile, "utf8"),
+    "utf8",
+  ).toString("base64");
+
   sim = new simulator.Simulator({
     simfile: resolve(join(currentDir, "../../infrastructure/target/main.wsim")),
   });
   await sim.start();
   logsBucket = sim.getResource(
-    "root/Default/runtime.RuntimeService/deployment logs",
+    "root/Default/deployment logs",
   ) as cloud.IBucketClient;
-  const config = sim.getResourceConfig(
-    "root/Default/cloud.Api",
-  ) as ApiSchema;
+  const config = sim.getResourceConfig("root/Default/cloud.Api") as ApiSchema;
   wingApiUrl = config.attrs.url;
-}, 60000);
+}, 60_000);
 
 afterEach(async () => {
   await sim?.stop();
@@ -66,11 +75,9 @@ export const withTestContext = async (
   });
   await sim.start();
   const logsBucket = sim.getResource(
-    "root/Default/runtime.RuntimeService/deployment logs",
+    "root/Default/deployment logs",
   ) as cloud.IBucketClient;
-  const config = sim.getResourceConfig(
-    "root/Default/cloud.Api",
-  ) as ApiSchema;
+  const config = sim.getResourceConfig("root/Default/cloud.Api") as ApiSchema;
   const wingApiUrl = config.attrs.url;
 
   await cb({ logsBucket, wingApiUrl, examplesDir });

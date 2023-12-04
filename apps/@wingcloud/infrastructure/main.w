@@ -7,6 +7,7 @@ bring "cdktf" as cdktf;
 bring "./users.w" as Users;
 bring "./apps.w" as Apps;
 bring "./environments.w" as Environments;
+bring "./endpoints.w" as Endpoints;
 bring "./environment-manager.w" as EnvironmentManager;
 bring "./secrets.w" as Secrets;
 bring "./api.w" as wingcloud_api;
@@ -16,6 +17,9 @@ bring "./runtime/runtime-client.w" as runtime_client;
 bring "./probot.w" as probot;
 bring "./probot-adapter.w" as adapter;
 bring "./components/parameter/parameter.w" as parameter;
+bring "./components/dns/dns.w" as Dns;
+bring "./components/public-endpoint/public-endpoint.w" as PublicEndpoint;
+bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 
 // And the sun, and the moon, and the stars, and the flowers.
@@ -46,6 +50,7 @@ let apps = new Apps.Apps(table);
 let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
 let secrets = new Secrets.Secrets();
+let endpoints = new Endpoints.Endpoints(table);
 
 let probotAdapter = new adapter.ProbotAdapter(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
@@ -84,11 +89,52 @@ let siteURL = (() => {
   }
 })();
 
+let dns = new Dns.DNS(token: (): str? => {
+  if util.env("WING_TARGET") != "sim" {
+    return util.env("DNSIMPLE_TOKEN");
+  } else {
+    return nil;
+  }
+}());
+let endpointProvider = new PublicEndpoint.PublicEndpointProvider(dns: dns, domain: (): str => {
+  if util.env("WING_TARGET") == "sim" {
+    return "127.0.0.1";
+  } else {
+    return "wingcloud.io";
+  }
+}());
+
+let environmentServerCertificate = new certificate.Certificate(
+  privateKeyFile: (): str => {
+    if util.env("WING_TARGET") == "sim" {
+      return util.env("ENVIRONMENT_SERVER_PRIVATE_KEY_FILE");
+    }
+  }(),
+  certificateFile: (): str => {
+    if util.env("WING_TARGET") == "sim" {
+      return util.env("ENVIRONMENT_SERVER_CERTIFICATE_FILE");
+    }
+  }(),
+  certificateId: (): num => {
+    if util.env("WING_TARGET") != "sim" {
+      return num.fromStr(util.env("ENVIRONMENT_SERVER_CERTIFICATE_ID"));
+    }
+  }(),
+  domain: (): str => {
+    if util.env("WING_TARGET") != "sim" {
+      return util.env("ENVIRONMENT_SERVER_ZONE_NAME");
+    }
+  }(),
+);
+
 let environmentManager = new EnvironmentManager.EnvironmentManager(
   users: users,
   apps: apps,
   environments: environments,
   secrets: secrets,
+  endpoints: endpoints,
+  endpointProvider: endpointProvider,
+  certificate: environmentServerCertificate,
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
@@ -101,6 +147,7 @@ let wingCloudApi = new wingcloud_api.Api(
   environments: environments,
   environmentManager: environmentManager,
   secrets: secrets,
+  endpoints: endpoints,
   probotAdapter: probotAdapter,
   githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),

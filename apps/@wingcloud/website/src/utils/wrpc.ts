@@ -108,6 +108,21 @@ export interface Secret {
 
 export type EnvironmentType = "produciton" | "preview";
 
+export interface Endpoint {
+  id: string;
+  appId: string;
+  runId: string;
+  environmentId: string;
+  path: string;
+  type: string;
+  localUrl: string;
+  publicUrl: string;
+  port: number;
+  digest: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const wrpc = createWRPCReact<{
   "auth.check": QueryProcedure<
     undefined,
@@ -161,6 +176,12 @@ export const wrpc = createWRPCReact<{
       tests: TestLog[];
     }
   >;
+  "app.environment.endpoints": QueryProcedure<
+    { appName: string; branch: string },
+    {
+      endpoints: Endpoint[];
+    }
+  >;
   "app.listSecrets": QueryProcedure<
     { appId: string },
     {
@@ -211,7 +232,6 @@ export const wrpc = createWRPCReact<{
       repoName: string;
       repoOwner: string;
       defaultBranch: string;
-      entryfile: string;
       installationId: string;
     },
     {

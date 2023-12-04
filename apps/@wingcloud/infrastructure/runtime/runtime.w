@@ -10,6 +10,7 @@ bring "./runtime-docker.w" as runtimeDocker;
 bring "../environments.w" as environments;
 bring "@cdktf/provider-aws" as awsprovider;
 bring "../components/parameter/iparameter.w" as parameter;
+bring "../components/certificate/icertificate.w" as certificate;
 bring "../nanoid62.w" as nanoid62;
 
 class Consts {
@@ -17,6 +18,7 @@ class Consts {
     return "/root/.wing/secrets.json";
   }
 }
+
 struct RuntimeStartOptions {
   gitToken: str?;
   gitRepo: str;
@@ -29,6 +31,7 @@ struct RuntimeStartOptions {
   wingCloudUrl: parameter.IParameter;
   environmentId: str;
   secrets: Map<str>;
+  certificate: certificate.Certificate;
 }
 
 struct RuntimeStopOptions {
@@ -77,6 +80,8 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
       "ENVIRONMENT_ID" => opts.environmentId,
       "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
+      "SSL_PRIVATE_KEY" => util.base64Encode(opts.certificate.privateKey),
+      "SSL_CERTIFICATE" => util.base64Encode(opts.certificate.certificate)
     };
 
     if let token = opts.gitToken {
@@ -124,7 +129,9 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     }
 
     app.addSecrets({
-      "WING_SECRETS": util.base64Encode(Json.stringify(opts.secrets))
+      "WING_SECRETS": util.base64Encode(Json.stringify(opts.secrets)),
+      "SSL_PRIVATE_KEY": util.base64Encode(opts.certificate.privateKey),
+      "SSL_CERTIFICATE": util.base64Encode(opts.certificate.certificate)
     });
 
     let files = Array<flyio.File>[{
@@ -149,15 +156,32 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       env.set("GIT_TOKEN", token);
     }
 
+    let createOptions: flyio.ICreateMachineProps = {
+      imageName: this.image.image.imageName, env: env.copy(), memoryMb: 1024, files: files, services: [{
+        protocol: "tcp",
+        internal_port: 3000,
+        ports: [{
+          port: 3000,
+          handlers: ["tls"],
+        }]
+      }, {
+        protocol: "tcp",
+        internal_port: 3001,
+        ports: [{
+          port: 443
+        }]
+      }]
+    };
+  
     if exists {
       log("updating machine in app ${app.props.name}");
-      app.update(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024, files: files);
+      app.update(createOptions);
     } else {
       log("adding machine to app ${app.props.name}");
-      app.addMachine(imageName: this.image.image.imageName, env: env.copy(), port: 3000, memoryMb: 1024, files: files);
+      app.addMachine(createOptions);
     }
 
-    return app.url();
+    return "{app.url()}:3000";
   }
 
   pub inflight stop(opts: RuntimeStopOptions) {
@@ -179,6 +203,7 @@ pub struct Message {
   environmentId: str;
   token: str?;
   secrets: Map<str>;
+  certificate: certificate.Certificate;
 }
 
 struct RuntimeServiceProps {
@@ -264,6 +289,7 @@ pub class RuntimeService {
           wingCloudUrl: props.wingCloudUrl,
           environmentId: msg.environmentId,
           secrets: msg.secrets,
+          certificate: msg.certificate,
           logsBucketName: bucketName,
           logsBucketRegion: bucketRegion,
           awsAccessKeyId: awsAccessKeyId,
