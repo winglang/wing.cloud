@@ -1,8 +1,9 @@
 import { createKeyStore } from "./auth/key-store.js";
-import { BucketLogger } from "./bucket-logger.js";
 import { cleanEnvironment } from "./clean.js";
 import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
+import { BucketLogger } from "./logger/bucket-logger.js";
+import { redactSecrets } from "./redact-secrets.js";
 import { useReportStatus } from "./report-status.js";
 import { Setup } from "./setup.js";
 import { prepareServer } from "./wing/server.js";
@@ -21,9 +22,12 @@ export const run = async function ({
   const keyStore = await createKeyStore(context.environment.id);
   const report = useReportStatus(context, keyStore);
 
+  const redact = redactSecrets([process.env["GIT_TOKEN"]!]);
+
   const deployLogger = new BucketLogger({
     key: context.environment.deploymentKey(),
     bucket: context.logsBucket,
+    redact,
   });
 
   const runtimeLogger = new BucketLogger({
@@ -45,11 +49,11 @@ export const run = async function ({
   try {
     await report("deploying");
 
-    const { paths, entryfilePath } = await setup.run();
-    wingPaths = paths;
-
     // clean environment from secrets and environment variables
     cleanEnvironment();
+
+    const { paths, entryfilePath } = await setup.run();
+    wingPaths = paths;
 
     const testResults = await setup.runWingTest(paths, entryfilePath);
 

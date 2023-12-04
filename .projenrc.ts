@@ -195,6 +195,7 @@ runtime.addDeps("jwk-to-pem");
 runtime.addDeps("jose");
 runtime.addDeps("node-fetch");
 runtime.addDeps("which");
+runtime.addDeps("redact-env");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/http-proxy");

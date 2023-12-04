@@ -13,6 +13,7 @@
     "jsonwebtoken": "^9.0.2",
     "jwk-to-pem": "^2.0.5",
     "node-fetch": "^3.3.2",
+    "redact-env": "^1.0.0",
     "which": "^4.0.0",
     "winglang": "^0.50.6"
   },

@@ -205,6 +205,9 @@ importers:
       node-fetch:
         specifier: ^3.3.2
         version: 3.3.2
+      redact-env:
+        specifier: ^1.0.0
+        version: 1.0.0
       which:
         specifier: ^4.0.0
         version: 4.0.0
@@ -10051,6 +10054,10 @@ packages:
     dependencies:
       resolve: 1.22.8
     dev: true
+
+  /redact-env@1.0.0:
+    resolution: {integrity: sha512-aC97mfXjThiOU5n21/NEu0Z3t3zrgFcTREKkF29F4Q/F2QABzhyJ7Qc9XX2A+gfz7h07B2O37u12TvfGHOMReQ==}
+    dev: false
 
   /redis-commands@1.7.0:
     resolution: {integrity: sha512-nJWqw3bTFy21hX/CPKHth6sfhZbdiHP6bTawSgQBlKOVRG7EZkfHbbHwQJnrE4vsQf0CMNE+3gJ4Fmm16vdVlQ==}

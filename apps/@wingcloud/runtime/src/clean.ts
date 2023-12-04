@@ -6,6 +6,7 @@ export const cleanEnvironment = function () {
     "TMPDIR",
     "LANG",
     "USER",
+    "GIT_TOKEN",
   ]);
   for (let env in process.env) {
     if (!allowedEnvVars.has(env)) {
