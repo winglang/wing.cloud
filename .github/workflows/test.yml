@@ -85,7 +85,7 @@ jobs:
           TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}
           TF_BACKEND_BUCKET_REGION: ${{ vars.TF_BACKEND_BUCKET_REGION }}
           TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
-          TF_BACKEND_STATE_FILE: "${{ github.repository }}/${{ github.base_ref }}/infrastructure/main.tfstate"
+          TF_BACKEND_STATE_FILE: "${{ github.repository }}/testing/infrastructure/main.tfstate"
           LANDING_DOMAIN: ${{ vars.LANDING_DOMAIN }}
           TF_IN_AUTOMATION: true
           ENVIRONMENT_SERVER_ZONE_NAME:  ${{ vars.ENVIRONMENT_SERVER_ZONE_NAME }}
