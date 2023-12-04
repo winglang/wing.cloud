@@ -37,11 +37,23 @@ describe('Platform', () => {
       templatePath = path.join(result, 'main.tf.json');
     }, 10000);
 
+    test('s3_backend', async () => {
+      const template = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
+      const backend = template.terraform['backend']['s3'];
+
+      // code bucket and the cloud.Bucket
+      expect(backend).toMatchObject({
+        bucket: 'mock-bucket',
+        region: 'mock-region',
+        key: 'mock-key',
+        dynamodb_table: 'mock-table',
+      });
+    });
+
     test('aws_s3_bucket', async () => {
       const template = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
       const buckets = template.resource['aws_s3_bucket'];
 
-      console.log(template.resource.aws_s3_bucket);
       // code bucket and the cloud.Bucket
       expect(Object.values(buckets).length).toEqual(1);
       expect(buckets['cloudBucket']).toBeDefined();

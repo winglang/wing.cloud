@@ -1,6 +1,7 @@
 import { type AppProps, App } from '@winglang/sdk/lib/core';
 import type { IPlatform } from '@winglang/sdk/lib/platform';
 import { App as TestApp } from './test/app';
+import s3Backend from './s3-backend';
 
 export class Platform implements IPlatform {
   public readonly target = 'tf-aws';
@@ -11,6 +12,7 @@ export class Platform implements IPlatform {
   }
 
   postSynth(config: any) {
+    config = s3Backend(config);
     return config;
   }
 }
