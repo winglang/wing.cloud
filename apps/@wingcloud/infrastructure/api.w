@@ -2,7 +2,6 @@ bring cloud;
 bring http;
 bring ex;
 bring util;
-bring fs;
 
 bring "./json-api.w" as json_api;
 bring "./cookie.w" as Cookie;
@@ -410,15 +409,8 @@ pub class Api {
         let defaultBranch = input.get("defaultBranch").asStr();
         let repoOwner = input.get("repoOwner").asStr();
         let repoName = input.get("repoName").asStr();
+        let entryfile = input.get("entryfile").asStr();
         let repoId = "{repoOwner}/{repoName}";
-
-        // get application default entrypoint path (main.w)
-        let entrypoint = getMainEntrypointFile(GetListOfEntrypointsProps{
-          accessToken: accessToken,
-          owner: repoOwner,
-          repo: repoName,
-          defaultBranch: defaultBranch,
-        });
 
         // TODO: https://github.com/winglang/wing/issues/3644
         let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9-]+", "*");
@@ -438,7 +430,7 @@ pub class Api {
           repoName: repoName,
           repoOwner: repoOwner,
           userId: owner.id,
-          entryfile: entrypoint,
+          entryfile: entryfile,
           createdAt: datetime.utcNow().toIso(),
         );
 
@@ -720,12 +712,18 @@ pub class Api {
         let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/{defaultBranch}");
         let tree = octokit.git.getTree(owner: owner, repo: repo, tree_sha: ref.data.object.sha, recursive: "true");
 
-        let entryfiles = getListOfEntrypoints(GetListOfEntrypointsProps{
-          accessToken: accessToken,
-          owner: owner,
-          repo: repo,
-          defaultBranch: defaultBranch,
-        });
+        let octokit = Octokit.octokit(accessToken);
+        let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/{defaultBranch}");
+        let tree = octokit.git.getTree(owner: owner, repo: repo, tree_sha: ref.data.object.sha, recursive: "true");
+
+        let entryfiles = MutArray<str>[];
+        for item in tree.data.tree {
+          if let path = item.path {
+            if item.type == "blob" && path.endsWith("main.w") {
+              entryfiles.push(path);
+            }
+          }
+        }
 
         return {
           body: {

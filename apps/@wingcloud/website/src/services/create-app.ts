@@ -27,6 +27,7 @@ export const useCreateAppFromRepo = () => {
       description: string;
       repoName: string;
       repoOwner: string;
+      entryfile: string;
       defaultBranch: string;
       installationId: string;
     }) => {
