@@ -22,6 +22,7 @@ env:
 
 jobs:
   aws:
+    if: contains(github.event.pull_request.labels.*.name, 'test-aws')
     timeout-minutes: 60
     runs-on: ubuntu-latest
     environment: testing
