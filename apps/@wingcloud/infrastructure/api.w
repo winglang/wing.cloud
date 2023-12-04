@@ -2,7 +2,6 @@ bring cloud;
 bring http;
 bring ex;
 bring util;
-bring fs;
 
 bring "./json-api.w" as json_api;
 bring "./cookie.w" as Cookie;
@@ -361,41 +360,6 @@ pub class Api {
       }}));
     });
 
-    struct GetListOfEntrypointsProps{
-      accessToken: str;
-      owner: str;
-      repo: str;
-      defaultBranch: str;
-    }
-
-    let getListOfEntrypoints = inflight (props: GetListOfEntrypointsProps): MutArray<str> => {
-      let octokit = Octokit.octokit(props.accessToken);
-      let ref = octokit.git.getRef(owner: props.owner, repo: props.repo, ref: "heads/{props.defaultBranch}");
-      let tree = octokit.git.getTree(owner: props.owner, repo: props.repo, tree_sha: ref.data.object.sha, recursive: "true");
-
-      let entryfiles = MutArray<str>[];
-      for item in tree.data.tree {
-        if let path = item.path {
-          if item.type == "blob" && path.endsWith("main.w") {
-            entryfiles.push(path);
-          }
-        }
-      }
-      return entryfiles;
-    };
-
-    let getMainEntrypointFile = inflight (props: GetListOfEntrypointsProps): str => {
-      let entrypoints = getListOfEntrypoints(props);
-    
-      for entrypoint in entrypoints {
-        if fs.basename(entrypoint) == "main.w" {
-          return entrypoint;
-        }
-      }
-      // don't know if we should throw an exception here or let the failure happen in the preview deployment phase
-      return "";
-    };
-
     api.post("/wrpc/app.create", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
         let user = getUserFromCookie(request);
@@ -410,15 +374,8 @@ pub class Api {
         let defaultBranch = input.get("defaultBranch").asStr();
         let repoOwner = input.get("repoOwner").asStr();
         let repoName = input.get("repoName").asStr();
+        let entryfile = input.get("entryfile").asStr();
         let repoId = "{repoOwner}/{repoName}";
-
-        // get application default entrypoint path (main.w)
-        let entrypoint = getMainEntrypointFile(GetListOfEntrypointsProps{
-          accessToken: accessToken,
-          owner: repoOwner,
-          repo: repoName,
-          defaultBranch: defaultBranch,
-        });
 
         // TODO: https://github.com/winglang/wing/issues/3644
         let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9-]+", "*");
@@ -438,7 +395,7 @@ pub class Api {
           repoName: repoName,
           repoOwner: repoOwner,
           userId: owner.id,
-          entryfile: entrypoint,
+          entryfile: entryfile,
           createdAt: datetime.utcNow().toIso(),
         );
 
@@ -451,7 +408,7 @@ pub class Api {
           defaultBranch: defaultBranch,
           installationId: num.fromStr(input.get("installationId").asStr()),
           appId: appId,
-          entryfile: entrypoint,
+          entryfile: entryfile,
         }));
 
         return {
@@ -716,12 +673,18 @@ pub class Api {
         let repo = request.query.get("repo");
         let defaultBranch = request.query.get("default_branch");
 
-        let entryfiles = getListOfEntrypoints(GetListOfEntrypointsProps{
-          accessToken: accessToken,
-          owner: owner,
-          repo: repo,
-          defaultBranch: defaultBranch,
-        });
+        let octokit = Octokit.octokit(accessToken);
+        let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/{defaultBranch}");
+        let tree = octokit.git.getTree(owner: owner, repo: repo, tree_sha: ref.data.object.sha, recursive: "true");
+
+        let entryfiles = MutArray<str>[];
+        for item in tree.data.tree {
+          if let path = item.path {
+            if item.type == "blob" && path.endsWith("main.w") {
+              entryfiles.push(path);
+            }
+          }
+        }
 
         return {
           body: {
