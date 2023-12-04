@@ -39,6 +39,7 @@ export class Setup {
     const entrydir = dirname(entryfilePath);
     await this.gitClone();
     await this.npmInstall(entrydir);
+    await this.runCustomScript(entrydir);
     const wingPaths = await this.runInstallWing(entrydir);
 
     return { paths: wingPaths, entryfilePath };
@@ -65,6 +66,16 @@ export class Setup {
   private async npmInstall(cwd: string) {
     if (existsSync(join(cwd, "package.json"))) {
       return this.executer.exec("npm", ["install"], {
+        cwd,
+        throwOnFailure: true,
+      });
+    }
+  }
+
+  private async runCustomScript(cwd: string) {
+    const scriptPath = join(cwd, "wing.sh");
+    if (existsSync(scriptPath)) {
+      return this.executer.exec("sh", [scriptPath], {
         cwd,
         throwOnFailure: true,
       });
