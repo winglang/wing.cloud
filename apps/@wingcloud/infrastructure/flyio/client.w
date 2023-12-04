@@ -186,6 +186,9 @@ pub inflight class Client {
           cpu_kind: "shared",
           memory_mb: props.memoryMb ?? 512,
         },
+        restart: {
+          policy: "no",
+        },
         env: props.env ?? {},
         files: props.files ?? [],
         auto_destroy: true,
