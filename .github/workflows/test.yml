@@ -83,6 +83,9 @@ jobs:
           TF_BACKEND_STATE_FILE: "${{ github.repository }}/${{ github.base_ref }}/infrastructure/main.tfstate"
           LANDING_DOMAIN: ${{ vars.LANDING_DOMAIN }}
           TF_IN_AUTOMATION: true
+          ENVIRONMENT_SERVER_ZONE_NAME:  ${{ vars.ENVIRONMENT_SERVER_ZONE_NAME }}
+          ENVIRONMENT_SERVER_CERTIFICATE_ID:  ${{ vars.ENVIRONMENT_SERVER_CERTIFICATE_ID }}
+
           # dnsimple provider
           DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
           DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
