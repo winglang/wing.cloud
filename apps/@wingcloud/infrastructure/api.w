@@ -373,15 +373,15 @@ pub class Api {
       let ref = octokit.git.getRef(owner: props.owner, repo: props.repo, ref: "heads/{props.defaultBranch}");
       let tree = octokit.git.getTree(owner: props.owner, repo: props.repo, tree_sha: ref.data.object.sha, recursive: "true");
 
-      let entryfiles = MutArray<str>[];
+      let entrypoints = MutArray<str>[];
       for item in tree.data.tree {
         if let path = item.path {
           if item.type == "blob" && path.endsWith("main.w") {
-            entryfiles.push(path);
+            entrypoints.push(path);
           }
         }
       }
-      return entryfiles;
+      return entrypoints;
     };
 
     let getMainEntrypointFile = inflight (props: GetListOfEntrypointsProps): str => {
