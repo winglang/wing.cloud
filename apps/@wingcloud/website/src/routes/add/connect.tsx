@@ -62,6 +62,7 @@ export const Component = () => {
         description: selectedRepo.description ?? "",
         repoName: selectedRepo.name,
         repoOwner: selectedRepo.owner.login,
+        entryfile: "main.w",
         defaultBranch: selectedRepo.default_branch,
         installationId,
       });
