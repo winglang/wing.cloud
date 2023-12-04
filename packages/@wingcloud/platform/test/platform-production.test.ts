@@ -17,13 +17,19 @@ describe('Platform', () => {
     beforeAll(async () => {
       originalEnv = { ...process.env };
       fs.mkdirSync(path.join(__dirname, '..', 'tmp'), { recursive: true });
-      tempDir = fs.mkdtempSync(path.join(__dirname, '..', 'tmp', 'platform-test-'));
-      console.debug({tempDir});
+      tempDir = fs.mkdtempSync(path.join(__dirname, '..', 'tmp', 'platform-production-'));
 
-      const lib = path.join(__dirname, '..', 'lib', "platform-test.js");
+      process.env = Object.assign(process.env, {
+        TF_BACKEND_BUCKET: 'mock-bucket',
+        TF_BACKEND_BUCKET_REGION: 'mock-region',
+        TF_BACKEND_STATE_FILE: 'mock-key',
+        TF_BACKEND_LOCK_TABLE: 'mock-table',
+      });
+
+      const lib = path.join(__dirname, '..', 'lib', "platform-production.js");
       const result = await compile('examples/simple.main.w', {
         platform: [lib],
-        testing: true,
+        testing: false,
         color: false,
         targetDir: tempDir,
       });
@@ -34,18 +40,15 @@ describe('Platform', () => {
     test('aws_s3_bucket', async () => {
       const template = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
       const buckets = template.resource['aws_s3_bucket'];
-      // code bucket and the cloud.Bucket
-      expect(Object.values(buckets).length).toEqual(2);
-      expect(buckets['cloudBucket']).toBeDefined();
-      expect(buckets['Code']).toBeDefined();
 
-      expect(buckets['cloudBucket']).toMatchObject({
+      console.log(template.resource.aws_s3_bucket);
+      // code bucket and the cloud.Bucket
+      expect(Object.values(buckets).length).toEqual(1);
+      expect(buckets['cloudBucket']).toBeDefined();
+
+      expect(buckets['cloudBucket']).not.include({
         force_destroy: true,
       });
-
-      expect(buckets['Code']).toMatchObject({
-        force_destroy: true,
-      })
     });
 
     test('aws_dynamodb_table', async () => {

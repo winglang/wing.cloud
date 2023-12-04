@@ -6,7 +6,7 @@ export class Platform implements IPlatform {
   public readonly target = 'tf-aws';
 
   newApp(appProps: AppProps): App {
-    console.error("hello from dev");
+    console.error("hello from production");
     return new TestApp(appProps);
   }
 
