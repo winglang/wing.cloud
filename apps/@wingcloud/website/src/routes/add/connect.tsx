@@ -1,6 +1,5 @@
 import { LinkIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { awscdk } from "projen";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
