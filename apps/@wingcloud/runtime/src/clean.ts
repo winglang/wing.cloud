@@ -7,6 +7,7 @@ export const cleanEnvironment = function () {
     "LANG",
     "USER",
     "GIT_TOKEN",
+    "ENVIRONMENT_ID",
   ]);
   for (let env in process.env) {
     if (!allowedEnvVars.has(env)) {

@@ -1,3 +1,4 @@
+import { CommandLineIcon } from "@heroicons/react/24/solid";
 import { Console } from "@wingconsole/ui";
 import clsx from "clsx";
 import { useMemo } from "react";
@@ -7,6 +8,7 @@ import { ErrorBoundary } from "../../../../../components/error-boundary.js";
 import { Header } from "../../../../../components/header.js";
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
+import { BranchIcon } from "../../../../../icons/branch-icon.js";
 import { wrpc } from "../../../../../utils/wrpc.js";
 
 const ConsolePage = () => {
@@ -53,9 +55,24 @@ const ConsolePage = () => {
 };
 
 export const Component = () => {
+  const { owner, appName, branch } = useParams();
   return (
     <div className="flex flex-col h-full">
-      <Header />
+      <Header
+        breadcrumbs={[
+          { label: appName!, to: `/${owner}/${appName}` },
+          {
+            label: branch!,
+            to: `/${owner}/${appName}/${branch}`,
+            icon: <BranchIcon className="w-4 h-4 text-slate-700" />,
+          },
+          {
+            label: "Console",
+            to: `/${owner}/${appName}/${branch}/console`,
+            icon: <CommandLineIcon className="w-4 h-4 text-slate-500" />,
+          },
+        ]}
+      />
       <ErrorBoundary>
         <ConsolePage />
       </ErrorBoundary>

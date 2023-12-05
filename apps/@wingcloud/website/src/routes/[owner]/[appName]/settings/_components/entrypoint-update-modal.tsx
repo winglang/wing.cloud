@@ -21,7 +21,7 @@ export const EntrypointUpdateModal = ({
 }: EntrypointUpdateModalProps) => {
   const dialogBody = useMemo(
     () => (
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-slate-500">
         Updating this property will restart all active environments for{" "}
         <span className="bg-slate-200 text-slate-700 px-1 rounded">
           {appName}

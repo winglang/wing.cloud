@@ -6,7 +6,7 @@ import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
 import { useBucketWrite } from "./storage/bucket-write.js";
 import { installWing } from "./wing/install.js";
-import { wingTest } from "./wing/test.js";
+import { runWingTests } from "./wing/test.js";
 
 export interface SetupProps {
   executer: Executer;
@@ -45,8 +45,8 @@ export class Setup {
     return { paths: wingPaths, entrypointPath };
   }
 
-  async runWingTest(wingPaths: WingPaths, entrypoint: string) {
-    return wingTest({
+  async runWingTests(wingPaths: WingPaths, entrypoint: string) {
+    return runWingTests({
       wingCompilerPath: wingPaths["@winglang/compiler"],
       wingSdkPath: wingPaths["@winglang/sdk"],
       entrypointPath: entrypoint,

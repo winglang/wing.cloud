@@ -9,7 +9,7 @@ import { fileBucketSync } from "../storage/file-bucket-sync.js";
 import { FileLogger } from "./file-logger.js";
 
 export class BucketLogger extends FileLogger {
-  stop: () => void;
+  stop: () => Promise<void>;
 
   constructor({
     key,
@@ -32,7 +32,7 @@ export class BucketLogger extends FileLogger {
       this.stop = cancelSync;
     } catch (error) {
       console.log(error);
-      this.stop = () => {};
+      this.stop = async () => {};
     }
   }
 }

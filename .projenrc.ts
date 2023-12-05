@@ -196,6 +196,9 @@ runtime.addDeps("jose");
 runtime.addDeps("node-fetch");
 runtime.addDeps("which");
 runtime.addDeps("redact-env");
+runtime.addDeps("codespan-wasm");
+runtime.addDeps("chalk");
+runtime.addDeps("stacktracey");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/http-proxy");
