@@ -32,7 +32,7 @@ export function fileBucketSync({ file, key, bucket }: FileBucketSyncProps) {
 
   return {
     cancelSync: async () => {
-      sync(false);
+      return sync(false);
     },
   };
 }

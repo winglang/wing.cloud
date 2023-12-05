@@ -2,13 +2,14 @@ import { readFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 
 import { CompileError, PreflightError } from "@winglang/compiler";
-import { prettyPrintError } from "@winglang/sdk/lib/util/enhanced-error";
 import {
   CHARS_ASCII,
   emitDiagnostic,
   type File,
   type Label,
 } from "codespan-wasm";
+
+import { prettyPrintError } from "./enhanced-error.js";
 
 function offsetFromLineAndColumn(source: string, line: number, column: number) {
   const lines = source.split("\n");
