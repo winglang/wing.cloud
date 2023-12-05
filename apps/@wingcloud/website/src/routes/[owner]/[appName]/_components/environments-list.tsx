@@ -154,8 +154,8 @@ export const EnvironmentsList = ({
                   theme.text1,
                 )}
               >
-                <BranchIcon className="w-12 h-12 mx-auto text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">
+                <BranchIcon className="w-12 h-12 mx-auto text-slate-400" />
+                <h3 className="mt-2 text-sm font-medium text-slate-900">
                   No previews found.
                 </h3>
               </div>
