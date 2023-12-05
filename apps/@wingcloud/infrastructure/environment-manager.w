@@ -82,6 +82,7 @@ pub class EnvironmentManager {
     this.probotAdapter = props.probotAdapter;
     this.githubComment = new comment.GithubComment(
       environments: props.environments,
+      endpoints: props.endpoints,
       users: props.users,
       apps: props.apps,
       siteDomain: props.siteDomain
