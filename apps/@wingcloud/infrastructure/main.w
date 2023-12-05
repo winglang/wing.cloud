@@ -243,10 +243,6 @@ let updateGithubWebhook = inflight () => {
 
 new cloud.OnDeploy(updateGithubWebhook);
 
-test "hello world" {
-  assert(true);
-}
-
 new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";
 new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
