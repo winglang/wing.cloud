@@ -166,7 +166,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
         }]
       }, {
         protocol: "tcp",
-        internal_port: 3001,
+        internal_port: 30_011,
         ports: [{
           port: 443
         }]

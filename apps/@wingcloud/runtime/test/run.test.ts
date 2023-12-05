@@ -300,3 +300,36 @@ test("run() - access endpoints through reverse proxy", async () => {
 
   await close();
 });
+
+test("run() - uses custom platform", async () => {
+  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const examplesDirRepo = `file://${examplesDir}`;
+  const gitProvider = new LocalGitProvider();
+  const environment = new Environment("test-id", "api/main.w", {
+    repo: examplesDirRepo,
+    sha: "main",
+  });
+
+  process.env["WING_TARGET"] = "tf-aws";
+  process.env["ENVIRONMENT_ID"] = "test-id";
+  const { close, endpoints, port } = await run({
+    context: { environment, gitProvider, logsBucket, wingApiUrl },
+  });
+
+  expect(endpoints.length).toBe(1);
+  expect(endpoints[0].digest).toBe("d834e1d3d496ef67");
+  expect(endpoints[0].path).toBe("root/Default/cloud.Api");
+
+  const response = await fetch(`http://localhost:${port}/url`, {
+    headers: {
+      host: `localhost:${endpoints[0].port}`,
+    },
+  });
+
+  expect(response.ok).toBeTruthy();
+  expect(await response.text()).toEqual(
+    "https://d834e1d3d496ef67.wingcloud.io",
+  );
+
+  await close();
+});

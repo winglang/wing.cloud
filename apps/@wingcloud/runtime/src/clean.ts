@@ -6,6 +6,7 @@ export const cleanEnvironment = function () {
     "TMPDIR",
     "LANG",
     "USER",
+    "ENVIRONMENT_ID",
   ]);
   for (let env in process.env) {
     if (!allowedEnvVars.has(env)) {
