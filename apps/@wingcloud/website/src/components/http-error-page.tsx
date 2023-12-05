@@ -37,7 +37,7 @@ export const HttpErrorPage = ({
         </h1>
         <p
           className={clsx(
-            "mt-5 text-base leading-7 text-gray-600",
+            "mt-5 text-base leading-7 text-slate-600",
             theme.text1,
           )}
         >

@@ -6,4 +6,9 @@ import { api } from "./plugins/index.js";
 
 export default defineConfig({
   plugins: [api(), react(), wingcloud()],
+  server: {
+    hmr: {
+      port: 5800,
+    },
+  },
 });
