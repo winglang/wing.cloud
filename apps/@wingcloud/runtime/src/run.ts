@@ -89,21 +89,21 @@ export const run = async function ({
     if (wingPaths) {
       const wingCompiler = await import(wingPaths["@winglang/compiler"]);
       if (error instanceof wingCompiler.CompileError) {
-        // try {
-        //   errorMessage = await formatWingError(
-        //     error,
-        //     context.environment.entrypoint,
-        //   );
-        // } catch (error: any) {
-        //   deployLogger.log(`Unable to format error: ${error.message}`);
-        // }
+        try {
+          errorMessage = await formatWingError(
+            error,
+            context.environment.entrypoint,
+          );
+        } catch (error: any) {
+          deployLogger.log(`Unable to format error: ${error.message}`);
+        }
       }
     }
 
     deployLogger.log(errorMessage);
     await report("error", { message: errorMessage });
-    deployLogger.stop();
-    runtimeLogger.stop();
+    await deployLogger.stop();
+    await runtimeLogger.stop();
     closeSSL();
     throw error;
   }
