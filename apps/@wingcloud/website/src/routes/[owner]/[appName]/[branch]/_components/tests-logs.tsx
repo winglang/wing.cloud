@@ -155,7 +155,8 @@ export const TestsLogs = ({
                           </div>
                           <div
                             className={clsx(
-                              theme.text2,
+                              log.pass && theme.text2,
+                              !log.pass && "text-red-500",
                               "break-all whitespace-pre-wrap",
                             )}
                           >
