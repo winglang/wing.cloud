@@ -1,7 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 
-import { CompileError, PreflightError } from "@winglang/compiler";
 import {
   CHARS_ASCII,
   emitDiagnostic,
@@ -26,12 +25,13 @@ export const formatWingError = async (
   error: unknown,
   entryPoint?: string,
 ) => {
-  const wingCompiler = await import(compilerPath);
+  const wingCompiler = (await import(
+    compilerPath
+  )) as typeof import("@winglang/compiler");
   try {
     if (error instanceof wingCompiler.CompileError) {
-      const compilerError = error as CompileError;
       // This is a bug in the user's code. Print the compiler diagnostics.
-      const errors = compilerError.diagnostics;
+      const errors = error.diagnostics;
       const result = [];
 
       for (const error of errors) {
@@ -105,15 +105,14 @@ export const formatWingError = async (
       }
       return result.join("\n");
     } else if (error instanceof wingCompiler.PreflightError) {
-      const preflightError = error as PreflightError;
       const output = new Array<string>();
 
       output.push(
-        await prettyPrintError(preflightError.causedBy, {
+        await prettyPrintError(error.causedBy, {
           sourceEntrypoint: resolve(entryPoint ?? "."),
         }),
         "--------------------------------- ORIGINAL STACK TRACE ---------------------------------",
-        preflightError.stack ?? "(no stacktrace available)",
+        error.stack ?? "(no stacktrace available)",
       );
 
       return output.join("\n");
