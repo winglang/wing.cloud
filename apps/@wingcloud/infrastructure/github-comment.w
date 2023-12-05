@@ -1,4 +1,5 @@
 bring "./environments.w" as environments;
+bring "./endpoints.w" as endpoints;
 bring "./users.w" as users;
 bring "./apps.w" as apps;
 bring "./status-reports.w" as status_reports;
@@ -6,6 +7,7 @@ bring "./types/octokit-types.w" as octokit;
 
 struct GithubCommentProps {
   environments: environments.Environments;
+  endpoints: endpoints.Endpoints;
   users: users.Users;
   apps: apps.Apps;
   siteDomain: str;
@@ -21,12 +23,14 @@ struct GithubCommentCreateProps {
 
 pub class GithubComment {
   environments: environments.Environments;
+  endpoints: endpoints.Endpoints;
   users: users.Users;
   apps: apps.Apps;
   siteDomain: str;
 
   new(props: GithubCommentProps) {
     this.environments = props.environments;
+    this.endpoints = props.endpoints;
     this.users = props.users;
     this.apps = props.apps;
     this.siteDomain = props.siteDomain;
@@ -60,7 +64,7 @@ pub class GithubComment {
 
   pub inflight createOrUpdate(props: GithubCommentCreateProps): num {
     let var commentId: num? = nil;
-    let tableHeader = "<tr><th>App</th><th>Status</th><th>Console</th><th>Updated (UTC)</th></tr>";
+    let tableHeader = "<tr><th>App</th><th>Status</th><th>Console</th><th>Endpoints</th><th>Updated (UTC)</th></tr>";
     let var commentBody = "<table>{tableHeader}";
 
     let appOwner = this.getAppOwner(props.appId);
@@ -98,10 +102,16 @@ pub class GithubComment {
           }
         }
 
+        let var endpointsString = "";
+        for endpoint in this.endpoints.list(environmentId: environment.id) {
+          let endpointUrl = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.path.split("/").at(-1)}</a>";
+          endpointsString = "{endpointUrl}<br> {endpointsString}";
+        }
+
         let date = std.Datetime.utcNow();
         let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
         let envStatus = this.envStatusToString(environment.status, appOwner ?? "", props.appName, environment.branch);
-        let tableRows = "<tr><td>{appNameLink}</td><td>{envStatus}</td><td>{previewUrl}</td><td>{dateStr}</td></tr>";
+        let tableRows = "<tr><td>{appNameLink}</td><td>{envStatus}</td><td>{previewUrl}</td><td>{endpointsString}</td><td>{dateStr}</td></tr>";
         let testsSection = "<details><summary>Tests</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
 
         commentBody = "{commentBody}{tableRows}</table>";

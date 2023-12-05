@@ -29,8 +29,8 @@ export const AppCard = ({
         <div className="w-full truncate space-y-1">
           <div className={clsx("text-lg", theme.text1)}>{app.appName}</div>
           <div className={clsx("text-xs flex gap-x-1", theme.text2)}>
-            <div className="truncate" title={app.entryfile}>
-              {app.entryfile}
+            <div className="truncate" title={app.entrypoint}>
+              {app.entrypoint}
             </div>
           </div>
         </div>
