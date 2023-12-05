@@ -3,9 +3,9 @@ import { BucketLogger } from "./bucket-logger.js";
 import { cleanEnvironment } from "./clean.js";
 import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
+import { formatWingError } from "./format-wing-error.js";
 import { useReportStatus } from "./report-status.js";
 import { Setup } from "./setup.js";
-import { formatWingError } from "./utils/format-wing-error.js";
 import { prepareServer } from "./wing/server.js";
 
 export interface RunProps {
@@ -90,7 +90,10 @@ export const run = async function ({
       const wingCompiler = await import(wingPaths["@winglang/compiler"]);
       if (error instanceof wingCompiler.CompileError) {
         try {
-          errorMessage = await formatWingError(error);
+          errorMessage = await formatWingError(
+            error,
+            context.environment.entrypoint,
+          );
         } catch (error: any) {
           deployLogger.log(`Unable to format error: ${error.message}`);
         }
