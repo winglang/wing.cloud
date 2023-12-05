@@ -22,13 +22,19 @@ const Avatar = ({ avatarURL }: { avatarURL?: string }) => {
     <>
       {avatarURL && (
         <img
-          className={clsx("h-5 w-5 rounded")}
+          className={clsx("h-5 w-5 rounded-full")}
           src={avatarURL}
           alt="User avatar"
         />
       )}
       {!avatarURL && (
-        <UserIcon className={clsx(theme.text2, theme.focusInput, "w-5 h-5")} />
+        <UserIcon
+          className={clsx(
+            theme.text2,
+            theme.focusInput,
+            "w-5 h-5 rounded-full",
+          )}
+        />
       )}
     </>
   );
