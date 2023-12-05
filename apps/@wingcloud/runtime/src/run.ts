@@ -22,7 +22,7 @@ export const run = async function ({
   const keyStore = await createKeyStore(context.environment.id);
   const report = useReportStatus(context, keyStore);
 
-  const redact = redactSecrets([process.env["GIT_TOKEN"]!]);
+  const redact = redactSecrets();
 
   const deployLogger = new BucketLogger({
     key: context.environment.deploymentKey(),
