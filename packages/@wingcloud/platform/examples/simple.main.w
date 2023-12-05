@@ -14,6 +14,7 @@ let table = new ex.DynamodbTable({
 
 bucket.onCreate(inflight () => {
   log("hello world");
+  bucket.put("/hello/world", "hello world");
 });
 
 test "hello world" {

@@ -1,33 +1,21 @@
-import { type AppProps, App } from '@winglang/sdk/lib/core';
-import { Node as WingNode } from '@winglang/sdk/lib/std';
-import type { IPlatform } from '@winglang/sdk/lib/platform';
-import { aws } from '@winglang/sdk';
 import { App as PlatformApp } from './app';
+import { App } from '@winglang/sdk/lib/target-tf-aws';
+import { type AppProps } from '@winglang/sdk/lib/core';
+import type { IPlatform } from '@winglang/sdk/lib/platform';
 import s3Backend from './s3-backend';
 import { Aspects } from 'cdktf';
-import { Construct } from 'constructs';
-
-class OverrideApiGatewayDeployment {
-  constructor() {}
-
-  visit(node: Construct) {
-    if (node instanceof aws.Function) {
-      console.log({node})
-    }
-  }
-}
+import { EnableXray } from './production/enable_xray';
 
 export class Platform implements IPlatform {
   public readonly target = 'tf-aws';
 
   newApp(appProps: AppProps): App {
-    console.error("hello from production");
-    return new PlatformApp(appProps);
+    console.error("using production platform");
+    return new App(appProps);
   }
 
-  preSynth(app: App) {
-    Aspects.of(app).add(new OverrideApiGatewayDeployment());
-    return app;
+  preSynth(app: PlatformApp) {
+    Aspects.of(app).add(new EnableXray(app));
   }
 
   postSynth(config: any) {

@@ -1,9 +1,12 @@
 import { Node } from '@winglang/sdk/lib/std';
 import * as tfaws from '@winglang/sdk/lib/target-tf-aws';
-import type { AppProps } from '@winglang/sdk/lib/core';
+import { type AppProps } from '@winglang/sdk/lib/core';
 import type { TestRunner } from '@winglang/sdk/lib/std';
 
 export class App extends tfaws.App {
+  constructor(props: AppProps) {
+    super(props);
+  }
   /**
  * Override the default behavior of synthRoots for testing
  * to allow for a single root construct, rather than one per

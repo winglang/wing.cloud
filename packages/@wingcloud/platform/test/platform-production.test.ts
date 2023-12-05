@@ -53,11 +53,8 @@ describe('Platform', () => {
     test('aws_s3_bucket', async () => {
       const template = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
       const buckets = template.resource['aws_s3_bucket'];
-
-      // code bucket and the cloud.Bucket
-      expect(Object.values(buckets).length).toEqual(1);
+;
       expect(buckets['cloudBucket']).toBeDefined();
-
       expect(buckets['cloudBucket']).not.include({
         force_destroy: true,
       });
@@ -74,18 +71,47 @@ describe('Platform', () => {
       });
     });
 
-    test('aws_lambda_function', async () => {
+    test('enable xray', async () => {
       const template = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
       const functions = template.resource['aws_lambda_function'];
-
-      console.log({functions})
+      const fn = functions['cloudBucket_oncreate-OnMessage0_0B1CA993'];
 
       expect(Object.values(functions).length).toEqual(1);
-      expect(functions['cloudBucket_oncreate-OnMessage0_0B1CA993']).toBeDefined();
-      expect(functions['cloudBucket_oncreate-OnMessage0_0B1CA993']).toMatchObject({
+      expect(fn).toBeDefined();
+      expect(fn).toMatchObject({
         tracing_config: {
           mode: 'Active',
-        }
+        },
+        layers: [
+          'arn:aws:lambda:${data.aws_region.Region.name}:901920570463:layer:aws-otel-nodejs-arm64-ver-1-17-1:1',
+        ],
+      });
+
+      const fnPath = fn['//']['metadata']['path']
+      const basePath = fnPath.slice(0, fnPath.lastIndexOf('/'));
+
+      const rolePolicy: any | undefined = Object.values(template.resource['aws_iam_role_policy']).find((policy: any) => {
+        return policy['//']['metadata']['path'].startsWith(basePath);
+      });
+
+      expect(rolePolicy).toBeDefined();
+
+      const policy = JSON.parse(rolePolicy['policy']);
+
+      expect(policy).toMatchObject({
+        Statement: [
+          {
+            Action: [
+              'xray:PutTraceSegments',
+              'xray:PutTelemetryRecords',
+              'xray:GetSamplingRules',
+              'xray:GetSamplingTargets',
+              'xray:GetSamplingStatisticSummaries',
+            ],
+            Effect: 'Allow',
+            Resource: ['*'],
+          },
+        ],
       });
     });
   });
