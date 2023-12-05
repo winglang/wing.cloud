@@ -147,7 +147,11 @@ export async function prettyPrintError(
 
       if (interestingLine) {
         // last line is the caret
-        output.push(" ".repeat(maxDigits) + " |" + fRed(linesOfInterest[x]));
+        output.push(
+          " ".repeat(maxDigits) +
+            " |" +
+            fRed(linesOfInterest[x] ?? "[could not resolve the line]"),
+        );
       }
     }
   }
@@ -155,7 +159,7 @@ export async function prettyPrintError(
   const outputText = output.length > 0 ? "\n" + output.join("\n") : "";
   const extraStack =
     traceWithSources.length > 0
-      ? "\n" + fDim(traceWithSources.map(printItem).join("\n"))
+      ? "\n" + fDim(traceWithSources.map((item) => printItem(item)).join("\n"))
       : "";
 
   // add the rest of the stack trace from the same file
