@@ -91,8 +91,8 @@ export const run = async function ({
       if (error instanceof wingCompiler.CompileError) {
         try {
           errorMessage = await formatWingError(
+            wingPaths["@winglang/compiler"],
             error,
-            context.environment.entrypoint,
           );
         } catch (error: any) {
           deployLogger.log(`Unable to format error: ${error.message}`);

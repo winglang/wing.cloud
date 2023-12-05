@@ -21,11 +21,17 @@ function offsetFromLineAndColumn(source: string, line: number, column: number) {
   return offset;
 }
 
-export const formatWingError = async (error: unknown, entryPoint?: string) => {
+export const formatWingError = async (
+  compilerPath: string,
+  error: unknown,
+  entryPoint?: string,
+) => {
+  const wingCompiler = await import(compilerPath);
   try {
-    if (error instanceof CompileError) {
+    if (error instanceof wingCompiler.CompileError) {
+      const compilerError = error as CompileError;
       // This is a bug in the user's code. Print the compiler diagnostics.
-      const errors = error.diagnostics;
+      const errors = compilerError.diagnostics;
       const result = [];
 
       for (const error of errors) {
@@ -98,15 +104,16 @@ export const formatWingError = async (error: unknown, entryPoint?: string) => {
         result.push(diagnosticText);
       }
       return result.join("\n");
-    } else if (error instanceof PreflightError) {
+    } else if (error instanceof wingCompiler.PreflightError) {
+      const preflightError = error as PreflightError;
       const output = new Array<string>();
 
       output.push(
-        await prettyPrintError(error.causedBy, {
+        await prettyPrintError(preflightError.causedBy, {
           sourceEntrypoint: resolve(entryPoint ?? "."),
         }),
         "--------------------------------- ORIGINAL STACK TRACE ---------------------------------",
-        error.stack ?? "(no stacktrace available)",
+        preflightError.stack ?? "(no stacktrace available)",
       );
 
       return output.join("\n");

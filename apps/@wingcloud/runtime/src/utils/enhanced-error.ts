@@ -186,8 +186,8 @@ export function rewriteCommonError(error: Error): Error {
     newMessage.push(
       error.message,
       "hint: Every preflight object needs a unique identifier within its scope. You can assign one as shown:",
-    , '> new cloud.Bucket() as "MyBucket";',
-      "For more information, see https://www.winglang.io/docs/concepts/application-tree"
+      '> new cloud.Bucket() as "MyBucket";',
+      "For more information, see https://www.winglang.io/docs/concepts/application-tree",
     );
     error.message = newMessage.join("\n\n");
   } else if (error.constructor.name === "NotImplementedError") {
