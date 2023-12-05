@@ -10,7 +10,7 @@ pub struct App {
   repoName: str;
   repoId: str;
   userId: str;
-  entryfile: str;
+  entrypoint: str;
   createdAt: str;
 }
 
@@ -26,7 +26,7 @@ struct CreateAppOptions {
   repoName: str;
   repoId: str;
   userId: str;
-  entryfile: str;
+  entrypoint: str;
   createdAt: str;
 }
 
@@ -58,12 +58,12 @@ struct MakeItemOptions {
   sk: str;
 }
 
-struct UpdateEntryfileOptions {
+struct UpdateEntrypointOptions {
   appId: str;
   appName: str;
   userId: str;
   repository: str;
-  entryfile: str;
+  entrypoint: str;
 }
 
 pub class Apps {
@@ -88,7 +88,7 @@ pub class Apps {
         repoOwner: options.repoOwner,
         repoName: options.repoName,
         userId: options.userId,
-        entryfile: options.entryfile,
+        entrypoint: options.entrypoint,
         createdAt: options.createdAt,
       };
     };
@@ -267,7 +267,7 @@ pub class Apps {
     return apps;
   }
 
-  pub inflight updateEntrypoint(options: UpdateEntryfileOptions): void {
+  pub inflight updateEntrypoint(options: UpdateEntrypointOptions): void {
     this.table.transactWriteItems(transactItems: [
       {
         update: {
@@ -275,15 +275,15 @@ pub class Apps {
             pk: "APP#{options.appId}",
             sk: "#",
           },
-          updateExpression: "SET #entryfile = :entryfile",
+          updateExpression: "SET #entrypoint = :entrypoint",
           conditionExpression: "attribute_exists(#pk) and #userId = :userId",
           expressionAttributeNames: {
             "#pk": "pk",
-            "#entryfile": "entryfile",
+            "#entrypoint": "entrypoint",
             "#userId": "userId",
           },
           expressionAttributeValues: {
-            ":entryfile": options.entryfile,
+            ":entrypoint": options.entrypoint,
             ":userId": options.userId,
           },
         }
@@ -294,12 +294,12 @@ pub class Apps {
             pk: "USER#{options.userId}",
             sk: "APP#{options.appId}",
           },
-          updateExpression: "SET #entryfile = :entryfile",
+          updateExpression: "SET #entrypoint = :entrypoint",
           expressionAttributeNames: {
-            "#entryfile": "entryfile",
+            "#entrypoint": "entrypoint",
           },
           expressionAttributeValues: {
-            ":entryfile": options.entryfile,
+            ":entrypoint": options.entrypoint,
           },
         }
       },
@@ -309,12 +309,12 @@ pub class Apps {
             pk: "USER#{options.userId}",
             sk: "APP_NAME#{options.appName}",
           },
-          updateExpression: "SET #entryfile = :entryfile",
+          updateExpression: "SET #entrypoint = :entrypoint",
           expressionAttributeNames: {
-            "#entryfile": "entryfile",
+            "#entrypoint": "entrypoint",
           },
           expressionAttributeValues: {
-            ":entryfile": options.entryfile,
+            ":entrypoint": options.entrypoint,
           },
         }
       },
@@ -324,12 +324,12 @@ pub class Apps {
             pk: "REPOSITORY#{options.repository}",
             sk: "APP#{options.appId}",
           },
-          updateExpression: "SET #entryfile = :entryfile",
+          updateExpression: "SET #entrypoint = :entrypoint",
           expressionAttributeNames: {
-            "#entryfile": "entryfile",
+            "#entrypoint": "entrypoint",
           },
           expressionAttributeValues: {
-            ":entryfile": options.entryfile,
+            ":entrypoint": options.entrypoint,
           },
         }
       },

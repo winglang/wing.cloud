@@ -29,7 +29,7 @@ export interface PrepareServerProps {
 
 export interface StartServerProps {
   consolePath: string;
-  entryfilePath: string;
+  entrypointPath: string;
   logger: LoggerInterface;
   keyStore: KeyStore;
   requestedPort?: number;
@@ -134,7 +134,7 @@ export async function prepareServer({
     },
     startServer: async ({
       consolePath,
-      entryfilePath,
+      entrypointPath,
       logger,
       keyStore,
       requestedPort,
@@ -146,7 +146,7 @@ export async function prepareServer({
       };
 
       const { port, close } = await create({
-        wingfile: entryfilePath,
+        wingfile: entrypointPath,
         expressApp: app,
         requestedPort,
         log: {
@@ -177,7 +177,7 @@ export async function prepareServer({
 
       const { endpoints } = await endpointsFn({ port, environmentId });
       console.log(
-        `Console app opened on port ${port} for app ${entryfilePath}`,
+        `Console app opened on port ${port} for app ${entrypointPath}`,
         JSON.stringify({
           endpoints,
         }),
