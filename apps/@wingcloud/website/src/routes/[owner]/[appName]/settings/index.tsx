@@ -2,6 +2,7 @@ import {
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
+import { Cog6ToothIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -44,7 +45,7 @@ const SettingsPage = () => {
     },
   );
 
-  const entryfilesQuery = wrpc["app.listEntryfiles"].useQuery(
+  const entrypointsQuery = wrpc["app.listEntrypoints"].useQuery(
     {
       owner: app?.repoOwner || "",
       repo: app?.repoName || "",
@@ -55,49 +56,50 @@ const SettingsPage = () => {
     },
   );
 
-  const isValidEntryfile = useMemo(() => {
-    if (!app?.entryfile || !entryfilesQuery.data) {
+  const isValidEntrypoint = useMemo(() => {
+    if (!app?.entrypoint || !entrypointsQuery.data) {
       return true;
     }
-    return entryfilesQuery.data.entryfiles.includes(app.entryfile);
-  }, [app, entryfilesQuery.data]);
+    return entrypointsQuery.data.entrypoints.includes(app.entrypoint);
+  }, [app, entrypointsQuery.data]);
 
-  const entryfiles = useMemo(() => {
+  const entrypoints = useMemo(() => {
     return (
-      entryfilesQuery.data?.entryfiles.map((e) => ({ value: e, label: e })) || [
-        { value: app?.entryfile || "", label: app?.entryfile || "" },
-      ]
+      entrypointsQuery.data?.entrypoints.map((e) => ({
+        value: e,
+        label: e,
+      })) || [{ value: app?.entrypoint || "", label: app?.entrypoint || "" }]
     );
-  }, [app, entryfilesQuery.data]);
+  }, [app, entrypointsQuery.data]);
 
-  const [entryfile, setEntryfile] = useState(app?.entryfile);
+  const [entrypoint, setEntrypoint] = useState(app?.entrypoint);
 
-  const updateEntryfileMutation = wrpc["app.updateEntryfile"].useMutation();
+  const updateEntrypointMutation = wrpc["app.updateEntrypoint"].useMutation();
 
   const [loading, setLoading] = useState(false);
 
-  const updateEntryfile = useCallback(async () => {
+  const updateEntrypoint = useCallback(async () => {
     try {
       setLoading(true);
-      await updateEntryfileMutation.mutateAsync({
+      await updateEntrypointMutation.mutateAsync({
         appId: app?.appId!,
-        entryfile: entryfile!,
+        entrypoint: entrypoint!,
       });
       appQuery.refetch();
-      showNotification("Succefully updated the app's entryfile");
+      showNotification("Succefully updated the app's entrypoint");
       setLoading(false);
       setConfirmModalOpen(false);
     } catch (error) {
       setLoading(false);
       setConfirmModalOpen(false);
       if (error instanceof Error) {
-        showNotification("Failed to update the app's entryfile", {
+        showNotification("Failed to update the app's entrypoint", {
           body: error.message,
           type: "error",
         });
       }
     }
-  }, [app?.appId, entryfile, updateEntryfileMutation]);
+  }, [app?.appId, entrypoint, updateEntrypointMutation]);
 
   return (
     <div
@@ -124,7 +126,7 @@ const SettingsPage = () => {
             <div className={clsx("flex flex-col text-x truncate", theme.text1)}>
               <div className="flex flex-row items-center gap-2">
                 <span>App Entrypoint</span>
-                {!isValidEntryfile && !entryfilesQuery.isLoading && (
+                {!isValidEntrypoint && !entrypointsQuery.isLoading && (
                   <ExclamationTriangleIcon
                     title="The configured entrypoint file could not be found in this repository."
                     className="h-4 w-4 flex-shrink-0 text-orange-600"
@@ -136,10 +138,10 @@ const SettingsPage = () => {
               <div className="w-full space-y-2">
                 <div className="flex gap-2 w-full items-center">
                   <Select
-                    items={entryfiles}
-                    value={entryfile || app.entryfile}
-                    onChange={setEntryfile}
-                    disabled={entryfilesQuery.isLoading}
+                    items={entrypoints}
+                    value={entrypoint || app.entrypoint}
+                    onChange={setEntrypoint}
+                    disabled={entrypointsQuery.isLoading}
                     className="w-full"
                   />
                 </div>
@@ -148,7 +150,7 @@ const SettingsPage = () => {
                 <Button
                   onClick={() => setConfirmModalOpen(true)}
                   disabled={
-                    loading || !entryfile || app.entryfile === entryfile
+                    loading || !entrypoint || app.entrypoint === entrypoint
                   }
                   className="truncate"
                 >
@@ -156,7 +158,7 @@ const SettingsPage = () => {
                 </Button>
               </div>
             </div>
-            <hr className="h-px mt-4 mb-2 bg-gray-200 border-0 dark:bg-gray-700" />
+            <hr className="h-px mt-4 mb-2 bg-slate-200 border-0 dark:bg-slate-700" />
             <div className="flex flex-row gap-2">
               <ExclamationCircleIcon
                 className={clsx("h-4 w-4 flex-shrink-0", theme.text2)}
@@ -183,10 +185,10 @@ const SettingsPage = () => {
         <EntrypointUpdateModal
           appName={appName}
           show={confirmModalOpen}
-          isIdle={updateEntryfileMutation.isIdle}
+          isIdle={updateEntrypointMutation.isIdle}
           isPending={loading}
           onClose={setConfirmModalOpen}
-          onConfirm={updateEntryfile}
+          onConfirm={updateEntrypoint}
         />
       )}
     </div>
@@ -194,9 +196,20 @@ const SettingsPage = () => {
 };
 
 export const Component = () => {
+  const { owner, appName } = useParams();
+
   return (
     <div className="flex flex-col h-full">
-      <Header />
+      <Header
+        breadcrumbs={[
+          { label: appName!, to: `/${owner}/${appName}` },
+          {
+            label: "Settings",
+            to: `/${owner}/${appName}/settings`,
+            icon: <Cog6ToothIcon className="w-4 h-4 text-slate-500" />,
+          },
+        ]}
+      />
       <ErrorBoundary>
         <SettingsPage />
       </ErrorBoundary>

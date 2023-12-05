@@ -152,7 +152,7 @@ export const Component = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <Header />
+      <Header breadcrumbs={[{ label: appName!, to: `/${owner}/${appName}` }]} />
       <ErrorBoundary>
         <AppPage owner={owner!} appName={appName!} />
       </ErrorBoundary>

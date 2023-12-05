@@ -241,10 +241,7 @@ let updateGithubWebhook = inflight () => {
   log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
 };
 
-// Not sure why, but terraform doesn't seem to like this.
-if util.tryEnv("WING_TARGET") == "sim" {
-  new cloud.OnDeploy(updateGithubWebhook);
-}
+new cloud.OnDeploy(updateGithubWebhook);
 
 test "hello world" {
   assert(true);

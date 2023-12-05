@@ -1,6 +1,7 @@
-import { UserCircleIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { Cog6ToothIcon, UserIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -12,9 +13,38 @@ import { wrpc } from "../utils/wrpc.js";
 export interface Breadcrumb {
   label: string;
   to: string;
+  icon?: React.ReactNode;
 }
 
-const UserMenu = ({ avatarUrl }: { avatarUrl?: string }) => {
+const Avatar = ({ avatarURL }: { avatarURL?: string }) => {
+  const { theme } = useTheme();
+  return (
+    <>
+      {avatarURL && (
+        <img
+          className={clsx("h-5 w-5 rounded-full")}
+          src={avatarURL}
+          alt="User avatar"
+        />
+      )}
+      {!avatarURL && (
+        <UserIcon
+          className={clsx(
+            theme.text2,
+            theme.focusInput,
+            "w-5 h-5 rounded-full",
+          )}
+        />
+      )}
+    </>
+  );
+};
+
+interface UserMenuProps {
+  avatarURL?: string;
+}
+
+const UserMenu = (props: UserMenuProps) => {
   const { theme } = useTheme();
 
   const signOut = wrpc["auth.signOut"].useMutation({
@@ -34,99 +64,94 @@ const UserMenu = ({ avatarUrl }: { avatarUrl?: string }) => {
           },
         },
       ]}
-      icon={
-        <>
-          {avatarUrl && (
-            <img
-              className={clsx(
-                "h-8 w-8 rounded-full",
-                "border-2",
-                theme.borderInput,
-                theme.focusInput,
-              )}
-              src={avatarUrl}
-              alt="User avatar"
-            />
-          )}
-          {!avatarUrl && (
-            <UserCircleIcon
-              className={clsx(theme.text2, theme.focusInput, "w-8 h-8")}
-            />
-          )}
-        </>
-      }
+      icon={<Avatar avatarURL={props.avatarURL} />}
     />
   );
 };
 
-export const Header = () => {
+export interface HeaderProps {
+  breadcrumbs?: Breadcrumb[];
+}
+
+export const Header = (props: HeaderProps) => {
   const { theme } = useTheme();
-  const location = useLocation();
 
-  const breadcrumbs = useMemo(() => {
-    const parts = location.pathname.split("/").filter((part) => part !== "");
-
-    return parts.map((part, index) => {
-      const to = `/${parts.slice(0, index + 1).join("/")}`;
-      return {
-        label: decodeURIComponent(part),
-        to: `${to}`,
-      };
-    });
-  }, [location.pathname]);
-
-  const userQuery = wrpc["auth.check"].useQuery(undefined, {
+  const user = wrpc["auth.check"].useQuery(undefined, {
     throwOnError: false,
     retry: false,
   });
 
   useEffect(() => {
-    if (userQuery.isError) {
+    if (user.isError) {
       window.location.href = "/";
     }
-  }, [userQuery.isError]);
+  }, [user.isError]);
+
+  const dashboardLink = useMemo(() => {
+    if (user.data?.user.username) {
+      return `/${user.data.user.username}`;
+    }
+    return "/dashboard";
+  }, [user.data?.user.username]);
 
   return (
-    <header className={clsx("p-6 shadow z-10", theme.bgInput)}>
-      <nav className="flex" aria-label="Breadcrumb">
-        <ol role="list" className="flex items-center space-x-2 truncate">
-          <li>
-            <div>
-              <Link
-                to="/dashboard"
-                className={clsx(theme.text1, theme.text1Hover)}
-              >
-                <WingIcon className="h-5 w-auto" />
-              </Link>
-            </div>
-          </li>
-          {breadcrumbs.map((breadcrumb, index) => {
-            return (
-              <li key={index} className="truncate">
-                <div className="flex items-center truncate">
-                  <ChevronRightIcon
-                    className={clsx("h-4 w-4 flex-shrink-0", theme.text1)}
-                  />
-                  <Link
-                    className={clsx(
-                      "ml-2 text-sm font-medium truncate",
-                      theme.text1,
-                      theme.text1Hover,
-                    )}
-                    to={breadcrumb.to}
-                  >
-                    {breadcrumb.label}
-                  </Link>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
+    <header className={clsx("px-6 py-3 shadow z-30", theme.bgInput)}>
+      <div className="flex items-center gap-6">
+        <Link
+          to={dashboardLink}
+          className={clsx(theme.text1, theme.text1Hover)}
+        >
+          <WingIcon className="h-5 w-auto" />
+        </Link>
 
-        <div className="flex grow justify-end gap-x-12 shrink-0">
-          <UserMenu avatarUrl={userQuery.data?.user.avatarUrl} />
+        <div className="flex items-center gap-2">
+          <div>
+            <Link
+              to={dashboardLink}
+              className="rounded hover:bg-slate-100 px-2 py-1 text-sm text-slate-800 font-medium flex items-center gap-1.5"
+            >
+              {!user.data && (
+                <>
+                  {/* <span className="w-5 h-5 rounded bg-slate-300 animate-pulse"></span> */}
+                  <span className="w-32 bg-slate-300 animate-pulse rounded">
+                    &nbsp;
+                  </span>
+                </>
+              )}
+              {user.data && (
+                <>
+                  {/* <Avatar avatarURL={user.data.user.avatarUrl} /> */}
+                  <span>{user.data?.user.username}</span>
+                </>
+              )}
+            </Link>
+          </div>
+          {props.breadcrumbs?.map((breadcrumb, index) => (
+            <Fragment key={index}>
+              <span className="text-slate-600 text-sm">/</span>
+              <Link
+                to={breadcrumb.to}
+                className="rounded hover:bg-slate-100 px-2 py-1 text-sm text-slate-800 font-medium flex items-center gap-1.5"
+              >
+                {breadcrumb.icon ? (
+                  <span className="-ml-1">{breadcrumb.icon}</span>
+                ) : undefined}
+                <span
+                  className={clsx({
+                    "-ml-0.5": breadcrumb.icon,
+                  })}
+                >
+                  {breadcrumb.label}
+                </span>
+              </Link>
+            </Fragment>
+          ))}
         </div>
-      </nav>
+
+        <div className="flex-grow"></div>
+
+        <UserMenu avatarURL={user.data?.user.avatarUrl} />
+      </div>
     </header>
   );
 };
