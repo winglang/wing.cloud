@@ -114,7 +114,7 @@ pub class EnvironmentsTest {
             repoName: repo.repo,
             repoOwner: repo.owner,
             userId: user.id,
-            entryfile: "main.w"
+            entrypoint: "main.w"
           );
 
           // create a PR
@@ -265,7 +265,7 @@ pub class EnvironmentsTest {
               repoOwner: repo.owner,
               repoName: repo.repo,
               appName: "test-app",
-              entryfile: "main.w",
+              entrypoint: "main.w",
               installationId: "{installationId}",
             }),
             headers: {
