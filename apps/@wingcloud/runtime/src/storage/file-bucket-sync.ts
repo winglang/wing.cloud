@@ -14,9 +14,7 @@ export interface FileBucketSyncProps {
 
 export function fileBucketSync({ file, key, bucket }: FileBucketSyncProps) {
   let clear: NodeJS.Timeout;
-  let continueSync = true;
-
-  const sync = async () => {
+  const sync = async (continueSync = true) => {
     try {
       const contents = readFileSync(file, "utf8");
 
@@ -33,9 +31,8 @@ export function fileBucketSync({ file, key, bucket }: FileBucketSyncProps) {
   sync();
 
   return {
-    cancelSync: () => {
-      continueSync = false;
-      clearTimeout(clear);
+    cancelSync: async () => {
+      sync(false);
     },
   };
 }
