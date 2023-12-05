@@ -52,10 +52,10 @@ export const run = async function ({
     // clean environment from secrets and environment variables
     cleanEnvironment();
 
-    const { paths, entryfilePath } = await setup.run();
+    const { paths, entrypointPath } = await setup.run();
     wingPaths = paths;
 
-    const testResults = await setup.runWingTest(paths, entryfilePath);
+    const testResults = await setup.runWingTest(paths, entrypointPath);
 
     if (testResults) {
       await report("tests", { testResults });
@@ -66,7 +66,7 @@ export const run = async function ({
 
     const { port, close, endpoints } = await startServer({
       consolePath: paths["@wingconsole/app"],
-      entryfilePath,
+      entrypointPath,
       logger: runtimeLogger,
       keyStore,
       requestedPort,

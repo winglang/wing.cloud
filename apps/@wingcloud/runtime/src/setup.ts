@@ -32,24 +32,24 @@ export class Setup {
   }
 
   async run() {
-    const entryfilePath = join(
+    const entrypointPath = join(
       this.sourceDir,
-      this.context.environment.entryfile,
+      this.context.environment.entrypoint,
     );
-    const entrydir = dirname(entryfilePath);
+    const entrydir = dirname(entrypointPath);
     await this.gitClone();
     await this.npmInstall(entrydir);
     await this.runCustomScript(entrydir);
     const wingPaths = await this.runInstallWing(entrydir);
 
-    return { paths: wingPaths, entryfilePath };
+    return { paths: wingPaths, entrypointPath };
   }
 
-  async runWingTest(wingPaths: WingPaths, entryfile: string) {
+  async runWingTest(wingPaths: WingPaths, entrypoint: string) {
     return wingTest({
       wingCompilerPath: wingPaths["@winglang/compiler"],
       wingSdkPath: wingPaths["@winglang/sdk"],
-      entryfilePath: entryfile,
+      entrypointPath: entrypoint,
       environment: this.context.environment,
       bucketWrite: useBucketWrite({ bucket: this.context.logsBucket }),
     });

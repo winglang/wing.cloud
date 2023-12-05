@@ -12,7 +12,6 @@ bring "./environment-manager.w" as environment_manager;
 bring "./users.w" as users;
 bring "./apps.w" as apps;
 bring "./status-reports.w" as status_reports;
-bring "./github-comment.w" as comment;
 
 struct PostCommentProps {
   environmentId: str;
@@ -35,7 +34,6 @@ pub class ProbotApp {
   environments: environments.Environments;
   environmentManager: environment_manager.EnvironmentManager;
   apps: apps.Apps;
-  githubComment: comment.GithubComment;
 
   new(props: ProbotAppProps) {
     this.adapter = props.probotAdapter;
@@ -43,12 +41,6 @@ pub class ProbotApp {
     this.environments = props.environments;
     this.environmentManager = props.environmentManager;
     this.apps = props.apps;
-    this.githubComment = new comment.GithubComment(
-      environments: props.environments,
-      users: props.users,
-      apps: props.apps,
-      siteDomain: props.siteDomain
-    );
 
     let queue = new cloud.Queue(timeout: 6m);
     this.githubApp = new github.GithubApp(
@@ -118,7 +110,7 @@ pub class ProbotApp {
               prTitle: context.payload.pull_request.title,
             },
             appId: app.appId,
-            entryfile: app.entryfile,
+            entrypoint: app.entrypoint,
             sha: context.payload.pull_request.head.sha,
           );
         } else {
@@ -169,7 +161,7 @@ pub class ProbotApp {
           this.environmentManager.restart(
             environment: environment,
             appId: app.appId,
-            entryfile: app.entryfile,
+            entrypoint: app.entrypoint,
             sha: context.payload.pull_request.head.sha,
           );
         }
@@ -189,7 +181,7 @@ pub class ProbotApp {
           this.environmentManager.restart(
             environment: environment,
             appId: app.appId,
-            entryfile: app.entryfile,
+            entrypoint: app.entrypoint,
             sha: context.payload.after,
           );
         }
