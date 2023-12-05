@@ -45,6 +45,8 @@ export const run = async function ({
   try {
     await report("deploying");
 
+    const wingPlatform = process.env["WING_TARGET"];
+
     const { paths, entrypointPath } = await setup.run();
     wingPaths = paths;
 
@@ -66,6 +68,7 @@ export const run = async function ({
       logger: runtimeLogger,
       keyStore,
       requestedPort,
+      platform: wingPlatform,
     });
 
     await report("running", { objects: { endpoints } });

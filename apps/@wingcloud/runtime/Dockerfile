@@ -27,6 +27,7 @@ COPY docker-entrypoint.d ./docker-entrypoint.d
 COPY entrypoint.sh ./entrypoint.sh
 COPY lib ./lib
 COPY package.json ./package.json
+COPY platform.js platform.js
 
 ARG SETUP_DOCKER="true"
 RUN if [ "$SETUP_DOCKER" == "false" ]; then rm -rf ./docker-entrypoint.d; fi
