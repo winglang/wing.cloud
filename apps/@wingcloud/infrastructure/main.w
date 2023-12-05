@@ -230,7 +230,7 @@ if util.tryEnv("WING_TARGET") == "sim" {
 
   let devNgrok = new ngrok.Ngrok(
     url: webhookUrl,
-    domain: util.env("NGROK_DOMAIN"),
+    domain: util.tryEnv("NGROK_DOMAIN"),
   );
 
   webhookUrl = devNgrok.url;
