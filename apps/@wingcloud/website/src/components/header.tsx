@@ -16,7 +16,29 @@ export interface Breadcrumb {
   icon?: React.ReactNode;
 }
 
-const UserMenu = () => {
+const Avatar = ({ avatarURL }: { avatarURL?: string }) => {
+  const { theme } = useTheme();
+  return (
+    <>
+      {avatarURL && (
+        <img
+          className={clsx("h-5 w-5 rounded")}
+          src={avatarURL}
+          alt="User avatar"
+        />
+      )}
+      {!avatarURL && (
+        <UserIcon className={clsx(theme.text2, theme.focusInput, "w-5 h-5")} />
+      )}
+    </>
+  );
+};
+
+interface UserMenuProps {
+  avatarURL?: string;
+}
+
+const UserMenu = (props: UserMenuProps) => {
   const { theme } = useTheme();
 
   const signOut = wrpc["auth.signOut"].useMutation({
@@ -36,30 +58,8 @@ const UserMenu = () => {
           },
         },
       ]}
-      icon={
-        <Cog6ToothIcon
-          className={clsx(theme.text2, theme.focusInput, "w-5 h-5")}
-        />
-      }
+      icon={<Avatar avatarURL={props.avatarURL} />}
     />
-  );
-};
-
-const Avatar = ({ avatarURL }: { avatarURL?: string }) => {
-  const { theme } = useTheme();
-  return (
-    <>
-      {avatarURL && (
-        <img
-          className={clsx("h-5 w-5 rounded")}
-          src={avatarURL}
-          alt="User avatar"
-        />
-      )}
-      {!avatarURL && (
-        <UserIcon className={clsx(theme.text2, theme.focusInput, "w-5 h-5")} />
-      )}
-    </>
   );
 };
 
@@ -106,7 +106,7 @@ export const Header = (props: HeaderProps) => {
             >
               {!user.data && (
                 <>
-                  <span className="w-5 h-5 rounded bg-slate-300 animate-pulse"></span>
+                  {/* <span className="w-5 h-5 rounded bg-slate-300 animate-pulse"></span> */}
                   <span className="w-32 bg-slate-300 animate-pulse rounded">
                     &nbsp;
                   </span>
@@ -114,7 +114,7 @@ export const Header = (props: HeaderProps) => {
               )}
               {user.data && (
                 <>
-                  <Avatar avatarURL={user.data.user.avatarUrl} />
+                  {/* <Avatar avatarURL={user.data.user.avatarUrl} /> */}
                   <span>{user.data?.user.username}</span>
                 </>
               )}
@@ -144,7 +144,7 @@ export const Header = (props: HeaderProps) => {
 
         <div className="flex-grow"></div>
 
-        <UserMenu />
+        <UserMenu avatarURL={user.data?.user.avatarUrl} />
       </div>
     </header>
   );
