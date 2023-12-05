@@ -52,7 +52,7 @@ export const run = async function ({
     // clean environment from secrets and environment variables
     cleanEnvironment();
 
-    const testResults = await setup.runWingTest(paths, entrypointPath);
+    const testResults = await setup.runWingTests(paths, entrypointPath);
 
     if (testResults) {
       await report("tests", { testResults });

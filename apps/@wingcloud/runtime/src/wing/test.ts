@@ -1,5 +1,6 @@
 import { compile as compileFn, BuiltinPlatform } from "@winglang/compiler";
 import { type simulator, type std } from "@winglang/sdk";
+import { Json } from "@winglang/sdk/lib/std/json.js";
 
 import { Environment } from "../environment.js";
 
@@ -23,7 +24,7 @@ export async function wingCompile(
   return simfile;
 }
 
-async function wingTestOne(
+async function runWingTest(
   testRunner: std.ITestRunnerClient,
   testResourcePath: string,
   props: WingTestProps,
@@ -34,10 +35,8 @@ async function wingTestOne(
   const result = await testRunner.runTest(testResourcePath);
   const time = Date.now() - startTime;
 
-  const id = testResourcePath.replaceAll(/[^\dA-Za-z]/g, "");
-  const testResult = {
+  return {
     ...result,
-    id,
     timestamp,
     time,
     traces: result.traces
@@ -49,15 +48,9 @@ async function wingTestOne(
         };
       }),
   };
-
-  await props.bucketWrite(
-    props.environment.testKey(result.pass, testResourcePath),
-    JSON.stringify(testResult),
-  );
-  return { id, path: result.path, pass: result.pass };
 }
 
-export async function wingTest(props: WingTestProps) {
+export async function runWingTests(props: WingTestProps) {
   const simfile = await wingCompile(
     props.wingCompilerPath,
     props.entrypointPath,
@@ -74,9 +67,30 @@ export async function wingTest(props: WingTestProps) {
     const client = simulator.getResource(
       "root/cloud.TestRunner",
     ) as std.ITestRunnerClient;
+
     const testResults = [];
     for (let test of await client.listTests()) {
-      const testResult = await wingTestOne(client, test, props);
+      const result = await runWingTest(client, test, props);
+
+      const id = test.replaceAll(/[^\dA-Za-z]/g, "");
+      const traces = result.traces;
+      if (result.error) {
+        traces.push({
+          message: result.error,
+          timestamp: result.timestamp,
+        });
+      }
+      const testResult = {
+        ...result,
+        id,
+        traces,
+      };
+
+      await props.bucketWrite(
+        props.environment.testKey(testResult.pass, testResult.id),
+        JSON.stringify(testResult),
+      );
+
       testResults.push(testResult);
     }
 
