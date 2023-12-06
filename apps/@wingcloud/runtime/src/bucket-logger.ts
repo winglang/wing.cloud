@@ -8,7 +8,7 @@ import { FileLogger } from "./file-logger.js";
 import { fileBucketSync } from "./storage/file-bucket-sync.js";
 
 export class BucketLogger extends FileLogger {
-  stop: () => void;
+  stop: () => Promise<void>;
 
   constructor({ key, bucket }: { key: string; bucket: IBucketClient }) {
     const logfile = join(tmpdir(), "log-" + randomBytes(8).toString("hex"));
@@ -23,7 +23,7 @@ export class BucketLogger extends FileLogger {
       this.stop = cancelSync;
     } catch (error) {
       console.log(error);
-      this.stop = () => {};
+      this.stop = async () => {};
     }
   }
 }
