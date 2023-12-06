@@ -147,24 +147,26 @@ export const EnvironmentsList = ({
                     No previews found.
                   </h3>
 
-                  {/* <p
+                  <p
                     className={clsx(
                       "mt-1 text-sm flex gap-x-1 w-full justify-center",
                       theme.text2,
                     )}
                   >
-                    <span>Get started by</span>
-                    <a
-                      className="text-blue-600 hover:underline"
-                      href={`${repoUrl}/compare`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-disabled={repoUrl === ""}
-                    >
-                      opening a Pull Request
-                    </a>
-                    .
-                  </p> */}
+                    <span>
+                      Get started by{" "}
+                      <a
+                        className="text-blue-600 hover:underline"
+                        href={`${repoUrl}/compare`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-disabled={repoUrl === ""}
+                      >
+                        opening a Pull Request
+                      </a>
+                      .
+                    </span>
+                  </p>
                 </div>
               )}
             </>
