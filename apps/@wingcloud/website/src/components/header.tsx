@@ -1,5 +1,4 @@
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { Cog6ToothIcon, UserIcon } from "@heroicons/react/24/solid";
+import { UserIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { Fragment, useMemo } from "react";
 import { useEffect } from "react";
@@ -19,24 +18,14 @@ export interface Breadcrumb {
 const Avatar = ({ avatarURL }: { avatarURL?: string }) => {
   const { theme } = useTheme();
   return (
-    <>
-      {avatarURL && (
-        <img
-          className={clsx("h-5 w-5 rounded-full")}
-          src={avatarURL}
-          alt="User avatar"
-        />
-      )}
+    <div className="rounded-full h-7 w-7 overflow-hidden hover:opacity-90 transition-all">
+      {avatarURL && <img src={avatarURL} alt="User avatar" />}
       {!avatarURL && (
-        <UserIcon
-          className={clsx(
-            theme.text2,
-            theme.focusInput,
-            "w-5 h-5 rounded-full",
-          )}
-        />
+        <div className="p-0.5">
+          <UserIcon className={clsx(theme.text2, theme.focusInput)} />
+        </div>
       )}
-    </>
+    </div>
   );
 };
 
