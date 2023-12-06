@@ -1,7 +1,7 @@
-import { spawnSync } from "node:child_process";
-import { openSync, createReadStream } from "node:fs";
+import { spawn } from "node:child_process";
+import { appendFileSync } from "node:fs";
 
-import type { FileLogger } from "./file-logger.js";
+import type { FileLogger } from "./logger/file-logger.js";
 
 export interface ExecProps {
   cwd?: string;
@@ -14,52 +14,45 @@ export interface ExecProps {
 
 export class Executer {
   logger: FileLogger;
-  logfile: string;
-  outfile: number;
-  errfile: number;
   constructor(logger: FileLogger) {
     this.logger = logger;
-    const logfile = logger.getLogfile();
-
-    createReadStream(logfile).pipe(process.stdout);
-    this.logfile = logfile;
-    this.errfile = openSync(logfile, "a");
-    this.outfile = openSync(logfile, "a");
   }
 
   async exec(command: string, args: string[], options?: ExecProps) {
-    let logfile = this.logfile;
-    let errfile = this.errfile;
-    let outfile = this.outfile;
-    if (options?.logfile) {
-      logfile = options.logfile;
-      errfile = openSync(logfile, "a");
-      outfile = openSync(logfile, "a");
-    }
-
     if (!options?.dontAppendPrefix) {
       this.logger.log(`Running ${command} ${args.join(" ")}`);
     }
-    const subprocess = spawnSync(command, args, {
-      cwd: options?.cwd,
-      stdio: ["ignore", outfile, errfile],
-      env: options?.env
-        ? { ...options.env, PATH: process.env["PATH"] }
-        : process.env,
+    // eslint-disable-next-line unicorn/no-null
+    let statusCode: number | null = null;
+    const onData = (data: any) => {
+      const output = data.toString();
+      if (options?.logfile) {
+        appendFileSync(options?.logfile, output, "utf8");
+      } else {
+        this.logger.log(output);
+        console.log(output);
+      }
+    };
+    await new Promise<void>((resolve) => {
+      const subprocess = spawn(command, args, {
+        cwd: options?.cwd,
+        env: options?.env
+          ? { ...options.env, PATH: process.env["PATH"] }
+          : process.env,
+      });
+      subprocess.stdout.on("data", onData);
+      subprocess.stderr.on("data", onData);
+      subprocess.on("close", (code) => {
+        statusCode = code;
+        resolve();
+      });
     });
     if (!options?.dontAppendSuffix) {
-      this.logger.log(
-        `Command ${command} exited with status ${subprocess.status}`,
-      );
+      this.logger.log(`Command ${command} exited with status ${statusCode}`);
     }
-    if (
-      (options?.throwOnFailure && subprocess.status !== 0) ||
-      subprocess.status === null
-    ) {
-      throw new Error(
-        `command ${command} failed with status ${subprocess.status}`,
-      );
+    if ((options?.throwOnFailure && statusCode !== 0) || statusCode === null) {
+      throw new Error(`command ${command} failed with status ${statusCode}`);
     }
-    return subprocess.status;
+    return statusCode;
   }
 }
