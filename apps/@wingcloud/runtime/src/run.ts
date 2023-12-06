@@ -1,8 +1,9 @@
 import { createKeyStore } from "./auth/key-store.js";
-import { BucketLogger } from "./bucket-logger.js";
 import { cleanEnvironment } from "./clean.js";
 import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
+import { BucketLogger } from "./logger/bucket-logger.js";
+import { redactSecrets } from "./redact-secrets.js";
 import { useReportStatus } from "./report-status.js";
 import { Setup } from "./setup.js";
 import { formatWingError } from "./utils/format-wing-error.js";
@@ -22,9 +23,12 @@ export const run = async function ({
   const keyStore = await createKeyStore(context.environment.id);
   const report = useReportStatus(context, keyStore);
 
+  const redact = redactSecrets();
+
   const deployLogger = new BucketLogger({
     key: context.environment.deploymentKey(),
     bucket: context.logsBucket,
+    redact,
   });
 
   const runtimeLogger = new BucketLogger({
@@ -48,11 +52,11 @@ export const run = async function ({
 
     const wingPlatform = process.env["WING_TARGET"];
 
-    const { paths, entrypointPath } = await setup.run();
-    wingPaths = paths;
-
     // clean environment from secrets and environment variables
     cleanEnvironment();
+
+    const { paths, entrypointPath } = await setup.run();
+    wingPaths = paths;
 
     const testResults = await setup.runWingTests(paths, entrypointPath);
 
