@@ -8,7 +8,7 @@ import express, { type Application } from "express";
 import httpProxy from "http-proxy";
 
 import { type KeyStore } from "../auth/key-store.js";
-import type { LoggerInterface } from "../logger.js";
+import type { LoggerInterface } from "../logger/logger.js";
 import { loadCertificate } from "../ssl/ssl.js";
 
 import { findEndpoints } from "./endpoints.js";

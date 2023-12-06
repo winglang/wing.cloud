@@ -34,7 +34,8 @@ test("run() - installs npm packages and run tests", async () => {
   expect(files.length).toBe(3);
 
   const deploymentLogs = await logsBucket.get(environment.deploymentKey());
-  expect(deploymentLogs).toContain("Running npm install\n\nadded 1 package");
+  expect(deploymentLogs).toContain("Running npm install");
+  expect(deploymentLogs).toContain("added 1 package");
 
   const testLogs = await logsBucket.get(
     environment.testKey(true, "root/Default/test:Hello, world!"),
@@ -79,6 +80,29 @@ test("run() - doesn't have access to runtime env vars", async () => {
       environment.testKey(true, "root/Default/test:access-token"),
     ),
   ).toBeTruthy();
+
+  await close();
+});
+
+test("run() - redacting secrets from logs", async () => {
+  process.env.FILE_BUCKET_SYNC_MS = "50";
+  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const examplesDirRepo = `file://${examplesDir}`;
+  const gitProvider = new LocalGitProvider();
+  const environment = new Environment("test-id", "access-env/main.w", {
+    repo: examplesDirRepo,
+    sha: "main",
+  });
+  process.env["GIT_TOKEN"] = "token-123";
+
+  const { close } = await run({
+    context: { environment, gitProvider, logsBucket, wingApiUrl },
+  });
+
+  await sleep(200);
+
+  const deploymentLogs = await logsBucket.get(environment.deploymentKey());
+  expect(deploymentLogs).toContain("token: ***");
 
   await close();
 });
