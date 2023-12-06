@@ -56,87 +56,27 @@ export const EnvironmentsList = ({
 
   return (
     <>
-      {loading && (
-        <div className="p-6 w-full flex items-center justify-center">
-          <SpinnerLoader />
-        </div>
-      )}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className={clsx("text-lg pt-2", theme.text1)}>Production</div>
 
-      {!loading && environments.length === 0 && (
-        <div
-          className={clsx(
-            "text-center p-6 w-ful border",
-            theme.bgInput,
-            theme.borderInput,
-          )}
-        >
-          <LinkIcon className={clsx("w-8 h-8 mx-auto", theme.text2)} />
-          <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
-            No preview environments found.
-          </h3>
-
-          <p
-            className={clsx(
-              "mt-1 text-sm flex gap-x-1 w-full justify-center",
-              theme.text2,
-            )}
-          >
-            <span>Get started by</span>
-            <a
-              className="text-blue-600 hover:underline"
-              href={`${repoUrl}/compare`}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-disabled={repoUrl === ""}
+          {productionEnvs.length === 0 && (
+            <div
+              className={clsx(
+                "rounded p-4 text-left w-full block",
+                theme.bgInput,
+                "border",
+                theme.borderInput,
+              )}
             >
-              opening a Pull Request
-            </a>
-            .
-          </p>
-        </div>
-      )}
-
-      {environments.length > 0 && (
-        <div className="space-y-4">
-          {productionEnvs.length > 0 && (
-            <div className="space-y-2">
-              <div className={clsx("text-lg pt-2", theme.text1)}>
-                Production
+              <div className="p-6 w-full flex items-center justify-center">
+                <SpinnerLoader size="sm" />
               </div>
-
-              {productionEnvs.map((environment) => (
-                <EnvironmentsListItem
-                  key={environment.id}
-                  owner={owner}
-                  appName={appName}
-                  environment={environment}
-                />
-              ))}
             </div>
           )}
 
-          <div className="space-y-2">
-            <div className={clsx("text-lg pt-2", theme.text1)}>
-              Preview Environments
-            </div>
-
-            {previewEnvs.length > 0 && (
-              <Input
-                type="text"
-                leftIcon={MagnifyingGlassIcon}
-                className="block w-full"
-                containerClassName="w-full"
-                name="search"
-                id="search"
-                placeholder="Search..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                }}
-              />
-            )}
-
-            {filteredPreviewEnvs.map((environment) => (
+          {productionEnvs.length > 0 &&
+            productionEnvs.map((environment) => (
               <EnvironmentsListItem
                 key={environment.id}
                 owner={owner}
@@ -144,25 +84,93 @@ export const EnvironmentsList = ({
                 environment={environment}
               />
             ))}
-
-            {filteredPreviewEnvs.length === 0 && (
-              <div
-                className={clsx(
-                  "p-4 w-full border text-center rounded",
-                  theme.bgInput,
-                  theme.borderInput,
-                  theme.text1,
-                )}
-              >
-                <BranchIcon className="w-12 h-12 mx-auto text-slate-400" />
-                <h3 className="mt-2 text-sm font-medium text-slate-900">
-                  No previews found.
-                </h3>
-              </div>
-            )}
-          </div>
         </div>
-      )}
+
+        <div className="space-y-2">
+          <div className={clsx("text-lg pt-2", theme.text1)}>
+            Preview Environments
+          </div>
+
+          {loading && (
+            <div
+              className={clsx(
+                "rounded p-4 text-left w-full block",
+                theme.bgInput,
+                "border",
+                theme.borderInput,
+              )}
+            >
+              <div className="p-6 w-full flex items-center justify-center">
+                <SpinnerLoader size="sm" />
+              </div>
+            </div>
+          )}
+
+          {!loading && (
+            <>
+              {filteredPreviewEnvs.length > 0 && (
+                <Input
+                  type="text"
+                  leftIcon={MagnifyingGlassIcon}
+                  className="block w-full"
+                  containerClassName="w-full"
+                  name="search"
+                  id="search"
+                  placeholder="Search..."
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                  }}
+                />
+              )}
+
+              {filteredPreviewEnvs.map((environment) => (
+                <EnvironmentsListItem
+                  key={environment.id}
+                  owner={owner}
+                  appName={appName}
+                  environment={environment}
+                />
+              ))}
+
+              {filteredPreviewEnvs.length === 0 && (
+                <div
+                  className={clsx(
+                    "p-4 w-full border text-center rounded",
+                    theme.bgInput,
+                    theme.borderInput,
+                    theme.text1,
+                  )}
+                >
+                  <BranchIcon className="w-12 h-12 mx-auto text-slate-400" />
+                  <h3 className="mt-2 text-sm font-medium text-slate-900">
+                    No previews found.
+                  </h3>
+
+                  {/* <p
+                    className={clsx(
+                      "mt-1 text-sm flex gap-x-1 w-full justify-center",
+                      theme.text2,
+                    )}
+                  >
+                    <span>Get started by</span>
+                    <a
+                      className="text-blue-600 hover:underline"
+                      href={`${repoUrl}/compare`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-disabled={repoUrl === ""}
+                    >
+                      opening a Pull Request
+                    </a>
+                    .
+                  </p> */}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </>
   );
 };
