@@ -157,7 +157,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     }
 
     let createOptions: flyio.ICreateMachineProps = {
-      imageName: this.image.image.imageName, env: env.copy(), memoryMb: 1024, files: files, services: [{
+      imageName: this.image.image.imageName, env: env.copy(), memoryMb: 2048, files: files, services: [{
         protocol: "tcp",
         internal_port: 3000,
         ports: [{
