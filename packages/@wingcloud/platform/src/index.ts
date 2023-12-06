@@ -4,6 +4,7 @@ import * as tfaws from '@winglang/sdk/lib/target-tf-aws';
 import { TestPlatform } from './platform-test';
 import { ProductionPlatform } from './platform-production';
 import { App as CustomApp } from './app';
+import type { Construct } from 'constructs';
 
 const WING_ENV = process.env["WING_ENV"] || "production";
 
@@ -24,11 +25,20 @@ if (WING_ENV !== WingEnv.Production && WING_ENV !== WingEnv.Test) {
 // https://github.com/winglang/wing/issues/5131
 const PlatformHandler = WING_ENV === WingEnv.Production ? ProductionPlatform : TestPlatform;
 
+import { EnableXray } from './production/enable_xray';
+import { Aspects } from 'cdktf';
 export class Platform implements IPlatform {
   public readonly target = 'tf-aws';
 
   newApp(appProps: AppProps): App {
-    return new CustomApp(appProps);
+    return new tfaws.App(appProps);
+  }
+
+  preSynth(app: any): void {
+    if (WING_ENV === WingEnv.Test) {
+      return;
+    }
+    Aspects.of(app).add(new EnableXray(app));
   }
 
   postSynth(config: any) {

@@ -71,13 +71,39 @@ describe('Platform', () => {
         billing_mode: 'PAY_PER_REQUEST',
       });
     });
+  });
 
-    test('enable xray', async () => {
+
+  describe("api.main.w", () => {
+    beforeAll(async () => {
+      originalEnv = { ...process.env };
+      fs.mkdirSync(path.join(__dirname, '..', 'tmp'), { recursive: true });
+      tempDir = fs.mkdtempSync(path.join(__dirname, '..', 'tmp', 'platform-production-'));
+
+      process.env = Object.assign(process.env, {
+        TF_BACKEND_BUCKET: 'mock-bucket',
+        TF_BACKEND_BUCKET_REGION: 'mock-region',
+        TF_BACKEND_STATE_FILE: 'mock-key',
+        TF_BACKEND_LOCK_TABLE: 'mock-table',
+        WING_ENV: 'production',
+      });
+
+      const lib = path.join(__dirname, '..', 'lib', "index.js");
+      const result = await compile('examples/api.main.w', {
+        platform: [lib],
+        testing: false,
+        color: false,
+        targetDir: tempDir,
+      });
+
+      templatePath = path.join(result, 'main.tf.json');
+    }, 10000);
+
+    test('enable xray for functions', async () => {
       const template = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
       const functions = template.resource['aws_lambda_function'];
-      const fn = functions['cloudBucket_oncreate-OnMessage0_0B1CA993'];
+      const fn = functions['cloudApi_OnRequest0_E65A93DD'];
 
-      expect(Object.values(functions).length).toEqual(1);
       expect(fn).toBeDefined();
       expect(fn).toMatchObject({
         tracing_config: {
@@ -100,7 +126,7 @@ describe('Platform', () => {
       const policy = JSON.parse(rolePolicy['policy']);
 
       expect(policy).toMatchObject({
-        Statement: [
+        Statement: expect.arrayContaining([
           {
             Action: [
               'xray:PutTraceSegments',
@@ -112,7 +138,18 @@ describe('Platform', () => {
             Effect: 'Allow',
             Resource: ['*'],
           },
-        ],
+        ]),
+      });
+    });
+
+    test('enable xray for api gateway', async () => {
+      const template = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
+      const stages = template.resource['aws_api_gateway_stage'];
+      const stage = stages['cloudApi_api_stage_BBB283E4'];
+
+      expect(stage).toBeDefined();
+      expect(stage).toMatchObject({
+        xray_tracing_enabled: true,
       });
     });
   });

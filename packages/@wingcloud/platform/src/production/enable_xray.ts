@@ -6,6 +6,9 @@ export class EnableXray {
   constructor(private app: App) {}
 
   visit(node: Construct) {
+    if (node && (node as any)["terraformResourceType"] === 'aws_api_gateway_stage') {
+      (node as any).addOverride('xray_tracing_enabled', true);
+    }
     if (node && (node as any)['function'] && (node as any)['function']['terraformResourceType'] === 'aws_lambda_function') {
       const cloudFunction = node as Function;
       const lambdaArchitecture = "arm64"
