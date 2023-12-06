@@ -23,7 +23,7 @@ struct RuntimeStartOptions {
   gitToken: str?;
   gitRepo: str;
   gitSha: str;
-  entryfile: str;
+  entrypoint: str;
   logsBucketName: str;
   logsBucketRegion: str;
   awsAccessKeyId: str;
@@ -74,7 +74,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
     let env = MutMap<str>{
       "GIT_REPO" => repo,
       "GIT_SHA" => opts.gitSha,
-      "ENTRYFILE" => opts.entryfile,
+      "ENTRYPOINT" => opts.entrypoint,
       "WING_TARGET" => util.env("WING_TARGET"),
       "LOGS_BUCKET_NAME" => util.env(opts.logsBucketName), // get simulator handle for the bucket
       "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
@@ -142,7 +142,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     let env = MutMap<str>{
       "GIT_REPO" => opts.gitRepo,
       "GIT_SHA" => opts.gitSha,
-      "ENTRYFILE" => opts.entryfile,
+      "ENTRYPOINT" => opts.entrypoint,
       "WING_TARGET" => util.env("WING_TARGET"),
       "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
       "LOGS_BUCKET_NAME" => opts.logsBucketName,
@@ -166,7 +166,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
         }]
       }, {
         protocol: "tcp",
-        internal_port: 3001,
+        internal_port: 30_011,
         ports: [{
           port: 443
         }]
@@ -198,7 +198,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
 pub struct Message {
   repo: str;
   sha: str;
-  entryfile: str;
+  entrypoint: str;
   appId: str;
   environmentId: str;
   token: str?;
@@ -285,7 +285,7 @@ pub class RuntimeService {
           gitToken: msg.token,
           gitRepo: msg.repo,
           gitSha: msg.sha,
-          entryfile: msg.entryfile,
+          entrypoint: msg.entrypoint,
           wingCloudUrl: props.wingCloudUrl,
           environmentId: msg.environmentId,
           secrets: msg.secrets,

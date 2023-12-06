@@ -7,7 +7,8 @@ export class App extends tfaws.App {
   constructor(props: AppProps) {
     super(props);
   }
-  /**
+
+/**
  * Override the default behavior of synthRoots for testing
  * to allow for a single root construct, rather than one per
  * test.

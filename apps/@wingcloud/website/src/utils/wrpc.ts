@@ -34,7 +34,7 @@ export interface App {
   repoName: string;
   repoOwner: string;
   userId: string;
-  entryfile: string;
+  entrypoint: string;
 }
 
 export interface TestResult {
@@ -205,14 +205,14 @@ export const wrpc = createWRPCReact<{
     { appId: string; environmentType: string; secretId: string },
     {}
   >;
-  "app.listEntryfiles": QueryProcedure<
+  "app.listEntrypoints": QueryProcedure<
     { owner: string; repo: string; default_branch: string },
     {
-      entryfiles: Array<string>;
+      entrypoints: Array<string>;
     }
   >;
-  "app.updateEntryfile": MutationProcedure<
-    { appId: string; entryfile: string },
+  "app.updateEntrypoint": MutationProcedure<
+    { appId: string; entrypoint: string },
     {}
   >;
   "app.delete": MutationProcedure<{ owner: string; appName: string }, {}>;

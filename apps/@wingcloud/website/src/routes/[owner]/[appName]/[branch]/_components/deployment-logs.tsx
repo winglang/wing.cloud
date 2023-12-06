@@ -78,7 +78,12 @@ export const DeploymentLogs = ({
                     <div className={clsx(theme.text2)}>
                       {getTime(log.timestamp)}
                     </div>
-                    <div className={clsx(theme.text1, "break-all")}>
+                    <div
+                      className={clsx(
+                        theme.text1,
+                        "break-all whitespace-pre-wrap",
+                      )}
+                    >
                       {log.message}
                     </div>
                   </div>

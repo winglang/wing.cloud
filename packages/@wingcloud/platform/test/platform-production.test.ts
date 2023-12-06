@@ -24,9 +24,10 @@ describe('Platform', () => {
         TF_BACKEND_BUCKET_REGION: 'mock-region',
         TF_BACKEND_STATE_FILE: 'mock-key',
         TF_BACKEND_LOCK_TABLE: 'mock-table',
+        WING_ENV: 'production',
       });
 
-      const lib = path.join(__dirname, '..', 'lib', "platform-production.js");
+      const lib = path.join(__dirname, '..', 'lib', "index.js");
       const result = await compile('examples/simple.main.w', {
         platform: [lib],
         testing: false,

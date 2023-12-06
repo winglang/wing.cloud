@@ -5,6 +5,7 @@ import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
 import { useReportStatus } from "./report-status.js";
 import { Setup } from "./setup.js";
+import { formatWingError } from "./utils/format-wing-error.js";
 import { prepareServer } from "./wing/server.js";
 
 export interface RunProps {
@@ -45,13 +46,15 @@ export const run = async function ({
   try {
     await report("deploying");
 
-    const { paths, entryfilePath } = await setup.run();
+    const wingPlatform = process.env["WING_TARGET"];
+
+    const { paths, entrypointPath } = await setup.run();
     wingPaths = paths;
 
     // clean environment from secrets and environment variables
     cleanEnvironment();
 
-    const testResults = await setup.runWingTest(paths, entryfilePath);
+    const testResults = await setup.runWingTests(paths, entrypointPath);
 
     if (testResults) {
       await report("tests", { testResults });
@@ -62,10 +65,11 @@ export const run = async function ({
 
     const { port, close, endpoints } = await startServer({
       consolePath: paths["@wingconsole/app"],
-      entryfilePath,
+      entrypointPath,
       logger: runtimeLogger,
       keyStore,
       requestedPort,
+      platform: wingPlatform,
     });
 
     await report("running", { objects: { endpoints } });
@@ -83,25 +87,26 @@ export const run = async function ({
       },
     };
   } catch (error: any) {
+    let errorMessage = error.message;
+
     if (wingPaths) {
       const wingCompiler = await import(wingPaths["@winglang/compiler"]);
       if (error instanceof wingCompiler.CompileError) {
-        // TODO: Use @wingconsole/server/src/utils/format-wing-error.ts to format the error
-        let errorMessage = error.diagnostics
-          .map((diagnostic: any) => diagnostic.message)
-          .join("\n");
-
-        deployLogger.log(`Error: ${errorMessage}`);
-      } else {
-        deployLogger.log(error.message);
+        try {
+          errorMessage = await formatWingError(
+            wingPaths["@winglang/compiler"],
+            error,
+          );
+        } catch (error: any) {
+          deployLogger.log(`Unable to format error: ${error.message}`);
+        }
       }
-    } else {
-      deployLogger.log(error.message);
     }
-    await report("error", { message: error.message });
 
-    deployLogger.stop();
-    runtimeLogger.stop();
+    deployLogger.log(errorMessage);
+    await report("error", { message: errorMessage });
+    await deployLogger.stop();
+    await runtimeLogger.stop();
     closeSSL();
     throw error;
   }

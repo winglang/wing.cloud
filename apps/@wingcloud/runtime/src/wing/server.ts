@@ -1,6 +1,9 @@
 import https from "node:https";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { createConsoleApp } from "@wingconsole/app";
+import { BuiltinPlatform } from "@winglang/compiler";
 import express, { type Application } from "express";
 import httpProxy from "http-proxy";
 
@@ -9,6 +12,8 @@ import type { LoggerInterface } from "../logger.js";
 import { loadCertificate } from "../ssl/ssl.js";
 
 import { findEndpoints } from "./endpoints.js";
+
+const currentDir = dirname(fileURLToPath(import.meta.url));
 
 interface ConsoleState {
   result: {
@@ -29,10 +34,11 @@ export interface PrepareServerProps {
 
 export interface StartServerProps {
   consolePath: string;
-  entryfilePath: string;
+  entrypointPath: string;
   logger: LoggerInterface;
   keyStore: KeyStore;
   requestedPort?: number;
+  platform: string | undefined;
 }
 
 export async function prepareServer({
@@ -134,10 +140,11 @@ export async function prepareServer({
     },
     startServer: async ({
       consolePath,
-      entryfilePath,
+      entrypointPath,
       logger,
       keyStore,
       requestedPort,
+      platform,
     }: StartServerProps) => {
       const wingConsole = await import(consolePath);
       const create: typeof createConsoleApp = wingConsole.createConsoleApp;
@@ -145,10 +152,17 @@ export async function prepareServer({
         logger.log(message, props);
       };
 
+      const platforms = [BuiltinPlatform.SIM];
+      // use custom platform for non sim environments
+      if (platform !== undefined && platform !== BuiltinPlatform.SIM) {
+        platforms.push(join(currentDir, "../../platform.js"));
+      }
+
       const { port, close } = await create({
-        wingfile: entryfilePath,
+        wingfile: entrypointPath,
         expressApp: app,
         requestedPort,
+        platform: platforms,
         log: {
           info: log,
           error: log,
@@ -177,7 +191,7 @@ export async function prepareServer({
 
       const { endpoints } = await endpointsFn({ port, environmentId });
       console.log(
-        `Console app opened on port ${port} for app ${entryfilePath}`,
+        `Console app opened on port ${port} for app ${entrypointPath}`,
         JSON.stringify({
           endpoints,
         }),

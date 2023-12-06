@@ -230,7 +230,7 @@ if util.tryEnv("WING_TARGET") == "sim" {
 
   let devNgrok = new ngrok.Ngrok(
     url: webhookUrl,
-    domain: util.env("NGROK_DOMAIN"),
+    domain: util.tryEnv("NGROK_DOMAIN"),
   );
 
   webhookUrl = devNgrok.url;
@@ -241,14 +241,7 @@ let updateGithubWebhook = inflight () => {
   log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
 };
 
-// Not sure why, but terraform doesn't seem to like this.
-if util.tryEnv("WING_TARGET") == "sim" {
-  new cloud.OnDeploy(updateGithubWebhook);
-}
-
-test "hello world" {
-  assert(true);
-}
+new cloud.OnDeploy(updateGithubWebhook);
 
 new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";

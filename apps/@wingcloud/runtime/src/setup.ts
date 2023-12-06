@@ -6,7 +6,7 @@ import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
 import { useBucketWrite } from "./storage/bucket-write.js";
 import { installWing } from "./wing/install.js";
-import { wingTest } from "./wing/test.js";
+import { runWingTests } from "./wing/test.js";
 
 export interface SetupProps {
   executer: Executer;
@@ -32,24 +32,24 @@ export class Setup {
   }
 
   async run() {
-    const entryfilePath = join(
+    const entrypointPath = join(
       this.sourceDir,
-      this.context.environment.entryfile,
+      this.context.environment.entrypoint,
     );
-    const entrydir = dirname(entryfilePath);
+    const entrydir = dirname(entrypointPath);
     await this.gitClone();
     await this.npmInstall(entrydir);
     await this.runCustomScript(entrydir);
     const wingPaths = await this.runInstallWing(entrydir);
 
-    return { paths: wingPaths, entryfilePath };
+    return { paths: wingPaths, entrypointPath };
   }
 
-  async runWingTest(wingPaths: WingPaths, entryfile: string) {
-    return wingTest({
+  async runWingTests(wingPaths: WingPaths, entrypoint: string) {
+    return runWingTests({
       wingCompilerPath: wingPaths["@winglang/compiler"],
       wingSdkPath: wingPaths["@winglang/sdk"],
-      entryfilePath: entryfile,
+      entrypointPath: entrypoint,
       environment: this.context.environment,
       bucketWrite: useBucketWrite({ bucket: this.context.logsBucket }),
     });

@@ -10,7 +10,7 @@ struct RuntimeClientProps {
 
 struct RuntimeClientCreateOptions {
   appId: str;
-  entryfile: str;
+  entrypoint: str;
   environment: environments.Environment;
   secrets: Map<str>;
   certificate: certificate.Certificate;
@@ -33,7 +33,7 @@ pub class RuntimeClient {
     let res = http.post(this.runtimeUrl, body: Json.stringify(runtime.Message {
       repo: options.environment.repo,
       sha: options.sha,
-      entryfile: options.entryfile,
+      entrypoint: options.entrypoint,
       appId: options.appId,
       environmentId: options.environment.id,
       token: options.token,

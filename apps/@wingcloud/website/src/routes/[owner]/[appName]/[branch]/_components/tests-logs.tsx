@@ -153,7 +153,13 @@ export const TestsLogs = ({
                           <div className={clsx(theme.text2)}>
                             {getTime(trace.timestamp)}
                           </div>
-                          <div className={clsx(theme.text2, "truncate")}>
+                          <div
+                            className={clsx(
+                              log.pass && theme.text2,
+                              !log.pass && "text-red-500",
+                              "break-all whitespace-pre-wrap",
+                            )}
+                          >
                             {trace.message}
                           </div>
                         </div>
