@@ -22,6 +22,6 @@ export async function handler({ logsBucket, wingApiUrl }: HandlerProps) {
   await run({
     context: { environment, gitProvider, logsBucket, wingApiUrl },
     requestedPort: 3000,
-    requestedSSLPort: 3001,
+    requestedSSLPort: 30_011,
   });
 }
