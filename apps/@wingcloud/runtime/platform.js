@@ -26,7 +26,7 @@ exports.Platform = class Platform {
     } else if (type === "@winglang/sdk.ex.ReactApp") {
       class CustomReactApp extends ReactApp {
         get _websiteHost() {
-          return { url: `http://127.0.0.1:${this._localPort}` };
+          return this._host ?? { url: `http://127.0.0.1:${this._localPort}` };
         }
       }
 
