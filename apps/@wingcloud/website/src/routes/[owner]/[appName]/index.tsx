@@ -28,7 +28,16 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
     { owner, appName },
     {
       // TODO: query invalidation
-      refetchInterval: 1000 * 10,
+      refetchInterval(query) {
+        if (
+          !(query.state.data as any)?.environments ||
+          (query.state.data as any).environments.length === 0
+        ) {
+          return 1000;
+        }
+
+        return 10_000;
+      },
     },
   );
   const environments = useMemo(() => {
