@@ -1,10 +1,8 @@
 import { type AppProps, App } from '@winglang/sdk/lib/core';
 import type { IPlatform } from '@winglang/sdk/lib/platform';
-import * as tfaws from '@winglang/sdk/lib/target-tf-aws';
 import { TestPlatform } from './platform-test';
 import { ProductionPlatform } from './platform-production';
 import { App as CustomApp } from './app';
-import type { Construct } from 'constructs';
 
 const WING_ENV = process.env["WING_ENV"] || "production";
 
@@ -31,13 +29,17 @@ export class Platform implements IPlatform {
   public readonly target = 'tf-aws';
 
   newApp(appProps: AppProps): App {
-    return new tfaws.App(appProps);
+    return new CustomApp(appProps);
   }
 
   preSynth(app: any): void {
     if (WING_ENV === WingEnv.Test) {
       return;
     }
+    // this has to be in the direct entrypoint
+    // of the platform, otherwise it won't work
+    // see https://github.com/winglang/wing/issues/5151
+    // once fixed, this can be moved to the ./pla
     Aspects.of(app).add(new EnableXray(app));
   }
 
