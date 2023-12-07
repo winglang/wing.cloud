@@ -2,11 +2,10 @@ bring cloud;
 bring http;
 bring ex;
 bring util;
+bring "cdktf" as cdktf;
 bring "./types/probot-types.w" as probot;
 bring "./types/octokit-types.w" as octokit;
 bring "./probot-adapter.w" as adapter;
-bring "./lowkeys-map.w" as lowkeys;
-bring "./github-app.w" as github;
 bring "./environments.w" as environments;
 bring "./environment-manager.w" as environment_manager;
 bring "./users.w" as users;
@@ -18,7 +17,6 @@ struct PostCommentProps {
 }
 
 struct ProbotAppProps {
-  probotAdapter: adapter.ProbotAdapter;
   runtimeUrl: str;
   environments: environments.Environments;
   environmentManager: environment_manager.EnvironmentManager;
@@ -30,68 +28,21 @@ struct ProbotAppProps {
 pub class ProbotApp {
   adapter: adapter.ProbotAdapter;
   runtimeUrl: str;
-  pub githubApp: github.GithubApp;
   environments: environments.Environments;
   environmentManager: environment_manager.EnvironmentManager;
   apps: apps.Apps;
 
   new(props: ProbotAppProps) {
-    this.adapter = props.probotAdapter;
+    this.adapter = new adapter.ProbotAdapter();
     this.runtimeUrl = props.runtimeUrl;
     this.environments = props.environments;
     this.environmentManager = props.environmentManager;
     this.apps = props.apps;
-
-    let queue = new cloud.Queue(timeout: 6m);
-    this.githubApp = new github.GithubApp(
-      this.adapter.appId,
-      this.adapter.secretKey,
-      inflight (req) => {
-        queue.push(
-          Json.stringify(this.getVerifyAndReceievePropsProps(req)),
-        );
-        return {
-          status: 200
-        };
-      }
-    );
-
-    queue.setConsumer(inflight (message) => {
-      log("receive message: {message}");
-      let props = probot.VerifyAndReceieveProps.fromJson(Json.parse(message));
-      this.listen(props);
-    });
   }
 
-  inflight getVerifyAndReceievePropsProps(req: cloud.ApiRequest): probot.VerifyAndReceieveProps {
-    let lowkeysHeaders = lowkeys.LowkeysMap.fromMap(req.headers ?? {});
-    if !lowkeysHeaders.has("x-github-delivery") {
-      throw "getVerifyProps: missing id header";
-    }
-
-    let id = lowkeysHeaders.get("x-github-delivery");
-
-    if !lowkeysHeaders.has("x-github-event") {
-      throw "getVerifyProps: missing name header";
-    }
-
-    let name = lowkeysHeaders.get("x-github-event");
-
-    let signature = lowkeysHeaders.get("x-hub-signature-256");
-
-    if let payload = req.body {
-      return {
-        id: id,
-        name: name,
-        signature: signature,
-        payload: payload,
-      };
-    }
-
-    throw "getVerifyProps: missing body";
-  }
-
-  inflight listen(props: probot.VerifyAndReceieveProps) {
+  // this should emit doimain specific events, rather
+  // than doing all the work here
+  pub inflight listen(props: probot.VerifyAndReceieveProps) {
     let onPullRequestOpen = inflight (context: probot.IPullRequestOpenedContext): void => {
       let branch = context.payload.pull_request.head.ref;
 

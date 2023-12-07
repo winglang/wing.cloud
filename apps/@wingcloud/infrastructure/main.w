@@ -14,8 +14,7 @@ bring "./api.w" as wingcloud_api;
 
 bring "./runtime/runtime.w" as runtime;
 bring "./runtime/runtime-client.w" as runtime_client;
-bring "./probot.w" as probot;
-bring "./probot-adapter.w" as adapter;
+bring "./github-app.w" as github;
 bring "./components/parameter/parameter.w" as parameter;
 bring "./components/dns/dns.w" as Dns;
 bring "./components/public-endpoint/public-endpoint.w" as PublicEndpoint;
@@ -23,7 +22,6 @@ bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 
 // And the sun, and the moon, and the stars, and the flowers.
-let appSecret = util.env("APP_SECRET");
 
 let api = new cloud.Api(
   cors: true,
@@ -51,12 +49,6 @@ let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
 let secrets = new Secrets.Secrets();
 let endpoints = new Endpoints.Endpoints(table);
-
-let probotAdapter = new adapter.ProbotAdapter(
-  probotAppId: util.env("BOT_GITHUB_APP_ID"),
-  probotSecretKey: util.env("BOT_GITHUB_PRIVATE_KEY"),
-  webhookSecret: util.env("BOT_GITHUB_WEBHOOK_SECRET"),
-);
 
 let bucketLogs = new cloud.Bucket() as "deployment logs";
 
@@ -136,7 +128,15 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   endpointProvider: endpointProvider,
   certificate: environmentServerCertificate,
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
-  probotAdapter: probotAdapter,
+  siteDomain: siteURL,
+);
+
+new github.GithubApp(
+  runtimeUrl: rntm.api.url,
+  environments: environments,
+  users: users,
+  apps: apps,
+  environmentManager: environmentManager,
   siteDomain: siteURL,
 );
 
@@ -148,21 +148,10 @@ let wingCloudApi = new wingcloud_api.Api(
   environmentManager: environmentManager,
   secrets: secrets,
   endpoints: endpoints,
-  probotAdapter: probotAdapter,
   githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
-  appSecret: appSecret,
+  appSecret: util.env("APP_SECRET"),
   logs: bucketLogs,
-);
-
-let probotApp = new probot.ProbotApp(
-  probotAdapter: probotAdapter,
-  runtimeUrl: rntm.api.url,
-  environments: environments,
-  users: users,
-  apps: apps,
-  environmentManager: environmentManager,
-  siteDomain: siteURL,
 );
 
 let apiDomainName = (() => {
@@ -224,27 +213,7 @@ let proxyUrl = (() => {
   }
 })();
 
-let var webhookUrl = probotApp.githubApp.webhookUrl;
-if util.tryEnv("WING_TARGET") == "sim" {
-  bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
-
-  let devNgrok = new ngrok.Ngrok(
-    url: webhookUrl,
-    domain: util.tryEnv("NGROK_DOMAIN"),
-  );
-
-  webhookUrl = devNgrok.url;
-}
-
-let updateGithubWebhook = inflight () => {
-  probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
-  log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
-};
-
-new cloud.OnDeploy(updateGithubWebhook);
-
 new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";
-new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
 new cdktf.TerraformOutput(value: proxyUrl) as "Proxy URL";
 new cdktf.TerraformOutput(value: siteURL) as "Site URL";

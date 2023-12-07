@@ -82,7 +82,6 @@ class Util {
 
 bring "./environment-manager.w" as EnvironmentManager;
 bring "./status-reports.w" as status_reports;
-bring "./probot-adapter.w" as adapter;
 bring "./octokit.w" as Octokit;
 
 struct ApiProps {
@@ -93,7 +92,6 @@ struct ApiProps {
   environmentManager: EnvironmentManager.EnvironmentManager;
   secrets: Secrets.Secrets;
   endpoints: Endpoints.Endpoints;
-  probotAdapter: adapter.ProbotAdapter;
   githubAppClientId: str;
   githubAppClientSecret: str;
   appSecret: str;

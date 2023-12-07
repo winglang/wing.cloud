@@ -1,28 +1,30 @@
 bring "./types/octokit-types.w" as octokit;
 bring "./types/probot-types.w" as probot;
-
-pub struct ProbotAdapterProps {
-  probotAppId: str;
-  probotSecretKey: str;
-  webhookSecret: str;
-}
+bring cloud;
 
 pub class ProbotAdapter {
   extern "./src/probot.mts" pub static inflight createProbot(appId: str, privateKey: str, webhookSecret: str): probot.ProbotInstance;
 
-  pub appId: str;
-  pub secretKey: str;
-  pub webhookSecret: str;
+  pub appId: cloud.Secret;
+  pub secretKey: cloud.Secret;
+  pub webhookSecret: cloud.Secret;
+
   inflight var instance: probot.ProbotInstance?;
 
-  new(props: ProbotAdapterProps) {
-    this.appId =  props.probotAppId;
-    this.secretKey = props.probotSecretKey;
-    this.webhookSecret = props.webhookSecret;
+  new() {
+    this.appId = new cloud.Secret(
+      name: "github-app-id",
+    );
+    this.secretKey = new cloud.Secret(
+      name: "secret-key",
+    );
+    this.webhookSecret = new cloud.Secret(
+      name: "webhook-secret",
+    );
   }
 
   inflight new() {
-    this.instance = ProbotAdapter.createProbot(this.appId, this.secretKey, this.webhookSecret);
+    this.instance = ProbotAdapter.createProbot(this.appId.value(), this.secretKey.value(), this.webhookSecret.value());
   }
 
   pub inflight handlePullRequstOpened(handler: inflight (probot.IPullRequestOpenedContext): void) {
