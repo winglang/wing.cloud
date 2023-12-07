@@ -10,5 +10,6 @@ packages:
   - packages/@wingcloud/vite
   - apps/@wingcloud/website
   - apps/@wingcloud/runtime
+  - packages/@wingcloud/platform
   - apps/@wingcloud/infrastructure
   - aws
