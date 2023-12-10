@@ -103,6 +103,7 @@ export const createWRPCReact = <
             const url = new URL(`${useContext(WRPCContext).url}/${route}`);
             return useMutation({
               ...options,
+              mutationKey: [route],
               mutationFn: async (input) => await fetcher("POST", url, input),
             });
           },
