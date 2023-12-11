@@ -276,10 +276,10 @@ pub class Api {
         let installationId = num.fromStr(request.query.get("installationId"));
         let page = num.fromStr(request.query.get("page"));
 
-        let repositories = GitHub.Client.listInstallationRepos(accessToken, installationId, page);
+        let data = GitHub.Client.listInstallationRepos(accessToken, installationId, page);
 
         return {
-          body: repositories,
+          body: data,
         };
       } else {
         throw httpError.HttpError.unauthorized();

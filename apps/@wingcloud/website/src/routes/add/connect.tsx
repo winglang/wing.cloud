@@ -90,14 +90,8 @@ export const Component = () => {
     if (!listReposQuery.data?.pages) {
       return setReposList([]);
     }
-
-    const repos = listReposQuery.data.pages.flatMap(
-      (page) => page.repositories,
-    );
-
+    const repos = listReposQuery.data.pages.flatMap((page) => page.data);
     setReposList(repos);
-
-    //listReposQuery.hasNextPage && listReposQuery.fetchNextPage();
   }, [listReposQuery.data]);
 
   return (

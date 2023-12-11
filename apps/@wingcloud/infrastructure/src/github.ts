@@ -39,10 +39,13 @@ export const listInstallationRepos = async (
     });
 
   return {
-    page,
-    perPage,
-    total: orgRepos.total_count,
-    repositories: orgRepos.repositories,
+    pagination: {
+      page: page,
+      perPage: perPage,
+      total: orgRepos.total_count,
+      nextPage: orgRepos.total_count > page * perPage ? page + 1 : undefined,
+    },
+    data: orgRepos.repositories,
   };
 };
 

@@ -1,4 +1,5 @@
 bring http;
+bring "./types/pagination.w" as pagination;
 
 pub struct AuthTokens {
   access_token: str;
@@ -82,9 +83,8 @@ struct GitHubUser {
 }
 
 struct ListRepositoryResponse {
-  total: num;
-  page: num;
   repositories: Array<InstallationRepository>;
+  pagination: pagination.Pagination;
 }
 
 pub class Exchange {

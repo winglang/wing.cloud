@@ -3,6 +3,7 @@ import {
   type InfinitQueryProcedure,
   type MutationProcedure,
   type QueryProcedure,
+  type PaginatedResponse,
 } from "@wingcloud/wrpc";
 
 export interface User {
@@ -141,11 +142,7 @@ export const wrpc = createWRPCReact<{
   >;
   "github.listRepositories": InfinitQueryProcedure<
     { installationId: string; page?: number },
-    {
-      repositories: Array<Repository>;
-      total: number;
-      page: number;
-    }
+    PaginatedResponse<Array<Repository>>
   >;
   "github.getRepository": QueryProcedure<
     { owner: string; repo: string },
