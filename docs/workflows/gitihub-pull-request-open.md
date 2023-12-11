@@ -54,9 +54,9 @@ sequenceDiagram
 
     GitHub->>API_Gateway: PullRequest Open Event
     API_Gateway->>Lambda: Trigger
-    Lambda->>DynamoDB: Apps (Single Table)
+    Lambda->>DynamoDB: Apps (Shared Table)
     DynamoDB-->>Lambda: App(s) for Event Repository
-    Lambda->>DynamoDB: Create 'environment' (Single Table)
+    Lambda->>DynamoDB: Create 'environment' (Shared Table)
     DynamoDB-->>Lambda: Environment Created
     Lambda->>GitHub: Get Auth Token
     GitHub-->>Lambda: Auth Token
@@ -64,7 +64,7 @@ sequenceDiagram
     DynamoDB-->>Lambda: Secrets Fetched
     Lambda->>KMS: Decrypt Secrets
     KMS-->>Lambda: Decrypted Secrets
-    Lambda->>DynamoDB: Fetch App Record (Single Table)
+    Lambda->>DynamoDB: Fetch App Record (Shared Table)
     DynamoDB-->>Lambda: App Record
     Lambda->>GitHub: Create Comment on PR
     Lambda->>GitHub: Create Installation Token
