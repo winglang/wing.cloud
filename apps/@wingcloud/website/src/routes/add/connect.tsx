@@ -9,7 +9,7 @@ import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
 import { PopupWindowContext } from "../../utils/popup-window-provider.js";
-import { wrpc } from "../../utils/wrpc.js";
+import { wrpc, type Repository } from "../../utils/wrpc.js";
 
 import { AddAppContainer } from "./_components/add-app-container.js";
 import { GitRepoSelect } from "./_components/git-repo-select.js";
@@ -36,15 +36,14 @@ export const Component = () => {
   const user = wrpc["auth.check"].useQuery();
 
   const [createAppLoading, setCreateAppLoading] = useState(false);
+  const [reposList, setReposList] = useState<Repository[]>([]);
 
   const selectedRepo = useMemo(() => {
-    if (!listReposQuery.data?.repositories || !repositoryId) {
+    if (!reposList || !repositoryId) {
       return;
     }
-    return listReposQuery.data?.repositories.find(
-      (repo) => repo.full_name.toString() === repositoryId,
-    );
-  }, [listReposQuery.data?.repositories, repositoryId]);
+    return reposList.find((repo) => repo.full_name.toString() === repositoryId);
+  }, [reposList, repositoryId]);
 
   const onCreate = useCallback(async () => {
     if (!installationId || !selectedRepo || !user.data?.user) {
@@ -87,6 +86,20 @@ export const Component = () => {
     }
   }, [installationId]);
 
+  useEffect(() => {
+    if (!listReposQuery.data?.pages) {
+      return setReposList([]);
+    }
+
+    const repos = listReposQuery.data.pages.flatMap(
+      (page) => page.repositories,
+    );
+
+    setReposList(repos);
+
+    //listReposQuery.hasNextPage && listReposQuery.fetchNextPage();
+  }, [listReposQuery.data]);
+
   return (
     <AddAppContainer
       step={{
@@ -109,9 +122,12 @@ export const Component = () => {
             repositoryId={repositoryId || ""}
             setRepositoryId={setRepositoryId}
             installations={listInstallationsQuery.data?.installations ?? []}
-            repos={listReposQuery.data?.repositories ?? []}
+            repos={reposList ?? []}
             loading={loading}
             disabled={createAppLoading}
+            loadNextPage={() => {
+              listReposQuery.fetchNextPage();
+            }}
           />
           <div className="text-xs flex gap-1 items-center">
             <span className={clsx(theme.text1)}>Missing a repository?</span>

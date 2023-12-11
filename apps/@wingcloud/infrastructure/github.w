@@ -81,6 +81,12 @@ struct GitHubUser {
   avatar_url: str;
 }
 
+struct ListRepositoryResponse {
+  total: num;
+  page: num;
+  repositories: Array<InstallationRepository>;
+}
+
 pub class Exchange {
   pub static inflight codeForTokens(options: ExchangeCodeForTokensOptions): AuthTokens {
     let response = http.post("https://github.com/login/oauth/access_token", {
@@ -108,7 +114,7 @@ pub class Exchange {
 pub class Client {
   extern "./src/github.ts" pub static inflight getUser(accessToken: str): GitHubUser;
   extern "./src/github.ts" pub static inflight listUserInstallations(token: str): Array<UserInstallation>;
-  extern "./src/github.ts" pub static inflight listInstallationRepos(token: str, installationId: num): Array<InstallationRepository>;
+  extern "./src/github.ts" pub static inflight listInstallationRepos(token: str, installationId: num, page: num?): ListRepositoryResponse;
   extern "./src/github.ts" pub static inflight getLastCommit(options: GetLastCommitOptions): CommitResponse;
   extern "./src/github.ts" pub static inflight getRepository(options: GetRepositoryOptions): Repository;
   extern "./src/github.ts" pub static inflight getPullRequest(options: GetPullRequestOptions): PullRequest;

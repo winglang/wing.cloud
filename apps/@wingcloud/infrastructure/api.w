@@ -274,13 +274,12 @@ pub class Api {
     api.get("/wrpc/github.listRepositories", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
         let installationId = num.fromStr(request.query.get("installationId"));
+        let page = num.fromStr(request.query.get("page"));
 
-        let repositories = GitHub.Client.listInstallationRepos(accessToken, installationId);
+        let repositories = GitHub.Client.listInstallationRepos(accessToken, installationId, page);
 
         return {
-          body: {
-            repositories: repositories
-          },
+          body: repositories,
         };
       } else {
         throw httpError.HttpError.unauthorized();

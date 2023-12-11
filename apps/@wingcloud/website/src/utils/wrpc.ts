@@ -1,5 +1,6 @@
 import {
   createWRPCReact,
+  type InfinitQueryProcedure,
   type MutationProcedure,
   type QueryProcedure,
 } from "@wingcloud/wrpc";
@@ -138,10 +139,12 @@ export const wrpc = createWRPCReact<{
       installations: Array<Installation>;
     }
   >;
-  "github.listRepositories": QueryProcedure<
-    { installationId: string },
+  "github.listRepositories": InfinitQueryProcedure<
+    { installationId: string; page?: number },
     {
       repositories: Array<Repository>;
+      total: number;
+      page: number;
     }
   >;
   "github.getRepository": QueryProcedure<

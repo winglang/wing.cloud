@@ -9,12 +9,12 @@ export const useCreateAppFromRepo = () => {
 
   const listInstallationsQuery = wrpc["github.listInstallations"].useQuery();
 
-  const listReposQuery = wrpc["github.listRepositories"].useQuery(
+  const listReposQuery = wrpc["github.listRepositories"].useInfiniteQuery(
     {
       installationId: installationId!,
     },
     {
-      enabled: installationId != undefined,
+      enabled: !!installationId,
     },
   );
 

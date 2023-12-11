@@ -22,17 +22,28 @@ export const listUserInstallations = async (token: string) => {
 export const listInstallationRepos = async (
   token: string,
   installationId: number,
+  page = 1,
 ) => {
   const octokit = new Octokit({
     auth: token,
   });
 
+  const perPage = 10;
+
+  // https://docs.github.com/en/rest/apps/installations?apiVersion=2022-11-28#list-repositories-accessible-to-the-user-access-token
   const { data: orgRepos } =
     await octokit.rest.apps.listInstallationReposForAuthenticatedUser({
       installation_id: installationId,
+      page,
+      per_page: perPage,
     });
 
-  return orgRepos.repositories;
+  return {
+    page,
+    perPage,
+    total: orgRepos.total_count,
+    repositories: orgRepos.repositories,
+  };
 };
 
 export const getLastCommit = async ({
