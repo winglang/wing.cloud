@@ -145,6 +145,7 @@ website.addDeps("@headlessui/react");
 website.addDeps("@heroicons/react");
 website.addDeps("react-popper");
 website.addDeps("@wingconsole/ui");
+website.addDeps("@segment/analytics-next");
 
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 

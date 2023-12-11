@@ -14,19 +14,21 @@ import { router } from "./router.jsx";
 import { AnalyticsIdentityProvider } from "./utils/analytics-identity-provider.js";
 import { AnalyticsContext } from "./utils/analytics-provider.js";
 import { PopupWindowProvider } from "./utils/popup-window-provider.js";
+import { useAnalyticsEvents } from "./utils/use-analytics-events.js";
 
 const API_URL = new URL(location.origin);
 API_URL.pathname = "/wrpc";
 
 export const App = () => {
   const { track } = useContext(AnalyticsContext);
+  const { handleEvent } = useAnalyticsEvents({ track });
   const [queryClient] = useState(
     () =>
       new QueryClient({
         queryCache: new QueryCache({
           onSuccess: (data, query) => {
             if (query.queryKey[0] && typeof query.queryKey[0] === "string") {
-              track(
+              handleEvent(
                 query.queryKey[0],
                 query.queryKey[1] as Record<string, any>,
               );
@@ -40,7 +42,7 @@ export const App = () => {
               mutation.options.mutationKey[0] &&
               typeof mutation.options.mutationKey[0] === "string"
             ) {
-              track(
+              handleEvent(
                 mutation.options.mutationKey[0],
                 variables as Record<string, any>,
               );
