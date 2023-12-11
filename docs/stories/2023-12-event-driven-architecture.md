@@ -34,6 +34,8 @@ Possible future features for consideration:
 
 ## Existing Workflows
 
+- [Pull Request Open / Reopen](../workflows/gitihub-pull-request-open.md)
+
 ### Github App
 
 #### Preflight Sideffects
