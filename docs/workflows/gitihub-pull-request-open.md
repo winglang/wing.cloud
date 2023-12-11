@@ -15,7 +15,7 @@
 
 ## Data
 
-- DynamoDB Table
+- DynamoDB Tables
   - Apps
   - Environments
   - Users
@@ -32,6 +32,8 @@
 - Lambda: Create `environment` in Dynamodb Table
   - 3 almost identicial records are written with different primary key / sort key combinations
 - Lambda: Decrypted secrets are fetched for the environment type
+  - Secrets are a dedicted DynamoDB table
+  - For decryption, KMS is called
 - Lambda: App recrod is fetched for the created environment
 - Lambda: A github comment is created on the Pull Request
 - Lambda: A Github installation token is created for the runtime
@@ -46,20 +48,23 @@ sequenceDiagram
     participant API_Gateway as API Gateway
     participant Lambda as Lambda Function
     participant DynamoDB as DynamoDB Table
+    participant KMS as AWS KMS
     participant Fly_io as Fly.io Runtime
     participant ErrorLog as Error Log
 
     GitHub->>API_Gateway: PullRequest Open Event
     API_Gateway->>Lambda: Trigger
-    Lambda->>DynamoDB: Apps#listByRepository
+    Lambda->>DynamoDB: Apps (Single Table)
     DynamoDB-->>Lambda: App(s) for Event Repository
-    Lambda->>DynamoDB: Create 'environment'
+    Lambda->>DynamoDB: Create 'environment' (Single Table)
     DynamoDB-->>Lambda: Environment Created
     Lambda->>GitHub: Get Auth Token
     GitHub-->>Lambda: Auth Token
-    Lambda->>DynamoDB: Fetch Decrypted Secrets
-    DynamoDB-->>Lambda: Secrets
-    Lambda->>DynamoDB: Fetch App Record
+    Lambda->>DynamoDB: Fetch Secrets (Secrets Table)
+    DynamoDB-->>Lambda: Secrets Fetched
+    Lambda->>KMS: Decrypt Secrets
+    KMS-->>Lambda: Decrypted Secrets
+    Lambda->>DynamoDB: Fetch App Record (Single Table)
     DynamoDB-->>Lambda: App Record
     Lambda->>GitHub: Create Comment on PR
     Lambda->>GitHub: Create Installation Token
