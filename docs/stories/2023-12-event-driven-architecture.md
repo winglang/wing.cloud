@@ -32,6 +32,114 @@ Possible future features for consideration:
 - Enhancing authorization features.
 - Developing custom services to support the Wing Framework SDK in Cloudlets.
 
+## Existing Workflows
+
+### Github App
+
+#### Preflight Sideffects
+
+- Update Webhook Url (on Deploy)
+
+#### Preflight Inputs
+
+- Github App ID
+- Github Private Key
+- Runtime url (fly.io) - (not used?)
+- Apps table
+- Users table (not used?)
+- Environment Manager
+- Environments
+
+#### Inbound Events from Github
+
+- PullRequest Open
+- PullRequest Close
+- PullRequest Reopened
+- PullRequest Synchronize
+- push
+
+##### PullRequest Open / Reopened
+
+- Apps#listByRepository (DDB Table)
+- Create Environment (Environment Manager) for branch
+
+##### PullRequest Close
+
+- Apps#listByRepository (DDB Table)
+- Close Environment (Environment Manager)
+  - for each environment found which is
+  - matching the event branch
+  - not stopped
+
+##### PullRequest Synchronize
+
+- Apps#listByRepository (DDB Table)
+- Restart Environment (Environment Manager)
+  - for each environment found which is
+  - matching the event branch
+  - not stopped
+
+##### Push
+
+- Apps#listByRepository (DDB Table)
+- Restart Environment (Environment Manager)
+  - for each environment found which is
+  - matching the event branch
+  - not "production" environment type
+  - not stopped
+
+#### Diagram
+
+Generated from above
+
+```mermaid
+graph TD
+    A[Github App] --> B[Update Webhook URL]
+    A --> C[Set Preflight Inputs]
+
+    A --> D{Inbound Events from Github}
+    D -->|PullRequest Open| E[PR Open/Reopen Process]
+    D -->|PullRequest Close| F[PR Close Process]
+    D -->|PullRequest Reopen| E
+    D -->|PullRequest Synchronize| G[PR Synchronize Process]
+    D -->|Push| H[Push Process]
+
+    E --> I[List Apps by Repository]
+    I --> J[Create Environment]
+
+    F --> K[List Apps by Repository]
+    K --> L[Close Environment]
+    L --> M{Check Environment}
+    M -->|Matching Branch, Not Stopped| N[Close Matched Environments]
+    M -->|Otherwise| O[End]
+
+    G --> P[List Apps by Repository]
+    P --> Q[Restart Environment]
+    Q --> R{Check Environment}
+    R -->|Matching Branch, Not Stopped| S[Restart Matched Environments]
+    R -->|Otherwise| T[End]
+
+    H --> U[List Apps by Repository]
+    U --> V[Restart Environment]
+    V --> W{Check Environment}
+    W -->|Matching Branch, Not Prod, Not Stopped| X[Restart Matched Environments]
+    W -->|Otherwise| Y[End]
+```
+
+### Environment Manager
+
+### Secrets
+
+### Runtime (flyio)
+
+### API
+
+### Dnsimple / Reverse Proxy
+
+### Logs
+
+### Notifications
+
 ## Proposal
 
 We aim to define and agree on a unified vision for system development. This initial proposal outlines broad ideas rather than a detailed plan:
