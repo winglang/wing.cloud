@@ -112,8 +112,8 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2
       winglang:
-        specifier: ^0.51.16
-        version: 0.51.16(constructs@10.3.0)
+        specifier: ^0.51.21
+        version: 0.51.21(constructs@10.3.0)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
         specifier: ^0.0.335
@@ -165,7 +165,7 @@ importers:
         version: 2.29.0(@typescript-eslint/parser@6.13.1)(eslint-import-resolver-typescript@3.6.1)(eslint@8.55.0)
       eslint-plugin-prettier:
         specifier: ^5.0.1
-        version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.55.0)(prettier@3.1.0)
+        version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.55.0)(prettier@3.1.1)
       eslint-plugin-unicorn:
         specifier: ^49.0.0
         version: 49.0.0(eslint@8.55.0)
@@ -182,14 +182,14 @@ importers:
   apps/@wingcloud/runtime:
     dependencies:
       '@wingconsole/app':
-        specifier: ^0.51.16
-        version: 0.51.16(constructs@10.2.70)
+        specifier: ^0.51.21
+        version: 0.51.21(constructs@10.2.70)
       '@winglang/compiler':
-        specifier: ^0.51.16
-        version: 0.51.16(constructs@10.2.70)
+        specifier: ^0.51.21
+        version: 0.51.21(constructs@10.2.70)
       '@winglang/sdk':
-        specifier: ^0.51.16
-        version: 0.51.16(constructs@10.2.70)
+        specifier: ^0.51.21
+        version: 0.51.21(constructs@10.2.70)
       chalk:
         specifier: ^5.3.0
         version: 5.3.0
@@ -224,8 +224,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0
       winglang:
-        specifier: ^0.51.16
-        version: 0.51.16(constructs@10.2.70)
+        specifier: ^0.51.21
+        version: 0.51.21(constructs@10.2.70)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
         specifier: ^0.0.335
@@ -268,7 +268,7 @@ importers:
         version: 2.29.0(@typescript-eslint/parser@6.13.1)(eslint-import-resolver-typescript@3.6.1)(eslint@8.55.0)
       eslint-plugin-prettier:
         specifier: ^5.0.1
-        version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.55.0)(prettier@3.1.0)
+        version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.55.0)(prettier@3.1.1)
       eslint-plugin-unicorn:
         specifier: ^49.0.0
         version: 49.0.0(eslint@8.55.0)
@@ -306,8 +306,8 @@ importers:
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/wrpc
       '@wingconsole/ui':
-        specifier: ^0.51.16
-        version: 0.51.16(@types/react@18.2.39)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^0.51.21
+        version: 0.51.21(@types/react@18.2.39)(react-dom@18.2.0)(react@18.2.0)
       clsx:
         specifier: ^2.0.0
         version: 2.0.0
@@ -377,7 +377,7 @@ importers:
         version: 2.29.0(@typescript-eslint/parser@6.13.1)(eslint-import-resolver-typescript@3.6.1)(eslint@8.55.0)
       eslint-plugin-prettier:
         specifier: ^5.0.1
-        version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.55.0)(prettier@3.1.0)
+        version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.55.0)(prettier@3.1.1)
       eslint-plugin-unicorn:
         specifier: ^49.0.0
         version: 49.0.0(eslint@8.55.0)
@@ -447,11 +447,11 @@ importers:
         specifier: ^6.13.1
         version: 6.13.1(eslint@8.55.0)(typescript@5.3.2)
       '@winglang/compiler':
-        specifier: ^0.51.16
-        version: 0.51.16(constructs@10.3.0)
+        specifier: ^0.51.21
+        version: 0.51.21(constructs@10.3.0)
       '@winglang/sdk':
-        specifier: ^0.51.16
-        version: 0.51.16(constructs@10.3.0)
+        specifier: ^0.51.21
+        version: 0.51.21(constructs@10.3.0)
       cdktf:
         specifier: ^0.19.1
         version: 0.19.1(constructs@10.3.0)
@@ -472,7 +472,7 @@ importers:
         version: 2.29.0(@typescript-eslint/parser@6.13.1)(eslint-import-resolver-typescript@3.6.1)(eslint@8.55.0)
       eslint-plugin-prettier:
         specifier: ^5.0.1
-        version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.55.0)(prettier@3.1.0)
+        version: 5.0.1(eslint-config-prettier@9.0.0)(eslint@8.55.0)(prettier@3.1.1)
       eslint-plugin-unicorn:
         specifier: ^49.0.0
         version: 49.0.0(eslint@8.55.0)
@@ -1627,7 +1627,7 @@ packages:
       ajv: 6.12.6
       debug: 4.3.4
       espree: 9.6.1
-      globals: 13.23.0
+      globals: 13.24.0
       ignore: 5.3.0
       import-fresh: 3.3.0
       js-yaml: 4.1.0
@@ -3694,11 +3694,11 @@ packages:
       pretty-format: 29.7.0
     dev: true
 
-  /@wingconsole/app@0.51.16(constructs@10.2.70):
-    resolution: {integrity: sha512-S/GfAGsM7IjjZaR9h5m6V8xFkJ+P+d3orMIX8EoBtiKunpo94Q7V+na3xnBVAJ9InOxBgMgwCPsBX3VRkBhzjg==}
+  /@wingconsole/app@0.51.21(constructs@10.2.70):
+    resolution: {integrity: sha512-s2oUym6jwETwfu8Wz00NnDcKTzwGRwXa+iiw9JjRWNPA7v1f+BjV6+0kB7DZihy+gwvSlEzEAQk06QQ99Y1uWg==}
     dependencies:
       '@segment/analytics-node': 1.1.4
-      '@wingconsole/server': 0.51.16(constructs@10.2.70)
+      '@wingconsole/server': 0.51.21(constructs@10.2.70)
       cross-spawn: 7.0.3
       express: 4.18.2
       picocolors: 1.0.0
@@ -3708,11 +3708,11 @@ packages:
       - supports-color
     dev: false
 
-  /@wingconsole/app@0.51.16(constructs@10.3.0):
-    resolution: {integrity: sha512-S/GfAGsM7IjjZaR9h5m6V8xFkJ+P+d3orMIX8EoBtiKunpo94Q7V+na3xnBVAJ9InOxBgMgwCPsBX3VRkBhzjg==}
+  /@wingconsole/app@0.51.21(constructs@10.3.0):
+    resolution: {integrity: sha512-s2oUym6jwETwfu8Wz00NnDcKTzwGRwXa+iiw9JjRWNPA7v1f+BjV6+0kB7DZihy+gwvSlEzEAQk06QQ99Y1uWg==}
     dependencies:
       '@segment/analytics-node': 1.1.4
-      '@wingconsole/server': 0.51.16(constructs@10.3.0)
+      '@wingconsole/server': 0.51.21(constructs@10.3.0)
       cross-spawn: 7.0.3
       express: 4.18.2
       picocolors: 1.0.0
@@ -3722,8 +3722,8 @@ packages:
       - supports-color
     dev: false
 
-  /@wingconsole/design-system@0.51.16:
-    resolution: {integrity: sha512-i2deiyi4RHzgi+5qnN6DZX7F70GxuffNlAeGYW3eprwPSY8W1Nw+loIJZj1ZC4z6sTblIC3y0c2Va4Uv5HfsFA==}
+  /@wingconsole/design-system@0.51.21:
+    resolution: {integrity: sha512-KUmaUHzntzU6UQQWRwCdZtX3XYo8R6diJKWE1Oun9XYdgmgqDA/yehy3F89nnJod21T37hNS9gA3mkUhfuCOFA==}
     dependencies:
       '@headlessui/react': 1.7.17(react-dom@18.2.0)(react@18.2.0)
       '@heroicons/react': 2.0.18(react@18.2.0)
@@ -3740,11 +3740,11 @@ packages:
       - ts-node
     dev: false
 
-  /@wingconsole/server@0.51.16(constructs@10.2.70):
-    resolution: {integrity: sha512-m6F7oLYHXh+SM32Ce8izD0FJ47erxmspMABElRbaC01RrgM0EoMvLW9Xatu/enhZ5H/+t+XGZizdm2U+xLWDvA==}
+  /@wingconsole/server@0.51.21(constructs@10.2.70):
+    resolution: {integrity: sha512-b+QkKypWpLBGUxJk0msVxzWaw8ftQpC5LCblwdLsaHiPcLl9ICX5caba8WIyNK6xg7yHi/k1RZXVgWCARgZ9cg==}
     dependencies:
-      '@winglang/compiler': 0.51.16(constructs@10.2.70)
-      '@winglang/sdk': 0.51.16(constructs@10.2.70)
+      '@winglang/compiler': 0.51.21(constructs@10.2.70)
+      '@winglang/sdk': 0.51.21(constructs@10.2.70)
       codespan-wasm: 0.4.0
       debug: 4.3.4
       launch-editor: 2.6.1
@@ -3754,11 +3754,11 @@ packages:
       - supports-color
     dev: false
 
-  /@wingconsole/server@0.51.16(constructs@10.3.0):
-    resolution: {integrity: sha512-m6F7oLYHXh+SM32Ce8izD0FJ47erxmspMABElRbaC01RrgM0EoMvLW9Xatu/enhZ5H/+t+XGZizdm2U+xLWDvA==}
+  /@wingconsole/server@0.51.21(constructs@10.3.0):
+    resolution: {integrity: sha512-b+QkKypWpLBGUxJk0msVxzWaw8ftQpC5LCblwdLsaHiPcLl9ICX5caba8WIyNK6xg7yHi/k1RZXVgWCARgZ9cg==}
     dependencies:
-      '@winglang/compiler': 0.51.16(constructs@10.3.0)
-      '@winglang/sdk': 0.51.16(constructs@10.3.0)
+      '@winglang/compiler': 0.51.21(constructs@10.3.0)
+      '@winglang/sdk': 0.51.21(constructs@10.3.0)
       codespan-wasm: 0.4.0
       debug: 4.3.4
       launch-editor: 2.6.1
@@ -3768,8 +3768,8 @@ packages:
       - supports-color
     dev: false
 
-  /@wingconsole/ui@0.51.16(@types/react@18.2.39)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-cYFLd1X3V78Tc8eD/zwoK/npfBw46lTeun1KpYcipH+Ih5Jn24lUAdXZMFVpC6b21QCK2dPXwDMfdQqJqDNSOg==}
+  /@wingconsole/ui@0.51.21(@types/react@18.2.39)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-R63vOL42OVONtP1ApdKSKTbewiBsuc1H82c46JusVvgyzSFloCzytQvRY9KwgssE+d70N7YlhIN3HtywUJnmkQ==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
@@ -3780,12 +3780,12 @@ packages:
       '@trpc/client': 10.44.1(@trpc/server@10.44.1)
       '@trpc/react-query': 10.44.1(@tanstack/react-query@4.36.1)(@trpc/client@10.44.1)(@trpc/server@10.44.1)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/server': 10.44.1
-      '@wingconsole/design-system': 0.51.16
+      '@wingconsole/design-system': 0.51.21
       classnames: 2.3.2
       d3-selection: 3.0.0
       d3-zoom: 3.0.0
       elkjs: 0.8.2
-      framer-motion: 10.16.15(react-dom@18.2.0)(react@18.2.0)
+      framer-motion: 10.16.16(react-dom@18.2.0)(react@18.2.0)
       jszip: 3.10.1
       linkify-react: 4.1.3(linkifyjs@4.1.3)(react@18.2.0)
       linkifyjs: 4.1.3
@@ -3804,29 +3804,29 @@ packages:
       - ts-node
     dev: false
 
-  /@winglang/compiler@0.51.16(constructs@10.2.70):
-    resolution: {integrity: sha512-UryQ2LKar8gtU61KhTMhvVulHmitgGd7/R8XbdWT4sRi8hohBwKGkXARMGsVXJid8/MCXVsKdXQxWa9y6O4yQw==}
+  /@winglang/compiler@0.51.21(constructs@10.2.70):
+    resolution: {integrity: sha512-5Xtiq6DFGJwY5u8bM4NBsqkGva1rHxSw3xIjr/0sihB1MHHYjmhJT9T2yN69uYsoVOTfeE+0TaSNAwJ3amQ1oA==}
     engines: {node: '>=v18.0.0'}
     dependencies:
-      '@winglang/sdk': 0.51.16(constructs@10.2.70)
+      '@winglang/sdk': 0.51.21(constructs@10.2.70)
     transitivePeerDependencies:
       - constructs
     dev: false
     bundledDependencies:
       - wasi-js
 
-  /@winglang/compiler@0.51.16(constructs@10.3.0):
-    resolution: {integrity: sha512-UryQ2LKar8gtU61KhTMhvVulHmitgGd7/R8XbdWT4sRi8hohBwKGkXARMGsVXJid8/MCXVsKdXQxWa9y6O4yQw==}
+  /@winglang/compiler@0.51.21(constructs@10.3.0):
+    resolution: {integrity: sha512-5Xtiq6DFGJwY5u8bM4NBsqkGva1rHxSw3xIjr/0sihB1MHHYjmhJT9T2yN69uYsoVOTfeE+0TaSNAwJ3amQ1oA==}
     engines: {node: '>=v18.0.0'}
     dependencies:
-      '@winglang/sdk': 0.51.16(constructs@10.3.0)
+      '@winglang/sdk': 0.51.21(constructs@10.3.0)
     transitivePeerDependencies:
       - constructs
     bundledDependencies:
       - wasi-js
 
-  /@winglang/sdk@0.51.16(constructs@10.2.70):
-    resolution: {integrity: sha512-gFJ4jcmPJ820g9DBXgPHKIgWNF5U3rqj7ArEoC8lQH17vcRHQjQ6Rkv+YejGxiPGEEBHLE+K12Ku5XNEwiJyHg==}
+  /@winglang/sdk@0.51.21(constructs@10.2.70):
+    resolution: {integrity: sha512-ct9ik0PI4upE7qxEKIdt4Htc2IvgH7t3Ke/uJxtMU0YudJ17e4mssH8vnYPqrkvQFt6BOawxaj6GUI2iFUTxww==}
     engines: {node: '>= 18.13.0'}
     peerDependencies:
       constructs: ~10.2.69
@@ -3868,8 +3868,8 @@ packages:
       - uuid
       - yaml
 
-  /@winglang/sdk@0.51.16(constructs@10.3.0):
-    resolution: {integrity: sha512-gFJ4jcmPJ820g9DBXgPHKIgWNF5U3rqj7ArEoC8lQH17vcRHQjQ6Rkv+YejGxiPGEEBHLE+K12Ku5XNEwiJyHg==}
+  /@winglang/sdk@0.51.21(constructs@10.3.0):
+    resolution: {integrity: sha512-ct9ik0PI4upE7qxEKIdt4Htc2IvgH7t3Ke/uJxtMU0YudJ17e4mssH8vnYPqrkvQFt6BOawxaj6GUI2iFUTxww==}
     engines: {node: '>= 18.13.0'}
     peerDependencies:
       constructs: ~10.2.69
@@ -5379,6 +5379,27 @@ packages:
       synckit: 0.8.5
     dev: true
 
+  /eslint-plugin-prettier@5.0.1(eslint-config-prettier@9.0.0)(eslint@8.55.0)(prettier@3.1.1):
+    resolution: {integrity: sha512-m3u5RnR56asrwV/lDC4GHorlW75DsFfmUcjfCYylTUs85dBRnB7VM6xG8eCMJdeDRnppzmxZVf1GEPJvl1JmNg==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    peerDependencies:
+      '@types/eslint': '>=8.0.0'
+      eslint: '>=8.0.0'
+      eslint-config-prettier: '*'
+      prettier: '>=3.0.0'
+    peerDependenciesMeta:
+      '@types/eslint':
+        optional: true
+      eslint-config-prettier:
+        optional: true
+    dependencies:
+      eslint: 8.55.0
+      eslint-config-prettier: 9.0.0(eslint@8.55.0)
+      prettier: 3.1.1
+      prettier-linter-helpers: 1.0.0
+      synckit: 0.8.5
+    dev: true
+
   /eslint-plugin-unicorn@49.0.0(eslint@8.55.0):
     resolution: {integrity: sha512-0fHEa/8Pih5cmzFW5L7xMEfUTvI9WKeQtjmKpTUmY+BiFCDxkxrTdnURJOHKykhtwIeyYsxnecbGvDCml++z4Q==}
     engines: {node: '>=16'}
@@ -5443,7 +5464,7 @@ packages:
       file-entry-cache: 6.0.1
       find-up: 5.0.0
       glob-parent: 6.0.2
-      globals: 13.23.0
+      globals: 13.24.0
       graphemer: 1.4.0
       ignore: 5.3.0
       imurmurhash: 0.1.4
@@ -5790,8 +5811,8 @@ packages:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
     dev: true
 
-  /framer-motion@10.16.15(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-BapW1EKc/Sgph1rKEwL9bFt2B79z7bu7jN4Up1jGUaTE78WBsVO+6eCmoUZsQH0hHtRUDnnTqjjBbM7dk9Kp8A==}
+  /framer-motion@10.16.16(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-je6j91rd7NmUX7L1XHouwJ4v3R+SO4umso2LUcgOct3rHZ0PajZ80ETYZTajzEXEl9DlKyzjyt4AvGQ+lrebOw==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
@@ -5971,8 +5992,8 @@ packages:
       minimatch: 5.1.6
       once: 1.4.0
 
-  /globals@13.23.0:
-    resolution: {integrity: sha512-XAmF0RjlrjY23MA51q3HltdlGxUpXPvg0GioKiD9X6HD28iMjo2dKC8Vqwm7lne4GNr78+RHTfliktR6ZH09wA==}
+  /globals@13.24.0:
+    resolution: {integrity: sha512-AhO5QUcj8llrbG09iWhPU2B204J1xnPeL8kQmVorSsy+Sjj1sk8gIyh6cUocGmH4L0UuhAJy+hJMRA4mgA4mFQ==}
     engines: {node: '>=8'}
     dependencies:
       type-fest: 0.20.2
@@ -8243,6 +8264,12 @@ packages:
     hasBin: true
     dev: true
 
+  /prettier@3.1.1:
+    resolution: {integrity: sha512-22UbSzg8luF4UuZtzgiUOfcGM8s4tjBv6dJRT7j275NXsy2jb4aJa4NNveul5x4eqlF1wuhuR2RElK71RvmVaw==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: true
+
   /pretty-format@29.7.0:
     resolution: {integrity: sha512-Pdlw/oPxN+aXdmM9R00JVC9WVFoCLTKJvDVLgmJ+qAffBMxsV85l/Lu7sNx4zSzPyoL2euImuEwHhOXdEgNFZQ==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
@@ -9342,7 +9369,7 @@ packages:
     dependencies:
       ionstore: 1.0.0
       tiny-colors: 2.1.2
-      when-exit: 2.1.1
+      when-exit: 2.1.2
     dev: false
 
   /tinybench@2.5.1:
@@ -10069,8 +10096,8 @@ packages:
       webidl-conversions: 4.0.2
     dev: true
 
-  /when-exit@2.1.1:
-    resolution: {integrity: sha512-XLipGldz/UcleuGaoQjbYuWwD+ICRnzIjlldtwTaTWr7aZz8yQW49rXk6MHQnh+KxOiWiJpM1vIyaxprOnlW4g==}
+  /when-exit@2.1.2:
+    resolution: {integrity: sha512-u9J+toaf3CCxCAzM/484qNAxQE75rFdVgiFEEV8Xps2gzYhf0tx73s1WXDQhkwV17E3MxRMz40m7Ekd2/121Lg==}
     dev: false
 
   /which-boxed-primitive@1.0.2:
@@ -10124,17 +10151,17 @@ packages:
       string-width: 4.2.3
     dev: false
 
-  /winglang@0.51.16(constructs@10.2.70):
-    resolution: {integrity: sha512-9AS5HkB9aXQuxl0N3nlkXmY7gf9I6/ONcMfu88zZmGF0byCcrHPv1E+8tnkg7S+Y3oDZLRcItZca7mSmEmVCTQ==}
+  /winglang@0.51.21(constructs@10.2.70):
+    resolution: {integrity: sha512-C8NnPicL0XO9AnnkhoGLxzfK8qzqjT6pVxB5CANq7psy+laK98vitcglgjyS8c5E7kHXYi9Fk/V5XUkrUImvVg==}
     engines: {node: '>=v18.0.0'}
     hasBin: true
     dependencies:
       '@npmcli/arborist': 7.2.2
       '@segment/analytics-node': 1.1.4
-      '@wingconsole/app': 0.51.16(constructs@10.2.70)
-      '@wingconsole/server': 0.51.16(constructs@10.2.70)
-      '@winglang/compiler': 0.51.16(constructs@10.2.70)
-      '@winglang/sdk': 0.51.16(constructs@10.2.70)
+      '@wingconsole/app': 0.51.21(constructs@10.2.70)
+      '@wingconsole/server': 0.51.21(constructs@10.2.70)
+      '@winglang/compiler': 0.51.21(constructs@10.2.70)
+      '@winglang/sdk': 0.51.21(constructs@10.2.70)
       chalk: 4.1.2
       codespan-wasm: 0.4.0
       commander: 10.0.1
@@ -10158,17 +10185,17 @@ packages:
       - supports-color
     dev: false
 
-  /winglang@0.51.16(constructs@10.3.0):
-    resolution: {integrity: sha512-9AS5HkB9aXQuxl0N3nlkXmY7gf9I6/ONcMfu88zZmGF0byCcrHPv1E+8tnkg7S+Y3oDZLRcItZca7mSmEmVCTQ==}
+  /winglang@0.51.21(constructs@10.3.0):
+    resolution: {integrity: sha512-C8NnPicL0XO9AnnkhoGLxzfK8qzqjT6pVxB5CANq7psy+laK98vitcglgjyS8c5E7kHXYi9Fk/V5XUkrUImvVg==}
     engines: {node: '>=v18.0.0'}
     hasBin: true
     dependencies:
       '@npmcli/arborist': 7.2.2
       '@segment/analytics-node': 1.1.4
-      '@wingconsole/app': 0.51.16(constructs@10.3.0)
-      '@wingconsole/server': 0.51.16(constructs@10.3.0)
-      '@winglang/compiler': 0.51.16(constructs@10.3.0)
-      '@winglang/sdk': 0.51.16(constructs@10.3.0)
+      '@wingconsole/app': 0.51.21(constructs@10.3.0)
+      '@wingconsole/server': 0.51.21(constructs@10.3.0)
+      '@winglang/compiler': 0.51.21(constructs@10.3.0)
+      '@winglang/sdk': 0.51.21(constructs@10.3.0)
       chalk: 4.1.2
       codespan-wasm: 0.4.0
       commander: 10.0.1
