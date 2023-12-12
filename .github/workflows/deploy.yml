@@ -82,6 +82,10 @@ jobs:
         id: init
         run: terraform init
         working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
       - name: Terraform Apply
         id: plan
         env:
