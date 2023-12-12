@@ -119,7 +119,7 @@ pub class GithubComment {
         let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
         let envStatus = this.envStatusToString(environment.status, appOwner ?? "", props.appName, environment.branch);
         let tableRows = "<tr><td>{appNameLink}</td><td>{envStatus}</td><td>{previewUrl}</td><td>{endpointsString}</td><td>{dateStr}</td></tr>";
-        let testSummary = "Tests: {passedTests} ✅ (Passed)   |   {failedTests} ❌ (Failed)";
+        let testSummary = "Tests: {passedTests} ✅ | {failedTests} ❌";
         let testsSection = "<details><summary>{testSummary}</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
 
         commentBody = "{commentBody}{tableRows}</table>";
