@@ -102,7 +102,7 @@ describe('Platform', () => {
     test('enable xray for functions', async () => {
       const template = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
       const functions = template.resource['aws_lambda_function'];
-      const fn = functions['cloudApi_OnRequest0_E65A93DD'];
+      const fn = functions['cloudApi_get_hello_0_2F9F5F19'];
 
       expect(fn).toBeDefined();
       expect(fn).toMatchObject({
