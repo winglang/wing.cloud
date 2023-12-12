@@ -73,13 +73,20 @@ pub class GithubComment {
 
       if environment.repo == props.repo && environment.prNumber == props.prNumber {
         let var testRows = "";
+        let var passedTests = 0;
+        let var failedTests = 0;
         if let testResults = environment.testResults {
           let var i = 0;
           for testResult in testResults.testResults {
-            let var testRes = "✅ Passed";
+            let var testRes = "";
             if !testResult.pass {
               testRes = "❌ Failed";
+              failedTests += 1;
+            } else {
+              testRes = "✅ Passed";
+              passedTests += 1;
             }
+
             let testId = testResult.id;
             let testName = testResult.path.split(":").at(-1);
             let testResourcePath = testResult.path.split(":").at(0);
@@ -112,7 +119,8 @@ pub class GithubComment {
         let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
         let envStatus = this.envStatusToString(environment.status, appOwner ?? "", props.appName, environment.branch);
         let tableRows = "<tr><td>{appNameLink}</td><td>{envStatus}</td><td>{previewUrl}</td><td>{endpointsString}</td><td>{dateStr}</td></tr>";
-        let testsSection = "<details><summary>Tests</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
+        let testSummary = "Tests: {passedTests} ✅ Passed | {failedTests} ❌ Failed";
+        let testsSection = "<details><summary>{testSummary}</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
 
         commentBody = "{commentBody}{tableRows}</table>";
 
