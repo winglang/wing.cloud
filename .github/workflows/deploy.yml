@@ -1,0 +1,38 @@
+name: Deployment
+
+on:
+  push:
+    paths-ignore:
+      - "**/*.md"
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  # This deploys into the "Wing Cloud Staging" AWS account
+  # https://wingcloud.awsapps.com/start
+  deploy-staging:
+    name: Deploy Staging
+    uses: ./.github/workflows/deploy-shared.yml
+    with:
+      TF_BACKEND_STATE_FILE: "winglang/wing.cloud/main/infrastructure/main.tfstate"
+      AWS_REGION: "us-east-1"
+      ENVIRONMENT_NAME: "staging"
+    secrets: inherit
+  # This deploys into the "Wing Cloud Production" AWS account
+  # https://wingcloud.awsapps.com/start
+  deploy-production:
+    needs: deploy-staging
+    name: Deploy Production
+    uses: ./.github/workflows/deploy-shared.yml
+    with:
+      TF_BACKEND_STATE_FILE: "winglang/wing.cloud/production/infrastructure/main.tfstate"
+      AWS_REGION: "us-east-1"
+      ENVIRONMENT_NAME: "production"
+    secrets: inherit
