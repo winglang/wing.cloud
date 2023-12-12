@@ -70,7 +70,7 @@ export const GitRepoSelect = ({
             onChange={setInstallationId}
             value={installationId ?? ""}
             className="w-full"
-            disabled={loading || disabled}
+            disabled={disabled}
             renderItem={(item) => {
               return (
                 <div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ export const GitRepoSelect = ({
             id="search"
             placeholder="Search..."
             value={search}
-            disabled={loading || disabled}
+            disabled={disabled}
             onChange={(e) => {
               setSearch(e.target.value);
             }}
