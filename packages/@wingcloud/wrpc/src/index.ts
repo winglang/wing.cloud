@@ -149,7 +149,7 @@ export const createWRPCReact = <
               ...options,
               queryKey: [route, input],
               queryFn: async ({ pageParam }) => {
-                url.searchParams.set("page", `${pageParam || 1}`);
+                url.searchParams.set("page", `${pageParam ?? 1}`);
                 return fetcher("GET", url);
               },
               getNextPageParam: ({ nextPage }) => {
