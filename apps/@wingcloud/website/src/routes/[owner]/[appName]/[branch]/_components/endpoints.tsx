@@ -1,7 +1,10 @@
 import clsx from "clsx";
+import { useCallback, useContext } from "react";
+import { useParams } from "react-router-dom";
 
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
+import { AnalyticsContext } from "../../../../../utils/analytics-provider.js";
 import type { Endpoint } from "../../../../../utils/wrpc.js";
 
 export interface EndpointsProps {
@@ -9,6 +12,7 @@ export interface EndpointsProps {
   isOpen: boolean;
   endpoints: Endpoint[];
   loading?: boolean;
+  environmentType?: string;
 }
 
 export const Endpoints = ({
@@ -16,9 +20,24 @@ export const Endpoints = ({
   isOpen,
   endpoints,
   loading,
+  environmentType,
 }: EndpointsProps) => {
   const { theme } = useTheme();
-
+  const { track } = useContext(AnalyticsContext);
+  const { appName, branch } = useParams();
+  const onEndpointClick = useCallback(
+    (endpoint: Endpoint) => {
+      track("cloud_endpoint_visited", {
+        repo: appName,
+        branch,
+        type: environmentType,
+        endpoint_path: endpoint.path,
+        endpoint_url: endpoint.publicUrl,
+        endpoint_type: endpoint.type,
+      });
+    },
+    [track, branch, appName, environmentType],
+  );
   return (
     <div
       className={clsx(
@@ -100,6 +119,7 @@ export const Endpoints = ({
                         href={endpoint.publicUrl}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={(e) => onEndpointClick(endpoint)}
                       >
                         {endpoint.publicUrl}
                       </a>
