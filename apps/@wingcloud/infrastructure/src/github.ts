@@ -28,21 +28,20 @@ export const listInstallationRepos = async (
     auth: token,
   });
 
-  const perPage = 10;
+  const perPage = 30;
 
   // https://docs.github.com/en/rest/apps/installations?apiVersion=2022-11-28#list-repositories-accessible-to-the-user-access-token
   const { data: orgRepos } =
     await octokit.rest.apps.listInstallationReposForAuthenticatedUser({
       installation_id: installationId,
       page,
+      // The number of results per page (max 100).
+      // Default: 30
       per_page: perPage,
     });
 
   return {
     pagination: {
-      page: page,
-      perPage: perPage,
-      total: orgRepos.total_count,
       nextPage: orgRepos.total_count > page * perPage ? page + 1 : undefined,
     },
     data: orgRepos.repositories,

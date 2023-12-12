@@ -90,8 +90,7 @@ export const Component = () => {
     if (!listReposQuery.data?.pages) {
       return setReposList([]);
     }
-    const repos = listReposQuery.data.pages.flatMap((page) => page.data);
-    setReposList(repos);
+    setReposList(listReposQuery.data.pages.flatMap((page) => page.data));
   }, [listReposQuery.data]);
 
   return (
@@ -110,6 +109,7 @@ export const Component = () => {
               <SpinnerLoader className="z-20" />
             </div>
           )}
+
           <GitRepoSelect
             installationId={installationId}
             setInstallationId={setInstallationId}
@@ -119,8 +119,8 @@ export const Component = () => {
             repos={reposList ?? []}
             loading={loading}
             disabled={createAppLoading}
-            loadNextPage={listReposQuery.fetchNextPage}
           />
+
           <div className="text-xs flex gap-1 items-center">
             <span className={clsx(theme.text1)}>Missing a repository?</span>
             <button

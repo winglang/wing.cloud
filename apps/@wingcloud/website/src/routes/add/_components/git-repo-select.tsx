@@ -3,9 +3,8 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
-import { InfiniteScrollTrigger } from "../../../components/infinit-scroll-trigger.js";
 import { SpinnerLoader } from "../../../components/spinner-loader.js";
 import { Input } from "../../../design-system/input.js";
 import { Select } from "../../../design-system/select.js";
@@ -22,7 +21,6 @@ export interface GitRepoSelectProps {
   repos: Repository[];
   loading: boolean;
   disabled?: boolean;
-  loadNextPage: () => void;
 }
 
 export const GitRepoSelect = ({
@@ -34,7 +32,6 @@ export const GitRepoSelect = ({
   repos,
   loading,
   disabled,
-  loadNextPage,
 }: GitRepoSelectProps) => {
   const { theme } = useTheme();
 
@@ -183,13 +180,6 @@ export const GitRepoSelect = ({
             </div>
           )}
         </div>
-        <InfiniteScrollTrigger
-          onTriggered={() => {
-            if (!loading) {
-              loadNextPage();
-            }
-          }}
-        />
       </div>
     </div>
   );

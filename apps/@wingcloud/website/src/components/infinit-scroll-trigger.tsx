@@ -17,7 +17,6 @@ export const InfiniteScrollTrigger = ({
         }
       },
       {
-        root: undefined,
         rootMargin: "0px",
         threshold: 1,
       },
@@ -32,7 +31,7 @@ export const InfiniteScrollTrigger = ({
         observer.unobserve(triggerRef.current);
       }
     };
-  }, [onTriggered, loading]);
+  }, [onTriggered]);
 
   return <div ref={triggerRef} />;
 };

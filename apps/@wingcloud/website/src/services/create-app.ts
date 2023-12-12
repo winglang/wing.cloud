@@ -9,14 +9,17 @@ export const useCreateAppFromRepo = () => {
 
   const listInstallationsQuery = wrpc["github.listInstallations"].useQuery();
 
-  const listReposQuery = wrpc["github.listRepositories"].useInfiniteQuery(
-    {
-      installationId: installationId!,
-    },
-    {
-      enabled: !!installationId,
-    },
-  );
+  const listReposQuery = wrpc["github.listRepositories"].useInfiniteQuery({
+    installationId: installationId!,
+    page: 1,
+  });
+
+  useEffect(() => {
+    if (!listReposQuery.data?.pages) {
+      return;
+    }
+    listReposQuery.fetchNextPage();
+  }, [listReposQuery.data]);
 
   const createAppMutation = wrpc["app.create"].useMutation();
 
@@ -58,10 +61,6 @@ export const useCreateAppFromRepo = () => {
     setRepositoryId("");
   }, [installationId]);
 
-  const disabled = useMemo(() => {
-    return !installationId || !repositoryId;
-  }, [installationId, repositoryId]);
-
   const loading = useMemo(() => {
     return (
       listInstallationsQuery.isLoading ||
@@ -79,7 +78,6 @@ export const useCreateAppFromRepo = () => {
     setRepositoryId,
     createAppLoading,
     loading,
-    disabled,
     listReposQuery,
     listInstallationsQuery,
   };

@@ -45,7 +45,7 @@ export interface TestResult {
 }
 
 interface TestResults {
-  testResults: Array<TestResult>;
+  testResults: TestResult[];
 }
 
 interface StatusReport {
@@ -95,7 +95,7 @@ export interface TestLog {
   error: string;
   time: number;
   timestamp: string;
-  traces: Array<Trace>;
+  traces: Trace[];
 }
 
 export interface Secret {
@@ -137,12 +137,12 @@ export const wrpc = createWRPCReact<{
   "github.listInstallations": QueryProcedure<
     undefined,
     {
-      installations: Array<Installation>;
+      installations: Installation[];
     }
   >;
   "github.listRepositories": InfinitQueryProcedure<
     { installationId: string; page?: number },
-    PaginatedResponse<Array<Repository>>
+    PaginatedResponse<Repository[]>
   >;
   "github.getRepository": QueryProcedure<
     { owner: string; repo: string },
@@ -159,7 +159,7 @@ export const wrpc = createWRPCReact<{
   "app.listEnvironments": QueryProcedure<
     { owner: string; appName: string },
     {
-      environments: Array<Environment>;
+      environments: Environment[];
     }
   >;
   "app.environment": QueryProcedure<
@@ -185,7 +185,7 @@ export const wrpc = createWRPCReact<{
   "app.listSecrets": QueryProcedure<
     { appId: string },
     {
-      secrets: Array<Secret>;
+      secrets: Secret[];
     }
   >;
   "app.decryptSecret": MutationProcedure<
@@ -208,7 +208,7 @@ export const wrpc = createWRPCReact<{
   "app.listEntrypoints": QueryProcedure<
     { owner: string; repo: string; default_branch: string },
     {
-      entrypoints: Array<string>;
+      entrypoints: string[];
     }
   >;
   "app.updateEntrypoint": MutationProcedure<
@@ -221,7 +221,7 @@ export const wrpc = createWRPCReact<{
       owner: string;
     },
     {
-      apps: Array<App>;
+      apps: App[];
     }
   >;
   "app.create": MutationProcedure<
