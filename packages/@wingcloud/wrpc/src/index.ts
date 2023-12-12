@@ -23,10 +23,6 @@ export class ForbiddenError extends ControlledError {}
 
 export class NotFoundError extends ControlledError {}
 
-export interface PaginatedInput {
-  page?: number;
-}
-
 export interface PaginatedResponse<T> {
   data: T;
   nextPage?: number;

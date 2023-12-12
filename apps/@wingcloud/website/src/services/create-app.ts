@@ -7,11 +7,9 @@ export const useCreateAppFromRepo = () => {
   const [repositoryId, setRepositoryId] = useState<string>();
   const [installationId, setInstallationId] = useState<string>();
 
-  const listInstallationsQuery = wrpc[
-    "github.listInstallations"
-  ].useInfiniteQuery({
-    page: 1,
-  });
+  const listInstallationsQuery =
+    wrpc["github.listInstallations"].useInfiniteQuery();
+
   useEffect(() => {
     if (!listInstallationsQuery.data?.pages) {
       return;
@@ -21,7 +19,6 @@ export const useCreateAppFromRepo = () => {
 
   const listReposQuery = wrpc["github.listRepositories"].useInfiniteQuery({
     installationId: installationId!,
-    page: 1,
   });
 
   useEffect(() => {

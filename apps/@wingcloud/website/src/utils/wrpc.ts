@@ -3,7 +3,6 @@ import {
   type InfinitQueryProcedure,
   type MutationProcedure,
   type QueryProcedure,
-  type PaginatedInput,
   type PaginatedResponse,
 } from "@wingcloud/wrpc";
 
@@ -136,11 +135,11 @@ export const wrpc = createWRPCReact<{
   "auth.signOut": MutationProcedure;
   "github.callback": QueryProcedure<{ code: string }, {}>;
   "github.listInstallations": InfinitQueryProcedure<
-    PaginatedInput,
+    undefined,
     PaginatedResponse<Installation[]>
   >;
   "github.listRepositories": InfinitQueryProcedure<
-    PaginatedInput & { installationId: string },
+    { installationId: string },
     PaginatedResponse<Repository[]>
   >;
   "github.getRepository": QueryProcedure<
