@@ -3,8 +3,9 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
+import { InfiniteScrollTrigger } from "../../../components/infinit-scroll-trigger.js";
 import { SpinnerLoader } from "../../../components/spinner-loader.js";
 import { Input } from "../../../design-system/input.js";
 import { Select } from "../../../design-system/select.js";
@@ -21,7 +22,7 @@ export interface GitRepoSelectProps {
   repos: Repository[];
   loading: boolean;
   disabled?: boolean;
-  loadNextPage?: () => void;
+  loadNextPage: () => void;
 }
 
 export const GitRepoSelect = ({
@@ -124,80 +125,71 @@ export const GitRepoSelect = ({
       <div
         className={clsx(
           "flex flex-col max-h-80 overflow-auto rounded",
-          "border divide-y divide-slate-200 dark:divide-slate-700",
+          "border",
           theme.borderInput,
         )}
       >
-        {filteredRepos.map((repo) => (
-          <div
-            aria-disabled={disabled}
-            key={repo.id}
-            className={clsx(
-              theme.text1,
-              "text-xs px-2.5 py-4 gap-1",
-              "w-full text-left flex items-center",
-              "transition-all outline-none focus:outline-none",
-              "focus:bg-slate-50 dark:focus:bg-slate-750",
-              repositoryId === repo.full_name &&
-                "bg-slate-50 dark:bg-slate-750",
-              repositoryId !== repo.full_name && theme.bgInput,
-              disabled && "opacity-50 cursor-not-allowed",
-            )}
-          >
-            <div className="flex items-center gap-2">
-              <img
-                className="w-6 h-6 shrink-0 rounded-full"
-                src={repo.owner.avatar_url}
-              />
-              <div className="flex gap-1 items-center truncate">
-                <div className="truncate">{repo.name}</div>
-                {repo.private && (
-                  <LockClosedIcon className="w-3 h-3 shrink-0" />
-                )}
+        <div className="divide-y divide-slate-200 dark:divide-slate-700 rounded">
+          {filteredRepos.map((repo) => (
+            <div
+              aria-disabled={disabled}
+              key={repo.id}
+              className={clsx(
+                theme.text1,
+                "text-xs px-2.5 py-4 gap-1",
+                "w-full text-left flex items-center",
+                "transition-all outline-none focus:outline-none",
+                "focus:bg-slate-50 dark:focus:bg-slate-750",
+                repositoryId === repo.full_name &&
+                  "bg-slate-50 dark:bg-slate-750",
+                repositoryId !== repo.full_name && theme.bgInput,
+                disabled && "opacity-50 cursor-not-allowed",
+              )}
+            >
+              <div className="flex items-center gap-2">
+                <img
+                  className="w-6 h-6 shrink-0 rounded-full"
+                  src={repo.owner.avatar_url}
+                />
+                <div className="flex gap-1 items-center truncate">
+                  <div className="truncate">{repo.name}</div>
+                  {repo.private && (
+                    <LockClosedIcon className="w-3 h-3 shrink-0" />
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-grow justify-end">
+                <button
+                  className={clsx(
+                    "rounded px-1 py-0.5 border text-xs",
+                    theme.borderInput,
+                    theme.bgInputHover,
+                    theme.textInput,
+                  )}
+                  onClick={() => {
+                    setRepositoryId(repo.full_name);
+                  }}
+                  disabled={disabled}
+                >
+                  Connect
+                </button>
               </div>
             </div>
-            <div className="flex flex-grow justify-end">
-              <button
-                className={clsx(
-                  "rounded px-1 py-0.5 border text-xs",
-                  theme.borderInput,
-                  theme.bgInputHover,
-                  theme.textInput,
-                )}
-                onClick={() => {
-                  setRepositoryId(repo.full_name);
-                }}
-                disabled={disabled}
-              >
-                Connect
-              </button>
+          ))}
+
+          {loading && (
+            <div className="p-4 w-full flex items-center justify-center relative">
+              <SpinnerLoader size="sm" />
             </div>
-          </div>
-        ))}
-
-        {loading && (
-          <div className="p-4 w-full flex items-center justify-center">
-            <SpinnerLoader size="sm" />
-          </div>
-        )}
-
-        {loadNextPage && !loading && (
-          <div className="flex justify-center w-full p-4">
-            <button
-              className={clsx(
-                "rounded px-1 py-0.5 border text-xs",
-                theme.borderInput,
-                theme.bgInputHover,
-                theme.textInput,
-              )}
-              onClick={() => {
-                loadNextPage();
-              }}
-            >
-              Load more
-            </button>
-          </div>
-        )}
+          )}
+        </div>
+        <InfiniteScrollTrigger
+          onTriggered={() => {
+            if (!loading) {
+              loadNextPage();
+            }
+          }}
+        />
       </div>
     </div>
   );

@@ -119,9 +119,7 @@ export const Component = () => {
             repos={reposList ?? []}
             loading={loading}
             disabled={createAppLoading}
-            loadNextPage={() => {
-              listReposQuery.fetchNextPage();
-            }}
+            loadNextPage={listReposQuery.fetchNextPage}
           />
           <div className="text-xs flex gap-1 items-center">
             <span className={clsx(theme.text1)}>Missing a repository?</span>
