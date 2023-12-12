@@ -241,7 +241,9 @@ let updateGithubWebhook = inflight () => {
   log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
 };
 
-new cloud.OnDeploy(updateGithubWebhook);
+if util.tryEnv("WING_TARGET") == "sim" {
+  new cloud.OnDeploy(updateGithubWebhook);
+}
 
 new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";
