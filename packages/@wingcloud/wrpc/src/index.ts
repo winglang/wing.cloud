@@ -25,6 +25,7 @@ export class NotFoundError extends ControlledError {}
 
 export interface PaginatedResponse<T> {
   pagination: {
+    total: number;
     nextPage?: number;
   };
   data: T;

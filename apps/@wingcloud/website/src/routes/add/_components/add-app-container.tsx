@@ -5,7 +5,6 @@ import { type ForwardRefExoticComponent, type PropsWithChildren } from "react";
 import { ErrorBoundary } from "../../../components/error-boundary.js";
 import { Header } from "../../../components/header.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
-import { wrpc } from "../../../utils/wrpc.js";
 
 export interface AddAppContainerProps {
   step?: {
@@ -18,7 +17,6 @@ export const AddAppContainer = ({
   step,
   children,
 }: PropsWithChildren<AddAppContainerProps>) => {
-  const user = wrpc["auth.check"].useQuery();
   const { theme } = useTheme();
 
   return (
