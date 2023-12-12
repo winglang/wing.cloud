@@ -3,7 +3,6 @@ import type { IPlatform } from '@winglang/sdk/lib/platform';
 import { TestPlatform } from './platform-test';
 import { ProductionPlatform } from './platform-production';
 import { App as CustomApp } from './app';
-
 const WING_ENV = process.env["WING_ENV"] || "production";
 
 enum WingEnv {
@@ -24,6 +23,7 @@ if (WING_ENV !== WingEnv.Production && WING_ENV !== WingEnv.Test) {
 const PlatformHandler = WING_ENV === WingEnv.Production ? ProductionPlatform : TestPlatform;
 
 import { EnableXray } from './production/enable_xray';
+import { OverrideApiGatewayDeployment } from './production/cyclic_hack';
 import { Aspects } from 'cdktf';
 export class Platform implements IPlatform {
   public readonly target = 'tf-aws';
@@ -41,6 +41,7 @@ export class Platform implements IPlatform {
     // see https://github.com/winglang/wing/issues/5151
     // once fixed, this can be moved to the ./pla
     Aspects.of(app).add(new EnableXray(app));
+    Aspects.of(app).add(new OverrideApiGatewayDeployment());
   }
 
   postSynth(config: any) {
