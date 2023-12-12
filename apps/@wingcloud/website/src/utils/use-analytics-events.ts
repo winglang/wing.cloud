@@ -4,42 +4,9 @@ export interface UseAnalyticsEventsOptions {
   track: (event: string, properties?: Record<string, any>) => void;
 }
 
-interface Environment {
-  branch: string;
-  type: string;
-}
-// TODO: remove when we will have a websocket support for receiving a new environment creation event
-const repoEnvironments: Record<string, Environment[]> = {};
-const syncRepoEnvironments = (
-  repo: string,
-  environments: Environment[],
-): Environment[] => {
-  if (!repo) {
-    return [];
-  }
-  const previousEnvironments = repoEnvironments[repo] || [];
-  const newEnvironments = environments.filter((environment) => {
-    for (const previousEnvironment of previousEnvironments) {
-      if (
-        previousEnvironment.branch === environment.branch &&
-        previousEnvironment.type === environment.type
-      ) {
-        return false;
-      }
-    }
-    return true;
-  });
-  repoEnvironments[repo] = environments;
-  return newEnvironments;
-};
-
 export const useAnalyticsEvents = ({ track }: UseAnalyticsEventsOptions) => {
-  const { getOwner, getEnv, getApp } = useGetPathDetails();
-  const handleEvent = (
-    event: string,
-    options?: Record<string, any>,
-    data?: any,
-  ) => {
+  const { getApp } = useGetPathDetails();
+  const handleEvent = (event: string, options?: Record<string, any>) => {
     switch (event) {
       case "app.create": {
         if (!options) {
@@ -57,25 +24,8 @@ export const useAnalyticsEvents = ({ track }: UseAnalyticsEventsOptions) => {
           repo: getApp(),
         });
       }
-      case "app.listEnvironments": {
-        if (!options || !data || !data.environments) {
-          return;
-        }
-        const newEnvironments = syncRepoEnvironments(
-          getApp(),
-          data.environments.map((environment: Environment) => ({
-            branch: environment.branch,
-            type: environment.type,
-          })),
-        );
-        for (const environment of newEnvironments) {
-          track("cloud_environment_created", {
-            repo: getApp(),
-            environment,
-          });
-        }
-        return;
-      }
+      //TODO: add when we will have a websocket support for receiving a new environment creation event.
+      //case "app.listEnvironments": {}
       default: {
         console.debug("analytics events: unknown event", event, options);
       }
