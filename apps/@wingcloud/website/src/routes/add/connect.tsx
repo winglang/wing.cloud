@@ -1,8 +1,10 @@
-import { LinkIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon, LinkIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { ErrorBoundary } from "../../components/error-boundary.js";
+import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { useNotifications } from "../../design-system/notification.js";
@@ -11,10 +13,9 @@ import { useCreateAppFromRepo } from "../../services/create-app.js";
 import { PopupWindowContext } from "../../utils/popup-window-provider.js";
 import { wrpc, type Repository } from "../../utils/wrpc.js";
 
-import { AddAppContainer } from "./_components/add-app-container.js";
 import { GitRepoSelect } from "./_components/git-repo-select.js";
 
-export const Component = () => {
+const ConnectPage = () => {
   const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
 
   const { theme } = useTheme();
@@ -94,12 +95,13 @@ export const Component = () => {
   }, [listReposQuery.data]);
 
   return (
-    <AddAppContainer
-      step={{
-        name: "Connect",
-        icon: LinkIcon,
-      }}
-    >
+    <div>
+      <div className={clsx("flex items-center gap-1", theme.text1)}>
+        Add an app
+        <ChevronRightIcon className="h-4 w-4 flex-shrink-0" />
+        <LinkIcon className="h-3.5 w-3.5 font-semibold" />
+        <div className="truncate">Connect</div>
+      </div>
       <div className="w-full space-y-2">
         <div className={clsx(theme.text1)}>Select a repository</div>
         <div className="w-full relative space-y-2">
@@ -154,6 +156,37 @@ export const Component = () => {
           </div>
         </div>
       </div>
-    </AddAppContainer>
+    </div>
+  );
+};
+
+export const Component = () => {
+  const navigate = useNavigate();
+
+  const { theme } = useTheme();
+
+  return (
+    <div className="flex flex-col h-full">
+      <Header />
+      <ErrorBoundary>
+        <div
+          className={clsx(
+            "w-full flex-grow",
+            "max-w-5xl mx-auto p-4 sm:p-6",
+            "space-y-4",
+          )}
+        >
+          <div
+            className={clsx(
+              "w-full rounded p-6 space-y-4 border",
+              theme.bg4,
+              theme.borderInput,
+            )}
+          >
+            <ConnectPage />
+          </div>
+        </div>
+      </ErrorBoundary>
+    </div>
   );
 };
