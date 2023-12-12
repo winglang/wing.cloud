@@ -23,7 +23,7 @@ const ChoosePage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <div className={clsx("flex items-center gap-1", theme.text1)}>
         Add an app
       </div>
