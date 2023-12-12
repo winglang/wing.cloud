@@ -95,13 +95,14 @@ const ConnectPage = () => {
   }, [listReposQuery.data]);
 
   return (
-    <div>
+    <div className="space-y-2">
       <div className={clsx("flex items-center gap-1", theme.text1)}>
         Add an app
         <ChevronRightIcon className="h-4 w-4 flex-shrink-0" />
         <LinkIcon className="h-3.5 w-3.5 font-semibold" />
         <div className="truncate">Connect</div>
       </div>
+
       <div className="w-full space-y-2">
         <div className={clsx(theme.text1)}>Select a repository</div>
         <div className="w-full relative space-y-2">
