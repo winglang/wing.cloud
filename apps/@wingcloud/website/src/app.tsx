@@ -31,6 +31,7 @@ export const App = () => {
               handleEvent(
                 query.queryKey[0],
                 query.queryKey[1] as Record<string, any>,
+                data,
               );
             }
           },

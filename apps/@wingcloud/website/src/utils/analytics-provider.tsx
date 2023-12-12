@@ -1,6 +1,8 @@
 import { AnalyticsBrowser } from "@segment/analytics-next";
 import { createContext, type PropsWithChildren, useEffect } from "react";
 
+import { useGetPathDetails } from "./use-get-path-details.js";
+
 const instance = AnalyticsBrowser.load({
   writeKey: "MvkxDOKWzcs7MFrWu1UNaO2bGn1S2RvA",
 });
@@ -42,6 +44,7 @@ const track = (event: string, properties?: Record<string, any>) => {
 };
 
 function useAnalytics() {
+  const { getApp, getEnv } = useGetPathDetails();
   useEffect(() => {
     instance.page();
   }, []);
@@ -93,10 +96,9 @@ function useAnalytics() {
           resource: resourceName,
           action,
           ...properties,
+          branch: getEnv(),
+          repo: getApp(),
         });
-        // resource specific event
-        const resourceEventName = `cloud_${resourceName}_${action}`;
-        track(resourceEventName, properties);
       }
     };
 

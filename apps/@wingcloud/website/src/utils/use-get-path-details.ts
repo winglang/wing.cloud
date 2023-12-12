@@ -5,15 +5,15 @@ const getPath = () => {
 };
 
 const getOwner = () => {
-  return getPath()[0];
+  return getPath()[0] || "";
 };
 
 const getApp = () => {
-  return getPath()[1];
+  return getPath()[1] || "";
 };
 
 const getEnv = () => {
-  return getPath()[2];
+  return getPath()[2] || "";
 };
 export const useGetPathDetails = () => {
   return {
