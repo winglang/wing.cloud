@@ -1,5 +1,4 @@
 bring http;
-bring "./types/pagination.w" as pagination;
 
 pub struct AuthTokens {
   access_token: str;
@@ -82,9 +81,18 @@ struct GitHubUser {
   avatar_url: str;
 }
 
-struct ListRepositoryResponse {
-  repositories: Array<InstallationRepository>;
-  pagination: pagination.Pagination;
+struct PaginatedResponse {
+  nextPage: num?;
+  prevPage: num?;
+  total: num;
+}
+
+struct ListUserInstallationsResponse extends PaginatedResponse {
+  data: Array<UserInstallation>;
+}
+
+struct ListRepositoryResponse extends PaginatedResponse {
+  data: Array<InstallationRepository>;
 }
 
 pub class Exchange {
@@ -113,7 +121,7 @@ pub class Exchange {
 
 pub class Client {
   extern "./src/github.ts" pub static inflight getUser(accessToken: str): GitHubUser;
-  extern "./src/github.ts" pub static inflight listUserInstallations(token: str): Array<UserInstallation>;
+  extern "./src/github.ts" pub static inflight listUserInstallations(token: str): ListUserInstallationsResponse;
   extern "./src/github.ts" pub static inflight listInstallationRepos(token: str, installationId: num, page: num?): ListRepositoryResponse;
   extern "./src/github.ts" pub static inflight getLastCommit(options: GetLastCommitOptions): CommitResponse;
   extern "./src/github.ts" pub static inflight getRepository(options: GetRepositoryOptions): Repository;

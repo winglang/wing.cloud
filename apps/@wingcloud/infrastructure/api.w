@@ -259,12 +259,10 @@ pub class Api {
 
     api.get("/wrpc/github.listInstallations", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        let installations = GitHub.Client.listUserInstallations(accessToken);
+        let data = GitHub.Client.listUserInstallations(accessToken);
 
         return {
-          body: {
-            installations: installations,
-          },
+          body: data,
         };
       } else {
         throw httpError.HttpError.unauthorized();

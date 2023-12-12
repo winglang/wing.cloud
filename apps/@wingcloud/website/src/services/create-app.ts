@@ -7,7 +7,17 @@ export const useCreateAppFromRepo = () => {
   const [repositoryId, setRepositoryId] = useState<string>();
   const [installationId, setInstallationId] = useState<string>();
 
-  const listInstallationsQuery = wrpc["github.listInstallations"].useQuery();
+  const listInstallationsQuery = wrpc[
+    "github.listInstallations"
+  ].useInfiniteQuery({
+    page: 1,
+  });
+  useEffect(() => {
+    if (!listInstallationsQuery.data?.pages) {
+      return;
+    }
+    listInstallationsQuery.fetchNextPage();
+  }, [listInstallationsQuery.data]);
 
   const listReposQuery = wrpc["github.listRepositories"].useInfiniteQuery({
     installationId: installationId!,
@@ -47,7 +57,9 @@ export const useCreateAppFromRepo = () => {
   );
 
   useEffect(() => {
-    const installations = listInstallationsQuery.data?.installations;
+    const installations = listInstallationsQuery.data?.pages?.flatMap(
+      (page) => page.data,
+    );
     if (!installations || installations.length === 0) {
       return;
     }

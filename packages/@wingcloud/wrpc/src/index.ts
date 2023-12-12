@@ -23,12 +23,15 @@ export class ForbiddenError extends ControlledError {}
 
 export class NotFoundError extends ControlledError {}
 
+export interface PaginatedInput {
+  page?: number;
+}
+
 export interface PaginatedResponse<T> {
-  pagination: {
-    total: number;
-    nextPage?: number;
-  };
   data: T;
+  nextPage?: number;
+  prevPage?: number;
+  total: number;
 }
 
 export type QueryProcedure<
@@ -153,11 +156,11 @@ export const createWRPCReact = <
                 url.searchParams.set("page", `${pageParam || 1}`);
                 return fetcher("GET", url);
               },
-              getNextPageParam: ({ pagination }) => {
-                return pagination?.nextPage || undefined;
+              getNextPageParam: ({ nextPage }) => {
+                return nextPage;
               },
-              getPreviousPageParam: ({ pagination }) => {
-                return pagination?.page > 1 ? pagination.page - 1 : undefined;
+              getPreviousPageParam: ({ prevPage }) => {
+                return prevPage;
               },
             });
           },

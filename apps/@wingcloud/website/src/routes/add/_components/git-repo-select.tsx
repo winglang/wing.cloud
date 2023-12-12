@@ -38,7 +38,7 @@ export const GitRepoSelect = ({
   const [search, setSearch] = useState("");
 
   const installationPlaceholder = useMemo(() => {
-    if (loading) {
+    if (loading && installations.length === 0) {
       return "Loading...";
     }
     if (installations.length === 0) {
@@ -70,7 +70,7 @@ export const GitRepoSelect = ({
             onChange={setInstallationId}
             value={installationId ?? ""}
             className="w-full"
-            disabled={disabled}
+            disabled={installations.length === 0 || disabled}
             renderItem={(item) => {
               return (
                 <div className="flex items-center gap-2">

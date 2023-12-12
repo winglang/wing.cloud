@@ -37,7 +37,20 @@ const ConnectPage = () => {
   const user = wrpc["auth.check"].useQuery();
 
   const [createAppLoading, setCreateAppLoading] = useState(false);
-  const [reposList, setReposList] = useState<Repository[]>([]);
+
+  const installationList = useMemo(() => {
+    if (!listInstallationsQuery.data?.pages) {
+      return [];
+    }
+    return listInstallationsQuery.data.pages.flatMap((page) => page.data);
+  }, [listInstallationsQuery.data]);
+
+  const reposList = useMemo(() => {
+    if (!listReposQuery.data?.pages) {
+      return [];
+    }
+    return listReposQuery.data.pages.flatMap((page) => page.data);
+  }, [listReposQuery.data]);
 
   const selectedRepo = useMemo(() => {
     if (!reposList || !repositoryId) {
@@ -87,13 +100,6 @@ const ConnectPage = () => {
     }
   }, [installationId]);
 
-  useEffect(() => {
-    if (!listReposQuery.data?.pages) {
-      return setReposList([]);
-    }
-    setReposList(listReposQuery.data.pages.flatMap((page) => page.data));
-  }, [listReposQuery.data]);
-
   return (
     <div className="space-y-4">
       <div className={clsx("flex items-center gap-1", theme.text1)}>
@@ -118,8 +124,8 @@ const ConnectPage = () => {
             setInstallationId={setInstallationId}
             repositoryId={repositoryId || ""}
             setRepositoryId={setRepositoryId}
-            installations={listInstallationsQuery.data?.installations ?? []}
-            repos={reposList ?? []}
+            installations={installationList}
+            repos={reposList}
             loading={loading}
             disabled={createAppLoading}
           />
