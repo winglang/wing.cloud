@@ -81,8 +81,9 @@ pub class GithubComment {
               testRes = "❌ Failed";
             }
             let testId = testResult.id;
-            let testName = testResult.path.split(":").at(-1);
-            let testResourcePath = testResult.path.split(":").at(0);
+            let pathParts = testResult.path.split(":");
+            let testName = pathParts.at(pathParts.length - 1);
+            let testResourcePath = pathParts.at(0);
             let var link = "";
             if environment.status == "running" && appOwner? {
               link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}?testId={testId}\">Logs</a>";
@@ -104,7 +105,8 @@ pub class GithubComment {
 
         let var endpointsString = "";
         for endpoint in this.endpoints.list(environmentId: environment.id) {
-          let endpointUrl = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.path.split("/").at(-1)}</a>";
+          let pathParts = endpoint.path.split("/");
+          let endpointUrl = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{pathParts.at(pathParts.length - 1)}</a>";
           endpointsString = "{endpointUrl}<br> {endpointsString}";
         }
 
