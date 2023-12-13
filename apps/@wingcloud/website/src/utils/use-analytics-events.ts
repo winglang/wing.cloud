@@ -24,8 +24,6 @@ export const useAnalyticsEvents = ({ track }: UseAnalyticsEventsOptions) => {
           repo: getApp(),
         });
       }
-      //TODO: add when we will have a websocket support for receiving a new environment creation event.
-      //case "app.listEnvironments": {}
       default: {
         console.debug("analytics events: unknown event", event, options);
       }
