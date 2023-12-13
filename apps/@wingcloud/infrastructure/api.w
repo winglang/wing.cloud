@@ -358,6 +358,7 @@ pub class Api {
           appId: input.appId,
           entrypoint: input.entrypoint,
           sha: commitData.sha,
+          owner: input.repoOwner
       }}));
     });
 

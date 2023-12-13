@@ -31,6 +31,7 @@ pub struct CreateEnvironmentOptions {
   appId: str;
   entrypoint: str;
   sha: str;
+  owner: str;
 }
 
 pub struct RestartEnvironmentOptions {
@@ -98,7 +99,7 @@ pub class EnvironmentManager {
 
     let environment = this.environments.create(options.createEnvironment);
 
-    this.analytics.track("cloud_environment_created", {
+    this.analytics.track(options.owner, "cloud_environment_created", {
       branch: environment.branch,
       repo: environment.repo,
       type: environment.type,

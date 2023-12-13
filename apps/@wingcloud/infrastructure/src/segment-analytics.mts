@@ -1,21 +1,11 @@
-import Analytics from "@segment/analytics-node";
+import {Analytics} from "@segment/analytics-node";
 
 interface SegmentAnalyticsOptions {
     writeKey: string;
-    identity?: {
-        userId: string;
-        traits: {
-            name: string;
-        }
-    }
 }
 
-export const createSegmentAnalytics = ({writeKey, identity}: SegmentAnalyticsOptions): Analytics => {
-    const analytics = new Analytics({writeKey});
-    if (identity){
-        analytics.identify(identity);
-    }
-    return analytics;
+export const createSegmentAnalytics = ({writeKey}: SegmentAnalyticsOptions): Analytics => {
+    return new Analytics({writeKey});
 }
 
 export const normilizeEventName = (event: string): string => {
