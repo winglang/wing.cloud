@@ -10,7 +10,7 @@ bring "./types/octokit-types.w" as octokit;
 bring "./runtime/runtime-client.w" as runtime_client;
 bring "./probot-adapter.w" as adapter;
 bring "./status-reports.w" as status_reports;
-bring "./key-pair.w" as keyPair;
+bring "./key-pair.w" as KeyPair;
 
 struct EnvironmentsProps {
   users: users.Users;
@@ -93,7 +93,7 @@ pub class EnvironmentManager {
   pub inflight create(options: CreateEnvironmentOptions) {
     let octokit = this.auth(options.createEnvironment.installationId);
 
-    let keyPair = keyPair.KeyPair.generate();
+    let keyPair = KeyPair.KeyPair.generate();
 
     let item = MutJson(options.createEnvironment);
     item.set("publicKey", keyPair.publicKey);
@@ -132,7 +132,7 @@ pub class EnvironmentManager {
 
   pub inflight restart(options: RestartEnvironmentOptions) {
     let octokit = this.auth(options.environment.installationId);
-     let keyPair = keyPair.KeyPair.generate();
+     let keyPair = KeyPair.KeyPair.generate();
 
     this.environments.updatePublicKey(
       id: options.environment.id,

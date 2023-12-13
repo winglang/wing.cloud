@@ -44,7 +44,6 @@ export function useReportStatus(
       },
       body: JSON.stringify({
         ...data,
-        publicKey: keyStore.publicKey(),
       }),
     });
   };
