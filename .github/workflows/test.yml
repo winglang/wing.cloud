@@ -97,7 +97,7 @@ jobs:
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           role-session-name: gh-actions-wingcloud-testing
-          aws-region: ${{ inputs.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
       - name: Terraform Init
         id: init
         run: terraform init
