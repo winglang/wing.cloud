@@ -4,7 +4,7 @@ import { createContext, type PropsWithChildren, useEffect } from "react";
 import { useGetPathDetails } from "./use-get-path-details.js";
 
 const instance = AnalyticsBrowser.load({
-  writeKey: "MvkxDOKWzcs7MFrWu1UNaO2bGn1S2RvA",
+  writeKey: "ATbJK0k4bIJbTc8F9yCknGLmEHdY1su8",
 });
 
 export interface UserIdentity {
