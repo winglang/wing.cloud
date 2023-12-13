@@ -73,16 +73,24 @@ pub class GithubComment {
 
       if environment.repo == props.repo && environment.prNumber == props.prNumber {
         let var testRows = "";
+        let var passedTests = 0;
+        let var failedTests = 0;
         if let testResults = environment.testResults {
           let var i = 0;
           for testResult in testResults.testResults {
-            let var testRes = "✅ Passed";
+            let var testRes = "";
             if !testResult.pass {
               testRes = "❌ Failed";
+              failedTests += 1;
+            } else {
+              testRes = "✅ Passed";
+              passedTests += 1;
             }
+
             let testId = testResult.id;
-            let testName = testResult.path.split(":").at(-1);
-            let testResourcePath = testResult.path.split(":").at(0);
+            let pathParts = testResult.path.split(":");
+            let testName = pathParts.at(pathParts.length - 1);
+            let testResourcePath = pathParts.at(0);
             let var link = "";
             if environment.status == "running" && appOwner? {
               link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}?testId={testId}\">Logs</a>";
@@ -104,7 +112,8 @@ pub class GithubComment {
 
         let var endpointsString = "";
         for endpoint in this.endpoints.list(environmentId: environment.id) {
-          let endpointUrl = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.path.split("/").at(-1)}</a>";
+          let pathParts = endpoint.path.split("/");
+          let endpointUrl = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{pathParts.at(pathParts.length - 1)}</a>";
           endpointsString = "{endpointUrl}<br> {endpointsString}";
         }
 
@@ -112,7 +121,8 @@ pub class GithubComment {
         let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
         let envStatus = this.envStatusToString(environment.status, appOwner ?? "", props.appName, environment.branch);
         let tableRows = "<tr><td>{appNameLink}</td><td>{envStatus}</td><td>{previewUrl}</td><td>{endpointsString}</td><td>{dateStr}</td></tr>";
-        let testsSection = "<details><summary>Tests</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
+        let testSummary = "Tests: ✅ {passedTests} Passed  | ❌ {failedTests} Failed";
+        let testsSection = "<details><summary>{testSummary}</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
 
         commentBody = "{commentBody}{tableRows}</table>";
 
