@@ -47,6 +47,7 @@ jobs:
         env:
           ## Inflight
           APP_SECRET: ${{ secrets.APP_SECRET }}
+          SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
           FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
           FLY_TOKEN: ${{ secrets.FLY_TOKEN }}
           DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
