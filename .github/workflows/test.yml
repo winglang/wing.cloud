@@ -53,12 +53,6 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Compile Wing Cloud dependencies
         run: npx turbo compile --filter=!@wingcloud/infrastructure
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-          role-session-name: gh-actions-wingcloud-testing
-          aws-region: ${{ env.AWS_REGION }}
       - name: Run Wing Tests
         env:
           ## Inflight
@@ -89,22 +83,55 @@ jobs:
           ENVIRONMENT_SERVER_ZONE_NAME:  ${{ vars.ENVIRONMENT_SERVER_ZONE_NAME }}
           ENVIRONMENT_SERVER_CERTIFICATE_ID:  ${{ vars.ENVIRONMENT_SERVER_CERTIFICATE_ID }}
 
-          # dnsimple provider
-          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
-          DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
-
-          # for `flyctl auth docker` in terraform
-          FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}
-
-          TF_LOG: info
-          TF_LOG_PATH: ${{ runner.workspace }}/terraform.log
-
           # Wing Platfrom
           WING_ENV: "test"
           # Wing debug logging
           DEBUG: "wing:*"
-        run: pnpm wing test -t @wingcloud/platform main.w
+        run: pnpm wing compile --platform @wingcloud/platform main.w
         working-directory: 'apps/@wingcloud/infrastructure'
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          role-session-name: gh-actions-wingcloud-testing
+          aws-region: ${{ inputs.AWS_REGION }}
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
+      - name: Terraform Apply
+        id: apply
+        env:
+          TF_IN_AUTOMATION: true
+          TF_LOG: info
+          TF_LOG_PATH: ${{ runner.workspace }}/terraform.log
+
+          # dnsimple provider
+          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
+          DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
+          # for `flyctl auth docker` in terraform
+          FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}
+        run: |
+          terraform apply -auto-approve
+        working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
+      - name: Smoke Test
+        run: |
+          curl -sSfL https://${{ vars.PROXY_SUBDOMAIN }}.${{ vars.PROXY_ZONE_NAME }}/wrpc/health
+      - name: Terraform Destroy
+        id: destroy
+        env:
+          TF_IN_AUTOMATION: true
+          TF_LOG: info
+          TF_LOG_PATH: ${{ runner.workspace }}/terraform.log
+
+          # dnsimple provider
+          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
+          DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
+          # for `flyctl auth docker` in terraform
+          FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}
+        run: |
+          terraform destroy -auto-approve
+        working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
       - name: Output Terraform log
         if: failure()
         run: cat ${{ runner.workspace }}/terraform.log
