@@ -21,6 +21,7 @@ bring "./components/dns/dns.w" as Dns;
 bring "./components/public-endpoint/public-endpoint.w" as PublicEndpoint;
 bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
+bring "./components/smoke-tests" as smokeTests;
 
 // And the sun, and the moon, and the stars, and the flowers.
 let appSecret = util.env("APP_SECRET");
@@ -242,6 +243,24 @@ let updateGithubWebhook = inflight () => {
 };
 
 new cloud.OnDeploy(updateGithubWebhook);
+
+// Smoke Tests
+
+let proxyUrlParameter = new parameter.Parameter(
+  name: "proxy-url",
+  value: proxyUrl,
+);
+
+api.get("/health", inflight () => {
+  return {
+    status: 200,
+  };
+});
+
+new smokeTests.SmokeTests(
+  baseUrl: proxyUrlParameter,
+  path: "/wrpc/health",
+) as "API smoke tests";
 
 new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";

@@ -355,6 +355,7 @@ infrastructure.addDeps("jose@4");
 infrastructure.addDeps("octokit", "node-fetch");
 infrastructure.addDeps("@aws-sdk/client-kms");
 infrastructure.addDeps("dnsimple");
+infrastructure.addDeps("@winglibs/checks");
 
 infrastructure.addDeps("@aws-sdk/client-ssm");
 
