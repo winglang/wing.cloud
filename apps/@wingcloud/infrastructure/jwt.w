@@ -1,5 +1,4 @@
 bring util;
-bring "./github.w" as GitHub;
 
 struct SignOptions {
   secret: str;

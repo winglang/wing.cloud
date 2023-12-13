@@ -323,9 +323,11 @@ infrastructure.addDeps("express", "@vendia/serverless-express");
 infrastructure.addDeps("@probot/adapter-aws-lambda-serverless");
 infrastructure.addDeps("http-proxy");
 infrastructure.addDeps("jsonwebtoken");
+infrastructure.addDeps("jwk-to-pem");
 infrastructure.addDeps("node-fetch");
 infrastructure.addDevDeps("@types/express", "@types/http-proxy");
 infrastructure.addDevDeps("@types/jsonwebtoken");
+infrastructure.addDevDeps("@types/jwk-to-pem");
 infrastructure.addDevDeps("@types/express");
 
 infrastructure.addDeps("glob");
