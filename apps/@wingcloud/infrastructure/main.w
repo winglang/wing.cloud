@@ -249,7 +249,7 @@ new cloud.OnDeploy(updateGithubWebhook);
 let proxyUrlParameter = new parameter.Parameter(
   name: "proxy-url",
   value: proxyUrl,
-);
+) as "proxy url parameter";
 
 api.get("/health", inflight () => {
   return {
