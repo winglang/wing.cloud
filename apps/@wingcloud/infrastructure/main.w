@@ -1,3 +1,4 @@
+// And the sun, and the moon, and the stars, and the flowers.
 bring cloud;
 bring util;
 bring http;
@@ -11,6 +12,7 @@ bring "./endpoints.w" as Endpoints;
 bring "./environment-manager.w" as EnvironmentManager;
 bring "./secrets.w" as Secrets;
 bring "./api.w" as wingcloud_api;
+bring "./segment-analytics.w" as SegmentAnalytics;
 
 bring "./runtime/runtime.w" as runtime;
 bring "./runtime/runtime-client.w" as runtime_client;
@@ -22,8 +24,10 @@ bring "./components/public-endpoint/public-endpoint.w" as PublicEndpoint;
 bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 
-// And the sun, and the moon, and the stars, and the flowers.
 let appSecret = util.env("APP_SECRET");
+let segmentWriteKey = util.env("SEGMENT_WRITE_KEY");
+
+let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey);
 
 let api = new cloud.Api(
   cors: true,
@@ -138,6 +142,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
+  analytics: analytics
 );
 
 let wingCloudApi = new wingcloud_api.Api(

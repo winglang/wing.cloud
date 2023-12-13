@@ -32,15 +32,14 @@ const track = (event: string, properties?: Record<string, any>) => {
   if (!identified) {
     console.debug("user not identified, ignoring analytics event");
   }
-  // instance.track(event.toLowerCase().replaceAll(/\s/g, ""), {
-  //   ...properties,
-  //   integrations: {
-  //     "Actions Amplitude": {
-  //       session_id: sessionId,
-  //     },
-  //   },
-  // });
-  console.log("track:", event, properties);
+  instance.track(event.toLowerCase().replaceAll(/\s/g, ""), {
+    ...properties,
+    integrations: {
+      "Actions Amplitude": {
+        session_id: sessionId,
+      },
+    },
+  });
 };
 
 function useAnalytics() {

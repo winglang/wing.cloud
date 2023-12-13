@@ -10,6 +10,7 @@ bring "./types/octokit-types.w" as octokit;
 bring "./runtime/runtime-client.w" as runtime_client;
 bring "./probot-adapter.w" as adapter;
 bring "./status-reports.w" as status_reports;
+bring "./segment-analytics.w" as analytics;
 
 struct EnvironmentsProps {
   users: users.Users;
@@ -22,6 +23,7 @@ struct EnvironmentsProps {
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
   siteDomain: str;
+  analytics: analytics.SegmentAnalytics;
 }
 
 pub struct CreateEnvironmentOptions {
@@ -70,6 +72,7 @@ pub class EnvironmentManager {
   githubComment: comment.GithubComment;
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
+  analytics: analytics.SegmentAnalytics;
 
   new(props: EnvironmentsProps) {
     this.apps = props.apps;
@@ -87,12 +90,19 @@ pub class EnvironmentManager {
       apps: props.apps,
       siteDomain: props.siteDomain
     );
+    this.analytics = props.analytics;
   }
 
   pub inflight create(options: CreateEnvironmentOptions) {
     let octokit = this.auth(options.createEnvironment.installationId);
 
     let environment = this.environments.create(options.createEnvironment);
+
+    this.analytics.track("cloud_environment_created", {
+      branch: environment.branch,
+      repo: environment.repo,
+      type: environment.type,
+    });
 
     let secrets = this.secretsForEnvironment(environment);
 
