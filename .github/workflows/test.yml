@@ -122,6 +122,7 @@ jobs:
           curl -sSfL https://${{ vars.PROXY_SUBDOMAIN }}.${{ vars.PROXY_ZONE_NAME }}/wrpc/health
       - name: Terraform Destroy
         id: destroy
+        if: always()
         env:
           TF_IN_AUTOMATION: true
           TF_LOG: info
