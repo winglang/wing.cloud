@@ -69,6 +69,9 @@ jobs:
           TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}
           TESTS_GITHUB_USER: ${{ vars.TESTS_GITHUB_USER }}
 
+          ## Inflight Dns
+          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
+
           ## Preflight
           VITE_GITHUB_APP_CLIENT_ID: ${{ secrets.VITE_GITHUB_APP_CLIENT_ID }}
           VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}
