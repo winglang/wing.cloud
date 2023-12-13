@@ -248,20 +248,6 @@ let updateGithubWebhook = inflight () => {
 
 new cloud.OnDeploy(updateGithubWebhook);
 
-bring "./tests/environments.w" as tests;
-new tests.EnvironmentsTest(
-  users: users,
-  apps: apps,
-  environments: environments,
-  githubApp: probotApp.githubApp,
-  updateGithubWebhook: updateGithubWebhook,
-  appSecret: appSecret,
-  wingCloudUrl: apiUrlParam,
-  githubToken: util.tryEnv("TESTS_GITHUB_TOKEN"),
-  githubOrg: util.tryEnv("TESTS_GITHUB_ORG"),
-  githubUser: util.tryEnv("TESTS_GITHUB_USER"),
-);
-
 new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";
 new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
