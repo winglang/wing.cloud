@@ -244,7 +244,7 @@ let updateGithubWebhook = inflight () => {
 new cloud.OnDeploy(updateGithubWebhook);
 
 // Smoke Tests
-api.get("/health", inflight () => {
+api.get("/wrpc/health", inflight () => {
   return {
     status: 200,
   };
