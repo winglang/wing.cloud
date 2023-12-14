@@ -46,6 +46,7 @@ jobs:
         env:
           APP_SECRET: ${{ secrets.APP_SECRET }}
           SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
+          ENABLE_ANALYTICS: ${{ secrets.ENABLE_ANALYTICS }}
           BOT_GITHUB_CLIENT_ID: ${{ secrets.BOT_GITHUB_CLIENT_ID }}
           BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
           BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
