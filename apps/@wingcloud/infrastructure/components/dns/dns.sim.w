@@ -41,6 +41,7 @@ pub class DNS impl idns.IDNS {
   }
 
   inflight portFromUrl(url: str): num {
-    return num.fromStr(url.split(":").at(-1));
+    let urlParts = url.split(":");
+    return num.fromStr(urlParts.at(urlParts.length - 1));
   }
 }
