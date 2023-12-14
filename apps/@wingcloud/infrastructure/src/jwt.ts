@@ -1,5 +1,5 @@
 import * as jose from "jose";
-import jwt from "jsonwebtoken";
+
 const JWT_EXPIRATION_TIME = "1h";
 
 export interface SignOptions {
