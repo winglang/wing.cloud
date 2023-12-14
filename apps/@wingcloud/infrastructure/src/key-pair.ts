@@ -1,21 +1,14 @@
 import * as jose from "jose";
-import jwt from "jsonwebtoken";
-import jwkToPem from "jwk-to-pem";
+
 const JWT_EXPIRATION_TIME = "1h";
 const AUDIENCE = "https://wing.cloud";
 
 export const generate = async () => {
   const keyPair = await jose.generateKeyPair("RS256");
 
-  const privateKey = jwkToPem(
-    (await jose.exportJWK(keyPair.privateKey)) as any,
-    { private: true },
-  );
-  const publicKey = jwkToPem((await jose.exportJWK(keyPair.publicKey)) as any);
-
   return {
-    privateKey,
-    publicKey,
+    privateKey: await jose.exportPKCS8(keyPair.privateKey),
+    publicKey: await jose.exportSPKI(keyPair.publicKey),
   };
 };
 
@@ -26,12 +19,15 @@ export interface SignOptions {
 }
 
 export const sign = async ({ data, privateKey, issuer }: SignOptions) => {
-  return jwt.sign(data, privateKey, {
-    algorithm: "RS256",
-    expiresIn: JWT_EXPIRATION_TIME,
-    audience: AUDIENCE,
-    issuer,
-  });
+  const keyObject = await jose.importPKCS8(privateKey, "pem");
+
+  return await new jose.SignJWT(data)
+    .setSubject(issuer)
+    .setProtectedHeader({ alg: "RS256" })
+    .setIssuedAt()
+    .setAudience(AUDIENCE)
+    .setExpirationTime(JWT_EXPIRATION_TIME)
+    .sign(keyObject);
 };
 
 export interface VerifyOptions {
@@ -40,8 +36,11 @@ export interface VerifyOptions {
 }
 
 export const verify = async ({ token, publicKey }: VerifyOptions) => {
-  return jwt.verify(token, publicKey, {
+  const keyObject = await jose.importSPKI(publicKey, "pem");
+
+  const result = await jose.compactVerify(token, keyObject, {
     algorithms: ["RS256"],
-    audience: AUDIENCE,
   });
+
+  return JSON.parse(new TextDecoder().decode(result.payload));
 };

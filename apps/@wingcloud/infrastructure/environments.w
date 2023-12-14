@@ -491,6 +491,7 @@ pub class Environments {
         pk: "ENVIRONMENT#{options.id}",
         sk: "#",
       },
+      projectionExpression: "publicKey",
     );
 
     if let item = result.item {
