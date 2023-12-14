@@ -203,7 +203,7 @@ importers:
         specifier: ^1.18.1
         version: 1.18.1
       jose:
-        specifier: '4'
+        specifier: ^4.15.4
         version: 4.15.4
       jsonwebtoken:
         specifier: ^9.0.2
