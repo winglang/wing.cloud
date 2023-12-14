@@ -191,7 +191,7 @@ runtime.addDeps("@wingconsole/app");
 runtime.addDeps("express");
 runtime.addDeps("http-proxy");
 runtime.addDeps("jsonwebtoken");
-runtime.addDeps("jose@4");
+runtime.addDeps("jose");
 runtime.addDeps("node-fetch");
 runtime.addDeps("which");
 runtime.addDeps("redact-env");
