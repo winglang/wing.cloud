@@ -3,8 +3,11 @@ import { createContext, type PropsWithChildren, useEffect } from "react";
 
 import { useGetPathDetails } from "./use-get-path-details.js";
 
+// @ts-ignore - this is a winglang hack
+const SEGMENT_WRITE_KEY = window.wingEnv?.SEGMENT_WRITE_KEY;
+
 const instance = AnalyticsBrowser.load({
-  writeKey: "ATbJK0k4bIJbTc8F9yCknGLmEHdY1su8",
+  writeKey: SEGMENT_WRITE_KEY,
 });
 
 export interface UserIdentity {

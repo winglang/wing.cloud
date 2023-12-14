@@ -80,6 +80,7 @@ let dashboard = new ex.ReactApp(
   buildDir: "dist",
   localPort: dashboardPort,
 );
+dashboard.addEnvironment("SEGMENT_WRITE_KEY", segmentWriteKey);
 
 reactAppPatch.ReactAppPatch.apply(dashboard);
 
