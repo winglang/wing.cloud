@@ -1,20 +1,21 @@
-import { LinkIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon, LinkIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { ErrorBoundary } from "../../components/error-boundary.js";
+import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
 import { PopupWindowContext } from "../../utils/popup-window-provider.js";
-import { wrpc } from "../../utils/wrpc.js";
+import { wrpc, type Repository } from "../../utils/wrpc.js";
 
-import { AddAppContainer } from "./_components/add-app-container.js";
 import { GitRepoSelect } from "./_components/git-repo-select.js";
 
-export const Component = () => {
+const ConnectPage = () => {
   const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
 
   const { theme } = useTheme();
@@ -37,14 +38,26 @@ export const Component = () => {
 
   const [createAppLoading, setCreateAppLoading] = useState(false);
 
+  const installationList = useMemo(() => {
+    if (!listInstallationsQuery.data?.pages) {
+      return [];
+    }
+    return listInstallationsQuery.data.pages.flatMap((page) => page.data);
+  }, [listInstallationsQuery.data]);
+
+  const reposList = useMemo(() => {
+    if (!listReposQuery.data?.pages) {
+      return [];
+    }
+    return listReposQuery.data.pages.flatMap((page) => page.data);
+  }, [listReposQuery.data]);
+
   const selectedRepo = useMemo(() => {
-    if (!listReposQuery.data?.repositories || !repositoryId) {
+    if (!reposList || !repositoryId) {
       return;
     }
-    return listReposQuery.data?.repositories.find(
-      (repo) => repo.full_name.toString() === repositoryId,
-    );
-  }, [listReposQuery.data?.repositories, repositoryId]);
+    return reposList.find((repo) => repo.full_name.toString() === repositoryId);
+  }, [reposList, repositoryId]);
 
   const onCreate = useCallback(async () => {
     if (!installationId || !selectedRepo || !user.data?.user) {
@@ -88,13 +101,15 @@ export const Component = () => {
   }, [installationId]);
 
   return (
-    <AddAppContainer
-      step={{
-        name: "Connect",
-        icon: LinkIcon,
-      }}
-    >
-      <div className="w-full space-y-2">
+    <div className="space-y-4">
+      <div className={clsx("flex items-center gap-1", theme.text1)}>
+        Add an app
+        <ChevronRightIcon className="h-4 w-4 flex-shrink-0" />
+        <LinkIcon className="h-3.5 w-3.5 font-semibold" />
+        <div className="truncate">Connect</div>
+      </div>
+
+      <div className="w-full space-y-2 text-sm">
         <div className={clsx(theme.text1)}>Select a repository</div>
         <div className="w-full relative space-y-2">
           {createAppLoading && (
@@ -103,16 +118,18 @@ export const Component = () => {
               <SpinnerLoader className="z-20" />
             </div>
           )}
+
           <GitRepoSelect
             installationId={installationId}
             setInstallationId={setInstallationId}
             repositoryId={repositoryId || ""}
             setRepositoryId={setRepositoryId}
-            installations={listInstallationsQuery.data?.installations ?? []}
-            repos={listReposQuery.data?.repositories ?? []}
+            installations={installationList}
+            repos={reposList}
             loading={loading}
             disabled={createAppLoading}
           />
+
           <div className="text-xs flex gap-1 items-center">
             <span className={clsx(theme.text1)}>Missing a repository?</span>
             <button
@@ -146,6 +163,37 @@ export const Component = () => {
           </div>
         </div>
       </div>
-    </AddAppContainer>
+    </div>
+  );
+};
+
+export const Component = () => {
+  const navigate = useNavigate();
+
+  const { theme } = useTheme();
+
+  return (
+    <div className="flex flex-col h-full">
+      <Header />
+      <ErrorBoundary>
+        <div
+          className={clsx(
+            "w-full flex-grow",
+            "max-w-5xl mx-auto p-4 sm:p-6",
+            "space-y-4",
+          )}
+        >
+          <div
+            className={clsx(
+              "w-full rounded p-6 space-y-4 border",
+              theme.bg4,
+              theme.borderInput,
+            )}
+          >
+            <ConnectPage />
+          </div>
+        </div>
+      </ErrorBoundary>
+    </div>
   );
 };

@@ -1,10 +1,13 @@
 import {
   useQuery,
   useMutation,
+  useInfiniteQuery,
   type UseMutationOptions,
   type UseQueryOptions,
+  type UseInfiniteQueryOptions,
   type UseQueryResult,
   type UseMutationResult,
+  type UseInfiniteQueryResult,
 } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 
@@ -19,6 +22,13 @@ export class UnauthorizedError extends ControlledError {}
 export class ForbiddenError extends ControlledError {}
 
 export class NotFoundError extends ControlledError {}
+
+export interface PaginatedResponse<T> {
+  data: T;
+  nextPage?: number;
+  prevPage?: number;
+  total: number;
+}
 
 export type QueryProcedure<
   Input = undefined,
@@ -42,6 +52,35 @@ export type MutationProcedure<Input = undefined, Output = unknown> = {
     options?: Omit<UseMutationOptions<Output, unknown, Input>, "queryKey">,
   ): UseMutationResult<Output, unknown, Input>;
 };
+
+export type InfinitQueryProcedure<
+  Input = undefined,
+  Output = unknown,
+> = undefined extends Input
+  ? {
+      useInfiniteQuery(
+        input?: Input,
+        options?: Omit<
+          UseInfiniteQueryOptions<unknown, unknown, Input>,
+          "queryKey"
+        >,
+      ): UseInfiniteQueryResult<{
+        pageParams: Array<unknown>;
+        pages: Array<Output>;
+      }>;
+    }
+  : {
+      useInfiniteQuery(
+        input: Input,
+        options?: Omit<
+          UseInfiniteQueryOptions<unknown, unknown, Output>,
+          "queryKey"
+        >,
+      ): UseInfiniteQueryResult<{
+        pageParams: Array<unknown>;
+        pages: Array<Output>;
+      }>;
+    };
 
 const fetcher = async (method: string, url: URL, input?: any) => {
   const response = await fetch(url, {
@@ -97,6 +136,28 @@ export const createWRPCReact = <
               ...options,
               queryKey: [route, input],
               queryFn: async () => await fetcher("GET", url),
+            });
+          },
+          useInfiniteQuery: (input: any, options: UseInfiniteQueryOptions) => {
+            const url = new URL(`${useContext(WRPCContext).url}/${route}`);
+            if (input) {
+              for (const [key, value] of Object.entries(input)) {
+                url.searchParams.append(key, `${value}`);
+              }
+            }
+            return useInfiniteQuery({
+              ...options,
+              queryKey: [route, input],
+              queryFn: async ({ pageParam }) => {
+                url.searchParams.set("page", `${pageParam ?? 1}`);
+                return fetcher("GET", url);
+              },
+              getNextPageParam: ({ nextPage }) => {
+                return nextPage;
+              },
+              getPreviousPageParam: ({ prevPage }) => {
+                return prevPage;
+              },
             });
           },
           useMutation: (options: UseMutationOptions) => {
