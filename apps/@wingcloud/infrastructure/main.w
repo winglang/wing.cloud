@@ -26,8 +26,9 @@ bring "./patches/react-app.patch.w" as reactAppPatch;
 
 let appSecret = util.env("APP_SECRET");
 let segmentWriteKey = util.env("SEGMENT_WRITE_KEY");
+let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true";
 
-let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey);
+let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey, enableAnalytics);
 
 let api = new cloud.Api(
   cors: true,
@@ -81,6 +82,7 @@ let dashboard = new ex.ReactApp(
   localPort: dashboardPort,
 );
 dashboard.addEnvironment("SEGMENT_WRITE_KEY", segmentWriteKey);
+dashboard.addEnvironment("ENABLE_ANALYTICS", "{enableAnalytics}");
 
 reactAppPatch.ReactAppPatch.apply(dashboard);
 

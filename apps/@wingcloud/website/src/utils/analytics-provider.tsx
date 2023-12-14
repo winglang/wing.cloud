@@ -5,10 +5,29 @@ import { useGetPathDetails } from "./use-get-path-details.js";
 
 // @ts-ignore - this is a winglang hack
 const SEGMENT_WRITE_KEY = window.wingEnv?.SEGMENT_WRITE_KEY;
+// @ts-ignore - this is a winglang hack
+const ENABLE_ANALYTICS = window.wingEnv?.ENABLE_ANALYTICS;
 
-const instance = AnalyticsBrowser.load({
-  writeKey: SEGMENT_WRITE_KEY,
-});
+const MockAnalytics = {
+  track: (
+    eventName: string,
+    options?: Record<string, any>,
+    integrations?: Record<string, any>,
+  ) => {
+    console.debug("Analytics.track", eventName, options, integrations);
+  },
+  identify: (id: string, traits: Record<string, any>) => {
+    console.debug("Analytics.identify", id, traits);
+  },
+  page: () => {},
+};
+
+let instance = MockAnalytics;
+if (ENABLE_ANALYTICS === "true") {
+  instance = AnalyticsBrowser.load({
+    writeKey: SEGMENT_WRITE_KEY,
+  });
+}
 
 export interface UserIdentity {
   name: string;
@@ -21,13 +40,14 @@ const MAX_ANALYTICS_STRING_LENGTH = 1024;
 
 const sessionId = Date.now();
 
-const identified = false;
+let identified = false;
 
 const setIdentity = (identity: UserIdentity) => {
   if (!identified) {
     instance.identify(identity.id, {
       name: identity.name,
     });
+    identified = true;
   }
 };
 
