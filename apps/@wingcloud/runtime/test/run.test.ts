@@ -38,7 +38,7 @@ test("run() - installs npm packages and run tests", async () => {
   expect(deploymentLogs).toContain("added 1 package");
 
   const testLogs = await logsBucket.get(
-    environment.testKey(true, "root/Default/test:Hello, world!"),
+    environment.testKey(true, "rootDefaulttestHelloworld"),
   );
   expect(testLogs).toContain("a test log");
 
@@ -77,7 +77,7 @@ test("run() - doesn't have access to runtime env vars", async () => {
 
   expect(
     await logsBucket.exists(
-      environment.testKey(true, "root/Default/test:access-token"),
+      environment.testKey(true, "rootDefaulttestaccesstoken"),
     ),
   ).toBeTruthy();
 
@@ -238,7 +238,7 @@ test("run() - works with github", async () => {
 
   expect(
     await logsBucket.exists(
-      environment.testKey(true, "root/Default/test:Hello, world!"),
+      environment.testKey(true, "rootDefaulttestHelloworld"),
     ),
   ).toBeTruthy();
 
@@ -262,23 +262,21 @@ test("run() - have multiple tests results", async () => {
 
   expect(
     await logsBucket.get(
-      environment.testKey(true, "root/Default/test:will succeed"),
+      environment.testKey(true, "rootDefaulttestwillsucceed"),
     ),
   ).toContain("will succeed first log");
   expect(
     await logsBucket.get(
-      environment.testKey(true, "root/Default/test:will succeed"),
+      environment.testKey(true, "rootDefaulttestwillsucceed"),
     ),
   ).toContain("will succeed second log");
   expect(
     await logsBucket.exists(
-      environment.testKey(true, "root/Default/test:will succeed 2"),
+      environment.testKey(true, "rootDefaulttestwillsucceed2"),
     ),
   ).toBeTruthy();
   expect(
-    await logsBucket.get(
-      environment.testKey(false, "root/Default/test:will fail"),
-    ),
+    await logsBucket.get(environment.testKey(false, "rootDefaulttestwillfail")),
   ).toContain("will fail log");
 
   await close();
