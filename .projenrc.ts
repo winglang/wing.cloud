@@ -145,6 +145,7 @@ website.addDeps("@headlessui/react");
 website.addDeps("@heroicons/react");
 website.addDeps("react-popper");
 website.addDeps("@wingconsole/ui");
+website.addDeps("@segment/analytics-next");
 
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 
@@ -355,6 +356,7 @@ infrastructure.addDeps("jose@4");
 infrastructure.addDeps("octokit", "node-fetch");
 infrastructure.addDeps("@aws-sdk/client-kms");
 infrastructure.addDeps("dnsimple");
+infrastructure.addDeps("@segment/analytics-node");
 
 infrastructure.addDeps("@aws-sdk/client-ssm");
 
