@@ -3,7 +3,6 @@ import type { IPlatform } from '@winglang/sdk/lib/platform';
 import { TestPlatform } from './platform-test';
 import { ProductionPlatform } from './platform-production';
 import { App as CustomApp } from './app';
-
 const WING_ENV = process.env["WING_ENV"] || "production";
 
 enum WingEnv {

@@ -1,7 +1,7 @@
 import { CommandLineIcon } from "@heroicons/react/24/solid";
 import { Console } from "@wingconsole/ui";
 import clsx from "clsx";
-import { useMemo } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../../../../components/error-boundary.js";
@@ -9,6 +9,7 @@ import { Header } from "../../../../../components/header.js";
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
+import { AnalyticsContext } from "../../../../../utils/analytics-provider.js";
 import { wrpc } from "../../../../../utils/wrpc.js";
 
 const ConsolePage = () => {
@@ -20,6 +21,19 @@ const ConsolePage = () => {
     appName: appName!,
     branch: branch!,
   });
+
+  const { track } = useContext(AnalyticsContext);
+
+  useEffect(() => {
+    if (!appName || !branch || !environment.data?.environment) {
+      return;
+    }
+    track("cloud_console_visited", {
+      repo: appName,
+      branch,
+      type: environment.data?.environment.type,
+    });
+  }, [appName, branch, track, environment.data?.environment]);
 
   const url = useMemo(() => {
     return environment.data?.environment.url ?? "";
