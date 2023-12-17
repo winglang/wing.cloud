@@ -112,8 +112,7 @@ pub class GithubComment {
 
         let var endpointsString = "";
         for endpoint in this.endpoints.list(environmentId: environment.id) {
-          let pathParts = endpoint.path.split("/");
-          let endpointUrl = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{pathParts.at(pathParts.length - 1)}</a>";
+          let endpointUrl = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.label}</a>";
           endpointsString = "{endpointUrl}<br> {endpointsString}";
         }
 

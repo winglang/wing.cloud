@@ -106,6 +106,13 @@ struct EnvironmentAction {
   data: Json;
 }
 
+struct GetListOfEntrypointsProps{
+  accessToken: str;
+  owner: str;
+  repo: str;
+  defaultBranch: str;
+}
+
 pub class Api {
   new(props: ApiProps) {
     let api = new json_api.JsonApi(api: props.api);
@@ -358,13 +365,6 @@ pub class Api {
           owner: input.repoOwner
       }}));
     });
-
-    struct GetListOfEntrypointsProps{
-      accessToken: str;
-      owner: str;
-      repo: str;
-      defaultBranch: str;
-    }
 
     let getListOfEntrypoints = inflight (props: GetListOfEntrypointsProps): MutArray<str> => {
       let octokit = Octokit.octokit(props.accessToken);

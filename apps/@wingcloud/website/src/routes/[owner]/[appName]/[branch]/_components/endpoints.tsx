@@ -33,7 +33,7 @@ export const Endpoints = ({
         type: environmentType,
         endpoint_path: endpoint.path,
         endpoint_url: endpoint.publicUrl,
-        endpoint_type: endpoint.type,
+        endpoint_label: endpoint.label,
       });
     },
     [track, branch, appName, environmentType],
@@ -81,31 +81,19 @@ export const Endpoints = ({
                   key={index}
                   className="flex flex-grow flex-row px-4 py-2 gap-4 sm:gap-6 transition-all w-full pl-10"
                 >
-                  <div className="flex flex-col gap-1 truncate w-1/3">
-                    <div className={clsx("text-xs", theme.text2)}>Type</div>
+                  <div className="flex flex-col gap-1 truncate w-1/2">
+                    <div className={clsx("text-xs", theme.text2)}>Label</div>
                     <div
                       className={clsx(
                         "truncate text-xs font-medium",
                         theme.text1,
                       )}
                     >
-                      {endpoint.type.replace("@winglang/sdk.", "")}
+                      {endpoint.label}
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-1 w-1/3">
-                    <div className={clsx("text-xs", theme.text2)}>Path</div>
-                    <div
-                      className={clsx(
-                        "truncate text-xs font-medium",
-                        theme.text1,
-                      )}
-                    >
-                      {endpoint.path}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1 w-1/3">
+                  <div className="flex flex-col gap-1 w-1/2">
                     <div className={clsx("text-xs", theme.text2)}>URL</div>
                     <div
                       className={clsx(
