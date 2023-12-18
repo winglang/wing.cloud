@@ -189,7 +189,7 @@ pub class EnvironmentManager {
         port: endpoint.port,
         targetUrl: "{options.environment.url}").delete();
     }
-    
+
     this.postComment(
       environmentId: options.environment.id,
       octokit: octokit,
@@ -276,7 +276,7 @@ pub class EnvironmentManager {
           targetUrl: url);
 
 
-        // check if we already created this public endpoint 
+        // check if we already created this public endpoint
         let var found = false;
         for existingEndpoint in existingEndpoints {
           if existingEndpoint.publicUrl == publicEndpoint.url() {
