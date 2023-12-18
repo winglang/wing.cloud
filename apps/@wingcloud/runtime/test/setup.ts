@@ -14,6 +14,7 @@ let sim: simulator.Simulator;
 let logsBucket: cloud.IBucketClient;
 let wingApiUrl: string;
 let examplesDir: string;
+let stateDir: string;
 
 beforeAll(async () => {
   examplesDir = mkdtempSync(join(tmpdir(), "examples-"));
@@ -29,14 +30,7 @@ beforeAll(async () => {
 const privateKeyFile = process.env["ENVIRONMENT_SERVER_PRIVATE_KEY_FILE"]!;
 const certificateFile = process.env["ENVIRONMENT_SERVER_CERTIFICATE_FILE"]!;
 beforeEach(async () => {
-  process.env["SSL_PRIVATE_KEY"] = Buffer.from(
-    readFileSync(privateKeyFile, "utf8"),
-    "utf8",
-  ).toString("base64");
-  process.env["SSL_CERTIFICATE"] = Buffer.from(
-    readFileSync(certificateFile, "utf8"),
-    "utf8",
-  ).toString("base64");
+  setupSSL();
 
   sim = new simulator.Simulator({
     simfile: resolve(join(currentDir, "../../infrastructure/target/main.wsim")),
@@ -47,6 +41,7 @@ beforeEach(async () => {
   ) as cloud.IBucketClient;
   const config = sim.getResourceConfig("root/Default/cloud.Api") as ApiSchema;
   wingApiUrl = config.attrs.url;
+  stateDir = mkdtempSync(join(tmpdir(), "state"));
 }, 60_000);
 
 afterEach(async () => {
@@ -58,7 +53,19 @@ export const getContext = () => {
     logsBucket,
     wingApiUrl,
     examplesDir,
+    stateDir,
   };
+};
+
+export const setupSSL = () => {
+  process.env["SSL_PRIVATE_KEY"] = Buffer.from(
+    readFileSync(privateKeyFile, "utf8"),
+    "utf8",
+  ).toString("base64");
+  process.env["SSL_CERTIFICATE"] = Buffer.from(
+    readFileSync(certificateFile, "utf8"),
+    "utf8",
+  ).toString("base64");
 };
 
 export interface TextContextCallbackProps {

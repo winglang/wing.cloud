@@ -29,6 +29,7 @@ interface ConsoleError {
 
 export interface PrepareServerProps {
   environmentId: string;
+  stateDir: string;
   requestedSSLPort?: number;
 }
 
@@ -43,6 +44,7 @@ export interface StartServerProps {
 
 export async function prepareServer({
   environmentId,
+  stateDir,
   requestedSSLPort,
 }: PrepareServerProps) {
   let consolePort: number | undefined;
@@ -163,6 +165,7 @@ export async function prepareServer({
         expressApp: app,
         requestedPort,
         platform: platforms,
+        stateDir,
         log: {
           info: log,
           error: log,

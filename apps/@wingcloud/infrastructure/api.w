@@ -54,6 +54,13 @@ struct CreateProductionEnvironmentMessage {
   entrypoint: str;
 }
 
+struct GetListOfEntrypointsProps{
+  accessToken: str;
+  owner: str;
+  repo: str;
+  defaultBranch: str;
+}
+
 // TODO: https://github.com/winglang/wing/issues/3644
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
@@ -358,13 +365,6 @@ pub class Api {
           owner: input.repoOwner
       }}));
     });
-
-    struct GetListOfEntrypointsProps{
-      accessToken: str;
-      owner: str;
-      repo: str;
-      defaultBranch: str;
-    }
 
     let getListOfEntrypoints = inflight (props: GetListOfEntrypointsProps): MutArray<str> => {
       let octokit = Octokit.octokit(props.accessToken);
