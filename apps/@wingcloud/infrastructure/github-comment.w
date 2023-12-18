@@ -112,9 +112,10 @@ pub class GithubComment {
 
         let var endpointsString = "";
         for endpoint in this.endpoints.list(environmentId: environment.id) {
+          let var endpointText = endpoint.label;
           if endpoint.browserSupport {
-            let endpointUrl = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.label}</a>";
-            endpointsString = "{endpointUrl}<br> {endpointsString}";
+            endpointText = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.label}</a>";
+            endpointsString = "{endpointText}<br> {endpointsString}";
           }
         }
 

@@ -102,15 +102,19 @@ export const Endpoints = ({
                         "h-5 flex",
                       )}
                     >
-                      <a
-                        className="hover:underline truncate h-full"
-                        href={endpoint.publicUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => onEndpointClick(endpoint)}
-                      >
-                        {endpoint.publicUrl}
-                      </a>
+                      {endpoint.browserSupport ? (
+                        <a
+                          className="hover:underline truncate h-full"
+                          href={endpoint.publicUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => onEndpointClick(endpoint)}
+                        >
+                          {endpoint.publicUrl}
+                        </a>
+                      ) : (
+                        endpoint.publicUrl
+                      )}
                     </div>
                   </div>
                 </div>
