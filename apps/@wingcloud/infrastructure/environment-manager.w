@@ -99,7 +99,7 @@ pub class EnvironmentManager {
     item.set("publicKey", keyPair.publicKey);
 
     let environment = this.environments.create(
-      environments.CreateEnvironmentOptions.fromJson(item)
+      environments.InternalCreateEnvironmentOptions.fromJson(item)
     );
 
     let secrets = this.secretsForEnvironment(environment);
