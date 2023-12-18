@@ -1,0 +1,16 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`S3Backend > should apply config with correct values 1`] = `
+{
+  "terraform": {
+    "backend": {
+      "s3": {
+        "bucket": "mock-bucket",
+        "dynamodb_table": "mock-table",
+        "key": "mock-key",
+        "region": "mock-region",
+      },
+    },
+  },
+}
+`;

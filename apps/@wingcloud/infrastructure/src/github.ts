@@ -1,6 +1,20 @@
 // import fetch from "node-fetch";
 import { Octokit } from "octokit";
 
+const getNextPage = (page: number, total: number, perPage: number) => {
+  if (total > page * perPage) {
+    return page + 1;
+  }
+  return;
+};
+
+const getPreviousPage = (page: number) => {
+  if (page > 1) {
+    return page - 1;
+  }
+  return;
+};
+
 export const getUser = async (accessToken: string) => {
   const octokit = new Octokit({
     auth: accessToken,
@@ -9,30 +23,57 @@ export const getUser = async (accessToken: string) => {
   return user;
 };
 
-export const listUserInstallations = async (token: string) => {
-  const octokit = new Octokit({
-    auth: token,
-  });
-
-  const { data: installations } =
-    await octokit.rest.apps.listInstallationsForAuthenticatedUser();
-  return installations.installations;
-};
-
-export const listInstallationRepos = async (
+export const listUserInstallations = async (
   token: string,
-  installationId: number,
+  page = 1,
+  perPage = 30,
 ) => {
   const octokit = new Octokit({
     auth: token,
   });
 
+  const { data: installations } =
+    await octokit.rest.apps.listInstallationsForAuthenticatedUser({
+      page,
+      // The number of results per page (max 100).
+      // Default: 30
+      per_page: perPage,
+    });
+
+  return {
+    data: installations.installations,
+    nextPage: getNextPage(page, installations.total_count, perPage),
+    prevPage: getPreviousPage(page),
+    total: installations.total_count,
+  };
+};
+
+export const listInstallationRepos = async (
+  token: string,
+  installationId: number,
+  page = 1,
+  perPage = 30,
+) => {
+  const octokit = new Octokit({
+    auth: token,
+  });
+
+  // https://docs.github.com/en/rest/apps/installations?apiVersion=2022-11-28#list-repositories-accessible-to-the-user-access-token
   const { data: orgRepos } =
     await octokit.rest.apps.listInstallationReposForAuthenticatedUser({
       installation_id: installationId,
+      page,
+      // The number of results per page (max 100).
+      // Default: 30
+      per_page: perPage,
     });
 
-  return orgRepos.repositories;
+  return {
+    data: orgRepos.repositories,
+    nextPage: getNextPage(page, orgRepos.total_count, perPage),
+    prevPage: getPreviousPage(page),
+    total: orgRepos.total_count,
+  };
 };
 
 export const getLastCommit = async ({

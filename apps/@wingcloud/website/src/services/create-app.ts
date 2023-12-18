@@ -7,16 +7,26 @@ export const useCreateAppFromRepo = () => {
   const [repositoryId, setRepositoryId] = useState<string>();
   const [installationId, setInstallationId] = useState<string>();
 
-  const listInstallationsQuery = wrpc["github.listInstallations"].useQuery();
+  const listInstallationsQuery =
+    wrpc["github.listInstallations"].useInfiniteQuery();
 
-  const listReposQuery = wrpc["github.listRepositories"].useQuery(
-    {
-      installationId: installationId!,
-    },
-    {
-      enabled: installationId != undefined,
-    },
-  );
+  useEffect(() => {
+    if (!listInstallationsQuery.data?.pages) {
+      return;
+    }
+    listInstallationsQuery.fetchNextPage();
+  }, [listInstallationsQuery.data]);
+
+  const listReposQuery = wrpc["github.listRepositories"].useInfiniteQuery({
+    installationId: installationId!,
+  });
+
+  useEffect(() => {
+    if (!listReposQuery.data?.pages) {
+      return;
+    }
+    listReposQuery.fetchNextPage();
+  }, [listReposQuery.data]);
 
   const createAppMutation = wrpc["app.create"].useMutation();
 
@@ -44,7 +54,9 @@ export const useCreateAppFromRepo = () => {
   );
 
   useEffect(() => {
-    const installations = listInstallationsQuery.data?.installations;
+    const installations = listInstallationsQuery.data?.pages?.flatMap(
+      (page) => page.data,
+    );
     if (!installations || installations.length === 0) {
       return;
     }
@@ -57,10 +69,6 @@ export const useCreateAppFromRepo = () => {
   useEffect(() => {
     setRepositoryId("");
   }, [installationId]);
-
-  const disabled = useMemo(() => {
-    return !installationId || !repositoryId;
-  }, [installationId, repositoryId]);
 
   const loading = useMemo(() => {
     return (
@@ -79,7 +87,6 @@ export const useCreateAppFromRepo = () => {
     setRepositoryId,
     createAppLoading,
     loading,
-    disabled,
     listReposQuery,
     listInstallationsQuery,
   };

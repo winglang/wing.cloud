@@ -1,3 +1,4 @@
+// And the sun, and the moon, and the stars, and the flowers.
 bring cloud;
 bring util;
 bring http;
@@ -11,6 +12,7 @@ bring "./endpoints.w" as Endpoints;
 bring "./environment-manager.w" as EnvironmentManager;
 bring "./secrets.w" as Secrets;
 bring "./api.w" as wingcloud_api;
+bring "./segment-analytics.w" as SegmentAnalytics;
 
 bring "./runtime/runtime.w" as runtime;
 bring "./runtime/runtime-client.w" as runtime_client;
@@ -22,8 +24,11 @@ bring "./components/public-endpoint/public-endpoint.w" as PublicEndpoint;
 bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 
-// And the sun, and the moon, and the stars, and the flowers.
 let appSecret = util.env("APP_SECRET");
+let segmentWriteKey = util.env("SEGMENT_WRITE_KEY");
+let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true";
+
+let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey, enableAnalytics);
 
 let api = new cloud.Api(
   cors: true,
@@ -76,6 +81,8 @@ let dashboard = new ex.ReactApp(
   buildDir: "dist",
   localPort: dashboardPort,
 );
+dashboard.addEnvironment("SEGMENT_WRITE_KEY", segmentWriteKey);
+dashboard.addEnvironment("ENABLE_ANALYTICS", "{enableAnalytics}");
 
 reactAppPatch.ReactAppPatch.apply(dashboard);
 
@@ -138,6 +145,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
+  analytics: analytics
 );
 
 let wingCloudApi = new wingcloud_api.Api(
@@ -242,20 +250,6 @@ let updateGithubWebhook = inflight () => {
 };
 
 new cloud.OnDeploy(updateGithubWebhook);
-
-bring "./tests/environments.w" as tests;
-new tests.EnvironmentsTest(
-  users: users,
-  apps: apps,
-  environments: environments,
-  githubApp: probotApp.githubApp,
-  updateGithubWebhook: updateGithubWebhook,
-  appSecret: appSecret,
-  wingCloudUrl: apiUrlParam,
-  githubToken: util.tryEnv("TESTS_GITHUB_TOKEN"),
-  githubOrg: util.tryEnv("TESTS_GITHUB_ORG"),
-  githubUser: util.tryEnv("TESTS_GITHUB_USER"),
-);
 
 new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";

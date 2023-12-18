@@ -41,7 +41,7 @@ export const SecretsListItem = ({
   const updatedAt = useTimeAgo(secret.updatedAt);
 
   return (
-    <div className="text-xs flex items-center gap-4">
+    <div className="text-xs flex items-center gap-4" fs-mask>
       <LockClosedIcon className={clsx("w-5 h-5 rounded-full", theme.text2)} />
 
       <div className="flex flex-col gap-2 truncate w-1/2">

@@ -259,12 +259,10 @@ pub class Api {
 
     api.get("/wrpc/github.listInstallations", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        let installations = GitHub.Client.listUserInstallations(accessToken);
+        let data = GitHub.Client.listUserInstallations(accessToken);
 
         return {
-          body: {
-            installations: installations,
-          },
+          body: data,
         };
       } else {
         throw httpError.HttpError.unauthorized();
@@ -274,13 +272,12 @@ pub class Api {
     api.get("/wrpc/github.listRepositories", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
         let installationId = num.fromStr(request.query.get("installationId"));
+        let page = num.fromStr(request.query.get("page"));
 
-        let repositories = GitHub.Client.listInstallationRepos(accessToken, installationId);
+        let data = GitHub.Client.listInstallationRepos(accessToken, installationId, page);
 
         return {
-          body: {
-            repositories: repositories
-          },
+          body: data,
         };
       } else {
         throw httpError.HttpError.unauthorized();
@@ -358,6 +355,7 @@ pub class Api {
           appId: input.appId,
           entrypoint: input.entrypoint,
           sha: commitData.sha,
+          owner: input.repoOwner
       }}));
     });
 
