@@ -25,7 +25,7 @@ struct Item extends Environment {
   sk: str;
 }
 
-pub struct CreateEnvironmentOptions {
+pub struct EnvironmentOptions {
   appId: str;
   type: str;
   repo: str;
@@ -36,7 +36,7 @@ pub struct CreateEnvironmentOptions {
   installationId: num;
 }
 
-pub struct InternalCreateEnvironmentOptions extends CreateEnvironmentOptions {
+pub struct CreateEnvironmentOptions extends EnvironmentOptions {
   publicKey: str;
 }
 
@@ -100,7 +100,7 @@ pub class Environments {
     this.table = table;
   }
 
-  pub inflight create(options: InternalCreateEnvironmentOptions): Environment {
+  pub inflight create(options: CreateEnvironmentOptions): Environment {
     let createdAt = datetime.utcNow().toIso();
     let environment = Environment {
       id: "environment_{nanoid62.Nanoid62.generate()}",

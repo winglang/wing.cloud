@@ -26,7 +26,7 @@ struct EnvironmentsProps {
 }
 
 pub struct CreateEnvironmentOptions {
-  createEnvironment: environments.CreateEnvironmentOptions;
+  createEnvironment: environments.EnvironmentOptions;
   appId: str;
   entrypoint: str;
   sha: str;
@@ -99,7 +99,7 @@ pub class EnvironmentManager {
     item.set("publicKey", keyPair.publicKey);
 
     let environment = this.environments.create(
-      environments.InternalCreateEnvironmentOptions.fromJson(item)
+      environments.CreateEnvironmentOptions.fromJson(item)
     );
 
     let secrets = this.secretsForEnvironment(environment);
