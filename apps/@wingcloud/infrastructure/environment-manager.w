@@ -132,7 +132,7 @@ pub class EnvironmentManager {
 
   pub inflight restart(options: RestartEnvironmentOptions) {
     let octokit = this.auth(options.environment.installationId);
-     let keyPair = KeyPair.KeyPair.generate();
+    let keyPair = KeyPair.KeyPair.generate();
 
     this.environments.updatePublicKey(
       id: options.environment.id,

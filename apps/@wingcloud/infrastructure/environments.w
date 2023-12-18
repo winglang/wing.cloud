@@ -34,7 +34,7 @@ pub struct CreateEnvironmentOptions {
   prNumber: num?;
   prTitle: str?;
   installationId: num;
-  publicKey: str?;
+  publicKey: str;
 }
 
 struct UpdateEnvironmentStatusOptions {
