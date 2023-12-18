@@ -1,7 +1,9 @@
 import {
   createWRPCReact,
+  type InfinitQueryProcedure,
   type MutationProcedure,
   type QueryProcedure,
+  type PaginatedResponse,
 } from "@wingcloud/wrpc";
 
 export interface User {
@@ -43,7 +45,7 @@ export interface TestResult {
 }
 
 interface TestResults {
-  testResults: Array<TestResult>;
+  testResults: TestResult[];
 }
 
 interface StatusReport {
@@ -93,7 +95,7 @@ export interface TestLog {
   error: string;
   time: number;
   timestamp: string;
-  traces: Array<Trace>;
+  traces: Trace[];
 }
 
 export interface Secret {
@@ -132,17 +134,13 @@ export const wrpc = createWRPCReact<{
   >;
   "auth.signOut": MutationProcedure;
   "github.callback": QueryProcedure<{ code: string }, {}>;
-  "github.listInstallations": QueryProcedure<
+  "github.listInstallations": InfinitQueryProcedure<
     undefined,
-    {
-      installations: Array<Installation>;
-    }
+    PaginatedResponse<Installation[]>
   >;
-  "github.listRepositories": QueryProcedure<
+  "github.listRepositories": InfinitQueryProcedure<
     { installationId: string },
-    {
-      repositories: Array<Repository>;
-    }
+    PaginatedResponse<Repository[]>
   >;
   "github.getRepository": QueryProcedure<
     { owner: string; repo: string },
@@ -159,7 +157,7 @@ export const wrpc = createWRPCReact<{
   "app.listEnvironments": QueryProcedure<
     { owner: string; appName: string },
     {
-      environments: Array<Environment>;
+      environments: Environment[];
     }
   >;
   "app.environment": QueryProcedure<
@@ -185,7 +183,7 @@ export const wrpc = createWRPCReact<{
   "app.listSecrets": QueryProcedure<
     { appId: string },
     {
-      secrets: Array<Secret>;
+      secrets: Secret[];
     }
   >;
   "app.decryptSecret": MutationProcedure<
@@ -208,7 +206,7 @@ export const wrpc = createWRPCReact<{
   "app.listEntrypoints": QueryProcedure<
     { owner: string; repo: string; default_branch: string },
     {
-      entrypoints: Array<string>;
+      entrypoints: string[];
     }
   >;
   "app.updateEntrypoint": MutationProcedure<
@@ -221,7 +219,7 @@ export const wrpc = createWRPCReact<{
       owner: string;
     },
     {
-      apps: Array<App>;
+      apps: App[];
     }
   >;
   "app.create": MutationProcedure<
