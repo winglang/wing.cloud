@@ -83,7 +83,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
       "SSL_PRIVATE_KEY" => util.base64Encode(opts.certificate.privateKey),
       "SSL_CERTIFICATE" => util.base64Encode(opts.certificate.certificate),
-      "PRIVATE_KEY" => opts.privateKey,
+      "ENVIRONMENT_PRIVATE_KEY" => opts.privateKey,
     };
 
     if let token = opts.gitToken {
@@ -152,7 +152,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "AWS_ACCESS_KEY_ID" => opts.awsAccessKeyId,
       "AWS_SECRET_ACCESS_KEY" => opts.awsSecretAccessKey,
       "AWS_REGION" => opts.logsBucketRegion,
-      "PRIVATE_KEY" => opts.privateKey,
+      "ENVIRONMENT_PRIVATE_KEY" => opts.privateKey,
     };
 
     if let token = opts.gitToken {

@@ -20,10 +20,10 @@ export const run = async function ({
   requestedPort,
   requestedSSLPort,
 }: RunProps) {
-  const privateKey = process.env["PRIVATE_KEY"];
+  const privateKey = process.env["ENVIRONMENT_PRIVATE_KEY"];
 
   if (!privateKey) {
-    throw new Error("Missing PRIVATE_KEY environment variable");
+    throw new Error("Missing ENVIRONMENT_PRIVATE_KEY environment variable");
   }
 
   const keyStore = await createKeyStore(context.environment.id, privateKey);
