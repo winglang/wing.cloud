@@ -6,9 +6,10 @@
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
+    "@segment/analytics-next": "^1.62.0",
     "@tanstack/react-query": "^5.8.9",
     "@wingcloud/wrpc": "workspace:^",
-    "@wingconsole/ui": "^0.51.21",
+    "@wingconsole/ui": "^0.51.27",
     "clsx": "^2.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
