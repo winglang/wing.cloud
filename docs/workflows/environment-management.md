@@ -42,7 +42,7 @@
 - lambda: Call create runtime in Runtime Service from SQS Queue
 - lambda: The [Runtime Service](./runtime-service.md) is invoked via HTTP
 
-```
+```mermaid
 sequenceDiagram
     participant P as Probot API
     participant W as Wing Cloud API
