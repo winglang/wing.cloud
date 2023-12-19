@@ -4,7 +4,6 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "@wingcloud/wrpc";
-import clsx from "clsx";
 import type { PropsWithChildren } from "react";
 import { useMemo } from "react";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
