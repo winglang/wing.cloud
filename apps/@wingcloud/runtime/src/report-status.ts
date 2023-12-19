@@ -34,13 +34,17 @@ export function useReportStatus(
       status,
       data: payload,
     };
-    const token = await keyStore.createToken(data);
+    const token = await keyStore.createToken({
+      environmentId: data.environmentId,
+    });
     await fetch(`${context.wingApiUrl}/environment.report`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+      }),
     });
   };
 }

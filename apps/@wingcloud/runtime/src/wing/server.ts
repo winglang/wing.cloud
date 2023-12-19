@@ -177,10 +177,6 @@ export async function prepareServer({
           set(key: any, value: any) {},
         },
         onExpressCreated: (app: Application) => {
-          app.get("/public-key", async (req, res) => {
-            const data = keyStore.publicKey();
-            res.send(data);
-          });
           app.get("/health", async (req, res) => {
             res.sendStatus(200);
           });
