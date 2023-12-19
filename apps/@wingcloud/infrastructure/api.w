@@ -3,7 +3,7 @@ bring http;
 bring ex;
 bring util;
 bring fs;
-bring websockets;
+//bring websockets;
 
 bring "./json-api.w" as json_api;
 bring "./cookie.w" as Cookie;
@@ -88,7 +88,7 @@ bring "./octokit.w" as Octokit;
 
 struct ApiProps {
   api: cloud.Api;
-  ws: websockets.WebSocket;
+  //ws: websockets.WebSocket;
   apps: Apps.Apps;
   users: Users.Users;
   environments: Environments.Environments;
@@ -111,7 +111,7 @@ struct EnvironmentAction {
 pub class Api {
   new(props: ApiProps) {
     let api = new json_api.JsonApi(api: props.api);
-    let ws = props.ws;
+    //let ws = props.ws;
     let apps = props.apps;
     let users = props.users;
     let logs = props.logs;
@@ -398,7 +398,7 @@ pub class Api {
     };
 
     api.post("/wrpc/app.create", inflight (request) => {
-      ws.sendMessage("app.create", Json.stringify(request.body));
+      //ws.sendMessage("app.create", Json.stringify(request.body));
 
       if let accessToken = getAccessTokenFromCookie(request) {
         let user = getUserFromCookie(request);

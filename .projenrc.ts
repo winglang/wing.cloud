@@ -253,6 +253,8 @@ infrastructure.addGitIgnore("!/.env.example");
 
 infrastructure.addGitIgnore("**/target/");
 infrastructure.addDeps("winglang");
+infrastructure.addDeps("@winglibs/websockets");
+
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
@@ -365,7 +367,6 @@ infrastructure.addDevDeps("@octokit/rest");
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(runtime.name);
 
-infrastructure.addDeps("@winglibs/websockets");
 ///////////////////////////////////////////////////////////////////////////////
 
 const aws = new NodeProject({

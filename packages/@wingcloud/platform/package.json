@@ -6,8 +6,8 @@
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.350",
     "@types/node": "20",
-    "@typescript-eslint/eslint-plugin": "^6.14.0",
-    "@typescript-eslint/parser": "^6.14.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
     "@winglang/compiler": "^0.51.27",
     "@winglang/sdk": "^0.51.27",
     "cdktf": "^0.19.2",
