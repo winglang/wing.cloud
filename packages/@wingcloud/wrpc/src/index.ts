@@ -11,7 +11,7 @@ import {
 } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 
-const WRPCContext = createContext({ url: "" });
+const WRPCContext = createContext({ url: "", ws: "" });
 
 export const WRPCProvider = WRPCContext.Provider;
 
@@ -166,6 +166,22 @@ export const createWRPCReact = <
               ...options,
               mutationKey: [route],
               mutationFn: async (input) => await fetcher("POST", url, input),
+            });
+          },
+          useSubscription: () => {
+            const url = new URL(`${useContext(WRPCContext).ws}/${route}`);
+
+            return useQuery({
+              retry(failureCount, error) {
+                if (error instanceof ControlledError) {
+                  return false;
+                }
+                return failureCount < 3;
+              },
+              throwOnError: true,
+              ...options,
+              queryKey: [route, input],
+              queryFn: async () => await fetcher("GET", url),
             });
           },
         };

@@ -3,6 +3,8 @@ bring cloud;
 bring util;
 bring http;
 bring ex;
+bring websockets;
+
 bring "cdktf" as cdktf;
 
 bring "./users.w" as Users;
@@ -29,6 +31,8 @@ let segmentWriteKey = util.env("SEGMENT_WRITE_KEY");
 let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true";
 
 let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey, enableAnalytics);
+
+let ws = new websockets.WebSocket(name: "MyWebSocket") as "my-websocket";
 
 let api = new cloud.Api(
   cors: true,
@@ -150,6 +154,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
 
 let wingCloudApi = new wingcloud_api.Api(
   api: api,
+  ws: ws,
   apps: apps,
   users: users,
   environments: environments,
@@ -211,6 +216,10 @@ let proxyUrl = (() => {
         {
           pathPattern: "/wrpc/*",
           domainName: apiDomainName,
+        },
+        {
+          pathPattern: "/ws/*",
+          domainName: ws.url(),
         },
         {
           pathPattern: "*",

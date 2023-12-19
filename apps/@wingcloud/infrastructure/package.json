@@ -20,6 +20,7 @@
     "@wingcloud/platform": "workspace:^",
     "@wingcloud/probot": "workspace:^",
     "@wingcloud/simutils": "workspace:^",
+    "@winglibs/websockets": "^0.0.2",
     "cdktf": "^0.19.1",
     "constructs": "^10.3.0",
     "cookie-es": "^1.0.0",

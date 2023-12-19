@@ -365,6 +365,7 @@ infrastructure.addDevDeps("@octokit/rest");
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(runtime.name);
 
+infrastructure.addDeps("@winglibs/websockets");
 ///////////////////////////////////////////////////////////////////////////////
 
 const aws = new NodeProject({

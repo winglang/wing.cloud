@@ -19,6 +19,9 @@ import { useAnalyticsEvents } from "./utils/use-analytics-events.js";
 const API_URL = new URL(location.origin);
 API_URL.pathname = "/wrpc";
 
+const WS_URL = new URL(location.origin);
+WS_URL.protocol = "ws" + WS_URL.protocol.slice(4);
+
 export const App = () => {
   const { track } = useContext(AnalyticsContext);
   const { handleEvent } = useAnalyticsEvents({ track });
@@ -54,7 +57,7 @@ export const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <WRPCProvider value={{ url: API_URL.toString() }}>
+      <WRPCProvider value={{ url: API_URL.toString(), ws: WS_URL.toString() }}>
         <AnalyticsIdentityProvider>
           <ThemeProvider mode="light" theme={DefaultTheme}>
             <NotificationsProvider>
