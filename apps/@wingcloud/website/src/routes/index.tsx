@@ -7,6 +7,7 @@ import { SpinnerLoader } from "../components/spinner-loader.js";
 import { wrpc } from "../utils/wrpc.js";
 
 export const AppPage = () => {
+  // This check is required in order to prevent the app from flashing pages content
   const user = wrpc["auth.check"].useQuery(undefined, {
     throwOnError: false,
     retry: false,
