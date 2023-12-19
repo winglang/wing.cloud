@@ -16,9 +16,12 @@ struct IPullRequestHead {
   sha: str;
   ref: str;
 }
-
+struct IPullRequestUser {
+  login: str;
+}
 struct IPullRequestPR {
   head: IPullRequestHead;
+  user: IPullRequestUser;
   number: num;
   title: str;
 }

@@ -145,6 +145,7 @@ website.addDeps("@headlessui/react");
 website.addDeps("@heroicons/react");
 website.addDeps("react-popper");
 website.addDeps("@wingconsole/ui");
+website.addDeps("@segment/analytics-next");
 
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 
@@ -191,7 +192,6 @@ runtime.addDeps("@wingconsole/app");
 runtime.addDeps("express");
 runtime.addDeps("http-proxy");
 runtime.addDeps("jsonwebtoken");
-runtime.addDeps("jwk-to-pem");
 runtime.addDeps("jose");
 runtime.addDeps("node-fetch");
 runtime.addDeps("which");
@@ -203,7 +203,6 @@ runtime.addDeps("stacktracey");
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/http-proxy");
 runtime.addDevDeps("@types/jsonwebtoken");
-runtime.addDevDeps("@types/jwk-to-pem");
 runtime.addDevDeps("simple-git");
 runtime.addDevDeps("msw@1");
 runtime.addDevDeps("@types/which");
@@ -355,7 +354,7 @@ infrastructure.addDeps("jose@4");
 infrastructure.addDeps("octokit", "node-fetch");
 infrastructure.addDeps("@aws-sdk/client-kms");
 infrastructure.addDeps("dnsimple");
-infrastructure.addDeps("@winglibs/checks");
+infrastructure.addDeps("@segment/analytics-node");
 
 infrastructure.addDeps("@aws-sdk/client-ssm");
 

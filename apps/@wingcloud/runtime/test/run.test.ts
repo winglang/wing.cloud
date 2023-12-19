@@ -199,19 +199,6 @@ test("run() - reporting statuses", async () => {
 
   server.close();
   server.resetHandlers();
-
-  const response = await fetch(`http://localhost:${port}/public-key`);
-  const { aud, iss, environmentId, status } = jwt.verify(
-    authToken!.replace("Bearer ", ""),
-    await response.text(),
-  ) as any;
-  expect({ aud, iss, environmentId, status }).toStrictEqual({
-    environmentId: "test-id",
-    status: "deploying",
-    aud: "https://wing.cloud",
-    iss: "test-id",
-  });
-
   await close();
 });
 

@@ -109,6 +109,7 @@ pub class ProbotApp {
               prNumber: context.payload.pull_request.number,
               prTitle: context.payload.pull_request.title,
             },
+            owner: context.payload.repository.owner.login,
             appId: app.appId,
             entrypoint: app.entrypoint,
             sha: context.payload.pull_request.head.sha,

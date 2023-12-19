@@ -10,6 +10,8 @@ bring "./types/octokit-types.w" as octokit;
 bring "./runtime/runtime-client.w" as runtime_client;
 bring "./probot-adapter.w" as adapter;
 bring "./status-reports.w" as status_reports;
+bring "./key-pair.w" as KeyPair;
+bring "./segment-analytics.w" as analytics;
 
 struct EnvironmentsProps {
   users: users.Users;
@@ -22,13 +24,15 @@ struct EnvironmentsProps {
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
   siteDomain: str;
+  analytics: analytics.SegmentAnalytics;
 }
 
 pub struct CreateEnvironmentOptions {
-  createEnvironment: environments.CreateEnvironmentOptions;
+  createEnvironment: environments.EnvironmentOptions;
   appId: str;
   entrypoint: str;
   sha: str;
+  owner: str;
 }
 
 pub struct RestartEnvironmentOptions {
@@ -70,6 +74,7 @@ pub class EnvironmentManager {
   githubComment: comment.GithubComment;
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
+  analytics: analytics.SegmentAnalytics;
 
   new(props: EnvironmentsProps) {
     this.apps = props.apps;
@@ -87,12 +92,26 @@ pub class EnvironmentManager {
       apps: props.apps,
       siteDomain: props.siteDomain
     );
+    this.analytics = props.analytics;
   }
 
   pub inflight create(options: CreateEnvironmentOptions) {
     let octokit = this.auth(options.createEnvironment.installationId);
 
-    let environment = this.environments.create(options.createEnvironment);
+    let keyPair = KeyPair.KeyPair.generate();
+
+    let item = MutJson(options.createEnvironment);
+    item.set("publicKey", keyPair.publicKey);
+
+    let environment = this.environments.create(
+      environments.CreateEnvironmentOptions.fromJson(item)
+    );
+
+    this.analytics.track(options.owner, "cloud_environment_created", {
+      branch: environment.branch,
+      repo: environment.repo,
+      type: environment.type,
+    });
 
     let secrets = this.secretsForEnvironment(environment);
 
@@ -107,7 +126,7 @@ pub class EnvironmentManager {
 
     let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: environment.installationId);
     if tokenRes.status >= 300 || tokenRes.status < 200 {
-      throw "environment create: unable to create installtion access token";
+      throw "environment create: unable to create installation access token";
     }
 
     this.runtimeClient.create(
@@ -118,13 +137,25 @@ pub class EnvironmentManager {
       certificate: this.certificate.certificate(),
       sha: options.sha,
       token: tokenRes.data.token,
+      privateKey: keyPair.privateKey,
     );
   }
 
   pub inflight restart(options: RestartEnvironmentOptions) {
     let octokit = this.auth(options.environment.installationId);
+    let keyPair = KeyPair.KeyPair.generate();
 
-    this.environments.updateStatus(id: options.environment.id, appId: options.appId, status: "initializing");
+    this.environments.updatePublicKey(
+      id: options.environment.id,
+      appId: options.appId,
+      publicKey: keyPair.publicKey
+    );
+
+    this.environments.updateStatus(
+      id: options.environment.id,
+      appId: options.appId,
+      status: "initializing"
+    );
 
     let secrets = this.secretsForEnvironment(options.environment);
 
@@ -150,6 +181,7 @@ pub class EnvironmentManager {
       certificate: this.certificate.certificate(),
       sha: options.sha,
       token: tokenRes.data.token,
+      privateKey: keyPair.privateKey,
     );
   }
 
@@ -178,7 +210,7 @@ pub class EnvironmentManager {
         port: endpoint.port,
         targetUrl: "{options.environment.url}").delete();
     }
-    
+
     this.postComment(
       environmentId: options.environment.id,
       octokit: octokit,
@@ -248,7 +280,11 @@ pub class EnvironmentManager {
 
   inflight secretsForEnvironment(environment: environments.Environment): Map<str> {
     let map = MutMap<str>{};
-    let secrets = this.secrets.list(appId: environment.appId, environmentType: environment.type, decryptValues: true);
+    let secrets = this.secrets.list(
+      appId: environment.appId,
+      environmentType: environment.type,
+      decryptValues: true
+    );
     for secret in secrets {
       map.set(secret.name, secret.value);
     }
@@ -265,7 +301,7 @@ pub class EnvironmentManager {
           targetUrl: url);
 
 
-        // check if we already created this public endpoint 
+        // check if we already created this public endpoint
         let var found = false;
         for existingEndpoint in existingEndpoints {
           if existingEndpoint.publicUrl == publicEndpoint.url() {

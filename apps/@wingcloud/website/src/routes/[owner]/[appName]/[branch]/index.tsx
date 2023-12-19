@@ -105,14 +105,13 @@ const EnvironmentPage = () => {
         loading={environment.isLoading}
         environment={environment.data?.environment}
       />
-
       <Endpoints
         id={ENDPOINTS_ID}
         isOpen={true}
         endpoints={endpoints.data?.endpoints || []}
         loading={endpoints.isLoading}
+        environmentType={environment.data?.environment.type}
       />
-
       <DeploymentLogs
         id={DEPLOYMENT_LOGS_ID}
         isOpen={deploymentLogsOpen}
@@ -120,7 +119,6 @@ const EnvironmentPage = () => {
         logs={logs.data?.deploy || []}
         loading={logs.isLoading}
       />
-
       <TestsLogs
         id={TEST_LOGS_ID}
         isOpen={testLogsOpen}

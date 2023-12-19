@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { simulator, cloud } from "@winglang/sdk";
 import { type ApiSchema } from "@winglang/sdk/lib/target-sim/schema-resources.js";
+import * as jose from "jose";
 import { simpleGit } from "simple-git";
 import { beforeEach, afterEach, beforeAll } from "vitest";
 
@@ -28,6 +29,11 @@ beforeAll(async () => {
 
 const privateKeyFile = process.env["ENVIRONMENT_SERVER_PRIVATE_KEY_FILE"]!;
 const certificateFile = process.env["ENVIRONMENT_SERVER_CERTIFICATE_FILE"]!;
+
+const keyPair = await jose.generateKeyPair("RS256");
+const privateKey = await jose.exportPKCS8(keyPair.privateKey);
+//const publicKey = await jose.exportSPKI(keyPair.publicKey);
+
 beforeEach(async () => {
   process.env["SSL_PRIVATE_KEY"] = Buffer.from(
     readFileSync(privateKeyFile, "utf8"),
@@ -37,6 +43,7 @@ beforeEach(async () => {
     readFileSync(certificateFile, "utf8"),
     "utf8",
   ).toString("base64");
+  process.env["ENVIRONMENT_PRIVATE_KEY"] = privateKey;
 
   sim = new simulator.Simulator({
     simfile: resolve(join(currentDir, "../../infrastructure/target/main.wsim")),
