@@ -9,6 +9,7 @@ bring "./cookie.w" as Cookie;
 bring "./github-tokens-table.w" as github_tokens_table;
 bring "./github.w" as GitHub;
 bring "./jwt.w" as JWT;
+bring "./key-pair.w" as KeyPair;
 bring "./apps.w" as Apps;
 bring "./users.w" as Users;
 bring "./environments.w" as Environments;
@@ -139,6 +140,20 @@ pub class Api {
           } catch {
             return nil;
           }
+        }
+      }
+    };
+
+    let getJWTPayloadFromBearer = inflight (publicKey: str, request: cloud.ApiRequest): Map<str>? => {
+      let headers = lowkeys.LowkeysMap.fromMap(request.headers ?? {});
+      let input = Json.parse(request.body ?? "");
+
+      if let authHeader = headers.tryGet("authorization") {
+        let token = authHeader.replace("Bearer","").trim();
+        try {
+          return KeyPair.KeyPair.verify(token: token, publicKey: publicKey);
+        } catch {
+          return nil;
         }
       }
     };
@@ -830,17 +845,25 @@ pub class Api {
       };
     });
 
-    api.post("/environment.report", inflight (req) => {
-      if let event = req.body {
+    api.post("/environment.report", inflight (request) => {
+      if let event = request.body {
         log("report status: {event}");
         let data = Json.parse(event);
         let statusReport = status_reports.StatusReport.fromJson(data);
-        props.environmentManager.updateStatus(statusReport: statusReport);
-      }
+        let publicKey = props.environments.getPublicKey(id: statusReport.environmentId);
 
-      return {
-        status: 200
-      };
+        if let payload = getJWTPayloadFromBearer(publicKey, request) {
+          let payloadEnvironmentId = payload.get("environmentId");
+
+          if payloadEnvironmentId == statusReport.environmentId {
+            props.environmentManager.updateStatus(statusReport: statusReport);
+            return {
+              status: 200
+            };
+          }
+        }
+      }
+      throw httpError.HttpError.badRequest("Invalid status report");
     });
 
     environmentsQueue.setConsumer(inflight (event) => {

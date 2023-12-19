@@ -45,6 +45,7 @@ struct RuntimeStartOptions {
   environmentId: str;
   secrets: Map<str>;
   certificate: certificate.Certificate;
+  privateKey: str;
 }
 
 struct RuntimeStopOptions {
@@ -106,7 +107,8 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "ENVIRONMENT_ID" => opts.environmentId,
       "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
       "SSL_PRIVATE_KEY" => util.base64Encode(opts.certificate.privateKey),
-      "SSL_CERTIFICATE" => util.base64Encode(opts.certificate.certificate)
+      "SSL_CERTIFICATE" => util.base64Encode(opts.certificate.certificate),
+      "ENVIRONMENT_PRIVATE_KEY" => opts.privateKey,
     };
 
     if let token = opts.gitToken {
@@ -189,6 +191,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "AWS_ACCESS_KEY_ID" => opts.awsAccessKeyId,
       "AWS_SECRET_ACCESS_KEY" => opts.awsSecretAccessKey,
       "AWS_REGION" => opts.logsBucketRegion,
+      "ENVIRONMENT_PRIVATE_KEY" => opts.privateKey,
     };
 
     if let token = opts.gitToken {
@@ -217,7 +220,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
         }]
       }]
     };
-  
+
     if exists {
       log("updating machine in app ${app.props.name}");
       app.update(createOptions);
@@ -249,6 +252,7 @@ pub struct Message {
   token: str?;
   secrets: Map<str>;
   certificate: certificate.Certificate;
+  privateKey: str;
 }
 
 struct RuntimeServiceProps {
@@ -335,6 +339,7 @@ pub class RuntimeService {
           environmentId: msg.environmentId,
           secrets: msg.secrets,
           certificate: msg.certificate,
+          privateKey: msg.privateKey,
           logsBucketName: bucketName,
           logsBucketRegion: bucketRegion,
           awsAccessKeyId: awsAccessKeyId,

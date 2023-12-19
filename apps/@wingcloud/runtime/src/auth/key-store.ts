@@ -1,32 +1,27 @@
 import * as jose from "jose";
-import jwt from "jsonwebtoken";
-import jwkToPem from "jwk-to-pem";
+
+const JWT_EXPIRATION_TIME = "1h";
+const AUDIENCE = "https://wing.cloud";
 
 export interface KeyStore {
-  publicKey(): string;
   createToken(data: Record<string, any>): Promise<string>;
 }
 
-export async function createKeyStore(issuer: string): Promise<KeyStore> {
-  const keyStore = await jose.generateKeyPair("RS256");
-
-  const privateKey = jwkToPem(
-    (await jose.exportJWK(keyStore.privateKey)) as any,
-    { private: true },
-  );
-  const publicKey = jwkToPem((await jose.exportJWK(keyStore.publicKey)) as any);
-
+export async function createKeyStore(
+  issuer: string,
+  privateKey: string,
+): Promise<KeyStore> {
   return {
-    publicKey: () => {
-      return publicKey;
-    },
     createToken: async (data: Record<string, any>) => {
-      return jwt.sign(data, privateKey, {
-        algorithm: "RS256",
-        expiresIn: "1h",
-        audience: "https://wing.cloud",
-        issuer,
-      });
+      const keyObject = await jose.importPKCS8(privateKey, "pem");
+
+      return await new jose.SignJWT(data)
+        .setSubject(issuer)
+        .setProtectedHeader({ alg: "RS256" })
+        .setIssuedAt()
+        .setAudience(AUDIENCE)
+        .setExpirationTime(JWT_EXPIRATION_TIME)
+        .sign(keyObject);
     },
   };
 }
