@@ -424,6 +424,7 @@ pub class Api {
         let defaultBranch = input.get("defaultBranch").asStr();
         let repoOwner = input.get("repoOwner").asStr();
         let repoName = input.get("repoName").asStr();
+        let installationId = input.get("installationId").asNum();
         let repoId = "{repoOwner}/{repoName}";
 
         // get application default entrypoint path (main.w)
@@ -463,7 +464,7 @@ pub class Api {
           repoOwner: repoOwner,
           repoName: repoName,
           defaultBranch: defaultBranch,
-          installationId: num.fromStr(input.get("installationId").asStr()),
+          installationId: installationId,
           appId: appId,
           entrypoint: entrypoint,
         }));
