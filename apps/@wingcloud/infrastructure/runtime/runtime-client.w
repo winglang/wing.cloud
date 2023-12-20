@@ -16,6 +16,7 @@ struct RuntimeClientCreateOptions {
   certificate: certificate.Certificate;
   token: str;
   sha: str;
+  privateKey: str;
 }
 
 struct RuntimeClientDeleteOptions {
@@ -39,6 +40,7 @@ pub class RuntimeClient {
       token: options.token,
       secrets: options.secrets,
       certificate: options.certificate,
+      privateKey: options.privateKey,
     }));
 
     if !res.ok {

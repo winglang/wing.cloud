@@ -25,7 +25,7 @@ struct Item extends Environment {
   sk: str;
 }
 
-pub struct CreateEnvironmentOptions {
+pub struct EnvironmentOptions {
   appId: str;
   type: str;
   repo: str;
@@ -36,10 +36,20 @@ pub struct CreateEnvironmentOptions {
   installationId: num;
 }
 
+pub struct CreateEnvironmentOptions extends EnvironmentOptions {
+  publicKey: str;
+}
+
 struct UpdateEnvironmentStatusOptions {
   id: str;
   appId: str;
   status: str;
+}
+
+struct UpdateEnvirohmentPublicKeyOptions {
+  id: str;
+  appId: str;
+  publicKey: str;
 }
 
 struct UpdateEnvironmentUrlOptions {
@@ -120,6 +130,7 @@ pub class Environments {
         installationId: environment.installationId,
         createdAt: environment.createdAt,
         updatedAt: environment.updatedAt,
+        publicKey: options.publicKey,
       };
 
       if let prNumber = environment.prNumber {
@@ -155,6 +166,64 @@ pub class Environments {
     ]);
 
     return environment;
+  }
+
+  pub inflight updatePublicKey(options: UpdateEnvirohmentPublicKeyOptions) {
+    let branch = this.get(
+      id: options.id,
+    ).branch;
+
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "ENVIRONMENT#{options.id}",
+            sk: "#",
+          },
+          updateExpression: "SET #publicKey = :publicKey",
+          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
+          expressionAttributeNames: {
+            "#pk": "pk",
+            "#publicKey": "publicKey",
+            "#appId": "appId",
+          },
+          expressionAttributeValues: {
+            ":publicKey": options.publicKey,
+            ":appId": options.appId,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#{options.appId}",
+            sk: "ENVIRONMENT#{options.id}",
+          },
+          updateExpression: "SET #publicKey = :publicKey",
+          expressionAttributeNames: {
+            "#publicKey": "publicKey",
+          },
+          expressionAttributeValues: {
+            ":publicKey": options.publicKey,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#{options.appId}",
+            sk: "BRANCH#{branch}",
+          },
+          updateExpression: "SET #publicKey = :publicKey",
+          expressionAttributeNames: {
+            "#publicKey": "publicKey",
+          },
+          expressionAttributeValues: {
+            ":publicKey": options.publicKey,
+          },
+        }
+      },
+    ]);
   }
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
@@ -414,6 +483,22 @@ pub class Environments {
         createdAt: item.get("createdAt").asStr(),
         updatedAt: item.get("updatedAt").asStr(),
       };
+    }
+
+    throw httpError.HttpError.notFound("Environment '{options.id}' not found");
+  }
+
+  pub inflight getPublicKey(options: GetEnvironmentOptions): str {
+    let result = this.table.getItem(
+      key: {
+        pk: "ENVIRONMENT#{options.id}",
+        sk: "#",
+      },
+      projectionExpression: "publicKey",
+    );
+
+    if let item = result.item {
+      return item.get("publicKey").asStr();
     }
 
     throw httpError.HttpError.notFound("Environment '{options.id}' not found");

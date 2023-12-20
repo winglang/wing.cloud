@@ -40,8 +40,15 @@ export const listUserInstallations = async (
       per_page: perPage,
     });
 
+  const data = installations.installations.map((installation) => ({
+    id: installation.id,
+    account: {
+      login: (installation.account as any)?.login ?? "",
+    },
+  }));
+
   return {
-    data: installations.installations,
+    data,
     nextPage: getNextPage(page, installations.total_count, perPage),
     prevPage: getPreviousPage(page),
     total: installations.total_count,
