@@ -174,7 +174,7 @@ pub class Api {
       };
     };
 
-    let checkOwnerAccessRights = inflight (request, owner: str): str => {
+    let checkOwnerAccessRights = inflight (request, owner: str) => {
       let user = getUserFromCookie(request);
       // TODO: Currently we only allow the signed in user to access their own resources.
       if user.username != owner {
