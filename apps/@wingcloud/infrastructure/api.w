@@ -380,8 +380,9 @@ pub class Api {
             sha: commitData.sha,
             owner: input.repoOwner
         }}));
+      } else {
+        throw httpError.HttpError.unauthorized();
       }
-      throw httpError.HttpError.unauthorized();
     });
 
     let getListOfEntrypoints = inflight (props: GetListOfEntrypointsProps): MutArray<str> => {
