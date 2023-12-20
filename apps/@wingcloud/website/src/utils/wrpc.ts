@@ -25,7 +25,6 @@ export interface Repository {
   private: boolean;
   owner: { login: string; avatar_url: string };
   default_branch: string;
-  html_url: string;
 }
 
 export interface App {
