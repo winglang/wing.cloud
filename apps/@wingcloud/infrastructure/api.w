@@ -45,7 +45,7 @@ struct DeleteAppMessage {
 }
 
 struct CreateProductionEnvironmentMessage {
-  accessToken: str;
+  userId: str;
   repoId: str;
   repoOwner: str;
   repoName: str;
@@ -364,32 +364,35 @@ pub class Api {
     let productionEnvironmentQueue = new cloud.Queue() as "Production Environment Queue";
     productionEnvironmentQueue.setConsumer(inflight (event) => {
       let input = CreateProductionEnvironmentMessage.fromJson(Json.parse(event));
+      if let accessToken = githubAccessTokens.get(input.userId)?.access_token {
+        let commitData = GitHub.Client.getLastCommit(
+          token: accessToken,
+          owner:  input.repoOwner,
+          repo: input.repoName,
+          default_branch: input.defaultBranch,
+        );
 
-      let commitData = GitHub.Client.getLastCommit(
-        token: input.accessToken,
-        owner:  input.repoOwner,
-        repo: input.repoName,
-        default_branch: input.defaultBranch,
-      );
-
-      let installationId = input.installationId;
-      environmentsQueue.push(Json.stringify(EnvironmentAction {
-        type: "create",
-        data: EnvironmentManager.CreateEnvironmentOptions {
-          createEnvironment: {
-            branch: input.defaultBranch,
+        let installationId = input.installationId;
+        environmentsQueue.push(Json.stringify(EnvironmentAction {
+          type: "create",
+          data: EnvironmentManager.CreateEnvironmentOptions {
+            createEnvironment: {
+              branch: input.defaultBranch,
+              appId: input.appId,
+              type: "production",
+              prTitle: input.defaultBranch,
+              repo: input.repoId,
+              status: "initializing",
+              installationId: installationId,
+            },
             appId: input.appId,
-            type: "production",
-            prTitle: input.defaultBranch,
-            repo: input.repoId,
-            status: "initializing",
-            installationId: installationId,
-          },
-          appId: input.appId,
-          entrypoint: input.entrypoint,
-          sha: commitData.sha,
-          owner: input.repoOwner
-      }}));
+            entrypoint: input.entrypoint,
+            sha: commitData.sha,
+            owner: input.repoOwner
+        }}));
+      } else {
+        throw httpError.HttpError.unauthorized();
+      }
     });
 
     let getListOfEntrypoints = inflight (props: GetListOfEntrypointsProps): MutArray<str> => {
@@ -468,8 +471,7 @@ pub class Api {
         );
 
         productionEnvironmentQueue.push(Json.stringify(CreateProductionEnvironmentMessage {
-          // TODO: https://github.com/winglang/wing.cloud/issues/282
-          accessToken: accessToken,
+          userId: user.userId,
           repoId: repoId,
           repoOwner: repoOwner,
           repoName: repoName,

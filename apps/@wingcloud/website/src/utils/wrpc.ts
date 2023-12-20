@@ -25,7 +25,6 @@ export interface Repository {
   private: boolean;
   owner: { login: string; avatar_url: string };
   default_branch: string;
-  html_url: string;
 }
 
 export interface App {
@@ -116,7 +115,8 @@ export interface Endpoint {
   runId: string;
   environmentId: string;
   path: string;
-  type: string;
+  label: string;
+  browserSupport: boolean;
   localUrl: string;
   publicUrl: string;
   port: number;

@@ -30,7 +30,7 @@ struct InstallationRepository {
 
 struct Owner {
   login: str;
-  avatarUrl: str;
+  avatar_url: str;
 }
 
 struct Repository {
@@ -40,7 +40,6 @@ struct Repository {
   private: bool;
   owner: Owner;
   default_branch: str;
-  url: str;
 }
 
 struct Commit {
