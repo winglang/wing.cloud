@@ -125,7 +125,7 @@ pub class Endpoints {
     throw "Endpoint [{options.id}] not found";
   }
 
-  pub inflight delete(options: DeleteEndpointOptions): Endpoint {
+  pub inflight delete(options: DeleteEndpointOptions) {
     let result = this.table.deleteItem(
       key: {
         pk: "ENVIRONMENT#{options.environmentId}",

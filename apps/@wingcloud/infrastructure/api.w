@@ -181,7 +181,7 @@ pub class Api {
       };
     };
 
-    let checkOwnerAccessRights = inflight (request, owner: str): str => {
+    let checkOwnerAccessRights = inflight (request, owner: str) => {
       let user = getUserFromCookie(request);
       // TODO: Currently we only allow the signed in user to access their own resources.
       if user.username != owner {
@@ -288,7 +288,8 @@ pub class Api {
 
     api.get("/wrpc/github.listInstallations", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        let data = GitHub.Client.listUserInstallations(accessToken);
+        let page = num.fromStr(request.query.get("page"));
+        let data = GitHub.Client.listUserInstallations(accessToken, page);
 
         return {
           body: data,
