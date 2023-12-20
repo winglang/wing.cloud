@@ -115,8 +115,8 @@ pub class GithubComment {
           let var endpointText = endpoint.label;
           if endpoint.browserSupport {
             endpointText = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.label}</a>";
-            endpointsString = "{endpointText}<br> {endpointsString}";
           }
+          endpointsString = "{endpointText}<br> {endpointsString}";
         }
 
         let date = std.Datetime.utcNow();
