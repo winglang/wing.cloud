@@ -447,11 +447,11 @@ importers:
         specifier: ^6.14.0
         version: 6.14.0(eslint@8.56.0)(typescript@5.3.3)
       '@winglang/compiler':
-        specifier: ^0.52.9
-        version: 0.52.9(constructs@10.3.0)
+        specifier: ^0.53.3
+        version: 0.53.3(constructs@10.3.0)(typescript@5.3.3)
       '@winglang/sdk':
-        specifier: ^0.52.9
-        version: 0.52.9(constructs@10.3.0)
+        specifier: ^0.53.3
+        version: 0.53.3(constructs@10.3.0)
       cdktf:
         specifier: ^0.19.2
         version: 0.19.2(constructs@10.3.0)
@@ -6728,21 +6728,6 @@ packages:
       - ts-node
     dev: false
 
-  /@winglang/compiler@0.52.9(constructs@10.3.0):
-    resolution: {integrity: sha512-QuJBGGElLrRm9Yioltkr6pFM6mD23a329pC4PQXMaFQR7ePsMHGygH/oqBGVxhu8Vzg+Np6BacmOPCcAGeJz0A==}
-    engines: {node: '>=v18.0.0'}
-    dependencies:
-      '@winglang/sdk': 0.52.9(constructs@10.3.0)
-      wasi-js: 1.7.3
-    transitivePeerDependencies:
-      - aws-crt
-      - constructs
-      - encoding
-      - supports-color
-    dev: true
-    bundledDependencies:
-      - wasi-js
-
   /@winglang/compiler@0.53.3(constructs@10.2.70)(typescript@5.3.2):
     resolution: {integrity: sha512-/UkLT29VDegc4S4J19PKb0BaVOkbcA5X+/Jq0Le5AECaaFDF1dbtU7WFNnUHUQUkajlwv+tN6iaPqixpNxS0YQ==}
     engines: {node: '>=v18.0.0'}
@@ -6777,85 +6762,22 @@ packages:
     bundledDependencies:
       - wasi-js
 
-  /@winglang/sdk@0.52.9(constructs@10.3.0):
-    resolution: {integrity: sha512-5a6Rl6+tapbQOZw/NGeHIo/HlveA0Bmax25FwhR+nUgIsjlYCn17Qy4qJoDawsHpjvyiMIl/f387LXIu+qVVUw==}
-    engines: {node: '>= 18.13.0'}
-    peerDependencies:
-      constructs: ~10.2.69
+  /@winglang/compiler@0.53.3(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-/UkLT29VDegc4S4J19PKb0BaVOkbcA5X+/Jq0Le5AECaaFDF1dbtU7WFNnUHUQUkajlwv+tN6iaPqixpNxS0YQ==}
+    engines: {node: '>=v18.0.0'}
     dependencies:
-      '@aws-sdk/client-cloudwatch-logs': 3.449.0
-      '@aws-sdk/client-dynamodb': 3.449.0
-      '@aws-sdk/client-elasticache': 3.449.0
-      '@aws-sdk/client-lambda': 3.449.0
-      '@aws-sdk/client-s3': 3.449.0
-      '@aws-sdk/client-secrets-manager': 3.449.0
-      '@aws-sdk/client-sns': 3.449.0
-      '@aws-sdk/client-sqs': 3.449.0
-      '@aws-sdk/s3-request-presigner': 3.449.0
-      '@aws-sdk/types': 3.449.0
-      '@aws-sdk/util-dynamodb': 3.449.0(@aws-sdk/client-dynamodb@3.449.0)
-      '@azure/core-paging': 1.5.0
-      '@azure/identity': 3.1.3
-      '@azure/storage-blob': 12.14.0
-      '@google-cloud/storage': 6.9.5
-      '@smithy/util-stream': 2.0.17
-      '@smithy/util-utf8': 2.0.0
-      '@types/aws-lambda': 8.10.130
-      cdktf: 0.17.0(constructs@10.3.0)
-      constructs: 10.3.0
-      cron-parser: 4.9.0
-      esbuild-wasm: 0.18.20
-      express: 4.18.2
-      google-auth-library: 8.9.0
-      ioredis: 5.3.2
-      jsonschema: 1.4.1
-      mime: 3.0.0
-      mime-types: 2.1.35
-      nanoid: 3.3.7
-      safe-stable-stringify: 2.4.3
-      stacktracey: 2.1.8
-      undici: 5.28.2
-      uuid: 8.3.2
-      yaml: 2.3.4
+      '@winglang/sdk': 0.53.3(constructs@10.3.0)
+      ts4w: 0.53.3(typescript@5.3.3)
+      wasi-js: 1.7.3
     transitivePeerDependencies:
       - aws-crt
+      - constructs
       - encoding
       - supports-color
+      - typescript
     dev: true
     bundledDependencies:
-      - '@aws-sdk/client-cloudwatch-logs'
-      - '@aws-sdk/client-dynamodb'
-      - '@aws-sdk/client-elasticache'
-      - '@aws-sdk/client-lambda'
-      - '@aws-sdk/client-s3'
-      - '@aws-sdk/client-secrets-manager'
-      - '@aws-sdk/client-sns'
-      - '@aws-sdk/client-sqs'
-      - '@aws-sdk/s3-request-presigner'
-      - '@aws-sdk/types'
-      - '@aws-sdk/util-dynamodb'
-      - '@azure/core-paging'
-      - '@azure/identity'
-      - '@azure/storage-blob'
-      - '@google-cloud/storage'
-      - '@smithy/util-stream'
-      - '@smithy/util-utf8'
-      - '@types/aws-lambda'
-      - cdktf
-      - cron-parser
-      - esbuild-wasm
-      - express
-      - google-auth-library
-      - ioredis
-      - jsonschema
-      - mime
-      - mime-types
-      - nanoid
-      - safe-stable-stringify
-      - stacktracey
-      - undici
-      - uuid
-      - yaml
+      - wasi-js
 
   /@winglang/sdk@0.53.3(constructs@10.2.70):
     resolution: {integrity: sha512-W/lL0UdHymrKHnj0tkL16g0mugsmt5ZY9Pak08uflMStOiRzE+4ieuX98tw82/c9ayxPxvkE/uCDqH7Axr5G0g==}
@@ -6901,7 +6823,6 @@ packages:
       - aws-crt
       - encoding
       - supports-color
-    dev: false
     bundledDependencies:
       - '@aws-sdk/client-cloudwatch-logs'
       - '@aws-sdk/client-dynamodb'
@@ -6977,11 +6898,6 @@ packages:
       undici: 5.28.2
       uuid: 8.3.2
       yaml: 2.3.4
-    transitivePeerDependencies:
-      - aws-crt
-      - encoding
-      - supports-color
-    dev: false
     bundledDependencies:
       - '@aws-sdk/client-cloudwatch-logs'
       - '@aws-sdk/client-dynamodb'
@@ -7575,7 +7491,6 @@ packages:
       constructs: 10.2.70
       json-stable-stringify: 1.1.0
       semver: 7.5.4
-    dev: false
     bundledDependencies:
       - archiver
       - json-stable-stringify
@@ -7872,7 +7787,6 @@ packages:
   /constructs@10.2.70:
     resolution: {integrity: sha512-z6zr1E8K/9tzJbCQzY0UGX0/oVKPFKu9C/mzEnghCG6TAJINnvlq0CMKm63XqqeMleadZYm5T3sZGJKcxJS/Pg==}
     engines: {node: '>= 16.14.0'}
-    dev: false
 
   /constructs@10.3.0:
     resolution: {integrity: sha512-vbK8i3rIb/xwZxSpTjz3SagHn1qq9BChLEfy5Hf6fB3/2eFbrwt2n9kHwQcS0CPTRBesreeAcsJfMq2229FnbQ==}
@@ -12959,6 +12873,20 @@ packages:
       - encoding
       - supports-color
     dev: false
+
+  /ts4w@0.53.3(typescript@5.3.3):
+    resolution: {integrity: sha512-9jscTOwTyCMQb/k6LsOmYFF7rLwWyAWHBlT8w5NHGSbor2+pzBsvVQ7H9VX0UiH8KdQDetgnhgYOIQ/JpHRAPQ==}
+    peerDependencies:
+      typescript: ^5.3.3
+    dependencies:
+      '@winglang/sdk': 0.53.3(constructs@10.2.70)
+      constructs: 10.2.70
+      typescript: 5.3.3
+    transitivePeerDependencies:
+      - aws-crt
+      - encoding
+      - supports-color
+    dev: true
 
   /tsconfig-paths@3.14.2:
     resolution: {integrity: sha512-o/9iXgCYc5L/JxCHPe3Hvh8Q/2xm5Z+p18PESBU6Ff33695QnCHBEjcytY2q19ua7Mbl/DavtBOLq+oG0RCL+g==}

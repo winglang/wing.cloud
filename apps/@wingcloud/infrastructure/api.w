@@ -114,13 +114,6 @@ struct EnvironmentAction {
   data: Json;
 }
 
-struct GetListOfEntrypointsProps{
-  accessToken: str;
-  owner: str;
-  repo: str;
-  defaultBranch: str;
-}
-
 pub class Api {
   new(props: ApiProps) {
     let api = new json_api.JsonApi(api: props.api);
