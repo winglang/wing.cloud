@@ -295,8 +295,10 @@ test("run() - access endpoints through reverse proxy", async () => {
   });
 
   expect(endpoints.length).toBe(1);
-  expect(endpoints[0].digest).toBe("d834e1d3d496ef67");
-  expect(endpoints[0].path).toBe("root/Default/cloud.Api");
+  expect(endpoints[0].digest).toBe("091601b590dabbe1");
+  expect(endpoints[0].path).toBe("root/Default/cloud.Api/Endpoint");
+  expect(endpoints[0].label).toBe("Endpoint for Api root/Default/cloud.Api");
+  expect(endpoints[0].browserSupport).toBe(false);
 
   const response = await fetch(`http://localhost:${port}`, {
     headers: {
@@ -326,8 +328,10 @@ test("run() - uses custom platform", async () => {
   });
 
   expect(endpoints.length).toBe(1);
-  expect(endpoints[0].digest).toBe("d834e1d3d496ef67");
-  expect(endpoints[0].path).toBe("root/Default/cloud.Api");
+  expect(endpoints[0].digest).toBe("091601b590dabbe1");
+  expect(endpoints[0].path).toBe("root/Default/cloud.Api/Endpoint");
+  expect(endpoints[0].label).toBe("Endpoint for Api root/Default/cloud.Api");
+  expect(endpoints[0].browserSupport).toBe(false);
 
   const response = await fetch(`http://localhost:${port}/url`, {
     headers: {
@@ -337,7 +341,7 @@ test("run() - uses custom platform", async () => {
 
   expect(response.ok).toBeTruthy();
   expect(await response.text()).toEqual(
-    "https://d834e1d3d496ef67.wingcloud.io",
+    "https://091601b590dabbe1.wingcloud.io",
   );
 
   await close();
