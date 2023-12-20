@@ -72,7 +72,6 @@ const ConnectPage = () => {
         repoName: selectedRepo.name,
         repoOwner: selectedRepo.owner.login,
         defaultBranch: selectedRepo.default_branch,
-        installationId,
       });
       navigate(`/${app?.appFullName}`);
     } catch (error) {

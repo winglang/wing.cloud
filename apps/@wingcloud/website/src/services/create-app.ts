@@ -38,7 +38,6 @@ export const useCreateAppFromRepo = () => {
       repoName: string;
       repoOwner: string;
       defaultBranch: string;
-      installationId: string;
     }) => {
       setCreateAppLoading(true);
       const response = await createAppMutation.mutateAsync(params, {

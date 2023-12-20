@@ -195,6 +195,16 @@ pub class Api {
       }
     };
 
+    let getInstallationId = inflight(accessToken: str, repoOwner: str): num => {
+      let installations = GitHub.Client.listUserInstallations(accessToken);
+      for installation in installations.data {
+        if installation.account.login == repoOwner {
+          return installation.id;
+        }
+      }
+      throw httpError.HttpError.badRequest("Installation not found");
+    };
+
     api.get("/wrpc/auth.check", inflight (request) => {
       try {
         let payload = getJWTPayloadFromCookie(request);
@@ -424,7 +434,7 @@ pub class Api {
         let defaultBranch = input.get("defaultBranch").asStr();
         let repoOwner = input.get("repoOwner").asStr();
         let repoName = input.get("repoName").asStr();
-        let installationId = input.get("installationId").asNum();
+        let installationId = getInstallationId(accessToken, repoOwner);
         let repoId = "{repoOwner}/{repoName}";
 
         // get application default entrypoint path (main.w)
