@@ -10,7 +10,8 @@ pub struct TestResults {
 
 pub struct Endpoint {
   path: str;
-  type: str;
+  label: str;
+  browserSupport: bool;
   url: str;
   port: num;
   digest: str;

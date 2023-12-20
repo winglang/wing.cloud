@@ -112,9 +112,11 @@ pub class GithubComment {
 
         let var endpointsString = "";
         for endpoint in this.endpoints.list(environmentId: environment.id) {
-          let pathParts = endpoint.path.split("/");
-          let endpointUrl = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{pathParts.at(pathParts.length - 1)}</a>";
-          endpointsString = "{endpointUrl}<br> {endpointsString}";
+          let var endpointText = endpoint.label;
+          if endpoint.browserSupport {
+            endpointText = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.label}</a>";
+          }
+          endpointsString = "{endpointText}<br> {endpointsString}";
         }
 
         let date = std.Datetime.utcNow();
