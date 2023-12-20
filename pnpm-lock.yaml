@@ -115,8 +115,8 @@ importers:
         specifier: ^3.1.2
         version: 3.1.2
       winglang:
-        specifier: ^0.52.9
-        version: 0.52.9(constructs@10.3.0)
+        specifier: ^0.53.3
+        version: 0.53.3(constructs@10.3.0)(typescript@5.3.2)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
         specifier: ^0.0.335
@@ -185,14 +185,14 @@ importers:
   apps/@wingcloud/runtime:
     dependencies:
       '@wingconsole/app':
-        specifier: ^0.52.9
-        version: 0.52.9(constructs@10.2.70)
+        specifier: ^0.53.3
+        version: 0.53.3(constructs@10.2.70)(typescript@5.3.2)
       '@winglang/compiler':
-        specifier: ^0.52.9
-        version: 0.52.9(constructs@10.2.70)
+        specifier: ^0.53.3
+        version: 0.53.3(constructs@10.2.70)(typescript@5.3.2)
       '@winglang/sdk':
-        specifier: ^0.52.9
-        version: 0.52.9(constructs@10.2.70)
+        specifier: ^0.53.3
+        version: 0.53.3(constructs@10.2.70)
       chalk:
         specifier: ^5.3.0
         version: 5.3.0
@@ -224,8 +224,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0
       winglang:
-        specifier: ^0.52.9
-        version: 0.52.9(constructs@10.2.70)
+        specifier: ^0.53.3
+        version: 0.53.3(constructs@10.2.70)(typescript@5.3.2)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
         specifier: ^0.0.335
@@ -306,8 +306,8 @@ importers:
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/wrpc
       '@wingconsole/ui':
-        specifier: ^0.52.9
-        version: 0.52.9(@types/react@18.2.39)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^0.53.3
+        version: 0.53.3(@types/react@18.2.39)(react-dom@18.2.0)(react@18.2.0)
       clsx:
         specifier: ^2.0.0
         version: 2.0.0
@@ -3128,8 +3128,8 @@ packages:
       - supports-color
     dev: false
 
-  /@npmcli/arborist@7.2.1:
-    resolution: {integrity: sha512-o1QIAX56FC8HEPF+Hf4V4/hck9j0a3UiLnMX4aDHPbtU4Po1tUOUSmc2GAx947VWT+acrdMYTDkqUt2CaSXt7A==}
+  /@npmcli/arborist@7.2.2:
+    resolution: {integrity: sha512-dIIzyhy1zS2dYPS8bdM/8qA8W2evQE9KENBxVOhFthm/2RKqf2ninRWQc8xfc5f1gsiTxTP20Y9flIfziHfSKA==}
     engines: {node: ^16.14.0 || >=18.0.0}
     hasBin: true
     dependencies:
@@ -6608,11 +6608,11 @@ packages:
     dependencies:
       fs-monkey: 1.0.5
 
-  /@wingconsole/app@0.52.9(constructs@10.2.70):
-    resolution: {integrity: sha512-Pl7TkpmlSS7Gl+eQHptUiRgQOcRsX1P6/7dJAjBHAaQ4vwrIA72/LyEtzTYvvYMDy+LUKW/zH9EBH+rtopjLtw==}
+  /@wingconsole/app@0.53.3(constructs@10.2.70)(typescript@5.3.2):
+    resolution: {integrity: sha512-a4rRTph3zrjrvY8/8lDNtiFRLiY7lQwAw/PEEFwpi9rbPXK5I1+aTr7M26HryC6A7GAKc00+YPXJ3roetZC+LA==}
     dependencies:
       '@segment/analytics-node': 1.1.4
-      '@wingconsole/server': 0.52.9(constructs@10.2.70)
+      '@wingconsole/server': 0.53.3(constructs@10.2.70)(typescript@5.3.2)
       cross-spawn: 7.0.3
       express: 4.18.2
       picocolors: 1.0.0
@@ -6621,13 +6621,14 @@ packages:
       - constructs
       - encoding
       - supports-color
+      - typescript
     dev: false
 
-  /@wingconsole/app@0.52.9(constructs@10.3.0):
-    resolution: {integrity: sha512-Pl7TkpmlSS7Gl+eQHptUiRgQOcRsX1P6/7dJAjBHAaQ4vwrIA72/LyEtzTYvvYMDy+LUKW/zH9EBH+rtopjLtw==}
+  /@wingconsole/app@0.53.3(constructs@10.3.0)(typescript@5.3.2):
+    resolution: {integrity: sha512-a4rRTph3zrjrvY8/8lDNtiFRLiY7lQwAw/PEEFwpi9rbPXK5I1+aTr7M26HryC6A7GAKc00+YPXJ3roetZC+LA==}
     dependencies:
       '@segment/analytics-node': 1.1.4
-      '@wingconsole/server': 0.52.9(constructs@10.3.0)
+      '@wingconsole/server': 0.53.3(constructs@10.3.0)(typescript@5.3.2)
       cross-spawn: 7.0.3
       express: 4.18.2
       picocolors: 1.0.0
@@ -6636,10 +6637,11 @@ packages:
       - constructs
       - encoding
       - supports-color
+      - typescript
     dev: false
 
-  /@wingconsole/design-system@0.52.9:
-    resolution: {integrity: sha512-gPaVed8BI+H7zXEp8FRapusxfrc/A1IbZU1LLDQ/JwlaN2V7ztkxivXfM0JDrNHE8Beidk+JJklbycztiCDxUw==}
+  /@wingconsole/design-system@0.53.3:
+    resolution: {integrity: sha512-vzOWPCH3ZvCGF/A5eYploUZVY+7pqjErOwovH8njgaikGj1VDI21R1Oi71QmI0by05GQ10ed9F0fmC1nTmIBow==}
     dependencies:
       '@headlessui/react': 1.7.17(react-dom@18.2.0)(react@18.2.0)
       '@heroicons/react': 2.0.18(react@18.2.0)
@@ -6656,11 +6658,11 @@ packages:
       - ts-node
     dev: false
 
-  /@wingconsole/server@0.52.9(constructs@10.2.70):
-    resolution: {integrity: sha512-dEP4ds+kJOO1XjNdqHB8KUVvieLEQ1nHhMNJ9/AJylMihOiUG0luRZjzTsZnxxCi8cmCmFueU80tz0n21zXCYw==}
+  /@wingconsole/server@0.53.3(constructs@10.2.70)(typescript@5.3.2):
+    resolution: {integrity: sha512-/xgwgwNykHEZoZPHNZ118cwo60sRK/UCVDSdWgWLUD0wQpE3qDC5fbjLPXaKfIZxhX7XKUwiX86Y6NTW2MAkDA==}
     dependencies:
-      '@winglang/compiler': 0.52.9(constructs@10.2.70)
-      '@winglang/sdk': 0.52.9(constructs@10.2.70)
+      '@winglang/compiler': 0.53.3(constructs@10.2.70)(typescript@5.3.2)
+      '@winglang/sdk': 0.53.3(constructs@10.2.70)
       codespan-wasm: 0.4.0
       debug: 4.3.4
       launch-editor: 2.6.1
@@ -6670,13 +6672,14 @@ packages:
       - constructs
       - encoding
       - supports-color
+      - typescript
     dev: false
 
-  /@wingconsole/server@0.52.9(constructs@10.3.0):
-    resolution: {integrity: sha512-dEP4ds+kJOO1XjNdqHB8KUVvieLEQ1nHhMNJ9/AJylMihOiUG0luRZjzTsZnxxCi8cmCmFueU80tz0n21zXCYw==}
+  /@wingconsole/server@0.53.3(constructs@10.3.0)(typescript@5.3.2):
+    resolution: {integrity: sha512-/xgwgwNykHEZoZPHNZ118cwo60sRK/UCVDSdWgWLUD0wQpE3qDC5fbjLPXaKfIZxhX7XKUwiX86Y6NTW2MAkDA==}
     dependencies:
-      '@winglang/compiler': 0.52.9(constructs@10.3.0)
-      '@winglang/sdk': 0.52.9(constructs@10.3.0)
+      '@winglang/compiler': 0.53.3(constructs@10.3.0)(typescript@5.3.2)
+      '@winglang/sdk': 0.53.3(constructs@10.3.0)
       codespan-wasm: 0.4.0
       debug: 4.3.4
       launch-editor: 2.6.1
@@ -6686,10 +6689,11 @@ packages:
       - constructs
       - encoding
       - supports-color
+      - typescript
     dev: false
 
-  /@wingconsole/ui@0.52.9(@types/react@18.2.39)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-ajC+4IUIMpAeCnDaUj21+CuwcwRcZ/srH8dcMDC1h0e5IKQWljHd2dqywtdIzBao7z8e0WN0vPsdO1q4ehFzHA==}
+  /@wingconsole/ui@0.53.3(@types/react@18.2.39)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-LqKib4lHzUG47zsLWwAt/VTvsBmQA0vBf1RyENBqeBZZ88VAwpdf9RIazBFtG7xBx9Bo4APuib7C0lV2a7krwg==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
@@ -6700,12 +6704,12 @@ packages:
       '@trpc/client': 10.44.1(@trpc/server@10.44.1)
       '@trpc/react-query': 10.44.1(@tanstack/react-query@4.36.1)(@trpc/client@10.44.1)(@trpc/server@10.44.1)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/server': 10.44.1
-      '@wingconsole/design-system': 0.52.9
+      '@wingconsole/design-system': 0.53.3
       classnames: 2.3.2
       d3-selection: 3.0.0
       d3-zoom: 3.0.0
       elkjs: 0.8.2
-      framer-motion: 10.16.14(react-dom@18.2.0)(react@18.2.0)
+      framer-motion: 10.16.16(react-dom@18.2.0)(react@18.2.0)
       jszip: 3.10.1
       linkify-react: 4.1.3(linkifyjs@4.1.3)(react@18.2.0)
       linkifyjs: 4.1.3
@@ -6724,21 +6728,6 @@ packages:
       - ts-node
     dev: false
 
-  /@winglang/compiler@0.52.9(constructs@10.2.70):
-    resolution: {integrity: sha512-QuJBGGElLrRm9Yioltkr6pFM6mD23a329pC4PQXMaFQR7ePsMHGygH/oqBGVxhu8Vzg+Np6BacmOPCcAGeJz0A==}
-    engines: {node: '>=v18.0.0'}
-    dependencies:
-      '@winglang/sdk': 0.52.9(constructs@10.2.70)
-      wasi-js: 1.7.3
-    transitivePeerDependencies:
-      - aws-crt
-      - constructs
-      - encoding
-      - supports-color
-    dev: false
-    bundledDependencies:
-      - wasi-js
-
   /@winglang/compiler@0.52.9(constructs@10.3.0):
     resolution: {integrity: sha512-QuJBGGElLrRm9Yioltkr6pFM6mD23a329pC4PQXMaFQR7ePsMHGygH/oqBGVxhu8Vzg+Np6BacmOPCcAGeJz0A==}
     engines: {node: '>=v18.0.0'}
@@ -6750,11 +6739,126 @@ packages:
       - constructs
       - encoding
       - supports-color
+    dev: true
     bundledDependencies:
       - wasi-js
 
-  /@winglang/sdk@0.52.9(constructs@10.2.70):
+  /@winglang/compiler@0.53.3(constructs@10.2.70)(typescript@5.3.2):
+    resolution: {integrity: sha512-/UkLT29VDegc4S4J19PKb0BaVOkbcA5X+/Jq0Le5AECaaFDF1dbtU7WFNnUHUQUkajlwv+tN6iaPqixpNxS0YQ==}
+    engines: {node: '>=v18.0.0'}
+    dependencies:
+      '@winglang/sdk': 0.53.3(constructs@10.2.70)
+      ts4w: 0.53.3(typescript@5.3.2)
+      wasi-js: 1.7.3
+    transitivePeerDependencies:
+      - aws-crt
+      - constructs
+      - encoding
+      - supports-color
+      - typescript
+    dev: false
+    bundledDependencies:
+      - wasi-js
+
+  /@winglang/compiler@0.53.3(constructs@10.3.0)(typescript@5.3.2):
+    resolution: {integrity: sha512-/UkLT29VDegc4S4J19PKb0BaVOkbcA5X+/Jq0Le5AECaaFDF1dbtU7WFNnUHUQUkajlwv+tN6iaPqixpNxS0YQ==}
+    engines: {node: '>=v18.0.0'}
+    dependencies:
+      '@winglang/sdk': 0.53.3(constructs@10.3.0)
+      ts4w: 0.53.3(typescript@5.3.2)
+      wasi-js: 1.7.3
+    transitivePeerDependencies:
+      - aws-crt
+      - constructs
+      - encoding
+      - supports-color
+      - typescript
+    dev: false
+    bundledDependencies:
+      - wasi-js
+
+  /@winglang/sdk@0.52.9(constructs@10.3.0):
     resolution: {integrity: sha512-5a6Rl6+tapbQOZw/NGeHIo/HlveA0Bmax25FwhR+nUgIsjlYCn17Qy4qJoDawsHpjvyiMIl/f387LXIu+qVVUw==}
+    engines: {node: '>= 18.13.0'}
+    peerDependencies:
+      constructs: ~10.2.69
+    dependencies:
+      '@aws-sdk/client-cloudwatch-logs': 3.449.0
+      '@aws-sdk/client-dynamodb': 3.449.0
+      '@aws-sdk/client-elasticache': 3.449.0
+      '@aws-sdk/client-lambda': 3.449.0
+      '@aws-sdk/client-s3': 3.449.0
+      '@aws-sdk/client-secrets-manager': 3.449.0
+      '@aws-sdk/client-sns': 3.449.0
+      '@aws-sdk/client-sqs': 3.449.0
+      '@aws-sdk/s3-request-presigner': 3.449.0
+      '@aws-sdk/types': 3.449.0
+      '@aws-sdk/util-dynamodb': 3.449.0(@aws-sdk/client-dynamodb@3.449.0)
+      '@azure/core-paging': 1.5.0
+      '@azure/identity': 3.1.3
+      '@azure/storage-blob': 12.14.0
+      '@google-cloud/storage': 6.9.5
+      '@smithy/util-stream': 2.0.17
+      '@smithy/util-utf8': 2.0.0
+      '@types/aws-lambda': 8.10.130
+      cdktf: 0.17.0(constructs@10.3.0)
+      constructs: 10.3.0
+      cron-parser: 4.9.0
+      esbuild-wasm: 0.18.20
+      express: 4.18.2
+      google-auth-library: 8.9.0
+      ioredis: 5.3.2
+      jsonschema: 1.4.1
+      mime: 3.0.0
+      mime-types: 2.1.35
+      nanoid: 3.3.7
+      safe-stable-stringify: 2.4.3
+      stacktracey: 2.1.8
+      undici: 5.28.2
+      uuid: 8.3.2
+      yaml: 2.3.4
+    transitivePeerDependencies:
+      - aws-crt
+      - encoding
+      - supports-color
+    dev: true
+    bundledDependencies:
+      - '@aws-sdk/client-cloudwatch-logs'
+      - '@aws-sdk/client-dynamodb'
+      - '@aws-sdk/client-elasticache'
+      - '@aws-sdk/client-lambda'
+      - '@aws-sdk/client-s3'
+      - '@aws-sdk/client-secrets-manager'
+      - '@aws-sdk/client-sns'
+      - '@aws-sdk/client-sqs'
+      - '@aws-sdk/s3-request-presigner'
+      - '@aws-sdk/types'
+      - '@aws-sdk/util-dynamodb'
+      - '@azure/core-paging'
+      - '@azure/identity'
+      - '@azure/storage-blob'
+      - '@google-cloud/storage'
+      - '@smithy/util-stream'
+      - '@smithy/util-utf8'
+      - '@types/aws-lambda'
+      - cdktf
+      - cron-parser
+      - esbuild-wasm
+      - express
+      - google-auth-library
+      - ioredis
+      - jsonschema
+      - mime
+      - mime-types
+      - nanoid
+      - safe-stable-stringify
+      - stacktracey
+      - undici
+      - uuid
+      - yaml
+
+  /@winglang/sdk@0.53.3(constructs@10.2.70):
+    resolution: {integrity: sha512-W/lL0UdHymrKHnj0tkL16g0mugsmt5ZY9Pak08uflMStOiRzE+4ieuX98tw82/c9ayxPxvkE/uCDqH7Axr5G0g==}
     engines: {node: '>= 18.13.0'}
     peerDependencies:
       constructs: ~10.2.69
@@ -6833,8 +6937,8 @@ packages:
       - uuid
       - yaml
 
-  /@winglang/sdk@0.52.9(constructs@10.3.0):
-    resolution: {integrity: sha512-5a6Rl6+tapbQOZw/NGeHIo/HlveA0Bmax25FwhR+nUgIsjlYCn17Qy4qJoDawsHpjvyiMIl/f387LXIu+qVVUw==}
+  /@winglang/sdk@0.53.3(constructs@10.3.0):
+    resolution: {integrity: sha512-W/lL0UdHymrKHnj0tkL16g0mugsmt5ZY9Pak08uflMStOiRzE+4ieuX98tw82/c9ayxPxvkE/uCDqH7Axr5G0g==}
     engines: {node: '>= 18.13.0'}
     peerDependencies:
       constructs: ~10.2.69
@@ -6877,6 +6981,7 @@ packages:
       - aws-crt
       - encoding
       - supports-color
+    dev: false
     bundledDependencies:
       - '@aws-sdk/client-cloudwatch-logs'
       - '@aws-sdk/client-dynamodb'
@@ -9036,8 +9141,8 @@ packages:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
     dev: true
 
-  /framer-motion@10.16.14(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-poovsXtR7doXRfjqVjUai82Zl2z5yMUFKtYWHnQK+xsDVPhHVUJEU+Kr2kqEnUV4gry+LcRdrDzcMI7OdJlDMg==}
+  /framer-motion@10.16.16(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-je6j91rd7NmUX7L1XHouwJ4v3R+SO4umso2LUcgOct3rHZ0PajZ80ETYZTajzEXEl9DlKyzjyt4AvGQ+lrebOw==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
@@ -10983,8 +11088,8 @@ packages:
       validate-npm-package-name: 5.0.0
     dev: false
 
-  /npm-packlist@8.0.0:
-    resolution: {integrity: sha512-ErAGFB5kJUciPy1mmx/C2YFbvxoJ0QJ9uwkCZOeR6CqLLISPZBOiFModAbSXnjjlwW5lOhuhXva+fURsSGJqyw==}
+  /npm-packlist@8.0.1:
+    resolution: {integrity: sha512-MQpL27ZrsJQ2kiAuQPpZb5LtJwydNRnI15QWXsf3WHERu4rzjRj6Zju/My2fov7tLuu3Gle/uoIX/DDZ3u4O4Q==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dependencies:
       ignore-walk: 6.0.4
@@ -11275,7 +11380,7 @@ packages:
       fs-minipass: 3.0.3
       minipass: 7.0.4
       npm-package-arg: 11.0.1
-      npm-packlist: 8.0.0
+      npm-packlist: 8.0.1
       npm-pick-manifest: 9.0.0
       npm-registry-fetch: 16.1.0
       proc-log: 3.0.0
@@ -12754,7 +12859,7 @@ packages:
     dependencies:
       ionstore: 1.0.0
       tiny-colors: 2.1.2
-      when-exit: 2.1.1
+      when-exit: 2.1.2
     dev: false
 
   /tinybench@2.5.1:
@@ -12840,6 +12945,20 @@ packages:
 
   /ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
+
+  /ts4w@0.53.3(typescript@5.3.2):
+    resolution: {integrity: sha512-9jscTOwTyCMQb/k6LsOmYFF7rLwWyAWHBlT8w5NHGSbor2+pzBsvVQ7H9VX0UiH8KdQDetgnhgYOIQ/JpHRAPQ==}
+    peerDependencies:
+      typescript: ^5.3.3
+    dependencies:
+      '@winglang/sdk': 0.53.3(constructs@10.2.70)
+      constructs: 10.2.70
+      typescript: 5.3.2
+    transitivePeerDependencies:
+      - aws-crt
+      - encoding
+      - supports-color
+    dev: false
 
   /tsconfig-paths@3.14.2:
     resolution: {integrity: sha512-o/9iXgCYc5L/JxCHPe3Hvh8Q/2xm5Z+p18PESBU6Ff33695QnCHBEjcytY2q19ua7Mbl/DavtBOLq+oG0RCL+g==}
@@ -13135,7 +13254,6 @@ packages:
     resolution: {integrity: sha512-6l+RyNy7oAHDfxC4FzSJcz9vnjTKxrLpDG5M2Vu4SHRVNg6xzqZp6LYSR9zjqQTu8DU/f5xwxUdADOkbrIX2gQ==}
     engines: {node: '>=14.17'}
     hasBin: true
-    dev: true
 
   /typescript@5.3.3:
     resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
@@ -13633,8 +13751,8 @@ packages:
       webidl-conversions: 4.0.2
     dev: true
 
-  /when-exit@2.1.1:
-    resolution: {integrity: sha512-XLipGldz/UcleuGaoQjbYuWwD+ICRnzIjlldtwTaTWr7aZz8yQW49rXk6MHQnh+KxOiWiJpM1vIyaxprOnlW4g==}
+  /when-exit@2.1.2:
+    resolution: {integrity: sha512-u9J+toaf3CCxCAzM/484qNAxQE75rFdVgiFEEV8Xps2gzYhf0tx73s1WXDQhkwV17E3MxRMz40m7Ekd2/121Lg==}
     dev: false
 
   /which-boxed-primitive@1.0.2:
@@ -13688,17 +13806,17 @@ packages:
       string-width: 4.2.3
     dev: false
 
-  /winglang@0.52.9(constructs@10.2.70):
-    resolution: {integrity: sha512-6s4XGjGUBgzM3yJZaGftIYPFQ07Y02hGcyICqCYLL8OjxeaZM4fpasOzuGNAsgQHojcPy4erpqteGzG/FllqfQ==}
+  /winglang@0.53.3(constructs@10.2.70)(typescript@5.3.2):
+    resolution: {integrity: sha512-/3bLVzSmMDWSsjhYsxYniQBKgTO9TY+UxPjiQckXUkwR1rUoEsJ4AdBAtAvM7Nx+fj0Qp9ec3vGjSd0SuGj8ww==}
     engines: {node: '>=v18.0.0'}
     hasBin: true
     dependencies:
-      '@npmcli/arborist': 7.2.1
+      '@npmcli/arborist': 7.2.2
       '@segment/analytics-node': 1.1.4
-      '@wingconsole/app': 0.52.9(constructs@10.2.70)
-      '@wingconsole/server': 0.52.9(constructs@10.2.70)
-      '@winglang/compiler': 0.52.9(constructs@10.2.70)
-      '@winglang/sdk': 0.52.9(constructs@10.2.70)
+      '@wingconsole/app': 0.53.3(constructs@10.2.70)(typescript@5.3.2)
+      '@wingconsole/server': 0.53.3(constructs@10.2.70)(typescript@5.3.2)
+      '@winglang/compiler': 0.53.3(constructs@10.2.70)(typescript@5.3.2)
+      '@winglang/sdk': 0.53.3(constructs@10.2.70)
       chalk: 4.1.2
       codespan-wasm: 0.4.0
       commander: 10.0.1
@@ -13708,7 +13826,7 @@ packages:
       dotenv-expand: 10.0.0
       glob: 10.3.10
       nanoid: 3.3.7
-      npm-packlist: 8.0.0
+      npm-packlist: 8.0.1
       open: 8.4.2
       ora: 5.4.1
       tar: 6.2.0
@@ -13721,19 +13839,20 @@ packages:
       - constructs
       - encoding
       - supports-color
+      - typescript
     dev: false
 
-  /winglang@0.52.9(constructs@10.3.0):
-    resolution: {integrity: sha512-6s4XGjGUBgzM3yJZaGftIYPFQ07Y02hGcyICqCYLL8OjxeaZM4fpasOzuGNAsgQHojcPy4erpqteGzG/FllqfQ==}
+  /winglang@0.53.3(constructs@10.3.0)(typescript@5.3.2):
+    resolution: {integrity: sha512-/3bLVzSmMDWSsjhYsxYniQBKgTO9TY+UxPjiQckXUkwR1rUoEsJ4AdBAtAvM7Nx+fj0Qp9ec3vGjSd0SuGj8ww==}
     engines: {node: '>=v18.0.0'}
     hasBin: true
     dependencies:
-      '@npmcli/arborist': 7.2.1
+      '@npmcli/arborist': 7.2.2
       '@segment/analytics-node': 1.1.4
-      '@wingconsole/app': 0.52.9(constructs@10.3.0)
-      '@wingconsole/server': 0.52.9(constructs@10.3.0)
-      '@winglang/compiler': 0.52.9(constructs@10.3.0)
-      '@winglang/sdk': 0.52.9(constructs@10.3.0)
+      '@wingconsole/app': 0.53.3(constructs@10.3.0)(typescript@5.3.2)
+      '@wingconsole/server': 0.53.3(constructs@10.3.0)(typescript@5.3.2)
+      '@winglang/compiler': 0.53.3(constructs@10.3.0)(typescript@5.3.2)
+      '@winglang/sdk': 0.53.3(constructs@10.3.0)
       chalk: 4.1.2
       codespan-wasm: 0.4.0
       commander: 10.0.1
@@ -13743,7 +13862,7 @@ packages:
       dotenv-expand: 10.0.0
       glob: 10.3.10
       nanoid: 3.3.7
-      npm-packlist: 8.0.0
+      npm-packlist: 8.0.1
       open: 8.4.2
       ora: 5.4.1
       tar: 6.2.0
@@ -13756,6 +13875,7 @@ packages:
       - constructs
       - encoding
       - supports-color
+      - typescript
     dev: false
 
   /wordwrap@1.0.0:
