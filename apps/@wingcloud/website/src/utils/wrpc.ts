@@ -116,7 +116,8 @@ export interface Endpoint {
   runId: string;
   environmentId: string;
   path: string;
-  type: string;
+  label: string;
+  browserSupport: boolean;
   localUrl: string;
   publicUrl: string;
   port: number;

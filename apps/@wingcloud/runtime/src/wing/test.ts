@@ -1,6 +1,5 @@
 import { compile as compileFn, BuiltinPlatform } from "@winglang/compiler";
 import { type simulator, type std } from "@winglang/sdk";
-import { Json } from "@winglang/sdk/lib/std/json.js";
 
 import { Environment } from "../environment.js";
 import { prettyPrintError } from "../utils/enhanced-error.js";
@@ -21,6 +20,7 @@ export async function wingCompile(
   const compile: typeof compileFn = wingCompiler.compile;
   const simfile = await compile(entrypointPath, {
     platform: [BuiltinPlatform.SIM],
+    testing: true,
   });
   return simfile;
 }

@@ -20,7 +20,10 @@ interface Node {
     data: {
       type: string;
       attributes: {
+        inputUrl: string;
         url: string;
+        label?: string;
+        browserSupport?: boolean;
       };
     };
   };
@@ -30,14 +33,16 @@ interface LocalEndpoint {
   path: string;
   url: string;
   port: number;
-  type: string;
+  label: string;
+  browserSupport: boolean;
 }
 
 export interface Endpoint {
   path: string;
   url: string;
   port: number;
-  type: string;
+  label: string;
+  browserSupport: boolean;
   digest: string;
 }
 
@@ -65,13 +70,14 @@ const findLocalEndpoints = async ({ port }: { port: number }) => {
     }
 
     const node: Node = (await res.json()) as any;
-    const portParts = node.result.data.attributes.url.split(":");
+    const portParts = node.result.data.attributes.inputUrl.split(":");
     const localPort = Number.parseInt(portParts.at(-1)!, 10);
     localEndpoints.push({
-      url: node.result.data.attributes.url,
+      url: node.result.data.attributes.inputUrl,
       path: endpoint,
       port: localPort,
-      type: node.result.data.type,
+      label: node.result.data.attributes.label ?? `Endpoint for ${endpoint}`,
+      browserSupport: node.result.data.attributes.browserSupport ?? false,
     });
   }
 
@@ -101,7 +107,8 @@ export const findEndpoints = () => {
           url: e.url,
           path: e.path,
           port: e.port,
-          type: e.type,
+          label: e.label,
+          browserSupport: e.browserSupport,
         };
 
         endpointsByDigest[digest] = endpoint;
@@ -116,11 +123,7 @@ export const findEndpoints = () => {
 };
 
 const findWingEndpoints = (item: ExplorerItem, endpoints: string[]) => {
-  if (
-    item.type == "@winglang/sdk.ex.ReactApp" ||
-    item.type == "@winglang/sdk.cloud.Api" ||
-    item.type == "@winglang/sdk.cloud.Website"
-  ) {
+  if (item.type == "@winglang/sdk.cloud.Endpoint") {
     endpoints.push(item.id);
   }
 
