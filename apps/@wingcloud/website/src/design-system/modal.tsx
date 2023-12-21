@@ -4,12 +4,12 @@ import type { PropsWithChildren } from "react";
 
 export interface ModalProps {
   show: boolean;
-  onClose: (value: boolean) => void;
+  onClose?: (value: boolean) => void;
 }
 
 export const Modal = ({
   show,
-  onClose,
+  onClose = () => {},
   children,
 }: PropsWithChildren<ModalProps>) => {
   return (

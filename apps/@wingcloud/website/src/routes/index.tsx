@@ -1,48 +1,51 @@
-import { useEffect } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
-import { ErrorBoundary } from "../components/error-boundary.js";
 import { GithubLogin } from "../components/github-login.js";
-import { SpinnerLoader } from "../components/spinner-loader.js";
 import { wrpc } from "../utils/wrpc.js";
+import { Modal } from "../design-system/modal.js";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { Button } from "../design-system/button.js";
 
-export const AppPage = () => {
-  // This check is required in order to prevent the app from flashing pages content
+export const Component = () => {
+  const navigate = useNavigate();
+
   const user = wrpc["auth.check"].useQuery(undefined, {
     throwOnError: false,
     retry: false,
   });
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user.isError) {
-      navigate("/");
-    }
-  }, [user.isError]);
-
-  return (
-    <>
-      {user.isLoading && (
-        <div className="fixed inset-0 flex items-center justify-center">
-          <SpinnerLoader />
-        </div>
-      )}
-      {!user.isLoading && <Outlet />}
-    </>
-  );
-};
-
-export const Component = () => {
-  const location = useLocation();
-
   return (
     <>
       {location.pathname === "/" && <GithubLogin />}
       {location.pathname !== "/" && (
-        <ErrorBoundary>
-          <AppPage />
-        </ErrorBoundary>
+        <>
+          <Outlet />
+          <Modal show={user.error !== undefined}>
+            <div className="space-y-4">
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <ExclamationTriangleIcon
+                    className="h-6 w-6 text-red-600"
+                    aria-hidden="true"
+                  />
+                </div>
+                <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                  <h3 className="text-base font-semibold leading-6 text-gray-900">
+                    Ups...
+                  </h3>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      Please sign in to access this page.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="sm:flex sm:flex-row-reverse">
+                <Button onClick={() => navigate("/")}>Back to home</Button>
+              </div>
+            </div>
+          </Modal>
+        </>
       )}
     </>
   );
