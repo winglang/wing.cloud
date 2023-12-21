@@ -207,7 +207,6 @@ pub class Api {
 
     api.get("/wrpc/auth.check", inflight (request) => {
       try {
-        let payload = getJWTPayloadFromCookie(request);
         // check if the user from the cookie is valid
         let userId = getUserIdFromCookie(request);
 

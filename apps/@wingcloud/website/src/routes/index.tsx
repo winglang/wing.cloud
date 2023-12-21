@@ -1,10 +1,11 @@
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { useEffect, useMemo } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 import { GithubLogin } from "../components/github-login.js";
-import { wrpc } from "../utils/wrpc.js";
-import { Modal } from "../design-system/modal.js";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { Button } from "../design-system/button.js";
+import { Modal } from "../design-system/modal.js";
+import { wrpc } from "../utils/wrpc.js";
 
 export const Component = () => {
   const navigate = useNavigate();
@@ -14,13 +15,17 @@ export const Component = () => {
     retry: false,
   });
 
+  const showModal = useMemo(() => {
+    return user.error !== null;
+  }, [user.error]);
+
   return (
     <>
       {location.pathname === "/" && <GithubLogin />}
       {location.pathname !== "/" && (
         <>
           <Outlet />
-          <Modal show={user.error !== undefined}>
+          <Modal show={showModal}>
             <div className="space-y-4">
               <div className="sm:flex sm:items-start">
                 <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">

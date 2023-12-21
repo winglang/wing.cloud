@@ -70,12 +70,6 @@ export const Header = (props: HeaderProps) => {
     retry: false,
   });
 
-  useEffect(() => {
-    if (user.isError) {
-      window.location.href = "/";
-    }
-  }, [user.isError]);
-
   const dashboardLink = useMemo(() => {
     if (user.data?.user.username) {
       return `/${user.data.user.username}`;
