@@ -1,0 +1,107 @@
+regions:
+- us-east-1
+- global
+
+account-blocklist:
+- "108269615366" # production
+- "891197207596" # staging
+
+presets:
+  sso:
+    filters:
+      IAMSAMLProvider:
+      - type: "regex"
+        value: "AWSSSO_.*_DO_NOT_DELETE"
+      IAMRole:
+      - type: "glob"
+        value: "AWSReservedSSO_*"
+      IAMRolePolicyAttachment:
+      - type: "glob"
+        value: "AWSReservedSSO_*"
+  defaultvpc:
+    filters:
+      # BEGIN: Filter all default VPC resources
+      EC2DHCPOption:
+      - property: DefaultVPC
+        value: "true"
+      EC2InternetGateway:
+      - property: DefaultVPC
+        value: "true"
+      EC2InternetGatewayAttachment:
+      - property: DefaultVPC
+        value: "true"
+      EC2RouteTable:
+      - property: DefaultVPC
+        value: "true"
+      EC2Subnet:
+      - property: DefaultVPC
+        value: "true"
+      EC2VPC:
+      - property: IsDefault
+        value: "true"
+
+resource-types:
+  excludes:
+  - EC2DefaultSecurityGroupRule # Retain default VPC resources
+  - CloudFormationStack
+  - ConfigServiceConfigurationRecorder
+  - CloudTrailTrail
+  - IAMOpenIDConnectProvider
+  - OSPackage
+
+accounts:
+  110379683389:
+    presets:
+      - sso
+      - defaultvpc
+    filters:
+      S3Bucket:
+      - "s3://wingcloud-tfstate-testing"
+      S3Object:
+      - property: Bucket
+        value: wingcloud-tfstate-testing
+      IAMRole:
+      - "aws-controltower-AdministratorExecutionRole"
+      - "aws-controltower-ConfigRecorderRole"
+      - "aws-controltower-ForwardSnsNotificationRole"
+      - "aws-controltower-ReadOnlyExecutionRole"
+      - "AWSControlTowerExecution"
+      - "OrganizationAccountAccessRole"
+      - "wing-cloud-repo-testing"
+      - "wing-cloud-repo-testing-read-only"
+      IAMRolePolicyAttachment:
+      - type: "regex"
+        value: "aws-controltower-.*"
+      - type: "regex"
+        value: "AWSControlTowerExecution -> AdministratorAccess"
+      - "OrganizationAccountAccessRole -> AdministratorAccess"
+      - "wing-cloud-repo-testing -> github-action20231107132637691500000002"
+      - "wing-cloud-repo-testing-read-only -> ReadOnlyAccess"
+      - "wing-cloud-repo-testing-read-only -> github-action20231107132637691400000001"
+      IAMPolicy:
+      - type: "glob"
+        value: "arn:aws:iam::110379683389:policy/github-action*"
+      IAMRolePolicy:
+      - "aws-controltower-ForwardSnsNotificationRole -> sns"
+      ConfigServiceDeliveryChannel:
+      - "aws-controltower-BaselineConfigDeliveryChannel"
+      CloudWatchEventsTarget:
+      - type: "regex"
+        value: "AWSControlTowerManagedRule|aws-controltower-ConfigComplianceChangeEventRule"
+      CloudWatchEventsRule:
+      - type: "regex"
+        value: "AWSControlTowerManagedRule|aws-controltower-ConfigComplianceChangeEventRule"
+      DynamoDBTable:
+      - "wingcloud-tfstate-lock-testing"
+      DynamoDBTableItem:
+      - property: Table
+        value: wingcloud-tfstate-lock-testing
+      SNSSubscription:
+      - "Owner: 110379683389 ARN: arn:aws:sns:us-east-1:110379683389:aws-controltower-SecurityNotifications:ef44829c-6364-419e-b2eb-cf724732ddde"
+      SNSTopic:
+      - property: TopicARN
+        value: "arn:aws:sns:us-east-1:110379683389:aws-controltower-SecurityNotifications"
+      LambdaFunction:
+      - "aws-controltower-NotificationForwarder"
+      CloudWatchLogsLogGroup:
+      - "/aws/lambda/aws-controltower-NotificationForwarder"

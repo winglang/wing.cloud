@@ -22,7 +22,8 @@ test "storing and listing endpoints" {
     path: "resource-1",
     port: 80,
     publicUrl: "example.com", 
-    type: "cloud.Api");
+    label: "Endpoint for cloud.Api",
+    browserSupport: false);
   let endpoint2 = endpoints.create(
     appId: "test-app",
     digest: "digest2",
@@ -31,7 +32,8 @@ test "storing and listing endpoints" {
     path: "resource-2",
     port: 80,
     publicUrl: "example2.com", 
-    type: "cloud.Api");
+    label: "Endpoint for cloud.Api",
+    browserSupport: false);
   let endpoint3 = endpoints.create(
     appId: "test-app",
     digest: "digest3",
@@ -40,7 +42,8 @@ test "storing and listing endpoints" {
     path: "resource-3",
     port: 80,
     publicUrl: "example3.com", 
-    type: "cloud.Api");
+    label: "Endpoint for cloud.Api",
+    browserSupport: false);
 
   let storedEndpoints = endpoints.list(environmentId: "env-test");
   
@@ -58,7 +61,8 @@ test "get and delete endpoint" {
     path: "resource-1",
     port: 80,
     publicUrl: "example.com", 
-    type: "cloud.Api");
+    label: "Endpoint for cloud.Api",
+    browserSupport: false);
 
   assert(endpoints.get(environmentId: "env-test", id: endpoint1.id) == endpoint1);
 
