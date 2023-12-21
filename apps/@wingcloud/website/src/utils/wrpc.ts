@@ -230,7 +230,6 @@ export const wrpc = createWRPCReact<{
       repoName: string;
       repoOwner: string;
       defaultBranch: string;
-      installationId: string;
     },
     {
       appId: string;
