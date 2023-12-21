@@ -11,7 +11,7 @@ COPY package.json ./package.json
 RUN pnpm install
 
 ###############################################################################
-FROM docker:24-git
+FROM docker:24.0.6-git
 
 RUN apk update
 RUN apk add bash ip6tables pigz sysstat procps lsof nodejs npm
