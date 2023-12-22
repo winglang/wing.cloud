@@ -1,14 +1,17 @@
 import { Dialog, Transition } from "@headlessui/react";
+import { clsx } from "clsx";
 import { Fragment } from "react";
 import type { PropsWithChildren } from "react";
 
 export interface ModalProps {
   show: boolean;
+  backdropBlur?: boolean;
   onClose?: (value: boolean) => void;
 }
 
 export const Modal = ({
   show,
+  backdropBlur,
   onClose = () => {},
   children,
 }: PropsWithChildren<ModalProps>) => {
@@ -19,9 +22,9 @@ export const Modal = ({
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
-          enterTo="opacity-100"
+          enterTo={clsx("opacity-100", { "backdrop-blur-sm": backdropBlur })}
           leave="ease-in duration-200"
-          leaveFrom="opacity-100"
+          leaveFrom={clsx("opacity-100", { "backdrop-blur-sm": backdropBlur })}
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-slate-500 bg-opacity-75 transition-opacity" />
