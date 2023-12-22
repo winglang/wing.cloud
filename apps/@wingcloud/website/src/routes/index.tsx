@@ -71,7 +71,7 @@ export const Component = () => {
                     location.href = AUTHORIZE_URL;
                   }}
                 >
-                  Sign in
+                  Sign In
                 </Button>
                 <Button onClick={() => navigate("/")}>Home</Button>
               </div>
