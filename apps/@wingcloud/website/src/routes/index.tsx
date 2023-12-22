@@ -1,5 +1,5 @@
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 import { GithubLogin } from "../components/github-login.js";
@@ -30,8 +30,12 @@ export const Component = () => {
     retry: false,
   });
 
-  const showModal = useMemo(() => {
-    return user.error !== null;
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (user.error !== null) {
+      setShowModal(true);
+    }
   }, [user.error]);
 
   return (
