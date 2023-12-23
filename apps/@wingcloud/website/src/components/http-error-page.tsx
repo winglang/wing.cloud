@@ -21,6 +21,13 @@ export const HttpErrorPage = ({
     }
   }, [message]);
 
+  const link = useMemo(() => {
+    if (code === 401) {
+      return "/";
+    }
+    return "/dashboard";
+  }, [code]);
+
   return (
     <div className="px-6 py-24 sm:py-32 lg:px-8">
       <div className="text-center items-center">
@@ -45,7 +52,7 @@ export const HttpErrorPage = ({
         </p>
         <div className="mt-8 flex justify-center items-center">
           <Link
-            to="/dashboard"
+            to={link}
             className={clsx(
               "text-sm font-semibold hover:underline",
               theme.text1,
