@@ -45,7 +45,7 @@ struct DeleteAppMessage {
 }
 
 struct CreateProductionEnvironmentMessage {
-  accessToken: str;
+  userId: str;
   repoId: str;
   repoOwner: str;
   repoName: str;
@@ -174,7 +174,7 @@ pub class Api {
       };
     };
 
-    let checkOwnerAccessRights = inflight (request, owner: str): str => {
+    let checkOwnerAccessRights = inflight (request, owner: str) => {
       let user = getUserFromCookie(request);
       // TODO: Currently we only allow the signed in user to access their own resources.
       if user.username != owner {
@@ -195,9 +195,18 @@ pub class Api {
       }
     };
 
+    let getInstallationId = inflight(accessToken: str, repoOwner: str): num => {
+      let installations = GitHub.Client.listUserInstallations(accessToken);
+      for installation in installations.data {
+        if installation.account.login == repoOwner {
+          return installation.id;
+        }
+      }
+      throw httpError.HttpError.badRequest("Installation not found");
+    };
+
     api.get("/wrpc/auth.check", inflight (request) => {
       try {
-        let payload = getJWTPayloadFromCookie(request);
         // check if the user from the cookie is valid
         let userId = getUserIdFromCookie(request);
 
@@ -281,7 +290,8 @@ pub class Api {
 
     api.get("/wrpc/github.listInstallations", inflight (request) => {
       if let accessToken = getAccessTokenFromCookie(request) {
-        let data = GitHub.Client.listUserInstallations(accessToken);
+        let page = num.fromStr(request.query.get("page"));
+        let data = GitHub.Client.listUserInstallations(accessToken, page);
 
         return {
           body: data,
@@ -353,32 +363,35 @@ pub class Api {
     let productionEnvironmentQueue = new cloud.Queue() as "Production Environment Queue";
     productionEnvironmentQueue.setConsumer(inflight (event) => {
       let input = CreateProductionEnvironmentMessage.fromJson(Json.parse(event));
+      if let accessToken = githubAccessTokens.get(input.userId)?.access_token {
+        let commitData = GitHub.Client.getLastCommit(
+          token: accessToken,
+          owner:  input.repoOwner,
+          repo: input.repoName,
+          default_branch: input.defaultBranch,
+        );
 
-      let commitData = GitHub.Client.getLastCommit(
-        token: input.accessToken,
-        owner:  input.repoOwner,
-        repo: input.repoName,
-        default_branch: input.defaultBranch,
-      );
-
-      let installationId = input.installationId;
-      environmentsQueue.push(Json.stringify(EnvironmentAction {
-        type: "create",
-        data: EnvironmentManager.CreateEnvironmentOptions {
-          createEnvironment: {
-            branch: input.defaultBranch,
+        let installationId = input.installationId;
+        environmentsQueue.push(Json.stringify(EnvironmentAction {
+          type: "create",
+          data: EnvironmentManager.CreateEnvironmentOptions {
+            createEnvironment: {
+              branch: input.defaultBranch,
+              appId: input.appId,
+              type: "production",
+              prTitle: input.defaultBranch,
+              repo: input.repoId,
+              status: "initializing",
+              installationId: installationId,
+            },
             appId: input.appId,
-            type: "production",
-            prTitle: input.defaultBranch,
-            repo: input.repoId,
-            status: "initializing",
-            installationId: installationId,
-          },
-          appId: input.appId,
-          entrypoint: input.entrypoint,
-          sha: commitData.sha,
-          owner: input.repoOwner
-      }}));
+            entrypoint: input.entrypoint,
+            sha: commitData.sha,
+            owner: input.repoOwner
+        }}));
+      } else {
+        throw httpError.HttpError.unauthorized();
+      }
     });
 
     let getListOfEntrypoints = inflight (props: GetListOfEntrypointsProps): MutArray<str> => {
@@ -423,6 +436,7 @@ pub class Api {
         let defaultBranch = input.get("defaultBranch").asStr();
         let repoOwner = input.get("repoOwner").asStr();
         let repoName = input.get("repoName").asStr();
+        let installationId = getInstallationId(accessToken, repoOwner);
         let repoId = "{repoOwner}/{repoName}";
 
         // get application default entrypoint path (main.w)
@@ -456,13 +470,12 @@ pub class Api {
         );
 
         productionEnvironmentQueue.push(Json.stringify(CreateProductionEnvironmentMessage {
-          // TODO: https://github.com/winglang/wing.cloud/issues/282
-          accessToken: accessToken,
+          userId: user.userId,
           repoId: repoId,
           repoOwner: repoOwner,
           repoName: repoName,
           defaultBranch: defaultBranch,
-          installationId: num.fromStr(input.get("installationId").asStr()),
+          installationId: installationId,
           appId: appId,
           entrypoint: entrypoint,
         }));

@@ -251,6 +251,13 @@ let updateGithubWebhook = inflight () => {
 
 new cloud.OnDeploy(updateGithubWebhook);
 
+// Smoke Tests
+api.get("/wrpc/health", inflight () => {
+  return {
+    status: 200,
+  };
+});
+
 new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";
 new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";

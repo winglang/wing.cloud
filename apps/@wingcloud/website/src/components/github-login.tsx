@@ -1,21 +1,6 @@
 import clsx from "clsx";
 
-// TODO: Use state to prevent man-in-the-middle attacks.
-const GITHUB_APP_CLIENT_ID = import.meta.env.VITE_GITHUB_APP_CLIENT_ID;
-
-const AUTHORIZE_URL = (() => {
-  const url = new URL("https://github.com/login/oauth/authorize");
-  url.searchParams.append("client_id", GITHUB_APP_CLIENT_ID);
-  if (import.meta.env.DEV) {
-    url.searchParams.append(
-      "redirect_uri",
-      "http://localhost:3900/wrpc/github.callback",
-    );
-  }
-  return url.toString();
-})();
-
-export const GithubLogin = () => {
+export const GithubLogin = ({ url }: { url: string }) => {
   return (
     <div
       className={clsx(
@@ -25,7 +10,7 @@ export const GithubLogin = () => {
     >
       <a
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex gap-x-2"
-        href={AUTHORIZE_URL}
+        href={url}
       >
         <span>Login with GitHub</span>
         <svg

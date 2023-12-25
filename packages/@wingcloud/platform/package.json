@@ -4,12 +4,12 @@
   "type": "commonjs",
   "sideEffects": false,
   "devDependencies": {
-    "@cloudy-ts/eslint-plugin": "^0.0.350",
+    "@cloudy-ts/eslint-plugin": "^0.0.333",
     "@types/node": "20",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
-    "@winglang/compiler": "^0.52.5",
-    "@winglang/sdk": "^0.52.5",
+    "@winglang/compiler": "^0.53.3",
+    "@winglang/sdk": "^0.53.3",
     "cdktf": "^0.19.2",
     "constructs": "^10.3.0",
     "eslint-config-prettier": "^9.1.0",
@@ -21,7 +21,7 @@
     "tsup": "^8.0.1",
     "tsx": "^4.6.2",
     "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
+    "vitest": "^0.34.6"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",

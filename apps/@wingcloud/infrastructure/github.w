@@ -15,9 +15,13 @@ struct ExchangeCodeForTokensOptions {
   clientSecret: str;
 }
 
+struct UserAccount {
+  login: str;
+}
+
 struct UserInstallation {
   id: num;
-  account: str;
+  account: UserAccount;
 }
 
 struct InstallationRepository {
@@ -26,7 +30,7 @@ struct InstallationRepository {
 
 struct Owner {
   login: str;
-  avatarUrl: str;
+  avatar_url: str;
 }
 
 struct Repository {
@@ -36,7 +40,6 @@ struct Repository {
   private: bool;
   owner: Owner;
   default_branch: str;
-  url: str;
 }
 
 struct Commit {
@@ -121,7 +124,7 @@ pub class Exchange {
 
 pub class Client {
   extern "./src/github.ts" pub static inflight getUser(accessToken: str): GitHubUser;
-  extern "./src/github.ts" pub static inflight listUserInstallations(token: str): ListUserInstallationsResponse;
+  extern "./src/github.ts" pub static inflight listUserInstallations(token: str, page: num?): ListUserInstallationsResponse;
   extern "./src/github.ts" pub static inflight listInstallationRepos(token: str, installationId: num, page: num?): ListRepositoryResponse;
   extern "./src/github.ts" pub static inflight getLastCommit(options: GetLastCommitOptions): CommitResponse;
   extern "./src/github.ts" pub static inflight getRepository(options: GetRepositoryOptions): Repository;
