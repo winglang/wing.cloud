@@ -1,4 +1,5 @@
 // import fetch from "node-fetch";
+import { url } from "inspector";
 import { Octokit } from "octokit";
 
 const getNextPage = (page: number, total: number, perPage: number) => {
@@ -75,8 +76,19 @@ export const listInstallationRepos = async (
       per_page: perPage,
     });
 
+  const data = orgRepos.repositories.map((repository) => ({
+    id: repository.id,
+    name: repository.name,
+    full_name: repository.full_name,
+    owner: {
+      login: repository.owner.login,
+      avatar_url: repository.owner.avatar_url,
+    },
+    default_branch: repository.default_branch,
+  }));
+
   return {
-    data: orgRepos.repositories,
+    data: data,
     nextPage: getNextPage(page, orgRepos.total_count, perPage),
     prevPage: getPreviousPage(page),
     total: orgRepos.total_count,
