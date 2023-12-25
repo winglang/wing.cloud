@@ -7,6 +7,12 @@ pub struct File {
   secret_name: str?;
 }
 
+pub struct Mount {
+  name: str;
+  path: str;
+  volume: str;
+}
+
 pub struct IClientPageInfo {
   endCursor: str;
   hasNextPage: bool;
@@ -31,6 +37,19 @@ pub struct IClientCreateMachineProps {
   memoryMb: num?;
   env: Map<str>?;
   files: Array<File>?;
+  mounts: Array<Mount>?;
+}
+
+pub struct IClientCreateVolumeProps {
+  appName: str;
+  name: str;
+  region: str;
+  size: num;
+}
+
+pub struct IClientVolume {
+  id: str;
+  name: str;
 }
 
 pub struct IMachineNode {
@@ -189,6 +208,7 @@ pub inflight class Client {
         restart: {
           policy: "no",
         },
+        mounts: props.mounts ?? [],
         env: props.env ?? {},
         files: props.files ?? [],
         auto_destroy: true,
@@ -226,6 +246,29 @@ pub inflight class Client {
     if (!waitRes.ok) {
       throw "failed to wait for machine {appName} {machineResult.id}: {waitRes.body}";
     }
+  }
+
+  pub createVolume(props: IClientCreateVolumeProps): IClientVolume {
+    let volumeRes = http.post("{this.apiUrl}/apps/{props.appName}/volumes", headers: this._headers(), body: Json.stringify({
+      name: props.name,
+      region: props.region,
+      size_gb: props.size,
+    }));
+    if (!volumeRes.ok) {
+      throw "failed to create volume for app {props.appName}: {volumeRes.body}";
+    }
+    let volume = IClientVolume.fromJson(this.verifyJsonResponse(Json.parse(volumeRes.body)));
+    return volume;
+  }
+
+  pub listVolumes(appName: str): Array<IClientVolume> {
+    let volumesRes = http.get("{this.apiUrl}/apps/{appName}/volumes", headers: this._headers());
+    if (!volumesRes.ok) {
+      throw "failed to list volumes for app {appName}: {volumesRes.body}";
+    }
+    
+    let volumes: Array<IClientVolume> = unsafeCast(this.verifyJsonResponse(Json.parse(volumesRes.body)));
+    return volumes;
   }
 
   pub getApp(appName: str): IGetAppResult {
