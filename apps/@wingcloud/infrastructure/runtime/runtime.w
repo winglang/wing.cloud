@@ -3,6 +3,7 @@ bring http;
 bring ex;
 bring util;
 bring fs;
+bring sim;
 bring "constructs" as constructs;
 bring "../containers.w" as containers;
 bring "../flyio" as flyio;
@@ -16,6 +17,18 @@ bring "../nanoid62.w" as nanoid62;
 class Consts {
   pub static inflight secretsPath(): str {
     return "/root/.wing/secrets.json";
+  }
+
+  pub static inflight statePath(): str {
+    return "/root/.wing/.state";
+  }
+
+  pub static inflight volumeName(): str {
+    return "state";
+  }
+
+  pub static inflight region(): str {
+    return "lhr";
   }
 }
 
@@ -46,12 +59,17 @@ interface IRuntimeHandler {
 
 class RuntimeHandler_sim impl IRuntimeHandler {
   container: containers.Container_sim;
+  stateDir: str;
   new() {
     this.container = new containers.Container_sim(name: "previews-runtime", image: "../runtime", args: {
       "SETUP_DOCKER": "false",
     },  port: 3000, privileged: true);
 
+    let stateVolume = new sim.State();
+    this.stateDir = stateVolume.token("volume");
+
     new cloud.Service(inflight () => {
+      stateVolume.set("volume", fs.mkdtemp("state-dir"));
       return () => {
         this.container.stopAll();
       };
@@ -71,6 +89,13 @@ class RuntimeHandler_sim impl IRuntimeHandler {
     let secretsFile = fs.join(fs.mkdtemp("secrets-"), nanoid62.Nanoid62.generate());
     fs.writeFile(secretsFile, Json.stringify(opts.secrets), encoding: "utf8");
     volumes.set(secretsFile, Consts.secretsPath());
+    
+    // setup the state directory
+    let environmentStateDir = fs.join(this.stateDir, opts.environmentId);
+    if !fs.exists(environmentStateDir) {
+      fs.mkdir(environmentStateDir, recursive: true);
+    }
+    volumes.set(environmentStateDir, Consts.statePath());
 
     let env = MutMap<str>{
       "GIT_REPO" => repo,
@@ -126,8 +151,22 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     let fly = new flyio.Fly(flyClient);
     let app = fly.app(this.appNameFromEnvironment(opts.environmentId));
     let exists = app.exists();
+    let mounts = MutArray<flyio.Mount>[];
     if !exists {
       app.create();
+      let volume = app.addVolume(name: Consts.volumeName(), region: Consts.region(), size: 1);
+      mounts.push({
+        name: Consts.volumeName(),
+        path: Consts.statePath(),
+        volume: volume.id,
+      });
+    } else {
+      let volumes = app.listVolumes();
+      mounts.push({
+        name: Consts.volumeName(),
+        path: Consts.statePath(),
+        volume: volumes.at(0).id,
+      });
     }
 
     app.addSecrets({
@@ -160,7 +199,13 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     }
 
     let createOptions: flyio.ICreateMachineProps = {
-      imageName: this.image.image.imageName, env: env.copy(), memoryMb: 2048, files: files, services: [{
+      region: Consts.region(),
+      imageName: this.image.image.imageName,
+      env: env.copy(),
+      memoryMb: 2048,
+      files: files,
+      mounts: mounts.copy(),
+      services: [{
         protocol: "tcp",
         internal_port: 3000,
         ports: [{

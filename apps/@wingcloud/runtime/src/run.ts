@@ -51,6 +51,7 @@ export const run = async function ({
   let wingPaths;
   const { startServer, closeSSL } = await prepareServer({
     environmentId: context.environment.id,
+    stateDir: context.stateDir,
     requestedSSLPort,
   });
   try {
@@ -82,6 +83,18 @@ export const run = async function ({
       platform: wingPlatform,
     });
 
+    const closeAll = async () => {
+      deployLogger.stop();
+      runtimeLogger.stop();
+      await close();
+      closeSSL();
+    };
+
+    process.on("SIGINT", async () => {
+      await closeAll();
+      process.kill(0);
+    });
+
     await report("running", { objects: { endpoints } });
 
     return {
@@ -89,12 +102,7 @@ export const run = async function ({
       logfile: deployLogger.getLogfile(),
       port,
       endpoints,
-      close: async () => {
-        deployLogger.stop();
-        runtimeLogger.stop();
-        await close();
-        closeSSL();
-      },
+      close: closeAll,
     };
   } catch (error: any) {
     let errorMessage = error.message;

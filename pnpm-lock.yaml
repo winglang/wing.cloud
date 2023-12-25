@@ -6898,6 +6898,10 @@ packages:
       undici: 5.28.2
       uuid: 8.3.2
       yaml: 2.3.4
+    transitivePeerDependencies:
+      - aws-crt
+      - encoding
+      - supports-color
     bundledDependencies:
       - '@aws-sdk/client-cloudwatch-logs'
       - '@aws-sdk/client-dynamodb'
