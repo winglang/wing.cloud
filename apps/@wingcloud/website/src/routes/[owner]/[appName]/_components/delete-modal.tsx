@@ -1,5 +1,6 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { ConfirmationModal } from "../../../../components/confirmation-modal.js";
 import { useNotifications } from "../../../../design-system/notification.js";
@@ -19,13 +20,16 @@ export const DeleteModal = ({
   onClose,
 }: DeleteModalProps) => {
   const { showNotification } = useNotifications();
+  const queryClient = useQueryClient();
 
   const navigate = useNavigate();
 
   const deleteApp = wrpc["app.delete"].useMutation({
+    onMutate() {
+      navigate(`/${owner}`);
+    },
     onSuccess() {
       showNotification(`App ${appName} deleted`, { type: "success" });
-      navigate(`/${owner}`);
     },
     onError(error) {
       if (error instanceof Error) {

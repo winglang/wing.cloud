@@ -3,11 +3,14 @@ import { createRoot } from "react-dom/client";
 
 import { App } from "./app.js";
 import { AnalyticsProvider } from "./utils/analytics-provider.js";
+import { EventBusProvider } from "./utils/eventbus-provider.js";
 
 createRoot(document.querySelector("#app")!).render(
   <StrictMode>
-    <AnalyticsProvider>
-      <App />
-    </AnalyticsProvider>
+    <EventBusProvider>
+      <AnalyticsProvider>
+        <App />
+      </AnalyticsProvider>
+    </EventBusProvider>
   </StrictMode>,
 );

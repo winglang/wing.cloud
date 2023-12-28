@@ -1,4 +1,5 @@
 import {
+  Mutation,
   MutationCache,
   QueryCache,
   QueryClient,
@@ -13,7 +14,9 @@ import { DefaultTheme, ThemeProvider } from "./design-system/theme-provider.js";
 import { router } from "./router.jsx";
 import { AnalyticsIdentityProvider } from "./utils/analytics-identity-provider.js";
 import { AnalyticsContext } from "./utils/analytics-provider.js";
+import { EventBusContext } from "./utils/eventbus-provider.js";
 import { PopupWindowProvider } from "./utils/popup-window-provider.js";
+import { QuerySideEffectsProvider } from "./utils/query-side-effects-provider.js";
 import { useAnalyticsEvents } from "./utils/use-analytics-events.js";
 
 const API_URL = new URL(location.origin);
@@ -21,36 +24,85 @@ API_URL.pathname = "/wrpc";
 
 export const App = () => {
   const { track } = useContext(AnalyticsContext);
-  const { handleEvent } = useAnalyticsEvents({ track });
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        queryCache: new QueryCache({
-          onSuccess: (data, query) => {
-            if (query.queryKey[0] && typeof query.queryKey[0] === "string") {
-              handleEvent(
-                query.queryKey[0],
-                query.queryKey[1] as Record<string, any>,
-              );
-            }
-          },
-        }),
-        mutationCache: new MutationCache({
-          onSuccess: (data, variables, context, mutation) => {
-            if (
-              mutation.options.mutationKey &&
-              mutation.options.mutationKey[0] &&
-              typeof mutation.options.mutationKey[0] === "string"
-            ) {
-              handleEvent(
-                mutation.options.mutationKey[0],
-                variables as Record<string, any>,
-              );
-            }
-          },
-        }),
+  const { dispatchEvent } = useContext(EventBusContext);
+  const { handleEvent: handleAnalyticsEvent } = useAnalyticsEvents({ track });
+
+  const [queryClient] = useState(() => {
+    const mutationEventDispatcher = (
+      state: "on-success" | "on-mutate" | "on-error",
+      mutation: Mutation<any, any, any, any>,
+      variables: Record<string, any>,
+    ) => {
+      if (
+        mutation.options.mutationKey &&
+        mutation.options.mutationKey[0] &&
+        typeof mutation.options.mutationKey[0] === "string"
+      ) {
+        dispatchEvent(
+          new CustomEvent(`custom:${state}:query-side-effect`, {
+            detail: {
+              queryKey: mutation.options.mutationKey[0],
+              variables: variables as Record<string, any>,
+            },
+          }),
+        );
+      }
+    };
+
+    return new QueryClient({
+      queryCache: new QueryCache({
+        onSuccess: (data, query) => {
+          if (query.queryKey[0] && typeof query.queryKey[0] === "string") {
+            handleAnalyticsEvent(
+              query.queryKey[0],
+              query.queryKey[1] as Record<string, any>,
+            );
+            dispatchEvent(
+              new CustomEvent("custom:on-success:query-side-effect", {
+                detail: {
+                  queryKey: query.queryKey[0],
+                  variables: query.queryKey[1],
+                },
+              }),
+            );
+          }
+        },
       }),
-  );
+      mutationCache: new MutationCache({
+        onMutate: (variables, mutation) => {
+          mutationEventDispatcher(
+            "on-mutate",
+            mutation,
+            variables as Record<string, any>,
+          );
+        },
+        onSuccess: (data, variables, context, mutation) => {
+          mutationEventDispatcher(
+            "on-success",
+            mutation,
+            variables as Record<string, any>,
+          );
+          if (
+            mutation.options.mutationKey &&
+            mutation.options.mutationKey[0] &&
+            typeof mutation.options.mutationKey[0] === "string"
+          ) {
+            handleAnalyticsEvent(
+              mutation.options.mutationKey[0],
+              variables as Record<string, any>,
+            );
+          }
+        },
+        onError: (error, variables, context, mutation) => {
+          mutationEventDispatcher(
+            "on-error",
+            mutation,
+            variables as Record<string, any>,
+          );
+        },
+      }),
+    });
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -58,9 +110,11 @@ export const App = () => {
         <AnalyticsIdentityProvider>
           <ThemeProvider mode="light" theme={DefaultTheme}>
             <NotificationsProvider>
-              <PopupWindowProvider>
-                <RouterProvider router={router} />
-              </PopupWindowProvider>
+              <QuerySideEffectsProvider>
+                <PopupWindowProvider>
+                  <RouterProvider router={router} />
+                </PopupWindowProvider>
+              </QuerySideEffectsProvider>
             </NotificationsProvider>
           </ThemeProvider>
         </AnalyticsIdentityProvider>
