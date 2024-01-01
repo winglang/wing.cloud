@@ -15,6 +15,7 @@
     "@segment/analytics-node": "^1.1.4",
     "@vendia/serverless-express": "^4.10.4",
     "@wingcloud/containers": "workspace:^",
+    "@wingcloud/dateutils": "workspace:^",
     "@wingcloud/nanoid": "workspace:^",
     "@wingcloud/ngrok": "workspace:^",
     "@wingcloud/platform": "workspace:^",

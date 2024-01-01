@@ -66,6 +66,9 @@ importers:
       '@wingcloud/containers':
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/containers
+      '@wingcloud/dateutils':
+        specifier: workspace:^
+        version: link:../../../packages/@wingcloud/dateutils
       '@wingcloud/nanoid':
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/nanoid
@@ -423,6 +426,8 @@ importers:
       '@wingcloud/nanoid':
         specifier: workspace:^
         version: link:../nanoid
+
+  packages/@wingcloud/dateutils: {}
 
   packages/@wingcloud/nanoid: {}
 
