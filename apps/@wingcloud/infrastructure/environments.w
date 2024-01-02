@@ -17,7 +17,6 @@ pub struct Environment {
   commentId: num?;
   createdAt: str;
   updatedAt: str;
-  statusUpdatedAt: str;
   testResults: status_report.TestResults?;
 }
 
@@ -121,7 +120,6 @@ pub class Environments {
       installationId: options.installationId,
       createdAt: createdAt,
       updatedAt: createdAt,
-      statusUpdatedAt: statusUpdatedAt,
     };
 
     let makeItem = (ops: MakeItemOptions) => {
@@ -138,7 +136,6 @@ pub class Environments {
         installationId: environment.installationId,
         createdAt: environment.createdAt,
         updatedAt: environment.updatedAt,
-        statusUpdatedAt: environment.statusUpdatedAt,
         publicKey: options.publicKey,
       };
 
@@ -175,7 +172,7 @@ pub class Environments {
       {
         put: {
           item: {
-            pk: "DEPLOYED#{environment.statusUpdatedAt}",
+            pk: "DEPLOYED#{statusUpdatedAt}",
             sk: "ENV#{environment.id}",
             id: environment.id,
           },
@@ -248,6 +245,8 @@ pub class Environments {
     let now = datetime.utcNow();
     let statusUpdatedAt = "{now.dayOfMonth}_{now.month}";
     let environment = this.get(id: options.id);
+    let updatedAt = datetime.fromIso(environment.updatedAt);
+    let lastStatusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
     let transactItems: MutArray<ex.DynamodbTransactWriteItem> = MutArray<ex.DynamodbTransactWriteItem>[
       {
@@ -256,18 +255,18 @@ pub class Environments {
             pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
-          updateExpression: "SET #status = :status, #statusUpdatedAt = :statusUpdatedAt",
+          updateExpression: "SET #status = :status, #updatedAt = :updatedAt",
           conditionExpression: "attribute_exists(#pk) and #appId = :appId",
           expressionAttributeNames: {
             "#pk": "pk",
             "#appId": "appId",
             "#status": "status",
-            "#statusUpdatedAt": "statusUpdatedAt",
+            "#updatedAt": "updatedAt",
           },
           expressionAttributeValues: {
             ":appId": options.appId,
             ":status": options.status,
-            ":statusUpdatedAt": statusUpdatedAt,
+            ":updatedAt": now.toIso(),
           },
         }
       },
@@ -277,14 +276,14 @@ pub class Environments {
             pk: "APP#{options.appId}",
             sk: "ENVIRONMENT#{options.id}",
           },
-          updateExpression: "SET #status = :status, #statusUpdatedAt = :statusUpdatedAt",
+          updateExpression: "SET #status = :status, #updatedAt = :updatedAt",
           expressionAttributeNames: {
             "#status": "status",
-            "#statusUpdatedAt": "statusUpdatedAt",
+            "#updatedAt": "updatedAt",
           },
           expressionAttributeValues: {
             ":status": options.status,
-            ":statusUpdatedAt": statusUpdatedAt,
+            ":updatedAt": now.toIso(),
           },
         }
       },
@@ -294,25 +293,25 @@ pub class Environments {
             pk: "APP#{options.appId}",
             sk: "BRANCH#{environment.branch}",
           },
-          updateExpression: "SET #status = :status, #statusUpdatedAt = :statusUpdatedAt",
+          updateExpression: "SET #status = :status, #updatedAt = :updatedAt",
           expressionAttributeNames: {
             "#status": "status",
-            "#statusUpdatedAt": "statusUpdatedAt",
+            "#updatedAt": "updatedAt",
           },
           expressionAttributeValues: {
             ":status": options.status,
-            ":statusUpdatedAt": statusUpdatedAt,
+            ":updatedAt": now.toIso(),
           },
         }
       },
     ];
 
     // replace last status update
-    if environment.statusUpdatedAt != statusUpdatedAt {
+    if lastStatusUpdatedAt != statusUpdatedAt {
       transactItems.concat(MutArray<ex.DynamodbTransactWriteItem>[{
         delete: {
           key: {
-            pk: "DEPLOYED#{environment.statusUpdatedAt}",
+            pk: "DEPLOYED#{lastStatusUpdatedAt}",
             sk: "ENV#{environment.id}"
           },
         }
@@ -590,6 +589,8 @@ pub class Environments {
     );
 
     if let app = result.item {
+      let updatedAt = datetime.fromIso(app.get("updatedAt").asStr());
+      let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
       let result = this.table.transactWriteItems(transactItems: [
         {
           delete: {
@@ -622,7 +623,7 @@ pub class Environments {
         {
           delete: {
             key: {
-              pk: "DEPLOYED#{app.get("statusUpdatedAt").asStr()}",
+              pk: "DEPLOYED#{statusUpdatedAt}",
               sk: "ENV#{options.environmentId}"
             },
           }
@@ -650,7 +651,6 @@ pub class Environments {
       testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
       createdAt: item.get("createdAt").asStr(),
       updatedAt: item.get("updatedAt").asStr(),
-      statusUpdatedAt: item.get("statusUpdatedAt").asStr(),
     };
   }
 }
