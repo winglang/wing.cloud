@@ -47,7 +47,13 @@ export interface Endpoint {
 }
 
 const findLocalEndpoints = async ({ port }: { port: number }) => {
-  const res = await fetch(`http://localhost:${port}/trpc/app.explorerTree`);
+  const res = await fetch(
+    `http://localhost:${port}/trpc/app.explorerTree?input=${encodeURIComponent(
+      JSON.stringify({
+        includeHiddens: true,
+      }),
+    )}`,
+  );
   if (!res.ok) {
     throw new Error(`failed to fetch endpoints: ${await res.text()}`);
   }
@@ -76,7 +82,7 @@ const findLocalEndpoints = async ({ port }: { port: number }) => {
       url: node.result.data.attributes.inputUrl,
       path: endpoint,
       port: localPort,
-      label: node.result.data.attributes.label ?? `Endpoint for ${endpoint}`,
+      label: node.result.data.attributes.label ?? endpoint,
       browserSupport: node.result.data.attributes.browserSupport ?? false,
     });
   }
