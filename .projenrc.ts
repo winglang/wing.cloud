@@ -72,6 +72,12 @@ const nanoid = new WingLibProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const dateutils = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/dateutils"
+});
+
+///////////////////////////////////////////////////////////////////////////////
 const simutils = new WingLibProject({
   monorepo,
   name: "@wingcloud/simutils",
@@ -333,6 +339,7 @@ infrastructure.addDeps(
   probot.name,
   containers.name,
   nanoid.name,
+  dateutils.name,
   simutils.name,
   ngrok.name,
   platform.name,
