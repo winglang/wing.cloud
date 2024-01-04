@@ -205,6 +205,7 @@ runtime.addDeps("redact-env");
 runtime.addDeps("codespan-wasm");
 runtime.addDeps("chalk");
 runtime.addDeps("stacktracey");
+runtime.addDeps("chokidar");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/http-proxy");

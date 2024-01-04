@@ -1,6 +1,7 @@
-import { readFileSync, watch } from "node:fs";
+import { readFileSync } from "node:fs";
 
 import { cloud } from "@winglang/sdk";
+import chokidar from "chokidar";
 
 export interface FileBucketSyncProps {
   file: string;
@@ -18,12 +19,13 @@ export function fileBucketSync({ file, key, bucket }: FileBucketSyncProps) {
     }
   };
 
-  const watcher = watch(file, sync);
+  const watcher = chokidar.watch(file);
+  watcher.on("change", sync);
   sync();
 
   return {
     cancelSync: async () => {
-      watcher.close();
+      await watcher.close();
       return sync();
     },
   };
