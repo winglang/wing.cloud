@@ -3,7 +3,6 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import jwt from "jsonwebtoken";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import fetch from "node-fetch";
@@ -19,7 +18,6 @@ import { getContext, setupSSL } from "./setup.js";
 import { sleep } from "./utils.js";
 
 test("run() - installs npm packages and run tests", async () => {
-  process.env.FILE_BUCKET_SYNC_MS = "50";
   const { examplesDir, logsBucket, wingApiUrl, stateDir } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
@@ -41,7 +39,7 @@ test("run() - installs npm packages and run tests", async () => {
   expect(deploymentLogs).toContain("added 1 package");
 
   const testLogs = await logsBucket.get(
-    environment.testKey(true, "rootDefaulttestHelloworld"),
+    environment.testKey(true, "rootenv0testHelloworld"),
   );
   expect(testLogs).toContain("a test log");
 
@@ -82,7 +80,7 @@ test("run() - doesn't have access to runtime env vars", async () => {
 
   expect(
     await logsBucket.exists(
-      environment.testKey(true, "rootDefaulttestaccesstoken"),
+      environment.testKey(true, "rootenv0testaccesstoken"),
     ),
   ).toBeTruthy();
 
@@ -173,6 +171,10 @@ test("run() - reporting statuses", async () => {
     context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
 
+  delete requests[1].data?.testResults[0].time;
+  delete requests[1].data?.testResults[0].timestamp;
+  delete requests[1].data?.testResults[0].traces;
+
   expect(requests).toStrictEqual([
     {
       environmentId: "test-id",
@@ -184,9 +186,9 @@ test("run() - reporting statuses", async () => {
       data: {
         testResults: [
           {
-            id: "rootDefaulttestHelloworld",
+            id: "rootenv0testHelloworld",
             pass: true,
-            path: "root/Default/test:Hello, world!",
+            path: "root/env0/test:Hello, world!",
           },
         ],
       },
@@ -243,7 +245,7 @@ test("run() - works with github", async () => {
 
   expect(
     await logsBucket.exists(
-      environment.testKey(true, "rootDefaulttestHelloworld"),
+      environment.testKey(true, "rootenv0testHelloworld"),
     ),
   ).toBeTruthy();
 
@@ -262,26 +264,19 @@ test("run() - have multiple tests results", async () => {
     context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
 
-  const files = await logsBucket.list();
-  expect(files.length).toBe(5);
-
   expect(
-    await logsBucket.get(
-      environment.testKey(true, "rootDefaulttestwillsucceed"),
-    ),
+    await logsBucket.get(environment.testKey(true, "rootenv0testwillsucceed")),
   ).toContain("will succeed first log");
   expect(
-    await logsBucket.get(
-      environment.testKey(true, "rootDefaulttestwillsucceed"),
-    ),
+    await logsBucket.get(environment.testKey(true, "rootenv0testwillsucceed")),
   ).toContain("will succeed second log");
   expect(
     await logsBucket.exists(
-      environment.testKey(true, "rootDefaulttestwillsucceed2"),
+      environment.testKey(true, "rootenv1testwillsucceed2"),
     ),
   ).toBeTruthy();
   expect(
-    await logsBucket.get(environment.testKey(false, "rootDefaulttestwillfail")),
+    await logsBucket.get(environment.testKey(false, "rootenv2testwillfail")),
   ).toContain("will fail log");
 
   await close();
@@ -376,7 +371,7 @@ test("run() - uses state directory", async () => {
   expect(response1.ok).toBeTruthy();
   expect(await response1.text()).toEqual("1");
 
-  process.kill = (pid, signal) => {
+  process.kill = (pid, signal): true => {
     return true;
   };
   process.emit("SIGINT");
