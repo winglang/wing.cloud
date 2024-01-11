@@ -72,6 +72,12 @@ const nanoid = new WingLibProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const dateutils = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/dateutils"
+});
+
+///////////////////////////////////////////////////////////////////////////////
 const simutils = new WingLibProject({
   monorepo,
   name: "@wingcloud/simutils",
@@ -199,6 +205,7 @@ runtime.addDeps("redact-env");
 runtime.addDeps("codespan-wasm");
 runtime.addDeps("chalk");
 runtime.addDeps("stacktracey");
+runtime.addDeps("chokidar");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/http-proxy");
@@ -333,6 +340,7 @@ infrastructure.addDeps(
   probot.name,
   containers.name,
   nanoid.name,
+  dateutils.name,
   simutils.name,
   ngrok.name,
   platform.name,

@@ -10,6 +10,7 @@ bring "./apps.w" as Apps;
 bring "./environments.w" as Environments;
 bring "./endpoints.w" as Endpoints;
 bring "./environment-manager.w" as EnvironmentManager;
+bring "./environment-cleaner.w" as EnvironmentCleaner;
 bring "./secrets.w" as Secrets;
 bring "./api.w" as wingcloud_api;
 bring "./segment-analytics.w" as SegmentAnalytics;
@@ -250,6 +251,8 @@ let updateGithubWebhook = inflight () => {
 };
 
 new cloud.OnDeploy(updateGithubWebhook);
+
+new EnvironmentCleaner.EnvironmentCleaner(apps: apps, environmentManager: environmentManager, environments: environments);
 
 // Smoke Tests
 api.get("/wrpc/health", inflight () => {

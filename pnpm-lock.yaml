@@ -66,6 +66,9 @@ importers:
       '@wingcloud/containers':
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/containers
+      '@wingcloud/dateutils':
+        specifier: workspace:^
+        version: link:../../../packages/@wingcloud/dateutils
       '@wingcloud/nanoid':
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/nanoid
@@ -196,6 +199,9 @@ importers:
       chalk:
         specifier: ^5.3.0
         version: 5.3.0
+      chokidar:
+        specifier: ^3.5.3
+        version: 3.5.3
       codespan-wasm:
         specifier: ^0.4.0
         version: 0.4.0
@@ -423,6 +429,8 @@ importers:
       '@wingcloud/nanoid':
         specifier: workspace:^
         version: link:../nanoid
+
+  packages/@wingcloud/dateutils: {}
 
   packages/@wingcloud/nanoid: {}
 

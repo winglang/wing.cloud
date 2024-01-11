@@ -40,6 +40,7 @@ beforeEach(async () => {
 
   sim = new simulator.Simulator({
     simfile: resolve(join(currentDir, "../../infrastructure/target/main.wsim")),
+    stateDir: mkdtempSync(join(tmpdir(), "state")),
   });
   await sim.start();
   logsBucket = sim.getResource(

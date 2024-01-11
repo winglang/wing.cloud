@@ -4,6 +4,7 @@ packages:
   - packages/@wingcloud/wrpc
   - packages/@wingcloud/probot
   - packages/@wingcloud/nanoid
+  - packages/@wingcloud/dateutils
   - packages/@wingcloud/simutils
   - packages/@wingcloud/ngrok
   - packages/@wingcloud/containers

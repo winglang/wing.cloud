@@ -18,6 +18,7 @@ pub struct Environment {
   createdAt: str;
   updatedAt: str;
   testResults: status_report.TestResults?;
+  publicKey: str;
 }
 
 struct Item extends Environment {
@@ -83,9 +84,16 @@ struct ListEnvironmentOptions {
   appId: str;
 }
 
+struct ListEnvironmentDeployedAtOptions {
+  deployedAt: std.Datetime;
+}
+
 struct MakeItemOptions {
   pk: str;
   sk: str;
+  environment: Environment;
+  updatedAt: str?;
+  status: str?;
 }
 
 struct DeleteEnvironmentOptions {
@@ -100,8 +108,42 @@ pub class Environments {
     this.table = table;
   }
 
+  inflight makeItem(ops: MakeItemOptions): Json {
+    let item = MutJson {
+      pk: ops.pk,
+      sk: ops.sk,
+      id: ops.environment.id,
+      appId: ops.environment.appId,
+      type: ops.environment.type,
+      repo: ops.environment.repo,
+      branch: ops.environment.branch,
+      prTitle: ops.environment.prTitle,
+      status: ops.environment.status,
+      installationId: ops.environment.installationId,
+      createdAt: ops.environment.createdAt,
+      updatedAt: ops.environment.updatedAt,
+      publicKey: ops.environment.publicKey,
+    };
+
+    if let prNumber = ops.environment.prNumber {
+      item.set("prNumber", prNumber);
+    }
+
+    if let updatedAt = ops.updatedAt {
+      item.set("updatedAt", updatedAt);
+    }
+
+    if let status = ops.status {
+      item.set("status", status);
+    }
+
+    return item;
+  }
+
   pub inflight create(options: CreateEnvironmentOptions): Environment {
-    let createdAt = datetime.utcNow().toIso();
+    let now = datetime.utcNow();
+    let createdAt = now.toIso();
+    let statusUpdatedAt = "{now.dayOfMonth}_{now.month}";
     let environment = Environment {
       id: "environment_{nanoid62.Nanoid62.generate()}",
       appId: options.appId,
@@ -114,52 +156,44 @@ pub class Environments {
       installationId: options.installationId,
       createdAt: createdAt,
       updatedAt: createdAt,
-    };
-
-    let makeItem = (ops: MakeItemOptions) => {
-      let item = MutJson {
-        pk: ops.pk,
-        sk: ops.sk,
-        id: environment.id,
-        appId: environment.appId,
-        type: environment.type,
-        repo: environment.repo,
-        branch: environment.branch,
-        prTitle: environment.prTitle,
-        status: environment.status,
-        installationId: environment.installationId,
-        createdAt: environment.createdAt,
-        updatedAt: environment.updatedAt,
-        publicKey: options.publicKey,
-      };
-
-      if let prNumber = environment.prNumber {
-        item.set("prNumber", prNumber);
-      }
-
-      return item;
+      publicKey: options.publicKey,
     };
 
     this.table.transactWriteItems(transactItems: [
       {
         put: {
-          item: makeItem(pk: "ENVIRONMENT#{environment.id}", sk: "#"),
+          item: this.makeItem(
+            pk: "ENVIRONMENT#{environment.id}",
+            sk: "#",
+            environment: environment
+          ),
           conditionExpression: "attribute_not_exists(pk)"
         },
       },
       {
         put: {
-          item: makeItem(
+          item: this.makeItem(
             pk: "APP#{environment.appId}",
-            sk: "ENVIRONMENT#{environment.id}"
+            sk: "ENVIRONMENT#{environment.id}",
+            environment: environment,
           ),
         },
       },
       {
         put: {
-          item: makeItem(
+          item: this.makeItem(
             pk: "APP#{environment.appId}",
-            sk: "BRANCH#{environment.branch}"
+            sk: "BRANCH#{environment.branch}",
+            environment: environment,
+          ),
+        },
+      },
+      {
+        put: {
+          item: this.makeItem(
+            pk: "DEPLOYED#{statusUpdatedAt}",
+            sk: "ENV#{environment.id}",
+            environment: environment,
           ),
         },
       },
@@ -169,9 +203,10 @@ pub class Environments {
   }
 
   pub inflight updatePublicKey(options: UpdateEnvirohmentPublicKeyOptions) {
-    let branch = this.get(
-      id: options.id,
-    ).branch;
+    let environment = this.get(id: options.id);
+    let branch = environment.branch;
+    let updatedAt = datetime.fromIso(environment.updatedAt);
+    let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
     this.table.transactWriteItems(transactItems: [
       {
@@ -213,6 +248,21 @@ pub class Environments {
           key: {
             pk: "APP#{options.appId}",
             sk: "BRANCH#{branch}",
+          },
+          updateExpression: "SET #publicKey = :publicKey",
+          expressionAttributeNames: {
+            "#publicKey": "publicKey",
+          },
+          expressionAttributeValues: {
+            ":publicKey": options.publicKey,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "DEPLOYED#{statusUpdatedAt}",
+            sk: "ENV#{options.id}",
           },
           updateExpression: "SET #publicKey = :publicKey",
           expressionAttributeNames: {
@@ -227,27 +277,31 @@ pub class Environments {
   }
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
-    let branch = this.get(
-      id: options.id,
-    ).branch;
+    let now = datetime.utcNow();
+    let statusUpdatedAt = "{now.dayOfMonth}_{now.month}";
+    let environment = this.get(id: options.id);
+    let updatedAt = datetime.fromIso(environment.updatedAt);
+    let lastStatusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    let var transactItems: MutArray<ex.DynamodbTransactWriteItem> = MutArray<ex.DynamodbTransactWriteItem>[
       {
         update: {
           key: {
             pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
-          updateExpression: "SET #status = :status",
+          updateExpression: "SET #status = :status, #updatedAt = :updatedAt",
           conditionExpression: "attribute_exists(#pk) and #appId = :appId",
           expressionAttributeNames: {
             "#pk": "pk",
-            "#status": "status",
             "#appId": "appId",
+            "#status": "status",
+            "#updatedAt": "updatedAt",
           },
           expressionAttributeValues: {
-            ":status": options.status,
             ":appId": options.appId,
+            ":status": options.status,
+            ":updatedAt": now.toIso(),
           },
         }
       },
@@ -257,12 +311,14 @@ pub class Environments {
             pk: "APP#{options.appId}",
             sk: "ENVIRONMENT#{options.id}",
           },
-          updateExpression: "SET #status = :status",
+          updateExpression: "SET #status = :status, #updatedAt = :updatedAt",
           expressionAttributeNames: {
             "#status": "status",
+            "#updatedAt": "updatedAt",
           },
           expressionAttributeValues: {
             ":status": options.status,
+            ":updatedAt": now.toIso(),
           },
         }
       },
@@ -270,24 +326,74 @@ pub class Environments {
         update: {
           key: {
             pk: "APP#{options.appId}",
-            sk: "BRANCH#{branch}",
+            sk: "BRANCH#{environment.branch}",
           },
-          updateExpression: "SET #status = :status",
+          updateExpression: "SET #status = :status, #updatedAt = :updatedAt",
           expressionAttributeNames: {
             "#status": "status",
+            "#updatedAt": "updatedAt",
           },
           expressionAttributeValues: {
             ":status": options.status,
+            ":updatedAt": now.toIso(),
           },
         }
       },
-    ]);
+    ];
+
+    if lastStatusUpdatedAt != statusUpdatedAt {
+      // replace last status update
+      transactItems = transactItems.concat(MutArray<ex.DynamodbTransactWriteItem>[
+        {
+          delete: {
+            key: {
+              pk: "DEPLOYED#{lastStatusUpdatedAt}",
+              sk: "ENV#{environment.id}"
+            },
+          }
+        },
+        {
+          put: {
+            item: this.makeItem(
+              pk: "DEPLOYED#{statusUpdatedAt}",
+              sk: "ENV#{environment.id}",
+              environment: environment,
+              updatedAt: now.toIso(),
+              status: options.status,
+            ),
+          },
+        }
+      ]);
+    } else {
+      transactItems = transactItems.concat(MutArray<ex.DynamodbTransactWriteItem>[
+        {
+          update: {
+            key: {
+              pk: "DEPLOYED#{statusUpdatedAt}",
+              sk: "ENV#{environment.id}",
+            },
+            updateExpression: "SET #status = :status, #updatedAt = :updatedAt",
+            expressionAttributeNames: {
+              "#status": "status",
+              "#updatedAt": "updatedAt",
+            },
+            expressionAttributeValues: {
+              ":status": options.status,
+              ":updatedAt": now.toIso(),
+            },
+          }
+        },
+      ]);
+    }
+
+    this.table.transactWriteItems(transactItems: transactItems.copy());
   }
 
   pub inflight updateUrl(options: UpdateEnvironmentUrlOptions) {
-    let branch = this.get(
-      id: options.id,
-    ).branch;
+    let environment = this.get(id: options.id);
+    let branch = environment.branch;
+    let updatedAt = datetime.fromIso(environment.updatedAt);
+    let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
     this.table.transactWriteItems(transactItems: [
       {
@@ -329,6 +435,21 @@ pub class Environments {
           key: {
             pk: "APP#{options.appId}",
             sk: "BRANCH#{branch}",
+          },
+          updateExpression: "SET #url = :url",
+          expressionAttributeNames: {
+            "#url": "url",
+          },
+          expressionAttributeValues: {
+            ":url": options.url,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "DEPLOYED#{statusUpdatedAt}",
+            sk: "ENV#{options.id}",
           },
           updateExpression: "SET #url = :url",
           expressionAttributeNames: {
@@ -343,9 +464,10 @@ pub class Environments {
   }
 
   pub inflight updateCommentId(options: UpdateEnvironmentCommentIdOptions) {
-    let branch = this.get(
-      id: options.id,
-    ).branch;
+    let environment = this.get(id: options.id);
+    let branch = environment.branch;
+    let updatedAt = datetime.fromIso(environment.updatedAt);
+    let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
     this.table.transactWriteItems(transactItems: [
       {
@@ -387,6 +509,21 @@ pub class Environments {
           key: {
             pk: "APP#{options.appId}",
             sk: "BRANCH#{branch}",
+          },
+          updateExpression: "SET #commentId = :commentId",
+          expressionAttributeNames: {
+            "#commentId": "commentId",
+          },
+          expressionAttributeValues: {
+            ":commentId": options.commentId,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "DEPLOYED#{statusUpdatedAt}",
+            sk: "ENV#{options.id}",
           },
           updateExpression: "SET #commentId = :commentId",
           expressionAttributeNames: {
@@ -401,9 +538,10 @@ pub class Environments {
   }
 
   pub inflight updateTestResults(options: UpdateEnvironmentTestResultsOptions) {
-    let branch = this.get(
-      id: options.id,
-    ).branch;
+    let environment = this.get(id: options.id);
+    let branch = environment.branch;
+    let updatedAt = datetime.fromIso(environment.updatedAt);
+    let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
     this.table.transactWriteItems(transactItems: [
       {
@@ -445,6 +583,21 @@ pub class Environments {
           key: {
             pk: "APP#{options.appId}",
             sk: "BRANCH#{branch}",
+          },
+          updateExpression: "SET #testResults = :testResults",
+          expressionAttributeNames: {
+            "#testResults": "testResults",
+          },
+          expressionAttributeValues: {
+            ":testResults": options.testResults,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "DEPLOYED#{statusUpdatedAt}",
+            sk: "ENV#{options.id}",
           },
           updateExpression: "SET #testResults = :testResults",
           expressionAttributeNames: {
@@ -467,41 +620,14 @@ pub class Environments {
     );
 
     if let item = result.item {
-      return {
-        id: item.get("id").asStr(),
-        appId: item.get("appId").asStr(),
-        type: item.get("type").asStr(),
-        repo: item.get("repo").asStr(),
-        branch: item.get("branch").asStr(),
-        status: item.get("status").asStr(),
-        installationId: item.get("installationId").asNum(),
-        prNumber: item.tryGet("prNumber")?.tryAsNum(),
-        prTitle: item.tryGet("prTitle")?.tryAsStr(),
-        url: item.tryGet("url")?.tryAsStr(),
-        commentId: item.tryGet("commentId")?.tryAsNum(),
-        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
-        createdAt: item.get("createdAt").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-      };
+      return this.fromDB(item);
     }
 
     throw httpError.HttpError.notFound("Environment '{options.id}' not found");
   }
 
   pub inflight getPublicKey(options: GetEnvironmentOptions): str {
-    let result = this.table.getItem(
-      key: {
-        pk: "ENVIRONMENT#{options.id}",
-        sk: "#",
-      },
-      projectionExpression: "publicKey",
-    );
-
-    if let item = result.item {
-      return item.get("publicKey").asStr();
-    }
-
-    throw httpError.HttpError.notFound("Environment '{options.id}' not found");
+    return this.get(id: options.id).publicKey;
   }
 
   pub inflight getByBranch(options: GetEnvironmentByBranchOptions): Environment {
@@ -513,22 +639,7 @@ pub class Environments {
     );
 
     if let item = result.item {
-      return {
-        id: item.get("id").asStr(),
-        appId: item.get("appId").asStr(),
-        type: item.get("type").asStr(),
-        repo: item.get("repo").asStr(),
-        branch: item.get("branch").asStr(),
-        status: item.get("status").asStr(),
-        installationId: item.get("installationId").asNum(),
-        prNumber: item.tryGet("prNumber")?.tryAsNum(),
-        prTitle: item.tryGet("prTitle")?.tryAsStr(),
-        url: item.tryGet("url")?.tryAsStr(),
-        commentId: item.tryGet("commentId")?.tryAsNum(),
-        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
-        createdAt: item.get("createdAt").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-      };
+      return this.fromDB(item);
     }
 
     throw httpError.HttpError.notFound("Environment '{options.branch}' not found");
@@ -544,23 +655,23 @@ pub class Environments {
     );
     let var environments: Array<Environment> = [];
     for item in result.items {
-      environments = environments.concat([{
-        id: item.get("id").asStr(),
-        appId: item.get("appId").asStr(),
-        type: item.get("type").asStr(),
-        repo: item.get("repo").asStr(),
-        branch: item.get("branch").asStr(),
-        status: item.get("status").asStr(),
-        prNumber: item.tryGet("prNumber")?.tryAsNum(),
-        prTitle: item.tryGet("prTitle")?.tryAsStr(),
-        installationId: item.get("installationId").asNum(),
-        // https://github.com/winglang/wing/issues/4470
-        url: item.tryGet("url")?.tryAsStr(),
-        commentId: item.tryGet("commentId")?.tryAsNum(),
-        testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
-        createdAt: item.get("createdAt").asStr(),
-        updatedAt: item.get("updatedAt").asStr(),
-      }]);
+      environments = environments.concat([this.fromDB(item)]);
+    }
+    return environments;
+  }
+
+  pub inflight listDeployedAt(options: ListEnvironmentDeployedAtOptions): Array<Environment> {
+    let statusUpdatedAt = "{options.deployedAt.dayOfMonth}_{options.deployedAt.month}";
+    let result = this.table.query(
+      keyConditionExpression: "pk = :pk",
+      expressionAttributeValues: {
+        ":pk": "DEPLOYED#{statusUpdatedAt}",
+      },
+    );
+    let var environments: Array<Environment> = [];
+    for item in result.items {
+      let environment = this.fromDB(item);
+      environments = environments.concat([environment]);
     }
     return environments;
   }
@@ -574,6 +685,8 @@ pub class Environments {
     );
 
     if let app = result.item {
+      let updatedAt = datetime.fromIso(app.get("updatedAt").asStr());
+      let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
       let result = this.table.transactWriteItems(transactItems: [
         {
           delete: {
@@ -595,10 +708,46 @@ pub class Environments {
             },
           }
         },
+        {
+          delete: {
+            key: {
+              pk: "APP#{options.appId}",
+              sk: "BRANCH#{app.get("branch").asStr()}",
+            },
+          }
+        },
+        {
+          delete: {
+            key: {
+              pk: "DEPLOYED#{statusUpdatedAt}",
+              sk: "ENV#{options.environmentId}"
+            },
+          }
+        },
       ]);
       return;
     }
 
     throw httpError.HttpError.notFound("Environment '{options.environmentId}' not found");
+  }
+
+  inflight fromDB(item: Json): Environment {
+    return {
+      id: item.get("id").asStr(),
+      appId: item.get("appId").asStr(),
+      type: item.get("type").asStr(),
+      repo: item.get("repo").asStr(),
+      branch: item.get("branch").asStr(),
+      status: item.get("status").asStr(),
+      installationId: item.get("installationId").asNum(),
+      prNumber: item.tryGet("prNumber")?.tryAsNum(),
+      prTitle: item.tryGet("prTitle")?.tryAsStr(),
+      url: item.tryGet("url")?.tryAsStr(),
+      commentId: item.tryGet("commentId")?.tryAsNum(),
+      testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
+      createdAt: item.get("createdAt").asStr(),
+      updatedAt: item.get("updatedAt").asStr(),
+      publicKey: item.get("publicKey").asStr(),
+    };
   }
 }
