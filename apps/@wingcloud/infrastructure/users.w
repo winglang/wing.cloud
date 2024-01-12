@@ -7,12 +7,14 @@ struct User {
   displayName: str;
   username: str;
   avatarUrl: str;
+  email: str?;
 }
 
 struct CreateOptions {
   displayName: str;
   username: str;
   avatarUrl: str?;
+  email: str?;
 }
 
 struct FromLoginOptions {
@@ -23,10 +25,18 @@ struct GetOrCreateOptions {
   displayName: str;
   username: str;
   avatarUrl: str?;
+  email: str?;
 }
 
 struct GetUsernameOptions {
   userId: str;
+}
+
+struct UpdateOptions {
+  userId: str;
+  displayName: str;
+  avatarUrl: str?;
+  email: str?;
 }
 
 pub class Users {
@@ -51,6 +61,7 @@ pub class Users {
               displayName: options.displayName,
               username: options.username,
               avatarUrl: options.avatarUrl,
+              email: options.email,
             },
             conditionExpression: "attribute_not_exists(pk)",
           },
@@ -64,6 +75,7 @@ pub class Users {
               displayName: options.displayName,
               username: options.username,
               avatarUrl: options.avatarUrl,
+              email: options.email,
             },
           }
         }
@@ -75,7 +87,28 @@ pub class Users {
       displayName: options.displayName,
       username: options.username,
       avatarUrl: options.avatarUrl ?? "",
+      email: options.email ?? "",
     };
+  }
+
+  pub inflight update(
+    options: UpdateOptions,
+  ): User {
+    let result = this.table.updateItem(
+      key: {
+        pk: "USER#{options.userId}",
+        sk: "#",
+      },
+      updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email",
+      expressionAttributeValues: {
+        ":displayName": options.displayName,
+        ":avatarUrl": options.avatarUrl,
+        ":email": options.email
+      },
+      returnValues: "ALL_NEW",
+    );
+
+    return User.fromJson(result.attributes);
   }
 
   pub inflight fromLogin(options: FromLoginOptions): User? {
@@ -98,13 +131,21 @@ pub class Users {
 
 
   pub inflight getOrCreate(options: GetOrCreateOptions): User {
-    let user = this.fromLogin(username: options.username);
-
-    return user ?? this.create(
-      displayName: options.displayName,
-      username: options.username,
-      avatarUrl: options.avatarUrl
-    );
+    if let user = this.fromLogin(username: options.username) {
+      return this.update(
+        userId: user.id,
+        displayName: options.displayName,
+        avatarUrl: options.avatarUrl,
+        email: options.email
+      );
+    } else {
+      return this.create(
+        displayName: options.displayName,
+        username: options.username,
+        avatarUrl: options.avatarUrl,
+        email: options.email
+      );
+    }
   }
 
   pub inflight get(options: GetUsernameOptions): User {

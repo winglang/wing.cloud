@@ -258,6 +258,7 @@ pub class Api {
         displayName: githubUser.name,
         username: githubUser.login,
         avatarUrl: githubUser.avatar_url,
+        email: githubUser.email,
       );
 
       githubAccessTokens.set(user.id, tokens);
