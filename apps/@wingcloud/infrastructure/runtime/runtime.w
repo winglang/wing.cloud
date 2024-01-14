@@ -23,6 +23,10 @@ class Consts {
     return "/root/.wing/.state";
   }
 
+  pub static inflight cachePath(): str {
+    return "/root/.wing/.state/cache";
+  }
+
   pub static inflight volumeName(): str {
     return "state";
   }
@@ -109,6 +113,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "SSL_PRIVATE_KEY" => util.base64Encode(opts.certificate.privateKey),
       "SSL_CERTIFICATE" => util.base64Encode(opts.certificate.certificate),
       "ENVIRONMENT_PRIVATE_KEY" => opts.privateKey,
+      "CACHE_DIR" => Consts.cachePath(),
     };
 
     if let token = opts.gitToken {
@@ -192,6 +197,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "AWS_SECRET_ACCESS_KEY" => opts.awsSecretAccessKey,
       "AWS_REGION" => opts.logsBucketRegion,
       "ENVIRONMENT_PRIVATE_KEY" => opts.privateKey,
+      "CACHE_DIR" => Consts.cachePath(),
     };
 
     if let token = opts.gitToken {

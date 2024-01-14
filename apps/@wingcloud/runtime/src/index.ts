@@ -19,12 +19,20 @@ export async function handler({ logsBucket, wingApiUrl }: HandlerProps) {
   const entrypoint = process.env["ENTRYPOINT"] || "examples/redis/main.w";
   const environmentId = process.env["ENVIRONMENT_ID"] || "test_environment_id";
   const stateDir = process.env["STATE_DIR"] || join(homedir(), ".wing/.state");
+  const cacheDir = process.env["CACHE_DIR"];
 
   const gitProvider = getGitProvider(repo, gitToken);
   const environment = new Environment(environmentId, entrypoint, { repo, sha });
 
   await run({
-    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
+    context: {
+      environment,
+      gitProvider,
+      logsBucket,
+      wingApiUrl,
+      stateDir,
+      cacheDir,
+    },
     requestedPort: 3000,
     requestedSSLPort: 30_011,
   });

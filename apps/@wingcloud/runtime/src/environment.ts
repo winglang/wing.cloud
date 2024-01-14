@@ -40,4 +40,5 @@ export interface EnvironmentContext {
   logsBucket: cloud.IBucketClient;
   wingApiUrl: string;
   stateDir: string;
+  cacheDir?: string;
 }

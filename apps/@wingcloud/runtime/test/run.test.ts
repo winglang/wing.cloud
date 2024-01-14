@@ -18,7 +18,8 @@ import { getContext, setupSSL } from "./setup.js";
 import { sleep } from "./utils.js";
 
 test("run() - installs npm packages and run tests", async () => {
-  const { examplesDir, logsBucket, wingApiUrl, stateDir } = getContext();
+  const { examplesDir, logsBucket, wingApiUrl, stateDir, cacheDir } =
+    getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
   const environment = new Environment("test-id", "redis/main.w", {
@@ -26,7 +27,14 @@ test("run() - installs npm packages and run tests", async () => {
     sha: "main",
   });
   const { port, close } = await run({
-    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
+    context: {
+      environment,
+      gitProvider,
+      logsBucket,
+      wingApiUrl,
+      stateDir,
+      cacheDir,
+    },
   });
 
   await sleep(200);
