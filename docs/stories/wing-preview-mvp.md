@@ -166,7 +166,7 @@ Each app has a settings page with the following configuration:
 
 * **Name**: the unique name of the application (within the user's context), cannot be changed once an app is created. The name must be symbolic (lowercase, digits, hyphens). E.g. `my-app-123`.
 * **Source**: `repository` (e.g. `monadahq/hello`) and `entrypoint` (e.g. `main.w`).
-* **Inputs**: for every "input" defined in the application defined in the application, a secure value must be supplied for each type of environment (preview, prod). If a value is missing for a certain input, a **warning** icon will be displayed next to the "Inputs" section as well as on the main view of the app.
+* **Inputs**: for every "input" defined in the application defined in the application, a secure value must be supplied for each type of environment (preview, prod). If a value is missing for a certain input, a **warning** icon will be displayed next to the "Inputs" section as well as on the main view of the app. (Warning section is P2)
 
 ## URLs
 ### Programmatic API
