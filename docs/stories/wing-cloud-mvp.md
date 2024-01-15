@@ -15,7 +15,7 @@ While the *Wing Framework* covers the **development stage** in the application l
 ```
     develop     -> build -> test -> preview -> deploy to Wing Cloudlet > operate
 <-------------->  <------------------------------------------------------------->
- Wing Framework                          Wing Preveiw
+ Wing Framework                          Wing Preview
 ```
 
 ## Taxonomy
@@ -251,5 +251,5 @@ The idea is to create a persistency system for simulator resources (likely file 
 We should also make sure that containers are able to store state, which is one of the reasons I think the underlying mechanism should be eventually be a file system volume (volumes are also commonly supported in container-orchestration systems such as fly.io).
 
 ## TBD
-- product name (Wing Cloud, Wing Cloud ...)
+- product name (Wing Cloud, Wing Preview ...)
 - domain name (wing.cloud ...)
