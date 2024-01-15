@@ -1,7 +1,8 @@
-import { handler } from "./index.js";
 import { type cloud } from "@winglang/sdk";
-import { makeSimulatorClient } from "@winglang/sdk/lib/simulator/client.js";
 import { BucketClient } from "@winglang/sdk/lib/shared-aws/bucket.inflight.js";
+import { makeSimulatorClient } from "@winglang/sdk/lib/simulator/client.js";
+
+import { handler } from "./index.js";
 
 const bucketName = process.env["LOGS_BUCKET_NAME"];
 if (!bucketName) {
@@ -27,8 +28,8 @@ if (!wingApiUrl) {
 try {
   new URL(wingApiUrl);
   console.log("url ok");
-} catch (e: any) {
-  console.log("url no ok", e.toString());
+} catch (error: any) {
+  console.log("url no ok", error.toString());
 }
 console.log(`runtime entrypoint: ${bucketName}, ${wingApiUrl}`);
 
