@@ -113,6 +113,26 @@ inflight class FlyApp {
     return createMachineResult;
   }
 
+  pub updateMachine(machineId: str, props: ICreateMachineProps): client.ICreateMachineResult {
+    let updateMachineResult = this.props.client.updateMachine({
+      machineId: machineId,
+      appName: this.props.name,
+      imageName: props.imageName,
+      region: props.region,
+      memoryMb: props.memoryMb,
+      env: props.env,
+      files: props.files,
+      mounts: props.mounts,
+      services: props.services,
+    });
+
+    this.props.client.waitForMachineState(
+      this.props.name,
+      updateMachineResult,
+    );
+    return updateMachineResult;
+  }
+
   /**
    * Remove a machine from this app.
    */

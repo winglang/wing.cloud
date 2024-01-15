@@ -222,10 +222,15 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     };
 
     if exists {
-      log("updating machine in app ${app.props.name}");
-      app.update(createOptions);
+      if let machine = app.machinesInfo().tryAt(0) {
+        log("updating machine in app {app.props.name} {machine.id}");
+        app.updateMachine(machine.id, createOptions);
+      } else {
+        log("deleting and creating machine in app {app.props.name}");
+        app.update(createOptions);
+      }
     } else {
-      log("adding machine to app ${app.props.name}");
+      log("adding machine to app {app.props.name}");
       app.addMachine(createOptions);
     }
 
