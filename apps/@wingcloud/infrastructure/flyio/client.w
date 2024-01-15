@@ -40,6 +40,10 @@ pub struct IClientCreateMachineProps {
   mounts: Array<Mount>?;
 }
 
+pub struct IClientUpdateMachineProps extends IClientCreateMachineProps {
+  machineId: str;
+}
+
 pub struct IClientCreateVolumeProps {
   appName: str;
   name: str;
@@ -197,25 +201,11 @@ pub inflight class Client {
   }
 
   pub createMachine(props: IClientCreateMachineProps): ICreateMachineResult {
-    let machineRes = http.post("{this.apiUrl}/apps/{props.appName}/machines", headers: this._headers(), body: Json.stringify({
-      region: props.region,
-      config: {
-        guest: {
-          cpus: 1,
-          cpu_kind: "shared",
-          memory_mb: props.memoryMb ?? 512,
-        },
-        restart: {
-          policy: "no",
-        },
-        mounts: props.mounts ?? [],
-        env: props.env ?? {},
-        files: props.files ?? [],
-        auto_destroy: true,
-        image: props.imageName,
-        services: props.services,
-      },
-    }));
+    let machineRes = http.post(
+      "{this.apiUrl}/apps/{props.appName}/machines",
+      headers: this._headers(),
+      body: Json.stringify(this.machineConfigFromProps(props))
+    );
     if (!machineRes.ok) {
       throw "failed to create machine {props.appName}: {machineRes.body}";
     }
@@ -229,6 +219,48 @@ pub inflight class Client {
       throw "unexpected create machine data: {data}";
     }
     return data;
+  }
+
+  pub updateMachine(props: IClientUpdateMachineProps): ICreateMachineResult {
+    let machineRes = http.post(
+      "{this.apiUrl}/apps/{props.appName}/machines/{props.machineId}",
+      headers: this._headers(),
+      body: Json.stringify(this.machineConfigFromProps(props))
+    );
+    if (!machineRes.ok) {
+      throw "failed to update machine {props.appName}: {machineRes.body}";
+    }
+
+    let rdata = IRuntimeCreateMachineResult.fromJson(this.verifyJsonResponse(Json.parse(machineRes.body)));
+    let data: ICreateMachineResult = {
+      id: rdata.id,
+      instanceId: rdata.instance_id,
+    };
+    if (data.id == "" || data.instanceId == "") {
+      throw "unexpected update machine data: {data}";
+    }
+    return data;
+  }
+
+  machineConfigFromProps(props: IClientCreateMachineProps): Json {
+    return {
+      region: props.region,
+      config: {
+        guest: {
+          cpus: 1,
+          cpu_kind: "shared",
+          memory_mb: props.memoryMb ?? 512,
+        },
+        restart: {
+          policy: "no",
+        },
+        mounts: props.mounts ?? [],
+        env: props.env ?? {},
+        files: props.files ?? [],
+        image: props.imageName,
+        services: props.services,
+      },
+    };
   }
 
   pub deleteMachine(appName: str, id: str) {
