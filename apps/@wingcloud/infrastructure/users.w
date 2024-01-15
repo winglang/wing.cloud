@@ -154,7 +154,7 @@ pub class Users {
         pk: "USER#{options.userId}",
         sk: "#",
       },
-      projectionExpression: "id, displayName, username, avatarUrl",
+      projectionExpression: "id, displayName, username, avatarUrl, email",
     );
 
     if let user = User.tryFromJson(result.item) {

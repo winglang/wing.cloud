@@ -10,6 +10,7 @@ export interface User {
   id: string;
   username: string;
   avatarUrl: string;
+  email: string;
 }
 
 export interface Installation {
