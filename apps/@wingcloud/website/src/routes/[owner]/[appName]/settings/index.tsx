@@ -141,7 +141,10 @@ const SettingsPage = () => {
                     items={entrypoints}
                     value={entrypoint || app.entrypoint}
                     onChange={setEntrypoint}
-                    disabled={entrypointsQuery.isLoading}
+                    disabled={
+                      entrypointsQuery.isLoading ||
+                      entrypointsQuery.data === undefined
+                    }
                     className="w-full"
                   />
                 </div>

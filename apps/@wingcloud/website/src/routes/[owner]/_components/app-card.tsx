@@ -27,19 +27,28 @@ export const AppCard = ({
     >
       <div className="space-y-4 w-full">
         <div className="flex gap-x-3">
-          <div className="flex-shrink-0 items-start py-1">
-            {app.entrypoint.endsWith(".ts") && (
-              <TypeScriptIcon className={clsx("w-6 h-6", "text-[#2f74c0]")} />
-            )}
-            {app.entrypoint.endsWith(".w") && (
-              <WingIcon className={clsx("w-6 h-6", theme.text1)} />
-            )}
-          </div>
           <div className="flex-grow truncate space-y-1">
             <div className={clsx("text-lg", theme.text1)}>{app.appName}</div>
             <div className={clsx("text-xs flex gap-x-1", theme.text2)}>
               <div className="truncate" title={app.entrypoint}>
                 {app.entrypoint}
+              </div>
+              <div
+                className="flex flex-grow justify-end"
+                title={
+                  app.entrypoint.endsWith(".ts")
+                    ? "TypeScript Project"
+                    : "Wing Project"
+                }
+              >
+                {app.entrypoint.endsWith(".ts") && (
+                  <TypeScriptIcon
+                    className={clsx("w-4 h-4", "text-[#2f74c0]")}
+                  />
+                )}
+                {app.entrypoint.endsWith(".w") && (
+                  <WingIcon className={clsx("w-4 h-4", theme.text1)} />
+                )}
               </div>
             </div>
           </div>
