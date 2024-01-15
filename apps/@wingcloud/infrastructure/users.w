@@ -130,8 +130,14 @@ pub class Users {
   }
 
 
-  pub inflight getOrCreate(options: GetOrCreateOptions): User {
+  pub inflight updateOrCreate(options: GetOrCreateOptions): User {
     if let user = this.fromLogin(username: options.username) {
+      if user.displayName == options.displayName &&
+        user.avatarUrl == options.avatarUrl ?? "" &&
+        user.email == options.email {
+          return user;
+      }
+
       return this.update(
         userId: user.id,
         displayName: options.displayName,
