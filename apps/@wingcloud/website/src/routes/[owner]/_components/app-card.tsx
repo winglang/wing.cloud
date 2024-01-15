@@ -1,8 +1,8 @@
 import clsx from "clsx";
 
 import { useTheme } from "../../../design-system/theme-provider.js";
-import { GithubIcon } from "../../../icons/github-icon.js";
-import { useTimeAgo } from "../../../utils/time.js";
+import { TypeScriptIcon } from "../../../icons/typescript-icon.js";
+import { WingIcon } from "../../../icons/wing-icon.js";
 import type { App } from "../../../utils/wrpc.js";
 
 export const AppCard = ({
@@ -26,11 +26,21 @@ export const AppCard = ({
       )}
     >
       <div className="space-y-4 w-full">
-        <div className="w-full truncate space-y-1">
-          <div className={clsx("text-lg", theme.text1)}>{app.appName}</div>
-          <div className={clsx("text-xs flex gap-x-1", theme.text2)}>
-            <div className="truncate" title={app.entrypoint}>
-              {app.entrypoint}
+        <div className="flex gap-x-2.5">
+          <div className="flex-shrink-0 items-start py-1">
+            {app.entrypoint.endsWith(".ts") && (
+              <TypeScriptIcon className={clsx("w-5 h-5", "text-[#2f74c0]")} />
+            )}
+            {app.entrypoint.endsWith(".w") && (
+              <WingIcon className={clsx("w-5 h-5", theme.text1)} />
+            )}
+          </div>
+          <div className="flex-grow truncate space-y-1">
+            <div className={clsx("text-lg", theme.text1)}>{app.appName}</div>
+            <div className={clsx("text-xs flex gap-x-1", theme.text2)}>
+              <div className="truncate" title={app.entrypoint}>
+                {app.entrypoint}
+              </div>
             </div>
           </div>
         </div>
