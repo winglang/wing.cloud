@@ -65,7 +65,11 @@ export class Setup {
 
   private async npmInstall(cwd: string) {
     if (existsSync(join(cwd, "package.json"))) {
-      return this.executer.exec("npm", ["install"], {
+      const installArgs = ["install"];
+      if (this.context.cacheDir) {
+        installArgs.push("--cache", this.context.cacheDir);
+      }
+      return this.executer.exec("npm", installArgs, {
         cwd,
         throwOnFailure: true,
       });
