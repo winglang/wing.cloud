@@ -23,6 +23,7 @@ export const AnalyticsIdentityProvider = ({ children }: PropsWithChildren) => {
     if (queryData?.user) {
       setIdentity({
         name: queryData.user.username,
+        email: queryData.user.email,
         id: queryData.user.id,
       });
     }

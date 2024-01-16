@@ -30,8 +30,9 @@ if (ENABLE_ANALYTICS === "true") {
 }
 
 export interface UserIdentity {
-  name: string;
   id: string;
+  name: string;
+  email: string;
 }
 
 export interface AnalyticsProps {}
@@ -46,6 +47,7 @@ const setIdentity = (identity: UserIdentity) => {
   if (!identified) {
     instance.identify(identity.id, {
       name: identity.name,
+      email: identity.email,
     });
     identified = true;
   }
