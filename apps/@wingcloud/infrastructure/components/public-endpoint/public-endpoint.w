@@ -12,6 +12,7 @@ pub struct PublicEndpointProps {
   digest: str;
   port: num;
   targetUrl: str;
+  subdomain: str?;
 }
 
 pub inflight class PublicEndpoint impl iendpoint.IPublicEndpoint {
@@ -20,7 +21,7 @@ pub inflight class PublicEndpoint impl iendpoint.IPublicEndpoint {
     if util.env("WING_TARGET") == "sim" {
       this.inner = new sim.PublicEndpoint(dns: props.dns, port: props.port, targetUrl: props.targetUrl);
     } else {
-      this.inner = new aws.PublicEndpoint(dns: props.dns, domain: props.domain, digest: props.digest, targetUrl: props.targetUrl);
+      this.inner = new aws.PublicEndpoint(dns: props.dns, domain: props.domain, digest: props.digest, targetUrl: props.targetUrl, subdomain: props.subdomain);
     }
   }
 
@@ -40,6 +41,7 @@ pub inflight class PublicEndpoint impl iendpoint.IPublicEndpoint {
 pub struct PublicEndpointProviderProps {
   dns: idns.IDNS;
   domain: str;
+  subdomain: str?;
 }
 
 pub struct NewPublicEndpointOptions {
@@ -61,6 +63,7 @@ pub class PublicEndpointProvider {
       digest: options.digest,
       port: options.port,
       targetUrl: options.targetUrl,
+      subdomain: this.props.subdomain,
     );
   }
 }

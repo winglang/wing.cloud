@@ -8,6 +8,7 @@ export const cleanEnvironment = function () {
     "USER",
     "GIT_TOKEN",
     "ENVIRONMENT_ID",
+    "PUBLIC_ENDPOINT_DOMAIN",
   ]);
   for (let env in process.env) {
     if (!allowedEnvVars.has(env)) {
