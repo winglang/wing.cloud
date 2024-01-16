@@ -69,34 +69,34 @@ pub class GithubComment {
 
     let appOwner = this.getAppOwner(props.appId);
     for environment in this.environments.list(appId: props.appId) {
-      let shouldDisplayUrl = environment.status == "running";
-
       if environment.repo == props.repo && environment.prNumber == props.prNumber {
         let var testRows = "";
         let var passedTests = 0;
         let var failedTests = 0;
-        if let testResults = environment.testResults {
-          let var i = 0;
-          for testResult in testResults.testResults {
-            let var testRes = "";
-            if !testResult.pass {
-              testRes = "❌ Failed";
-              failedTests += 1;
-            } else {
-              testRes = "✅ Passed";
-              passedTests += 1;
+        if environment.status == "running" || environment.status == "tests" {
+          if let testResults = environment.testResults {
+            let var i = 0;
+            for testResult in testResults.testResults {
+              let var testRes = "";
+              if !testResult.pass {
+                testRes = "❌ Failed";
+                failedTests += 1;
+              } else {
+                testRes = "✅ Passed";
+                passedTests += 1;
+              }
+  
+              let testId = testResult.id;
+              let pathParts = testResult.path.split(":");
+              let testName = pathParts.at(pathParts.length - 1);
+              let testResourcePath = pathParts.at(0);
+              let var link = "";
+              if environment.status == "running" && appOwner? {
+                link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}?testId={testId}\">Logs</a>";
+              }
+              testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
+              i += 1;
             }
-
-            let testId = testResult.id;
-            let pathParts = testResult.path.split(":");
-            let testName = pathParts.at(pathParts.length - 1);
-            let testResourcePath = pathParts.at(0);
-            let var link = "";
-            if environment.status == "running" && appOwner? {
-              link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}?testId={testId}\">Logs</a>";
-            }
-            testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
-            i += 1;
           }
         }
 
@@ -111,12 +111,14 @@ pub class GithubComment {
         }
 
         let var endpointsString = "";
-        for endpoint in this.endpoints.list(environmentId: environment.id) {
-          let var endpointText = endpoint.label;
-          if endpoint.browserSupport {
-            endpointText = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.label}</a>";
+        if environment.status == "running" {
+          for endpoint in this.endpoints.list(environmentId: environment.id) {
+            let var endpointText = endpoint.label;
+            if endpoint.browserSupport {
+              endpointText = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.label}</a>";
+            }
+            endpointsString = "{endpointText}<br> {endpointsString}";
           }
-          endpointsString = "{endpointText}<br> {endpointsString}";
         }
 
         let date = std.Datetime.utcNow();
