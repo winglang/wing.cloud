@@ -4,12 +4,12 @@
   "type": "module",
   "sideEffects": false,
   "dependencies": {
-    "turbo": "^1.11.2"
+    "turbo": "^1.11.3"
   },
   "devDependencies": {
-    "@skyrpex/wingen": "^0.6.40",
-    "@types/node": "20",
-    "prettier": "^3.1.1",
+    "@skyrpex/wingen": "^0.6.67",
+    "@types/node": "^20.11.4",
+    "prettier": "^3.2.2",
     "projen": "^0.77.6",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
