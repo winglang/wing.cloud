@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { existsSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -18,7 +18,8 @@ import { getContext, setupSSL } from "./setup.js";
 import { sleep } from "./utils.js";
 
 test("run() - installs npm packages and run tests", async () => {
-  const { examplesDir, logsBucket, wingApiUrl, stateDir } = getContext();
+  const { examplesDir, logsBucket, wingApiUrl, stateDir, cacheDir } =
+    getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
   const environment = new Environment("test-id", "redis/main.w", {
@@ -26,7 +27,14 @@ test("run() - installs npm packages and run tests", async () => {
     sha: "main",
   });
   const { port, close } = await run({
-    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
+    context: {
+      environment,
+      gitProvider,
+      logsBucket,
+      wingApiUrl,
+      stateDir,
+      cacheDir,
+    },
   });
 
   await sleep(200);
@@ -398,4 +406,29 @@ test("run() - uses state directory", async () => {
   expect(await response2.text()).toEqual("2");
 
   await close2();
+});
+
+test("run() - using npm cache dir", async () => {
+  const { examplesDir, logsBucket, wingApiUrl, stateDir, cacheDir } =
+    getContext();
+  const examplesDirRepo = `file://${examplesDir}`;
+  const gitProvider = new LocalGitProvider();
+  const environment = new Environment("test-id", "redis/main.w", {
+    repo: examplesDirRepo,
+    sha: "main",
+  });
+  const { port, close } = await run({
+    context: {
+      environment,
+      gitProvider,
+      logsBucket,
+      wingApiUrl,
+      stateDir,
+      cacheDir,
+    },
+  });
+
+  existsSync(join(cacheDir, "_cacache"));
+
+  await close();
 });
