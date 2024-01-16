@@ -21,6 +21,13 @@ struct GithubCommentCreateProps {
   appName: str;
 }
 
+struct GithubCommentUpdateRepoProps {
+  octokit: octokit.OctoKit;
+  appId: str;
+  appName: str;
+  environmentId: str;
+}
+
 pub class GithubComment {
   environments: environments.Environments;
   endpoints: endpoints.Endpoints;
@@ -147,5 +154,16 @@ pub class GithubComment {
       let res = props.octokit.issues.createComment(owner: owner, repo: repo, issue_number: props.prNumber, body: commentBody);
       return res.data.id;
     }
+  }
+
+  pub inflight updateRepoInfo(props: GithubCommentUpdateRepoProps) {
+    let appOwner = this.getAppOwner(props.appId);
+    let environment = this.environments.get(id: props.environmentId);
+    let url = "{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}";
+    props.octokit.repos.update({
+      owner: environment.repo.split("/").at(0),
+      repo: environment.repo.split("/").at(1),
+      homepage: url,
+    });
   }
 }
