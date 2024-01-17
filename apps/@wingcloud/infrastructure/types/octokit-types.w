@@ -218,6 +218,13 @@ struct ListForOrgProps {
   org: str;
 }
 
+struct UpdateProps {
+  owner: str;
+  repo: str;
+  description: str?;
+  homepage: str?;
+}
+
 interface OctoKitRepos {
   inflight createOrUpdateFileContents(options: CreateOrUpdateFileContentsProps): BaseResponse;
   inflight createForAuthenticatedUser(options: CreateRepoProps): BaseResponse;
@@ -225,6 +232,7 @@ interface OctoKitRepos {
   inflight delete(options: DeleteRepoProps): BaseResponse;
   inflight listForAuthenticatedUser(options: ListForAuthenticatedUserProps): ListReposResponse;
   inflight listForOrg(options: ListForOrgProps): ListReposResponse;
+  inflight update(options: UpdateProps): BaseResponse;
 }
 
 pub struct OctoKit {
