@@ -36,9 +36,7 @@ export const AppCard = ({
               <div
                 className="flex flex-grow justify-end"
                 title={
-                  app.entrypoint.endsWith(".ts")
-                    ? "TypeScript Project"
-                    : "Wing Project"
+                  app.entrypoint.endsWith(".ts") ? "TypeScript" : "Winglang"
                 }
               >
                 {app.entrypoint.endsWith(".ts") && (
