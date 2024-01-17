@@ -404,8 +404,10 @@ pub class Api {
       let entrypoints = MutArray<str>[];
       for item in tree.data.tree {
         if let path = item.path {
-          if item.type == "blob" && path.endsWith("main.w") {
-            entrypoints.push(path);
+          if item.type == "blob" {
+            if path.endsWith("main.w") || path.endsWith("main.ts") {
+              entrypoints.push(path);
+            }
           }
         }
       }
