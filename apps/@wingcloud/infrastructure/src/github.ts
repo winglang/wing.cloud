@@ -1,5 +1,6 @@
 // import fetch from "node-fetch";
-import { url } from "inspector";
+import { url } from "node:inspector";
+
 import { Octokit } from "octokit";
 
 const getNextPage = (page: number, total: number, perPage: number) => {
@@ -21,7 +22,13 @@ export const getUser = async (accessToken: string) => {
     auth: accessToken,
   });
   const { data: user } = await octokit.request("GET /user");
-  return user;
+
+  return {
+    name: user.name,
+    login: user.login,
+    avatar_url: user.avatar_url ?? "",
+    email: user.email ?? "",
+  };
 };
 
 export const listUserInstallations = async (
