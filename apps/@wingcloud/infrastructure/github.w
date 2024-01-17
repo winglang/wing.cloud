@@ -82,6 +82,7 @@ struct GitHubUser {
   name: str;
   login: str;
   avatar_url: str;
+  email: str;
 }
 
 struct PaginatedResponse {

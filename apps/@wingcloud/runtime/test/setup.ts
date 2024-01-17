@@ -16,6 +16,7 @@ let logsBucket: cloud.IBucketClient;
 let wingApiUrl: string;
 let examplesDir: string;
 let stateDir: string;
+let cacheDir: string;
 
 beforeAll(async () => {
   examplesDir = mkdtempSync(join(tmpdir(), "examples-"));
@@ -49,6 +50,7 @@ beforeEach(async () => {
   const config = sim.getResourceConfig("root/Default/cloud.Api") as ApiSchema;
   wingApiUrl = config.attrs.url;
   stateDir = mkdtempSync(join(tmpdir(), "state"));
+  cacheDir = join(stateDir, ".cache");
 }, 60_000);
 
 afterEach(async () => {
@@ -61,6 +63,7 @@ export const getContext = () => {
     wingApiUrl,
     examplesDir,
     stateDir,
+    cacheDir,
   };
 };
 
