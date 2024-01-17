@@ -52,6 +52,7 @@ For the `BOT_GITHUB_*` variables, you'll need a [GitHub App](https://docs.github
   - Issues: Read & Write
   - Metadata: Read Only
   - Pull Requests: Read & Write
+  - Administration: Read & Write
 - The required events are:
   - Pull Request
   - Push
