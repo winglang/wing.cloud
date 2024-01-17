@@ -9,6 +9,7 @@ pub struct Environment {
   type: str;
   repo: str;
   branch: str;
+  sha: str;
   status: str;
   installationId: num;
   prNumber: num?;
@@ -31,6 +32,7 @@ pub struct EnvironmentOptions {
   type: str;
   repo: str;
   branch: str;
+  sha: str;
   status: str;
   prNumber: num?;
   prTitle: str?;
@@ -45,6 +47,12 @@ struct UpdateEnvironmentStatusOptions {
   id: str;
   appId: str;
   status: str;
+}
+
+struct UpdateEnvironmentShaOptions {
+  id: str;
+  appId: str;
+  sha: str;
 }
 
 struct UpdateEnvirohmentPublicKeyOptions {
@@ -117,6 +125,7 @@ pub class Environments {
       type: ops.environment.type,
       repo: ops.environment.repo,
       branch: ops.environment.branch,
+      sha: ops.environment.sha,
       prTitle: ops.environment.prTitle,
       status: ops.environment.status,
       installationId: ops.environment.installationId,
@@ -150,6 +159,7 @@ pub class Environments {
       type: options.type,
       repo: options.repo,
       branch: options.branch,
+      sha: options.sha,
       status: options.status,
       prNumber: options.prNumber,
       prTitle: options.prTitle,
@@ -387,6 +397,80 @@ pub class Environments {
     }
 
     this.table.transactWriteItems(transactItems: transactItems.copy());
+  }
+
+  pub inflight updateSha(options: UpdateEnvironmentShaOptions) {
+    let environment = this.get(id: options.id);
+    let branch = environment.branch;
+    let updatedAt = datetime.fromIso(environment.updatedAt);
+    let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
+
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "ENVIRONMENT#{options.id}",
+            sk: "#",
+          },
+          updateExpression: "SET #sha = :sha",
+          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
+          expressionAttributeNames: {
+            "#pk": "pk",
+            "#sha": "sha",
+            "#appId": "appId",
+          },
+          expressionAttributeValues: {
+            ":sha": options.sha,
+            ":appId": options.appId,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#{options.appId}",
+            sk: "ENVIRONMENT#{options.id}",
+          },
+          updateExpression: "SET #sha = :sha",
+          expressionAttributeNames: {
+            "#sha": "sha",
+          },
+          expressionAttributeValues: {
+            ":sha": options.sha,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#{options.appId}",
+            sk: "BRANCH#{branch}",
+          },
+          updateExpression: "SET #sha = :sha",
+          expressionAttributeNames: {
+            "#sha": "sha",
+          },
+          expressionAttributeValues: {
+            ":sha": options.sha,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "DEPLOYED#{statusUpdatedAt}",
+            sk: "ENV#{options.id}",
+          },
+          updateExpression: "SET #sha = :sha",
+          expressionAttributeNames: {
+            "#sha": "sha",
+          },
+          expressionAttributeValues: {
+            ":sha": options.sha,
+          },
+        }
+      },
+    ]);
   }
 
   pub inflight updateUrl(options: UpdateEnvironmentUrlOptions) {
@@ -738,6 +822,7 @@ pub class Environments {
       type: item.get("type").asStr(),
       repo: item.get("repo").asStr(),
       branch: item.get("branch").asStr(),
+      sha: item.get("sha").asStr(),
       status: item.get("status").asStr(),
       installationId: item.get("installationId").asNum(),
       prNumber: item.tryGet("prNumber")?.tryAsNum(),

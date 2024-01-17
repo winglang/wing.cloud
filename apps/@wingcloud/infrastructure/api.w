@@ -378,6 +378,7 @@ pub class Api {
           data: EnvironmentManager.CreateEnvironmentOptions {
             createEnvironment: {
               branch: input.defaultBranch,
+              sha: commitData.sha,
               appId: input.appId,
               type: "production",
               prTitle: input.defaultBranch,
