@@ -125,12 +125,16 @@ pub class EnvironmentManager {
     );
 
     if environment.type == "production" {
-      this.githubComment.updateRepoInfo(
-        octokit: octokit,
-        appId: options.appId,
-        appName: app.appName,
-        environmentId: environment.id,
-      );
+      try {
+        this.githubComment.updateRepoInfo(
+          octokit: octokit,
+          appId: options.appId,
+          appName: app.appName,
+          environmentId: environment.id,
+        );
+      } catch err {
+        log("unable to update repo url: {err}");
+      }
     }
 
     let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: environment.installationId);
