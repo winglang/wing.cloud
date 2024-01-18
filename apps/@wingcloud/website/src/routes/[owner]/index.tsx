@@ -13,15 +13,9 @@ import { Button } from "../../design-system/button.js";
 import { Input } from "../../design-system/input.js";
 import { SkeletonLoader } from "../../design-system/skeleton-loader.js";
 import { useTheme } from "../../design-system/theme-provider.js";
-import { useCreateAppFromRepo } from "../../services/create-app.js";
-import { wrpc, type App } from "../../utils/wrpc.js";
+import { wrpc } from "../../utils/wrpc.js";
 
 import { AppCard } from "./_components/app-card.js";
-
-const PreloadNewAppQueries = () => {
-  useCreateAppFromRepo();
-  return <div />;
-};
 
 const OwnerPage = () => {
   const { owner } = useParams();
@@ -90,7 +84,6 @@ const OwnerPage = () => {
               <p className={clsx("mt-1 text-sm", theme.text2)}>
                 Get started by adding an app.
               </p>
-              <PreloadNewAppQueries />
               <Button
                 label="Add app"
                 icon={PlusIcon}
