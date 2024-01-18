@@ -101,6 +101,7 @@ pub class ProbotApp {
           this.environmentManager.create(
             createEnvironment: {
               branch: branch,
+              sha: context.payload.pull_request.head.sha,
               appId: app.appId,
               type: "preview",
               repo: context.payload.repository.full_name,

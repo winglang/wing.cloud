@@ -1,5 +1,5 @@
 bring aws as awsutils;
-bring "@cdktf/provider-aws" as aws;
+bring "@cdktf/provider-aws" as awsprovider;
 bring "./kms.w"as kms;
 bring "./icrypto.w" as icrypto;
 
@@ -7,7 +7,7 @@ pub class Crypto impl icrypto.ICrypto {
   keyArn: str;
 
   new() {
-    let key = new aws.kmsKey.KmsKey();
+    let key = new awsprovider.kmsKey.KmsKey();
     this.keyArn = key.arn;
   }
 

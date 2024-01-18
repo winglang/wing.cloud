@@ -1,7 +1,7 @@
 bring util;
 bring cloud;
 bring "constructs" as constructs;
-bring "@cdktf/provider-aws" as aws;
+bring "@cdktf/provider-aws" as awsprovider;
 bring "@cdktf/provider-dnsimple" as dnsimple;
 
 struct DNSRecordProps {
@@ -62,10 +62,10 @@ struct CertificateProps {
 }
 
 class Certificate {
-  pub certificate: aws.acmCertificate.AcmCertificate;
+  pub certificate: awsprovider.acmCertificate.AcmCertificate;
 
   new(props: CertificateProps) {
-    this.certificate = new aws.acmCertificate.AcmCertificate(
+    this.certificate = new awsprovider.acmCertificate.AcmCertificate(
       domainName: props.domainName,
       validationMethod: "DNS",
       lifecycle: {
@@ -96,7 +96,7 @@ pub class DNSimpleValidatedCertificate {
     ) as "{props.zoneName}.dnsimple.zoneRecord.ZoneRecord";
 
     dnsRecord.record.addOverride("name", "$\{replace(each.value.name, \".{props.zoneName}.\", \"\")}");
-    dnsRecord.record.addOverride("value", "$\{replace(each.value.record, \"acm-validations.aws.\", \"acm-validations.aws\")}");
+    dnsRecord.record.addOverride("value", "$\{replace(each.value.record, \"acm-validations.awsprovider.\", \"acm-validations.aws\")}");
     dnsRecord.record.addOverride("for_each", "$\{\{
         for dvo in {this.certificate.certificate.fqn}.domain_validation_options : dvo.domain_name => \{
           name   = dvo.resource_record_name
@@ -106,9 +106,9 @@ pub class DNSimpleValidatedCertificate {
       }
     }");
 
-    let certValidation = new aws.acmCertificateValidation.AcmCertificateValidation(
+    let certValidation = new awsprovider.acmCertificateValidation.AcmCertificateValidation(
       certificateArn: this.certificate.certificate.arn
-    )as "{props.zoneName}.aws.acmCertificateValidation.AcmCertificateValidation";
+    )as "{props.zoneName}.awsprovider.acmCertificateValidation.AcmCertificateValidation";
 
     certValidation.addOverride("validation_record_fqdns", "$\{[for record in {dnsRecord.record.fqn} : record.qualified_name]}");
   }

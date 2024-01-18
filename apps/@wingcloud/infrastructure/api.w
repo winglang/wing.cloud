@@ -378,6 +378,7 @@ pub class Api {
           data: EnvironmentManager.CreateEnvironmentOptions {
             createEnvironment: {
               branch: input.defaultBranch,
+              sha: commitData.sha,
               appId: input.appId,
               type: "production",
               prTitle: input.defaultBranch,
@@ -403,8 +404,10 @@ pub class Api {
       let entrypoints = MutArray<str>[];
       for item in tree.data.tree {
         if let path = item.path {
-          if item.type == "blob" && path.endsWith("main.w") {
-            entrypoints.push(path);
+          if item.type == "blob" {
+            if path.endsWith("main.w") || path.endsWith("main.ts") {
+              entrypoints.push(path);
+            }
           }
         }
       }

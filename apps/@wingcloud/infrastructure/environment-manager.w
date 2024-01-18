@@ -124,6 +124,19 @@ pub class EnvironmentManager {
       octokit: octokit
     );
 
+    if environment.type == "production" {
+      try {
+        this.githubComment.updateRepoInfo(
+          octokit: octokit,
+          appId: options.appId,
+          appName: app.appName,
+          environmentId: environment.id,
+        );
+      } catch err {
+        log("unable to update repo url: {err}");
+      }
+    }
+
     let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: environment.installationId);
     if tokenRes.status >= 300 || tokenRes.status < 200 {
       throw "environment create: unable to create installation access token";
@@ -144,6 +157,12 @@ pub class EnvironmentManager {
   pub inflight restart(options: RestartEnvironmentOptions) {
     let octokit = this.auth(options.environment.installationId);
     let keyPair = KeyPair.KeyPair.generate();
+
+    this.environments.updateSha(
+      id: options.environment.id,
+      appId: options.appId,
+      sha: options.sha
+    );
 
     this.environments.updatePublicKey(
       id: options.environment.id,
@@ -224,6 +243,26 @@ pub class EnvironmentManager {
     let app = this.apps.get(appId: environment.appId);
     let status = options.statusReport.status;
     let data = options.statusReport.data;
+    let octokit = this.probotAdapter.auth(environment.installationId);
+
+    let ref = octokit.git.getRef(
+      owner: environment.repo.split("/").at(0),
+      repo: environment.repo.split("/").at(1),
+      ref: "heads/{environment.branch}"
+    );
+
+    // if the environment build has completed, check to see if there is a new commit
+    if status == "running" || status == "error" {
+      if environment.sha != ref.data.object.sha {
+        this.restart(
+          appId: app.appId,
+          entrypoint: app.entrypoint,
+          environment: environment,
+          sha: ref.data.object.sha
+        );
+        return;
+      }
+    }
 
     this.environments.updateStatus(
       id: environment.id,
@@ -246,8 +285,6 @@ pub class EnvironmentManager {
       let running = status_reports.Running.fromJson(options.statusReport.data);
       this.reconcileEndpoints(environment, running.objects.endpoints);
     }
-
-    let octokit = this.probotAdapter.auth(environment.installationId);
 
     this.postComment(
       appId: app.appId,
