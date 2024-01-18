@@ -36,6 +36,11 @@ const ConnectPage = () => {
 
   const user = wrpc["auth.check"].useQuery();
 
+  const subscription = wrpc["subscription"].useQuery();
+  useEffect(() => {
+    console.log(subscription.data);
+  }, [subscription.data]);
+
   const [createAppLoading, setCreateAppLoading] = useState(false);
 
   const installationList = useMemo(() => {
@@ -73,7 +78,7 @@ const ConnectPage = () => {
         repoOwner: selectedRepo.owner.login,
         defaultBranch: selectedRepo.default_branch,
       });
-      navigate(`/${app?.appFullName}`);
+      //navigate(`/${app?.appFullName}`);
     } catch (error) {
       setCreateAppLoading(false);
       if (error instanceof Error) {

@@ -1,10 +1,11 @@
 // And the sun, and the moon, and the stars, and the flowers.
 bring cloud;
+bring ex;
+bring websockets;
 bring util;
 bring http;
-bring ex;
+
 bring "cdktf" as cdktf;
-bring websockets;
 
 bring "./users.w" as Users;
 bring "./apps.w" as Apps;
@@ -31,6 +32,8 @@ let segmentWriteKey = util.env("SEGMENT_WRITE_KEY");
 let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true";
 
 let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey, enableAnalytics);
+
+let ws = new websockets.WebSocket(name: "ApiWebsocket") as "api-websocket";
 
 let api = new cloud.Api(
   cors: true,
@@ -152,6 +155,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
 
 let wingCloudApi = new wingcloud_api.Api(
   api: api,
+  ws: ws,
   apps: apps,
   users: users,
   environments: environments,
@@ -214,6 +218,10 @@ let proxyUrl = (() => {
           pathPattern: "/wrpc/*",
           domainName: apiDomainName,
         },
+        // {
+        //   pathPattern: "/ws/*",
+        //   domainName: ws.url(),
+        // },
         {
           pathPattern: "*",
           domainName: dashboard.url,
