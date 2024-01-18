@@ -4,6 +4,7 @@ bring util;
 bring http;
 bring ex;
 bring "cdktf" as cdktf;
+bring websockets;
 
 bring "./users.w" as Users;
 bring "./apps.w" as Apps;
