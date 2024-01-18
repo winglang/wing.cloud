@@ -376,10 +376,6 @@ infrastructure.addDeps("@winglibs/websockets");
 // https://github.com/winglang/wing/issues/5252#issuecomment-1893857213
 infrastructure.addDeps("@aws-cdk/asset-awscli-v1");
 infrastructure.addDeps("@aws-cdk/asset-kubectl-v20");
-infrastructure.addDeps("@cdktf/provider-aws");
-infrastructure.addDeps("aws-cdk-lib");
-infrastructure.addDeps("cdktf");
-infrastructure.addDeps("constructs");
 infrastructure.addDeps("@aws-cdk/asset-node-proxy-agent-v6");
 infrastructure.addDeps("@balena/dockerignore");
 infrastructure.addDeps("case");
@@ -392,6 +388,10 @@ infrastructure.addDeps("semver");
 infrastructure.addDeps("table");
 infrastructure.addDeps("yaml");
 
+infrastructure.addDeps("@cdktf/provider-aws");
+infrastructure.addDeps("cdktf");
+infrastructure.addDeps("constructs");
+infrastructure.addDeps("aws-cdk-lib");
 ///////////////////////////////////////////////////////////////////////////////
 
 const aws = new NodeProject({
