@@ -36,6 +36,7 @@ struct TestLog {
 struct UserFromCookie {
   userId: str;
   username: str;
+  email: str?;
 }
 
 struct DeleteAppMessage {
@@ -92,6 +93,7 @@ bring "./environment-manager.w" as EnvironmentManager;
 bring "./status-reports.w" as status_reports;
 bring "./probot-adapter.w" as adapter;
 bring "./octokit.w" as Octokit;
+bring "./segment-analytics.w" as analytics;
 
 struct ApiProps {
   api: cloud.Api;
@@ -106,6 +108,7 @@ struct ApiProps {
   githubAppClientSecret: str;
   appSecret: str;
   logs: cloud.Bucket;
+  analytics: analytics.SegmentAnalytics;
 }
 
 
@@ -171,6 +174,7 @@ pub class Api {
       return {
         userId: userId,
         username: user.username,
+        email: user.email,
       };
     };
 
@@ -285,6 +289,38 @@ pub class Api {
         headers: {
           Location: "/{user.username}",
           "Set-Cookie": authCookie,
+        },
+      };
+    });
+
+    api.get("/wrpc/console.signIn", inflight (request) => {
+      let anonymousId = request.query.get("anonymousId");
+      let localhostPort = num.fromStr(request.query.get("localhostPort"));
+
+      let user = getUserFromCookie(request);
+      let userId = user.userId;
+      let email = user.email;
+      let github = user.username;
+
+      props.analytics.identify(
+        anonymousId: anonymousId,
+        userId: userId,
+        traits: {
+          email: email,
+          github: github,
+        },
+      );
+
+      props.analytics.track(userId, "console_sign_in", {
+        anonymousId: anonymousId,
+        userId: userId,
+        email: email,
+        github: github,
+      });
+
+      return {
+        headers: {
+          Location: "http://localhost:{localhostPort}/",
         },
       };
     });

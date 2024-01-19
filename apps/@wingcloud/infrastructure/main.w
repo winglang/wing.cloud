@@ -162,6 +162,7 @@ let wingCloudApi = new wingcloud_api.Api(
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
   appSecret: appSecret,
   logs: bucketLogs,
+  analytics: analytics,
 );
 
 let probotApp = new probot.ProbotApp(
