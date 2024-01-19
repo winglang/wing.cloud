@@ -234,13 +234,15 @@ let proxyUrl = (() => {
   }
 })();
 
+new cloud.Endpoint(proxyUrl, browserSupport: true) as "Proxy Endpoint";
+
 let var webhookUrl = probotApp.githubApp.webhookUrl;
 if util.tryEnv("WING_TARGET") == "sim" {
   bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
 
   let devNgrok = new ngrok.Ngrok(
     url: webhookUrl,
-    domain: util.tryEnv("NGROK_DOMAIN"),
+    // domain: util.tryEnv("NGROK_DOMAIN"),
   );
 
   webhookUrl = devNgrok.url;
