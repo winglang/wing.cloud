@@ -3,7 +3,6 @@ bring http;
 bring ex;
 bring util;
 bring fs;
-bring websockets;
 
 bring "./json-api.w" as json_api;
 bring "./cookie.w" as Cookie;
@@ -18,6 +17,7 @@ bring "./secrets.w" as Secrets;
 bring "./endpoints.w" as Endpoints;
 bring "./lowkeys-map.w" as lowkeys;
 bring "./http-error.w" as httpError;
+bring "./websockets.w" as websockets;
 
 struct Log {
   message: str;
@@ -119,7 +119,7 @@ struct EnvironmentAction {
 pub class Api {
   new(props: ApiProps) {
     let api = new json_api.JsonApi(api: props.api);
-    //let ws = props.ws;
+    let ws = props.ws;
     let apps = props.apps;
     let users = props.users;
     let logs = props.logs;
@@ -430,7 +430,7 @@ pub class Api {
     };
 
     api.post("/wrpc/app.create", inflight (request) => {
-      //ws.sendMessage("app.create", Json.stringify(request.body));
+      ws.send(key: "app.create", body: Json.stringify(request.body));
 
       if let accessToken = getAccessTokenFromCookie(request) {
         let user = getUserFromCookie(request);
@@ -502,6 +502,8 @@ pub class Api {
     });
 
     api.get("/wrpc/app.list", inflight (request) => {
+      ws.send(key: "app.list", body: "APP LIST");
+
       let owner = request.query.get("owner");
       checkOwnerAccessRights(request, owner);
 

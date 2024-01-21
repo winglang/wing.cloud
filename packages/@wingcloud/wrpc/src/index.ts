@@ -8,6 +8,7 @@ import {
   type UseQueryResult,
   type UseMutationResult,
   type UseInfiniteQueryResult,
+  type QueryKey,
 } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 
@@ -22,6 +23,19 @@ export class UnauthorizedError extends ControlledError {}
 export class ForbiddenError extends ControlledError {}
 
 export class NotFoundError extends ControlledError {}
+
+interface UseSubscriptionOptions<
+  TQueryFnData = unknown,
+  TError = unknown,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+> extends UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> {
+  onData: (data: any) => void;
+}
+
+interface UseSubscriptionOutput {
+  close: () => void;
+}
 
 export interface PaginatedResponse<T> {
   data: T;
@@ -80,6 +94,29 @@ export type InfinitQueryProcedure<
         pageParams: Array<unknown>;
         pages: Array<Output>;
       }>;
+    };
+
+export type SubscriptionProcedure<
+  Input = undefined,
+  Output = unknown,
+> = undefined extends Input
+  ? {
+      useSubscription(
+        input?: Input,
+        options?: Omit<
+          UseSubscriptionOptions<unknown, unknown, Input>,
+          "queryKey"
+        >,
+      ): UseSubscriptionOutput;
+    }
+  : {
+      useSubscription(
+        input: Input,
+        options?: Omit<
+          UseSubscriptionOptions<unknown, unknown, Output>,
+          "queryKey"
+        >,
+      ): UseSubscriptionOutput;
     };
 
 const fetcher = async (method: string, url: URL, input?: any) => {
@@ -168,21 +205,24 @@ export const createWRPCReact = <
               mutationFn: async (input) => await fetcher("POST", url, input),
             });
           },
-          useSubscription: () => {
-            const url = new URL(`${useContext(WRPCContext).ws}/${route}`);
-
-            return useQuery({
-              retry(failureCount, error) {
-                if (error instanceof ControlledError) {
-                  return false;
-                }
-                return failureCount < 3;
-              },
-              throwOnError: true,
-              ...options,
-              queryKey: [route, input],
-              queryFn: async () => await fetcher("GET", url),
+          useSubscription: (input: any, options: UseSubscriptionOptions) => {
+            const url = new URL(`${useContext(WRPCContext).ws}`);
+            const ws = new WebSocket(url);
+            ws.addEventListener("open", () => {
+              console.log("connected");
             });
+            ws.addEventListener("close", () => {
+              console.log("ws closed");
+            });
+            ws.addEventListener("message", (event) => {
+              options.onData(event.data);
+            });
+
+            return {
+              close: () => {
+                ws.close();
+              },
+            };
           },
         };
       },

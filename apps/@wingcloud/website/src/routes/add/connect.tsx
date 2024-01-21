@@ -11,7 +11,7 @@ import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { useCreateAppFromRepo } from "../../services/create-app.js";
 import { PopupWindowContext } from "../../utils/popup-window-provider.js";
-import { wrpc, type Repository } from "../../utils/wrpc.js";
+import { wrpc } from "../../utils/wrpc.js";
 
 import { GitRepoSelect } from "./_components/git-repo-select.js";
 
@@ -35,11 +35,6 @@ const ConnectPage = () => {
   } = useCreateAppFromRepo();
 
   const user = wrpc["auth.check"].useQuery();
-
-  const subscription = wrpc["subscription"].useQuery();
-  useEffect(() => {
-    console.log(subscription.data);
-  }, [subscription.data]);
 
   const [createAppLoading, setCreateAppLoading] = useState(false);
 

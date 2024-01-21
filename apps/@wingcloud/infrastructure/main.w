@@ -1,7 +1,6 @@
 // And the sun, and the moon, and the stars, and the flowers.
 bring cloud;
 bring ex;
-bring websockets;
 bring util;
 bring http;
 
@@ -16,6 +15,7 @@ bring "./environment-cleaner.w" as EnvironmentCleaner;
 bring "./secrets.w" as Secrets;
 bring "./api.w" as wingcloud_api;
 bring "./segment-analytics.w" as SegmentAnalytics;
+bring "./websockets.w" as websockets;
 
 bring "./runtime/runtime.w" as runtime;
 bring "./runtime/runtime-client.w" as runtime_client;
@@ -33,7 +33,7 @@ let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true";
 
 let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey, enableAnalytics);
 
-let ws = new websockets.WebSocket(name: "ApiWebsocket") as "api-websocket";
+let ws = new websockets.WebSocket();
 
 let api = new cloud.Api(
   cors: true,
@@ -88,6 +88,8 @@ let dashboard = new ex.ReactApp(
 );
 dashboard.addEnvironment("SEGMENT_WRITE_KEY", segmentWriteKey);
 dashboard.addEnvironment("ENABLE_ANALYTICS", "{enableAnalytics}");
+dashboard.addEnvironment("API_URL", "{api.url}");
+dashboard.addEnvironment("WS_URL", "{ws.url}");
 
 reactAppPatch.ReactAppPatch.apply(dashboard);
 
@@ -218,10 +220,6 @@ let proxyUrl = (() => {
           pathPattern: "/wrpc/*",
           domainName: apiDomainName,
         },
-        // {
-        //   pathPattern: "/ws/*",
-        //   domainName: ws.url(),
-        // },
         {
           pathPattern: "*",
           domainName: dashboard.url,
@@ -243,23 +241,23 @@ let proxyUrl = (() => {
 })();
 
 let var webhookUrl = probotApp.githubApp.webhookUrl;
-if util.tryEnv("WING_TARGET") == "sim" {
-  bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
+// if util.tryEnv("WING_TARGET") == "sim" {
+//   bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
 
-  let devNgrok = new ngrok.Ngrok(
-    url: webhookUrl,
-    domain: util.tryEnv("NGROK_DOMAIN"),
-  );
+//   let devNgrok = new ngrok.Ngrok(
+//     url: webhookUrl,
+//     domain: util.tryEnv("NGROK_DOMAIN"),
+//   );
 
-  webhookUrl = devNgrok.url;
-}
+//   webhookUrl = devNgrok.url;
+// }
 
-let updateGithubWebhook = inflight () => {
-  probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
-  log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
-};
+// let updateGithubWebhook = inflight () => {
+//   probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
+//   log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
+// };
 
-new cloud.OnDeploy(updateGithubWebhook);
+// new cloud.OnDeploy(updateGithubWebhook);
 
 new EnvironmentCleaner.EnvironmentCleaner(apps: apps, environmentManager: environmentManager, environments: environments);
 
