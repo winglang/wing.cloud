@@ -50,6 +50,7 @@ struct RuntimeStartOptions {
   secrets: Map<str>;
   certificate: certificate.Certificate;
   privateKey: str;
+  publicEndpointFullDomainName: str;
 }
 
 struct RuntimeStopOptions {
@@ -114,6 +115,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "SSL_CERTIFICATE" => util.base64Encode(opts.certificate.certificate),
       "ENVIRONMENT_PRIVATE_KEY" => opts.privateKey,
       "CACHE_DIR" => Consts.cachePath(),
+      "PUBLIC_ENDPOINT_DOMAIN" => opts.publicEndpointFullDomainName,
     };
 
     if let token = opts.gitToken {
@@ -198,6 +200,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "AWS_REGION" => opts.logsBucketRegion,
       "ENVIRONMENT_PRIVATE_KEY" => opts.privateKey,
       "CACHE_DIR" => Consts.cachePath(),
+      "PUBLIC_ENDPOINT_DOMAIN" => opts.publicEndpointFullDomainName,
     };
 
     if let token = opts.gitToken {
@@ -272,6 +275,7 @@ struct RuntimeServiceProps {
   flyOrgSlug: str?;
   environments: environments.Environments;
   logs: cloud.Bucket;
+  publicEndpointFullDomainName: str;
 }
 
 bring "@cdktf/provider-aws" as aws;
@@ -355,6 +359,7 @@ pub class RuntimeService {
           logsBucketRegion: bucketRegion,
           awsAccessKeyId: awsAccessKeyId,
           awsSecretAccessKey: awsSecretAccessKey,
+          publicEndpointFullDomainName: props.publicEndpointFullDomainName,
         );
 
         log("preview environment url: {url}");
