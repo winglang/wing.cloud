@@ -52,12 +52,12 @@ async function runWingTest(
 }
 
 export async function runWingTests(props: WingTestProps) {
-  const simfile = await wingCompile(
-    props.wingCompilerPath,
-    props.entrypointPath,
-  );
-
   try {
+    const simfile = await wingCompile(
+      props.wingCompilerPath,
+      props.entrypointPath,
+    );
+
     const wingSdk = await import(props.wingSdkPath);
 
     let simulatorLogs: { message: string; timestamp: string }[] = [];
@@ -106,8 +106,9 @@ export async function runWingTests(props: WingTestProps) {
 
     await simulator.stop();
 
-    return testResults;
+    return { testsRun: true, testResults };
   } catch (error) {
     console.error("failed to run wing tests", error);
+    return { testsRun: false, testResults: undefined, error };
   }
 }
