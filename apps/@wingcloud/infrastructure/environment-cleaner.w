@@ -23,7 +23,13 @@ pub class EnvironmentCleaner {
         if environment.type != "production" {
           log("cleaning environment {Json.stringify(environment)}");
           let app = props.apps.get(appId: environment.appId);
-          props.environmentManager.stop(appId: environment.appId, appName: app.appName, environment: environment);
+          props.environmentManager.stop(
+            appId: environment.appId,
+            appName: app.appName,
+            environment: environment,
+            timestamp: datetime.utcNow().timestampMs,
+            delete: false,
+          );
         }
       }
     });

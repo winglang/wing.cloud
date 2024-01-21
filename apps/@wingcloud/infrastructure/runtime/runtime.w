@@ -13,6 +13,7 @@ bring "@cdktf/provider-aws" as awsprovider;
 bring "../components/parameter/iparameter.w" as parameter;
 bring "../components/certificate/icertificate.w" as certificate;
 bring "../nanoid62.w" as nanoid62;
+bring "../components/queues/fifoqueue" as fifoqueue;
 
 class Consts {
   pub static inflight secretsPath(): str {
@@ -331,7 +332,7 @@ pub class RuntimeService {
       }
     }
 
-    let queue = new cloud.Queue(timeout: 15m);
+    let queue = new fifoqueue.FifoQueue(timeout: 15m);
     queue.setConsumer(inflight (message) => {
       try {
         // hack to get bucket in this environment
@@ -373,7 +374,7 @@ pub class RuntimeService {
     this.api.post("/", inflight (req) => {
       let body = Json.parse(req.body ?? "");
       let message = Message.fromJson(body);
-      queue.push(Json.stringify(message));
+      queue.push(Json.stringify(message), groupId: message.environmentId);
       return {
         status: 200,
       };

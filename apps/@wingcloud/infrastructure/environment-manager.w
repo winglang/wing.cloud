@@ -1,3 +1,4 @@
+bring ex;
 bring "./environments.w" as environments;
 bring "./users.w" as users;
 bring "./apps.w" as apps;
@@ -12,6 +13,7 @@ bring "./probot-adapter.w" as adapter;
 bring "./status-reports.w" as status_reports;
 bring "./key-pair.w" as KeyPair;
 bring "./segment-analytics.w" as analytics;
+bring "./components/queues/most-recent-queue.w" as queue;
 
 struct EnvironmentsProps {
   users: users.Users;
@@ -25,6 +27,7 @@ struct EnvironmentsProps {
   probotAdapter: adapter.ProbotAdapter;
   siteDomain: str;
   analytics: analytics.SegmentAnalytics;
+  table: ex.DynamodbTable;
 }
 
 pub struct CreateEnvironmentOptions {
@@ -33,6 +36,7 @@ pub struct CreateEnvironmentOptions {
   entrypoint: str;
   sha: str;
   owner: str;
+  timestamp: num;
 }
 
 pub struct RestartEnvironmentOptions {
@@ -40,21 +44,38 @@ pub struct RestartEnvironmentOptions {
   appId: str;
   entrypoint: str;
   sha: str;
+  timestamp: num;
 }
 
 pub struct RestartAllEnvironmentOptions {
   appId: str;
   entrypoint: str;
+  timestamp: num;
 }
 
 pub struct StopEnvironmentOptions {
   appId: str;
   appName: str;
   environment: environments.Environment;
+  timestamp: num;
+  delete: bool;
 }
 
 pub struct UpdateEnvironmentStatusOptions {
   statusReport: status_reports.StatusReport;
+}
+
+struct QueueMessage {
+  action: str;
+  options: Json;
+}
+
+pub struct HandlerCreateEnvironmentOptions {
+  appId: str;
+  entrypoint: str;
+  sha: str;
+  environment: environments.Environment;
+  privateKey: str;
 }
 
 struct PostCommentOptions {
@@ -75,6 +96,7 @@ pub class EnvironmentManager {
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
   analytics: analytics.SegmentAnalytics;
+  mrq: queue.MostRecentQueue;
 
   new(props: EnvironmentsProps) {
     this.apps = props.apps;
@@ -93,6 +115,74 @@ pub class EnvironmentManager {
       siteDomain: props.siteDomain
     );
     this.analytics = props.analytics;
+    this.mrq = new queue.MostRecentQueue(table: props.table, handler: inflight (message) => {
+      let body = QueueMessage.parseJson(message.body);
+      this.handle(body);
+    });
+  }
+
+  pub inflight handle(body: QueueMessage) {
+    let action = body.action;
+    if action == "create" {
+      let options = HandlerCreateEnvironmentOptions.fromJson(body.options);
+      this.handleCreate(options);
+    } elif action == "restart" {
+      let options = RestartEnvironmentOptions.fromJson(body.options);
+      this.handleRestart(options);
+    } elif action == "stop" {
+      let options = StopEnvironmentOptions.fromJson(body.options);
+      this.handleStop(options);
+    } elif action == "updateStatus" {
+      let options = UpdateEnvironmentStatusOptions.fromJson(body.options);
+      this.hanldeUpdateStatus(options);
+    } else {
+      log("unknown action {action}");
+      throw "unknown action {action}";
+    }
+  }
+
+  pub inflight handleCreate(options: HandlerCreateEnvironmentOptions) {
+    let octokit = this.auth(options.environment.installationId);
+
+    let secrets = this.secretsForEnvironment(options.environment);
+
+    let app = this.apps.get(appId: options.environment.appId);
+
+    this.postComment(
+      appId: app.appId,
+      appName: app.appName,
+      environmentId: options.environment.id,
+      octokit: octokit
+    );
+
+    if options.environment.type == "production" {
+      try {
+        this.githubComment.updateRepoInfo(
+          octokit: octokit,
+          appId: options.appId,
+          appName: app.appName,
+          environmentId: options.environment.id,
+        );
+      } catch err {
+        log("unable to update repo url: {err}");
+      }
+    }
+
+    let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: options.environment.installationId);
+    if tokenRes.status >= 300 || tokenRes.status < 200 {
+      throw "environment create: unable to create installation access token";
+    }
+
+    this.runtimeClient.create(
+      appId: options.appId,
+      entrypoint: options.entrypoint,
+      environment: options.environment,
+      secrets: secrets,
+      certificate: this.certificate.certificate(),
+      sha: options.sha,
+      token: tokenRes.data.token,
+      privateKey: options.privateKey,
+    );
   }
 
   pub inflight create(options: CreateEnvironmentOptions) {
@@ -113,48 +203,23 @@ pub class EnvironmentManager {
       type: environment.type,
     });
 
-    let secrets = this.secretsForEnvironment(environment);
-
-    let app = this.apps.get(appId: environment.appId);
-
-    this.postComment(
-      appId: app.appId,
-      appName: app.appName,
-      environmentId: environment.id,
-      octokit: octokit
-    );
-
-    if environment.type == "production" {
-      try {
-        this.githubComment.updateRepoInfo(
-          octokit: octokit,
+    this.mrq.enqueue(
+      id: environment.id, 
+      timestamp: options.timestamp,
+      body: Json.stringify(QueueMessage{
+        action: "create",
+        options: HandlerCreateEnvironmentOptions{ 
           appId: options.appId,
-          appName: app.appName,
-          environmentId: environment.id,
-        );
-      } catch err {
-        log("unable to update repo url: {err}");
-      }
-    }
-
-    let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: environment.installationId);
-    if tokenRes.status >= 300 || tokenRes.status < 200 {
-      throw "environment create: unable to create installation access token";
-    }
-
-    this.runtimeClient.create(
-      appId: options.appId,
-      entrypoint: options.entrypoint,
-      environment: environment,
-      secrets: secrets,
-      certificate: this.certificate.certificate(),
-      sha: options.sha,
-      token: tokenRes.data.token,
-      privateKey: keyPair.privateKey,
+          entrypoint: options.entrypoint,
+          environment: environment,
+          sha: options.sha,
+          privateKey: keyPair.privateKey,
+        } 
+      })
     );
   }
 
-  pub inflight restart(options: RestartEnvironmentOptions) {
+  pub inflight handleRestart(options: RestartEnvironmentOptions) {
     let octokit = this.auth(options.environment.installationId);
     let keyPair = KeyPair.KeyPair.generate();
 
@@ -204,6 +269,17 @@ pub class EnvironmentManager {
     );
   }
 
+  pub inflight restart(options: RestartEnvironmentOptions) {
+    this.mrq.enqueue(
+      id: options.environment.id, 
+      timestamp: options.timestamp,
+      body: Json.stringify(QueueMessage{
+        action: "restart",
+        options: options,
+      })
+    );
+  }
+
   pub inflight restartAll(options: RestartAllEnvironmentOptions) {
     let environments = this.environments.list(appId: options.appId);
     for environment in environments {
@@ -212,11 +288,17 @@ pub class EnvironmentManager {
       let repo = environment.repo.split("/").at(1);
       let ref = octokit.git.getRef(owner: owner, repo: repo, ref: "heads/{environment.branch}");
 
-      this.restart(appId: options.appId, entrypoint: options.entrypoint, environment: environment, sha: ref.data.object.sha);
+      this.restart(
+        appId: options.appId,
+        entrypoint: options.entrypoint,
+        environment: environment,
+        sha: ref.data.object.sha,
+        timestamp: options.timestamp,
+      );
     }
   }
 
-  pub inflight stop(options: StopEnvironmentOptions) {
+  pub inflight handleStop(options: StopEnvironmentOptions) {
     let octokit = this.auth(options.environment.installationId);
 
     this.environments.updateStatus(id: options.environment.id, appId: options.appId, status: "stopped");
@@ -236,9 +318,27 @@ pub class EnvironmentManager {
       appId: options.appId,
       appName: options.appName,
     );
+
+    if options.delete {
+      this.environments.delete(
+        appId: options.appId,
+        environmentId: options.environment.id
+      );
+    }
   }
 
-  pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
+  pub inflight stop(options: StopEnvironmentOptions) {
+    this.mrq.enqueue(
+      id: options.environment.id, 
+      timestamp: options.timestamp,
+      body: Json.stringify(QueueMessage{
+        action: "stop",
+        options: options,
+      })
+    );
+  }
+
+  pub inflight hanldeUpdateStatus(options: UpdateEnvironmentStatusOptions) {
     let environment = this.environments.get(id: options.statusReport.environmentId);
     let app = this.apps.get(appId: environment.appId);
     let status = options.statusReport.status;
@@ -252,13 +352,14 @@ pub class EnvironmentManager {
     );
 
     // if the environment build has completed, check to see if there is a new commit
-    if status == "running" || status == "error" {
+    if status == "running" || status == "error" && environment.status != "stopped" {
       if environment.sha != ref.data.object.sha {
         this.restart(
           appId: app.appId,
           entrypoint: app.entrypoint,
           environment: environment,
-          sha: ref.data.object.sha
+          sha: ref.data.object.sha,
+          timestamp: datetime.utcNow().timestampMs,
         );
         return;
       }
@@ -270,18 +371,7 @@ pub class EnvironmentManager {
       status: status
     );
 
-    if status == "tests" {
-      let testReport = status_reports.TestResults.fromJson(data);
-      this.environments.updateTestResults(
-        id: environment.id,
-        appId: app.appId,
-        testResults: testReport
-      );
-
-      if testReport.testResults.length == 0 {
-        return;
-      }
-    } elif status == "running" {
+    if status == "running" {
       let running = status_reports.Running.fromJson(options.statusReport.data);
       this.reconcileEndpoints(environment, running.objects.endpoints);
     }
@@ -291,6 +381,27 @@ pub class EnvironmentManager {
       appName: app.appName,
       environmentId: environment.id,
       octokit: octokit
+    );
+  }
+
+  pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
+    let environment = this.environments.get(id: options.statusReport.environmentId);
+    if options.statusReport.status == "tests" {
+      let testReport = status_reports.TestResults.fromJson(options.statusReport.data);
+      this.environments.updateTestResults(
+        id: environment.id,
+        appId: environment.appId,
+        testResults: testReport
+      );
+    }
+
+    this.mrq.enqueue(
+      id: options.statusReport.environmentId, 
+      timestamp: options.statusReport.timestamp,
+      body: Json.stringify(QueueMessage{
+        action: "updateStatus",
+        options: options,
+      })
     );
   }
 

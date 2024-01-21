@@ -8,7 +8,7 @@ struct RuntimeClientProps {
   runtimeUrl: str;
 }
 
-struct RuntimeClientCreateOptions {
+pub struct RuntimeClientCreateOptions {
   appId: str;
   entrypoint: str;
   environment: environments.Environment;
