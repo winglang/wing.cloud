@@ -38,7 +38,7 @@ const OwnerPage = () => {
     );
   }, [apps, search]);
 
-  const ws = wrpc["subscription"].useSubscription(undefined, {
+  wrpc["subscription"].useSubscription(undefined, {
     async onData(data) {
       console.log("subscription", { data });
     },

@@ -430,8 +430,6 @@ pub class Api {
     };
 
     api.post("/wrpc/app.create", inflight (request) => {
-      ws.send(key: "app.create", body: Json.stringify(request.body));
-
       if let accessToken = getAccessTokenFromCookie(request) {
         let user = getUserFromCookie(request);
 
@@ -488,6 +486,7 @@ pub class Api {
           appId: appId,
           entrypoint: entrypoint,
         }));
+        ws.send(key: "app.create", body: Json.stringify(request.body));
 
         return {
           body: {
