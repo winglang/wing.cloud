@@ -147,7 +147,6 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
   analytics: analytics,
-  table: table,
 );
 
 let wingCloudApi = new wingcloud_api.Api(

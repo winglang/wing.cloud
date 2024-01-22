@@ -27,7 +27,6 @@ struct EnvironmentsProps {
   probotAdapter: adapter.ProbotAdapter;
   siteDomain: str;
   analytics: analytics.SegmentAnalytics;
-  table: ex.DynamodbTable;
 }
 
 pub struct CreateEnvironmentOptions {
@@ -115,7 +114,7 @@ pub class EnvironmentManager {
       siteDomain: props.siteDomain
     );
     this.analytics = props.analytics;
-    this.mrq = new queue.MostRecentQueue(table: props.table, handler: inflight (message) => {
+    this.mrq = new queue.MostRecentQueue(handler: inflight (message) => {
       let body = QueueMessage.parseJson(message.body);
       this.handle(body);
     });
@@ -204,7 +203,7 @@ pub class EnvironmentManager {
     });
 
     this.mrq.enqueue(
-      id: environment.id, 
+      groupId: environment.id, 
       timestamp: options.timestamp,
       body: Json.stringify(QueueMessage{
         action: "create",
@@ -271,7 +270,7 @@ pub class EnvironmentManager {
 
   pub inflight restart(options: RestartEnvironmentOptions) {
     this.mrq.enqueue(
-      id: options.environment.id, 
+      groupId: options.environment.id, 
       timestamp: options.timestamp,
       body: Json.stringify(QueueMessage{
         action: "restart",
@@ -329,7 +328,7 @@ pub class EnvironmentManager {
 
   pub inflight stop(options: StopEnvironmentOptions) {
     this.mrq.enqueue(
-      id: options.environment.id, 
+      groupId: options.environment.id, 
       timestamp: options.timestamp,
       body: Json.stringify(QueueMessage{
         action: "stop",
@@ -396,7 +395,7 @@ pub class EnvironmentManager {
     }
 
     this.mrq.enqueue(
-      id: options.statusReport.environmentId, 
+      groupId: options.statusReport.environmentId, 
       timestamp: options.statusReport.timestamp,
       body: Json.stringify(QueueMessage{
         action: "updateStatus",
