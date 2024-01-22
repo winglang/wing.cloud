@@ -5,7 +5,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { WRPCProvider } from "@wingcloud/wrpc";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState, type PropsWithChildren } from "react";
 import { RouterProvider } from "react-router-dom";
 
 import { NotificationsProvider } from "./design-system/notification.js";
@@ -15,6 +15,7 @@ import { AnalyticsIdentityProvider } from "./utils/analytics-identity-provider.j
 import { AnalyticsContext } from "./utils/analytics-provider.js";
 import { PopupWindowProvider } from "./utils/popup-window-provider.js";
 import { useAnalyticsEvents } from "./utils/use-analytics-events.js";
+import { wrpc } from "./utils/wrpc.js";
 
 const API_URL = new URL(location.origin);
 API_URL.pathname = "/wrpc";
@@ -23,6 +24,20 @@ API_URL.pathname = "/wrpc";
 const WS_URL = new URL(window["wingEnv"]["WS_URL"]);
 WS_URL.pathname = "/ws";
 WS_URL.protocol = "ws" + WS_URL.protocol.slice(4);
+
+const QueryInvalidationProvider = ({ children }: PropsWithChildren) => {
+  const ws = wrpc["app.invalidateQuery"].useSubscription(undefined, {
+    async onData(data) {
+      console.log("invalidateQuery", { data });
+    },
+  });
+  useEffect(() => {
+    return () => {
+      ws.close();
+    };
+  });
+  return children;
+};
 
 export const App = () => {
   const { track } = useContext(AnalyticsContext);
@@ -60,15 +75,17 @@ export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <WRPCProvider value={{ url: API_URL.toString(), ws: WS_URL.toString() }}>
-        <AnalyticsIdentityProvider>
-          <ThemeProvider mode="light" theme={DefaultTheme}>
-            <NotificationsProvider>
-              <PopupWindowProvider>
-                <RouterProvider router={router} />
-              </PopupWindowProvider>
-            </NotificationsProvider>
-          </ThemeProvider>
-        </AnalyticsIdentityProvider>
+        <QueryInvalidationProvider>
+          <AnalyticsIdentityProvider>
+            <ThemeProvider mode="light" theme={DefaultTheme}>
+              <NotificationsProvider>
+                <PopupWindowProvider>
+                  <RouterProvider router={router} />
+                </PopupWindowProvider>
+              </NotificationsProvider>
+            </ThemeProvider>
+          </AnalyticsIdentityProvider>
+        </QueryInvalidationProvider>
       </WRPCProvider>
     </QueryClientProvider>
   );

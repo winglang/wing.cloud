@@ -501,8 +501,6 @@ pub class Api {
     });
 
     api.get("/wrpc/app.list", inflight (request) => {
-      ws.send(key: "app.list", body: "APP LIST");
-
       let owner = request.query.get("owner");
       checkOwnerAccessRights(request, owner);
 
@@ -511,6 +509,7 @@ pub class Api {
           userId: user.id,
         );
 
+        ws.send(key: "app.list", body: "APP LIST");
         return {
           body: {
             apps: userApps,

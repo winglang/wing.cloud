@@ -6,6 +6,10 @@ struct WebsocketSendOpts {
   body: str;
 }
 
+struct WebsocketItem {
+  connectionIds: Set<str>;
+}
+
 pub class WebSocket {
   pub ws: websockets.WebSocket;
   table: ex.DynamodbTable;
@@ -17,9 +21,10 @@ pub class WebSocket {
     this.url = this.ws.url;
 
     this.ws.onConnect(inflight(id: str): void => {
+      let userId = this.getUserId();
       this.table.updateItem({
         key: {
-            pk: "WEBSOCKETS#{this.getUserId()}",
+            pk: "WEBSOCKETS#{userId}",
             sk: "#"
         },
         updateExpression: "SET connectionIds = list_append(if_not_exists(connectionIds, :empty_list), :connectionId)",
@@ -31,27 +36,27 @@ pub class WebSocket {
     });
 
     this.ws.onDisconnect(inflight(id: str): void => {
+      let userId = this.getUserId();
       let result = this.table.getItem({
         key: {
-            pk: "WEBSOCKETS#{this.getUserId()}",
+            pk: "WEBSOCKETS#{userId}",
             sk: "#"
         },
         projectionExpression: "connectionIds",
       });
 
-      if let connections = result.item?.tryGet("connectionIds")?.tryAsStr() {
-        let connectionIds = connections.split(",").copyMut();
-        let index = connectionIds.indexOf(id);
-        if (index > -1) {
-          connectionIds.popAt(index);
+      if let item = result.item {
+        let connections = WebsocketItem.fromJson(item).connectionIds;
+        let connectionIds = connections.copyMut();
+        if connectionIds.delete(id) {
           this.table.updateItem({
             key: {
-                pk: "WEBSOCKETS#{this.getUserId()}",
+                pk: "WEBSOCKETS#{userId}",
                 sk: "#"
             },
             updateExpression: "SET connectionIds = :newList",
             expressionAttributeValues: {
-              ":newList": connectionIds.join(",")
+              ":newList": connectionIds.toArray()
             },
           });
         }
@@ -64,17 +69,19 @@ pub class WebSocket {
   }
 
   pub inflight send(opts: WebsocketSendOpts) {
+    let userId = this.getUserId();
     let result = this.table.getItem(
       key: {
-        pk: "WEBSOCKETS#{this.getUserId()}",
+        pk: "WEBSOCKETS#{userId}",
         sk: "#"
       },
       projectionExpression: "connectionIds",
     );
-
-    let connections = result.item?.tryGet("connectionIds")?.tryAsStr() ?? "";
-    for connectionId in connections.split(",") {
-      this.ws.sendMessage(connectionId, opts.body);
+    if let item = result.item {
+      let connectionIds = WebsocketItem.fromJson(item).connectionIds;
+      for connectionId in connectionIds{
+        this.ws.sendMessage(connectionId, opts.body);
+      }
     }
   }
 

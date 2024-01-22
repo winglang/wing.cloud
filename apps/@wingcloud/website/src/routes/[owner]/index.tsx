@@ -38,12 +38,6 @@ const OwnerPage = () => {
     );
   }, [apps, search]);
 
-  wrpc["subscription"].useSubscription(undefined, {
-    async onData(data) {
-      console.log("subscription", { data });
-    },
-  });
-
   return (
     <div
       className={clsx(

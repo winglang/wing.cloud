@@ -128,7 +128,7 @@ export interface Endpoint {
 }
 
 export const wrpc = createWRPCReact<{
-  subscription: SubscriptionProcedure<undefined, any>;
+  "app.invalidateQuery": SubscriptionProcedure<undefined, any>;
   "auth.check": QueryProcedure<
     undefined,
     {
