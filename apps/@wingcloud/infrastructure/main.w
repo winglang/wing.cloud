@@ -33,8 +33,6 @@ let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true";
 
 let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey, enableAnalytics);
 
-let ws = new websockets.WebSocket();
-
 let api = new cloud.Api(
   cors: true,
   corsOptions: cloud.ApiCorsOptions {
@@ -61,6 +59,7 @@ let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
 let secrets = new Secrets.Secrets();
 let endpoints = new Endpoints.Endpoints(table);
+let ws = new websockets.WebSocket(table);
 
 let probotAdapter = new adapter.ProbotAdapter(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),

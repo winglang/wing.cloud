@@ -7,41 +7,54 @@ struct WebsocketSendOpts {
 }
 
 pub class WebSocket {
-  ws: websockets.WebSocket;
-  tb: ex.DynamodbTable;
+  pub ws: websockets.WebSocket;
+  table: ex.DynamodbTable;
   pub url: str;
 
-  new() {
+  new(table: ex.DynamodbTable) {
+    this.table = table;
     this.ws = new websockets.WebSocket(name: "WingCloudWebsocket") as "wingcloud-websocket";
     this.url = this.ws.url;
-    this.tb = new ex.DynamodbTable(
-      name: "WebSocketTable",
-      hashKey: "connectionId",
-      attributeDefinitions: {
-        "connectionId": "S",
-      },
-    ) as "wsTable";
 
     this.ws.onConnect(inflight(id: str): void => {
-      this.tb.putItem({
-        item: {
-          "connectionId": id
-        }
+      this.table.updateItem({
+        key: {
+            pk: "WEBSOCKETS#{this.getUserId()}",
+            sk: "#"
+        },
+        updateExpression: "SET connectionIds = list_append(if_not_exists(connectionIds, :empty_list), :connectionId)",
+        expressionAttributeValues: {
+            ":connectionId": ["{id}"],
+            ":empty_list": []
+        },
       });
     });
 
     this.ws.onDisconnect(inflight(id: str): void => {
-      this.tb.deleteItem({
+      let result = this.table.getItem({
         key: {
-          "connectionId": id
-        }
+            pk: "WEBSOCKETS#{this.getUserId()}",
+            sk: "#"
+        },
+        projectionExpression: "connectionIds",
       });
-    });
 
-    this.ws.onMessage(inflight (id: str, body: str): void => {
-      let connections = this.tb.scan();
-      for item in connections.items {
-        this.ws.sendMessage(str.fromJson(item.get("connectionId")), body);
+      if let connections = result.item?.tryGet("connectionIds")?.tryAsStr() {
+        let connectionIds = connections.split(",").copyMut();
+        let index = connectionIds.indexOf(id);
+        if (index > -1) {
+          connectionIds.popAt(index);
+          this.table.updateItem({
+            key: {
+                pk: "WEBSOCKETS#{this.getUserId()}",
+                sk: "#"
+            },
+            updateExpression: "SET connectionIds = :newList",
+            expressionAttributeValues: {
+              ":newList": connectionIds.join(",")
+            },
+          });
+        }
       }
     });
 
@@ -51,9 +64,23 @@ pub class WebSocket {
   }
 
   pub inflight send(opts: WebsocketSendOpts) {
-      let connections = this.tb.scan();
-      for item in connections.items {
-        this.ws.sendMessage(str.fromJson(item.get("connectionId")), opts.body);
-      }
+    let result = this.table.getItem(
+      key: {
+        pk: "WEBSOCKETS#{this.getUserId()}",
+        sk: "#"
+      },
+      projectionExpression: "connectionIds",
+    );
+
+    let connections = result.item?.tryGet("connectionIds")?.tryAsStr() ?? "";
+    for connectionId in connections.split(",") {
+      this.ws.sendMessage(connectionId, opts.body);
+    }
+  }
+
+  inflight getUserId(): str {
+    let userId = "polamoros";
+
+    return userId;
   }
 }
