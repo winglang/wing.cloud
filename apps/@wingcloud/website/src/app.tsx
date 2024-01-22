@@ -26,16 +26,28 @@ WS_URL.pathname = "/ws";
 WS_URL.protocol = "ws" + WS_URL.protocol.slice(4);
 
 const QueryInvalidationProvider = ({ children }: PropsWithChildren) => {
+  const auth = wrpc["auth.check"].useQuery();
+
   const ws = wrpc["app.invalidateQuery"].useSubscription(undefined, {
+    enabled: !!auth.data,
     async onData(data) {
-      console.log("invalidateQuery", { data });
+      console.log("app.invalidateQuery", data);
+
+      // // eslint-disable-next-line unicorn/prefer-ternary
+      // if (query) {
+      //   await ( as any)[query]?.invalidate();
+      // } else {
+      //   await trpcContext.invalidate();
+      // }
     },
+    userId: auth.data?.user.id ?? "",
   });
+
   useEffect(() => {
     return () => {
-      ws.close();
+      //ws.close();
     };
-  });
+  }, []);
   return children;
 };
 

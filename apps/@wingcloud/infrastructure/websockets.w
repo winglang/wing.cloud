@@ -2,8 +2,8 @@ bring websockets;
 bring ex;
 
 struct WebsocketSendOpts {
-  key: str;
-  body: str;
+  userId: str;
+  payload: Json;
 }
 
 struct WebsocketItem {
@@ -69,7 +69,7 @@ pub class WebSocket {
   }
 
   pub inflight send(opts: WebsocketSendOpts) {
-    let userId = this.getUserId();
+    let userId = this.getUserId(); // opts.userId;
     let result = this.table.getItem(
       key: {
         pk: "WEBSOCKETS#{userId}",
@@ -80,7 +80,7 @@ pub class WebSocket {
     if let item = result.item {
       let connectionIds = WebsocketItem.fromJson(item).connectionIds;
       for connectionId in connectionIds{
-        this.ws.sendMessage(connectionId, opts.body);
+        this.ws.sendMessage(connectionId, Json.stringify(opts));
       }
     }
   }

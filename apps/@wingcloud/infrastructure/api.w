@@ -216,6 +216,10 @@ pub class Api {
         // check if user exists in the db
         let user = users.get(userId: userId);
 
+        ws.send(
+          userId: userId,
+          payload: {key: "auth.check", body: "Check auth"}
+        );
         return {
           body: {
             user: user
@@ -486,7 +490,13 @@ pub class Api {
           appId: appId,
           entrypoint: entrypoint,
         }));
-        ws.send(key: "app.create", body: Json.stringify(request.body));
+        ws.send(
+          userId: user.userId,
+          payload: {
+            key: "app.create",
+            body: Json.stringify(request.body)
+          }
+        );
 
         return {
           body: {
@@ -509,7 +519,10 @@ pub class Api {
           userId: user.id,
         );
 
-        ws.send(key: "app.list", body: "APP LIST");
+        ws.send(userId: user.id, payload: {
+          key: "app.list",
+          body: Json.stringify(userApps),
+        });
         return {
           body: {
             apps: userApps,
