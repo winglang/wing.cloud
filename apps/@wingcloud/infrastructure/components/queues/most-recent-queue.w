@@ -28,11 +28,9 @@ pub class MostRecentQueue {
     this.table = new ex.DynamodbTable(
       name: "table",
       attributeDefinitions: {
-        "pk": "S",
-        "sk": "S",
+        "groupId": "S",
       },
-      hashKey: "pk",
-      rangeKey: "sk",
+      hashKey: "groupId",
     );
     this.queue = new fifoqueue.FifoQueue();
     this.queue.setConsumer(inflight (event: str) => {
@@ -40,8 +38,7 @@ pub class MostRecentQueue {
       let message = MostRecentQueueMessage.parseJson(event);
       let item = this.table.getItem({
         key:{
-          pk: "QUEUE_MESSAGE#{message.groupId}",
-          sk: "#",
+          groupId: message.groupId,
         }
       });
 
@@ -60,13 +57,11 @@ pub class MostRecentQueue {
       let id = util.nanoid();
       this.table.updateItem(
         key: {
-          pk: "QUEUE_MESSAGE#{message.groupId}",
-          sk: "#",
+          groupId: message.groupId,
         },
-        updateExpression: "SET lastMessageTimestamp = :lastMessageTimestamp, groupId = :groupId, id = :id",
+        updateExpression: "SET lastMessageTimestamp = :lastMessageTimestamp, id = :id",
         expressionAttributeValues: {
           ":lastMessageTimestamp": message.timestamp,
-          ":groupId": message.groupId,
           ":id": id,
         },
         conditionExpression: "attribute_not_exists(lastMessageTimestamp) OR lastMessageTimestamp < :lastMessageTimestamp",
