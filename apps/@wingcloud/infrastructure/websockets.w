@@ -122,7 +122,7 @@ pub class WebSocket {
     });
 
     this.ws.onDisconnect(inflight(id: str): void => {
-      deleteConnection(id);
+      //deleteConnection(id);
     });
 
     /* This method is temporarily required only for local execution (target sim) and will be deprecated in the future.
