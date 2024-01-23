@@ -1,13 +1,28 @@
 bring websockets;
 bring ex;
+bring "./jwt.w" as JWT;
 
 struct WebsocketSendOpts {
   userId: str;
   payload: Json;
 }
 
-struct WebsocketItem {
+struct UserItem {
   connectionIds: Set<str>;
+}
+
+struct ConnectionItem {
+  userId: str;
+}
+
+struct WebsocketMessage {
+  type: str;
+  payload: str;
+}
+
+pub struct WebSocketProps {
+  table: ex.DynamodbTable;
+  appSecret: str;
 }
 
 pub class WebSocket {
@@ -15,52 +30,99 @@ pub class WebSocket {
   table: ex.DynamodbTable;
   pub url: str;
 
-  new(table: ex.DynamodbTable) {
-    this.table = table;
+  new(props: WebSocketProps) {
+    this.table = props.table;
     this.ws = new websockets.WebSocket(name: "WingCloudWebsocket") as "wingcloud-websocket";
     this.url = this.ws.url;
 
-    this.ws.onConnect(inflight(id: str): void => {
-      let userId = this.getUserId();
-      this.table.updateItem({
+    let saveConnection = inflight (id: str, userId: str): void => {
+      this.table.transactWriteItems(
+        transactItems: [
+          {
+            update: {
+              key: {
+                pk: "WS_USER#{userId}",
+                sk: "#",
+              },
+              updateExpression: "SET connectionIds = list_append(if_not_exists(connectionIds, :empty_list), :connectionId)",
+              expressionAttributeValues: {
+                  ":connectionId": ["{id}"],
+                  ":empty_list": []
+              },
+            },
+            put: {
+              item: {
+                pk: "WS_CONNECTION#{id}",
+                sk: "#",
+                userId: "{userId}",
+              },
+              conditionExpression: "attribute_not_exists(pk)",
+            }
+          },
+
+        ],
+      );
+    };
+
+    let deleteConnection = inflight(id: str): void => {
+      let connection = this.table.getItem(
         key: {
-            pk: "WEBSOCKETS#{userId}",
-            sk: "#"
+          pk: "WS_CONNECTION#{id}",
+          sk: "#",
         },
-        updateExpression: "SET connectionIds = list_append(if_not_exists(connectionIds, :empty_list), :connectionId)",
-        expressionAttributeValues: {
-            ":connectionId": ["{id}"],
-            ":empty_list": []
-        },
-      });
+        projectionExpression: "userId",
+      );
+      if let user = ConnectionItem.tryFromJson(connection.item) {
+        this.table.deleteItem(
+          key: {
+            pk: "WS_CONNECTION#{id}",
+            sk: "#",
+          },
+        );
+
+        let userItem = this.table.getItem(
+          key: {
+            pk: "WS_USER#{user.userId}",
+            sk: "#",
+          },
+          projectionExpression: "connectionIds",
+        );
+        if let userData = UserItem.tryFromJson(userItem) {
+          let connectionIds = userData.connectionIds.copyMut();
+          if connectionIds.delete(id) {
+            this.table.updateItem({
+              key: {
+                  pk: "WS_USER#{user.userId}",
+                  sk: "#"
+              },
+              updateExpression: "SET connectionIds = :newList",
+              expressionAttributeValues: {
+                ":newList": connectionIds.toArray()
+              },
+            });
+          }
+        } else {
+          log("WS User '{user.userId}' not found");
+        }
+      } else {
+        log("Connection '{id}' not found");
+      }
+    };
+
+    this.ws.onMessage(inflight(id: str, message: str): void => {
+      let data = WebsocketMessage.fromJson(Json.parse(message));
+      if data.type == "authorize" && data.payload != "" {
+        let jwt = JWT.JWT.verify(
+          jwt: data.payload,
+          secret: props.appSecret
+        );
+        let userId = jwt.userId;
+        saveConnection(id, userId);
+      }
     });
 
     this.ws.onDisconnect(inflight(id: str): void => {
-      let userId = this.getUserId();
-      let result = this.table.getItem({
-        key: {
-            pk: "WEBSOCKETS#{userId}",
-            sk: "#"
-        },
-        projectionExpression: "connectionIds",
-      });
-
-      if let item = result.item {
-        let connections = WebsocketItem.fromJson(item).connectionIds;
-        let connectionIds = connections.copyMut();
-        if connectionIds.delete(id) {
-          this.table.updateItem({
-            key: {
-                pk: "WEBSOCKETS#{userId}",
-                sk: "#"
-            },
-            updateExpression: "SET connectionIds = :newList",
-            expressionAttributeValues: {
-              ":newList": connectionIds.toArray()
-            },
-          });
-        }
-      }
+      deleteConnection(id);
     });
 
     /* This method is temporarily required only for local execution (target sim) and will be deprecated in the future.
@@ -69,25 +131,18 @@ pub class WebSocket {
   }
 
   pub inflight send(opts: WebsocketSendOpts) {
-    let userId = this.getUserId(); // opts.userId;
     let result = this.table.getItem(
       key: {
-        pk: "WEBSOCKETS#{userId}",
+        pk: "WS_USER#{opts.userId}",
         sk: "#"
       },
       projectionExpression: "connectionIds",
     );
     if let item = result.item {
-      let connectionIds = WebsocketItem.fromJson(item).connectionIds;
-      for connectionId in connectionIds{
-        this.ws.sendMessage(connectionId, Json.stringify(opts));
+      let connectionIds = UserItem.fromJson(item).connectionIds;
+      for connectionId in connectionIds {
+        this.ws.sendMessage(connectionId, Json.stringify(opts.payload));
       }
     }
-  }
-
-  inflight getUserId(): str {
-    let userId = "polamoros";
-
-    return userId;
   }
 }

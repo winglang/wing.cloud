@@ -31,7 +31,7 @@ interface UseSubscriptionOptions<
   TQueryKey extends QueryKey = QueryKey,
 > extends UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> {
   onData: (data: any) => Promise<void>;
-  userId: string;
+  token: string;
 }
 
 interface UseSubscriptionOutput {
@@ -208,11 +208,14 @@ export const createWRPCReact = <
           },
           useSubscription: (input: any, options: UseSubscriptionOptions) => {
             const url = new URL(`${useContext(WRPCContext).ws}`);
-            url.searchParams.append("userId", options.userId);
-
             const ws = new WebSocket(url);
             ws.addEventListener("open", () => {
-              console.log("ws connected");
+              ws.send(
+                JSON.stringify({
+                  type: "authorize",
+                  payload: options.token,
+                }),
+              );
             });
             ws.addEventListener("close", () => {
               console.log("ws closed");

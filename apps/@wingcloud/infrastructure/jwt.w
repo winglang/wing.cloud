@@ -3,6 +3,7 @@ bring util;
 struct SignOptions {
   secret: str;
   userId: str;
+  expirationTime: str?;
 }
 
 struct VerifyOptions {

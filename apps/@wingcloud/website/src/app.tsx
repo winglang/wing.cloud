@@ -26,7 +26,7 @@ WS_URL.pathname = "/ws";
 WS_URL.protocol = "ws" + WS_URL.protocol.slice(4);
 
 const QueryInvalidationProvider = ({ children }: PropsWithChildren) => {
-  const auth = wrpc["auth.check"].useQuery();
+  const auth = wrpc["auth.ws"].useQuery();
 
   const ws = wrpc["app.invalidateQuery"].useSubscription(undefined, {
     enabled: !!auth.data,
@@ -40,7 +40,7 @@ const QueryInvalidationProvider = ({ children }: PropsWithChildren) => {
       //   await trpcContext.invalidate();
       // }
     },
-    userId: auth.data?.user.id ?? "",
+    token: auth.data?.token ?? "",
   });
 
   useEffect(() => {

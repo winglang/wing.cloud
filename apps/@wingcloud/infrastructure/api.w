@@ -208,6 +208,24 @@ pub class Api {
       throw httpError.HttpError.badRequest("Installation not found");
     };
 
+    api.get("/wrpc/auth.ws", inflight (request) => {
+      try {
+        let userId = getUserIdFromCookie(request);
+        let jwt = JWT.JWT.sign(
+          secret: props.appSecret,
+          userId: userId,
+          expirationTime: "1m",
+        );
+        return {
+          body: {
+            token: jwt,
+          },
+        };
+      } catch {
+        log("User not authenticated. Rejecting websocket connection");
+      }
+    });
+
     api.get("/wrpc/auth.check", inflight (request) => {
       try {
         // check if the user from the cookie is valid
