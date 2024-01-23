@@ -67,6 +67,7 @@ struct GetListOfEntrypointsProps{
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
   extern "./util.js" pub static inflight parseLog(log: str): Log?;
+  extern "./util.js" pub static inflight encodeURIComponent(value: str): str;
 
   pub static inflight parseLogs(messages: Array<str>): Array<Log> {
     let var parsedLogs = MutArray<Log>[];
@@ -315,6 +316,19 @@ pub class Api {
         headers: {
           Location: location,
           "Set-Cookie": authCookie,
+        },
+      };
+    });
+
+    api.get("/wrpc/console.signIn", inflight (request) => {
+      let port = request.query.get("port");
+      let anonymousId = Util.encodeURIComponent(request.query.get("anonymousId"));
+      let redirectURI = Util.encodeURIComponent("http://localhost:3900/wrpc/github.callback?port={port}&anonymousId={anonymousId}");
+
+      return {
+        status: 302,
+        headers: {
+          Location: "https://github.com/login/oauth/authorize?client_id={props.githubAppClientId}&redirect_uri={redirectURI}",
         },
       };
     });
