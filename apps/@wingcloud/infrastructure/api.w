@@ -284,43 +284,37 @@ pub class Api {
         },
       );
 
+      // The default redirect location is the user's profile page,
+      // but in the case of the Console Sign In process, we want to redirect
+      // to the Console instead.
+      let var location = "/{user.username}";
+
+      if let anonymousId = request.query.tryGet("anonymousId") {
+        props.analytics.identify(
+          anonymousId: anonymousId,
+          userId: user.id,
+          traits: {
+            email: user.email,
+            github: user.username,
+          },
+        );
+        props.analytics.track(user.id, "console_sign_in", {
+          anonymousId: anonymousId,
+          userId: user.id,
+          email: user.email,
+          github: user.username,
+        });
+
+        if let port = request.query.tryGet("port") {
+          location = "http://localhost:{port}/?signedIn";
+        }
+      }
+
       return {
         status: 302,
         headers: {
-          Location: "/{user.username}",
+          Location: location,
           "Set-Cookie": authCookie,
-        },
-      };
-    });
-
-    api.get("/wrpc/console.signIn", inflight (request) => {
-      let anonymousId = request.query.get("anonymousId");
-      let localhostPort = num.fromStr(request.query.get("localhostPort"));
-
-      let user = getUserFromCookie(request);
-      let userId = user.userId;
-      let email = user.email;
-      let github = user.username;
-
-      props.analytics.identify(
-        anonymousId: anonymousId,
-        userId: userId,
-        traits: {
-          email: email,
-          github: github,
-        },
-      );
-
-      props.analytics.track(userId, "console_sign_in", {
-        anonymousId: anonymousId,
-        userId: userId,
-        email: email,
-        github: github,
-      });
-
-      return {
-        headers: {
-          Location: "http://localhost:{localhostPort}/",
         },
       };
     });
