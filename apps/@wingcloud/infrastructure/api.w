@@ -234,10 +234,6 @@ pub class Api {
         // check if user exists in the db
         let user = users.get(userId: userId);
 
-        ws.send(
-          userId: userId,
-          payload: {key: "auth.check", body: "Check auth"}
-        );
         return {
           body: {
             user: user
