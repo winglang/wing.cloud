@@ -248,12 +248,12 @@ if util.tryEnv("WING_TARGET") == "sim" {
   webhookUrl = devNgrok.url;
 }
 
-// let updateGithubWebhook = inflight () => {
-//   probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
-//   log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
-// };
+let updateGithubWebhook = inflight () => {
+  probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
+  log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
+};
 
-// new cloud.OnDeploy(updateGithubWebhook);
+new cloud.OnDeploy(updateGithubWebhook);
 
 new EnvironmentCleaner.EnvironmentCleaner(apps: apps, environmentManager: environmentManager, environments: environments);
 
