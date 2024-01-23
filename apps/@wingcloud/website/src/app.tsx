@@ -47,12 +47,11 @@ const QueryInvalidationProvider = ({ children }: PropsWithChildren) => {
     },
   });
 
-  const token = useMemo(() => auth.data?.token, [auth.data?.token]);
   useEffect(() => {
-    if (!token) {
+    if (!auth.data?.token) {
       return;
     }
-    ws.auth(token);
+    ws.auth(auth.data?.token);
   }, [auth.data]);
 
   useEffect(() => {

@@ -66,21 +66,16 @@ pub class WebSocket {
     };
 
     let deleteConnection = inflight(id: str): void => {
-      let connection = this.table.getItem(
+      let connection = this.table.deleteItem(
         key: {
           pk: "WS_CONNECTION#{id}",
           sk: "#",
         },
-        projectionExpression: "userId",
+        returnValues: "ALL_OLD",
       );
-      if let user = ConnectionItem.tryFromJson(connection.item) {
-        this.table.deleteItem(
-          key: {
-            pk: "WS_CONNECTION#{id}",
-            sk: "#",
-          },
-        );
+      return;
 
+      if let user = ConnectionItem.tryFromJson(connection.attributes) {
         let userItem = this.table.getItem(
           key: {
             pk: "WS_USER#{user.userId}",
@@ -122,7 +117,7 @@ pub class WebSocket {
     });
 
     this.ws.onDisconnect(inflight(id: str): void => {
-      //deleteConnection(id);
+      deleteConnection(id);
     });
 
     /* This method is temporarily required only for local execution (target sim) and will be deprecated in the future.
