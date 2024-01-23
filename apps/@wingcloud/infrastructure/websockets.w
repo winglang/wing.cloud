@@ -21,7 +21,6 @@ struct WebsocketMessage {
 }
 
 pub struct WebSocketProps {
-  table: ex.DynamodbTable;
   appSecret: str;
 }
 
@@ -31,36 +30,38 @@ pub class WebSocket {
   pub url: str;
 
   new(props: WebSocketProps) {
-    this.table = props.table;
+    this.table = new ex.DynamodbTable(
+      name: "ws_table",
+      attributeDefinitions: {
+        "pk": "S",
+        "sk": "S",
+      },
+      hashKey: "pk",
+      rangeKey: "sk",
+    );
+
     this.ws = new websockets.WebSocket(name: "WingCloudWebsocket") as "wingcloud-websocket";
     this.url = this.ws.url;
 
     let saveConnection = inflight (id: str, userId: str): void => {
-      this.table.transactWriteItems(
-        transactItems: [
-          {
-            update: {
-              key: {
-                pk: "WS_USER#{userId}",
-                sk: "#",
-              },
-              updateExpression: "SET connectionIds = list_append(if_not_exists(connectionIds, :empty_list), :connectionId)",
-              expressionAttributeValues: {
-                  ":connectionId": ["{id}"],
-                  ":empty_list": []
-              },
-            },
-            put: {
-              item: {
-                pk: "WS_CONNECTION#{id}",
-                sk: "#",
-                userId: "{userId}",
-              },
-              conditionExpression: "attribute_not_exists(pk)",
-            }
-          },
-
-        ],
+      this.table.updateItem(
+        key: {
+          pk: "WS_USER#{userId}",
+          sk: "#",
+        },
+        updateExpression: "SET connectionIds = list_append(if_not_exists(connectionIds, :empty_list), :connectionId)",
+        expressionAttributeValues: {
+            ":connectionId": ["{id}"],
+            ":empty_list": []
+        },
+      );
+      this.table.putItem(
+        item: {
+          pk: "WS_CONNECTION#{id}",
+          sk: "#",
+          userId: "{userId}",
+        },
+        conditionExpression: "attribute_not_exists(pk)",
       );
     };
 

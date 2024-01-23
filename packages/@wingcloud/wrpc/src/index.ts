@@ -31,11 +31,11 @@ interface UseSubscriptionOptions<
   TQueryKey extends QueryKey = QueryKey,
 > extends UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> {
   onData: (data: any) => Promise<void>;
-  token: string;
 }
 
 interface UseSubscriptionOutput {
   close: () => void;
+  auth: (token: string) => void;
 }
 
 export interface PaginatedResponse<T> {
@@ -210,15 +210,10 @@ export const createWRPCReact = <
             const url = new URL(`${useContext(WRPCContext).ws}`);
             const ws = new WebSocket(url);
             ws.addEventListener("open", () => {
-              ws.send(
-                JSON.stringify({
-                  type: "authorize",
-                  payload: options.token,
-                }),
-              );
+              console.debug("ws opened");
             });
             ws.addEventListener("close", () => {
-              console.log("ws closed");
+              console.debug("ws closed");
             });
             ws.addEventListener("message", (event) => {
               options.onData(event.data);
@@ -227,6 +222,23 @@ export const createWRPCReact = <
             return {
               close: () => {
                 ws.close();
+              },
+              auth: (token: string) => {
+                const auth = () => {
+                  ws.send(
+                    JSON.stringify({
+                      type: "authorize",
+                      payload: token,
+                    }),
+                  );
+                };
+                if (ws.readyState === ws.OPEN) {
+                  auth();
+                } else {
+                  ws.addEventListener("open", () => {
+                    auth();
+                  });
+                }
               },
             };
           },

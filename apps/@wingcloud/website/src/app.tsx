@@ -5,7 +5,13 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { WRPCProvider } from "@wingcloud/wrpc";
-import { useContext, useEffect, useState, type PropsWithChildren } from "react";
+import {
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type PropsWithChildren,
+} from "react";
 import { RouterProvider } from "react-router-dom";
 
 import { NotificationsProvider } from "./design-system/notification.js";
@@ -29,7 +35,6 @@ const QueryInvalidationProvider = ({ children }: PropsWithChildren) => {
   const auth = wrpc["auth.ws"].useQuery();
 
   const ws = wrpc["app.invalidateQuery"].useSubscription(undefined, {
-    enabled: !!auth.data,
     async onData(data) {
       console.log("app.invalidateQuery", data);
 
@@ -40,12 +45,19 @@ const QueryInvalidationProvider = ({ children }: PropsWithChildren) => {
       //   await trpcContext.invalidate();
       // }
     },
-    token: auth.data?.token ?? "",
   });
+
+  const token = useMemo(() => auth.data?.token, [auth.data?.token]);
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    ws.auth(token);
+  }, [auth.data]);
 
   useEffect(() => {
     return () => {
-      //ws.close();
+      ws.close();
     };
   }, []);
   return children;

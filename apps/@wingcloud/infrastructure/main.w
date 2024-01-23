@@ -59,7 +59,7 @@ let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
 let secrets = new Secrets.Secrets();
 let endpoints = new Endpoints.Endpoints(table);
-let ws = new websockets.WebSocket(table: table, appSecret: appSecret);
+let ws = new websockets.WebSocket(appSecret: appSecret);
 
 let probotAdapter = new adapter.ProbotAdapter(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
