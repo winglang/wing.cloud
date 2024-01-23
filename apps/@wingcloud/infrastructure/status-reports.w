@@ -28,5 +28,6 @@ pub struct Running {
 pub struct StatusReport {
   environmentId: str;
   status: str;
+  timestamp: num;
   data: Json?;
 }

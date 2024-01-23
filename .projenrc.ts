@@ -363,7 +363,7 @@ infrastructure.addDeps("octokit", "node-fetch");
 infrastructure.addDeps("@aws-sdk/client-kms");
 infrastructure.addDeps("dnsimple");
 infrastructure.addDeps("@segment/analytics-node");
-
+infrastructure.addDeps("@aws-sdk/client-sqs");
 infrastructure.addDeps("@aws-sdk/client-ssm");
 
 infrastructure.addDevDeps("@octokit/rest");

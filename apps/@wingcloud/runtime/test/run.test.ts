@@ -179,6 +179,9 @@ test("run() - reporting statuses", async () => {
     context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
 
+  for (const request of requests) {
+    delete (request as any).timestamp;
+  }
   delete requests[1].data?.testResults[0].time;
   delete requests[1].data?.testResults[0].timestamp;
   delete requests[1].data?.testResults[0].traces;

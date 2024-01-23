@@ -167,7 +167,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
-  analytics: analytics
+  analytics: analytics,
 );
 
 let wingCloudApi = new wingcloud_api.Api(
@@ -255,7 +255,7 @@ let proxyUrl = (() => {
 })();
 
 let var webhookUrl = probotApp.githubApp.webhookUrl;
-if util.tryEnv("WING_TARGET") == "sim" {
+if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" {
   bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
 
   let devNgrok = new ngrok.Ngrok(
