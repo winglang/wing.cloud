@@ -117,8 +117,7 @@ pub class WebSocket {
           jwt: data.payload,
           secret: props.appSecret
         );
-        let userId = jwt.userId;
-        saveConnection(id, userId);
+        saveConnection(id, jwt.userId);
       }
     });
 
