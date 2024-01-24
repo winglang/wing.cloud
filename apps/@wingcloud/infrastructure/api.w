@@ -63,6 +63,10 @@ struct GetListOfEntrypointsProps{
   defaultBranch: str;
 }
 
+struct EnvironmentReportMessage {
+  environmentId: str;
+}
+
 // TODO: https://github.com/winglang/wing/issues/3644
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
@@ -892,6 +896,20 @@ pub class Api {
       };
     });
 
+
+    let notifyEnvReportQueue = new cloud.Queue() as "Environment Report Queue";
+    notifyEnvReportQueue.setConsumer(inflight (event) => {
+      let input = EnvironmentReportMessage.fromJson(Json.parse(event));
+
+      let environment = props.environments.get(id: input.environmentId);
+      let app = props.apps.get(appId: environment.appId);
+
+      props.ws.sendMessage(
+        userId: app.userId,
+        key: "environment.report",
+      );
+    });
+
     api.post("/environment.report", inflight (request) => {
       if let event = request.body {
         log("report status: {event}");
@@ -904,6 +922,11 @@ pub class Api {
 
           if payloadEnvironmentId == statusReport.environmentId {
             props.environmentManager.updateStatus(statusReport: statusReport);
+
+            notifyEnvReportQueue.push(Json.stringify(EnvironmentReportMessage {
+              environmentId: statusReport.environmentId,
+            }));
+
             return {
               status: 200
             };
