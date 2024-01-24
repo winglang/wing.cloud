@@ -100,7 +100,6 @@ pub class WebSocket {
         );
         if let userData = UserItem.tryFromJson(userItem.item) {
           let connectionIds = userData.connectionIds.copyMut();
-
           if connectionIds.delete(id) {
             this.table.updateItem({
               key: {

@@ -13,8 +13,8 @@ import { DefaultTheme, ThemeProvider } from "./design-system/theme-provider.js";
 import { router } from "./router.jsx";
 import { AnalyticsIdentityProvider } from "./utils/analytics-identity-provider.js";
 import { AnalyticsContext } from "./utils/analytics-provider.js";
+import { InvalidateQueryProvider } from "./utils/invalidate-query-provider.js";
 import { PopupWindowProvider } from "./utils/popup-window-provider.js";
-import { QueryInvalidation } from "./utils/query-invalidation.js";
 import { useAnalyticsEvents } from "./utils/use-analytics-events.js";
 import { wrpc } from "./utils/wrpc.js";
 
@@ -62,7 +62,7 @@ export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <WRPCProvider value={{ url: API_URL.toString(), ws: WS_URL.toString() }}>
-        <QueryInvalidation>
+        <InvalidateQueryProvider>
           <AnalyticsIdentityProvider>
             <ThemeProvider mode="light" theme={DefaultTheme}>
               <NotificationsProvider>
@@ -72,7 +72,7 @@ export const App = () => {
               </NotificationsProvider>
             </ThemeProvider>
           </AnalyticsIdentityProvider>
-        </QueryInvalidation>
+        </InvalidateQueryProvider>
       </WRPCProvider>
     </QueryClientProvider>
   );

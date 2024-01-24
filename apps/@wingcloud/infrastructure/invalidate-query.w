@@ -24,6 +24,7 @@ pub class InvalidateQuery {
       queries.push(query);
     }
 
+    // Invalidation logic for special keys
     if options.key == "environment.report" {
       queries.push("app.listEnvironments");
     }

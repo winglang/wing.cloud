@@ -33,11 +33,6 @@ interface UseSubscriptionOptions<
   onData: (data: any) => Promise<void>;
 }
 
-interface UseSubscriptionOutput {
-  close: () => void;
-  auth: (token: string) => void;
-}
-
 export interface PaginatedResponse<T> {
   data: T;
   nextPage?: number;
@@ -108,7 +103,7 @@ export type SubscriptionProcedure<
           UseSubscriptionOptions<unknown, unknown, Input>,
           "queryKey"
         >,
-      ): UseSubscriptionOutput;
+      ): WebSocket;
     }
   : {
       useSubscription(
@@ -117,7 +112,7 @@ export type SubscriptionProcedure<
           UseSubscriptionOptions<unknown, unknown, Output>,
           "queryKey"
         >,
-      ): UseSubscriptionOutput;
+      ): WebSocket;
     };
 
 const fetcher = async (method: string, url: URL, input?: any) => {
@@ -219,29 +214,7 @@ export const createWRPCReact = <
               options.onData(JSON.parse(event.data));
             });
 
-            return {
-              close: () => {
-                ws.close();
-              },
-              auth: (token: string) => {
-                const auth = () => {
-                  ws.send(
-                    JSON.stringify({
-                      type: "authorize",
-                      subscriptionId: route,
-                      payload: token,
-                    }),
-                  );
-                };
-                if (ws.readyState === ws.OPEN) {
-                  auth();
-                } else {
-                  ws.addEventListener("open", () => {
-                    auth();
-                  });
-                }
-              },
-            };
+            return ws;
           },
         };
       },
