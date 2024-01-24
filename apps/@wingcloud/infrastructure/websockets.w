@@ -111,8 +111,6 @@ pub class WebSocket {
                 ":newList": connectionIds.toArray()
               },
             });
-          } else {
-            log("Connection id '{id}' not found in user {Json.stringify(userData)}.");
           }
         }
       }

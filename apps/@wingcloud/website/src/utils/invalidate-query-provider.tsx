@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   type PropsWithChildren,
@@ -26,31 +27,30 @@ export const InvalidateQueryProvider = ({ children }: PropsWithChildren) => {
     },
   });
 
+  const authorize = useCallback(() => {
+    console.log("Authorize", auth.data?.token);
+    ws.send(
+      JSON.stringify({
+        type: "authorize",
+        subscriptionId: "app.invalidateQuery",
+        payload: auth.data?.token,
+      }),
+    );
+  }, [auth.data?.token, ws]);
+
   useEffect(() => {
-    if (!auth.data?.token) {
-      return;
-    }
-
-    const authorize = () => {
-      ws.send(
-        JSON.stringify({
-          type: "authorize",
-          subscriptionId: "app.invalidateQuery",
-          payload: auth.data?.token,
-        }),
-      );
-    };
-
     if (ws.readyState === WebSocket.OPEN) {
       authorize();
     } else {
-      ws.addEventListener("open", authorize);
+      ws.addEventListener("open", () => {
+        authorize();
+      });
     }
 
     return () => {
       ws.removeEventListener("open", authorize);
     };
-  }, [auth.data?.token]);
+  }, [auth.data?.token, ws, authorize]);
 
   useEffect(() => {
     return () => {
