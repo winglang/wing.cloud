@@ -73,8 +73,6 @@ pub class WebSocket {
         },
         returnValues: "ALL_OLD",
       );
-      return;
-
       if let user = ConnectionItem.tryFromJson(connection.attributes) {
         let userItem = this.table.getItem(
           key: {
@@ -83,25 +81,20 @@ pub class WebSocket {
           },
           projectionExpression: "connectionIds",
         );
-        if let userData = UserItem.tryFromJson(userItem) {
+        if let userData = UserItem.tryFromJson(userItem.item) {
           let connectionIds = userData.connectionIds.copyMut();
-          if connectionIds.delete(id) {
-            this.table.updateItem({
-              key: {
-                  pk: "WS_USER#{user.userId}",
-                  sk: "#"
-              },
-              updateExpression: "SET connectionIds = :newList",
-              expressionAttributeValues: {
-                ":newList": connectionIds.toArray()
-              },
-            });
-          }
-        } else {
-          log("WS User '{user.userId}' not found");
+          connectionIds.delete(id);
+          this.table.updateItem({
+            key: {
+                pk: "WS_USER#{user.userId}",
+                sk: "#"
+            },
+            updateExpression: "SET connectionIds = :newList",
+            expressionAttributeValues: {
+              ":newList": connectionIds.toArray()
+            },
+          });
         }
-      } else {
-        log("Connection '{id}' not found");
       }
     };
 
