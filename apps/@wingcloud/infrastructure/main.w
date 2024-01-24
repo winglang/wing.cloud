@@ -28,6 +28,7 @@ bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 
 let appSecret = util.env("APP_SECRET");
+let wsSecret = util.env("WS_SECRET");
 let segmentWriteKey = util.env("SEGMENT_WRITE_KEY");
 let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true";
 
@@ -59,7 +60,7 @@ let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
 let secrets = new Secrets.Secrets();
 let endpoints = new Endpoints.Endpoints(table);
-let ws = new websockets.WebSocket(appSecret: appSecret);
+let ws = new websockets.WebSocket(secret: wsSecret);
 
 let probotAdapter = new adapter.ProbotAdapter(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
@@ -167,6 +168,7 @@ let wingCloudApi = new wingcloud_api.Api(
   githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
   appSecret: appSecret,
+  wsSecret: wsSecret,
   logs: bucketLogs,
 );
 

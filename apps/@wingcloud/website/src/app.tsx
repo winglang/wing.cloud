@@ -5,13 +5,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { WRPCProvider } from "@wingcloud/wrpc";
-import {
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type PropsWithChildren,
-} from "react";
+import { useContext, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 
 import { NotificationsProvider } from "./design-system/notification.js";
@@ -20,6 +14,7 @@ import { router } from "./router.jsx";
 import { AnalyticsIdentityProvider } from "./utils/analytics-identity-provider.js";
 import { AnalyticsContext } from "./utils/analytics-provider.js";
 import { PopupWindowProvider } from "./utils/popup-window-provider.js";
+import { QueryInvalidation } from "./utils/query-invalidation.js";
 import { useAnalyticsEvents } from "./utils/use-analytics-events.js";
 import { wrpc } from "./utils/wrpc.js";
 
@@ -30,37 +25,6 @@ API_URL.pathname = "/wrpc";
 const WS_URL = new URL(window["wingEnv"]["WS_URL"]);
 WS_URL.pathname = "/ws";
 WS_URL.protocol = "ws" + WS_URL.protocol.slice(4);
-
-const QueryInvalidationProvider = ({ children }: PropsWithChildren) => {
-  const auth = wrpc["auth.ws"].useQuery();
-
-  const ws = wrpc["app.invalidateQuery"].useSubscription(undefined, {
-    async onData(data) {
-      console.log("app.invalidateQuery", data);
-
-      // // eslint-disable-next-line unicorn/prefer-ternary
-      // if (query) {
-      //   await ( as any)[query]?.invalidate();
-      // } else {
-      //   await trpcContext.invalidate();
-      // }
-    },
-  });
-
-  useEffect(() => {
-    if (!auth.data?.token) {
-      return;
-    }
-    ws.auth(auth.data?.token);
-  }, [auth.data]);
-
-  useEffect(() => {
-    return () => {
-      ws.close();
-    };
-  }, []);
-  return children;
-};
 
 export const App = () => {
   const { track } = useContext(AnalyticsContext);
@@ -98,7 +62,7 @@ export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <WRPCProvider value={{ url: API_URL.toString(), ws: WS_URL.toString() }}>
-        <QueryInvalidationProvider>
+        <QueryInvalidation>
           <AnalyticsIdentityProvider>
             <ThemeProvider mode="light" theme={DefaultTheme}>
               <NotificationsProvider>
@@ -108,7 +72,7 @@ export const App = () => {
               </NotificationsProvider>
             </ThemeProvider>
           </AnalyticsIdentityProvider>
-        </QueryInvalidationProvider>
+        </QueryInvalidation>
       </WRPCProvider>
     </QueryClientProvider>
   );

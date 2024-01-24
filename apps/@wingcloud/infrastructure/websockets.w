@@ -4,7 +4,15 @@ bring "./jwt.w" as JWT;
 
 struct WebsocketSendOpts {
   userId: str;
-  payload: Json;
+  key: str;
+  query: str?;
+  payload: Json?;
+}
+
+struct WebsocketMessage {
+  key: str;
+  query: str?;
+  payload: Json?;
 }
 
 struct UserItem {
@@ -15,13 +23,13 @@ struct ConnectionItem {
   userId: str;
 }
 
-struct WebsocketMessage {
+struct WsInputMessage {
   type: str;
   payload: str;
 }
 
 pub struct WebSocketProps {
-  appSecret: str;
+  secret: str;
 }
 
 pub class WebSocket {
@@ -99,11 +107,11 @@ pub class WebSocket {
     };
 
     this.ws.onMessage(inflight(id: str, message: str): void => {
-      let data = WebsocketMessage.fromJson(Json.parse(message));
+      let data = WsInputMessage.fromJson(Json.parse(message));
       if data.type == "authorize" && data.payload != "" {
         let jwt = JWT.JWT.verify(
           jwt: data.payload,
-          secret: props.appSecret
+          secret: props.secret
         );
         saveConnection(id, jwt.userId);
       }
@@ -118,7 +126,7 @@ pub class WebSocket {
     this.ws.initialize();
   }
 
-  pub inflight send(opts: WebsocketSendOpts) {
+  pub inflight sendMessage(opts: WebsocketSendOpts): void {
     let result = this.table.getItem(
       key: {
         pk: "WS_USER#{opts.userId}",
@@ -126,10 +134,17 @@ pub class WebSocket {
       },
       projectionExpression: "connectionIds",
     );
+
+    let message = WebsocketMessage.fromJson({
+      key: opts.key,
+      query: opts.query,
+      payload: opts.payload,
+    });
+
     if let item = result.item {
       let connectionIds = UserItem.fromJson(item).connectionIds;
       for connectionId in connectionIds {
-        this.ws.sendMessage(connectionId, Json.stringify(opts.payload));
+        this.ws.sendMessage(connectionId, Json.stringify(message));
       }
     }
   }

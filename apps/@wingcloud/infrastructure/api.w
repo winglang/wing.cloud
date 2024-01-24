@@ -107,6 +107,7 @@ struct ApiProps {
   githubAppClientId: str;
   githubAppClientSecret: str;
   appSecret: str;
+  wsSecret: str;
   logs: cloud.Bucket;
 }
 
@@ -208,11 +209,11 @@ pub class Api {
       throw httpError.HttpError.badRequest("Installation not found");
     };
 
-    api.get("/wrpc/auth.ws", inflight (request) => {
+    api.get("/wrpc/ws.auth", inflight (request) => {
       try {
         let userId = getUserIdFromCookie(request);
         let jwt = JWT.JWT.sign(
-          secret: props.appSecret,
+          secret: props.wsSecret,
           userId: userId,
           expirationTime: "1m",
         );
@@ -504,12 +505,10 @@ pub class Api {
           appId: appId,
           entrypoint: entrypoint,
         }));
-        ws.send(
+
+        ws.sendMessage(
           userId: user.userId,
-          payload: {
-            key: "app.create",
-            body: Json.stringify(request.body)
-          }
+          key: "app.create",
         );
 
         return {
@@ -532,11 +531,6 @@ pub class Api {
         let userApps = apps.list(
           userId: user.id,
         );
-
-        ws.send(userId: user.id, payload: {
-          key: "app.list",
-          body: Json.stringify(userApps),
-        });
         return {
           body: {
             apps: userApps,
@@ -569,7 +563,6 @@ pub class Api {
     });
 
     api.post("/wrpc/app.delete", inflight (request) => {
-
       let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
 
@@ -593,6 +586,11 @@ pub class Api {
         appName: app.appName,
         userId: app.userId,
       }));
+
+      ws.sendMessage(
+        userId: userId,
+        key: "app.delete",
+      );
 
       return {
         body: {

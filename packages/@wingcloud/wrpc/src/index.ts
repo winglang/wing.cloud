@@ -216,7 +216,7 @@ export const createWRPCReact = <
               console.debug("ws closed");
             });
             ws.addEventListener("message", (event) => {
-              options.onData(event.data);
+              options.onData(JSON.parse(event.data));
             });
 
             return {

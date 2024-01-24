@@ -31,7 +31,7 @@ Complete the missing `.env` variables (commented variables are optional).
 
 ### Creating the App Secret
 
-For the `APP_SECRET` environment variable, you can generate a random string with the following command:
+For the `APP_SECRET` and the `WS_SECRET` environment variables, you can generate a random string with the following command:
 
 ```sh
 openssl rand -hex 32
