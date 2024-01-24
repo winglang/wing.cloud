@@ -28,7 +28,6 @@ export const InvalidateQueryProvider = ({ children }: PropsWithChildren) => {
   });
 
   const authorize = useCallback(() => {
-    console.log("Authorize", auth.data?.token);
     ws.send(
       JSON.stringify({
         type: "authorize",
