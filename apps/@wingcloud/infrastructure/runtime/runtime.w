@@ -13,6 +13,7 @@ bring "@cdktf/provider-aws" as awsprovider;
 bring "../components/parameter/iparameter.w" as parameter;
 bring "../components/certificate/icertificate.w" as certificate;
 bring "../nanoid62.w" as nanoid62;
+bring "../components/queues/fifoqueue" as fifoqueue;
 
 class Consts {
   pub static inflight secretsPath(): str {
@@ -50,6 +51,7 @@ struct RuntimeStartOptions {
   secrets: Map<str>;
   certificate: certificate.Certificate;
   privateKey: str;
+  publicEndpointFullDomainName: str;
 }
 
 struct RuntimeStopOptions {
@@ -114,6 +116,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "SSL_CERTIFICATE" => util.base64Encode(opts.certificate.certificate),
       "ENVIRONMENT_PRIVATE_KEY" => opts.privateKey,
       "CACHE_DIR" => Consts.cachePath(),
+      "PUBLIC_ENDPOINT_DOMAIN" => opts.publicEndpointFullDomainName,
     };
 
     if let token = opts.gitToken {
@@ -198,6 +201,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "AWS_REGION" => opts.logsBucketRegion,
       "ENVIRONMENT_PRIVATE_KEY" => opts.privateKey,
       "CACHE_DIR" => Consts.cachePath(),
+      "PUBLIC_ENDPOINT_DOMAIN" => opts.publicEndpointFullDomainName,
     };
 
     if let token = opts.gitToken {
@@ -272,6 +276,7 @@ struct RuntimeServiceProps {
   flyOrgSlug: str?;
   environments: environments.Environments;
   logs: cloud.Bucket;
+  publicEndpointFullDomainName: str;
 }
 
 bring "@cdktf/provider-aws" as aws;
@@ -331,7 +336,7 @@ pub class RuntimeService {
       }
     }
 
-    let queue = new cloud.Queue(timeout: 15m);
+    let queue = new fifoqueue.FifoQueue(timeout: 15m);
     queue.setConsumer(inflight (message) => {
       try {
         // hack to get bucket in this environment
@@ -355,6 +360,7 @@ pub class RuntimeService {
           logsBucketRegion: bucketRegion,
           awsAccessKeyId: awsAccessKeyId,
           awsSecretAccessKey: awsSecretAccessKey,
+          publicEndpointFullDomainName: props.publicEndpointFullDomainName,
         );
 
         log("preview environment url: {url}");
@@ -373,7 +379,7 @@ pub class RuntimeService {
     this.api.post("/", inflight (req) => {
       let body = Json.parse(req.body ?? "");
       let message = Message.fromJson(body);
-      queue.push(Json.stringify(message));
+      queue.push(Json.stringify(message), groupId: message.environmentId);
       return {
         status: 200,
       };

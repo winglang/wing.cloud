@@ -9,6 +9,7 @@ pub struct EndpointProps {
   domain: str;
   digest: str;
   targetUrl: str;
+  subdomain: str?;
 }
 
 pub inflight class PublicEndpoint impl iendpoint.IPublicEndpoint {
@@ -16,11 +17,13 @@ pub inflight class PublicEndpoint impl iendpoint.IPublicEndpoint {
   domain: str;
   digest: str;
   targetUrl: str;
+  subdomain: str?;
   new (props: EndpointProps) {
     this.dns = props.dns;
     this.domain = props.domain;
     this.digest = props.digest;
     this.targetUrl = props.targetUrl;
+    this.subdomain = props.subdomain;
   }
 
   pub inflight create() {
@@ -28,7 +31,7 @@ pub inflight class PublicEndpoint impl iendpoint.IPublicEndpoint {
     this.dns.createRecords([{
       zone: this.domain,
       type: "CNAME",
-      name: this.digest,
+      name: this.name(),
       content: url.hostname
     }]);
   }
@@ -37,12 +40,20 @@ pub inflight class PublicEndpoint impl iendpoint.IPublicEndpoint {
     this.dns.deleteRecords([{
       zone: this.domain,
       type: "CNAME",
-      name: this.digest,
+      name: this.name(),
       content: ""
     }]);
   }
 
   pub inflight url(): str {
-    return "https://{this.digest}.{this.domain}";
+    return "https://{this.name()}.{this.domain}";
+  }
+
+  inflight name(): str {
+    if let subdomain = this.subdomain {
+      return "{this.digest}.{subdomain}";
+    } else {
+      return this.digest;
+    }
   }
 }

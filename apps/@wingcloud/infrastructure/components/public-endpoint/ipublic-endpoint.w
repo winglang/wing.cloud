@@ -5,6 +5,7 @@ bring "../../endpoints.w" as endpoints;
 pub struct PublicEndpointProps {
   dns: idns.IDNS;
   domain: str;
+  subdomain: str?;
 }
 
 pub interface IPublicEndpoint {

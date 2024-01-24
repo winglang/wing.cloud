@@ -179,6 +179,9 @@ test("run() - reporting statuses", async () => {
     context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
 
+  for (const request of requests) {
+    delete (request as any).timestamp;
+  }
   delete requests[1].data?.testResults[0].time;
   delete requests[1].data?.testResults[0].timestamp;
   delete requests[1].data?.testResults[0].traces;
@@ -331,6 +334,7 @@ test("run() - uses custom platform", async () => {
 
   process.env["WING_TARGET"] = "tf-aws";
   process.env["ENVIRONMENT_ID"] = "test-id";
+  process.env["PUBLIC_ENDPOINT_DOMAIN"] = "development.wingcloud.dev";
   const { close, endpoints, port } = await run({
     context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
@@ -349,7 +353,7 @@ test("run() - uses custom platform", async () => {
 
   expect(response.ok).toBeTruthy();
   expect(await response.text()).toEqual(
-    "https://091601b590dabbe1.wingcloud.io",
+    "https://091601b590dabbe1.development.wingcloud.dev",
   );
 
   await close();
