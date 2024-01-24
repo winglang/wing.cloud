@@ -18,6 +18,7 @@ bring "./endpoints.w" as Endpoints;
 bring "./lowkeys-map.w" as lowkeys;
 bring "./http-error.w" as httpError;
 bring "./websockets.w" as websockets;
+bring "./invalidate-query.w" as InvalidateQuery;
 
 struct Log {
   message: str;
@@ -129,6 +130,7 @@ pub class Api {
     let users = props.users;
     let logs = props.logs;
     let environmentsQueue = new cloud.Queue() as "Environments Queue";
+    let invalidateQuery = new InvalidateQuery.InvalidateQuery(ws: ws);
 
     let AUTH_COOKIE_NAME = "auth";
 
@@ -510,10 +512,7 @@ pub class Api {
           entrypoint: entrypoint,
         }));
 
-        ws.sendMessage(
-          userId: user.userId,
-          key: "app.create",
-        );
+        invalidateQuery.invalidate(userId: user.userId, key: "app.create");
 
         return {
           body: {
@@ -591,11 +590,7 @@ pub class Api {
         userId: app.userId,
       }));
 
-      ws.sendMessage(
-        userId: userId,
-        key: "app.delete",
-      );
-
+      invalidateQuery.invalidate(userId: userId, key: "app.delete");
       return {
         body: {
           appId: app.appId,
@@ -904,10 +899,7 @@ pub class Api {
       let environment = props.environments.get(id: input.environmentId);
       let app = props.apps.get(appId: environment.appId);
 
-      props.ws.sendMessage(
-        userId: app.userId,
-        key: "environment.report",
-      );
+      invalidateQuery.invalidate(userId: app.userId, key: "environment.report");
     });
 
     api.post("/environment.report", inflight (request) => {

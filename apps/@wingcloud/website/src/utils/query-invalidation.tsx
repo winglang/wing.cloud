@@ -15,7 +15,8 @@ export const QueryInvalidation = ({ children }: PropsWithChildren) => {
       if (data.query) {
         await queryClient.invalidateQueries({ queryKey: [data.query] });
       } else {
-        queryClient.invalidateQueries();
+        console.log("Invalidate all queries");
+        //queryClient.invalidateQueries();
       }
     },
   });

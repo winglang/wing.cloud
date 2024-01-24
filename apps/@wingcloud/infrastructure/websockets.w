@@ -3,14 +3,20 @@ bring ex;
 bring "./jwt.w" as JWT;
 
 struct WebsocketSendOpts {
+  subscriptionId: str;
   userId: str;
-  key: str;
+  key: str?;
   query: str?;
   payload: Json?;
 }
 
+struct SaveConnectionOpts {
+  subscriptionId: str;
+  connectionId: str;
+  userId: str;
+}
+
 struct WebsocketMessage {
-  key: str;
   query: str?;
   payload: Json?;
 }
@@ -21,10 +27,12 @@ struct UserItem {
 
 struct ConnectionItem {
   userId: str;
+  subscriptionId: str;
 }
 
 struct WsInputMessage {
   type: str;
+  subscriptionId: str;
   payload: str;
 }
 
@@ -51,57 +59,62 @@ pub class WebSocket {
     this.ws = new websockets.WebSocket(name: "WingCloudWebsocket") as "wingcloud-websocket";
     this.url = this.ws.url;
 
-    let saveConnection = inflight (id: str, userId: str): void => {
+    let saveConnection = inflight (opts: SaveConnectionOpts): void => {
       this.table.updateItem(
         key: {
-          pk: "WS_USER#{userId}",
-          sk: "#",
+          pk: "USER#{opts.userId}",
+          sk: "SUBSCRIPTION#{opts.subscriptionId}",
         },
         updateExpression: "SET connectionIds = list_append(if_not_exists(connectionIds, :empty_list), :connectionId)",
         expressionAttributeValues: {
-            ":connectionId": ["{id}"],
+            ":connectionId": ["{opts.connectionId}"],
             ":empty_list": []
         },
       );
       this.table.putItem(
         item: {
-          pk: "WS_CONNECTION#{id}",
+          pk: "WS_CONNECTION#{opts.connectionId}",
           sk: "#",
-          userId: "{userId}",
+          subscriptionId: "{opts.subscriptionId}",
+          userId: "{opts.userId}",
         },
         conditionExpression: "attribute_not_exists(pk)",
       );
     };
 
     let deleteConnection = inflight(id: str): void => {
-      let connection = this.table.deleteItem(
+      let item = this.table.deleteItem(
         key: {
           pk: "WS_CONNECTION#{id}",
           sk: "#",
         },
         returnValues: "ALL_OLD",
       );
-      if let user = ConnectionItem.tryFromJson(connection.attributes) {
+      if let connection = ConnectionItem.tryFromJson(item.attributes) {
         let userItem = this.table.getItem(
           key: {
-            pk: "WS_USER#{user.userId}",
-            sk: "#",
+            pk: "USER#{connection.userId}",
+            sk: "SUBSCRIPTION#{connection.subscriptionId}",
           },
           projectionExpression: "connectionIds",
         );
         if let userData = UserItem.tryFromJson(userItem.item) {
           let connectionIds = userData.connectionIds.copyMut();
-          connectionIds.delete(id);
-          this.table.updateItem({
-            key: {
-                pk: "WS_USER#{user.userId}",
-                sk: "#"
-            },
-            updateExpression: "SET connectionIds = :newList",
-            expressionAttributeValues: {
-              ":newList": connectionIds.toArray()
-            },
-          });
+
+          if connectionIds.delete(id) {
+            this.table.updateItem({
+              key: {
+                  pk: "USER#{connection.userId}",
+                  sk: "SUBSCRIPTION#{connection.subscriptionId}",
+              },
+              updateExpression: "SET connectionIds = :newList",
+              expressionAttributeValues: {
+                ":newList": connectionIds.toArray()
+              },
+            });
+          } else {
+            log("Connection id '{id}' not found in user {Json.stringify(userData)}.");
+          }
         }
       }
     };
@@ -113,7 +126,11 @@ pub class WebSocket {
           jwt: data.payload,
           secret: props.secret
         );
-        saveConnection(id, jwt.userId);
+        saveConnection(
+          subscriptionId: data.subscriptionId,
+          connectionId: id,
+          userId: jwt.userId
+        );
       }
     });
 
@@ -129,8 +146,8 @@ pub class WebSocket {
   pub inflight sendMessage(opts: WebsocketSendOpts): void {
     let result = this.table.getItem(
       key: {
-        pk: "WS_USER#{opts.userId}",
-        sk: "#"
+        pk: "USER#{opts.userId}",
+        sk: "SUBSCRIPTION#{opts.subscriptionId}"
       },
       projectionExpression: "connectionIds",
     );

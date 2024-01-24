@@ -228,6 +228,7 @@ export const createWRPCReact = <
                   ws.send(
                     JSON.stringify({
                       type: "authorize",
+                      subscriptionId: route,
                       payload: token,
                     }),
                   );
