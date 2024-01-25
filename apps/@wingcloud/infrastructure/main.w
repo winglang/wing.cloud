@@ -181,8 +181,10 @@ let wingCloudApi = new wingcloud_api.Api(
   probotAdapter: probotAdapter,
   githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
+  githubAppCallbackOrigin: util.env("BOT_GITHUB_CALLBACK_ORIGIN"),
   appSecret: appSecret,
   logs: bucketLogs,
+  analytics: analytics,
 );
 
 let probotApp = new probot.ProbotApp(
@@ -253,6 +255,8 @@ let proxyUrl = (() => {
     throw "Unknown WING_TARGET: {util.env("WING_TARGET")}";
   }
 })();
+
+new cloud.Endpoint(proxyUrl, browserSupport: true) as "Proxy Endpoint";
 
 let var webhookUrl = probotApp.githubApp.webhookUrl;
 if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" {
