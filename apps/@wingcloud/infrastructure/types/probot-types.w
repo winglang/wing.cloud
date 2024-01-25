@@ -24,6 +24,9 @@ struct IPullRequestPR {
   user: IPullRequestUser;
   number: num;
   title: str;
+  created_at: str?;
+  updated_at: str?;
+  closed_at: str?;
 }
 
 struct IPullRequestInstallation {

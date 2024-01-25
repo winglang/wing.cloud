@@ -44,6 +44,7 @@ struct DeleteAppMessage {
   appId: str;
   appName: str;
   userId: str;
+  timestamp: num;
 }
 
 struct CreateProductionEnvironmentMessage {
@@ -55,6 +56,7 @@ struct CreateProductionEnvironmentMessage {
   installationId: num;
   appId: str;
   entrypoint: str;
+  timestamp: num;
 }
 
 struct GetListOfEntrypointsProps{
@@ -437,7 +439,8 @@ pub class Api {
             appId: input.appId,
             entrypoint: input.entrypoint,
             sha: commitData.sha,
-            owner: input.repoOwner
+            owner: input.repoOwner,
+            timestamp: input.timestamp,
         }}));
       } else {
         throw httpError.HttpError.unauthorized();
@@ -530,6 +533,7 @@ pub class Api {
           installationId: installationId,
           appId: appId,
           entrypoint: entrypoint,
+          timestamp: datetime.utcNow().timestampMs,
         }));
 
         invalidateQuery.invalidate(userId: user.userId, queries: ["app.list"]);
@@ -577,10 +581,8 @@ pub class Api {
           appId: input.appId,
           appName: input.appName,
           environment: environment,
-        );
-        props.environments.delete(
-          appId: input.appId,
-          environmentId: environment.id
+          timestamp: input.timestamp,
+          delete: true,
         );
       }
     });
@@ -608,6 +610,7 @@ pub class Api {
         appId: app.appId,
         appName: app.appName,
         userId: app.userId,
+        timestamp: datetime.utcNow().timestampMs,
       }));
 
       invalidateQuery.invalidate(userId: userId, queries: ["app.list"]);
@@ -843,6 +846,7 @@ pub class Api {
         data: EnvironmentManager.RestartAllEnvironmentOptions {
           appId: appId,
           entrypoint: entrypoint,
+          timestamp: datetime.utcNow().timestampMs,
       }}));
 
       invalidateQuery.invalidate(userId: userId, queries: [

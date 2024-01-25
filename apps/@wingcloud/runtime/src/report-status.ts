@@ -7,6 +7,7 @@ export interface ReportEnvironmentStatusInput {
   environmentId: string;
   status: EnvironmentStatus;
   data?: Record<string, any>;
+  timestamp: number;
 }
 
 export type EnvironmentStatus =
@@ -34,6 +35,7 @@ export function useReportStatus(
       environmentId: context.environment.id,
       status,
       data: payload,
+      timestamp: Date.now(),
     };
     const token = await keyStore.createToken({
       environmentId: data.environmentId,

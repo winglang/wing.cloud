@@ -98,6 +98,7 @@ pub class ProbotApp {
       let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
       for app in apps {
         if let installation = context.payload.installation {
+          let time = datetime.fromIso(context.payload.pull_request.updated_at ?? datetime.utcNow().toIso());
           this.environmentManager.create(
             createEnvironment: {
               branch: branch,
@@ -114,6 +115,7 @@ pub class ProbotApp {
             appId: app.appId,
             entrypoint: app.entrypoint,
             sha: context.payload.pull_request.head.sha,
+            timestamp: time.timestampMs,
           );
         } else {
           throw "handlePullRequstOpened: missing installation id";
@@ -140,11 +142,14 @@ pub class ProbotApp {
           if environment.branch != branch || environment.status == "stopped" {
             continue;
           }
-
+          
+          let time = datetime.fromIso(context.payload.pull_request.closed_at ?? datetime.utcNow().toIso());
           this.environmentManager.stop(
             appId: app.appId,
             appName: app.appName,
             environment: environment,
+            timestamp: time.timestampMs,
+            delete: false,
           );
         }
       }
@@ -165,6 +170,7 @@ pub class ProbotApp {
             appId: app.appId,
             entrypoint: app.entrypoint,
             sha: context.payload.pull_request.head.sha,
+            timestamp: datetime.utcNow().timestampMs,
           );
         }
       }
@@ -185,6 +191,7 @@ pub class ProbotApp {
             appId: app.appId,
             entrypoint: app.entrypoint,
             sha: context.payload.after,
+            timestamp: datetime.utcNow().timestampMs,
           );
         }
       }

@@ -32,6 +32,28 @@ let wsSecret = util.env("WS_SECRET");
 let segmentWriteKey = util.env("SEGMENT_WRITE_KEY");
 let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true";
 
+let publicEndpointDomain = (): str => {
+  if util.env("WING_TARGET") == "sim" {
+    return "127.0.0.1";
+  } else {
+    return util.env("PUBLIC_ENDPOINT_DOMAIN");
+  }
+}();
+let publicEndpointSubdomain = (): str? => {
+  if let subdomain = util.tryEnv("PUBLIC_ENDPOINT_SUBDOMAIN") {
+    return subdomain;
+  } else {
+    return nil;
+  }
+}();
+let publicEndpointFullDomainName = (): str => {
+  if let subdomain = publicEndpointSubdomain {
+    return "{subdomain}.{publicEndpointDomain}";
+  } else {
+    return publicEndpointDomain;
+  }
+}();
+
 let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey, enableAnalytics);
 
 let api = new cloud.Api(
@@ -76,6 +98,7 @@ let rntm = new runtime.RuntimeService(
   flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
   environments: environments,
   logs: bucketLogs,
+  publicEndpointFullDomainName: publicEndpointFullDomainName,
 );
 
 let dashboardPort = 5174;
@@ -110,13 +133,11 @@ let dns = new Dns.DNS(token: (): str? => {
     return nil;
   }
 }());
-let endpointProvider = new PublicEndpoint.PublicEndpointProvider(dns: dns, domain: (): str => {
-  if util.env("WING_TARGET") == "sim" {
-    return "127.0.0.1";
-  } else {
-    return "wingcloud.io";
-  }
-}());
+let endpointProvider = new PublicEndpoint.PublicEndpointProvider(
+  dns: dns,
+  domain: publicEndpointDomain,
+  subdomain: publicEndpointSubdomain
+);
 
 let environmentServerCertificate = new certificate.Certificate(
   privateKeyFile: (): str => {
@@ -155,7 +176,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
-  analytics: analytics,
+  analytics: analytics,,
   onEnvironmentCreated: onEnvironmentCreated,
   onEndpointCreated: onEndpointCreated,
 );
@@ -253,7 +274,7 @@ let proxyUrl = (() => {
 })();
 
 let var webhookUrl = probotApp.githubApp.webhookUrl;
-if util.tryEnv("WING_TARGET") == "sim" {
+if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" {
   bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
 
   let devNgrok = new ngrok.Ngrok(
