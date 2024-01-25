@@ -12,6 +12,8 @@ import { wrpc } from "./wrpc.js";
 
 const InvalidateQueryContext = createContext<WebSocket | undefined>(undefined);
 
+const SUBSCRIPTION_ID = "invalidateQuery";
+
 export const InvalidateQueryProvider = ({
   url,
   children,
@@ -24,8 +26,8 @@ export const InvalidateQueryProvider = ({
   const onMessage = useCallback(
     (event: MessageEvent) => {
       const data = JSON.parse(event.data);
-      console.debug("app.invalidateQuery", data);
-      if (data.type === "invalidateQuery") {
+      console.debug("ws onMessage", data);
+      if (data.type === SUBSCRIPTION_ID) {
         if (data.query) {
           queryClient.invalidateQueries({ queryKey: [data.query] });
         } else {
@@ -46,14 +48,14 @@ export const InvalidateQueryProvider = ({
       websocket.send(
         JSON.stringify({
           type: "authorize",
-          subscriptionId: "app.invalidateQuery",
+          subscriptionId: SUBSCRIPTION_ID,
           payload: auth.data?.token,
         }),
       );
     });
     websocket.addEventListener("message", onMessage);
     setWs(websocket);
-  }, [auth.data?.token, onMessage, url]);
+  }, [auth.data?.token, onMessage, url, ws]);
 
   useEffect(() => {
     return () => {

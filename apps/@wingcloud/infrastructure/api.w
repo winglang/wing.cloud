@@ -116,8 +116,8 @@ struct ApiProps {
   appSecret: str;
   wsSecret: str;
   logs: cloud.Bucket;
-  onEnvironmentCreated: cloud.Topic;
-  onEndpointCreated: cloud.Topic;
+  onEnvironmentChange: cloud.Topic;
+  onEndpointChange: cloud.Topic;
 }
 
 
@@ -137,7 +137,7 @@ pub class Api {
 
     let invalidateQuery = new InvalidateQuery.InvalidateQuery(ws: ws);
 
-    props.onEnvironmentCreated.onMessage(inflight (event) => {
+    props.onEnvironmentChange.onMessage(inflight (event) => {
       let environment = Environments.Environment.fromJson(Json.parse(event));
       let app = apps.get(appId: environment.appId);
       invalidateQuery.invalidate(userId: app.userId, queries: [
@@ -145,7 +145,7 @@ pub class Api {
       ]);
     });
 
-    props.onEndpointCreated.onMessage(inflight (event) => {
+    props.onEndpointChange.onMessage(inflight (event) => {
       let endpoint = Endpoints.Endpoint.fromJson(Json.parse(event));
       let app = apps.get(appId: endpoint.appId);
       invalidateQuery.invalidate(userId: app.userId, queries: [

@@ -18,12 +18,14 @@ pub class InvalidateQuery {
   }
 
   pub inflight invalidate(options: InvalidateOpts) {
+    let SUBSCRIPTION_ID = "invalidateQuery";
+
     for query in options.queries ?? ["*"] {
       this.ws.sendMessage(
-        subscriptionId: "app.invalidateQuery",
+        subscriptionId: SUBSCRIPTION_ID,
         userId: options.userId,
         message: Json.stringify({
-          type: "invalidateQuery",
+          type: SUBSCRIPTION_ID,
           query: query,
           payload: options.payload,
         })
