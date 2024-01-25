@@ -176,7 +176,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
-  analytics: analytics,,
+  analytics: analytics,
   onEnvironmentCreated: onEnvironmentCreated,
   onEndpointCreated: onEndpointCreated,
 );
