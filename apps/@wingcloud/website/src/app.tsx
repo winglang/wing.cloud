@@ -16,7 +16,6 @@ import { AnalyticsContext } from "./utils/analytics-provider.js";
 import { InvalidateQueryProvider } from "./utils/invalidate-query-provider.js";
 import { PopupWindowProvider } from "./utils/popup-window-provider.js";
 import { useAnalyticsEvents } from "./utils/use-analytics-events.js";
-import { wrpc } from "./utils/wrpc.js";
 
 const API_URL = new URL(location.origin);
 API_URL.pathname = "/wrpc";
@@ -62,7 +61,7 @@ export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <WRPCProvider value={{ url: API_URL.toString(), ws: WS_URL.toString() }}>
-        <InvalidateQueryProvider>
+        <InvalidateQueryProvider url={WS_URL.toString()}>
           <AnalyticsIdentityProvider>
             <ThemeProvider mode="light" theme={DefaultTheme}>
               <NotificationsProvider>

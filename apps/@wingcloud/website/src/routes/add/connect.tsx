@@ -73,7 +73,7 @@ const ConnectPage = () => {
         repoOwner: selectedRepo.owner.login,
         defaultBranch: selectedRepo.default_branch,
       });
-      //navigate(`/${app?.appFullName}`);
+      navigate(`/${app?.appFullName}`);
     } catch (error) {
       setCreateAppLoading(false);
       if (error instanceof Error) {

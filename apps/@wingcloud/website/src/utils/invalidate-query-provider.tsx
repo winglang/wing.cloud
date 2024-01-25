@@ -4,6 +4,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useState,
   type PropsWithChildren,
 } from "react";
 
@@ -11,48 +12,53 @@ import { wrpc } from "./wrpc.js";
 
 const InvalidateQueryContext = createContext<WebSocket | undefined>(undefined);
 
-export const InvalidateQueryProvider = ({ children }: PropsWithChildren) => {
-  const auth = wrpc["ws.auth"].useQuery();
+export const InvalidateQueryProvider = ({
+  url,
+  children,
+}: PropsWithChildren<{ url: string }>) => {
   const queryClient = useQueryClient();
+  const auth = wrpc["ws.auth"].useQuery();
 
-  const ws = wrpc["app.invalidateQuery"].useSubscription(undefined, {
-    async onData(data) {
+  const [ws, setWs] = useState<WebSocket | undefined>(undefined);
+
+  const onMessage = useCallback(
+    (event: MessageEvent) => {
+      const data = JSON.parse(event.data);
       console.log("app.invalidateQuery", data);
       if (data.query) {
-        await queryClient.invalidateQueries({ queryKey: [data.query] });
+        queryClient.invalidateQueries({ queryKey: [data.query] });
       } else {
         console.log("Invalidate all queries");
         //queryClient.invalidateQueries();
       }
     },
-  });
-
-  const authorize = useCallback(() => {
-    ws.send(
-      JSON.stringify({
-        type: "authorize",
-        subscriptionId: "app.invalidateQuery",
-        payload: auth.data?.token,
-      }),
-    );
-  }, [auth.data?.token, ws]);
+    [queryClient],
+  );
 
   useEffect(() => {
-    if (ws.readyState === WebSocket.OPEN) {
-      authorize();
-    } else {
-      ws.addEventListener("open", () => {
-        authorize();
+    if (auth.data?.token && !ws) {
+      const websocket = new WebSocket(url);
+      websocket.addEventListener("open", () => {
+        console.log("ws opened");
+        websocket.send(
+          JSON.stringify({
+            type: "authorize",
+            subscriptionId: "app.invalidateQuery",
+            payload: auth.data?.token,
+          }),
+        );
       });
+      websocket.addEventListener("message", onMessage);
+      setWs(websocket);
+      return;
     }
-
-    return () => {
-      ws.removeEventListener("open", authorize);
-    };
-  }, [auth.data?.token, ws, authorize]);
+  }, [auth.data?.token]);
 
   useEffect(() => {
     return () => {
+      if (!ws) {
+        return;
+      }
       ws.close();
     };
   }, []);

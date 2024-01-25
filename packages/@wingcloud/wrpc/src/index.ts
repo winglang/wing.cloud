@@ -30,7 +30,9 @@ interface UseSubscriptionOptions<
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
 > extends UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> {
-  onData: (data: any) => Promise<void>;
+  onOpen?: () => Promise<void>;
+  onMessage?: (data: any) => Promise<void>;
+  onClose?: () => Promise<void>;
 }
 
 export interface PaginatedResponse<T> {
@@ -204,17 +206,15 @@ export const createWRPCReact = <
           useSubscription: (input: any, options: UseSubscriptionOptions) => {
             const url = new URL(`${useContext(WRPCContext).ws}`);
             const ws = new WebSocket(url);
-            ws.addEventListener("open", () => {
-              console.debug("ws opened");
+            ws.addEventListener("open", async () => {
+              options.onOpen?.();
             });
-            ws.addEventListener("close", () => {
-              console.debug("ws closed");
+            ws.addEventListener("message", async (event) => {
+              options.onMessage?.(JSON.parse(event.data));
             });
-            ws.addEventListener("message", (event) => {
-              options.onData(JSON.parse(event.data));
+            ws.addEventListener("close", async () => {
+              options.onClose?.();
             });
-
-            return ws;
           },
         };
       },
