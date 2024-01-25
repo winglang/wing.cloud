@@ -181,6 +181,7 @@ let wingCloudApi = new wingcloud_api.Api(
   probotAdapter: probotAdapter,
   githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
+  githubAppCallbackOrigin: util.env("BOT_GITHUB_CALLBACK_ORIGIN"),
   appSecret: appSecret,
   logs: bucketLogs,
   analytics: analytics,

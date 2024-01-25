@@ -109,6 +109,7 @@ struct ApiProps {
   probotAdapter: adapter.ProbotAdapter;
   githubAppClientId: str;
   githubAppClientSecret: str;
+  githubAppCallbackOrigin: str;
   appSecret: str;
   logs: cloud.Bucket;
   analytics: analytics.SegmentAnalytics;
@@ -309,6 +310,8 @@ pub class Api {
         });
 
         if let port = request.query.tryGet("port") {
+          // Redirect back to the local Console, using the `signedIn`
+          // GET parameter so the Console dismisses the sign in modal.
           location = "http://localhost:{port}/?signedIn";
         }
       }
@@ -323,9 +326,11 @@ pub class Api {
     });
 
     api.get("/wrpc/console.signIn", inflight (request) => {
+      // Redirect to the GitHub App OAuth flow, specifying the final redirect back to
+      // Wing Cloud, including the Console local port and the user's local anonymousId.
       let port = request.query.get("port");
       let anonymousId = Util.encodeURIComponent(request.query.get("anonymousId"));
-      let redirectURI = Util.encodeURIComponent("http://localhost:3900/wrpc/github.callback?port={port}&anonymousId={anonymousId}");
+      let redirectURI = Util.encodeURIComponent("{props.githubAppCallbackOrigin}/wrpc/github.callback?port={port}&anonymousId={anonymousId}");
 
       return {
         status: 302,
