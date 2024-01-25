@@ -373,8 +373,6 @@ infrastructure.addDevDeps("@octokit/rest");
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(runtime.name);
 
-infrastructure.addDeps("@winglibs/websockets");
-
 // TODO: We need to install all of these deps because of we are using pnpm
 // and wing is not resolving deps correctly.
 // https://github.com/winglang/wing/issues/5252#issuecomment-1893857213
