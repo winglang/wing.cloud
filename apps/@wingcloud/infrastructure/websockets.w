@@ -5,7 +5,6 @@ bring "./jwt.w" as JWT;
 struct WebsocketSendOpts {
   subscriptionId: str;
   userId: str;
-  key: str?;
   query: str?;
   payload: Json?;
 }
@@ -46,6 +45,8 @@ pub class WebSocket {
   pub url: str;
 
   new(props: WebSocketProps) {
+    let CONNECTIONS_PER_USER = 10;
+
     this.table = new ex.DynamodbTable(
       name: "ws_table",
       attributeDefinitions: {
@@ -58,29 +59,6 @@ pub class WebSocket {
 
     this.ws = new websockets.WebSocket(name: "WingCloudWebsocket") as "wingcloud-websocket";
     this.url = this.ws.url;
-
-    let saveConnection = inflight (opts: SaveConnectionOpts): void => {
-      this.table.updateItem(
-        key: {
-          pk: "USER#{opts.userId}",
-          sk: "SUBSCRIPTION#{opts.subscriptionId}",
-        },
-        updateExpression: "SET connectionIds = list_append(if_not_exists(connectionIds, :empty_list), :connectionId)",
-        expressionAttributeValues: {
-            ":connectionId": ["{opts.connectionId}"],
-            ":empty_list": []
-        },
-      );
-      this.table.putItem(
-        item: {
-          pk: "WS_CONNECTION#{opts.connectionId}",
-          sk: "#",
-          subscriptionId: "{opts.subscriptionId}",
-          userId: "{opts.userId}",
-        },
-        conditionExpression: "attribute_not_exists(pk)",
-      );
-    };
 
     let deleteConnection = inflight(id: str): void => {
       let item = this.table.deleteItem(
@@ -111,6 +89,38 @@ pub class WebSocket {
           }
         }
       }
+    };
+
+    let saveConnection = inflight (opts: SaveConnectionOpts): void => {
+      let userItem = this.table.updateItem(
+        key: {
+          pk: "USER#{opts.userId}",
+          sk: "SUBSCRIPTION#{opts.subscriptionId}",
+        },
+        updateExpression: "SET connectionIds = list_append(if_not_exists(connectionIds, :empty_list), :connectionId)",
+        expressionAttributeValues: {
+            ":connectionId": ["{opts.connectionId}"],
+            ":empty_list": []
+        },
+        returnValues: "ALL_OLD",
+      );
+
+       // Delete the oldest connection if the user has more than CONNECTIONS_PER_USER connections
+      if let userData = UserItem.tryFromJson(userItem.attributes) {
+        if userData.connectionIds.toArray().length >= CONNECTIONS_PER_USER {
+          deleteConnection(userData.connectionIds.toArray().at(0));
+        }
+      }
+
+      this.table.putItem(
+        item: {
+          pk: "WS_CONNECTION#{opts.connectionId}",
+          sk: "#",
+          subscriptionId: "{opts.subscriptionId}",
+          userId: "{opts.userId}",
+        },
+        conditionExpression: "attribute_not_exists(pk)",
+      );
     };
 
     this.ws.onMessage(inflight(id: str, message: str): void => {
@@ -147,7 +157,6 @@ pub class WebSocket {
     );
 
     let message = WebsocketMessage.fromJson({
-      key: opts.key,
       query: opts.query,
       payload: opts.payload,
     });

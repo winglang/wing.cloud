@@ -141,6 +141,9 @@ let environmentServerCertificate = new certificate.Certificate(
   }(),
 );
 
+let onEnvironmentCreated = new cloud.Topic() as "environment creation events";
+let onEndpointCreated = new cloud.Topic() as "endpoint creation events";
+
 let environmentManager = new EnvironmentManager.EnvironmentManager(
   users: users,
   apps: apps,
@@ -152,7 +155,9 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
-  analytics: analytics
+  analytics: analytics,
+  onEnvironmentCreated: onEnvironmentCreated,
+  onEndpointCreated: onEndpointCreated,
 );
 
 let wingCloudApi = new wingcloud_api.Api(
@@ -170,6 +175,8 @@ let wingCloudApi = new wingcloud_api.Api(
   appSecret: appSecret,
   wsSecret: wsSecret,
   logs: bucketLogs,
+  onEnvironmentCreated: onEnvironmentCreated,
+  onEndpointCreated: onEndpointCreated,
 );
 
 let probotApp = new probot.ProbotApp(

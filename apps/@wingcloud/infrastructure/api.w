@@ -114,6 +114,8 @@ struct ApiProps {
   appSecret: str;
   wsSecret: str;
   logs: cloud.Bucket;
+  onEnvironmentCreated: cloud.Topic;
+  onEndpointCreated: cloud.Topic;
 }
 
 
@@ -130,7 +132,24 @@ pub class Api {
     let users = props.users;
     let logs = props.logs;
     let environmentsQueue = new cloud.Queue() as "Environments Queue";
+
     let invalidateQuery = new InvalidateQuery.InvalidateQuery(ws: ws);
+
+    props.onEnvironmentCreated.onMessage(inflight (event) => {
+      let environment = Environments.Environment.fromJson(Json.parse(event));
+      let app = apps.get(appId: environment.appId);
+      invalidateQuery.invalidate(userId: app.userId, queries: [
+        "app.listEnvironments"
+      ]);
+    });
+
+    props.onEndpointCreated.onMessage(inflight (event) => {
+      let endpoint = Endpoints.Endpoint.fromJson(Json.parse(event));
+      let app = apps.get(appId: endpoint.appId);
+      invalidateQuery.invalidate(userId: app.userId, queries: [
+        "app.environment.endpoints"
+      ]);
+    });
 
     let AUTH_COOKIE_NAME = "auth";
 
@@ -218,6 +237,7 @@ pub class Api {
     api.get("/wrpc/ws.auth", inflight (request) => {
       try {
         let userId = getUserIdFromCookie(request);
+
         let jwt = JWT.JWT.sign(
           secret: props.wsSecret,
           userId: userId,
@@ -512,7 +532,7 @@ pub class Api {
           entrypoint: entrypoint,
         }));
 
-        invalidateQuery.invalidate(userId: user.userId, key: "app.create");
+        invalidateQuery.invalidate(userId: user.userId, queries: ["app.list"]);
 
         return {
           body: {
@@ -590,7 +610,8 @@ pub class Api {
         userId: app.userId,
       }));
 
-      invalidateQuery.invalidate(userId: userId, key: "app.delete");
+      invalidateQuery.invalidate(userId: userId, queries: ["app.list"]);
+
       return {
         body: {
           appId: app.appId,
@@ -740,6 +761,10 @@ pub class Api {
 
       let secret = props.secrets.create(appId: appId, environmentType: environmentType, name: name, value: value);
 
+      invalidateQuery.invalidate(userId: app.userId, queries: [
+        "app.listSecrets",
+      ]);
+
       return {
         body: {
           secretId: secret.id
@@ -761,6 +786,10 @@ pub class Api {
       let secretId = input.get("secretId").asStr();
 
       props.secrets.delete(id: secretId, appId: appId, environmentType: environmentType);
+
+      invalidateQuery.invalidate(userId: app.userId, queries: [
+        "app.listSecrets",
+      ]);
 
       return {
         body: {
@@ -815,6 +844,10 @@ pub class Api {
           appId: appId,
           entrypoint: entrypoint,
       }}));
+
+      invalidateQuery.invalidate(userId: userId, queries: [
+        "app.listEntrypoints",
+      ]);
 
       return {
         body: {
@@ -899,7 +932,12 @@ pub class Api {
       let environment = props.environments.get(id: input.environmentId);
       let app = props.apps.get(appId: environment.appId);
 
-      invalidateQuery.invalidate(userId: app.userId, key: "environment.report");
+      invalidateQuery.invalidate(userId: app.userId, queries: [
+        "app.listEnvironments",
+        "app.environment",
+        "app.environment.logs",
+        "app.environment.endpoints",
+      ]);
     });
 
     api.post("/environment.report", inflight (request) => {

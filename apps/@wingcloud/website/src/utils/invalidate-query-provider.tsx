@@ -24,12 +24,11 @@ export const InvalidateQueryProvider = ({
   const onMessage = useCallback(
     (event: MessageEvent) => {
       const data = JSON.parse(event.data);
-      console.log("app.invalidateQuery", data);
+      console.debug("app.invalidateQuery", data);
       if (data.query) {
         queryClient.invalidateQueries({ queryKey: [data.query] });
       } else {
-        console.log("Invalidate all queries");
-        //queryClient.invalidateQueries();
+        queryClient.invalidateQueries();
       }
     },
     [queryClient],
@@ -39,7 +38,7 @@ export const InvalidateQueryProvider = ({
     if (auth.data?.token && !ws) {
       const websocket = new WebSocket(url);
       websocket.addEventListener("open", () => {
-        console.log("ws opened");
+        console.debug("ws opened");
         websocket.send(
           JSON.stringify({
             type: "authorize",

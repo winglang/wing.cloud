@@ -23,7 +23,6 @@ export const SecretsList = ({ appId }: { appId: string }) => {
     },
     {
       enabled: appId != undefined,
-      refetchInterval: 1000 * 10,
     },
   );
 
@@ -43,7 +42,6 @@ export const SecretsList = ({ appId }: { appId: string }) => {
           name,
           value,
         });
-        await secretsQuery.refetch();
         showNotification("Secret created");
       } catch (error) {
         if (error instanceof Error) {
@@ -94,7 +92,6 @@ export const SecretsList = ({ appId }: { appId: string }) => {
           environmentType: secret.environmentType,
           secretId: secret.id,
         });
-        await secretsQuery.refetch();
         showNotification("Secret deleted");
       } catch (error) {
         if (error instanceof Error) {

@@ -1,3 +1,4 @@
+bring cloud;
 bring "./environments.w" as environments;
 bring "./users.w" as users;
 bring "./apps.w" as apps;
@@ -25,6 +26,8 @@ struct EnvironmentsProps {
   probotAdapter: adapter.ProbotAdapter;
   siteDomain: str;
   analytics: analytics.SegmentAnalytics;
+  onEnvironmentCreated: cloud.Topic?;
+  onEndpointCreated: cloud.Topic?;
 }
 
 pub struct CreateEnvironmentOptions {
@@ -75,6 +78,8 @@ pub class EnvironmentManager {
   runtimeClient: runtime_client.RuntimeClient;
   probotAdapter: adapter.ProbotAdapter;
   analytics: analytics.SegmentAnalytics;
+  onEnvironmentCreated: cloud.Topic?;
+  onEndpointCreated: cloud.Topic?;
 
   new(props: EnvironmentsProps) {
     this.apps = props.apps;
@@ -85,6 +90,10 @@ pub class EnvironmentManager {
     this.certificate = props.certificate;
     this.runtimeClient = props.runtimeClient;
     this.probotAdapter = props.probotAdapter;
+
+    this.onEnvironmentCreated = props.onEnvironmentCreated;
+    this.onEndpointCreated = props.onEndpointCreated;
+
     this.githubComment = new comment.GithubComment(
       environments: props.environments,
       endpoints: props.endpoints,
@@ -152,6 +161,8 @@ pub class EnvironmentManager {
       token: tokenRes.data.token,
       privateKey: keyPair.privateKey,
     );
+
+    this.onEnvironmentCreated?.publish(Json.stringify(environment));
   }
 
   pub inflight restart(options: RestartEnvironmentOptions) {
@@ -353,7 +364,7 @@ pub class EnvironmentManager {
 
         log("creating endpoint {Json.stringify(endpoint)}");
         publicEndpoint.create();
-        this.endpoints.create(
+        let newEndpoint = this.endpoints.create(
           appId: environment.appId,
           environmentId: environment.id,
           path: endpoint.path,
@@ -364,6 +375,7 @@ pub class EnvironmentManager {
           port: endpoint.port,
           digest: endpoint.digest,
         );
+        this.onEnvironmentCreated?.publish(Json.stringify(newEndpoint));
       }
 
       // public endpoints needs to be deleted when they no longer appear in the environment
