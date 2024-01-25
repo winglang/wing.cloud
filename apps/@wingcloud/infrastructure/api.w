@@ -38,6 +38,7 @@ struct TestLog {
 struct UserFromCookie {
   userId: str;
   username: str;
+  email: str?;
 }
 
 struct DeleteAppMessage {
@@ -74,6 +75,7 @@ struct EnvironmentReportMessage {
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
   extern "./util.js" pub static inflight parseLog(log: str): Log?;
+  extern "./util.js" pub static inflight encodeURIComponent(value: str): str;
 
   pub static inflight parseLogs(messages: Array<str>): Array<Log> {
     let var parsedLogs = MutArray<Log>[];
@@ -100,6 +102,7 @@ bring "./environment-manager.w" as EnvironmentManager;
 bring "./status-reports.w" as status_reports;
 bring "./probot-adapter.w" as adapter;
 bring "./octokit.w" as Octokit;
+bring "./segment-analytics.w" as analytics;
 
 struct ApiProps {
   api: cloud.Api;
@@ -113,9 +116,11 @@ struct ApiProps {
   probotAdapter: adapter.ProbotAdapter;
   githubAppClientId: str;
   githubAppClientSecret: str;
+  githubAppCallbackOrigin: str;
   appSecret: str;
   wsSecret: str;
   logs: cloud.Bucket;
+  analytics: analytics.SegmentAnalytics;
   onEnvironmentChange: cloud.Topic;
   onEndpointChange: cloud.Topic;
 }
@@ -202,6 +207,7 @@ pub class Api {
       return {
         userId: userId,
         username: user.username,
+        email: user.email,
       };
     };
 
@@ -330,11 +336,54 @@ pub class Api {
         },
       );
 
+      // The default redirect location is the user's profile page,
+      // but in the case of the Console Sign In process, we want to redirect
+      // to the Console instead.
+      let var location = "/{user.username}";
+
+      if let anonymousId = request.query.tryGet("anonymousId") {
+        props.analytics.identify(
+          anonymousId: anonymousId,
+          userId: user.id,
+          traits: {
+            email: user.email,
+            github: user.username,
+          },
+        );
+        props.analytics.track(user.id, "console_sign_in", {
+          anonymousId: anonymousId,
+          userId: user.id,
+          email: user.email,
+          github: user.username,
+        });
+
+        if let port = request.query.tryGet("port") {
+          // Redirect back to the local Console, using the `signedIn`
+          // GET parameter so the Console dismisses the sign in modal.
+          location = "http://localhost:{port}/?signedIn";
+        }
+      }
+
       return {
         status: 302,
         headers: {
-          Location: "/{user.username}",
+          Location: location,
           "Set-Cookie": authCookie,
+        },
+      };
+    });
+
+    api.get("/wrpc/console.signIn", inflight (request) => {
+      // Redirect to the GitHub App OAuth flow, specifying the final redirect back to
+      // Wing Cloud, including the Console local port and the user's local anonymousId.
+      let port = request.query.get("port");
+      let anonymousId = Util.encodeURIComponent(request.query.get("anonymousId"));
+      let redirectURI = Util.encodeURIComponent("{props.githubAppCallbackOrigin}/wrpc/github.callback?port={port}&anonymousId={anonymousId}");
+
+      return {
+        status: 302,
+        headers: {
+          Location: "https://github.com/login/oauth/authorize?client_id={props.githubAppClientId}&redirect_uri={redirectURI}",
         },
       };
     });

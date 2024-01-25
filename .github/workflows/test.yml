@@ -7,7 +7,7 @@ on:
   pull_request:
     types: [labeled, opened, synchronize, reopened]
     paths-ignore:
-      - '**/*.md'
+      - "**/*.md"
 
 concurrency:
   # this is a singleton build group, so only one build can run at a time
@@ -16,7 +16,7 @@ concurrency:
 
 permissions:
   id-token: write # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
+  contents: read # This is required for actions/checkout
   pull-requests: write # This is required for commenting on PRs
 
 env:
@@ -67,6 +67,7 @@ jobs:
           BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
           BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}
           BOT_GITHUB_WEBHOOK_SECRET: ${{ secrets.BOT_GITHUB_WEBHOOK_SECRET }}
+          BOT_GITHUB_CALLBACK_ORIGIN: ${{ secrets.BOT_GITHUB_CALLBACK_ORIGIN }}
 
           ## Inflight Testing
           TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}
@@ -86,8 +87,8 @@ jobs:
           TF_BACKEND_STATE_FILE: "${{ github.repository }}/testing/infrastructure/main.tfstate"
           LANDING_DOMAIN: ${{ vars.LANDING_DOMAIN }}
           TF_IN_AUTOMATION: true
-          ENVIRONMENT_SERVER_ZONE_NAME:  ${{ vars.ENVIRONMENT_SERVER_ZONE_NAME }}
-          ENVIRONMENT_SERVER_CERTIFICATE_ID:  ${{ vars.ENVIRONMENT_SERVER_CERTIFICATE_ID }}
+          ENVIRONMENT_SERVER_ZONE_NAME: ${{ vars.ENVIRONMENT_SERVER_ZONE_NAME }}
+          ENVIRONMENT_SERVER_CERTIFICATE_ID: ${{ vars.ENVIRONMENT_SERVER_CERTIFICATE_ID }}
           PUBLIC_ENDPOINT_DOMAIN: ${{ secrets.PUBLIC_ENDPOINT_DOMAIN }}
           PUBLIC_ENDPOINT_SUBDOMAIN: ${{ secrets.PUBLIC_ENDPOINT_SUBDOMAIN }}
 
@@ -96,7 +97,7 @@ jobs:
           # Wing debug logging
           DEBUG: "wing:*"
         run: pnpm wing compile --platform @wingcloud/platform main.w
-        working-directory: 'apps/@wingcloud/infrastructure'
+        working-directory: "apps/@wingcloud/infrastructure"
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
