@@ -4,9 +4,9 @@
   "type": "commonjs",
   "sideEffects": false,
   "dependencies": {
-    "@aws-sdk/client-kms": "^3.460.0",
-    "@aws-sdk/client-sqs": "^3.490.0",
-    "@aws-sdk/client-ssm": "^3.460.0",
+    "@aws-sdk/client-kms": "^3.499.0",
+    "@aws-sdk/client-sqs": "^3.499.0",
+    "@aws-sdk/client-ssm": "^3.499.0",
     "@cdktf/provider-aws": "^18.0.7",
     "@cdktf/provider-dnsimple": "^8.0.1",
     "@cdktf/provider-docker": "^10.0.0",
