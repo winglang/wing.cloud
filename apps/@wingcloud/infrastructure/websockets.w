@@ -99,17 +99,14 @@ pub class WebSocket {
           projectionExpression: "connectionIds",
         );
         if let userData = UserItem.tryFromJson(userItem.item) {
-          let connectionIds = userData.connectionIds.copyMut();
-          if connectionIds.delete(id) {
+          let index = userData.connectionIds.toArray().indexOf(id);
+          if index != -1 {
             this.table.updateItem({
               key: {
                   pk: "USER#{connection.userId}",
                   sk: "SUBSCRIPTION#{connection.subscriptionId}",
               },
-              updateExpression: "SET connectionIds = :newList",
-              expressionAttributeValues: {
-                ":newList": connectionIds.toArray()
-              },
+              updateExpression: "REMOVE connectionIds[{index}]",
             });
           }
         }
