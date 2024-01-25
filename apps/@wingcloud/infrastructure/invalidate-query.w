@@ -22,8 +22,11 @@ pub class InvalidateQuery {
       this.ws.sendMessage(
         subscriptionId: "app.invalidateQuery",
         userId: options.userId,
-        query: query,
-        payload: options.payload,
+        message: Json.stringify({
+          type: "invalidateQuery",
+          query: query,
+          payload: options.payload,
+        })
       );
     }
   }

@@ -25,39 +25,42 @@ export const InvalidateQueryProvider = ({
     (event: MessageEvent) => {
       const data = JSON.parse(event.data);
       console.debug("app.invalidateQuery", data);
-      if (data.query) {
-        queryClient.invalidateQueries({ queryKey: [data.query] });
-      } else {
-        queryClient.invalidateQueries();
+      if (data.type === "invalidateQuery") {
+        if (data.query) {
+          queryClient.invalidateQueries({ queryKey: [data.query] });
+        } else {
+          queryClient.invalidateQueries();
+        }
       }
     },
     [queryClient],
   );
 
   useEffect(() => {
-    if (auth.data?.token && !ws) {
-      const websocket = new WebSocket(url);
-      websocket.addEventListener("open", () => {
-        console.debug("ws opened");
-        websocket.send(
-          JSON.stringify({
-            type: "authorize",
-            subscriptionId: "app.invalidateQuery",
-            payload: auth.data?.token,
-          }),
-        );
-      });
-      websocket.addEventListener("message", onMessage);
-      setWs(websocket);
+    if (!auth.data?.token || ws) {
       return;
     }
-  }, [auth.data?.token]);
+    const websocket = new WebSocket(url);
+    websocket.addEventListener("open", () => {
+      console.debug("ws opened");
+      websocket.send(
+        JSON.stringify({
+          type: "authorize",
+          subscriptionId: "app.invalidateQuery",
+          payload: auth.data?.token,
+        }),
+      );
+    });
+    websocket.addEventListener("message", onMessage);
+    setWs(websocket);
+  }, [auth.data?.token, onMessage, url]);
 
   useEffect(() => {
     return () => {
       if (!ws) {
         return;
       }
+      ws.addEventListener("message", onMessage);
       ws.close();
     };
   }, []);

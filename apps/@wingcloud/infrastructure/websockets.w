@@ -5,19 +5,13 @@ bring "./jwt.w" as JWT;
 struct WebsocketSendOpts {
   subscriptionId: str;
   userId: str;
-  query: str?;
-  payload: Json?;
+  message: str;
 }
 
 struct SaveConnectionOpts {
   subscriptionId: str;
   connectionId: str;
   userId: str;
-}
-
-struct WebsocketMessage {
-  query: str?;
-  payload: Json?;
 }
 
 struct UserItem {
@@ -135,6 +129,9 @@ pub class WebSocket {
           connectionId: id,
           userId: jwt.userId
         );
+        this.ws.sendMessage(id, Json.stringify({
+          type: "authorized",
+        }));
       }
     });
 
@@ -156,15 +153,10 @@ pub class WebSocket {
       projectionExpression: "connectionIds",
     );
 
-    let message = WebsocketMessage.fromJson({
-      query: opts.query,
-      payload: opts.payload,
-    });
-
     if let item = result.item {
       let connectionIds = UserItem.fromJson(item).connectionIds;
       for connectionId in connectionIds {
-        this.ws.sendMessage(connectionId, Json.stringify(message));
+        this.ws.sendMessage(connectionId, opts.message);
       }
     }
   }
