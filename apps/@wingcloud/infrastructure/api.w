@@ -138,10 +138,10 @@ pub class Api {
     let logs = props.logs;
     let environmentsQueue = new cloud.Queue() as "Environments Queue";
 
-    let INVALIDATE_QUERY_SUBSCRIPTION = "invalidateQuery";
+    let INVALIDATE_SUBSCRIPTION_ID = "invalidateQuery";
     let invalidateQuery = new InvalidateQuery.InvalidateQuery(
       ws: ws,
-      subscriptionId: INVALIDATE_QUERY_SUBSCRIPTION
+      subscriptionId: INVALIDATE_SUBSCRIPTION_ID
     );
 
     props.environmentManager.onEnvironmentChange(inflight (event) => {
@@ -244,7 +244,7 @@ pub class Api {
       throw httpError.HttpError.badRequest("Installation not found");
     };
 
-    api.get("/wrpc/ws.auth", inflight (request) => {
+    api.get("/wrpc/ws.invalidateQuery.auth", inflight (request) => {
       try {
         let userId = getUserIdFromCookie(request);
 
@@ -256,6 +256,7 @@ pub class Api {
         return {
           body: {
             token: jwt,
+            subscriptionId: INVALIDATE_SUBSCRIPTION_ID,
           },
         };
       } catch {

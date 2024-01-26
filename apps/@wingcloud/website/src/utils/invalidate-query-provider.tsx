@@ -23,14 +23,11 @@ export const InvalidateQueryProvider = ({
 
   const onMessage = useCallback(
     (event: MessageEvent) => {
+      console.debug("ws onMessage", event.data);
+
       const data = JSON.parse(event.data);
-      console.debug("ws onMessage", data);
-      if (data.type === auth.data?.subscriptionId) {
-        if (data.query) {
-          queryClient.invalidateQueries({ queryKey: [data.query] });
-        } else {
-          queryClient.invalidateQueries();
-        }
+      if (data.query) {
+        queryClient.invalidateQueries({ queryKey: [data.query] });
       }
     },
     [queryClient, auth.data?.subscriptionId],
@@ -53,12 +50,17 @@ export const InvalidateQueryProvider = ({
     });
     websocket.addEventListener("message", onMessage);
     setWs(websocket);
-
-    return () => {
-      websocket.removeEventListener("message", onMessage);
-      websocket.close();
-    };
   }, [auth.data?.token, auth.data?.subscriptionId, onMessage, url, ws]);
+
+  useEffect(() => {
+    if (!ws) {
+      return;
+    }
+    return () => {
+      ws.removeEventListener("message", onMessage);
+      ws.close();
+    };
+  }, [ws]);
 
   return (
     <InvalidateQueryContext.Provider value={ws}>

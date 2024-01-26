@@ -26,7 +26,6 @@ pub class InvalidateQuery {
         subscriptionId: this.subscriptionId,
         userId: options.userId,
         message: Json.stringify({
-          type: this.subscriptionId,
           query: query,
           payload: options.payload,
         })

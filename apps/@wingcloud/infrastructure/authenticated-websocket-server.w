@@ -129,9 +129,7 @@ pub class AuthenticatedWebsocketServer {
           connectionId: id,
           userId: jwt.userId
         );
-        this.ws.sendMessage(id, Json.stringify({
-          type: "authorized",
-        }));
+        this.ws.sendMessage(id, "authorized");
       }
     });
 
