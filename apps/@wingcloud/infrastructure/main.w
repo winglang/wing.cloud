@@ -15,7 +15,7 @@ bring "./environment-cleaner.w" as EnvironmentCleaner;
 bring "./secrets.w" as Secrets;
 bring "./api.w" as wingcloud_api;
 bring "./segment-analytics.w" as SegmentAnalytics;
-bring "./websockets.w" as websockets;
+bring "./authenticated-websocket-server.w" as wsServer;
 
 bring "./runtime/runtime.w" as runtime;
 bring "./runtime/runtime-client.w" as runtime_client;
@@ -82,7 +82,7 @@ let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
 let secrets = new Secrets.Secrets();
 let endpoints = new Endpoints.Endpoints(table);
-let ws = new websockets.WebSocket(secret: wsSecret);
+let ws = new wsServer.AuthenticatedWebsocketServer(secret: wsSecret);
 
 let probotAdapter = new adapter.ProbotAdapter(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
@@ -162,9 +162,6 @@ let environmentServerCertificate = new certificate.Certificate(
   }(),
 );
 
-let onEnvironmentChange = new cloud.Topic() as "environment creation events";
-let onEndpointChange = new cloud.Topic() as "endpoint creation events";
-
 let environmentManager = new EnvironmentManager.EnvironmentManager(
   users: users,
   apps: apps,
@@ -177,8 +174,6 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
   analytics: analytics,
-  onEnvironmentChange: onEnvironmentChange,
-  onEndpointChange: onEndpointChange,
 );
 
 let wingCloudApi = new wingcloud_api.Api(
@@ -198,8 +193,6 @@ let wingCloudApi = new wingcloud_api.Api(
   wsSecret: wsSecret,
   logs: bucketLogs,
   analytics: analytics,
-  onEnvironmentChange: onEnvironmentChange,
-  onEndpointChange: onEndpointChange,
 );
 
 let probotApp = new probot.ProbotApp(

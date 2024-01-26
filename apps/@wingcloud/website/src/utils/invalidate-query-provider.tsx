@@ -12,14 +12,12 @@ import { wrpc } from "./wrpc.js";
 
 const InvalidateQueryContext = createContext<WebSocket | undefined>(undefined);
 
-const SUBSCRIPTION_ID = "invalidateQuery";
-
 export const InvalidateQueryProvider = ({
   url,
   children,
 }: PropsWithChildren<{ url: string }>) => {
   const queryClient = useQueryClient();
-  const auth = wrpc["ws.auth"].useQuery();
+  const auth = wrpc["ws.invalidateQuery.auth"].useQuery();
 
   const [ws, setWs] = useState<WebSocket | undefined>(undefined);
 
@@ -27,7 +25,7 @@ export const InvalidateQueryProvider = ({
     (event: MessageEvent) => {
       const data = JSON.parse(event.data);
       console.debug("ws onMessage", data);
-      if (data.type === SUBSCRIPTION_ID) {
+      if (data.type === auth.data?.subscriptionId) {
         if (data.query) {
           queryClient.invalidateQueries({ queryKey: [data.query] });
         } else {
@@ -35,7 +33,7 @@ export const InvalidateQueryProvider = ({
         }
       }
     },
-    [queryClient],
+    [queryClient, auth.data?.subscriptionId],
   );
 
   useEffect(() => {
@@ -48,24 +46,19 @@ export const InvalidateQueryProvider = ({
       websocket.send(
         JSON.stringify({
           type: "authorize",
-          subscriptionId: SUBSCRIPTION_ID,
+          subscriptionId: auth.data?.subscriptionId,
           payload: auth.data?.token,
         }),
       );
     });
     websocket.addEventListener("message", onMessage);
     setWs(websocket);
-  }, [auth.data?.token, onMessage, url, ws]);
 
-  useEffect(() => {
     return () => {
-      if (!ws) {
-        return;
-      }
-      ws.addEventListener("message", onMessage);
-      ws.close();
+      websocket.removeEventListener("message", onMessage);
+      websocket.close();
     };
-  }, []);
+  }, [auth.data?.token, auth.data?.subscriptionId, onMessage, url, ws]);
 
   return (
     <InvalidateQueryContext.Provider value={ws}>

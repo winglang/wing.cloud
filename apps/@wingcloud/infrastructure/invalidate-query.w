@@ -1,7 +1,8 @@
-bring "./websockets.w" as websockets;
+bring "./authenticated-websocket-server.w" as wsServer;
 
 pub struct InvalidateQueryProps {
-  ws: websockets.WebSocket;
+  subscriptionId: str;
+  ws: wsServer.AuthenticatedWebsocketServer;
 }
 
 struct InvalidateOpts {
@@ -11,21 +12,21 @@ struct InvalidateOpts {
 }
 
 pub class InvalidateQuery {
-  pub ws: websockets.WebSocket;
+  pub ws: wsServer.AuthenticatedWebsocketServer;
+  subscriptionId: str;
 
   new(props: InvalidateQueryProps) {
     this.ws = props.ws;
+    this.subscriptionId = props.subscriptionId;
   }
 
   pub inflight invalidate(options: InvalidateOpts) {
-    let SUBSCRIPTION_ID = "invalidateQuery";
-
     for query in options.queries ?? ["*"] {
       this.ws.sendMessage(
-        subscriptionId: SUBSCRIPTION_ID,
+        subscriptionId: this.subscriptionId,
         userId: options.userId,
         message: Json.stringify({
-          type: SUBSCRIPTION_ID,
+          type: this.subscriptionId,
           query: query,
           payload: options.payload,
         })

@@ -17,7 +17,7 @@ bring "./secrets.w" as Secrets;
 bring "./endpoints.w" as Endpoints;
 bring "./lowkeys-map.w" as lowkeys;
 bring "./http-error.w" as httpError;
-bring "./websockets.w" as websockets;
+bring "./authenticated-websocket-server.w" as wsServer;
 bring "./invalidate-query.w" as InvalidateQuery;
 
 struct Log {
@@ -106,7 +106,7 @@ bring "./segment-analytics.w" as analytics;
 
 struct ApiProps {
   api: cloud.Api;
-  ws: websockets.WebSocket;
+  ws: wsServer.AuthenticatedWebsocketServer;
   apps: Apps.Apps;
   users: Users.Users;
   environments: Environments.Environments;
@@ -121,8 +121,6 @@ struct ApiProps {
   wsSecret: str;
   logs: cloud.Bucket;
   analytics: analytics.SegmentAnalytics;
-  onEnvironmentChange: cloud.Topic;
-  onEndpointChange: cloud.Topic;
 }
 
 
@@ -140,9 +138,13 @@ pub class Api {
     let logs = props.logs;
     let environmentsQueue = new cloud.Queue() as "Environments Queue";
 
-    let invalidateQuery = new InvalidateQuery.InvalidateQuery(ws: ws);
+    let INVALIDATE_QUERY_SUBSCRIPTION = "invalidateQuery";
+    let invalidateQuery = new InvalidateQuery.InvalidateQuery(
+      ws: ws,
+      subscriptionId: INVALIDATE_QUERY_SUBSCRIPTION
+    );
 
-    props.onEnvironmentChange.onMessage(inflight (event) => {
+    props.environmentManager.onEnvironmentChange(inflight (event) => {
       let environment = Environments.Environment.fromJson(Json.parse(event));
       let app = apps.get(appId: environment.appId);
       invalidateQuery.invalidate(userId: app.userId, queries: [
@@ -150,7 +152,7 @@ pub class Api {
       ]);
     });
 
-    props.onEndpointChange.onMessage(inflight (event) => {
+    props.environmentManager.onEndpointChange(inflight (event) => {
       let endpoint = Endpoints.Endpoint.fromJson(Json.parse(event));
       let app = apps.get(appId: endpoint.appId);
       invalidateQuery.invalidate(userId: app.userId, queries: [

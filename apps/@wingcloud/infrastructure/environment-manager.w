@@ -28,8 +28,6 @@ struct EnvironmentsProps {
   probotAdapter: adapter.ProbotAdapter;
   siteDomain: str;
   analytics: analytics.SegmentAnalytics;
-  onEnvironmentChange: cloud.Topic?;
-  onEndpointChange: cloud.Topic?;
 }
 
 pub struct CreateEnvironmentOptions {
@@ -99,8 +97,8 @@ pub class EnvironmentManager {
   probotAdapter: adapter.ProbotAdapter;
   analytics: analytics.SegmentAnalytics;
   mrq: queue.MostRecentQueue;
-  onEnvironmentChange: cloud.Topic?;
-  onEndpointChange: cloud.Topic?;
+  environmentEvents: cloud.Topic;
+  endpointEvents: cloud.Topic;
 
   new(props: EnvironmentsProps) {
     this.apps = props.apps;
@@ -112,8 +110,8 @@ pub class EnvironmentManager {
     this.runtimeClient = props.runtimeClient;
     this.probotAdapter = props.probotAdapter;
 
-    this.onEnvironmentChange = props.onEnvironmentChange;
-    this.onEndpointChange = props.onEndpointChange;
+    this.environmentEvents = new cloud.Topic() as "environment creation events";
+    this.endpointEvents = new cloud.Topic() as "endpoint creation events";
 
     this.githubComment = new comment.GithubComment(
       environments: props.environments,
@@ -226,7 +224,7 @@ pub class EnvironmentManager {
       })
     );
 
-    this.onEnvironmentChange?.publish(Json.stringify(environment));
+    this.environmentEvents.publish(Json.stringify(environment));
   }
 
   pub inflight handleRestart(options: RestartEnvironmentOptions) {
@@ -250,7 +248,7 @@ pub class EnvironmentManager {
       appId: options.appId,
       status: "initializing"
     );
-    this.onEnvironmentChange?.publish(Json.stringify(options.environment));
+    this.environmentEvents.publish(Json.stringify(options.environment));
 
     let secrets = this.secretsForEnvironment(options.environment);
 
@@ -313,7 +311,7 @@ pub class EnvironmentManager {
     let octokit = this.auth(options.environment.installationId);
 
     this.environments.updateStatus(id: options.environment.id, appId: options.appId, status: "stopped");
-    this.onEnvironmentChange?.publish(Json.stringify(options.environment));
+    this.environmentEvents.publish(Json.stringify(options.environment));
 
     this.runtimeClient.delete(environment: options.environment);
 
@@ -382,7 +380,7 @@ pub class EnvironmentManager {
       appId: environment.appId,
       status: status
     );
-    this.onEnvironmentChange?.publish(Json.stringify(environment));
+    this.environmentEvents.publish(Json.stringify(environment));
 
     if status == "running" {
       let running = status_reports.Running.fromJson(options.statusReport.data);
@@ -416,6 +414,14 @@ pub class EnvironmentManager {
         options: options,
       })
     );
+  }
+
+  pub onEnvironmentChange(handler: inflight (str): void) {
+    this.environmentEvents.onMessage(handler);
+  }
+
+  pub onEndpointChange(handler: inflight (str): void) {
+    this.endpointEvents.onMessage(handler);
   }
 
   inflight postComment(props: PostCommentOptions) {
@@ -488,7 +494,7 @@ pub class EnvironmentManager {
           port: endpoint.port,
           digest: endpoint.digest,
         );
-        this.onEndpointChange?.publish(Json.stringify(newEndpoint));
+        this.endpointEvents.publish(Json.stringify(newEndpoint));
       }
 
       // public endpoints needs to be deleted when they no longer appear in the environment

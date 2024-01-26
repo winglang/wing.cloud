@@ -2,7 +2,7 @@ bring websockets;
 bring ex;
 bring "./jwt.w" as JWT;
 
-struct WebsocketSendOpts {
+struct SendMessageOptions {
   subscriptionId: str;
   userId: str;
   message: str;
@@ -29,16 +29,16 @@ struct WsInputMessage {
   payload: str;
 }
 
-pub struct WebSocketProps {
+pub struct AuthenticatedWebSocketServerProps {
   secret: str;
 }
 
-pub class WebSocket {
+pub class AuthenticatedWebsocketServer {
   pub ws: websockets.WebSocket;
   table: ex.DynamodbTable;
   pub url: str;
 
-  new(props: WebSocketProps) {
+  new(props: AuthenticatedWebSocketServerProps) {
     let CONNECTIONS_PER_USER = 10;
 
     this.table = new ex.DynamodbTable(
@@ -93,7 +93,7 @@ pub class WebSocket {
         },
         updateExpression: "SET connectionIds = list_append(if_not_exists(connectionIds, :empty_list), :connectionId)",
         expressionAttributeValues: {
-            ":connectionId": ["{opts.connectionId}"],
+            ":connectionId": [opts.connectionId],
             ":empty_list": []
         },
         returnValues: "ALL_OLD",
@@ -110,7 +110,7 @@ pub class WebSocket {
         item: {
           pk: "WS_CONNECTION#{opts.connectionId}",
           sk: "#",
-          subscriptionId: "{opts.subscriptionId}",
+          subscriptionId: opts.subscriptionId,
           userId: "{opts.userId}",
         },
         conditionExpression: "attribute_not_exists(pk)",
@@ -144,7 +144,7 @@ pub class WebSocket {
     this.ws.initialize();
   }
 
-  pub inflight sendMessage(opts: WebsocketSendOpts): void {
+  pub inflight sendMessage(opts: SendMessageOptions): void {
     let result = this.table.getItem(
       key: {
         pk: "USER#{opts.userId}",
