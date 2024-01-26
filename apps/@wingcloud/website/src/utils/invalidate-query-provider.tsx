@@ -24,10 +24,13 @@ export const InvalidateQueryProvider = ({
   const onMessage = useCallback(
     (event: MessageEvent) => {
       console.debug("ws onMessage", event.data);
-
-      const data = JSON.parse(event.data);
-      if (data.query) {
-        queryClient.invalidateQueries({ queryKey: [data.query] });
+      try {
+        const data = JSON.parse(event.data);
+        if (data.query) {
+          queryClient.invalidateQueries({ queryKey: [data.query] });
+        }
+      } catch {
+        console.debug("WS message is not a valid JSON");
       }
     },
     [queryClient, auth.data?.subscriptionId],
@@ -60,7 +63,7 @@ export const InvalidateQueryProvider = ({
       ws.removeEventListener("message", onMessage);
       ws.close();
     };
-  }, [ws]);
+  }, [ws, onMessage]);
 
   return (
     <InvalidateQueryContext.Provider value={ws}>
