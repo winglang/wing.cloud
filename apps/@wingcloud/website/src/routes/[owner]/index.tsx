@@ -4,7 +4,7 @@ import {
   PlusIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../components/error-boundary.js";
@@ -105,7 +105,10 @@ const OwnerPage = () => {
         )}
       >
         {listAppsQuery.isLoading &&
-          Array.from({ length: apps.length || 3 }).map((_, i) => (
+          Array.from({
+            length:
+              apps.length > 0 ? apps.length : Math.floor(Math.random() * 5) + 3,
+          }).map((_, i) => (
             <SkeletonLoader
               key={i}
               className={clsx("w-full h-20 rounded border", theme.borderInput)}
