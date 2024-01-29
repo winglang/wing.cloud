@@ -39,8 +39,6 @@ pub class AuthenticatedWebsocketServer {
   pub url: str;
 
   new(props: AuthenticatedWebSocketServerProps) {
-    let CONNECTIONS_PER_USER = 10;
-
     this.table = new ex.DynamodbTable(
       name: "ws_table",
       attributeDefinitions: {
