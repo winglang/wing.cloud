@@ -4,6 +4,7 @@ import {
   type MutationProcedure,
   type QueryProcedure,
   type PaginatedResponse,
+  type SubscriptionProcedure,
 } from "@wingcloud/wrpc";
 
 export interface User {
@@ -127,6 +128,13 @@ export interface Endpoint {
 }
 
 export const wrpc = createWRPCReact<{
+  "ws.invalidateQuery.auth": QueryProcedure<
+    undefined,
+    {
+      token: string;
+      subscriptionId: string;
+    }
+  >;
   "auth.check": QueryProcedure<
     undefined,
     {

@@ -9,9 +9,9 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../components/error-boundary.js";
 import { Header } from "../../components/header.js";
-import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { Button } from "../../design-system/button.js";
 import { Input } from "../../design-system/input.js";
+import { SkeletonLoader } from "../../design-system/skeleton-loader.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { wrpc } from "../../utils/wrpc.js";
 
@@ -36,7 +36,7 @@ const OwnerPage = () => {
     return apps.filter((app) =>
       `${app.appName}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
     );
-  }, [listAppsQuery.data, search]);
+  }, [apps, search]);
 
   return (
     <div
@@ -72,61 +72,60 @@ const OwnerPage = () => {
         )}
       </div>
 
-      {listAppsQuery.isLoading && (
-        <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <SpinnerLoader />
+      {!listAppsQuery.isLoading && filteredApps.length === 0 && (
+        <div className="text-center">
+          <FolderPlusIcon className={clsx("w-12 h-12 mx-auto", theme.text2)} />
+          <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
+            No apps found.
+          </h3>
+
+          {apps.length === 0 && (
+            <div>
+              <p className={clsx("mt-1 text-sm", theme.text2)}>
+                Get started by adding an app.
+              </p>
+              <Button
+                label="Add app"
+                icon={PlusIcon}
+                primary
+                className="mt-6"
+                onClick={() => {
+                  navigate("/add");
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
-      {!listAppsQuery.isLoading && (
-        <>
-          {filteredApps.length === 0 && (
-            <div className="text-center">
-              <FolderPlusIcon
-                className={clsx("w-12 h-12 mx-auto", theme.text2)}
-              />
-              <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
-                No apps found.
-              </h3>
 
-              {apps.length === 0 && (
-                <div>
-                  <p className={clsx("mt-1 text-sm", theme.text2)}>
-                    Get started by adding an app.
-                  </p>
-                  <Button
-                    label="Add app"
-                    icon={PlusIcon}
-                    primary
-                    className="mt-6"
-                    onClick={() => {
-                      navigate("/add");
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          )}
+      <div
+        className={clsx(
+          "flex flex-wrap gap-6 w-full",
+          "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
+        )}
+      >
+        {listAppsQuery.isLoading &&
+          Array.from({
+            length:
+              apps.length > 0 ? apps.length : Math.floor(Math.random() * 5) + 3,
+          }).map((_, i) => (
+            <SkeletonLoader
+              key={i}
+              className={clsx("w-full h-20 rounded border", theme.borderInput)}
+              loading
+            />
+          ))}
 
-          {filteredApps.length > 0 && (
-            <div
-              className={clsx(
-                "flex flex-wrap gap-6 w-full",
-                "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
-              )}
-            >
-              {filteredApps.map((app) => (
-                <AppCard
-                  key={app.appId}
-                  onClick={() => {
-                    navigate(`/${owner}/${app.appName}`);
-                  }}
-                  app={app}
-                />
-              ))}
-            </div>
-          )}
-        </>
-      )}
+        {filteredApps.map((app) => (
+          <AppCard
+            key={app.appId}
+            onClick={() => {
+              navigate(`/${owner}/${app.appName}`);
+            }}
+            app={app}
+          />
+        ))}
+      </div>
     </div>
   );
 };

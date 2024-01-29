@@ -24,22 +24,10 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
     appName,
   });
 
-  const environmentsQuery = wrpc["app.listEnvironments"].useQuery(
-    { owner, appName },
-    {
-      // TODO: query invalidation
-      refetchInterval(query) {
-        if (
-          !(query.state.data as any)?.environments ||
-          (query.state.data as any).environments.length === 0
-        ) {
-          return 1000;
-        }
-
-        return 10_000;
-      },
-    },
-  );
+  const environmentsQuery = wrpc["app.listEnvironments"].useQuery({
+    owner,
+    appName,
+  });
   const environments = useMemo(() => {
     return (
       environmentsQuery.data?.environments.sort(

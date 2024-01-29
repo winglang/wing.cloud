@@ -1,4 +1,5 @@
 bring ex;
+bring cloud;
 bring "./environments.w" as environments;
 bring "./users.w" as users;
 bring "./apps.w" as apps;
@@ -96,6 +97,8 @@ pub class EnvironmentManager {
   probotAdapter: adapter.ProbotAdapter;
   analytics: analytics.SegmentAnalytics;
   mrq: queue.MostRecentQueue;
+  environmentEvents: cloud.Topic;
+  endpointEvents: cloud.Topic;
 
   new(props: EnvironmentsProps) {
     this.apps = props.apps;
@@ -106,6 +109,10 @@ pub class EnvironmentManager {
     this.certificate = props.certificate;
     this.runtimeClient = props.runtimeClient;
     this.probotAdapter = props.probotAdapter;
+
+    this.environmentEvents = new cloud.Topic() as "environment creation events";
+    this.endpointEvents = new cloud.Topic() as "endpoint creation events";
+
     this.githubComment = new comment.GithubComment(
       environments: props.environments,
       endpoints: props.endpoints,
@@ -203,19 +210,21 @@ pub class EnvironmentManager {
     });
 
     this.mrq.enqueue(
-      groupId: environment.id, 
+      groupId: environment.id,
       timestamp: options.timestamp,
       body: Json.stringify(QueueMessage{
         action: "create",
-        options: HandlerCreateEnvironmentOptions{ 
+        options: HandlerCreateEnvironmentOptions{
           appId: options.appId,
           entrypoint: options.entrypoint,
           environment: environment,
           sha: options.sha,
           privateKey: keyPair.privateKey,
-        } 
+        }
       })
     );
+
+    this.environmentEvents.publish(Json.stringify(environment));
   }
 
   pub inflight handleRestart(options: RestartEnvironmentOptions) {
@@ -239,6 +248,7 @@ pub class EnvironmentManager {
       appId: options.appId,
       status: "initializing"
     );
+    this.environmentEvents.publish(Json.stringify(options.environment));
 
     let secrets = this.secretsForEnvironment(options.environment);
 
@@ -270,7 +280,7 @@ pub class EnvironmentManager {
 
   pub inflight restart(options: RestartEnvironmentOptions) {
     this.mrq.enqueue(
-      groupId: options.environment.id, 
+      groupId: options.environment.id,
       timestamp: options.timestamp,
       body: Json.stringify(QueueMessage{
         action: "restart",
@@ -301,6 +311,7 @@ pub class EnvironmentManager {
     let octokit = this.auth(options.environment.installationId);
 
     this.environments.updateStatus(id: options.environment.id, appId: options.appId, status: "stopped");
+    this.environmentEvents.publish(Json.stringify(options.environment));
 
     this.runtimeClient.delete(environment: options.environment);
 
@@ -328,7 +339,7 @@ pub class EnvironmentManager {
 
   pub inflight stop(options: StopEnvironmentOptions) {
     this.mrq.enqueue(
-      groupId: options.environment.id, 
+      groupId: options.environment.id,
       timestamp: options.timestamp,
       body: Json.stringify(QueueMessage{
         action: "stop",
@@ -369,6 +380,7 @@ pub class EnvironmentManager {
       appId: environment.appId,
       status: status
     );
+    this.environmentEvents.publish(Json.stringify(environment));
 
     if status == "running" {
       let running = status_reports.Running.fromJson(options.statusReport.data);
@@ -395,13 +407,27 @@ pub class EnvironmentManager {
     }
 
     this.mrq.enqueue(
-      groupId: options.statusReport.environmentId, 
+      groupId: options.statusReport.environmentId,
       timestamp: options.statusReport.timestamp,
       body: Json.stringify(QueueMessage{
         action: "updateStatus",
         options: options,
       })
     );
+  }
+
+  pub onEnvironmentChange(handler: inflight (environments.Environment): void) {
+    this.environmentEvents.onMessage(inflight (event) => {
+      let environment = environments.Environment.fromJson(Json.parse(event));
+      handler(environment);
+    });
+  }
+
+  pub onEndpointChange(handler: inflight (endpoints.Endpoint): void) {
+    this.endpointEvents.onMessage(inflight (event) => {
+      let endpoint = endpoints.Endpoint.fromJson(Json.parse(event));
+      handler(endpoint);
+    });
   }
 
   inflight postComment(props: PostCommentOptions) {
@@ -463,7 +489,7 @@ pub class EnvironmentManager {
 
         log("creating endpoint {Json.stringify(endpoint)}");
         publicEndpoint.create();
-        this.endpoints.create(
+        let newEndpoint = this.endpoints.create(
           appId: environment.appId,
           environmentId: environment.id,
           path: endpoint.path,
@@ -474,6 +500,7 @@ pub class EnvironmentManager {
           port: endpoint.port,
           digest: endpoint.digest,
         );
+        this.endpointEvents.publish(Json.stringify(newEndpoint));
       }
 
       // public endpoints needs to be deleted when they no longer appear in the environment

@@ -74,7 +74,7 @@ const nanoid = new WingLibProject({
 ///////////////////////////////////////////////////////////////////////////////
 const dateutils = new WingLibProject({
   monorepo,
-  name: "@wingcloud/dateutils"
+  name: "@wingcloud/dateutils",
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -258,6 +258,7 @@ infrastructure.addGitIgnore("!/.env.example");
 
 infrastructure.addGitIgnore("**/target/");
 infrastructure.addDeps("winglang");
+
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
@@ -370,6 +371,30 @@ infrastructure.addDevDeps("@octokit/rest");
 
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(runtime.name);
+
+infrastructure.addDeps("@winglibs/websockets");
+
+// TODO: We need to install all of these deps because of we are using pnpm
+// and wing is not resolving deps correctly.
+// https://github.com/winglang/wing/issues/5252#issuecomment-1893857213
+infrastructure.addDeps("@aws-cdk/asset-awscli-v1");
+infrastructure.addDeps("@aws-cdk/asset-kubectl-v20");
+infrastructure.addDeps("@aws-cdk/asset-node-proxy-agent-v6");
+infrastructure.addDeps("@balena/dockerignore");
+infrastructure.addDeps("case");
+infrastructure.addDeps("fs-extra");
+infrastructure.addDeps("ignore");
+infrastructure.addDeps("jsonschema");
+infrastructure.addDeps("minimatch");
+infrastructure.addDeps("punycode");
+infrastructure.addDeps("semver");
+infrastructure.addDeps("table");
+infrastructure.addDeps("yaml");
+
+infrastructure.addDeps("@cdktf/provider-aws");
+infrastructure.addDeps("cdktf");
+infrastructure.addDeps("constructs");
+infrastructure.addDeps("aws-cdk-lib");
 
 ///////////////////////////////////////////////////////////////////////////////
 

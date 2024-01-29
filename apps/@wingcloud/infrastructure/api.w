@@ -17,6 +17,8 @@ bring "./secrets.w" as Secrets;
 bring "./endpoints.w" as Endpoints;
 bring "./lowkeys-map.w" as lowkeys;
 bring "./http-error.w" as httpError;
+bring "./authenticated-websocket-server.w" as wsServer;
+bring "./invalidate-query.w" as InvalidateQuery;
 
 struct Log {
   message: str;
@@ -65,6 +67,10 @@ struct GetListOfEntrypointsProps{
   defaultBranch: str;
 }
 
+struct EnvironmentReportMessage {
+  environmentId: str;
+}
+
 // TODO: https://github.com/winglang/wing/issues/3644
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
@@ -100,6 +106,7 @@ bring "./segment-analytics.w" as analytics;
 
 struct ApiProps {
   api: cloud.Api;
+  ws: wsServer.AuthenticatedWebsocketServer;
   apps: Apps.Apps;
   users: Users.Users;
   environments: Environments.Environments;
@@ -111,6 +118,7 @@ struct ApiProps {
   githubAppClientSecret: str;
   githubAppCallbackOrigin: str;
   appSecret: str;
+  wsSecret: str;
   logs: cloud.Bucket;
   analytics: analytics.SegmentAnalytics;
 }
@@ -124,10 +132,31 @@ struct EnvironmentAction {
 pub class Api {
   new(props: ApiProps) {
     let api = new json_api.JsonApi(api: props.api);
+    let ws = props.ws;
     let apps = props.apps;
     let users = props.users;
     let logs = props.logs;
     let environmentsQueue = new cloud.Queue() as "Environments Queue";
+
+    let INVALIDATE_SUBSCRIPTION_ID = "invalidateQuery";
+    let invalidateQuery = new InvalidateQuery.InvalidateQuery(
+      ws: ws,
+      subscriptionId: INVALIDATE_SUBSCRIPTION_ID
+    );
+
+    props.environmentManager.onEnvironmentChange(inflight (environment) => {
+      let app = apps.get(appId: environment.appId);
+      invalidateQuery.invalidate(userId: app.userId, queries: [
+        "app.listEnvironments"
+      ]);
+    });
+
+    props.environmentManager.onEndpointChange(inflight (endpoint) => {
+      let app = apps.get(appId: endpoint.appId);
+      invalidateQuery.invalidate(userId: app.userId, queries: [
+        "app.environment.endpoints"
+      ]);
+    });
 
     let AUTH_COOKIE_NAME = "auth";
 
@@ -212,6 +241,26 @@ pub class Api {
       }
       throw httpError.HttpError.badRequest("Installation not found");
     };
+
+    api.get("/wrpc/ws.invalidateQuery.auth", inflight (request) => {
+      try {
+        let userId = getUserIdFromCookie(request);
+
+        let jwt = JWT.JWT.sign(
+          secret: props.wsSecret,
+          userId: userId,
+          expirationTime: "1m",
+        );
+        return {
+          body: {
+            token: jwt,
+            subscriptionId: INVALIDATE_SUBSCRIPTION_ID,
+          },
+        };
+      } catch {
+        log("User not authenticated. Rejecting websocket connection");
+      }
+    });
 
     api.get("/wrpc/auth.check", inflight (request) => {
       try {
@@ -537,6 +586,8 @@ pub class Api {
           timestamp: datetime.utcNow().timestampMs,
         }));
 
+        invalidateQuery.invalidate(userId: user.userId, queries: ["app.list"]);
+
         return {
           body: {
             appId: appId,
@@ -557,7 +608,6 @@ pub class Api {
         let userApps = apps.list(
           userId: user.id,
         );
-
         return {
           body: {
             apps: userApps,
@@ -588,7 +638,6 @@ pub class Api {
     });
 
     api.post("/wrpc/app.delete", inflight (request) => {
-
       let userId = getUserIdFromCookie(request);
       let input = Json.parse(request.body ?? "");
 
@@ -613,6 +662,8 @@ pub class Api {
         userId: app.userId,
         timestamp: datetime.utcNow().timestampMs,
       }));
+
+      invalidateQuery.invalidate(userId: userId, queries: ["app.list"]);
 
       return {
         body: {
@@ -763,6 +814,10 @@ pub class Api {
 
       let secret = props.secrets.create(appId: appId, environmentType: environmentType, name: name, value: value);
 
+      invalidateQuery.invalidate(userId: app.userId, queries: [
+        "app.listSecrets",
+      ]);
+
       return {
         body: {
           secretId: secret.id
@@ -784,6 +839,10 @@ pub class Api {
       let secretId = input.get("secretId").asStr();
 
       props.secrets.delete(id: secretId, appId: appId, environmentType: environmentType);
+
+      invalidateQuery.invalidate(userId: app.userId, queries: [
+        "app.listSecrets",
+      ]);
 
       return {
         body: {
@@ -839,6 +898,10 @@ pub class Api {
           entrypoint: entrypoint,
           timestamp: datetime.utcNow().timestampMs,
       }}));
+
+      invalidateQuery.invalidate(userId: userId, queries: [
+        "app.listEntrypoints",
+      ]);
 
       return {
         body: {
@@ -915,6 +978,22 @@ pub class Api {
       };
     });
 
+
+    let notifyEnvReportQueue = new cloud.Queue() as "Environment Report Queue";
+    notifyEnvReportQueue.setConsumer(inflight (event) => {
+      let input = EnvironmentReportMessage.fromJson(Json.parse(event));
+
+      let environment = props.environments.get(id: input.environmentId);
+      let app = props.apps.get(appId: environment.appId);
+
+      invalidateQuery.invalidate(userId: app.userId, queries: [
+        "app.listEnvironments",
+        "app.environment",
+        "app.environment.logs",
+        "app.environment.endpoints",
+      ]);
+    });
+
     api.post("/environment.report", inflight (request) => {
       if let event = request.body {
         log("report status: {event}");
@@ -927,6 +1006,11 @@ pub class Api {
 
           if payloadEnvironmentId == statusReport.environmentId {
             props.environmentManager.updateStatus(statusReport: statusReport);
+
+            notifyEnvReportQueue.push(Json.stringify(EnvironmentReportMessage {
+              environmentId: statusReport.environmentId,
+            }));
+
             return {
               status: 200
             };

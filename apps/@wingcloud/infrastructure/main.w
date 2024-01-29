@@ -1,8 +1,9 @@
 // And the sun, and the moon, and the stars, and the flowers.
 bring cloud;
+bring ex;
 bring util;
 bring http;
-bring ex;
+
 bring "cdktf" as cdktf;
 
 bring "./users.w" as Users;
@@ -14,6 +15,7 @@ bring "./environment-cleaner.w" as EnvironmentCleaner;
 bring "./secrets.w" as Secrets;
 bring "./api.w" as wingcloud_api;
 bring "./segment-analytics.w" as SegmentAnalytics;
+bring "./authenticated-websocket-server.w" as wsServer;
 
 bring "./runtime/runtime.w" as runtime;
 bring "./runtime/runtime-client.w" as runtime_client;
@@ -26,6 +28,7 @@ bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 
 let appSecret = util.env("APP_SECRET");
+let wsSecret = util.env("WS_SECRET");
 let segmentWriteKey = util.env("SEGMENT_WRITE_KEY");
 let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true";
 
@@ -79,6 +82,7 @@ let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
 let secrets = new Secrets.Secrets();
 let endpoints = new Endpoints.Endpoints(table);
+let ws = new wsServer.AuthenticatedWebsocketServer(secret: wsSecret) as "WebsocketServer";
 
 let probotAdapter = new adapter.ProbotAdapter(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
@@ -107,6 +111,8 @@ let dashboard = new ex.ReactApp(
 );
 dashboard.addEnvironment("SEGMENT_WRITE_KEY", segmentWriteKey);
 dashboard.addEnvironment("ENABLE_ANALYTICS", "{enableAnalytics}");
+dashboard.addEnvironment("API_URL", "{api.url}");
+dashboard.addEnvironment("WS_URL", "{ws.url}");
 
 reactAppPatch.ReactAppPatch.apply(dashboard);
 
@@ -172,6 +178,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
 
 let wingCloudApi = new wingcloud_api.Api(
   api: api,
+  ws: ws,
   apps: apps,
   users: users,
   environments: environments,
@@ -183,6 +190,7 @@ let wingCloudApi = new wingcloud_api.Api(
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
   githubAppCallbackOrigin: util.env("BOT_GITHUB_CALLBACK_ORIGIN"),
   appSecret: appSecret,
+  wsSecret: wsSecret,
   logs: bucketLogs,
   analytics: analytics,
 );

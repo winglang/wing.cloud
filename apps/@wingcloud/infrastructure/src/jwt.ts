@@ -5,6 +5,7 @@ const JWT_EXPIRATION_TIME = "1h";
 export interface SignOptions {
   secret: string;
   userId: string;
+  expirationTime?: string;
 }
 
 export const sign = async (options: SignOptions) => {
@@ -12,7 +13,7 @@ export const sign = async (options: SignOptions) => {
     .setSubject(options.userId)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(JWT_EXPIRATION_TIME)
+    .setExpirationTime(options.expirationTime ?? JWT_EXPIRATION_TIME)
     .sign(Buffer.from(options.secret, "hex"));
 };
 

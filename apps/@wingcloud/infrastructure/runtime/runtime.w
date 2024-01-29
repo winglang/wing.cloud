@@ -95,7 +95,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
     let secretsFile = fs.join(fs.mkdtemp("secrets-"), nanoid62.Nanoid62.generate());
     fs.writeFile(secretsFile, Json.stringify(opts.secrets), encoding: "utf8");
     volumes.set(secretsFile, Consts.secretsPath());
-    
+
     // setup the state directory
     let environmentStateDir = fs.join(this.stateDir, opts.environmentId);
     if !fs.exists(environmentStateDir) {
@@ -279,7 +279,6 @@ struct RuntimeServiceProps {
   publicEndpointFullDomainName: str;
 }
 
-bring "@cdktf/provider-aws" as aws;
 bring "cdktf" as cdktf;
 
 // Previews environment runtime
@@ -300,13 +299,13 @@ pub class RuntimeService {
       let bucketAddr = this.logs.node.addr;
       bucketName = "BUCKET_HANDLE_{bucketAddr.substring(bucketAddr.length - 8, bucketAddr.length)}";
     } else {
-      let awsUser = new aws.iamUser.IamUser(name: "{this.node.addr}-user");
+      let awsUser = new awsprovider.iamUser.IamUser(name: "{this.node.addr}-user");
       let bucket: awsprovider.s3Bucket.S3Bucket = unsafeCast(this.logs)?.bucket;
       let bucketArn: str = bucket.arn;
       bucketName = bucket.bucket;
       bucketRegion = bucket.region;
       bucket.forceDestroy = true;
-      let awsPolicy = new aws.iamUserPolicy.IamUserPolicy(
+      let awsPolicy = new awsprovider.iamUserPolicy.IamUserPolicy(
         user: awsUser.name,
         policy: Json.stringify({
           Version: "2012-10-17",
@@ -319,7 +318,7 @@ pub class RuntimeService {
           ],
         }),
       );
-      let awsAccessKey = new aws.iamAccessKey.IamAccessKey(user: awsUser.name);
+      let awsAccessKey = new awsprovider.iamAccessKey.IamAccessKey(user: awsUser.name);
       awsAccessKeyId = awsAccessKey.id;
       awsSecretAccessKey = awsAccessKey.secret;
       if let flyToken = props.flyToken {

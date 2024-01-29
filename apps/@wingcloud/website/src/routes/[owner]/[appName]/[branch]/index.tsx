@@ -21,17 +21,11 @@ const EnvironmentPage = () => {
   const [testLogsOpen, setTestLogsOpen] = useState(false);
   const [deploymentLogsOpen, setDeploymentLogsOpen] = useState(false);
 
-  const environment = wrpc["app.environment"].useQuery(
-    {
-      owner: owner!,
-      appName: appName!,
-      branch: branch!,
-    },
-    {
-      // TODO: query invalidation
-      refetchInterval: 1000 * 10,
-    },
-  );
+  const environment = wrpc["app.environment"].useQuery({
+    owner: owner!,
+    appName: appName!,
+    branch: branch!,
+  });
 
   const logs = wrpc["app.environment.logs"].useQuery(
     {
@@ -40,22 +34,15 @@ const EnvironmentPage = () => {
       branch: branch!,
     },
     {
-      // TODO: query invalidation
-      refetchInterval: 1000 * 10,
+      // TODO: use query invalidation once logs are not stored in a file
+      refetchInterval: 3 * 1000,
     },
   );
 
-  const endpoints = wrpc["app.environment.endpoints"].useQuery(
-    {
-      appName: appName!,
-      branch: branch!,
-    },
-    {
-      enabled: appName !== undefined && branch !== undefined,
-      // TODO: query invalidation
-      refetchInterval: 1000 * 10,
-    },
-  );
+  const endpoints = wrpc["app.environment.endpoints"].useQuery({
+    appName: appName!,
+    branch: branch!,
+  });
 
   const location = useLocation();
   const locationHash = useMemo(() => location.hash.slice(1), [location.hash]);

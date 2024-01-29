@@ -85,7 +85,6 @@ const SettingsPage = () => {
         appId: app?.appId!,
         entrypoint: entrypoint!,
       });
-      appQuery.refetch();
       showNotification("Succefully updated the app's entrypoint");
       setLoading(false);
       setConfirmModalOpen(false);
