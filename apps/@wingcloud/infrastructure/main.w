@@ -41,10 +41,12 @@ let publicEndpointDomain = (): str => {
 }();
 let publicEndpointSubdomain = (): str? => {
   if let subdomain = util.tryEnv("PUBLIC_ENDPOINT_SUBDOMAIN") {
-    return subdomain;
-  } else {
-    return nil;
+    if subdomain != "" {
+      return subdomain;
+    }
   }
+
+  return nil;
 }();
 let publicEndpointFullDomainName = (): str => {
   if let subdomain = publicEndpointSubdomain {
