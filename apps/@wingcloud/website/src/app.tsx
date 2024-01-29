@@ -60,7 +60,7 @@ export const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <WRPCProvider value={{ url: API_URL.toString(), ws: WS_URL.toString() }}>
+      <WRPCProvider value={{ url: API_URL.toString() }}>
         <InvalidateQueryProvider url={WS_URL.toString()}>
           <AnalyticsIdentityProvider>
             <ThemeProvider mode="light" theme={DefaultTheme}>

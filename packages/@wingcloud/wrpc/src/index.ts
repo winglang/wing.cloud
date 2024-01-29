@@ -8,11 +8,10 @@ import {
   type UseQueryResult,
   type UseMutationResult,
   type UseInfiniteQueryResult,
-  type QueryKey,
 } from "@tanstack/react-query";
 import { createContext, useContext } from "react";
 
-const WRPCContext = createContext({ url: "", ws: "" });
+const WRPCContext = createContext({ url: "" });
 
 export const WRPCProvider = WRPCContext.Provider;
 
