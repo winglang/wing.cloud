@@ -416,12 +416,18 @@ pub class EnvironmentManager {
     );
   }
 
-  pub onEnvironmentChange(handler: inflight (str): void) {
-    this.environmentEvents.onMessage(handler);
+  pub onEnvironmentChange(handler: inflight (environments.Environment): void) {
+    this.environmentEvents.onMessage(inflight (event) => {
+      let environment = environments.Environment.fromJson(Json.parse(event));
+      handler(environment);
+    });
   }
 
-  pub onEndpointChange(handler: inflight (str): void) {
-    this.endpointEvents.onMessage(handler);
+  pub onEndpointChange(handler: inflight (endpoints.Endpoint): void) {
+    this.endpointEvents.onMessage(inflight (event) => {
+      let endpoint = endpoints.Endpoint.fromJson(Json.parse(event));
+      handler(endpoint);
+    });
   }
 
   inflight postComment(props: PostCommentOptions) {

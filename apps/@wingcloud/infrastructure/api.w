@@ -144,16 +144,14 @@ pub class Api {
       subscriptionId: INVALIDATE_SUBSCRIPTION_ID
     );
 
-    props.environmentManager.onEnvironmentChange(inflight (event) => {
-      let environment = Environments.Environment.fromJson(Json.parse(event));
+    props.environmentManager.onEnvironmentChange(inflight (environment) => {
       let app = apps.get(appId: environment.appId);
       invalidateQuery.invalidate(userId: app.userId, queries: [
         "app.listEnvironments"
       ]);
     });
 
-    props.environmentManager.onEndpointChange(inflight (event) => {
-      let endpoint = Endpoints.Endpoint.fromJson(Json.parse(event));
+    props.environmentManager.onEndpointChange(inflight (endpoint) => {
       let app = apps.get(appId: endpoint.appId);
       invalidateQuery.invalidate(userId: app.userId, queries: [
         "app.environment.endpoints"
