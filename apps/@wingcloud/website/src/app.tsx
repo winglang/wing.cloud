@@ -23,7 +23,7 @@ API_URL.pathname = "/wrpc";
 // @ts-ignore
 const WS_URL = new URL(window["wingEnv"]["WS_URL"]);
 WS_URL.pathname = "/ws";
-WS_URL.protocol = "ws" + WS_URL.protocol.slice(4);
+WS_URL.protocol = API_URL.protocol === "https:" ? "wss:" : "ws:";
 
 export const App = () => {
   const { track } = useContext(AnalyticsContext);
