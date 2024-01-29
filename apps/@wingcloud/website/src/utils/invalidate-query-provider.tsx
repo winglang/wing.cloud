@@ -53,6 +53,7 @@ export const InvalidateQueryProvider = ({
       );
     };
 
+    console.debug("ws connecting to", url);
     const websocket = new WebSocket(url);
     websocket.addEventListener("open", onOpen);
     websocket.addEventListener("message", onMessage);
