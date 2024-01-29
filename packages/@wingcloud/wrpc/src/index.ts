@@ -24,17 +24,6 @@ export class ForbiddenError extends ControlledError {}
 
 export class NotFoundError extends ControlledError {}
 
-interface UseSubscriptionOptions<
-  TQueryFnData = unknown,
-  TError = unknown,
-  TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey,
-> extends UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> {
-  onOpen?: () => Promise<void>;
-  onMessage?: (data: any) => Promise<void>;
-  onClose?: () => Promise<void>;
-}
-
 export interface PaginatedResponse<T> {
   data: T;
   nextPage?: number;
@@ -92,29 +81,6 @@ export type InfinitQueryProcedure<
         pageParams: Array<unknown>;
         pages: Array<Output>;
       }>;
-    };
-
-export type SubscriptionProcedure<
-  Input = undefined,
-  Output = unknown,
-> = undefined extends Input
-  ? {
-      useSubscription(
-        input?: Input,
-        options?: Omit<
-          UseSubscriptionOptions<unknown, unknown, Input>,
-          "queryKey"
-        >,
-      ): WebSocket;
-    }
-  : {
-      useSubscription(
-        input: Input,
-        options?: Omit<
-          UseSubscriptionOptions<unknown, unknown, Output>,
-          "queryKey"
-        >,
-      ): WebSocket;
     };
 
 const fetcher = async (method: string, url: URL, input?: any) => {
@@ -201,19 +167,6 @@ export const createWRPCReact = <
               ...options,
               mutationKey: [route],
               mutationFn: async (input) => await fetcher("POST", url, input),
-            });
-          },
-          useSubscription: (input: any, options: UseSubscriptionOptions) => {
-            const url = new URL(`${useContext(WRPCContext).ws}`);
-            const ws = new WebSocket(url);
-            ws.addEventListener("open", async () => {
-              options.onOpen?.();
-            });
-            ws.addEventListener("message", async (event) => {
-              options.onMessage?.(JSON.parse(event.data));
-            });
-            ws.addEventListener("close", async () => {
-              options.onClose?.();
             });
           },
         };
