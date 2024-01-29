@@ -124,6 +124,7 @@ pub class AuthenticatedWebsocketServer {
         } catch error {
           log("Failed to send message to connection: {id}: {error}");
         }
+      }
     });
 
     this.ws.onDisconnect(inflight(id: str): void => {
