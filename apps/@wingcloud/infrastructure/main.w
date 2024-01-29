@@ -244,10 +244,6 @@ let proxyUrl = (() => {
           pathPattern: "/wrpc/*",
           domainName: apiDomainName,
         },
-        // {
-        //   pathPattern: "/ws/*",
-        //   domainName: ws.url,
-        // },
         {
           pathPattern: "*",
           domainName: dashboard.url,
