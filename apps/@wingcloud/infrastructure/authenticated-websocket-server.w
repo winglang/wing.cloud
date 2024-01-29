@@ -119,8 +119,11 @@ pub class AuthenticatedWebsocketServer {
           connectionId: id,
           userId: jwt.userId
         );
-        this.ws.sendMessage(id, "authorized");
-      }
+        try {
+          this.ws.sendMessage(id, "authorized");
+        } catch error {
+          log("Failed to send message to connection: {id}: {error}");
+        }
     });
 
     this.ws.onDisconnect(inflight(id: str): void => {
@@ -144,7 +147,11 @@ pub class AuthenticatedWebsocketServer {
     if let item = result.item {
       let connectionIds = UserItem.fromJson(item).connectionIds;
       for connectionId in connectionIds {
-        this.ws.sendMessage(connectionId, opts.message);
+        try {
+          this.ws.sendMessage(connectionId, opts.message);
+        } catch error {
+          log("Failed to send message to connection: {connectionId}: {error}");
+        }
       }
     }
   }
