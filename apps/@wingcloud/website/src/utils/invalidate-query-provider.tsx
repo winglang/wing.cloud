@@ -21,9 +21,17 @@ export const InvalidateQueryProvider = ({
 
   const [ws, setWs] = useState<WebSocket | undefined>(undefined);
 
-  const onMessage = useCallback(
-    (event: MessageEvent) => {
-      console.debug("ws onMessage", event.data);
+  useEffect(() => {
+    // there is no need to re-create the websocket
+    if (ws) {
+      return;
+    }
+    // can't create the websocket without the token and subscriptionId
+    if (!auth.data?.token || !auth.data?.subscriptionId) {
+      return;
+    }
+
+    const onMessage = (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data);
         if (data.query) {
@@ -32,16 +40,9 @@ export const InvalidateQueryProvider = ({
       } catch {
         console.debug("WS message is not a valid JSON");
       }
-    },
-    [queryClient, auth.data?.subscriptionId],
-  );
+    };
 
-  useEffect(() => {
-    if (!auth.data?.token || ws) {
-      return;
-    }
-    const websocket = new WebSocket(url);
-    websocket.addEventListener("open", () => {
+    const onOpen = () => {
       console.debug("ws opened");
       websocket.send(
         JSON.stringify({
@@ -50,20 +51,24 @@ export const InvalidateQueryProvider = ({
           payload: auth.data?.token,
         }),
       );
-    });
+    };
+
+    const websocket = new WebSocket(url);
+    websocket.addEventListener("open", onOpen);
     websocket.addEventListener("message", onMessage);
     setWs(websocket);
-  }, [auth.data?.token, auth.data?.subscriptionId, onMessage, url, ws]);
 
-  useEffect(() => {
-    if (!ws) {
-      return;
-    }
     return () => {
-      ws.removeEventListener("message", onMessage);
-      ws.close();
+      if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+        return;
+      }
+      websocket.removeEventListener("open", onOpen);
+      websocket.removeEventListener("message", onMessage);
+      websocket.close();
+      setWs(undefined);
+      console.debug("ws closed");
     };
-  }, [ws, onMessage]);
+  }, [auth.data, url, ws]);
 
   return (
     <InvalidateQueryContext.Provider value={ws}>
