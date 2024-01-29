@@ -86,7 +86,7 @@ pub class AuthenticatedWebsocketServer {
     };
 
     let saveConnection = inflight (opts: SaveConnectionOpts): void => {
-      let userItem = this.table.updateItem(
+      this.table.updateItem(
         key: {
           pk: "USER#{opts.userId}",
           sk: "SUBSCRIPTION#{opts.subscriptionId}",
@@ -96,15 +96,7 @@ pub class AuthenticatedWebsocketServer {
             ":connectionId": [opts.connectionId],
             ":empty_list": []
         },
-        returnValues: "ALL_OLD",
       );
-
-       // Delete the oldest connection if the user has more than CONNECTIONS_PER_USER connections
-      if let userData = UserItem.tryFromJson(userItem.attributes) {
-        if userData.connectionIds.toArray().length >= CONNECTIONS_PER_USER {
-          deleteConnection(userData.connectionIds.toArray().at(0));
-        }
-      }
 
       this.table.putItem(
         item: {
