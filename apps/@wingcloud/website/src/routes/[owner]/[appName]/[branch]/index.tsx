@@ -35,7 +35,7 @@ const EnvironmentPage = () => {
     },
     {
       // TODO: use query invalidation once logs are not stored in a file
-      refetchInterval: 1000 * 10,
+      refetchInterval: 3 * 1000,
     },
   );
 
