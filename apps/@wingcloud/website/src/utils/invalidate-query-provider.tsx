@@ -31,6 +31,7 @@ export const InvalidateQueryProvider = ({
     }
 
     const onMessage = (event: MessageEvent) => {
+      console.debug("ws message", event.data);
       try {
         const data = JSON.parse(event.data);
         if (data.query) {
