@@ -121,7 +121,7 @@ reactAppPatch.ReactAppPatch.apply(dashboard);
 let siteURL = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
     let var subDomain = util.tryEnv("PROXY_SUBDOMAIN");
-    if subDomain? {
+    if subDomain? && subDomain != "" {
       subDomain = "{subDomain}.";
     }
     let zoneName = util.env("PROXY_ZONE_NAME");
