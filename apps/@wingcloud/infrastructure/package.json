@@ -26,7 +26,7 @@
     "@wingcloud/platform": "workspace:^",
     "@wingcloud/probot": "workspace:^",
     "@wingcloud/simutils": "workspace:^",
-    "@winglibs/websockets": "^0.1.1",
+    "@winglibs/websockets": "^0.1.2",
     "aws-cdk-lib": "^2.121.1",
     "case": "^1.6.3",
     "cdktf": "^0.19.1",
