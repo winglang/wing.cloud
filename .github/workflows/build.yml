@@ -20,8 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Smoke Test
-        run: |
-          curl -sSfL https://${{ PROXY_SUBDOMAIN:+$PROXY_SUBDOMAIN. }}${{ vars.PROXY_ZONE_NAME }}/wrpc/health
+        run: curl -sSfL https://$( [ -n "${PROXY_SUBDOMAIN}" ] && echo "${PROXY_SUBDOMAIN}." )${PROXY_ZONE_NAME}/wrpc/health
         env:
           PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
       - name: Checkout
