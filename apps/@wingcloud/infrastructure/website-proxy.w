@@ -13,7 +13,7 @@ pub struct WebsiteProxyProps {
   landingDomainName: str;
   dashboardDomainName: str;
   zoneName: str;
-  subDomain: str;
+  subDomain: str?;
 }
 
 pub class WebsiteProxy {
@@ -86,9 +86,17 @@ pub class WebsiteProxy {
       ].join("\n"),
     ) as "RemoveTrailingSlashes";
 
+    let domain: str = (() => {
+      let subDomain = props.subDomain;
+      if subDomain? && subDomain != "" {
+        return "{subDomain}.{props.zoneName}";
+      }
+      return props.zoneName;
+    })();
+
     let distribution = new awsprovider.cloudfrontDistribution.CloudfrontDistribution(
       enabled: true,
-      aliases: ["{props.subDomain}.{props.zoneName}"],
+      aliases: [domain],
       viewerCertificate: {
         acmCertificateArn: certificate.certificate.certificate.arn,
         sslSupportMethod: "sni-only",

@@ -6,7 +6,7 @@ bring "@cdktf/provider-dnsimple" as dnsimple;
 
 struct DNSRecordProps {
   zoneName: str;
-  subDomain: str;
+  subDomain: str?;
   recordType: str;
   ttl: num;
   distributionUrl: str;
@@ -49,7 +49,7 @@ pub class DNSimpleZoneRecord {
     new DNSimpleProvider();
     this.record = new dnsimple.zoneRecord.ZoneRecord(
       zoneName: props.zoneName,
-      name: props.subDomain, // For the root domain, use an empty string. For subdomains, use the subdomain part (like 'www' for 'www.yourdomain.com')
+      name: props.subDomain ?? "", // For the root domain, use an empty string. For subdomains, use the subdomain part (like 'www' for 'www.yourdomain.com')
       value: props.distributionUrl, // This a CloudFront URL. CloudFront distribution domain or any other target.
       type: props.recordType,
       ttl: props.ttl
@@ -77,7 +77,7 @@ class Certificate {
 
 struct DNSimpleValidateCertificateProps {
   zoneName: str;
-  subDomain: str;
+  subDomain: str?;
 }
 
 // this class introduces some strange workarounds for validating a certificate
@@ -86,7 +86,13 @@ pub class DNSimpleValidatedCertificate {
   pub certificate: Certificate;
 
   new(props: DNSimpleValidateCertificateProps) {
-    this.certificate = new Certificate(domainName: "{props.subDomain}.{props.zoneName}");
+    let domainName = (() => {
+      if props.subDomain? && props.subDomain != "" {
+        return "{props.subDomain}.{props.zoneName}";
+      }
+      return props.zoneName;
+    })();
+    this.certificate = new Certificate(domainName: domainName);
     let dnsRecord = new DNSimpleZoneRecord(
       subDomain: "replaced",
       recordType: "$\{each.value.type}",
