@@ -121,9 +121,11 @@ pub class GithubComment {
         if environment.status == "running" {
           for endpoint in this.endpoints.list(environmentId: environment.id) {
             let var endpointText = endpoint.label;
+            let var endpointIcon = "🔗";
             if endpoint.browserSupport {
-              endpointText = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.label}</a>";
+              endpointIcon = "🌐";
             }
+            endpointText = "{endpointIcon} <a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.label}</a>";
             endpointsString = "{endpointText}<br> {endpointsString}";
           }
         }
