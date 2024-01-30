@@ -46,9 +46,11 @@ export const run = async function ({
   const setup = new Setup({
     executer,
     context,
+    logger: deployLogger,
   });
 
   let wingPaths;
+  deployLogger.log("Initializing wing server");
   const { startServer, closeSSL } = await prepareServer({
     environmentId: context.environment.id,
     stateDir: context.stateDir,
@@ -75,6 +77,7 @@ export const run = async function ({
       deployLogger.log(message);
     }
 
+    deployLogger.log("Starting wing console server");
     const { port, close, endpoints } = await startServer({
       consolePath: paths["@wingconsole/app"],
       entrypointPath,
@@ -98,6 +101,7 @@ export const run = async function ({
 
     await report("running", { objects: { endpoints } });
 
+    deployLogger.log("Wing console is running");
     return {
       paths,
       logfile: deployLogger.getLogfile(),

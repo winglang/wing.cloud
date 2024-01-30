@@ -2,6 +2,7 @@ import { compile as compileFn, BuiltinPlatform } from "@winglang/compiler";
 import { type simulator, type std } from "@winglang/sdk";
 
 import { Environment } from "../environment.js";
+import type { BucketLogger } from "../logger/bucket-logger.js";
 import { prettyPrintError } from "../utils/enhanced-error.js";
 
 export interface WingTestProps {
@@ -9,6 +10,7 @@ export interface WingTestProps {
   wingSdkPath: string;
   entrypointPath: string;
   environment: Environment;
+  logger: BucketLogger;
   bucketWrite: (key: string, contents: string) => Promise<void>;
 }
 
@@ -53,6 +55,7 @@ async function runWingTest(
 
 export async function runWingTests(props: WingTestProps) {
   try {
+    props.logger.log("Starting wing tests app");
     const simfile = await wingCompile(
       props.wingCompilerPath,
       props.entrypointPath,
@@ -87,6 +90,7 @@ export async function runWingTests(props: WingTestProps) {
     for (let test of await client.listTests()) {
       // reset simulator logs
       simulatorLogs = [];
+      props.logger.log("Running test", [test]);
       const result = await runWingTest(client, test, props);
 
       const id = test.replaceAll(/[^\dA-Za-z]/g, "");
