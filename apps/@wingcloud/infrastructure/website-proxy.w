@@ -165,6 +165,14 @@ pub class WebsiteProxy {
           viewerProtocolPolicy: "redirect-to-https",
           cachePolicyId: cachingOptimizedCachePolicyId,
         },
+        {
+          targetOriginId: "dashboard",
+          pathPattern: "/wing.js",
+          allowedMethods: ["GET", "HEAD"],
+          cachedMethods: ["GET", "HEAD"],
+          viewerProtocolPolicy: "redirect-to-https",
+          cachePolicyId: passthroughCachePolicy.id,
+        },
       ],
       defaultCacheBehavior: {
         targetOriginId: "landing_dashboard",
