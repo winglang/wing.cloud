@@ -16,6 +16,14 @@ permissions:
   pull-requests: write # This is required for commenting on PRs
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Smoke Test
+        run: |
+          curl -sSfL https://${{ $PROXY_SUBDOMAIN:+$PROXY_SUBDOMAIN. }}${{ vars.PROXY_ZONE_NAME }}/wrpc/health
+        env:
+          PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
   diff-staging:
     name: Diff Staging
     uses: ./.github/workflows/diff-shared.yml
