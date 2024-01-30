@@ -125,7 +125,7 @@ jobs:
         working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
       - name: Smoke Test
         run: |
-          curl -sSfL https://${{ $PROXY_SUBDOMAIN:+$PROXY_SUBDOMAIN. }}.${{ vars.PROXY_ZONE_NAME }}/wrpc/health
+          curl -sSfL https://$( [ -n "${PROXY_SUBDOMAIN}" ] && echo "${PROXY_SUBDOMAIN}." )${{ vars.PROXY_ZONE_NAME }}/wrpc/health
         env:
           PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
 
