@@ -1,3 +1,4 @@
+import { GlobeAltIcon, BoltIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { useCallback, useContext } from "react";
 import { useParams } from "react-router-dom";
@@ -38,6 +39,7 @@ export const Endpoints = ({
     },
     [track, branch, appName, environmentType],
   );
+
   return (
     <div
       className={clsx(
@@ -103,18 +105,19 @@ export const Endpoints = ({
                       )}
                     >
                       {endpoint.browserSupport ? (
-                        <a
-                          className="hover:underline truncate h-full"
-                          href={endpoint.publicUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => onEndpointClick(endpoint)}
-                        >
-                          {endpoint.publicUrl}
-                        </a>
+                        <GlobeAltIcon className="w-4 h-4 mr-1 text-violet-700 dark:text-violet-400" />
                       ) : (
-                        endpoint.publicUrl
+                        <BoltIcon className="w-4 h-4 mr-1 text-amber-500 dark:text-amber-400" />
                       )}
+                      <a
+                        className="hover:underline truncate h-full"
+                        href={endpoint.publicUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => onEndpointClick(endpoint)}
+                      >
+                        {endpoint.publicUrl}
+                      </a>
                     </div>
                   </div>
                 </div>
