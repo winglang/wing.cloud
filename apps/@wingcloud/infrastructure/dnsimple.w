@@ -86,7 +86,13 @@ pub class DNSimpleValidatedCertificate {
   pub certificate: Certificate;
 
   new(props: DNSimpleValidateCertificateProps) {
-    this.certificate = new Certificate(domainName: "{props.subDomain}.{props.zoneName}");
+    let domainName = (() => {
+      if props.subDomain? && props.subDomain != "" {
+        return "{props.subDomain}.{props.zoneName}";
+      }
+      return props.zoneName;
+    })();
+    this.certificate = new Certificate(domainName: domainName);
     let dnsRecord = new DNSimpleZoneRecord(
       subDomain: "replaced",
       recordType: "$\{each.value.type}",
