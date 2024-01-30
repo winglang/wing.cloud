@@ -19,6 +19,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Smoke Test
+        run: |
+          curl -sSfL https://${{ $PROXY_SUBDOMAIN:+$PROXY_SUBDOMAIN. }}${{ vars.PROXY_ZONE_NAME }}/wrpc/health
+        env:
+          PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
