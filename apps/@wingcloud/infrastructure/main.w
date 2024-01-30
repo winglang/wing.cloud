@@ -120,9 +120,12 @@ reactAppPatch.ReactAppPatch.apply(dashboard);
 
 let siteURL = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
-    let subDomain = util.env("PROXY_SUBDOMAIN");
+    let var subDomain = util.tryEnv("PROXY_SUBDOMAIN");
+    if subDomain? {
+      subDomain = "{subDomain}.";
+    }
     let zoneName = util.env("PROXY_ZONE_NAME");
-    return "https://{subDomain}.{zoneName}";
+    return "https://{subDomain}{zoneName}";
   } else {
     return "http://localhost:3900";
   }
@@ -233,7 +236,7 @@ let proxyUrl = (() => {
       landingDomainName: util.env("LANDING_DOMAIN"),
       dashboardDomainName: getDomainName(dashboard.url),
       zoneName: util.env("PROXY_ZONE_NAME"),
-      subDomain: util.env("PROXY_SUBDOMAIN"),
+      subDomain: util.tryEnv("PROXY_SUBDOMAIN"),
     );
 
     return proxy.url;

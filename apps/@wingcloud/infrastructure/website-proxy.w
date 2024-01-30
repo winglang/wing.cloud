@@ -13,7 +13,7 @@ pub struct WebsiteProxyProps {
   landingDomainName: str;
   dashboardDomainName: str;
   zoneName: str;
-  subDomain: str;
+  subDomain: str?;
 }
 
 pub class WebsiteProxy {
