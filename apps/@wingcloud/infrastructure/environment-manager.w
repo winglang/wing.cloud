@@ -129,30 +129,38 @@ pub class EnvironmentManager {
 
   pub inflight handle(body: QueueMessage) {
     let action = body.action;
-    if action == "create" {
-      let options = HandlerCreateEnvironmentOptions.fromJson(body.options);
-      this.handleCreate(options);
-    } elif action == "restart" {
-      let options = RestartEnvironmentOptions.fromJson(body.options);
-      this.handleRestart(options);
-    } elif action == "stop" {
-      let options = StopEnvironmentOptions.fromJson(body.options);
-      this.handleStop(options);
-    } elif action == "updateStatus" {
-      let options = UpdateEnvironmentStatusOptions.fromJson(body.options);
-      this.hanldeUpdateStatus(options);
-    } else {
-      log("unknown action {action}");
-      throw "unknown action {action}";
+    try {
+      if action == "create" {
+        let options = HandlerCreateEnvironmentOptions.fromJson(body.options);
+        if let app = this.apps.tryGet(appId: options.environment.appId) {
+          this.handleCreate(options, app);
+        }
+      } elif action == "restart" {
+        let options = RestartEnvironmentOptions.fromJson(body.options);
+        if let app = this.apps.tryGet(appId: options.appId) {
+          this.handleRestart(options, app);
+        }      
+      } elif action == "stop" {
+        let options = StopEnvironmentOptions.fromJson(body.options);
+        this.handleStop(options);
+      } elif action == "updateStatus" {
+        let options = UpdateEnvironmentStatusOptions.fromJson(body.options);
+        let environment = this.environments.get(id: options.statusReport.environmentId);
+        if let app = this.apps.tryGet(appId: environment.appId) {
+          this.handleUpdateStatus(options, app, environment);
+        }
+      } else {
+        log("unknown action {action}");
+      }
+    } catch err {
+      log("Failed to handle action {action}: {err}");
     }
   }
 
-  pub inflight handleCreate(options: HandlerCreateEnvironmentOptions) {
+  pub inflight handleCreate(options: HandlerCreateEnvironmentOptions, app: apps.App) {
     let octokit = this.auth(options.environment.installationId);
 
     let secrets = this.secretsForEnvironment(options.environment);
-
-    let app = this.apps.get(appId: options.environment.appId);
 
     this.postComment(
       appId: app.appId,
@@ -227,7 +235,7 @@ pub class EnvironmentManager {
     this.environmentEvents.publish(Json.stringify(environment));
   }
 
-  pub inflight handleRestart(options: RestartEnvironmentOptions) {
+  pub inflight handleRestart(options: RestartEnvironmentOptions, app: apps.App) {
     let octokit = this.auth(options.environment.installationId);
     let keyPair = KeyPair.KeyPair.generate();
 
@@ -251,8 +259,6 @@ pub class EnvironmentManager {
     this.environmentEvents.publish(Json.stringify(options.environment));
 
     let secrets = this.secretsForEnvironment(options.environment);
-
-    let app = this.apps.get(appId: options.appId);
 
     this.postComment(
       appId: app.appId,
@@ -348,51 +354,53 @@ pub class EnvironmentManager {
     );
   }
 
-  pub inflight hanldeUpdateStatus(options: UpdateEnvironmentStatusOptions) {
-    let environment = this.environments.get(id: options.statusReport.environmentId);
-    let app = this.apps.get(appId: environment.appId);
-    let status = options.statusReport.status;
-    let data = options.statusReport.data;
-    let octokit = this.probotAdapter.auth(environment.installationId);
-
-    let ref = octokit.git.getRef(
-      owner: environment.repo.split("/").at(0),
-      repo: environment.repo.split("/").at(1),
-      ref: "heads/{environment.branch}"
-    );
-
-    // if the environment build has completed, check to see if there is a new commit
-    if status == "running" || status == "error" && environment.status != "stopped" {
-      if environment.sha != ref.data.object.sha {
-        this.restart(
-          appId: app.appId,
-          entrypoint: app.entrypoint,
-          environment: environment,
-          sha: ref.data.object.sha,
-          timestamp: datetime.utcNow().timestampMs,
-        );
-        return;
+  pub inflight handleUpdateStatus(options: UpdateEnvironmentStatusOptions, app: apps.App, environment: environments.Environment) {
+    try {
+      let status = options.statusReport.status;
+      let data = options.statusReport.data;
+      let octokit = this.probotAdapter.auth(environment.installationId);
+  
+      let ref = octokit.git.getRef(
+        owner: environment.repo.split("/").at(0),
+        repo: environment.repo.split("/").at(1),
+        ref: "heads/{environment.branch}"
+      );
+  
+      // if the environment build has completed, check to see if there is a new commit
+      if status == "running" || status == "error" && environment.status != "stopped" {
+        if environment.sha != ref.data.object.sha {
+          this.restart(
+            appId: app.appId,
+            entrypoint: app.entrypoint,
+            environment: environment,
+            sha: ref.data.object.sha,
+            timestamp: datetime.utcNow().timestampMs,
+          );
+          return;
+        }
       }
+  
+      this.environments.updateStatus(
+        id: environment.id,
+        appId: environment.appId,
+        status: status
+      );
+      this.environmentEvents.publish(Json.stringify(environment));
+  
+      if status == "running" {
+        let running = status_reports.Running.fromJson(options.statusReport.data);
+        this.reconcileEndpoints(environment, running.objects.endpoints);
+      }
+  
+      this.postComment(
+        appId: app.appId,
+        appName: app.appName,
+        environmentId: environment.id,
+        octokit: octokit
+      );
+    } catch err {
+      log("Ignoring status update for a deleted app {environment.appId}");
     }
-
-    this.environments.updateStatus(
-      id: environment.id,
-      appId: environment.appId,
-      status: status
-    );
-    this.environmentEvents.publish(Json.stringify(environment));
-
-    if status == "running" {
-      let running = status_reports.Running.fromJson(options.statusReport.data);
-      this.reconcileEndpoints(environment, running.objects.endpoints);
-    }
-
-    this.postComment(
-      appId: app.appId,
-      appName: app.appName,
-      environmentId: environment.id,
-      octokit: octokit
-    );
   }
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {

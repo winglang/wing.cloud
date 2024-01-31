@@ -158,7 +158,15 @@ pub class Apps {
       return App.fromJson(item);
     }
 
-    throw httpError.HttpError.notFound("App '{options.appId}' not found");
+    throw httpError.HttpError.notFound("Get App '{options.appId}' not found");
+  }
+
+  pub inflight tryGet(options: GetAppOptions): App? {
+    try {
+      return this.get(options);
+    } catch error {
+      return nil;
+    }
   }
 
   pub inflight getByName(options: GetAppByNameOptions): App {
@@ -249,7 +257,7 @@ pub class Apps {
       return;
     }
 
-    throw httpError.HttpError.notFound("App '{options.appId}' not found");
+    throw httpError.HttpError.notFound("Delete App: '{options.appId}' not found");
   }
 
   pub inflight listByRepository(options: ListAppByRepositoryOptions): Array<App> {

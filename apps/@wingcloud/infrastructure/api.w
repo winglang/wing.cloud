@@ -145,17 +145,19 @@ pub class Api {
     );
 
     props.environmentManager.onEnvironmentChange(inflight (environment) => {
-      let app = apps.get(appId: environment.appId);
-      invalidateQuery.invalidate(userId: app.userId, queries: [
-        "app.listEnvironments"
-      ]);
+      if let app = apps.tryGet(appId: environment.appId) {
+        invalidateQuery.invalidate(userId: app.userId, queries: [
+          "app.listEnvironments"
+        ]);
+      }
     });
 
     props.environmentManager.onEndpointChange(inflight (endpoint) => {
-      let app = apps.get(appId: endpoint.appId);
-      invalidateQuery.invalidate(userId: app.userId, queries: [
-        "app.environment.endpoints"
-      ]);
+      if let app = apps.tryGet(appId: endpoint.appId) {
+        invalidateQuery.invalidate(userId: app.userId, queries: [
+          "app.environment.endpoints"
+        ]);
+      }
     });
 
     let AUTH_COOKIE_NAME = "auth";
@@ -984,14 +986,14 @@ pub class Api {
       let input = EnvironmentReportMessage.fromJson(Json.parse(event));
 
       let environment = props.environments.get(id: input.environmentId);
-      let app = props.apps.get(appId: environment.appId);
-
-      invalidateQuery.invalidate(userId: app.userId, queries: [
-        "app.listEnvironments",
-        "app.environment",
-        "app.environment.logs",
-        "app.environment.endpoints",
-      ]);
+      if let app = props.apps.tryGet(appId: environment.appId) {
+        invalidateQuery.invalidate(userId: app.userId, queries: [
+          "app.listEnvironments",
+          "app.environment",
+          "app.environment.logs",
+          "app.environment.endpoints",
+        ]);
+      }
     });
 
     api.post("/environment.report", inflight (request) => {
