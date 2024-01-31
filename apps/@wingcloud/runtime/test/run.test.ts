@@ -65,6 +65,7 @@ test("run() - throws when repo not found", async () => {
     repo: `${examplesDirRepo}-not`,
     sha: "main",
   });
+  process.exit = ((code?: number | undefined) => {}) as any;
   await expect(() =>
     run({
       context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },

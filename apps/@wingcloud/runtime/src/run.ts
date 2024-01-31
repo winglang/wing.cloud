@@ -49,7 +49,7 @@ export const run = async function ({
     logger: deployLogger,
   });
 
-  let wingPaths;
+  let wingPaths: any;
   deployLogger.log(
     `Initializing wing server using app ${process.env["FLY_APP_NAME"] || "localhost"}`,
   );
@@ -58,6 +58,12 @@ export const run = async function ({
     stateDir: context.stateDir,
     requestedSSLPort,
   });
+
+  process.on("uncaughtException", async (err) => {
+    await handleError(err);
+    process.exit(1);
+  });
+
   try {
     await report("deploying");
 
@@ -112,6 +118,11 @@ export const run = async function ({
       close: closeAll,
     };
   } catch (error: any) {
+    await handleError(error);
+    throw error;
+  }
+
+  async function handleError(error: any) {
     let errorMessage = error.message;
 
     if (wingPaths) {
@@ -133,6 +144,5 @@ export const run = async function ({
     await deployLogger.stop();
     await runtimeLogger.stop();
     closeSSL();
-    throw error;
   }
 };
