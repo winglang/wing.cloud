@@ -8,9 +8,10 @@ import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 export const TEST_LOGS_ID = "test-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
+export const RUNTIME_LOGS_ID = "runtime-logs";
 export const ENDPOINTS_ID = "endpoints";
 
-import { DeploymentLogs } from "./_components/deployment-logs.js";
+import { AppLogs } from "./_components/app-logs.js";
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
 import { TestsLogs } from "./_components/tests-logs.js";
@@ -20,6 +21,7 @@ const EnvironmentPage = () => {
 
   const [testLogsOpen, setTestLogsOpen] = useState(false);
   const [deploymentLogsOpen, setDeploymentLogsOpen] = useState(false);
+  const [runtimeLogsOpen, setRuntimeLogsOpen] = useState(false);
 
   const environment = wrpc["app.environment"].useQuery({
     owner: owner!,
@@ -72,6 +74,11 @@ const EnvironmentPage = () => {
 
         break;
       }
+      case RUNTIME_LOGS_ID: {
+        setRuntimeLogsOpen(true);
+
+        break;
+      }
       default: {
         if (selectedTestId) {
           setTestLogsOpen(true);
@@ -99,11 +106,20 @@ const EnvironmentPage = () => {
         loading={endpoints.isLoading}
         environmentType={environment.data?.environment.type}
       />
-      <DeploymentLogs
+      <AppLogs
         id={DEPLOYMENT_LOGS_ID}
+        title="Deployment Logs"
         isOpen={deploymentLogsOpen}
         setIsOpen={setDeploymentLogsOpen}
         logs={logs.data?.deploy || []}
+        loading={logs.isLoading}
+      />
+      <AppLogs
+        id={RUNTIME_LOGS_ID}
+        title="Runtime Logs"
+        isOpen={runtimeLogsOpen}
+        setIsOpen={setRuntimeLogsOpen}
+        logs={logs.data?.runtime || []}
         loading={logs.isLoading}
       />
       <TestsLogs
