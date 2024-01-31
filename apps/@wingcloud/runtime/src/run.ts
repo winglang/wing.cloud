@@ -50,7 +50,9 @@ export const run = async function ({
   });
 
   let wingPaths: any;
-  deployLogger.log("Initializing wing server");
+  deployLogger.log(
+    `Initializing wing server using app ${process.env["FLY_APP_NAME"] || "localhost"}`,
+  );
   const { startServer, closeSSL } = await prepareServer({
     environmentId: context.environment.id,
     stateDir: context.stateDir,
