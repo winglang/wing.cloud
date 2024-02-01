@@ -695,6 +695,14 @@ pub class Environments {
     ]);
   }
 
+  pub inflight tryGet(options: GetEnvironmentOptions): Environment? {
+    try {
+      return this.get(options);
+    } catch error {
+      return nil;
+    }
+  }
+
   pub inflight get(options: GetEnvironmentOptions): Environment {
     let result = this.table.getItem(
       key: {

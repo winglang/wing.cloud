@@ -189,10 +189,17 @@ pub class WebsiteProxy {
       },
     );
 
+    let recordType = (() => {
+      if props.subDomain? && props.subDomain != "" {
+        return "CNAME";
+      }
+      return "ALIAS";
+    })();
+
     let dnsRecord = new dnsimple.DNSimpleZoneRecord(
       zoneName: props.zoneName,
       subDomain: props.subDomain,
-      recordType: "CNAME",
+      recordType: recordType,
       ttl: 1h.seconds,
       distributionUrl: distribution.domainName,
     );
