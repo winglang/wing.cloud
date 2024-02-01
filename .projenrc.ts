@@ -239,6 +239,7 @@ platform.addDevDeps(`@winglang/compiler`);
 platform.addDevDeps(`@winglang/sdk`);
 platform.addDevDeps(`cdktf`);
 platform.addDevDeps(`constructs`);
+platform.addDevDeps(`@cdktf/provider-aws`);
 
 platform.addGitIgnore("**/target/");
 platform.addGitIgnore("tmp/");
