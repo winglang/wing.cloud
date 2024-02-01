@@ -45,7 +45,7 @@ pub class GithubComment {
 
   inflight envStatusToString(status: str, repoOwner: str, appName: str, branch: str): str {
     let inspect = "<a target=\"_blank\" href=\"{this.siteDomain}/{repoOwner}/{appName}/{branch}\">Inspect</a>";
-    if status == "tests" {
+    if status == "running-server" {
       return "Starting App";
     }
     if status == "running-tests" {
@@ -83,7 +83,7 @@ pub class GithubComment {
         let var testRows = "";
         let var passedTests = 0;
         let var failedTests = 0;
-        if environment.status == "running" || environment.status == "tests" {
+        if environment.status == "running" || environment.status == "running-server" {
           if let testResults = environment.testResults {
             let var i = 0;
             for testResult in testResults.testResults {

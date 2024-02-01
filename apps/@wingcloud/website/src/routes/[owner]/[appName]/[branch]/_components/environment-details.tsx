@@ -18,7 +18,7 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
   const { theme } = useTheme();
 
   const statusString = useMemo(() => {
-    if (environment?.status === "tests") {
+    if (environment?.status === "running-server") {
       return "Starting";
     }
     if (environment?.status === "running-tests") {
@@ -80,7 +80,7 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
                     "rounded-full shrink-0",
                     environment?.status === "initializing" &&
                       "bg-yellow-300 animate-pulse",
-                    environment?.status === "tests" &&
+                    environment?.status === "running-server" &&
                       "bg-yellow-300 animate-pulse",
                     environment?.status === "running-tests" &&
                       "bg-yellow-300 animate-pulse",

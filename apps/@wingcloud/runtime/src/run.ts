@@ -79,7 +79,7 @@ export const run = async function ({
     const testResults = await setup.runWingTests(paths, entrypointPath);
 
     if (testResults.testsRun) {
-      await report("tests", { testResults: testResults.testResults });
+      await report("running-server", { testResults: testResults.testResults });
     } else {
       const message = `failed to run tests: ${testResults.error?.toString()}`;
       await report("tests-error", { message });

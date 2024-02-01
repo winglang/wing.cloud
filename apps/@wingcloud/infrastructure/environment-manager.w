@@ -405,7 +405,7 @@ pub class EnvironmentManager {
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
     let environment = this.environments.get(id: options.statusReport.environmentId);
-    if options.statusReport.status == "tests" {
+    if options.statusReport.status == "running-server" {
       let testReport = status_reports.TestResults.fromJson(options.statusReport.data);
       this.environments.updateTestResults(
         id: environment.id,
