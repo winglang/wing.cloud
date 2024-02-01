@@ -19,34 +19,37 @@ export const AppCard = ({
       onClick={onClick}
       className={clsx(
         "flex flex-col",
-        "w-full h-full p-4 rounded",
+        "w-full h-full p-4 rounded-md",
         "text-left border",
         theme.bgInput,
         theme.borderInput,
+        "shadow-sm",
       )}
     >
       <div className="space-y-4 w-full">
         <div className="flex gap-x-3">
-          <div className="flex-grow truncate space-y-1">
-            <div className={clsx("text-lg", theme.text1)}>{app.appName}</div>
+          <div className="flex items-center">
+            <div
+              className="w-8 h-8"
+              title={app.entrypoint.endsWith(".ts") ? "TypeScript" : "Winglang"}
+            >
+              {app.entrypoint.endsWith(".ts") && (
+                <TypeScriptIcon
+                  className={clsx("w-full h-full", "text-[#2f74c0]")}
+                />
+              )}
+              {app.entrypoint.endsWith(".w") && (
+                <WingIcon className={clsx("w-full h-full", theme.text1)} />
+              )}
+            </div>
+          </div>
+          <div className="flex-grow truncate gap-y-1">
+            <div className={clsx("text-lg", "leading-tight", theme.text1)}>
+              {app.appName}
+            </div>
             <div className={clsx("text-xs flex gap-x-1", theme.text2)}>
               <div className="truncate" title={app.entrypoint}>
                 {app.entrypoint}
-              </div>
-              <div
-                className="flex flex-grow justify-end"
-                title={
-                  app.entrypoint.endsWith(".ts") ? "TypeScript" : "Winglang"
-                }
-              >
-                {app.entrypoint.endsWith(".ts") && (
-                  <TypeScriptIcon
-                    className={clsx("w-4 h-4", "text-[#2f74c0]")}
-                  />
-                )}
-                {app.entrypoint.endsWith(".w") && (
-                  <WingIcon className={clsx("w-4 h-4", theme.text1)} />
-                )}
               </div>
             </div>
           </div>
