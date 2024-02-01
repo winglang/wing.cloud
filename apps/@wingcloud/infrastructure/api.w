@@ -121,6 +121,7 @@ struct ApiProps {
   wsSecret: str;
   logs: cloud.Bucket;
   analytics: analytics.SegmentAnalytics;
+  segmentWriteKey: str;
 }
 
 
@@ -347,6 +348,7 @@ pub class Api {
       log("anonymousId = {request.query.tryGet("anonymousId")}");
 
       if let anonymousId = request.query.tryGet("anonymousId") {
+        log("segmentWriteKey = {props.segmentWriteKey}");
         log("Identifying anonymous user as {user.username}");
         log("before identify");
         props.analytics.identify(
