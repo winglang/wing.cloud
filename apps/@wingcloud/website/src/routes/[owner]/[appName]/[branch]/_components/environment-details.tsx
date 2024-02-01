@@ -19,6 +19,9 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
 
   const statusString = useMemo(() => {
     if (environment?.status === "tests") {
+      return "Starting";
+    }
+    if (environment?.status === "running-tests") {
       return "Running Tests";
     }
     if (
@@ -78,6 +81,8 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
                     environment?.status === "initializing" &&
                       "bg-yellow-300 animate-pulse",
                     environment?.status === "tests" &&
+                      "bg-yellow-300 animate-pulse",
+                    environment?.status === "running-tests" &&
                       "bg-yellow-300 animate-pulse",
                     environment?.status === "deploying" &&
                       "bg-yellow-300 animate-pulse",

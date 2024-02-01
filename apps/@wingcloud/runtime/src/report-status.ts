@@ -13,6 +13,7 @@ export interface ReportEnvironmentStatusInput {
 export type EnvironmentStatus =
   | "deploying"
   | "tests"
+  | "running-tests"
   | "tests-error"
   | "running"
   | "error"

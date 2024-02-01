@@ -75,6 +75,7 @@ export const run = async function ({
     const { paths, entrypointPath } = await setup.run();
     wingPaths = paths;
 
+    await report("running-tests");
     const testResults = await setup.runWingTests(paths, entrypointPath);
 
     if (testResults.testsRun) {

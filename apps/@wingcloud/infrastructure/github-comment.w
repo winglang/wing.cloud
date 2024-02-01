@@ -46,6 +46,9 @@ pub class GithubComment {
   inflight envStatusToString(status: str, repoOwner: str, appName: str, branch: str): str {
     let inspect = "<a target=\"_blank\" href=\"{this.siteDomain}/{repoOwner}/{appName}/{branch}\">Inspect</a>";
     if status == "tests" {
+      return "Starting App";
+    }
+    if status == "running-tests" {
       return "Running Tests";
     }
     if status == "running" {
