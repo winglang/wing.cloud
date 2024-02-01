@@ -139,7 +139,7 @@ pub class EnvironmentManager {
         let options = RestartEnvironmentOptions.fromJson(body.options);
         if let app = this.apps.tryGet(appId: options.appId) {
           this.handleRestart(options, app);
-        }      
+        }
       } elif action == "stop" {
         let options = StopEnvironmentOptions.fromJson(body.options);
         this.handleStop(options);
@@ -359,13 +359,13 @@ pub class EnvironmentManager {
       let status = options.statusReport.status;
       let data = options.statusReport.data;
       let octokit = this.probotAdapter.auth(environment.installationId);
-  
+
       let ref = octokit.git.getRef(
         owner: environment.repo.split("/").at(0),
         repo: environment.repo.split("/").at(1),
         ref: "heads/{environment.branch}"
       );
-  
+
       // if the environment build has completed, check to see if there is a new commit
       if status == "running" || status == "error" && environment.status != "stopped" {
         if environment.sha != ref.data.object.sha {
@@ -379,19 +379,19 @@ pub class EnvironmentManager {
           return;
         }
       }
-  
+
       this.environments.updateStatus(
         id: environment.id,
         appId: environment.appId,
         status: status
       );
       this.environmentEvents.publish(Json.stringify(environment));
-  
+
       if status == "running" {
         let running = status_reports.Running.fromJson(options.statusReport.data);
         this.reconcileEndpoints(environment, running.objects.endpoints);
       }
-  
+
       this.postComment(
         appId: app.appId,
         appName: app.appName,

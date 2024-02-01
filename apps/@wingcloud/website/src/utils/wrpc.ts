@@ -38,6 +38,9 @@ export interface App {
   repoOwner: string;
   userId: string;
   entrypoint: string;
+  createdAt: string;
+  lastCommitMessage: string;
+  lastCommitDate: string;
 }
 
 export interface TestResult {

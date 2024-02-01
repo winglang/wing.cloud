@@ -503,6 +503,8 @@ pub class Api {
             createEnvironment: {
               branch: input.defaultBranch,
               sha: commitData.sha,
+              commitMessage: commitData.commit.message,
+              commitDate: commitData.commit.author.date,
               appId: input.appId,
               type: "production",
               prTitle: input.defaultBranch,
@@ -516,6 +518,16 @@ pub class Api {
             owner: input.repoOwner,
             timestamp: input.timestamp,
         }}));
+
+        apps.updatLastCommit(
+          userId: input.userId,
+          appId: input.appId,
+          appName: input.repoName,
+          repository: input.repoId,
+          lastCommitMessage: commitData.commit.message,
+          lastCommitDate: commitData.commit.author.date ?? "",
+        );
+
       } else {
         throw httpError.HttpError.unauthorized();
       }

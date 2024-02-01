@@ -44,7 +44,7 @@ export const AppCard = ({
             </div>
           </div>
           <div className="flex-grow truncate gap-y-1">
-            <div className={clsx("text-lg", "leading-tight", theme.text1)}>
+            <div className={clsx("text-base", "leading-tight", theme.text1)}>
               {app.appName}
             </div>
             <div className={clsx("text-xs flex gap-x-1", theme.text2)}>
