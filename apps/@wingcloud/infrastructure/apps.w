@@ -158,7 +158,7 @@ pub class Apps {
       return App.fromJson(item);
     }
 
-    throw httpError.HttpError.notFound("Get App '{options.appId}' not found");
+    throw httpError.HttpError.notFound("Get App: '{options.appId}' not found");
   }
 
   pub inflight tryGet(options: GetAppOptions): App? {
