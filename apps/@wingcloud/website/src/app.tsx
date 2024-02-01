@@ -8,6 +8,7 @@ import { WRPCProvider } from "@wingcloud/wrpc";
 import { useContext, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 
+import { AppsDataProvider } from "./data-store/apps-data-provider.js";
 import { NotificationsProvider } from "./design-system/notification.js";
 import { DefaultTheme, ThemeProvider } from "./design-system/theme-provider.js";
 import { router } from "./router.jsx";
@@ -63,7 +64,9 @@ export const App = () => {
             <ThemeProvider mode="light" theme={DefaultTheme}>
               <NotificationsProvider>
                 <PopupWindowProvider>
-                  <RouterProvider router={router} />
+                  <AppsDataProvider>
+                    <RouterProvider router={router} />
+                  </AppsDataProvider>
                 </PopupWindowProvider>
               </NotificationsProvider>
             </ThemeProvider>
