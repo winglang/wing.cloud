@@ -108,7 +108,7 @@ const EnvironmentPage = () => {
       />
       <AppLogs
         id={DEPLOYMENT_LOGS_ID}
-        title="Deployment Logs"
+        title="Deployment"
         isOpen={deploymentLogsOpen}
         setIsOpen={setDeploymentLogsOpen}
         logs={logs.data?.deploy || []}
@@ -116,7 +116,7 @@ const EnvironmentPage = () => {
       />
       <AppLogs
         id={RUNTIME_LOGS_ID}
-        title="Runtime Logs"
+        title="Runtime"
         isOpen={runtimeLogsOpen}
         setIsOpen={setRuntimeLogsOpen}
         logs={logs.data?.runtime || []}
