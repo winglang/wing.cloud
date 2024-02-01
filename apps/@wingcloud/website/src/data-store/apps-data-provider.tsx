@@ -45,7 +45,9 @@ export const AppsDataProvider = ({ children }: PropsWithChildren) => {
   }, [user?.data?.user.username]);
 
   useEffect(() => {
-    if (!listAppsQuery.data) return;
+    if (!listAppsQuery.data) {
+      return;
+    }
     setApps(listAppsQuery.data.apps);
   }, [listAppsQuery.data]);
 
