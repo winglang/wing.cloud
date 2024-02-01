@@ -4,7 +4,6 @@
   "type": "commonjs",
   "sideEffects": false,
   "devDependencies": {
-    "@cdktf/provider-aws": "^19.3.0",
     "@cloudy-ts/eslint-plugin": "^0.0.333",
     "@types/node": "20",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
