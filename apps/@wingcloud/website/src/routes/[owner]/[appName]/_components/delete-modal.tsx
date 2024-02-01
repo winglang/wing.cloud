@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { ConfirmationModal } from "../../../../components/confirmation-modal.js";
 import { useNotifications } from "../../../../design-system/notification.js";
+import { useQueryCacheDeleteItem } from "../../../../utils/use-query-cache-delete.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 
 export interface DeleteModalProps {
@@ -22,9 +23,11 @@ export const DeleteModal = ({
 
   const navigate = useNavigate();
 
+  const { deleteAppItemFromAppList } = useQueryCacheDeleteItem();
   const deleteApp = wrpc["app.delete"].useMutation({
     onSuccess() {
       showNotification(`App ${appName} deleted`, { type: "success" });
+      deleteAppItemFromAppList(appName);
       navigate(`/${owner}`);
     },
     onError(error) {

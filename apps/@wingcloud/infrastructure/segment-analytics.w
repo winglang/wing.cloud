@@ -46,6 +46,7 @@ pub class SegmentAnalytics {
 
   inflight new () {
     if (this.enabled) {
+      log("SegmentAnalytics: enabled; write key = {this.writeKey}");
       this.analytics = SegmentAnalytics.createSegmentAnalytics({
         writeKey: this.writeKey
       });
@@ -60,6 +61,7 @@ pub class SegmentAnalytics {
   }
 
   pub inflight track(userId: str, event: str, properties: Json) {
+    log("SegmentAnalytics.track: {userId}, {SegmentAnalytics.normilizeEventName(event)}, {Json.stringify(properties)}");
     this.analytics.track({
       userId: userId,
       event: SegmentAnalytics.normilizeEventName(event),
