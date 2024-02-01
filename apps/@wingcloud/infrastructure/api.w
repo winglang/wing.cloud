@@ -658,14 +658,14 @@ pub class Api {
         userId: userId,
       );
 
+      invalidateQuery.invalidate(userId: userId, queries: ["app.list"]);
+
       deleteAppQueue.push(Json.stringify(DeleteAppMessage {
         appId: app.appId,
         appName: app.appName,
         userId: app.userId,
         timestamp: datetime.utcNow().timestampMs,
       }));
-
-      invalidateQuery.invalidate(userId: userId, queries: ["app.list"]);
 
       return {
         body: {
@@ -985,14 +985,15 @@ pub class Api {
     notifyEnvReportQueue.setConsumer(inflight (event) => {
       let input = EnvironmentReportMessage.fromJson(Json.parse(event));
 
-      let environment = props.environments.get(id: input.environmentId);
-      if let app = props.apps.tryGet(appId: environment.appId) {
-        invalidateQuery.invalidate(userId: app.userId, queries: [
-          "app.listEnvironments",
-          "app.environment",
-          "app.environment.logs",
-          "app.environment.endpoints",
-        ]);
+      if let environment = props.environments.tryGet(id: input.environmentId) {
+        if let app = props.apps.tryGet(appId: environment.appId) {
+          invalidateQuery.invalidate(userId: app.userId, queries: [
+            "app.listEnvironments",
+            "app.environment",
+            "app.environment.logs",
+            "app.environment.endpoints",
+          ]);
+        }
       }
     });
 
