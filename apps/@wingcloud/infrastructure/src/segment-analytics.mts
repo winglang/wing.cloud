@@ -1,13 +1,28 @@
-import {Analytics} from "@segment/analytics-node";
+import { Analytics } from "@segment/analytics-node";
 
 interface SegmentAnalyticsOptions {
-    writeKey: string;
+  writeKey: string;
 }
 
-export const createSegmentAnalytics = ({writeKey}: SegmentAnalyticsOptions): Analytics => {
-    return new Analytics({writeKey});
-}
+export const createSegmentAnalytics = async ({
+  writeKey,
+}: SegmentAnalyticsOptions) => {
+  const analytics = new Analytics({
+    writeKey,
+    // flushInterval: 1,
+    // @ts-ignore
+    flushAt: 1,
+  });
+  return {
+    async track(options: any) {
+      await new Promise((resolve) => analytics.track(options, resolve));
+    },
+    async identify(options: any) {
+      await new Promise((resolve) => analytics.identify(options, resolve));
+    },
+  };
+};
 
 export const normilizeEventName = (event: string): string => {
-    return event.toLowerCase().replaceAll(/\s/g, "")
-}
+  return event.toLowerCase().replaceAll(/\s/g, "");
+};
