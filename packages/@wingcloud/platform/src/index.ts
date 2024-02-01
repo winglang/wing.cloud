@@ -23,6 +23,7 @@ if (WING_ENV !== WingEnv.Production && WING_ENV !== WingEnv.Test) {
 const PlatformHandler = WING_ENV === WingEnv.Production ? ProductionPlatform : TestPlatform;
 
 import { EnableXray } from './production/enable_xray';
+import { EnableConcurrentExecutions } from './production/reserved-concurreny';
 import { Aspects } from 'cdktf';
 export class Platform implements IPlatform {
   public readonly target = 'tf-aws';
@@ -40,6 +41,7 @@ export class Platform implements IPlatform {
     // see https://github.com/winglang/wing/issues/5151
     // once fixed, this can be moved to the ./pla
     Aspects.of(app).add(new EnableXray(app));
+    Aspects.of(app).add(new EnableConcurrentExecutions(app));
   }
 
   postSynth(config: any) {
