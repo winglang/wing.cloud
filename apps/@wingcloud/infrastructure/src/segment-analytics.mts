@@ -9,7 +9,9 @@ export const createSegmentAnalytics = async ({
 }: SegmentAnalyticsOptions) => {
   const analytics = new Analytics({
     writeKey,
-    flushInterval: 1,
+    // flushInterval: 1,
+    // @ts-ignore
+    flushAt: 1,
   });
   return {
     async track(options: any) {
