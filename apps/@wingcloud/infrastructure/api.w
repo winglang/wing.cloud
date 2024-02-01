@@ -344,7 +344,11 @@ pub class Api {
       // to the Console instead.
       let var location = "/{user.username}";
 
+      log("anonymousId = {request.query.tryGet("anonymousId")}");
+
       if let anonymousId = request.query.tryGet("anonymousId") {
+        log("Identifying anonymous user as {user.username}");
+        log("before identify");
         props.analytics.identify(
           anonymousId: anonymousId,
           userId: user.id,
@@ -353,14 +357,18 @@ pub class Api {
             github: user.username,
           },
         );
+        log("after identify");
+        log("before track");
         props.analytics.track(user.id, "console_sign_in", {
           anonymousId: anonymousId,
           userId: user.id,
           email: user.email,
           github: user.username,
         });
+        log("after track");
 
         if let port = request.query.tryGet("port") {
+          log("redirecting to console");
           // Redirect back to the local Console, using the `signedIn`
           // GET parameter so the Console dismisses the sign in modal.
           location = "http://localhost:{port}/?signedIn";
