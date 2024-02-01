@@ -38,7 +38,9 @@ export const AppsDataProvider = ({ children }: PropsWithChildren) => {
 
   // trigger initial fetch only if owner is set
   useEffect(() => {
-    if (!user?.data?.user.username) return;
+    if (!user?.data?.user.username) {
+      return;
+    }
     listAppsQuery.refetch();
   }, [user?.data?.user.username]);
 
