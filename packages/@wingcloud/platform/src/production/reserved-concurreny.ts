@@ -23,7 +23,7 @@ export class EnableConcurrentExecutions {
       "provisioned-concurrency",
       {
         functionName: cdktfFunction.functionName,
-        provisionedConcurrentExecutions: 10,
+        provisionedConcurrentExecutions: 2,
         qualifier: cdktfFunction.version,
       },
     );
