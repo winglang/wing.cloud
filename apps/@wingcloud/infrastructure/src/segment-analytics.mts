@@ -7,7 +7,10 @@ interface SegmentAnalyticsOptions {
 export const createSegmentAnalytics = async ({
   writeKey,
 }: SegmentAnalyticsOptions) => {
-  const analytics = new Analytics({ writeKey });
+  const analytics = new Analytics({
+    writeKey,
+    flushInterval: 1,
+  });
   return {
     async track(options: any) {
       await new Promise((resolve) => analytics.track(options, resolve));
