@@ -114,6 +114,9 @@ const OwnerPage = () => {
             onOpenConsole={() => {
               navigate(`/${owner}/${app.appName}/${app.defaultBranch}/console`);
             }}
+            onOpenEnvironmentDetails={() => {
+              navigate(`/${owner}/${app.appName}/${app.defaultBranch}`);
+            }}
             onOpenSettings={() => {
               navigate(`/${owner}/${app.appName}/settings`);
             }}

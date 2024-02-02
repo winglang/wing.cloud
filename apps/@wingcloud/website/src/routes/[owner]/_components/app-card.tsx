@@ -48,6 +48,7 @@ export const AppCard = ({
   app,
   owner,
   onOpenConsole,
+  onOpenEnvironmentDetails,
   onOpenSettings,
   onOpenApp,
 }: {
@@ -55,6 +56,7 @@ export const AppCard = ({
   owner: string;
   onOpenConsole: () => void;
   onOpenSettings: () => void;
+  onOpenEnvironmentDetails: () => void;
   onOpenApp: () => void;
 }) => {
   const { theme } = useTheme();
@@ -116,6 +118,10 @@ export const AppCard = ({
               {
                 label: "View on Console",
                 onClick: onOpenConsole,
+              },
+              {
+                label: "View Environment details",
+                onClick: onOpenEnvironmentDetails,
               },
               {
                 label: "Settings",
