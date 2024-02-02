@@ -34,9 +34,10 @@ const getTimeFromNow = (datetime: string) => {
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
 
   if (hours > 24) {
-    return getDateTime(datetime);
+    return `${days}d ago`;
   }
 
   if (hours > 0) {

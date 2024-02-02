@@ -2,6 +2,12 @@ bring ex;
 bring "./http-error.w" as httpError;
 bring "./nanoid62.w" as nanoid62;
 
+struct Commit {
+  message: str;
+  date: str;
+  sha: str;
+}
+
 pub struct App {
   appId: str;
   appName: str;
@@ -12,8 +18,8 @@ pub struct App {
   userId: str;
   entrypoint: str;
   createdAt: str;
-  lastCommitMessage: str?;
-  lastCommitDate: str?;
+  defaultBranch: str;
+  commit: Commit?;
 }
 
 struct Item extends App {
@@ -30,8 +36,8 @@ struct CreateAppOptions {
   userId: str;
   entrypoint: str;
   createdAt: str;
-  lastCommitMessage: str?;
-  lastCommitDate: str?;
+  defaultBranch: str;
+  commit: Commit?;
 }
 
 struct GetAppOptions {
@@ -74,9 +80,8 @@ struct UpdateLastCommitOptions {
   appId: str;
   appName: str;
   userId: str;
-  repository: str;
-  lastCommitMessage: str;
-  lastCommitDate: str;
+  repoId: str;
+  commit: Commit;
 }
 
 pub class Apps {
@@ -103,8 +108,8 @@ pub class Apps {
         userId: options.userId,
         entrypoint: options.entrypoint,
         createdAt: options.createdAt,
-        lastCommitMessage: options.lastCommitMessage ?? "",
-        lastCommitDate: options.lastCommitDate ?? "",
+        defaultBranch: options.defaultBranch,
+        commit: options.commit
       };
     };
 
@@ -369,17 +374,15 @@ pub class Apps {
             pk: "APP#{options.appId}",
             sk: "#",
           },
-          updateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate",
+          updateExpression: "SET #commit = :commit",
           conditionExpression: "attribute_exists(#pk) and #userId = :userId",
           expressionAttributeNames: {
             "#pk": "pk",
-            "#lastCommitMessage": "lastCommitMessage",
-            "#lastCommitDate": "lastCommitDate",
+            "#commit": "commit",
             "#userId": "userId",
           },
           expressionAttributeValues: {
-            ":lastCommitMessage": options.lastCommitMessage,
-            ":lastCommitDate": options.lastCommitDate,
+            ":commit": options.commit,
             ":userId": options.userId,
           },
         }
@@ -390,14 +393,12 @@ pub class Apps {
             pk: "USER#{options.userId}",
             sk: "APP#{options.appId}",
           },
-          updateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate",
+          updateExpression: "SET #commit = :commit",
           expressionAttributeNames: {
-            "#lastCommitMessage": "lastCommitMessage",
-            "#lastCommitDate": "lastCommitDate",
+            "#commit": "commit",
           },
           expressionAttributeValues: {
-            ":lastCommitMessage": options.lastCommitMessage,
-            ":lastCommitDate": options.lastCommitDate,
+            ":commit": options.commit,
           },
         }
       },
@@ -407,31 +408,27 @@ pub class Apps {
             pk: "USER#{options.userId}",
             sk: "APP_NAME#{options.appName}",
           },
-          updateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate",
+          updateExpression: "SET #commit = :commit",
           expressionAttributeNames: {
-            "#lastCommitMessage": "lastCommitMessage",
-            "#lastCommitDate": "lastCommitDate",
+            "#commit": "commit",
           },
           expressionAttributeValues: {
-            ":lastCommitMessage": options.lastCommitMessage,
-            ":lastCommitDate": options.lastCommitDate,
+            ":commit": options.commit,
           },
         }
       },
       {
         update: {
           key: {
-            pk: "REPOSITORY#{options.repository}",
+            pk: "REPOSITORY#{options.repoId}",
             sk: "APP#{options.appId}",
           },
-          updateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate",
+          updateExpression: "SET #commit = :commit",
           expressionAttributeNames: {
-            "#lastCommitMessage": "lastCommitMessage",
-            "#lastCommitDate": "lastCommitDate",
+            "#commit": "commit",
           },
           expressionAttributeValues: {
-            ":lastCommitMessage": options.lastCommitMessage,
-            ":lastCommitDate": options.lastCommitDate,
+            ":commit": options.commit,
           },
         }
       },

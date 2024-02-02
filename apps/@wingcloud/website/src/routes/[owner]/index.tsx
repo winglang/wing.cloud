@@ -15,7 +15,7 @@ import { Input } from "../../design-system/input.js";
 import { SkeletonLoader } from "../../design-system/skeleton-loader.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 
-import { AppCard } from "./_components/app-card.js";
+import { AppCard, AppCardSkeleton } from "./_components/app-card.js";
 
 const OwnerPage = () => {
   const { owner } = useParams();
@@ -102,22 +102,22 @@ const OwnerPage = () => {
           Array.from({
             length:
               apps.length > 0 ? apps.length : Math.floor(Math.random() * 5) + 3,
-          }).map((_, i) => (
-            <SkeletonLoader
-              key={i}
-              className={clsx("w-full h-20 rounded border", theme.borderInput)}
-              loading
-            />
-          ))}
+          }).map((_, i) => <AppCardSkeleton key={i} />)}
 
         {filteredApps.map((app) => (
-          <AppCard
-            key={app.appId}
-            onClick={() => {
-              navigate(`/${owner}/${app.appName}`);
-            }}
-            app={app}
-          />
+          <>
+            <AppCard
+              key={app.appId}
+              owner={owner || ""}
+              onClick={() => {
+                navigate(`/${owner}/${app.appName}`);
+              }}
+              onOpenSettings={() => {
+                navigate(`/${owner}/${app.appName}/settings`);
+              }}
+              app={app}
+            />
+          </>
         ))}
       </div>
     </div>

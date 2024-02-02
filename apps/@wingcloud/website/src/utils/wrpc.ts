@@ -29,6 +29,12 @@ export interface Repository {
   default_branch: string;
 }
 
+interface Commit {
+  sha: string;
+  message: string;
+  date: string;
+}
+
 export interface App {
   appId: string;
   appName: string;
@@ -39,8 +45,8 @@ export interface App {
   userId: string;
   entrypoint: string;
   createdAt: string;
-  lastCommitMessage: string;
-  lastCommitDate: string;
+  defaultBranch: string;
+  commit: Commit;
 }
 
 export interface TestResult {

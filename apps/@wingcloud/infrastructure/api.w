@@ -49,6 +49,7 @@ struct DeleteAppMessage {
 }
 
 struct CreateProductionEnvironmentMessage {
+  appName: str;
   userId: str;
   repoId: str;
   repoOwner: str;
@@ -522,12 +523,15 @@ pub class Api {
         apps.updatLastCommit(
           userId: input.userId,
           appId: input.appId,
-          appName: input.repoName,
-          repository: input.repoId,
-          lastCommitMessage: commitData.commit.message,
-          lastCommitDate: commitData.commit.author.date ?? "",
+          appName: input.appName,
+          repoId: input.repoId,
+          commit: {
+            sha: commitData.sha,
+            message: commitData.commit.message,
+            date: commitData.commit.author.date ?? "",
+          }
         );
-
+        invalidateQuery.invalidate(userId: input.userId, queries: ["app.list", "app.getByName?appName={input.appName}"]);
       } else {
         throw httpError.HttpError.unauthorized();
       }
@@ -608,9 +612,11 @@ pub class Api {
           userId: owner.id,
           entrypoint: entrypoint,
           createdAt: datetime.utcNow().toIso(),
+          defaultBranch: defaultBranch,
         );
 
         productionEnvironmentQueue.push(Json.stringify(CreateProductionEnvironmentMessage {
+          appName: appName,
           userId: user.userId,
           repoId: repoId,
           repoOwner: repoOwner,
