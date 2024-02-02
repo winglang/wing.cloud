@@ -178,7 +178,7 @@ export const AppCard = ({
             </div>
           </div>
           <div className="flex justify-between gap-x-4">
-            <div className="flex gap-x-2 truncate">
+            <div className="flex gap-x-1 truncate">
               <div className={clsx("text-xs", theme.text4)}>{timeAgo} on</div>
               <div className={clsx("flex text-xs truncate", theme.text2)}>
                 <BranchIcon className="w-4 h-4" />
