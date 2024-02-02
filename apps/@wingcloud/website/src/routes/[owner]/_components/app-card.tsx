@@ -3,7 +3,6 @@ import { useMemo, type MouseEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Menu } from "../../../design-system/menu.js";
-import { SkeletonLoader } from "../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../icons/github-icon.js";
@@ -16,56 +15,31 @@ import type { App } from "../../../utils/wrpc.js";
 const AppIcon = ({ app }: { app: App }) => {
   const { theme } = useTheme();
 
-  return (
-    <div
-      className="w-8 h-8"
-      title={app.entrypoint.endsWith(".ts") ? "TypeScript" : "Winglang"}
-    >
-      {app.entrypoint.endsWith(".ts") && (
-        <TypeScriptIcon className={clsx("w-full h-full", "text-[#2f74c0]")} />
-      )}
-      {app.entrypoint.endsWith(".w") && (
-        <WingIcon className={clsx("w-full h-full", theme.text1)} />
-      )}
-    </div>
-  );
-};
-
-export const AppCardSkeleton = () => {
-  const { theme } = useTheme();
+  if (app.entrypoint.endsWith(".ts")) {
+    return (
+      <TypeScriptIcon
+        className="w-8 h-8 text-[#2f74c0]"
+        title={app.entrypoint.endsWith(".ts") ? "TypeScript" : "Winglang"}
+      />
+    );
+  }
+  if (app.entrypoint.endsWith(".w")) {
+    return (
+      <WingIcon
+        className={clsx("w-8 h-8", theme.text1)}
+        title={app.entrypoint.endsWith(".ts") ? "TypeScript" : "Winglang"}
+      />
+    );
+  }
+  // return an icon for the app with the default icon being the first letter of the app name
   return (
     <div
       className={clsx(
-        "w-full h-full rounded-md",
-        "text-left border",
-        theme.bgInput,
-        theme.borderInput,
-        "shadow-sm hover:shadow",
-        "truncate",
+        "w-8 h-8 flex items-center justify-center rounded",
+        theme.bg2,
       )}
     >
-      <div
-        className={clsx(
-          "flex items-center gap-x-4 p-4",
-          theme.bg4,
-          theme.borderInput,
-          "border-b",
-        )}
-      >
-        <SkeletonLoader className="w-8 h-8" loading />
-        <SkeletonLoader className="w-2/4 h-4" loading />
-        <div className="flex flex-grow justify-end">
-          <SkeletonLoader className="w-4 h-4" />
-        </div>
-      </div>
-
-      <div className="p-4 text-sm leading-6 space-y-1.5">
-        <div className="pb-2">
-          <SkeletonLoader className="w-1/3 h-4 pb-2" loading />
-        </div>
-        <SkeletonLoader className="w-3/4 h-4" loading />
-        <SkeletonLoader className="w-1/3 h-4" loading />
-      </div>
+      {app.appName.charAt(0).toUpperCase()}
     </div>
   );
 };

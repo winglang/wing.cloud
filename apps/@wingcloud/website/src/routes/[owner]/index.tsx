@@ -12,10 +12,10 @@ import { Header } from "../../components/header.js";
 import { AppsDataProviderContext } from "../../data-store/apps-data-provider.js";
 import { Button } from "../../design-system/button.js";
 import { Input } from "../../design-system/input.js";
-import { SkeletonLoader } from "../../design-system/skeleton-loader.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 
-import { AppCard, AppCardSkeleton } from "./_components/app-card.js";
+import { AppCardSkeleton } from "./_components/app-card-skeleton.js";
+import { AppCard } from "./_components/app-card.js";
 
 const OwnerPage = () => {
   const { owner } = useParams();
