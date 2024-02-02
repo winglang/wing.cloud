@@ -68,7 +68,7 @@ export const DefaultTheme: Theme = {
     "text-gray-900 placeholder:text-gray-500 dark:text-gray-300 dark:placeholder:text-gray-500",
   focusInput:
     "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
-  borderInput: "border-gray-300 dark:border-gray-900",
+  borderInput: "border-gray-200 dark:border-gray-800",
   focusWithin:
     "focus-within:ring-2 focus-within:ring-sky-500/50 focus-within:border-sky-500 outline-none",
   scrollbar:

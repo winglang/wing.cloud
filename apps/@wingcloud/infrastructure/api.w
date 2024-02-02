@@ -504,8 +504,6 @@ pub class Api {
             createEnvironment: {
               branch: input.defaultBranch,
               sha: commitData.sha,
-              commitMessage: commitData.commit.message,
-              commitDate: commitData.commit.author.date,
               appId: input.appId,
               type: "production",
               prTitle: input.defaultBranch,
@@ -525,11 +523,9 @@ pub class Api {
           appId: input.appId,
           appName: input.appName,
           repoId: input.repoId,
-          commit: {
-            sha: commitData.sha,
-            message: commitData.commit.message,
-            date: commitData.commit.author.date ?? "",
-          }
+          lastCommitSha: commitData.sha,
+          lastCommitMessage: commitData.commit.message,
+          lastCommitDate: commitData.commit.author.date ?? "",
         );
         invalidateQuery.invalidate(userId: input.userId, queries: ["app.list", "app.getByName?appName={input.appName}"]);
       } else {

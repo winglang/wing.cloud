@@ -58,7 +58,7 @@ export const AppCard = ({
   onOpenApp: () => void;
 }) => {
   const { theme } = useTheme();
-  const timeAgo = useTimeAgo(app.commit?.date || Date.now().toString(), true);
+  const timeAgo = useTimeAgo(app.lastCommitDate || Date.now().toString(), true);
   const navigate = useNavigate();
 
   const projectUrl = useMemo(() => {
@@ -70,11 +70,10 @@ export const AppCard = ({
   }, [app]);
 
   const commitUrl = useMemo(() => {
-    if (!app.commit) {
+    if (!app.lastCommitSha) {
       return;
     }
-
-    return `https://github.com/${app.repoOwner}/${app.repoName}/commit/${app.commit.sha}`;
+    return `https://github.com/${app.repoOwner}/${app.repoName}/commit/${app.lastCommitSha}`;
   }, [app]);
 
   return (
@@ -168,7 +167,7 @@ export const AppCard = ({
                 to={commitUrl || ""}
                 title="View commit on GitHub"
               >
-                {app.commit?.message}
+                {app.lastCommitMessage || ""}
               </Link>
             </div>
           </div>

@@ -10,8 +10,6 @@ pub struct Environment {
   repo: str;
   branch: str;
   sha: str;
-  commitMessage: str?;
-  commitDate: str?;
   status: str;
   installationId: num;
   prNumber: num?;
@@ -35,8 +33,6 @@ pub struct EnvironmentOptions {
   repo: str;
   branch: str;
   sha: str;
-  commitMessage: str?;
-  commitDate: str?;
   status: str;
   prNumber: num?;
   prTitle: str?;
@@ -130,8 +126,6 @@ pub class Environments {
       repo: ops.environment.repo,
       branch: ops.environment.branch,
       sha: ops.environment.sha,
-      commitMessage: ops.environment.commitMessage,
-      commitDate: ops.environment.commitDate,
       prTitle: ops.environment.prTitle,
       status: ops.environment.status,
       installationId: ops.environment.installationId,
@@ -166,8 +160,6 @@ pub class Environments {
       repo: options.repo,
       branch: options.branch,
       sha: options.sha,
-      commitMessage: options.commitMessage,
-      commitDate: options.commitDate,
       status: options.status,
       prNumber: options.prNumber,
       prTitle: options.prTitle,
