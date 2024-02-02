@@ -101,23 +101,24 @@ const OwnerPage = () => {
         {isLoading &&
           Array.from({
             length:
-              apps.length > 0 ? apps.length : Math.floor(Math.random() * 5) + 3,
+              apps.length > 0 ? apps.length : Math.floor(Math.random() * 4) + 3,
           }).map((_, i) => <AppCardSkeleton key={i} />)}
 
         {filteredApps.map((app) => (
-          <>
-            <AppCard
-              key={app.appId}
-              owner={owner || ""}
-              onClick={() => {
-                navigate(`/${owner}/${app.appName}`);
-              }}
-              onOpenSettings={() => {
-                navigate(`/${owner}/${app.appName}/settings`);
-              }}
-              app={app}
-            />
-          </>
+          <AppCard
+            key={app.appId}
+            owner={owner || ""}
+            onOpenApp={() => {
+              navigate(`/${owner}/${app.appName}`);
+            }}
+            onOpenConsole={() => {
+              navigate(`/${owner}/${app.appName}/${app.defaultBranch}/console`);
+            }}
+            onOpenSettings={() => {
+              navigate(`/${owner}/${app.appName}/settings`);
+            }}
+            app={app}
+          />
         ))}
       </div>
     </div>

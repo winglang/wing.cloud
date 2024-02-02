@@ -21,6 +21,7 @@ export interface Theme {
   border4: string;
   text1: string;
   text2: string;
+  text3: string;
   text1Hover: string;
   text2Hover: string;
   text3Hover: string;
@@ -52,12 +53,13 @@ export const DefaultTheme: Theme = {
   bg4Hover: "hover:bg-slate-50 dark:hover:bg-slate-500",
   border3: "border-slate-300 dark:border-slate-900",
   border4: "border-slate-200 dark:border-slate-800",
-  text1: "text-slate-800 dark:text-slate-250",
-  text2: "text-slate-500 dark:text-slate-400",
-  text1Hover: "hover:text-slate-950 dark:hover:text-slate-200",
-  text2Hover: "hover:text-slate-850 dark:hover:text-slate-250",
-  text3Hover: "hover:text-slate-600 dark:hover:text-slate-350",
-  text4Hover: "hover:text-slate-550 dark:hover:text-slate-350",
+  text1: "text-slate-700 dark:text-slate-250",
+  text2: "text-slate-600 dark:text-slate-300",
+  text3: "text-slate-500 dark:text-slate-400",
+  text1Hover: "hover:text-slate-750 dark:hover:text-slate-200",
+  text2Hover: "hover:text-slate-650 dark:hover:text-slate-250",
+  text3Hover: "hover:text-slate-550 dark:hover:text-slate-350",
+  text4Hover: "hover:text-slate-500 dark:hover:text-slate-300",
   text4GroupHover: "group-hover:text-slate-550 dark:group-hover:text-slate-350",
   textFocus: "text-sky-700 dark:text-sky-300",
   textInput:

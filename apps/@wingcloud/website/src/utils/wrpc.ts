@@ -46,7 +46,7 @@ export interface App {
   entrypoint: string;
   createdAt: string;
   defaultBranch: string;
-  commit: Commit;
+  commit?: Commit;
 }
 
 export interface TestResult {
