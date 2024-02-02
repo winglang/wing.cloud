@@ -126,54 +126,10 @@ export const AppCard = ({
           />
         </div>
       </div>
-      <div className="p-4 text-sm leading-6 space-y-1.5">
-        <div className="flex justify-between gap-x-4 pb-2">
-          <div className="flex gap-x-2 truncate">
-            <Link
-              className={clsx(
-                "truncate",
-                "text-xs",
-                theme.text1,
-                theme.text1Hover,
-                "hover:underline",
-                "font-medium",
-              )}
-              target="_blank"
-              to={projectUrl}
-            >
-              <div className="flex gap-x-0.5 truncate">
-                <GithubIcon className="w-4 h-4" />
-                <div className="ml-2 truncate">
-                  {app.repoOwner}/{app.repoName}
-                </div>
-              </div>
-            </Link>
-          </div>
-        </div>
-
-        <div className="flex justify-between gap-x-4">
-          <div className="flex gap-x-2 truncate">
-            <Link
-              aria-disabled={!commitUrl}
-              className={clsx(
-                "truncate",
-                "text-xs",
-                theme.text2,
-                theme.text2Hover,
-                "hover:underline",
-              )}
-              target="_blank"
-              to={commitUrl || ""}
-            >
-              {app.commit?.message}
-            </Link>
-          </div>
-        </div>
-        <div className="flex justify-between gap-x-4">
-          <div className="flex gap-x-2 truncate">
-            <div className={clsx("text-xs", theme.text3)}>{timeAgo} on</div>
-            <div className={clsx("flex text-xs truncate", theme.text2)}>
-              <BranchIcon className="w-4 h-4" />
+      <div className="p-4 space-y-4">
+        <div className="leading-6 space-y-1">
+          <div className="flex justify-between gap-x-4">
+            <div className="flex gap-x-2 truncate">
               <Link
                 className={clsx(
                   "truncate",
@@ -181,12 +137,59 @@ export const AppCard = ({
                   theme.text2,
                   theme.text2Hover,
                   "hover:underline",
+                  "font-medium",
                 )}
                 target="_blank"
-                to={branchUrl}
+                to={projectUrl}
               >
-                {app.defaultBranch}
+                <div className="flex gap-x-2 truncate items-center">
+                  <GithubIcon className="w-4 h-4" />
+                  <div className="truncate">
+                    {app.repoOwner}/{app.repoName}
+                  </div>
+                </div>
               </Link>
+            </div>
+          </div>
+        </div>
+        <div className="leading-6 space-y-1">
+          <div className="flex justify-between gap-x-4">
+            <div className="flex gap-x-2 truncate">
+              <Link
+                aria-disabled={!commitUrl}
+                className={clsx(
+                  "truncate",
+                  "text-xs",
+                  theme.text3,
+                  theme.text3Hover,
+                  "hover:underline",
+                )}
+                target="_blank"
+                to={commitUrl || ""}
+                title="View commit on GitHub"
+              >
+                {app.commit?.message}
+              </Link>
+            </div>
+          </div>
+          <div className="flex justify-between gap-x-4">
+            <div className="flex gap-x-2 truncate">
+              <div className={clsx("text-xs", theme.text4)}>{timeAgo} on</div>
+              <div className={clsx("flex text-xs truncate", theme.text2)}>
+                <BranchIcon className="w-4 h-4" />
+                <Link
+                  className={clsx(
+                    "truncate",
+                    "text-xs",
+                    theme.text2Hover,
+                    "hover:underline",
+                  )}
+                  target="_blank"
+                  to={branchUrl}
+                >
+                  {app.defaultBranch}
+                </Link>
+              </div>
             </div>
           </div>
         </div>
