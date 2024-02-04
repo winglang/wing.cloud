@@ -104,7 +104,7 @@ const EnvironmentPage = () => {
         isOpen={true}
         endpoints={endpoints.data?.endpoints || []}
         loading={endpoints.isLoading}
-        environmentType={environment.data?.environment.type}
+        environment={environment.data?.environment}
       />
       <AppLogs
         id={DEPLOYMENT_LOGS_ID}

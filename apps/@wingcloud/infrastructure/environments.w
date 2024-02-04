@@ -79,6 +79,11 @@ struct UpdateEnvironmentTestResultsOptions {
   testResults: status_report.TestResults;
 }
 
+struct ClearEnvironmentTestResultsOptions {
+  id: str;
+  appId: str;
+}
+
 struct GetEnvironmentOptions {
   id: str;
 }
@@ -690,6 +695,60 @@ pub class Environments {
           expressionAttributeValues: {
             ":testResults": options.testResults,
           },
+        }
+      }
+    ]);
+  }
+
+  pub inflight clearTestResults(options: ClearEnvironmentTestResultsOptions) {
+    let environment = this.get(id: options.id);
+    let branch = environment.branch;
+    let updatedAt = datetime.fromIso(environment.updatedAt);
+    let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
+
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "ENVIRONMENT#{options.id}",
+            sk: "#",
+          },
+          updateExpression: "REMOVE testResults",
+          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
+          expressionAttributeNames: {
+            "#pk": "pk",
+            "#appId": "appId",
+          },
+          expressionAttributeValues: {
+            ":appId": options.appId,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#{options.appId}",
+            sk: "ENVIRONMENT#{options.id}",
+          },
+          updateExpression: "REMOVE testResults",
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "APP#{options.appId}",
+            sk: "BRANCH#{branch}",
+          },
+          updateExpression: "REMOVE testResults",
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "DEPLOYED#{statusUpdatedAt}",
+            sk: "ENV#{options.id}",
+          },
+          updateExpression: "REMOVE testResults",
         }
       }
     ]);
