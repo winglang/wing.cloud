@@ -199,6 +199,7 @@ let wingCloudApi = new wingcloud_api.Api(
   wsSecret: wsSecret,
   logs: bucketLogs,
   analytics: analytics,
+  segmentWriteKey: segmentWriteKey,
 );
 
 let probotApp = new probot.ProbotApp(

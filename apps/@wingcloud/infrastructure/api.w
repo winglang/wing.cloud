@@ -71,6 +71,13 @@ struct EnvironmentReportMessage {
   environmentId: str;
 }
 
+struct AnalyticsSignInMessage {
+  anonymousId: str;
+  userId: str;
+  email: str?;
+  github: str;
+}
+
 // TODO: https://github.com/winglang/wing/issues/3644
 class Util {
   extern "./util.js" pub static inflight replaceAll(value:str, regex:str, replacement:str): str;
@@ -121,6 +128,7 @@ struct ApiProps {
   wsSecret: str;
   logs: cloud.Bucket;
   analytics: analytics.SegmentAnalytics;
+  segmentWriteKey: str;
 }
 
 
@@ -302,6 +310,24 @@ pub class Api {
       };
     });
 
+    let analyticsSignInQueue = new cloud.Queue() as "AnalyticsSignInQueue";
+    analyticsSignInQueue.setConsumer(inflight (message) => {
+      let event = AnalyticsSignInMessage.fromJson(Json.parse(message));
+      props.analytics.identify(
+          anonymousId: event.anonymousId,
+          userId: event.userId,
+          traits: {
+            email: event.email,
+            github: event.github,
+          },
+        );
+        props.analytics.track(event.userId, "console_sign_in", {
+          anonymousId: event.anonymousId,
+          userId: event.userId,
+          email: event.email,
+          github: event.github,
+        });
+    });
     api.get("/wrpc/github.callback", inflight (request) => {
       let code = request.query.get("code");
 
@@ -347,27 +373,15 @@ pub class Api {
       log("anonymousId = {request.query.tryGet("anonymousId")}");
 
       if let anonymousId = request.query.tryGet("anonymousId") {
+        log("segmentWriteKey = {props.segmentWriteKey}");
         log("Identifying anonymous user as {user.username}");
-        log("before identify");
-        props.analytics.identify(
-          anonymousId: anonymousId,
-          userId: user.id,
-          traits: {
+        if let port = request.query.tryGet("port") {
+          analyticsSignInQueue.push(Json.stringify(AnalyticsSignInMessage {
+            anonymousId: anonymousId,
+            userId: user.id,
             email: user.email,
             github: user.username,
-          },
-        );
-        log("after identify");
-        log("before track");
-        props.analytics.track(user.id, "console_sign_in", {
-          anonymousId: anonymousId,
-          userId: user.id,
-          email: user.email,
-          github: user.username,
-        });
-        log("after track");
-
-        if let port = request.query.tryGet("port") {
+          }));
           log("redirecting to console");
           // Redirect back to the local Console, using the `signedIn`
           // GET parameter so the Console dismisses the sign in modal.
