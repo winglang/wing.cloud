@@ -194,7 +194,11 @@ test("run() - reporting statuses", async () => {
     },
     {
       environmentId: "test-id",
-      status: "tests",
+      status: "running-tests",
+    },
+    {
+      environmentId: "test-id",
+      status: "running-server",
       data: {
         testResults: [
           {
