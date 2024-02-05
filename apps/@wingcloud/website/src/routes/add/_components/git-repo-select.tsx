@@ -119,7 +119,7 @@ export const GitRepoSelect = ({
         </div>
       )}
 
-      <div className="h-80">
+      <div className="h-80 overflow-auto">
         {(filteredRepos.length > 0 || loading) && (
           <div
             className={clsx(
