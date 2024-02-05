@@ -4,7 +4,7 @@ import {
   PlusIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../components/error-boundary.js";
@@ -20,7 +20,13 @@ import { AppCard } from "./_components/app-card.js";
 const OwnerPage = () => {
   const { owner } = useParams();
   const { theme } = useTheme();
-  const { apps, isLoading } = useContext(AppsDataProviderContext);
+  const { apps, isLoading, noApps } = useContext(AppsDataProviderContext);
+
+  useEffect(() => {
+    if (noApps) {
+      navigate("/add");
+    }
+  }, [noApps]);
 
   const navigate = useNavigate();
 

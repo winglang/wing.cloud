@@ -70,7 +70,6 @@ export const Component = () => {
     }
     setCreateAppLoading(true);
     try {
-      setCreateAppLoading(true);
       const app = await createAppMutation.mutateAsync(
         {
           owner: user.data.user.username,
@@ -87,7 +86,6 @@ export const Component = () => {
           },
         },
       );
-      setCreateAppLoading(false);
       navigate(`/${app?.appFullName}`);
     } catch (error) {
       setCreateAppLoading(false);
