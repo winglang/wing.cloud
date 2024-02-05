@@ -1,6 +1,6 @@
 import { Menu as HeadlessMenu, Transition } from "@headlessui/react";
 import clsx from "clsx";
-import { Fragment } from "react";
+import { Fragment, type MouseEvent } from "react";
 
 import { useTheme } from "./theme-provider.js";
 
@@ -14,9 +14,16 @@ export interface MenuProps {
   icon?: React.ReactNode;
   items: Item[];
   btnClassName?: string;
+  onClick?: (event: MouseEvent) => void;
 }
 
-export const Menu = ({ title, icon, items = [], btnClassName }: MenuProps) => {
+export const Menu = ({
+  title,
+  icon,
+  items = [],
+  btnClassName,
+  onClick,
+}: MenuProps) => {
   const { theme } = useTheme();
   return (
     <div className="relative items-center flex">
@@ -27,6 +34,9 @@ export const Menu = ({ title, icon, items = [], btnClassName }: MenuProps) => {
               "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
               btnClassName,
             )}
+            onClick={(event) => {
+              onClick?.(event);
+            }}
           >
             {icon}
             {title && <span className="ml-2">{title}</span>}

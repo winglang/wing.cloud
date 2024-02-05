@@ -7,42 +7,10 @@ import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../icons/github-icon.js";
 import { MenuIcon } from "../../../icons/menu-icon.js";
-import { TypeScriptIcon } from "../../../icons/typescript-icon.js";
-import { WingIcon } from "../../../icons/wing-icon.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import type { App } from "../../../utils/wrpc.js";
 
-const AppIcon = ({ app }: { app: App }) => {
-  const { theme } = useTheme();
-
-  if (app.entrypoint.endsWith(".ts")) {
-    return (
-      <TypeScriptIcon
-        className="w-8 h-8 text-[#2f74c0]"
-        title={app.entrypoint.endsWith(".ts") ? "TypeScript" : "Winglang"}
-      />
-    );
-  }
-  if (app.entrypoint.endsWith(".w")) {
-    return (
-      <WingIcon
-        className={clsx("w-8 h-8", theme.text1)}
-        title={app.entrypoint.endsWith(".ts") ? "TypeScript" : "Winglang"}
-      />
-    );
-  }
-  // return an icon for the app with the default icon being the first letter of the app name
-  return (
-    <div
-      className={clsx(
-        "w-8 h-8 flex items-center justify-center rounded",
-        theme.bg2,
-      )}
-    >
-      {app.appName.charAt(0).toUpperCase()}
-    </div>
-  );
-};
+import { AppIcon } from "./app-icon.js";
 
 export const AppCard = ({
   app,
@@ -79,41 +47,48 @@ export const AppCard = ({
   }, [app]);
 
   return (
-    <div
+    <button
       className={clsx(
         "w-full h-full rounded-md",
         "text-left border",
         theme.bgInput,
         theme.borderInput,
         "shadow-sm hover:shadow",
-        "truncate",
       )}
+      onClick={onOpenApp}
     >
       <div
         className={clsx(
-          "flex items-center gap-x-4 p-4",
+          "flex items-center gap-x-4 p-4 rounded-t-md",
           theme.bg4,
           "border-b",
           "theme.borderInput",
         )}
       >
         <AppIcon app={app} />
-        <Link
+        <div
           className={clsx(
             "text-sm font-medium leading-6",
             theme.text1,
             theme.text1Hover,
             "hover:underline",
           )}
-          onClick={onOpenApp}
-          to={`/${owner}/${app.appName}`}
         >
           {app.appName}
-        </Link>
+        </div>
         <div className="flex flex-grow justify-end">
           <Menu
-            icon={<MenuIcon className={clsx("w-4 h-4", theme.text2)} />}
+            icon={
+              <MenuIcon
+                className={clsx(
+                  "w-6 h-6 p-1 rounded",
+                  theme.text2,
+                  theme.bgInputHover,
+                )}
+              />
+            }
             btnClassName=" flex"
+            onClick={(event) => event.stopPropagation()}
             items={[
               {
                 label: "View on Console",
@@ -144,11 +119,12 @@ export const AppCard = ({
                   "hover:underline",
                   "font-medium",
                 )}
+                onClick={(event) => event.stopPropagation()}
                 target="_blank"
                 to={projectUrl}
               >
                 <div className="flex gap-x-2 truncate items-center">
-                  <GithubIcon className="w-4 h-4" />
+                  <GithubIcon className="w-4 h-4 shrink-0" />
                   <div className="truncate">
                     {app.repoOwner}/{app.repoName}
                   </div>
@@ -171,9 +147,10 @@ export const AppCard = ({
                 )}
                 target="_blank"
                 to={commitUrl || ""}
+                onClick={(event) => event.stopPropagation()}
                 title="View commit on GitHub"
               >
-                {app.lastCommitMessage || ""}
+                {app.lastCommitMessage || "View on GitHub"}
               </Link>
             </div>
           </div>
@@ -181,7 +158,7 @@ export const AppCard = ({
             <div className="flex gap-x-1 truncate">
               <div className={clsx("text-xs", theme.text4)}>{timeAgo} on</div>
               <div className={clsx("flex text-xs truncate", theme.text2)}>
-                <BranchIcon className="w-4 h-4" />
+                <BranchIcon className="w-4 h-4 shrink-0" />
                 <Link
                   className={clsx(
                     "truncate",
@@ -191,6 +168,7 @@ export const AppCard = ({
                   )}
                   target="_blank"
                   to={branchUrl}
+                  onClick={(event) => event.stopPropagation()}
                 >
                   {app.defaultBranch}
                 </Link>
@@ -199,6 +177,6 @@ export const AppCard = ({
           </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 };
