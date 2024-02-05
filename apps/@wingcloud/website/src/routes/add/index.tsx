@@ -200,23 +200,21 @@ export const Component = () => {
                     <div className="gap-4 grid grid-cols-2">
                       <AppTemplateItem
                         name="Wing App"
-                        description="Create a new Wing app from a template"
-                        icon={<WingIcon className="w-8 h-8 text-[#8bc6bc]" />}
+                        description="Create a new Wing app from a template."
+                        icon={<WingIcon className="text-[#8bc6bc]" />}
                         disabled
                         classname="cursor-default"
                       />
                       <AppTemplateItem
                         name="TypeScript"
-                        description="Create a new TypeScript app from a template"
-                        icon={
-                          <TypeScriptIcon className="w-8 h-8 text-[#2f74c0]" />
-                        }
+                        description="Create a new TypeScript app from a template."
+                        icon={<TypeScriptIcon className="text-[#2f74c0]" />}
                         disabled
                         classname="cursor-default"
                       />
                       <AppTemplateItem
                         name="More coming soon!"
-                        icon={<SquaresPlusIcon className="w-8 h-8" />}
+                        icon={<SquaresPlusIcon />}
                         disabled
                         classname="cursor-default"
                       />
