@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { StatusDot } from "../../../components/status-dot.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 
-export interface AppConfigurationListItemProps {
+export interface AppTemplateItemProps {
   name: string;
   description?: string;
   icon?: React.ReactNode;
@@ -12,14 +12,14 @@ export interface AppConfigurationListItemProps {
   classname?: string;
 }
 
-export const AppConfigurationListItem = ({
+export const AppTemplateItem = ({
   name,
   description,
   icon,
   disabled,
   onClick,
   classname,
-}: AppConfigurationListItemProps) => {
+}: AppTemplateItemProps) => {
   const { theme } = useTheme();
 
   return (
@@ -37,11 +37,11 @@ export const AppConfigurationListItem = ({
       )}
       onClick={onClick}
     >
-      <div className="flex gap-x-4 items-center h-full">
+      <div className="flex gap-x-4 items-center h-full truncate">
         <div className={clsx(theme.text1)}>{icon}</div>
-        <div>
-          <div className={clsx(theme.text1)}>{name}</div>
-          <div className={clsx("text-xs items-end", theme.text2)}>
+        <div className="truncate">
+          <div className={clsx(theme.text1, "truncate")}>{name}</div>
+          <div className={clsx("text-xs items-end truncate", theme.text2)}>
             {description}
           </div>
         </div>

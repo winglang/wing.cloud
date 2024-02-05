@@ -58,7 +58,7 @@ export const GitRepoSelect = ({
   }, [repos, search]);
 
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full space-y-4">
       <div className="flex gap-2 w-full items-center">
         <div className="w-1/3">
           <Select
@@ -122,12 +122,12 @@ export const GitRepoSelect = ({
       {(filteredRepos.length > 0 || loading) && (
         <div
           className={clsx(
-            "flex flex-col max-h-80 overflow-auto rounded",
+            "flex flex-col max-h-80 overflow-auto rounded-md",
             "border",
             theme.borderInput,
           )}
         >
-          <div className="divide-y divide-slate-200 dark:divide-slate-700 rounded">
+          <div className="divide-y divide-slate-200 dark:divide-slate-700 rounded-md">
             {filteredRepos.map((repo) => (
               <div
                 aria-disabled={disabled}
