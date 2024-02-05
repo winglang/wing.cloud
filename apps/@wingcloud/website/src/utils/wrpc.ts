@@ -48,6 +48,7 @@ export interface App {
   lastCommitMessage?: string;
   lastCommitDate?: string;
   lastCommitSha?: string;
+  status?: string;
 }
 
 export interface TestResult {

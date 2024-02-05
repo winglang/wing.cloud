@@ -7,6 +7,8 @@ import clsx from "clsx";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
+import { StatusDot } from "../../../../components/status-dot.js";
+import { StatusPill } from "../../../../components/status-pill.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../../icons/github-icon.js";
@@ -88,18 +90,7 @@ export const EnvironmentsListItem = ({
               theme.text2,
             )}
           />
-          <div
-            title={status}
-            className={clsx(
-              "absolute -top-1.5 -right-1.5",
-              "w-2.5 h-2.5",
-              "rounded-full",
-              status === "initializing" && "bg-yellow-300 animate-pulse",
-              status === "deploying" && "bg-yellow-300 animate-pulse",
-              status === "running" && "bg-green-300",
-              status === "error" && "bg-red-300",
-            )}
-          />
+          <StatusDot status={status} />
         </div>
 
         <div className="flex justify-between items-center truncate grow">
@@ -174,18 +165,7 @@ export const EnvironmentsListItem = ({
               </Link>
             )}
             {!linkEnabled && (
-              <div
-                className={clsx(
-                  status === "initializing" && "text-yellow-600 bg-yellow-100",
-                  status === "running-tests" && "text-yellow-600 bg-yellow-100",
-                  status === "running-server" &&
-                    "text-yellow-600 bg-yellow-100",
-                  status === "deploying" && "text-yellow-600 bg-yellow-100",
-                  status === "error" && "text-red-600 bg-red-100",
-                  "text-xs rounded-xl px-2 py-0.5",
-                  "capitalize font-[500]",
-                )}
-              >
+              <StatusPill status={status}>
                 {status === "error" && (
                   <Link
                     to={`/${owner}/${appName}/${environment.branch}/#${DEPLOYMENT_LOGS_ID}`}
@@ -195,7 +175,7 @@ export const EnvironmentsListItem = ({
                   </Link>
                 )}
                 {status !== "error" && statusString}
-              </div>
+              </StatusPill>
             )}
           </div>
         </div>

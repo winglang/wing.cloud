@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { useMemo, type MouseEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import { StatusPill } from "../../../components/status-pill.js";
 import { Menu } from "../../../design-system/menu.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
@@ -32,6 +33,42 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
     }
     return `https://github.com/${app.repoOwner}/${app.repoName}/commit/${app.lastCommitSha}`;
   }, [app]);
+
+  const menuItems = useMemo(() => {
+    var items = [
+      {
+        label: "View Logs",
+        onClick: (event: MouseEvent) => {
+          event.stopPropagation();
+          navigate(
+            `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
+          );
+        },
+      },
+      {
+        label: "Settings",
+        onClick: (event: MouseEvent) => {
+          event.stopPropagation();
+          navigate(`/${owner}/${app.appName}/settings`);
+        },
+      },
+    ];
+
+    if (app.status === "running") {
+      items = [
+        {
+          label: `View on Console`,
+          onClick: (event: MouseEvent) => {
+            event.stopPropagation();
+            navigate(`/${owner}/${app.appName}/${app.defaultBranch}/console`);
+          },
+        },
+        ...items,
+      ];
+    }
+
+    return items;
+  }, [app, owner]);
 
   return (
     <div
@@ -80,63 +117,37 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
             }
             btnClassName="flex z-10"
             onClick={(event) => event.stopPropagation()}
-            items={[
-              {
-                label: "View on Console",
-                onClick: (event: MouseEvent) => {
-                  event.stopPropagation();
-                  navigate(
-                    `/${owner}/${app.appName}/${app.defaultBranch}/console`,
-                  );
-                },
-              },
-              {
-                label: "View Logs",
-                onClick: (event: MouseEvent) => {
-                  event.stopPropagation();
-                  navigate(
-                    `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
-                  );
-                },
-              },
-              {
-                label: "Settings",
-                onClick: (event: MouseEvent) => {
-                  event.stopPropagation();
-                  navigate(`/${owner}/${app.appName}/settings`);
-                },
-              },
-            ]}
+            items={menuItems}
           />
         </div>
       </div>
       <div className="p-4 space-y-4">
-        <div className="leading-6 space-y-1">
-          <div className="flex justify-between gap-x-4">
-            <div className="flex gap-x-2 truncate">
-              <Link
-                className={clsx(
-                  "truncate",
-                  "text-xs font-medium",
-                  theme.text2,
-                  theme.text2Hover,
-                  theme.focusInput,
-                  "focus:underline hover:underline z-10",
-                )}
-                onClick={(event) => event.stopPropagation()}
-                target="_blank"
-                to={projectUrl}
-              >
-                <div className="flex gap-x-2 truncate items-center">
-                  <GithubIcon className="w-4 h-4 shrink-0" />
-                  <div className="truncate">
-                    {app.repoOwner}/{app.repoName}
-                  </div>
-                </div>
-              </Link>
+        <Link
+          className={clsx(
+            "flex grow gap-x-2 truncate",
+            "truncate",
+            "text-xs font-medium",
+            theme.text2,
+            theme.text2Hover,
+            theme.focusInput,
+            "focus:underline hover:underline z-10",
+          )}
+          onClick={(event) => event.stopPropagation()}
+          target="_blank"
+          to={projectUrl}
+        >
+          <div className="flex grow gap-x-2 truncate items-center">
+            <GithubIcon className="w-4 h-4 shrink-0" />
+            <div className="truncate">
+              {app.repoOwner}/{app.repoName}
+            </div>
+            <div className="flex grow justify-end">
+              {app.status && app.status !== "running" && (
+                <StatusPill status={app.status} />
+              )}
             </div>
           </div>
-        </div>
+        </Link>
         <div className="leading-6 space-y-1">
           <div className="flex justify-between gap-x-4">
             <div className="flex gap-x-2 truncate">
@@ -160,12 +171,13 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
             </div>
           </div>
           <div className="flex justify-between gap-x-4">
-            <div className="flex gap-x-1 truncate">
+            <div className="flex grow gap-x-1 truncate">
               <div className={clsx("text-xs", theme.text4)}>{timeAgo} on</div>
-              <div className={clsx("flex text-xs truncate", theme.text2)}>
+              <div className={clsx("flex grow text-xs truncate", theme.text2)}>
                 <BranchIcon className="w-4 h-4 shrink-0" />
                 <Link
                   className={clsx(
+                    "flex-grow",
                     "truncate",
                     "text-xs",
                     theme.text2Hover,

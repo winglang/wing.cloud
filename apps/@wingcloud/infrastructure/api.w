@@ -156,7 +156,8 @@ pub class Api {
     props.environmentManager.onEnvironmentChange(inflight (environment) => {
       if let app = apps.tryGet(appId: environment.appId) {
         invalidateQuery.invalidate(userId: app.userId, queries: [
-          "app.listEnvironments"
+          "app.listEnvironments",
+          "app.list"
         ]);
       }
     });
@@ -609,6 +610,7 @@ pub class Api {
           entrypoint: entrypoint,
           createdAt: datetime.utcNow().toIso(),
           defaultBranch: defaultBranch,
+          status: "initializing",
         );
 
         productionEnvironmentQueue.push(Json.stringify(CreateProductionEnvironmentMessage {

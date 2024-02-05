@@ -16,6 +16,7 @@ pub struct App {
   lastCommitMessage: str?;
   lastCommitDate: str?;
   lastCommitSha: str?;
+  status: str?;
 }
 
 struct Item extends App {
@@ -36,6 +37,7 @@ struct CreateAppOptions {
   lastCommitMessage: str?;
   lastCommitDate: str?;
   lastCommitSha: str?;
+  status: str?;
 }
 
 struct GetAppOptions {
@@ -84,6 +86,14 @@ struct UpdateLastCommitOptions {
   lastCommitSha: str;
 }
 
+struct UpdateStatusOptions {
+  appId: str;
+  appName: str;
+  userId: str;
+  repoId: str;
+  status: str;
+}
+
 pub class Apps {
   table: ex.DynamodbTable;
 
@@ -112,6 +122,7 @@ pub class Apps {
         lastCommitMessage: options.lastCommitMessage,
         lastCommitDate: options.lastCommitDate,
         lastCommitSha: options.lastCommitSha,
+        status: options.status,
       };
     };
 
@@ -367,8 +378,6 @@ pub class Apps {
   }
 
   pub inflight updatLastCommit(options: UpdateLastCommitOptions): void {
-    log("updateLastCommit {Json.stringify(options)}");
-
     this.table.transactWriteItems(transactItems: [
       {
         update: {
@@ -447,6 +456,78 @@ pub class Apps {
             ":lastCommitMessage": options.lastCommitMessage,
             ":lastCommitDate": options.lastCommitDate,
             ":lastCommitSha": options.lastCommitSha,
+          },
+        }
+      },
+    ]);
+  }
+
+  pub inflight updateStatus(options: UpdateStatusOptions): void {
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "APP#{options.appId}",
+            sk: "#",
+          },
+          updateExpression: "SET #status = :status",
+          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
+          expressionAttributeNames: {
+            "#pk": "pk",
+            "#status": "status",
+            "#userId": "userId",
+          },
+          expressionAttributeValues: {
+            ":userId": options.userId,
+            ":status": options.status,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "APP#{options.appId}",
+          },
+          updateExpression: "SET #status = :status",
+          expressionAttributeNames: {
+            "#status": "status",
+
+          },
+          expressionAttributeValues: {
+            ":status": options.status,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "APP_NAME#{options.appName}",
+          },
+          updateExpression: "SET #status = :status",
+          expressionAttributeNames: {
+            "#status": "status",
+
+          },
+          expressionAttributeValues: {
+            ":status": options.status,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "REPOSITORY#{options.repoId}",
+            sk: "APP#{options.appId}",
+          },
+          updateExpression: "SET #status = :status",
+          expressionAttributeNames: {
+            "#status": "status",
+
+          },
+          expressionAttributeValues: {
+            ":status": options.status,
           },
         }
       },
