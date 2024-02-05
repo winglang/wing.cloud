@@ -111,13 +111,16 @@ const OwnerPage = () => {
             onOpenApp={() => {
               navigate(`/${owner}/${app.appName}`);
             }}
-            onOpenConsole={() => {
+            onOpenConsole={(event) => {
+              event.stopPropagation();
               navigate(`/${owner}/${app.appName}/${app.defaultBranch}/console`);
             }}
-            onOpenEnvironmentDetails={() => {
+            onOpenProductionEnvironment={(event) => {
+              event.stopPropagation();
               navigate(`/${owner}/${app.appName}/${app.defaultBranch}`);
             }}
-            onOpenSettings={() => {
+            onOpenSettings={(event) => {
+              event.stopPropagation();
               navigate(`/${owner}/${app.appName}/settings`);
             }}
             app={app}

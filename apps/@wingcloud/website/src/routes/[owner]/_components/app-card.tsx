@@ -16,15 +16,15 @@ export const AppCard = ({
   app,
   owner,
   onOpenConsole,
-  onOpenEnvironmentDetails,
+  onOpenProductionEnvironment,
   onOpenSettings,
   onOpenApp,
 }: {
   app: App;
   owner: string;
-  onOpenConsole: () => void;
-  onOpenSettings: () => void;
-  onOpenEnvironmentDetails: () => void;
+  onOpenConsole: (event: MouseEvent) => void;
+  onOpenSettings: (event: MouseEvent) => void;
+  onOpenProductionEnvironment: (event: MouseEvent) => void;
   onOpenApp: () => void;
 }) => {
   const { theme } = useTheme();
@@ -96,7 +96,7 @@ export const AppCard = ({
               },
               {
                 label: "View Environment details",
-                onClick: onOpenEnvironmentDetails,
+                onClick: onOpenProductionEnvironment,
               },
               {
                 label: "Settings",

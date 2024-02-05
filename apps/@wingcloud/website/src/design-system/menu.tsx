@@ -6,7 +6,7 @@ import { useTheme } from "./theme-provider.js";
 
 interface Item {
   label?: string;
-  onClick: () => void;
+  onClick?: (event: MouseEvent) => void;
 }
 
 export interface MenuProps {
