@@ -126,7 +126,7 @@ export const Component = () => {
     <div className="flex flex-col h-full">
       <Header />
       <ErrorBoundary>
-        <div className="w-full max-w-7xl overflow-auto mx-auto p-4 space-y-4 md:p-8">
+        <div className="w-full max-w-7xl overflow-auto mx-auto space-y-4 p-4 md:p-8">
           <div className="space-y-1">
             <div className={clsx("text-2xl font-semibold", theme.text1)}>
               Add a new app
