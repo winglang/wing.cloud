@@ -157,7 +157,7 @@ pub class Api {
       if let app = apps.tryGet(appId: environment.appId) {
         let updatedEnvironment = props.environments.get(id: environment.id);
         let queries = MutArray<str>["app.environment"];
-        if environment.type == "production" && (environment.status != app.status ?? "") {
+        if environment.type == "production" && (updatedEnvironment.status != app.status ?? "") {
           apps.updateStatus(
             appId: app.appId,
             appName: app.appName,

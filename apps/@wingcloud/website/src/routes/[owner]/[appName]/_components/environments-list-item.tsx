@@ -59,19 +59,6 @@ export const EnvironmentsListItem = ({
 
   const updatedAt = useTimeAgo(environment.updatedAt);
 
-  const statusString = useMemo(() => {
-    if (status === "running-server") {
-      return "Running Server";
-    }
-    if (status === "running-tests") {
-      return "Running Tests";
-    }
-    if (status === "initializing" || status === "deploying") {
-      return "Deploying";
-    }
-    return status;
-  }, [status]);
-
   return (
     <div
       className={clsx(
@@ -171,10 +158,9 @@ export const EnvironmentsListItem = ({
                     to={`/${owner}/${appName}/${environment.branch}/#${DEPLOYMENT_LOGS_ID}`}
                     className="hover:underline"
                   >
-                    {statusString}
+                    {status}
                   </Link>
                 )}
-                {status !== "error" && statusString}
               </StatusPill>
             )}
           </div>

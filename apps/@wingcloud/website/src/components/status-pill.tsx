@@ -1,10 +1,23 @@
 import clsx from "clsx";
-import type { PropsWithChildren } from "react";
+import { useMemo, type PropsWithChildren } from "react";
 
 export const StatusPill = ({
   status,
   children,
 }: PropsWithChildren<{ status: string }>) => {
+  const statusString = useMemo(() => {
+    if (status === "running-server") {
+      return "Running Server";
+    }
+    if (status === "running-tests") {
+      return "Running Tests";
+    }
+    if (status === "initializing" || status === "deploying") {
+      return "Deploying";
+    }
+    return status;
+  }, [status]);
+
   return (
     <div
       className={clsx(
@@ -18,7 +31,7 @@ export const StatusPill = ({
         "capitalize font-[500]",
       )}
     >
-      {children || status}
+      {children || statusString}
     </div>
   );
 };
