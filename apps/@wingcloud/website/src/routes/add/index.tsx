@@ -197,7 +197,7 @@ export const Component = () => {
                     Clone a Template
                   </div>
                   <div className="w-full">
-                    <div className="gap-4 grid grid-cols-2">
+                    <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
                       <AppTemplateItem
                         name="Wing App"
                         description="Create a new Wing app from a template."
