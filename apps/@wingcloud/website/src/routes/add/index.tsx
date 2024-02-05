@@ -1,8 +1,4 @@
-import {
-  LinkIcon,
-  SquaresPlusIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/24/outline";
+import { SquaresPlusIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import {
   useCallback,
@@ -17,12 +13,11 @@ import { useNavigate } from "react-router-dom";
 import { ErrorBoundary } from "../../components/error-boundary.js";
 import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
-import { Button } from "../../design-system/button.js";
+import { GitDataProviderContext } from "../../data-store/git-data-provider.js";
 import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { TypeScriptIcon } from "../../icons/typescript-icon.js";
 import { WingIcon } from "../../icons/wing-icon.js";
-import { useCreateAppFromRepo } from "../../services/create-app.js";
 import { PopupWindowContext } from "../../utils/popup-window-provider.js";
 import { wrpc } from "../../utils/wrpc.js";
 
@@ -37,65 +32,62 @@ export interface AddAppContainerProps {
 }
 
 export const Component = () => {
-  const navigate = useNavigate();
-
-  const { theme } = useTheme();
-
   const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
+
+  const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const { showNotification } = useNotifications();
   const { openPopupWindow } = useContext(PopupWindowContext);
 
-  const {
-    createApp,
-    listInstallationsQuery,
-    listReposQuery,
-    installationId,
-    setInstallationId,
-    repositoryId,
-    setRepositoryId,
-    loading,
-  } = useCreateAppFromRepo();
+  const [createAppLoading, setCreateAppLoading] = useState(false);
+  const [repositoryId, setRepositoryId] = useState<string>();
 
   const user = wrpc["auth.check"].useQuery();
 
-  const [createAppLoading, setCreateAppLoading] = useState(false);
-
-  const installationList = useMemo(() => {
-    if (!listInstallationsQuery.data?.pages) {
-      return [];
-    }
-    return listInstallationsQuery.data.pages.flatMap((page) => page.data);
-  }, [listInstallationsQuery.data]);
-
-  const reposList = useMemo(() => {
-    if (!listReposQuery.data?.pages) {
-      return [];
-    }
-    return listReposQuery.data.pages.flatMap((page) => page.data);
-  }, [listReposQuery.data]);
+  const {
+    installations,
+    refetchInstallations,
+    installationId,
+    setInstallationId,
+    isLoading,
+    repos,
+    refetchRepos,
+  } = useContext(GitDataProviderContext);
 
   const selectedRepo = useMemo(() => {
-    if (!reposList || !repositoryId) {
+    if (!repos || !repositoryId) {
       return;
     }
-    return reposList.find((repo) => repo.full_name.toString() === repositoryId);
-  }, [reposList, repositoryId]);
+    return repos.find((repo) => repo.full_name.toString() === repositoryId);
+  }, [repos, repositoryId]);
 
-  const onCreate = useCallback(async () => {
+  const createAppMutation = wrpc["app.create"].useMutation();
+
+  const createApp = useCallback(async () => {
     if (!installationId || !selectedRepo || !user.data?.user) {
       return;
     }
     setCreateAppLoading(true);
     try {
-      const app = await createApp({
-        owner: user.data.user.username,
-        appName: selectedRepo.name,
-        description: selectedRepo.description ?? "",
-        repoName: selectedRepo.name,
-        repoOwner: selectedRepo.owner.login,
-        defaultBranch: selectedRepo.default_branch,
-      });
+      setCreateAppLoading(true);
+      const app = await createAppMutation.mutateAsync(
+        {
+          owner: user.data.user.username,
+          appName: selectedRepo.name,
+          defaultBranch: selectedRepo.default_branch,
+          description: selectedRepo.description ?? "",
+          repoName: selectedRepo.name,
+          repoOwner: selectedRepo.owner.login,
+        },
+        {
+          onError: (error) => {
+            setCreateAppLoading(false);
+            throw error;
+          },
+        },
+      );
+      setCreateAppLoading(false);
       navigate(`/${app?.appFullName}`);
     } catch (error) {
       setCreateAppLoading(false);
@@ -107,20 +99,17 @@ export const Component = () => {
         setRepositoryId("");
       }
     }
-  }, [createApp, navigate]);
+  }, [installationId, selectedRepo, user.data?.user]);
+
+  useEffect(() => {
+    setRepositoryId("");
+  }, [installationId]);
 
   useEffect(() => {
     if (repositoryId) {
-      onCreate();
+      createApp();
     }
   }, [repositoryId]);
-
-  // If installation id was changed, refetch repos. Needed in case the user didn't have access to any repo before.
-  useEffect(() => {
-    if (installationId) {
-      listReposQuery.refetch();
-    }
-  }, [installationId]);
 
   return (
     <div className="flex flex-col h-full">
@@ -163,9 +152,9 @@ export const Component = () => {
                       setInstallationId={setInstallationId}
                       repositoryId={repositoryId || ""}
                       setRepositoryId={setRepositoryId}
-                      installations={installationList}
-                      repos={reposList}
-                      loading={loading}
+                      installations={installations}
+                      repos={repos}
+                      loading={isLoading}
                       disabled={createAppLoading}
                     />
 
@@ -179,9 +168,9 @@ export const Component = () => {
                           openPopupWindow({
                             url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
                             onClose: async () => {
-                              await listInstallationsQuery.refetch();
+                              await refetchInstallations();
                               if (installationId) {
-                                listReposQuery.refetch();
+                                refetchRepos();
                               }
                             },
                           })

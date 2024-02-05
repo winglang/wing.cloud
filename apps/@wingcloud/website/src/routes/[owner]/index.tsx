@@ -14,7 +14,6 @@ import { Button } from "../../design-system/button.js";
 import { Input } from "../../design-system/input.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 
-import { RUNTIME_LOGS_ID } from "./[appName]/[branch]/index.js";
 import { AppCardSkeleton } from "./_components/app-card-skeleton.js";
 import { AppCard } from "./_components/app-card.js";
 

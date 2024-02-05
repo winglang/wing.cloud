@@ -9,6 +9,7 @@ import { useContext, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 
 import { AppsDataProvider } from "./data-store/apps-data-provider.js";
+import { GitDataProvider } from "./data-store/git-data-provider.js";
 import { NotificationsProvider } from "./design-system/notification.js";
 import { DefaultTheme, ThemeProvider } from "./design-system/theme-provider.js";
 import { router } from "./router.jsx";
@@ -65,7 +66,9 @@ export const App = () => {
               <NotificationsProvider>
                 <PopupWindowProvider>
                   <AppsDataProvider>
-                    <RouterProvider router={router} />
+                    <GitDataProvider>
+                      <RouterProvider router={router} />
+                    </GitDataProvider>
                   </AppsDataProvider>
                 </PopupWindowProvider>
               </NotificationsProvider>
