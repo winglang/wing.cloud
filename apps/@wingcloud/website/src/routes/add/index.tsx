@@ -207,7 +207,7 @@ export const Component = () => {
               <div className="space-y-8">
                 <div className="mb-4 flex flex-col w-full space-y-4">
                   <div className={clsx("text-lg font-semibold", theme.text1)}>
-                    Clone Template
+                    Clone a Template
                   </div>
                   <div className="w-full">
                     <div className="gap-4 grid grid-cols-2">
