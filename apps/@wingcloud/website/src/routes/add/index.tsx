@@ -198,9 +198,10 @@ export const Component = () => {
             <div
               className={clsx(
                 "w-full rounded-md p-8 space-y-8 border",
-                theme.bg3,
+                theme.bg4,
                 theme.borderInput,
                 "shadow-sm",
+                "opacity-50 cursor-default",
               )}
             >
               <div className="space-y-8">
@@ -215,7 +216,7 @@ export const Component = () => {
                         description="Create a new Wing app from a template"
                         icon={<WingIcon className="w-8 h-8 text-[#8bc6bc]" />}
                         disabled
-                        classname="opacity-50 cursor-default"
+                        classname="cursor-default"
                       />
                       <AppTemplateItem
                         name="TypeScript"
@@ -224,13 +225,13 @@ export const Component = () => {
                           <TypeScriptIcon className="w-8 h-8 text-[#2f74c0]" />
                         }
                         disabled
-                        classname="opacity-50 cursor-default"
+                        classname="cursor-default"
                       />
                       <AppTemplateItem
                         name="More coming soon!"
                         icon={<SquaresPlusIcon className="w-8 h-8" />}
                         disabled
-                        classname="opacity-50 cursor-default"
+                        classname="cursor-default"
                       />
                     </div>
                   </div>
