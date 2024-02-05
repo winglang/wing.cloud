@@ -155,10 +155,14 @@ pub class Api {
 
     props.environmentManager.onEnvironmentChange(inflight (environment) => {
       if let app = apps.tryGet(appId: environment.appId) {
-        invalidateQuery.invalidate(userId: app.userId, queries: [
-          "app.listEnvironments",
-          "app.list"
-        ]);
+
+        let queries = MutArray<str>["app.environment"];
+
+        if environment.type == "production" {
+          // update the app list when a production environment is modified.
+          queries.push("app.list");
+        }
+        invalidateQuery.invalidate(userId: app.userId, queries: queries.copy());
       }
     });
 
