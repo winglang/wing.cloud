@@ -172,7 +172,9 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
           </div>
           <div className="flex justify-between gap-x-4">
             <div className="flex grow gap-x-1 truncate">
-              <div className={clsx("text-xs", theme.text4)}>{timeAgo} on</div>
+              {app.lastCommitDate && (
+                <div className={clsx("text-xs", theme.text4)}>{timeAgo} on</div>
+              )}
               <div className={clsx("flex grow text-xs truncate", theme.text2)}>
                 <BranchIcon className="w-4 h-4 shrink-0" />
                 <Link
