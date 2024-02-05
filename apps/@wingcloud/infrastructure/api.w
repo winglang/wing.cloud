@@ -155,9 +155,20 @@ pub class Api {
 
     props.environmentManager.onEnvironmentChange(inflight (environment) => {
       if let app = apps.tryGet(appId: environment.appId) {
-        invalidateQuery.invalidate(userId: app.userId, queries: [
-          "app.listEnvironments"
-        ]);
+        let updatedEnvironment = props.environments.get(id: environment.id);
+        let queries = MutArray<str>["app.environment"];
+        if environment.type == "production" && (updatedEnvironment.status != app.status ?? "") {
+          apps.updateStatus(
+            appId: app.appId,
+            appName: app.appName,
+            repoId: app.repoId,
+            userId: app.userId,
+            status: updatedEnvironment.status,
+          );
+          // update the app list when a production environment is modified.
+          queries.push("app.list");
+        }
+        invalidateQuery.invalidate(userId: app.userId, queries: queries.copy());
       }
     });
 
@@ -609,6 +620,7 @@ pub class Api {
           entrypoint: entrypoint,
           createdAt: datetime.utcNow().toIso(),
           defaultBranch: defaultBranch,
+          status: "initializing",
         );
 
         productionEnvironmentQueue.push(Json.stringify(CreateProductionEnvironmentMessage {

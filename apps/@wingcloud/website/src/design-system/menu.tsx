@@ -7,6 +7,7 @@ import { useTheme } from "./theme-provider.js";
 interface Item {
   label?: string;
   onClick?: (event: MouseEvent) => void;
+  disabled?: boolean;
 }
 
 export interface MenuProps {
@@ -62,6 +63,7 @@ export const Menu = ({
                 <HeadlessMenu.Item key={item.label}>
                   {({ active }) => (
                     <button
+                      disabled={item.disabled}
                       key={item.label}
                       onClick={item.onClick}
                       className={clsx(
