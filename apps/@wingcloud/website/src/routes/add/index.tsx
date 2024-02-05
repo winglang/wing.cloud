@@ -126,7 +126,7 @@ export const Component = () => {
     <div className="flex flex-col h-full">
       <Header />
       <ErrorBoundary>
-        <div className="w-full max-w-7xl mx-auto p-6 space-y-6 md:p-8 md:space-y-8">
+        <div className="w-full max-w-7xl overflow-auto mx-auto p-4 space-y-4 md:p-8">
           <div className="space-y-1">
             <div className={clsx("text-2xl font-semibold", theme.text1)}>
               Add a new app
@@ -136,19 +136,19 @@ export const Component = () => {
             </div>
           </div>
 
-          <div className="block space-y-6 md:space-y-0 md:flex md:gap-10">
+          <div className="block space-y-4 md:space-y-0 md:flex gap-4 md:gap-8">
             <div
               className={clsx(
-                "w-full rounded-md p-6 space-y-6 border",
+                "w-full rounded-md p-8 space-y-8 border",
                 "shadow",
                 theme.bg4,
                 theme.borderInput,
               )}
             >
-              <div className="space-y-6">
+              <div className="space-y-8">
                 <div className="w-full space-y-4">
-                  <div className={clsx("text-lg", theme.text1)}>
-                    Connect to an existing Git Repository
+                  <div className={clsx("text-lg font-semibold", theme.text2)}>
+                    Connect Git Repository
                   </div>
                   <div className="w-full relative space-y-4">
                     {createAppLoading && (
@@ -169,7 +169,7 @@ export const Component = () => {
                       disabled={createAppLoading}
                     />
 
-                    <div className="text-xs flex gap-1 items-center">
+                    <div className="text-xs flex gap-1 items-center pt-4 border-t border-slate-200">
                       <span className={clsx(theme.text1)}>
                         Missing a repository?
                       </span>
@@ -197,15 +197,15 @@ export const Component = () => {
 
             <div
               className={clsx(
-                "w-full rounded-md p-6 space-y-6 border",
-                theme.bg4,
+                "w-full rounded-md p-8 space-y-8 border",
+                theme.bg3,
                 theme.borderInput,
                 "shadow-sm",
               )}
             >
-              <div className="space-y-6">
+              <div className="space-y-8">
                 <div className="mb-4 flex flex-col w-full space-y-4">
-                  <div className={clsx("text-lg", theme.text1)}>
+                  <div className={clsx("text-lg font-semibold", theme.text2)}>
                     Clone Template
                   </div>
                   <div className="w-full">
@@ -234,18 +234,6 @@ export const Component = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="w-full flex">
-            <div className="justify-end flex gap-x-2 grow">
-              <Button
-                onClick={() => {
-                  navigate("/dashboard");
-                }}
-              >
-                Back
-              </Button>
             </div>
           </div>
         </div>

@@ -29,6 +29,7 @@ export const AppTemplateItem = ({
         classname,
         "w-full p-4 text-left flex items-center",
         "border rounded transition-all",
+        "shadow-sm",
         theme.text1,
         theme.bgInputHover,
         !disabled && theme.focusInput,
