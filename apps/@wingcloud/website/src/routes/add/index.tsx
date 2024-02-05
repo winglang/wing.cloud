@@ -132,7 +132,7 @@ export const Component = () => {
               Add a new app
             </div>
             <div className={clsx("text-sm", theme.text3)}>
-              Choose how you want to add your new app.
+              Connect a Git repository to create a new app.
             </div>
           </div>
 
@@ -147,7 +147,7 @@ export const Component = () => {
             >
               <div className="space-y-8">
                 <div className="w-full space-y-4">
-                  <div className={clsx("text-lg font-semibold", theme.text2)}>
+                  <div className={clsx("text-lg font-semibold", theme.text1)}>
                     Connect Git Repository
                   </div>
                   <div className="w-full relative space-y-4">
@@ -205,7 +205,7 @@ export const Component = () => {
             >
               <div className="space-y-8">
                 <div className="mb-4 flex flex-col w-full space-y-4">
-                  <div className={clsx("text-lg font-semibold", theme.text2)}>
+                  <div className={clsx("text-lg font-semibold", theme.text1)}>
                     Clone Template
                   </div>
                   <div className="w-full">
