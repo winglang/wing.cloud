@@ -30,10 +30,7 @@ export const Menu = ({
       <HeadlessMenu as="div" className="relative inline-block text-left">
         <div>
           <HeadlessMenu.Button
-            className={clsx(
-              "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
-              btnClassName,
-            )}
+            className={clsx(btnClassName, theme.focusInput)}
             onClick={(event) => {
               onClick?.(event);
             }}
@@ -54,7 +51,7 @@ export const Menu = ({
           <HeadlessMenu.Items
             className={clsx(
               "absolute right-0 mt-2 w-56 origin-top-right",
-              "rounded shadow-lg z-10",
+              "rounded shadow-lg z-20",
               "divide-y divide-slate-100 dark:divide-slate-700",
               theme.bgInput,
               theme.focusInput,

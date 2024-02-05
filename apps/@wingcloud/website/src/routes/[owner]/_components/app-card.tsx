@@ -9,24 +9,11 @@ import { GithubIcon } from "../../../icons/github-icon.js";
 import { MenuIcon } from "../../../icons/menu-icon.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import type { App } from "../../../utils/wrpc.js";
+import { RUNTIME_LOGS_ID } from "../[appName]/[branch]/index.js";
 
 import { AppIcon } from "./app-icon.js";
 
-export const AppCard = ({
-  app,
-  owner,
-  onOpenConsole,
-  onOpenLogs,
-  onOpenSettings,
-  onOpenApp,
-}: {
-  app: App;
-  owner: string;
-  onOpenConsole: (event: MouseEvent) => void;
-  onOpenSettings: (event: MouseEvent) => void;
-  onOpenLogs: (event: MouseEvent) => void;
-  onOpenApp: () => void;
-}) => {
+export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
   const { theme } = useTheme();
   const timeAgo = useTimeAgo(app.lastCommitDate || Date.now().toString(), true);
   const navigate = useNavigate();
@@ -47,16 +34,20 @@ export const AppCard = ({
   }, [app]);
 
   return (
-    <button
+    <div
       className={clsx(
         "w-full h-full rounded-md",
         "text-left border",
         theme.bgInput,
         theme.borderInput,
         "shadow-sm hover:shadow",
+        "relative",
       )}
-      onClick={onOpenApp}
     >
+      <Link
+        className={clsx("absolute inset-0 rounded-md z-0", theme.focusInput)}
+        to={`/${owner}/${app.appName}`}
+      />
       <div
         className={clsx(
           "flex items-center gap-x-4 p-4 rounded-t-md",
@@ -87,20 +78,33 @@ export const AppCard = ({
                 )}
               />
             }
-            btnClassName=" flex"
+            btnClassName="flex z-10"
             onClick={(event) => event.stopPropagation()}
             items={[
               {
                 label: "View on Console",
-                onClick: onOpenConsole,
+                onClick: (event: MouseEvent) => {
+                  event.stopPropagation();
+                  navigate(
+                    `/${owner}/${app.appName}/${app.defaultBranch}/console`,
+                  );
+                },
               },
               {
                 label: "View Logs",
-                onClick: onOpenLogs,
+                onClick: (event: MouseEvent) => {
+                  event.stopPropagation();
+                  navigate(
+                    `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
+                  );
+                },
               },
               {
                 label: "Settings",
-                onClick: onOpenSettings,
+                onClick: (event: MouseEvent) => {
+                  event.stopPropagation();
+                  navigate(`/${owner}/${app.appName}/settings`);
+                },
               },
             ]}
           />
@@ -113,11 +117,11 @@ export const AppCard = ({
               <Link
                 className={clsx(
                   "truncate",
-                  "text-xs",
+                  "text-xs font-medium",
                   theme.text2,
                   theme.text2Hover,
-                  "hover:underline",
-                  "font-medium",
+                  theme.focusInput,
+                  "focus:underline hover:underline z-10",
                 )}
                 onClick={(event) => event.stopPropagation()}
                 target="_blank"
@@ -143,7 +147,8 @@ export const AppCard = ({
                   "text-xs",
                   theme.text3,
                   theme.text3Hover,
-                  "hover:underline",
+                  theme.focusInput,
+                  "focus:underline hover:underline z-10",
                 )}
                 target="_blank"
                 to={commitUrl || ""}
@@ -164,7 +169,8 @@ export const AppCard = ({
                     "truncate",
                     "text-xs",
                     theme.text2Hover,
-                    "hover:underline",
+                    theme.focusInput,
+                    "focus:underline hover:underline z-10",
                   )}
                   target="_blank"
                   to={branchUrl}
@@ -177,6 +183,6 @@ export const AppCard = ({
           </div>
         </div>
       </div>
-    </button>
+    </div>
   );
 };

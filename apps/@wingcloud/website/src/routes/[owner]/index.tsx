@@ -106,28 +106,7 @@ const OwnerPage = () => {
           }).map((_, i) => <AppCardSkeleton key={i} />)}
 
         {filteredApps.map((app) => (
-          <AppCard
-            key={app.appId}
-            owner={owner || ""}
-            onOpenApp={() => {
-              navigate(`/${owner}/${app.appName}`);
-            }}
-            onOpenConsole={(event) => {
-              event.stopPropagation();
-              navigate(`/${owner}/${app.appName}/${app.defaultBranch}/console`);
-            }}
-            onOpenLogs={(event) => {
-              event.stopPropagation();
-              navigate(
-                `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
-              );
-            }}
-            onOpenSettings={(event) => {
-              event.stopPropagation();
-              navigate(`/${owner}/${app.appName}/settings`);
-            }}
-            app={app}
-          />
+          <AppCard key={app.appId} owner={owner || ""} app={app} />
         ))}
       </div>
     </div>
