@@ -16,10 +16,6 @@ export const router = createBrowserRouter([
         lazy: () => import("./routes/dashboard.js"),
       },
       {
-        path: "/add/connect",
-        lazy: () => import("./routes/add/connect.js"),
-      },
-      {
         path: "/:owner",
         lazy: () => import("./routes/[owner]/index.js"),
       },
