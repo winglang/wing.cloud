@@ -119,11 +119,11 @@ export const GitRepoSelect = ({
         </div>
       )}
 
-      <div className="h-80 overflow-auto">
+      <div className="h-80">
         {(filteredRepos.length > 0 || loading) && (
           <div
             className={clsx(
-              "flex flex-col overflow-auto rounded-md",
+              "max-h-80 flex flex-col overflow-auto rounded-md",
               "border",
               theme.borderInput,
             )}
