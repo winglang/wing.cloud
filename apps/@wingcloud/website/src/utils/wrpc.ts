@@ -66,7 +66,8 @@ interface StatusReport {
 
 export type EnvironmentStatus =
   | "initializing"
-  | "tests"
+  | "running-server"
+  | "running-tests"
   | "deploying"
   | "running"
   | "error"

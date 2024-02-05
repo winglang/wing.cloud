@@ -28,6 +28,7 @@ struct EnvironmentsProps {
   probotAdapter: adapter.ProbotAdapter;
   siteDomain: str;
   analytics: analytics.SegmentAnalytics;
+  logs: cloud.Bucket;
 }
 
 pub struct CreateEnvironmentOptions {
@@ -99,6 +100,7 @@ pub class EnvironmentManager {
   mrq: queue.MostRecentQueue;
   environmentEvents: cloud.Topic;
   endpointEvents: cloud.Topic;
+  logs: cloud.Bucket;
 
   new(props: EnvironmentsProps) {
     this.apps = props.apps;
@@ -109,6 +111,7 @@ pub class EnvironmentManager {
     this.certificate = props.certificate;
     this.runtimeClient = props.runtimeClient;
     this.probotAdapter = props.probotAdapter;
+    this.logs = props.logs;
 
     this.environmentEvents = new cloud.Topic() as "environment creation events";
     this.endpointEvents = new cloud.Topic() as "endpoint creation events";
@@ -256,6 +259,7 @@ pub class EnvironmentManager {
       appId: options.appId,
       status: "initializing"
     );
+    this.clearEnvironmentData(options.environment);
     this.environmentEvents.publish(Json.stringify(options.environment));
 
     let secrets = this.secretsForEnvironment(options.environment);
@@ -316,6 +320,7 @@ pub class EnvironmentManager {
   pub inflight handleStop(options: StopEnvironmentOptions) {
     let octokit = this.auth(options.environment.installationId);
 
+    this.clearEnvironmentData(options.environment);
     this.environments.updateStatus(id: options.environment.id, appId: options.appId, status: "stopped");
     this.environmentEvents.publish(Json.stringify(options.environment));
 
@@ -405,7 +410,7 @@ pub class EnvironmentManager {
 
   pub inflight updateStatus(options: UpdateEnvironmentStatusOptions) {
     let environment = this.environments.get(id: options.statusReport.environmentId);
-    if options.statusReport.status == "tests" {
+    if options.statusReport.status == "running-server" {
       let testReport = status_reports.TestResults.fromJson(options.statusReport.data);
       this.environments.updateTestResults(
         id: environment.id,
@@ -537,6 +542,17 @@ pub class EnvironmentManager {
         publicEndpoint.delete();
         this.endpoints.delete(id: existingEndpoint.id, environmentId: existingEndpoint.environmentId);
       }
+    }
+  }
+
+  pub inflight clearEnvironmentData(environment: environments.Environment) {
+    this.environments.clearTestResults(id: environment.id, appId: environment.appId);
+
+    this.logs.tryDelete("{environment.id}/deployment.log");
+    this.logs.tryDelete("{environment.id}/runtime.log");
+    let testEntries = this.logs.list("{environment.id}/tests");
+    for entry in testEntries {
+      this.logs.tryDelete(entry);
     }
   }
 }
