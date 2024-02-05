@@ -215,6 +215,7 @@ export const Component = () => {
                         description="Create a new Wing app from a template"
                         icon={<WingIcon className="w-8 h-8 text-[#8bc6bc]" />}
                         disabled
+                        classname="opacity-50 cursor-default"
                       />
                       <AppTemplateItem
                         name="TypeScript"
@@ -223,6 +224,7 @@ export const Component = () => {
                           <TypeScriptIcon className="w-8 h-8 text-[#2f74c0]" />
                         }
                         disabled
+                        classname="opacity-50 cursor-default"
                       />
                       <AppTemplateItem
                         name="More coming soon!"
