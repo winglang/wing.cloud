@@ -260,6 +260,16 @@ pub class EnvironmentManager {
       status: "initializing"
     );
 
+    if options.environment.type == "production" {
+      this.apps.updateStatus(
+        appId: options.appId,
+        appName: app.appName,
+        repoId: app.repoId,
+        userId: app.userId,
+        status: "initializing"
+      );
+    }
+
     this.clearEnvironmentData(options.environment);
     this.environmentEvents.publish(Json.stringify(options.environment));
 
@@ -325,6 +335,17 @@ pub class EnvironmentManager {
 
     this.clearEnvironmentData(options.environment);
     this.environments.updateStatus(id: options.environment.id, appId: options.appId, status: status);
+
+    if options.environment.type == "production" {
+      let app = this.apps.get(appId: options.appId);
+      this.apps.updateStatus(
+        appId: app.appId,
+        appName: app.appName,
+        repoId: app.repoId,
+        userId: app.userId,
+        status: status
+      );
+    }
 
     this.environmentEvents.publish(Json.stringify(options.environment));
 
@@ -394,6 +415,16 @@ pub class EnvironmentManager {
         appId: environment.appId,
         status: status
       );
+
+      if environment.type == "production" {
+        this.apps.updateStatus(
+          appId: environment.appId,
+          appName: app.appName,
+          repoId: app.repoId,
+          userId: app.userId,
+          status: status
+        );
+      }
 
       this.environmentEvents.publish(Json.stringify(environment));
 
