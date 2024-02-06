@@ -89,6 +89,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
         className={clsx("absolute inset-0 rounded-md z-0", theme.focusInput)}
         to={`/${owner}/${app.appName}`}
       />
+
       <div
         className={clsx(
           "flex items-center gap-x-4 p-4 rounded-t-md",
@@ -109,6 +110,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
         >
           {app.appName}
         </Link>
+
         <div className="flex flex-grow justify-end">
           <Menu
             icon={
@@ -126,6 +128,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
           />
         </div>
       </div>
+
       <div className="p-4 space-y-4">
         <Link
           className={clsx(
@@ -150,6 +153,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
             </div>
           </div>
         </Link>
+
         <div className="leading-6 space-y-1">
           <div className="flex justify-between gap-x-4">
             <div className="flex gap-x-2 truncate">
@@ -171,6 +175,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
               </Link>
             </div>
           </div>
+
           <div className="flex justify-between gap-x-4">
             <div className="flex grow gap-x-1 truncate">
               <div className={clsx("text-xs", theme.text4)}>{timeAgo} on</div>
