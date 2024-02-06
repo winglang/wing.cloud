@@ -114,6 +114,7 @@ export const GitDataProvider = ({ children }: PropsWithChildren) => {
         isLoading: listInstallationsQuery.isLoading || listReposQuery.isLoading,
         isError: listInstallationsQuery.isError || listReposQuery.isError,
         refetchInstallations: listInstallationsQuery.refetch,
+        refetchRepos: listReposQuery.refetch,
       }}
     >
       {children}
