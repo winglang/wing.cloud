@@ -4,7 +4,7 @@ import { StatusDot } from "../../../components/status-dot.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 
 export interface AppTemplateItemProps {
-  name: string;
+  title?: string;
   description?: string;
   icon?: React.ReactNode;
   disabled?: boolean;
@@ -13,7 +13,7 @@ export interface AppTemplateItemProps {
 }
 
 export const AppTemplateItem = ({
-  name,
+  title,
   description,
   icon,
   disabled,
@@ -42,8 +42,8 @@ export const AppTemplateItem = ({
         <div className={clsx(theme.text1, "w-20 h-20 flex items-center")}>
           {icon}
         </div>
-        <div className="space-y-1">
-          <div className={clsx(theme.text1, "truncate")}>{name}</div>
+        <div className="space-y-1 mt-1">
+          <div className={clsx(theme.text1, "truncate text-sm")}>{title}</div>
           <div className={clsx("text-xs", theme.text2)}>{description}</div>
         </div>
       </div>

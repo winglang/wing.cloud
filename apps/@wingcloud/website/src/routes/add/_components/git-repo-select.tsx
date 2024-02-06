@@ -59,7 +59,7 @@ export const GitRepoSelect = ({
         used: apps.some((app) => app.repoId === repo.full_name),
       };
     });
-  }, [apps]);
+  }, [repos, apps]);
 
   const filteredRepos = useMemo(() => {
     return repoItems.filter((repo) => {
