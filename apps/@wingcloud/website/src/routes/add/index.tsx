@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { App } from "../../app.js";
 import { ErrorBoundary } from "../../components/error-boundary.js";
 import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
@@ -140,7 +141,7 @@ export const Component = () => {
                   <div className="w-full relative space-y-4">
                     {createAppLoading && (
                       <div className="absolute inset-0 flex items-center justify-center z-10">
-                        <div className="absolute inset-0 bg-white dark:bg-slate-900 opacity-50" />
+                        <div className="absolute inset-0 bg-white dark:bg-gray-900 opacity-50" />
                         <SpinnerLoader className="z-20" />
                       </div>
                     )}
@@ -156,7 +157,7 @@ export const Component = () => {
                       disabled={createAppLoading}
                     />
 
-                    <div className="text-xs flex gap-1 items-center pt-4 border-t border-slate-200">
+                    <div className="text-xs flex gap-1 items-center pt-4 border-t border-gray-200">
                       <span className={clsx(theme.text1)}>
                         Missing a repository?
                       </span>

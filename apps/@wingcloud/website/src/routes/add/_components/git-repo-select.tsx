@@ -3,9 +3,10 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 
 import { SpinnerLoader } from "../../../components/spinner-loader.js";
+import { AppsDataProviderContext } from "../../../data-store/apps-data-provider.js";
 import { Input } from "../../../design-system/input.js";
 import { Select } from "../../../design-system/select.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
@@ -23,6 +24,10 @@ export interface GitRepoSelectProps {
   disabled?: boolean;
 }
 
+interface RepoItem extends Repository {
+  used: boolean;
+}
+
 export const GitRepoSelect = ({
   installationId,
   setInstallationId,
@@ -36,6 +41,7 @@ export const GitRepoSelect = ({
   const { theme } = useTheme();
 
   const [search, setSearch] = useState("");
+  const { apps } = useContext(AppsDataProviderContext);
 
   const installationPlaceholder = useMemo(() => {
     if (loading && installations.length === 0) {
@@ -46,8 +52,17 @@ export const GitRepoSelect = ({
     }
   }, [loading, installations.length]);
 
+  const repoItems = useMemo(() => {
+    return repos.map((repo) => {
+      return {
+        ...repo,
+        used: apps.some((app) => app.repoId === repo.full_name),
+      };
+    });
+  }, [apps]);
+
   const filteredRepos = useMemo(() => {
-    return repos.filter((repo) => {
+    return repoItems.filter((repo) => {
       if (search === "") {
         return true;
       }
@@ -55,7 +70,7 @@ export const GitRepoSelect = ({
         .toLocaleLowerCase()
         .includes(search.toLocaleLowerCase());
     });
-  }, [repos, search]);
+  }, [repoItems, search]);
 
   return (
     <div className="w-full space-y-4">
@@ -128,19 +143,19 @@ export const GitRepoSelect = ({
               theme.borderInput,
             )}
           >
-            <div className="divide-y divide-slate-200 dark:divide-slate-700 rounded-md">
+            <div className="divide-y divide-gray-100 dark:divide-gray-700 rounded-md">
               {filteredRepos.map((repo) => (
                 <div
-                  aria-disabled={disabled}
+                  aria-disabled={disabled || repo.used}
                   key={repo.id}
                   className={clsx(
                     theme.text1,
                     "text-xs px-4 py-4 gap-1",
                     "w-full text-left flex items-center",
                     "transition-all outline-none focus:outline-none",
-                    "focus:bg-slate-50 dark:focus:bg-slate-750",
+                    "focus:bg-gray-50 dark:focus:bg-gray-750",
                     repositoryId === repo.full_name &&
-                      "bg-slate-50 dark:bg-slate-750",
+                      "bg-gray-50 dark:bg-gray-750",
                     repositoryId !== repo.full_name && theme.bgInput,
                     disabled && "opacity-50 cursor-not-allowed",
                   )}
@@ -162,15 +177,17 @@ export const GitRepoSelect = ({
                       className={clsx(
                         "rounded px-2 py-1 border text-xs",
                         theme.borderInput,
-                        theme.bgInputHover,
                         theme.textInput,
+                        disabled || repo.used
+                          ? "opacity-40"
+                          : [theme.bgInputHover],
                       )}
                       onClick={() => {
                         setRepositoryId(repo.full_name);
                       }}
-                      disabled={disabled}
+                      disabled={disabled || repo.used}
                     >
-                      Connect
+                      {repo.used ? "Connected" : "Connect"}
                     </button>
                   </div>
                 </div>

@@ -105,6 +105,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
             theme.text1,
             theme.text1Hover,
             "hover:underline z-10 cursor-pointer",
+            "truncate",
           )}
           to={`/${owner}/${app.appName}`}
         >
@@ -130,29 +131,29 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
       </div>
 
       <div className="p-4 space-y-4">
-        <Link
-          className={clsx(
-            "flex grow gap-x-2 truncate",
-            "truncate",
-            "text-xs font-medium",
-            theme.text2,
-            theme.text2Hover,
-            theme.focusInput,
-          )}
-          onClick={(event) => event.stopPropagation()}
-          target="_blank"
-          to={projectUrl}
-        >
-          <div className="flex grow gap-x-2 truncate items-center z-10 group">
+        <div className="flex grow gap-x-2">
+          <Link
+            className={clsx(
+              "truncate",
+              "text-xs font-medium",
+              "flex gap-x-2 truncate items-center z-10 group",
+              theme.text2,
+              theme.text2Hover,
+              theme.focusInput,
+            )}
+            onClick={(event) => event.stopPropagation()}
+            target="_blank"
+            to={projectUrl}
+          >
             <GithubIcon className="w-4 h-4 shrink-0" />
             <div className="truncate group-hover:underline group-focus:underline">
               {app.repoOwner}/{app.repoName}
             </div>
-            <div className="flex grow justify-end">
-              {app.status && <StatusPill status={app.status} />}
-            </div>
+          </Link>
+          <div className="flex grow justify-end">
+            {app.status && <StatusPill status={app.status} />}
           </div>
-        </Link>
+        </div>
 
         <div className="leading-6 space-y-1">
           <div className="flex justify-between gap-x-4">
