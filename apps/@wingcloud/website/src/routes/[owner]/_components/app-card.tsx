@@ -173,24 +173,28 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
               {app.lastCommitDate && (
                 <div className={clsx("text-xs", theme.text4)}>{timeAgo} on</div>
               )}
-              <div className={clsx("flex grow text-xs truncate", theme.text2)}>
-                <BranchIcon className="w-4 h-4 shrink-0" />
-                <Link
-                  className={clsx(
-                    "flex-grow",
-                    "truncate",
-                    "text-xs",
-                    theme.text2Hover,
-                    theme.focusInput,
-                    "focus:underline hover:underline z-10",
-                  )}
-                  target="_blank"
-                  to={branchUrl}
-                  onClick={(event) => event.stopPropagation()}
+              {app.defaultBranch && (
+                <div
+                  className={clsx("flex grow text-xs truncate", theme.text2)}
                 >
-                  {app.defaultBranch}
-                </Link>
-              </div>
+                  <BranchIcon className="w-4 h-4 shrink-0" />
+                  <Link
+                    className={clsx(
+                      "flex-grow",
+                      "truncate",
+                      "text-xs",
+                      theme.text2Hover,
+                      theme.focusInput,
+                      "focus:underline hover:underline z-10",
+                    )}
+                    target="_blank"
+                    to={branchUrl}
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    {app.defaultBranch}
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

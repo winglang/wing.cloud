@@ -12,7 +12,7 @@ pub struct App {
   userId: str;
   entrypoint: str;
   createdAt: str;
-  defaultBranch: str;
+  defaultBranch: str?;
   lastCommitMessage: str?;
   lastCommitDate: str?;
   lastCommitSha: str?;
@@ -33,7 +33,7 @@ struct CreateAppOptions {
   userId: str;
   entrypoint: str;
   createdAt: str;
-  defaultBranch: str;
+  defaultBranch: str?;
   lastCommitMessage: str?;
   lastCommitDate: str?;
   lastCommitSha: str?;
