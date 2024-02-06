@@ -40,15 +40,6 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
   const menuItems = useMemo(() => {
     var items = [
       {
-        label: "View Logs",
-        onClick: (event: MouseEvent) => {
-          event.stopPropagation();
-          navigate(
-            `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
-          );
-        },
-      },
-      {
         label: "Settings",
         onClick: (event: MouseEvent) => {
           event.stopPropagation();
@@ -57,17 +48,25 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
       },
     ];
 
-    if (app.status === "running") {
-      items = [
-        {
+    if (app.defaultBranch) {
+      items.push({
+        label: "View Logs",
+        onClick: (event: MouseEvent) => {
+          event.stopPropagation();
+          navigate(
+            `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
+          );
+        },
+      });
+      if (app.status === "running") {
+        items.push({
           label: `View in Console`,
           onClick: (event: MouseEvent) => {
             event.stopPropagation();
             navigate(`/${owner}/${app.appName}/${app.defaultBranch}/console`);
           },
-        },
-        ...items,
-      ];
+        });
+      }
     }
 
     return items;
