@@ -12,9 +12,10 @@ import { Header } from "../../components/header.js";
 import { AppsDataProviderContext } from "../../data-store/apps-data-provider.js";
 import { Button } from "../../design-system/button.js";
 import { Input } from "../../design-system/input.js";
-import { SkeletonLoader } from "../../design-system/skeleton-loader.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 
+import { RUNTIME_LOGS_ID } from "./[appName]/[branch]/index.js";
+import { AppCardSkeleton } from "./_components/app-card-skeleton.js";
 import { AppCard } from "./_components/app-card.js";
 
 const OwnerPage = () => {
@@ -101,23 +102,11 @@ const OwnerPage = () => {
         {isLoading &&
           Array.from({
             length:
-              apps.length > 0 ? apps.length : Math.floor(Math.random() * 5) + 3,
-          }).map((_, i) => (
-            <SkeletonLoader
-              key={i}
-              className={clsx("w-full h-20 rounded border", theme.borderInput)}
-              loading
-            />
-          ))}
+              apps.length > 0 ? apps.length : Math.floor(Math.random() * 4) + 3,
+          }).map((_, i) => <AppCardSkeleton key={i} />)}
 
         {filteredApps.map((app) => (
-          <AppCard
-            key={app.appId}
-            onClick={() => {
-              navigate(`/${owner}/${app.appName}`);
-            }}
-            app={app}
-          />
+          <AppCard key={app.appId} owner={owner || ""} app={app} />
         ))}
       </div>
     </div>

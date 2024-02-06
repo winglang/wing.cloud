@@ -42,8 +42,15 @@ struct Repository {
   default_branch: str;
 }
 
+struct Author {
+  name: str?;
+  email: str?;
+  date: str?;
+}
+
 struct Commit {
   message: str;
+  author: Author;
 }
 
 struct CommitResponse {

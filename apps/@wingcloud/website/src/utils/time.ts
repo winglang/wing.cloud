@@ -27,24 +27,35 @@ export const getTime = (datetime: string) => {
   });
 };
 
-const getTimeFromNow = (datetime: string) => {
+const getTimeFromNow = (datetime: string, short: boolean = false) => {
   const date = new Date(datetime);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
 
   if (hours > 24) {
-    return getDateTime(datetime);
+    if (short) {
+      return `${days}d ago`;
+    }
+    const label = days === 1 ? "day" : "days";
+    return `${days} ${label}  ago`;
   }
 
   if (hours > 0) {
+    if (short) {
+      return `${hours}h ago`;
+    }
     const label = hours === 1 ? "hour" : "hours";
     return `${hours} ${label} ago`;
   }
 
   if (minutes > 0) {
+    if (short) {
+      return `${minutes}m ago`;
+    }
     const label = minutes === 1 ? "minute" : "minutes";
     return `${minutes} ${label} ago`;
   }
@@ -52,8 +63,8 @@ const getTimeFromNow = (datetime: string) => {
   return "just now";
 };
 
-export const useTimeAgo = (datetime: string) => {
-  const [time, setTime] = useState(getTimeFromNow(datetime));
+export const useTimeAgo = (datetime: string, short: boolean = false) => {
+  const [time, setTime] = useState(getTimeFromNow(datetime, short));
 
   useEffect(() => {
     const interval = setInterval(() => {
