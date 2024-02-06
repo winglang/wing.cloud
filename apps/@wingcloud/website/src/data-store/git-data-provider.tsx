@@ -15,8 +15,8 @@ export interface GitDataProviderContext {
   repos: Repository[];
   isLoading: boolean;
   isError: boolean;
-  refetchInstallations: () => Promise<any>;
-  refetchRepos: () => Promise<any>;
+  refetchInstallations: () => Promise<void>;
+  refetchRepos: () => Promise<void>;
 }
 const DEFAULT_CONTEXT: GitDataProviderContext = {
   installationId: undefined,
@@ -50,6 +50,7 @@ export const GitDataProvider = ({ children }: PropsWithChildren) => {
   const listInstallationsQuery =
     wrpc["github.listInstallations"].useInfiniteQuery();
 
+  // TODO: Add a "load more" button to fetch more installations
   useEffect(() => {
     if (!listInstallationsQuery.data?.pages) {
       return;
@@ -64,6 +65,7 @@ export const GitDataProvider = ({ children }: PropsWithChildren) => {
     installationId: installationId!,
   });
 
+  // TODO: Add a "load more" button to fetch more repos
   useEffect(() => {
     if (!listReposQuery.data?.pages) {
       return;
@@ -123,13 +125,13 @@ export const GitDataProvider = ({ children }: PropsWithChildren) => {
         repos,
         isLoading: loading,
         isError: listInstallationsQuery.isError || listReposQuery.isError,
-        refetchInstallations: () => {
+        refetchInstallations: async () => {
           setLoading(true);
           setRepos([]);
-          return listInstallationsQuery.refetch();
+          await listInstallationsQuery.refetch();
         },
-        refetchRepos: () => {
-          return listReposQuery.refetch();
+        refetchRepos: async () => {
+          await listReposQuery.refetch();
         },
       }}
     >
