@@ -40,6 +40,7 @@ export const GitDataProvider = ({ children }: PropsWithChildren) => {
 
   const [installations, setInstallations] = useState<Installation[]>([]);
   const [repos, setRepos] = useState<Repository[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const user = wrpc["auth.check"].useQuery(undefined, {
     throwOnError: false,
@@ -104,6 +105,15 @@ export const GitDataProvider = ({ children }: PropsWithChildren) => {
     }
   }, [installationId, listReposQuery.data]);
 
+  useEffect(() => {
+    // Preveent turning off loading state if refetching
+    if (listInstallationsQuery.isRefetching || listReposQuery.isRefetching) {
+      return;
+    }
+
+    setLoading(listInstallationsQuery.isLoading || listReposQuery.isLoading);
+  }, [listInstallationsQuery, listReposQuery]);
+
   return (
     <GitDataProviderContext.Provider
       value={{
@@ -111,14 +121,14 @@ export const GitDataProvider = ({ children }: PropsWithChildren) => {
         installationId,
         setInstallationId,
         repos,
-        isLoading: listInstallationsQuery.isLoading || listReposQuery.isLoading,
+        isLoading: loading,
         isError: listInstallationsQuery.isError || listReposQuery.isError,
         refetchInstallations: () => {
-          setInstallations([]);
+          setLoading(true);
+          setRepos([]);
           return listInstallationsQuery.refetch();
         },
         refetchRepos: () => {
-          setRepos([]);
           return listReposQuery.refetch();
         },
       }}
