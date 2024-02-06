@@ -24,6 +24,9 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
   }, [app]);
 
   const branchUrl = useMemo(() => {
+    if (!app.defaultBranch) {
+      return `https://github.com/${app.repoOwner}/${app.repoName}`;
+    }
     return `https://github.com/${app.repoOwner}/${app.repoName}/tree/${app.defaultBranch}`;
   }, [app]);
 
@@ -37,15 +40,6 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
   const menuItems = useMemo(() => {
     var items = [
       {
-        label: "View Logs",
-        onClick: (event: MouseEvent) => {
-          event.stopPropagation();
-          navigate(
-            `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
-          );
-        },
-      },
-      {
         label: "Settings",
         onClick: (event: MouseEvent) => {
           event.stopPropagation();
@@ -54,17 +48,25 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
       },
     ];
 
-    if (app.status === "running") {
-      items = [
-        {
+    if (app.defaultBranch) {
+      items.push({
+        label: "View Logs",
+        onClick: (event: MouseEvent) => {
+          event.stopPropagation();
+          navigate(
+            `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
+          );
+        },
+      });
+      if (app.status === "running") {
+        items.push({
           label: `View in Console`,
           onClick: (event: MouseEvent) => {
             event.stopPropagation();
             navigate(`/${owner}/${app.appName}/${app.defaultBranch}/console`);
           },
-        },
-        ...items,
-      ];
+        });
+      }
     }
 
     return items;
@@ -173,24 +175,28 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
               {app.lastCommitDate && (
                 <div className={clsx("text-xs", theme.text4)}>{timeAgo} on</div>
               )}
-              <div className={clsx("flex grow text-xs truncate", theme.text2)}>
-                <BranchIcon className="w-4 h-4 shrink-0" />
-                <Link
-                  className={clsx(
-                    "flex-grow",
-                    "truncate",
-                    "text-xs",
-                    theme.text2Hover,
-                    theme.focusInput,
-                    "focus:underline hover:underline z-10",
-                  )}
-                  target="_blank"
-                  to={branchUrl}
-                  onClick={(event) => event.stopPropagation()}
+              {app.defaultBranch && (
+                <div
+                  className={clsx("flex grow text-xs truncate", theme.text2)}
                 >
-                  {app.defaultBranch}
-                </Link>
-              </div>
+                  <BranchIcon className="w-4 h-4 shrink-0" />
+                  <Link
+                    className={clsx(
+                      "flex-grow",
+                      "truncate",
+                      "text-xs",
+                      theme.text2Hover,
+                      theme.focusInput,
+                      "focus:underline hover:underline z-10",
+                    )}
+                    target="_blank"
+                    to={branchUrl}
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    {app.defaultBranch}
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

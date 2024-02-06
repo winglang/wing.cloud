@@ -44,7 +44,7 @@ export interface App {
   userId: string;
   entrypoint: string;
   createdAt: string;
-  defaultBranch: string;
+  defaultBranch?: string;
   lastCommitMessage?: string;
   lastCommitDate?: string;
   lastCommitSha?: string;
