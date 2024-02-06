@@ -24,10 +24,6 @@ export interface GitRepoSelectProps {
   disabled?: boolean;
 }
 
-interface RepoItem extends Repository {
-  used: boolean;
-}
-
 export const GitRepoSelect = ({
   installationId,
   setInstallationId,

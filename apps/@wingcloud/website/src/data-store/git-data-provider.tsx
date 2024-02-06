@@ -62,6 +62,7 @@ export const GitDataProvider = ({ children }: PropsWithChildren) => {
   const listReposQuery = wrpc["github.listRepositories"].useInfiniteQuery({
     installationId: installationId!,
   });
+
   useEffect(() => {
     if (!listReposQuery.data?.pages) {
       return;
@@ -70,6 +71,7 @@ export const GitDataProvider = ({ children }: PropsWithChildren) => {
     setRepos(listReposQuery.data.pages.flatMap((page) => page.data));
   }, [listReposQuery.data]);
 
+  // Set the default installation id after fetching installations
   useEffect(() => {
     const installations = listInstallationsQuery.data?.pages?.flatMap(
       (page) => page.data,
@@ -77,11 +79,11 @@ export const GitDataProvider = ({ children }: PropsWithChildren) => {
     if (!installations || installations.length === 0) {
       return;
     }
-    const mainInstallation = installations.find(
+    const defaultInstallationId = installations.find(
       (installation) => installation.account.login === user.data?.user.username,
     );
-    if (mainInstallation) {
-      setInstallationId(mainInstallation.id.toString());
+    if (defaultInstallationId) {
+      setInstallationId(defaultInstallationId.id.toString());
       return;
     }
     const firstInstallationId = installations[0]?.id.toString();
@@ -91,18 +93,16 @@ export const GitDataProvider = ({ children }: PropsWithChildren) => {
   }, [listInstallationsQuery.data, user.data]);
 
   useEffect(() => {
-    if (!listReposQuery.data?.pages) {
+    if (!installationId) {
       return;
     }
-    listReposQuery.fetchNextPage();
-  }, [listReposQuery.data]);
+    const repos = listReposQuery.data?.pages.flatMap((page) => page.data);
 
-  // If installation id was changed, refetch repos. Needed in case the user didn't have access to any repo before.
-  useEffect(() => {
-    if (installationId) {
-      listReposQuery.refetch();
+    // clean up repos if installationId changes and no repos are found for the new installationId
+    if (!repos) {
+      setRepos([]);
     }
-  }, [installationId]);
+  }, [installationId, listReposQuery.data]);
 
   return (
     <GitDataProviderContext.Provider
@@ -113,8 +113,14 @@ export const GitDataProvider = ({ children }: PropsWithChildren) => {
         repos,
         isLoading: listInstallationsQuery.isLoading || listReposQuery.isLoading,
         isError: listInstallationsQuery.isError || listReposQuery.isError,
-        refetchInstallations: listInstallationsQuery.refetch,
-        refetchRepos: listReposQuery.refetch,
+        refetchInstallations: () => {
+          setInstallations([]);
+          return listInstallationsQuery.refetch();
+        },
+        refetchRepos: () => {
+          setRepos([]);
+          return listReposQuery.refetch();
+        },
       }}
     >
       {children}
