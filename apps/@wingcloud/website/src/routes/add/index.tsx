@@ -13,13 +13,14 @@ import { useNavigate } from "react-router-dom";
 import { ErrorBoundary } from "../../components/error-boundary.js";
 import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
-import { GitDataProviderContext } from "../../data-store/git-data-provider.js";
+import { InstallationsDataProviderContext } from "../../data-store/installations-data-provider.js";
+import { ReposDataProviderContext } from "../../data-store/repos-data-provider.js";
 import { useNotifications } from "../../design-system/notification.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { TypeScriptIcon } from "../../icons/typescript-icon.js";
 import { WingIcon } from "../../icons/wing-icon.js";
 import { PopupWindowContext } from "../../utils/popup-window-provider.js";
-import { wrpc } from "../../utils/wrpc.js";
+import { wrpc, type Repository } from "../../utils/wrpc.js";
 
 import { AppTemplateItem } from "./_components/app-template-item.js";
 import { GitRepoSelect } from "./_components/git-repo-select.js";
@@ -43,18 +44,45 @@ export const Component = () => {
   const [createAppLoading, setCreateAppLoading] = useState(false);
   const [repositoryId, setRepositoryId] = useState<string>();
 
+  const [loading, setLoading] = useState(true);
+
   const user = wrpc["auth.check"].useQuery();
 
   const {
     installations,
-    refetchInstallations,
     installationId,
     setInstallationId,
-    isLoading,
-    repos,
-    refetchRepos,
-  } = useContext(GitDataProviderContext);
+    isLoading: installationsIsLoading,
+    isFetching: installationsIsFetching,
+    refetch: refetchInstallations,
+  } = useContext(InstallationsDataProviderContext);
 
+  const {
+    repos,
+    isLoading: reposIsLoading,
+    isFetching: reposIsFetching,
+    refetch: refetchRepos,
+  } = useContext(ReposDataProviderContext);
+
+  const [repoItems, setRepoItems] = useState<Repository[]>([]);
+  useEffect(() => {
+    if (repos) {
+      setRepoItems(repos);
+    }
+  }, [repos]);
+
+  useEffect(() => {
+    // Prevent turning off loading state if refetching
+    if (installationsIsFetching || reposIsFetching) {
+      return;
+    }
+    setLoading(installationsIsLoading || reposIsLoading);
+  }, [
+    installationsIsLoading,
+    reposIsLoading,
+    installationsIsFetching,
+    reposIsFetching,
+  ]);
   const selectedRepo = useMemo(() => {
     if (!repos || !repositoryId) {
       return;
@@ -98,6 +126,15 @@ export const Component = () => {
       }
     }
   }, [installationId, selectedRepo, user.data?.user]);
+
+  const onCloseMissingRepoModal = useCallback(async () => {
+    setLoading(true);
+    setRepoItems([]);
+    await refetchInstallations();
+    if (installationId) {
+      refetchRepos();
+    }
+  }, [installationId]);
 
   useEffect(() => {
     setRepositoryId("");
@@ -151,8 +188,8 @@ export const Component = () => {
                       repositoryId={repositoryId || ""}
                       setRepositoryId={setRepositoryId}
                       installations={installations}
-                      repos={repos}
-                      loading={isLoading}
+                      repos={repoItems}
+                      loading={loading}
                       disabled={createAppLoading}
                     />
 
@@ -165,12 +202,7 @@ export const Component = () => {
                         onClick={() =>
                           openPopupWindow({
                             url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
-                            onClose: async () => {
-                              await refetchInstallations();
-                              if (installationId) {
-                                refetchRepos();
-                              }
-                            },
+                            onClose: onCloseMissingRepoModal,
                           })
                         }
                       >
