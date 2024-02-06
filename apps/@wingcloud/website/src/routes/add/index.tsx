@@ -120,7 +120,7 @@ export const Component = () => {
               Add a new app
             </div>
             <div className={clsx("text-sm", theme.text3)}>
-              Connect a Git repository to create a new app.
+              Get started by connecting a Git Repository to create a new app.
             </div>
           </div>
 
