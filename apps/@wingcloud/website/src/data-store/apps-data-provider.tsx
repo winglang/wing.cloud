@@ -12,12 +12,14 @@ import { wrpc } from "../utils/wrpc.js";
 export interface AppsDataProviderContext {
   apps: App[];
   isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
   noApps: boolean;
 }
 const DEFAULT_CONTEXT: AppsDataProviderContext = {
   apps: [],
   isLoading: true,
+  isFetching: false,
   isError: false,
   noApps: true,
 };
@@ -54,13 +56,6 @@ export const AppsDataProvider = ({ children }: PropsWithChildren) => {
     setApps(listAppsQuery.data.apps);
   }, [listAppsQuery.data]);
 
-  const isLoading = useMemo(() => {
-    return (
-      listAppsQuery.isLoading ||
-      (listAppsQuery.data?.apps.length === 0 && listAppsQuery.isFetching)
-    );
-  }, [listAppsQuery]);
-
   const noApps = useMemo(() => {
     return (
       !listAppsQuery.data?.apps.length &&
@@ -74,7 +69,8 @@ export const AppsDataProvider = ({ children }: PropsWithChildren) => {
     <AppsDataProviderContext.Provider
       value={{
         apps,
-        isLoading,
+        isLoading: listAppsQuery.isLoading,
+        isFetching: listAppsQuery.isFetching,
         isError: listAppsQuery.isError,
         noApps,
       }}
