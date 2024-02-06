@@ -33,11 +33,11 @@ struct CreateAppOptions {
   userId: str;
   entrypoint: str;
   createdAt: str;
-  defaultBranch: str?;
+  defaultBranch: str;
+  status: str;
   lastCommitMessage: str?;
   lastCommitDate: str?;
   lastCommitSha: str?;
-  status: str?;
 }
 
 struct GetAppOptions {
@@ -119,10 +119,10 @@ pub class Apps {
         entrypoint: options.entrypoint,
         createdAt: options.createdAt,
         defaultBranch: options.defaultBranch,
-        lastCommitMessage: options.lastCommitMessage,
-        lastCommitDate: options.lastCommitDate,
-        lastCommitSha: options.lastCommitSha,
         status: options.status,
+        lastCommitMessage: options.lastCommitMessage ?? "",
+        lastCommitDate: options.lastCommitDate ?? "",
+        lastCommitSha: options.lastCommitSha ?? "",
       };
     };
 

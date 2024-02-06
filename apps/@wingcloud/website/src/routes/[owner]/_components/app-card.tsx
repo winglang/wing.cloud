@@ -32,7 +32,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
 
   const commitUrl = useMemo(() => {
     if (!app.lastCommitSha) {
-      return;
+      return `https://github.com/${app.repoOwner}/${app.repoName}`;
     }
     return `https://github.com/${app.repoOwner}/${app.repoName}/commit/${app.lastCommitSha}`;
   }, [app]);
@@ -152,7 +152,6 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
           <div className="flex justify-between gap-x-4">
             <div className="flex gap-x-2 truncate">
               <Link
-                aria-disabled={!commitUrl}
                 className={clsx(
                   "truncate",
                   "text-xs",
@@ -162,7 +161,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
                   "focus:underline hover:underline z-10",
                 )}
                 target="_blank"
-                to={commitUrl || ""}
+                to={commitUrl}
                 onClick={(event) => event.stopPropagation()}
                 title="View commit on GitHub"
               >
