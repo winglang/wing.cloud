@@ -71,59 +71,6 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
 
     return items;
   }, [app, owner]);
-  const timeAgo = useTimeAgo(app.lastCommitDate || Date.now().toString(), true);
-  const navigate = useNavigate();
-
-  const projectUrl = useMemo(() => {
-    return `https://github.com/${app.repoOwner}/${app.repoName}`;
-  }, [app]);
-
-  const branchUrl = useMemo(() => {
-    return `https://github.com/${app.repoOwner}/${app.repoName}/tree/${app.defaultBranch}`;
-  }, [app]);
-
-  const commitUrl = useMemo(() => {
-    if (!app.lastCommitSha) {
-      return;
-    }
-    return `https://github.com/${app.repoOwner}/${app.repoName}/commit/${app.lastCommitSha}`;
-  }, [app]);
-
-  const menuItems = useMemo(() => {
-    var items = [
-      {
-        label: "View Logs",
-        onClick: (event: MouseEvent) => {
-          event.stopPropagation();
-          navigate(
-            `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
-          );
-        },
-      },
-      {
-        label: "Settings",
-        onClick: (event: MouseEvent) => {
-          event.stopPropagation();
-          navigate(`/${owner}/${app.appName}/settings`);
-        },
-      },
-    ];
-
-    if (app.status === "running") {
-      items = [
-        {
-          label: `View on Console`,
-          onClick: (event: MouseEvent) => {
-            event.stopPropagation();
-            navigate(`/${owner}/${app.appName}/${app.defaultBranch}/console`);
-          },
-        },
-        ...items,
-      ];
-    }
-
-    return items;
-  }, [app, owner]);
 
   return (
     <div
