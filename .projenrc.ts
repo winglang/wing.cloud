@@ -362,11 +362,11 @@ infrastructure.addDeps(
 infrastructure.addDeps("cookie-es");
 infrastructure.addDeps("jose@4");
 infrastructure.addDeps("octokit", "node-fetch");
-infrastructure.addDeps("@aws-sdk/client-kms");
 infrastructure.addDeps("dnsimple");
 infrastructure.addDeps("@segment/analytics-node");
-infrastructure.addDeps("@aws-sdk/client-sqs");
-infrastructure.addDeps("@aws-sdk/client-ssm");
+infrastructure.addDeps("@aws-sdk/client-kms@3.449.0");
+infrastructure.addDeps("@aws-sdk/client-sqs@3.449.0");
+infrastructure.addDeps("@aws-sdk/client-ssm@3.449.0");
 
 infrastructure.addDevDeps("@octokit/rest");
 
