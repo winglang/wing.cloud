@@ -3,10 +3,13 @@ import {
   type PropsWithChildren,
   useEffect,
   useState,
+  useContext,
 } from "react";
 
-import type { App, Installation, Repository } from "../utils/wrpc.js";
+import type { Installation } from "../utils/wrpc.js";
 import { wrpc } from "../utils/wrpc.js";
+
+import { AuthDataProviderContext } from "./auth-data-provider.js";
 
 export interface InstallationsDataProviderContext {
   installationId?: string;
@@ -37,10 +40,7 @@ export const InstallationsDataProvider = ({ children }: PropsWithChildren) => {
 
   const [installations, setInstallations] = useState<Installation[]>([]);
 
-  const user = wrpc["auth.check"].useQuery(undefined, {
-    throwOnError: false,
-    retry: false,
-  });
+  const { user } = useContext(AuthDataProviderContext);
 
   const listInstallationsQuery =
     wrpc["github.listInstallations"].useInfiniteQuery();
@@ -65,7 +65,7 @@ export const InstallationsDataProvider = ({ children }: PropsWithChildren) => {
       return;
     }
     const defaultInstallationId = installations.find(
-      (installation) => installation.account.login === user.data?.user.username,
+      (installation) => installation.account.login === user?.username,
     );
     if (defaultInstallationId) {
       setInstallationId(defaultInstallationId.id.toString());
@@ -75,7 +75,7 @@ export const InstallationsDataProvider = ({ children }: PropsWithChildren) => {
     if (firstInstallationId) {
       setInstallationId(firstInstallationId);
     }
-  }, [listInstallationsQuery.data, user.data]);
+  }, [listInstallationsQuery.data, user]);
 
   return (
     <InstallationsDataProviderContext.Provider
