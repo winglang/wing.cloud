@@ -16,16 +16,14 @@ export interface ReposDataProviderContext {
   isLoading: boolean;
   isFetching: boolean;
   isError: boolean;
-  refetch: () => Promise<void>;
+  refetch: () => void;
 }
 const DEFAULT_CONTEXT: ReposDataProviderContext = {
   repos: [],
   isLoading: true,
   isError: false,
   isFetching: false,
-  refetch: () => {
-    return Promise.resolve();
-  },
+  refetch: () => {},
 };
 export const ReposDataProviderContext =
   createContext<ReposDataProviderContext>(DEFAULT_CONTEXT);
@@ -70,9 +68,7 @@ const InternalReposDataProvider = ({
         isLoading: listReposQuery.isLoading,
         isFetching: listReposQuery.isRefetching,
         isError: listReposQuery.isError,
-        refetch: async () => {
-          await listReposQuery.refetch();
-        },
+        refetch: listReposQuery.refetch,
       }}
     >
       {children}
