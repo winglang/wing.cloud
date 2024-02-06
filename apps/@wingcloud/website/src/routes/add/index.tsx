@@ -10,7 +10,6 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { App } from "../../app.js";
 import { ErrorBoundary } from "../../components/error-boundary.js";
 import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
@@ -136,7 +135,7 @@ export const Component = () => {
               <div className="space-y-8">
                 <div className="w-full space-y-4">
                   <div className={clsx("text-lg font-semibold", theme.text1)}>
-                    Connect Git Repository
+                    Connect a Git Repository
                   </div>
                   <div className="w-full relative space-y-4">
                     {createAppLoading && (
