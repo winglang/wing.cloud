@@ -25,7 +25,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
 
   const branchUrl = useMemo(() => {
     if (!app.defaultBranch) {
-      return `https://github.com/${app.repoOwner}/${app.repoName}/tree`;
+      return `https://github.com/${app.repoOwner}/${app.repoName}`;
     }
     return `https://github.com/${app.repoOwner}/${app.repoName}/tree/${app.defaultBranch}`;
   }, [app]);
