@@ -57,7 +57,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
     if (app.status === "running") {
       items = [
         {
-          label: `View on Console`,
+          label: `View in Console`,
           onClick: (event: MouseEvent) => {
             event.stopPropagation();
             navigate(`/${owner}/${app.appName}/${app.defaultBranch}/console`);
@@ -142,9 +142,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
               {app.repoOwner}/{app.repoName}
             </div>
             <div className="flex grow justify-end">
-              {app.status && app.status !== "running" && (
-                <StatusPill status={app.status} />
-              )}
+              {app.status && <StatusPill status={app.status} />}
             </div>
           </div>
         </Link>
