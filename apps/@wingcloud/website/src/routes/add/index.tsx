@@ -213,7 +213,8 @@ export const Component = () => {
                         classname="cursor-default"
                       />
                       <AppTemplateItem
-                        name="More coming soon!"
+                        name=""
+                        description="More coming soon!"
                         icon={<SquaresPlusIcon />}
                         disabled
                         classname="cursor-default"
