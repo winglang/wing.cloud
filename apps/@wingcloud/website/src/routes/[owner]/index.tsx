@@ -22,7 +22,7 @@ const OwnerPage = () => {
   const { theme } = useTheme();
   const { apps, isLoading, isFetching } = useContext(AppsDataProviderContext);
 
-  const skeletonsNumber = useMemo(() => {
+  const numberOfAppSkeletons = useMemo(() => {
     return Math.floor(Math.random() * 3) + 3;
   }, []);
 
@@ -112,7 +112,8 @@ const OwnerPage = () => {
       >
         {loading &&
           Array.from({
-            length: apps && apps?.length > 0 ? apps.length : skeletonsNumber,
+            length:
+              apps && apps?.length > 0 ? apps.length : numberOfAppSkeletons,
           }).map((_, i) => <AppCardSkeleton key={i} />)}
 
         {filteredApps.map((app) => (
