@@ -142,7 +142,7 @@ pub class ProbotApp {
           if environment.branch != branch || environment.status == "stopped" {
             continue;
           }
-          
+
           let time = datetime.fromIso(context.payload.pull_request.closed_at ?? datetime.utcNow().toIso());
           this.environmentManager.stop(
             appId: app.appId,
@@ -185,6 +185,16 @@ pub class ProbotApp {
           if environment.branch != branch || environment.status == "stopped" || environment.type != "production" {
             continue;
           }
+
+          this.apps.updatLastCommit(
+            appId: app.appId,
+            appName: app.appName,
+            repoId: app.repoId,
+            userId: app.userId,
+            lastCommitMessage: context.payload.head_commit.message,
+            lastCommitSha: context.payload.after,
+            lastCommitDate: context.payload.head_commit.committer.date,
+          );
 
           this.environmentManager.restart(
             environment: environment,

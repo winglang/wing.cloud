@@ -9,6 +9,8 @@ import { useContext, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 
 import { AppsDataProvider } from "./data-store/apps-data-provider.js";
+import { InstallationsDataProvider } from "./data-store/installations-data-provider.js";
+import { ReposDataProvider } from "./data-store/repos-data-provider.js";
 import { NotificationsProvider } from "./design-system/notification.js";
 import { DefaultTheme, ThemeProvider } from "./design-system/theme-provider.js";
 import { router } from "./router.jsx";
@@ -65,7 +67,11 @@ export const App = () => {
               <NotificationsProvider>
                 <PopupWindowProvider>
                   <AppsDataProvider>
-                    <RouterProvider router={router} />
+                    <InstallationsDataProvider>
+                      <ReposDataProvider>
+                        <RouterProvider router={router} />
+                      </ReposDataProvider>
+                    </InstallationsDataProvider>
                   </AppsDataProvider>
                 </PopupWindowProvider>
               </NotificationsProvider>

@@ -4,7 +4,7 @@ import {
   PlusIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../components/error-boundary.js";
@@ -12,15 +12,27 @@ import { Header } from "../../components/header.js";
 import { AppsDataProviderContext } from "../../data-store/apps-data-provider.js";
 import { Button } from "../../design-system/button.js";
 import { Input } from "../../design-system/input.js";
-import { SkeletonLoader } from "../../design-system/skeleton-loader.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 
+import { AppCardSkeleton } from "./_components/app-card-skeleton.js";
 import { AppCard } from "./_components/app-card.js";
 
 const OwnerPage = () => {
   const { owner } = useParams();
   const { theme } = useTheme();
-  const { apps, isLoading } = useContext(AppsDataProviderContext);
+  const { apps, isLoading, isFetching, noApps } = useContext(
+    AppsDataProviderContext,
+  );
+
+  const loading = useMemo(() => {
+    return isLoading || (apps.length === 0 && isFetching);
+  }, [isLoading, isFetching, apps.length]);
+
+  useEffect(() => {
+    if (noApps) {
+      navigate("/add");
+    }
+  }, [noApps]);
 
   const navigate = useNavigate();
 
@@ -66,7 +78,7 @@ const OwnerPage = () => {
         )}
       </div>
 
-      {!isLoading && filteredApps.length === 0 && (
+      {!loading && !noApps && filteredApps.length === 0 && (
         <div className="text-center">
           <FolderPlusIcon className={clsx("w-12 h-12 mx-auto", theme.text2)} />
           <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
@@ -98,26 +110,14 @@ const OwnerPage = () => {
           "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
         )}
       >
-        {isLoading &&
+        {(loading || noApps) &&
           Array.from({
             length:
-              apps.length > 0 ? apps.length : Math.floor(Math.random() * 5) + 3,
-          }).map((_, i) => (
-            <SkeletonLoader
-              key={i}
-              className={clsx("w-full h-20 rounded border", theme.borderInput)}
-              loading
-            />
-          ))}
+              apps.length > 0 ? apps.length : Math.floor(Math.random() * 4) + 3,
+          }).map((_, i) => <AppCardSkeleton key={i} />)}
 
         {filteredApps.map((app) => (
-          <AppCard
-            key={app.appId}
-            onClick={() => {
-              navigate(`/${owner}/${app.appName}`);
-            }}
-            app={app}
-          />
+          <AppCard key={app.appId} owner={owner || ""} app={app} />
         ))}
       </div>
     </div>

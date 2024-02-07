@@ -3,8 +3,8 @@ import clsx from "clsx";
 import { StatusDot } from "../../../components/status-dot.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 
-export interface AppConfigurationListItemProps {
-  name: string;
+export interface AppTemplateItemProps {
+  title?: string;
   description?: string;
   icon?: React.ReactNode;
   disabled?: boolean;
@@ -12,14 +12,14 @@ export interface AppConfigurationListItemProps {
   classname?: string;
 }
 
-export const AppConfigurationListItem = ({
-  name,
+export const AppTemplateItem = ({
+  title,
   description,
   icon,
   disabled,
   onClick,
   classname,
-}: AppConfigurationListItemProps) => {
+}: AppTemplateItemProps) => {
   const { theme } = useTheme();
 
   return (
@@ -27,23 +27,23 @@ export const AppConfigurationListItem = ({
       aria-disabled={disabled}
       className={clsx(
         classname,
-        "w-full p-4 text-left flex items-center",
+        "justify-center p-4 text-center flex items-center",
         "border rounded transition-all",
+        "shadow-sm",
         theme.text1,
-        theme.bgInputHover,
-        !disabled && theme.focusInput,
+        !disabled && [theme.focusInput, theme.bgInputHover],
         theme.bgInput,
         theme.borderInput,
       )}
       onClick={onClick}
     >
-      <div className="flex gap-x-4 items-center h-full">
-        <div className={clsx(theme.text1)}>{icon}</div>
-        <div>
-          <div className={clsx(theme.text1)}>{name}</div>
-          <div className={clsx("text-xs items-end", theme.text2)}>
-            {description}
-          </div>
+      <div className="flex flex-col items-center h-full justify-center p-4">
+        <div className={clsx(theme.text1, "w-20 h-20 flex items-center")}>
+          {icon}
+        </div>
+        <div className="space-y-1 mt-1">
+          <div className={clsx(theme.text1, "truncate text-sm")}>{title}</div>
+          <div className={clsx("text-xs", theme.text2)}>{description}</div>
         </div>
       </div>
     </button>

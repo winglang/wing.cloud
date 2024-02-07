@@ -33,6 +33,17 @@ struct IPullRequestInstallation {
   id: num;
 }
 
+struct ICommitter {
+  date: str;
+  name: str;
+  email: str;
+}
+
+struct IHeadCommit {
+  committer: ICommitter;
+  message: str;
+}
+
 struct IPullRequestPayload {
   number: num;
   repository: IProbotRepository;
@@ -60,6 +71,7 @@ struct IPushPayload {
   installation: IPullRequestInstallation?;
   after: str;
   ref: str;
+  head_commit: IHeadCommit;
 }
 
 pub struct IPushContext extends IContext {
@@ -74,8 +86,8 @@ pub struct VerifyAndReceieveProps {
 }
 
 pub interface IProbotWebhooks {
-  inflight on(name: str, handler: inflight (): void);
-  inflight verifyAndReceive(props: VerifyAndReceieveProps);
+  inflight on(name: str, handler: inflight (): void): void;
+  inflight verifyAndReceive(props: VerifyAndReceieveProps): void;
 }
 
 pub interface IProbotAuth {

@@ -4,7 +4,6 @@ import {
   type MutationProcedure,
   type QueryProcedure,
   type PaginatedResponse,
-  type SubscriptionProcedure,
 } from "@wingcloud/wrpc";
 
 export interface User {
@@ -29,6 +28,12 @@ export interface Repository {
   default_branch: string;
 }
 
+interface Commit {
+  sha: string;
+  message: string;
+  date: string;
+}
+
 export interface App {
   appId: string;
   appName: string;
@@ -38,6 +43,12 @@ export interface App {
   repoOwner: string;
   userId: string;
   entrypoint: string;
+  createdAt: string;
+  defaultBranch?: string;
+  lastCommitMessage?: string;
+  lastCommitDate?: string;
+  lastCommitSha?: string;
+  status?: string;
 }
 
 export interface TestResult {

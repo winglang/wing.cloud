@@ -1,12 +1,13 @@
 import { Menu as HeadlessMenu, Transition } from "@headlessui/react";
 import clsx from "clsx";
-import { Fragment } from "react";
+import { Fragment, type MouseEvent } from "react";
 
 import { useTheme } from "./theme-provider.js";
 
 interface Item {
   label?: string;
-  onClick: () => void;
+  onClick?: (event: MouseEvent) => void;
+  disabled?: boolean;
 }
 
 export interface MenuProps {
@@ -14,19 +15,26 @@ export interface MenuProps {
   icon?: React.ReactNode;
   items: Item[];
   btnClassName?: string;
+  onClick?: (event: MouseEvent) => void;
 }
 
-export const Menu = ({ title, icon, items = [], btnClassName }: MenuProps) => {
+export const Menu = ({
+  title,
+  icon,
+  items = [],
+  btnClassName,
+  onClick,
+}: MenuProps) => {
   const { theme } = useTheme();
   return (
     <div className="relative items-center flex">
       <HeadlessMenu as="div" className="relative inline-block text-left">
         <div>
           <HeadlessMenu.Button
-            className={clsx(
-              "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
-              btnClassName,
-            )}
+            className={clsx(btnClassName, theme.focusInput)}
+            onClick={(event) => {
+              onClick?.(event);
+            }}
           >
             {icon}
             {title && <span className="ml-2">{title}</span>}
@@ -44,7 +52,7 @@ export const Menu = ({ title, icon, items = [], btnClassName }: MenuProps) => {
           <HeadlessMenu.Items
             className={clsx(
               "absolute right-0 mt-2 w-56 origin-top-right",
-              "rounded shadow-lg z-10",
+              "rounded shadow-lg z-20",
               "divide-y divide-slate-100 dark:divide-slate-700",
               theme.bgInput,
               theme.focusInput,
@@ -55,6 +63,7 @@ export const Menu = ({ title, icon, items = [], btnClassName }: MenuProps) => {
                 <HeadlessMenu.Item key={item.label}>
                   {({ active }) => (
                     <button
+                      disabled={item.disabled}
                       key={item.label}
                       onClick={item.onClick}
                       className={clsx(
