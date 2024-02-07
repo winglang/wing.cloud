@@ -1,16 +1,17 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import { HttpErrorPage } from "./components/http-error-page.js";
-
 export const router = (onReady: () => void) => {
-  const lazyLoading = (module: any): any => {
-    onReady();
-    return module;
+  const lazyLoading = async (module: Promise<any>) => {
+    return module.then((module) => {
+      onReady();
+      return module;
+    });
   };
   return createBrowserRouter([
     {
       path: "/",
-      lazy: () => lazyLoading(import("./routes/index.js")),
+      lazy: () => import("./routes/index.js"),
       children: [
         {
           path: "/add",

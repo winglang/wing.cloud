@@ -9,7 +9,7 @@ export const AppLoaderSkeleton = () => {
   return (
     <div
       className={clsx(
-        "w-full h-full flex flex-col rounded-md text-center align-middle",
+        "w-full h-full flex flex-col rounded-md text-center align-middle absolute",
       )}
     >
       <header

@@ -5,9 +5,10 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { WRPCProvider } from "@wingcloud/wrpc";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 
+import { AppLoaderSkeleton } from "./app-loader-skeleton.js";
 import { AppsDataProvider } from "./data-store/apps-data-provider.js";
 import { AuthDataProvider } from "./data-store/auth-data-provider.js";
 import { InstallationsDataProvider } from "./data-store/installations-data-provider.js";
@@ -59,6 +60,14 @@ export const App = () => {
       }),
   );
 
+  const [routesReady, setRoutesReady] = useState(false);
+  const onRouterReady = useCallback(() => {
+    if (routesReady) {
+      return;
+    }
+    setRoutesReady(true);
+  }, [routesReady]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <WRPCProvider value={{ url: API_URL.toString() }}>
@@ -71,7 +80,8 @@ export const App = () => {
                     <AppsDataProvider>
                       <InstallationsDataProvider>
                         <ReposDataProvider>
-                          <RouterProvider router={router} />
+                          {!routesReady && <AppLoaderSkeleton />}
+                          <RouterProvider router={router(onRouterReady)} />
                         </ReposDataProvider>
                       </InstallationsDataProvider>
                     </AppsDataProvider>
