@@ -44,9 +44,17 @@ const OwnerPage = () => {
     if (!apps) {
       return [];
     }
-    return apps.filter((app) =>
-      `${app.appName}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
-    );
+    return apps
+      .filter((app) =>
+        `${app.appName}`
+          .toLocaleLowerCase()
+          .includes(search.toLocaleLowerCase()),
+      )
+      .sort((a, b) => {
+        return (
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      });
   }, [apps, search]);
 
   return (
@@ -100,10 +108,7 @@ const OwnerPage = () => {
       >
         {loading &&
           Array.from({
-            length:
-              apps && apps.length > 0
-                ? apps.length
-                : Math.floor(Math.random() * 4) + 3,
+            length: apps && apps?.length > 0 ? apps.length : 5,
           }).map((_, i) => <AppCardSkeleton key={i} />)}
 
         {filteredApps.map((app) => (
