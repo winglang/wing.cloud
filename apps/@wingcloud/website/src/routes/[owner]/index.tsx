@@ -28,7 +28,10 @@ const OwnerPage = () => {
   }, [isLoading, apps]);
 
   useEffect(() => {
-    if (apps?.length === 0 && !isFetching) {
+    if (!apps || isFetching) {
+      return;
+    }
+    if (apps.length === 0) {
       navigate("/add");
     }
   }, [apps, isFetching]);
