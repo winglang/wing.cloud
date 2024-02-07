@@ -24,7 +24,7 @@ const OwnerPage = () => {
 
   const loading = useMemo(() => {
     // Show loading if there are no apps until we redirect to add page
-    return isLoading || apps?.length === 0;
+    return isLoading && (!apps || apps.length === 0);
   }, [isLoading, apps]);
 
   useEffect(() => {
