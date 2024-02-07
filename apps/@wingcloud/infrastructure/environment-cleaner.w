@@ -16,22 +16,22 @@ pub class EnvironmentCleaner {
   new(props: EnvironmentCleanerProps) {
     this.environments = props.environments;
 
-    // let cleaner = new cloud.Schedule(rate: 60m);
-    // cleaner.onTick(inflight () => {
-    //   let expiredDate = datetime.fromIso(dateutils.addDays(datetime.utcNow().toIso(), -7));
-    //   for environment in this.environments.listDeployedAt(deployedAt: expiredDate) {
-    //     if environment.type != "production" {
-    //       log("cleaning environment {Json.stringify(environment)}");
-    //       let app = props.apps.get(appId: environment.appId);
-    //       props.environmentManager.stop(
-    //         appId: environment.appId,
-    //         appName: app.appName,
-    //         environment: environment,
-    //         timestamp: datetime.utcNow().timestampMs,
-    //         delete: false,
-    //       );
-    //     }
-    //   }
-    // });
+    let cleaner = new cloud.Schedule(rate: 60m);
+    cleaner.onTick(inflight () => {
+      let expiredDate = datetime.fromIso(dateutils.addDays(datetime.utcNow().toIso(), -7));
+      for environment in this.environments.listDeployedAt(deployedAt: expiredDate) {
+        if environment.type != "production" {
+          log("cleaning environment {Json.stringify(environment)}");
+          let app = props.apps.get(appId: environment.appId);
+          props.environmentManager.stop(
+            appId: environment.appId,
+            appName: app.appName,
+            environment: environment,
+            timestamp: datetime.utcNow().timestampMs,
+            delete: false,
+          );
+        }
+      }
+    });
   }
 }
