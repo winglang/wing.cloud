@@ -92,6 +92,7 @@ export const listInstallationRepos = async (
       avatar_url: repository.owner.avatar_url,
     },
     default_branch: repository.default_branch,
+    description: repository.description,
   }));
 
   return {

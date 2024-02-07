@@ -1,13 +1,14 @@
-import { LinkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 
-import { SpinnerLoader } from "../../../../components/spinner-loader.js";
+import { Duplicator } from "../../../../components/duplicator.js";
 import { Input } from "../../../../design-system/input.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
 import type { Environment } from "../../../../utils/wrpc.js";
 
+import { EnvironmentsListItemSkeleton } from "./environments-list-item-skeleton.js";
 import { EnvironmentsListItem } from "./environments-list-item.js";
 
 interface EnvironmentsListProps {
@@ -60,29 +61,17 @@ export const EnvironmentsList = ({
         <div className="space-y-2">
           <div className={clsx("text-lg pt-2", theme.text1)}>Production</div>
 
-          {productionEnvs.length === 0 && (
-            <div
-              className={clsx(
-                "rounded p-4 text-left w-full block",
-                theme.bgInput,
-                "border",
-                theme.borderInput,
-              )}
-            >
-              <div className="p-6 w-full flex items-center justify-center">
-                <SpinnerLoader size="sm" />
-              </div>
-            </div>
-          )}
-
+          {productionEnvs.length === 0 && <EnvironmentsListItemSkeleton />}
           {productionEnvs.length > 0 &&
             productionEnvs.map((environment) => (
-              <EnvironmentsListItem
-                key={environment.id}
-                owner={owner}
-                appName={appName}
-                environment={environment}
-              />
+              <div key={environment.id}>
+                <EnvironmentsListItem
+                  key={environment.id}
+                  owner={owner}
+                  appName={appName}
+                  environment={environment}
+                />
+              </div>
             ))}
         </div>
 
@@ -92,18 +81,9 @@ export const EnvironmentsList = ({
           </div>
 
           {loading && (
-            <div
-              className={clsx(
-                "rounded p-4 text-left w-full block",
-                theme.bgInput,
-                "border",
-                theme.borderInput,
-              )}
-            >
-              <div className="p-6 w-full flex items-center justify-center">
-                <SpinnerLoader size="sm" />
-              </div>
-            </div>
+            <Duplicator count={3}>
+              <EnvironmentsListItemSkeleton />
+            </Duplicator>
           )}
 
           {!loading && (
@@ -136,10 +116,11 @@ export const EnvironmentsList = ({
               {filteredPreviewEnvs.length === 0 && (
                 <div
                   className={clsx(
-                    "p-4 w-full border text-center rounded",
+                    "p-4 w-full border text-center rounded-md",
                     theme.bgInput,
                     theme.borderInput,
                     theme.text1,
+                    "shadow-sm",
                   )}
                 >
                   <BranchIcon className="w-12 h-12 mx-auto text-slate-400" />

@@ -15,6 +15,7 @@ import { useNotifications } from "../../../../design-system/notification.js";
 import { Select } from "../../../../design-system/select.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { wrpc } from "../../../../utils/wrpc.js";
+import { DeleteModal } from "../_components/delete-modal.js";
 
 import { EntrypointUpdateModal } from "./_components/entrypoint-update-modal.js";
 import { SecretsList } from "./_components/secrets-list.js";
@@ -78,6 +79,8 @@ const SettingsPage = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
   const updateEntrypoint = useCallback(async () => {
     try {
       setLoading(true);
@@ -104,7 +107,7 @@ const SettingsPage = () => {
     <div
       className={clsx(
         "w-full flex-grow overflow-auto",
-        "max-w-5xl mx-auto p-4 sm:p-6",
+        "max-w-7xl mx-auto p-4 sm:p-6",
       )}
     >
       {!app && (
@@ -180,6 +183,24 @@ const SettingsPage = () => {
           </div>
 
           <SecretsList appId={app.appId} />
+
+          <div
+            className={clsx(
+              "flex flex-col gap-2 rounded p-4 border",
+              theme.bgInput,
+              theme.borderInput,
+            )}
+          >
+            <div className={clsx("truncate", theme.text1)}>Advanced</div>
+            <div className="flex">
+              <Button
+                onClick={() => setDeleteModalOpen(true)}
+                className="bg-red-500 hover:bg-red-400 text-white"
+              >
+                Delete App
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -191,6 +212,15 @@ const SettingsPage = () => {
           isPending={loading}
           onClose={setConfirmModalOpen}
           onConfirm={updateEntrypoint}
+        />
+      )}
+
+      {appName && owner && (
+        <DeleteModal
+          owner={owner}
+          appName={appName}
+          show={deleteModalOpen}
+          onClose={setDeleteModalOpen}
         />
       )}
     </div>

@@ -91,7 +91,7 @@ const EnvironmentPage = () => {
     <div
       className={clsx(
         "w-full flex-grow overflow-auto",
-        "max-w-5xl mx-auto p-4 sm:p-6",
+        "max-w-7xl mx-auto p-4 sm:p-6",
         "space-y-4",
       )}
     >

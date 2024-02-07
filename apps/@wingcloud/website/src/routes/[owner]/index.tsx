@@ -7,6 +7,7 @@ import clsx from "clsx";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { Duplicator } from "../../components/duplicator.js";
 import { ErrorBoundary } from "../../components/error-boundary.js";
 import { Header } from "../../components/header.js";
 import { AppsDataProviderContext } from "../../data-store/apps-data-provider.js";
@@ -61,7 +62,7 @@ const OwnerPage = () => {
     <div
       className={clsx(
         "w-full flex-grow overflow-auto",
-        "max-w-5xl mx-auto p-4 sm:p-6",
+        "max-w-7xl mx-auto p-4 sm:p-6",
         "space-y-4",
       )}
     >
@@ -106,10 +107,11 @@ const OwnerPage = () => {
           "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
         )}
       >
-        {loading &&
-          Array.from({
-            length: apps && apps?.length > 0 ? apps.length : 5,
-          }).map((_, i) => <AppCardSkeleton key={i} />)}
+        {loading && (
+          <Duplicator count={5}>
+            <AppCardSkeleton />
+          </Duplicator>
+        )}
 
         {filteredApps.map((app) => (
           <AppCard key={app.appId} owner={owner || ""} app={app} />

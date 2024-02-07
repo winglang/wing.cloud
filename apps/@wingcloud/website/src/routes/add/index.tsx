@@ -101,7 +101,7 @@ const AddAppPage = () => {
     }
     setCreateAppLoading(true);
     try {
-      const app = await createAppMutation.mutateAsync(
+      await createAppMutation.mutateAsync(
         {
           owner: user?.username,
           appName: selectedRepo.name,

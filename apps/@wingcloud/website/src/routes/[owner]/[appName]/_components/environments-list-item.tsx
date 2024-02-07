@@ -62,17 +62,18 @@ export const EnvironmentsListItem = ({
   return (
     <div
       className={clsx(
-        "rounded p-4 text-left w-full block",
+        "rounded-md p-4 text-left w-full block",
         theme.bgInput,
         "border",
         theme.borderInput,
+        "shadow-sm hover:shadow",
       )}
     >
       <div className="flex items-center gap-x-4">
         <div className="relative">
           <BranchIcon
             className={clsx(
-              "w-8 h-8 ",
+              "w-8 h-8",
               "rounded-full border-slate-300 border",
               theme.text2,
             )}
