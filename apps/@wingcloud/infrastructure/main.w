@@ -68,7 +68,7 @@ let api = new cloud.Api(
 let apiUrlParam = new parameter.Parameter(
   name: "api-url",
   value: api.url,
-);
+) as "api-url";
 
 let table = new ex.DynamodbTable(
   name: "data",
@@ -106,7 +106,7 @@ let rntm = new runtime.RuntimeService(
 let runtimeUrlParam = new parameter.Parameter(
   name: "runtime-url",
   value: rntm.api.url,
-);
+) as "runtime-url";
 
 let dashboardPort = 5174;
 let dashboard = new ex.ReactApp(
