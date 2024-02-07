@@ -22,10 +22,6 @@ const OwnerPage = () => {
   const { theme } = useTheme();
   const { apps, isLoading, isFetching } = useContext(AppsDataProviderContext);
 
-  const numberOfAppSkeletons = useMemo(() => {
-    return Math.floor(Math.random() * 3) + 3;
-  }, []);
-
   const loading = useMemo(() => {
     // Show loading if there are no apps until we redirect to add page
     return isLoading || !apps || apps.length === 0;
@@ -112,8 +108,7 @@ const OwnerPage = () => {
       >
         {loading &&
           Array.from({
-            length:
-              apps && apps?.length > 0 ? apps.length : numberOfAppSkeletons,
+            length: apps && apps?.length > 0 ? apps.length : 5,
           }).map((_, i) => <AppCardSkeleton key={i} />)}
 
         {filteredApps.map((app) => (

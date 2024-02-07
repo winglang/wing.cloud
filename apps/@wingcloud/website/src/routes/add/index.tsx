@@ -115,10 +115,12 @@ const AddAppPage = () => {
             setCreateAppLoading(false);
             throw error;
           },
+          onSuccess: (data) => {
+            addAppItemToAppList(data.app);
+            navigate(`/${user.username}/${data.app.appName}`);
+          },
         },
       );
-      addAppItemToAppList(app.app);
-      navigate(`/${user.username}/${app.app.appName}`);
     } catch (error) {
       setCreateAppLoading(false);
       if (error instanceof Error) {
