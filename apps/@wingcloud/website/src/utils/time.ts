@@ -29,7 +29,7 @@ export const getTime = (datetime: string) => {
 
 const getTimeFromNow = (datetime?: string, short: boolean = false) => {
   if (!datetime) {
-    return "";
+    return;
   }
   const date = new Date(datetime);
   const now = new Date();

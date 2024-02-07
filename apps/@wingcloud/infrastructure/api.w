@@ -610,7 +610,7 @@ pub class Api {
           };
         }
 
-        let appId = apps.create(
+        let createAppOptions = {
           appName: appName,
           description: input.tryGet("description")?.tryAsStr() ?? "",
           repoId: repoId,
@@ -621,28 +621,36 @@ pub class Api {
           createdAt: datetime.utcNow().toIso(),
           defaultBranch: defaultBranch,
           status: "initializing",
-        );
+        };
+
+        let appId = apps.create(createAppOptions);
+
+        let appOptions = Json.deepCopyMut(createAppOptions);
+        appOptions.set("appId", appId);
+
+        let app = Apps.App.fromJson(appOptions);
 
         productionEnvironmentQueue.push(Json.stringify(CreateProductionEnvironmentMessage {
-          appName: appName,
-          userId: user.userId,
-          repoId: repoId,
-          repoOwner: repoOwner,
-          repoName: repoName,
+          appId: app.appId,
+          appName: app.appName,
+          userId: app.userId,
+          repoId: app.repoId,
+          repoOwner: app.repoOwner,
+          repoName: app.repoName,
+          entrypoint: app.entrypoint,
           defaultBranch: defaultBranch,
           installationId: installationId,
-          appId: appId,
-          entrypoint: entrypoint,
           timestamp: datetime.utcNow().timestampMs,
         }));
 
         invalidateQuery.invalidate(userId: user.userId, queries: ["app.list"]);
 
+
+
         return {
           body: {
-            appId: appId,
-            appName: appName,
             appFullName: "{user.username}/{appName}",
+            app: app,
           },
         };
       } else {
