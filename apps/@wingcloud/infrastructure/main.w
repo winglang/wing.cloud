@@ -277,7 +277,7 @@ let proxyUrl = (() => {
 
 new cloud.Endpoint(proxyUrl, browserSupport: true) as "Proxy Endpoint";
 
-let var webhookUrl = probotApp.githubApp.webhookUrl;
+let var webhookUrl = probotApp.githubApp.api.url;
 if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" {
   bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
 
@@ -307,6 +307,6 @@ api.get("/wrpc/health", inflight () => {
 
 new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";
-new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
+new cdktf.TerraformOutput(value: probotApp.githubApp.api.url) as "Probot API URL";
 new cdktf.TerraformOutput(value: proxyUrl) as "Proxy URL";
 new cdktf.TerraformOutput(value: siteURL) as "Site URL";
