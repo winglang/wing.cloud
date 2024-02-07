@@ -24,11 +24,11 @@ const OwnerPage = () => {
 
   const loading = useMemo(() => {
     // Show loading if there are no apps until we redirect to add page
-    return isLoading || apps.length === 0;
-  }, [isLoading, apps.length]);
+    return isLoading || apps?.length === 0;
+  }, [isLoading, apps]);
 
   useEffect(() => {
-    if (apps.length === 0 && !isFetching) {
+    if (apps?.length === 0 && !isFetching) {
       navigate("/add");
     }
   }, [apps, isFetching]);
@@ -38,6 +38,9 @@ const OwnerPage = () => {
   const [search, setSearch] = useState("");
 
   const filteredApps = useMemo(() => {
+    if (!apps) {
+      return [];
+    }
     return apps.filter((app) =>
       `${app.appName}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
     );
@@ -65,7 +68,7 @@ const OwnerPage = () => {
             setSearch(e.target.value);
           }}
         />
-        {apps.length > 0 && (
+        {apps && apps.length > 0 && (
           <Button
             label="Add"
             primary
@@ -112,7 +115,9 @@ const OwnerPage = () => {
         {loading &&
           Array.from({
             length:
-              apps.length > 0 ? apps.length : Math.floor(Math.random() * 4) + 3,
+              apps && apps.length > 0
+                ? apps.length
+                : Math.floor(Math.random() * 4) + 3,
           }).map((_, i) => <AppCardSkeleton key={i} />)}
 
         {filteredApps.map((app) => (
