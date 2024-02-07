@@ -68,7 +68,7 @@ let api = new cloud.Api(
 let apiUrlParam = new parameter.Parameter(
   name: "api-url",
   value: api.url,
-) as "api-url";
+);
 
 let table = new ex.DynamodbTable(
   name: "data",
@@ -287,14 +287,14 @@ if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" 
   );
 
   webhookUrl = devNgrok.url;
-
-  let updateGithubWebhook = inflight () => {
-    probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
-    log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
-  };
-
-  new cloud.OnDeploy(updateGithubWebhook);
 }
+
+let updateGithubWebhook = inflight () => {
+  probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
+  log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
+};
+
+new cloud.OnDeploy(updateGithubWebhook);
 
 new EnvironmentCleaner.EnvironmentCleaner(apps: apps, environmentManager: environmentManager, environments: environments);
 
