@@ -9,7 +9,7 @@ pub struct PublicEndpointProps {
 }
 
 pub interface IPublicEndpoint {
-  inflight create();
-  inflight delete();
+  inflight create(): void;
+  inflight delete(): void;
   inflight url(): str;
 }

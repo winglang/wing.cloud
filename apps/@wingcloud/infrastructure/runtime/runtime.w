@@ -60,7 +60,7 @@ struct RuntimeStopOptions {
 
 interface IRuntimeHandler {
   inflight start(opts: RuntimeStartOptions): str;
-  inflight stop(opts: RuntimeStopOptions);
+  inflight stop(opts: RuntimeStopOptions): void;
 }
 
 class RuntimeHandler_sim impl IRuntimeHandler {
