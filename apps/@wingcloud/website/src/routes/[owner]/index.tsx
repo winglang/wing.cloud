@@ -89,23 +89,6 @@ const OwnerPage = () => {
           <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
             No apps found.
           </h3>
-
-          {apps.length === 0 && (
-            <div>
-              <p className={clsx("mt-1 text-sm", theme.text2)}>
-                Get started by adding an app.
-              </p>
-              <Button
-                label="Add app"
-                icon={PlusIcon}
-                primary
-                className="mt-6"
-                onClick={() => {
-                  navigate("/add");
-                }}
-              />
-            </div>
-          )}
         </div>
       )}
 
