@@ -4,8 +4,8 @@ export const GithubLogin = ({ url }: { url: string }) => {
   return (
     <div
       className={clsx(
-        "w-full flex-grow overflow-auto",
-        "max-w-7xl mx-auto p-4 sm:p-6",
+        "w-full h-full flex-grow overflow-auto relative z-50",
+        "mx-auto p-4 sm:p-6 bg-white dark:bg-gray-900",
       )}
     >
       <a
