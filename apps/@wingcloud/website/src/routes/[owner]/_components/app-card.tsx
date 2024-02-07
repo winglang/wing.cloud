@@ -75,12 +75,9 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
     <div
       className={clsx(
         "w-full h-full rounded-md",
-        "w-full h-full rounded-md",
         "text-left border",
         theme.bgInput,
         theme.borderInput,
-        "shadow-sm hover:shadow",
-        "relative",
         "shadow-sm hover:shadow",
         "relative",
       )}
@@ -94,8 +91,8 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
         className={clsx(
           "flex items-center gap-x-4 p-4 rounded-t-md",
           theme.bg4,
+          theme.borderInput,
           "border-b",
-          "theme.borderInput",
         )}
       >
         <AppIcon app={app} />
