@@ -17,14 +17,12 @@ export interface AppsDataProviderContext {
   isLoading: boolean;
   isFetching: boolean;
   isError: boolean;
-  noApps: boolean;
 }
 const DEFAULT_CONTEXT: AppsDataProviderContext = {
   apps: [],
   isLoading: true,
   isFetching: false,
   isError: false,
-  noApps: false,
 };
 export const AppsDataProviderContext =
   createContext<AppsDataProviderContext>(DEFAULT_CONTEXT);
@@ -58,20 +56,6 @@ export const AppsDataProvider = ({ children }: PropsWithChildren) => {
     setApps(listAppsQuery.data.apps);
   }, [listAppsQuery.data]);
 
-  const noApps = useMemo(() => {
-    return (
-      listAppsQuery.data?.apps.length === 0 &&
-      !listAppsQuery.isLoading &&
-      !listAppsQuery.isError &&
-      !listAppsQuery.isFetching
-    );
-  }, [
-    listAppsQuery.data,
-    listAppsQuery.isLoading,
-    listAppsQuery.isError,
-    listAppsQuery.isFetching,
-  ]);
-
   return (
     <AppsDataProviderContext.Provider
       value={{
@@ -79,7 +63,6 @@ export const AppsDataProvider = ({ children }: PropsWithChildren) => {
         isLoading: listAppsQuery.isLoading,
         isFetching: listAppsQuery.isFetching,
         isError: listAppsQuery.isError,
-        noApps,
       }}
     >
       {children}
