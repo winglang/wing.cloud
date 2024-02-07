@@ -87,16 +87,6 @@ jobs:
         id: init
         run: terraform init
         working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
-      - name: Setup Graphviz
-        uses: ts-graphviz/setup-graphviz@v2
-      - name: Terraform Graph
-        run: terraform graph -type=plan | dot -Tdot >graph.dot
-        working-directory: "apps/@wingcloud/infrastructure/target/main.tfaws"
-      - name: Upload patch
-        uses: actions/upload-artifact@v3
-        with:
-          name: graph.dot
-          path: apps/@wingcloud/infrastructure/target/main.tfaws/graph.dot
       - name: Terraform Plan
         id: plan
         env:
