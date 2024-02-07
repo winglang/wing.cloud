@@ -17,6 +17,7 @@ export interface InstallationsDataProviderContext {
   installations: Installation[];
   isLoading: boolean;
   isFetching: boolean;
+  isRefetching: boolean;
   isError: boolean;
   refetch: () => Promise<void>;
 }
@@ -26,6 +27,7 @@ const DEFAULT_CONTEXT: InstallationsDataProviderContext = {
   installations: [],
   isLoading: true,
   isFetching: false,
+  isRefetching: false,
   isError: false,
   refetch: () => {
     return Promise.resolve();
@@ -84,7 +86,8 @@ export const InstallationsDataProvider = ({ children }: PropsWithChildren) => {
         installationId,
         setInstallationId,
         isLoading: listInstallationsQuery.isLoading,
-        isFetching: listInstallationsQuery.isRefetching,
+        isFetching: listInstallationsQuery.isFetching,
+        isRefetching: listInstallationsQuery.isRefetching,
         isError: listInstallationsQuery.isError,
         refetch: async () => {
           await listInstallationsQuery.refetch();

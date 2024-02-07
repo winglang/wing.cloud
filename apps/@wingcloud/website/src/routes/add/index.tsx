@@ -45,8 +45,6 @@ const AddAppPage = () => {
   const [createAppLoading, setCreateAppLoading] = useState(false);
   const [repositoryId, setRepositoryId] = useState<string>();
 
-  const [loading, setLoading] = useState(true);
-
   const { user } = useContext(AuthDataProviderContext);
 
   const {
@@ -54,14 +52,14 @@ const AddAppPage = () => {
     installationId,
     setInstallationId,
     isLoading: installationsIsLoading,
-    isFetching: installationsIsFetching,
+    isRefetching: installationsIsRefetching,
     refetch: refetchInstallations,
   } = useContext(InstallationsDataProviderContext);
 
   const {
     repos,
     isLoading: reposIsLoading,
-    isFetching: reposIsFetching,
+    isRefetching: reposIsRefetching,
     refetch: refetchRepos,
   } = useContext(ReposDataProviderContext);
 
@@ -72,18 +70,20 @@ const AddAppPage = () => {
     }
   }, [repos]);
 
-  useEffect(() => {
-    // Prevent turning off loading state if refetching
-    if (installationsIsFetching || reposIsFetching) {
-      return;
-    }
-    setLoading(installationsIsLoading || reposIsLoading);
+  const loading = useMemo(() => {
+    return (
+      installationsIsLoading ||
+      reposIsLoading ||
+      installationsIsRefetching ||
+      reposIsRefetching
+    );
   }, [
     installationsIsLoading,
     reposIsLoading,
-    installationsIsFetching,
-    reposIsFetching,
+    installationsIsRefetching,
+    reposIsRefetching,
   ]);
+
   const selectedRepo = useMemo(() => {
     if (!repos || !repositoryId) {
       return;
@@ -129,7 +129,6 @@ const AddAppPage = () => {
   }, [installationId, selectedRepo, user]);
 
   const onCloseMissingRepoModal = useCallback(async () => {
-    setLoading(true);
     setRepoItems([]);
     await refetchInstallations();
     if (installationId) {
