@@ -16,7 +16,8 @@ import { AppIcon } from "./app-icon.js";
 
 export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
   const { theme } = useTheme();
-  const timeAgo = useTimeAgo(app.lastCommitDate || Date.now().toString(), true);
+
+  const timeAgo = useTimeAgo(app.lastCommitDate, true);
   const navigate = useNavigate();
 
   const projectUrl = useMemo(() => {
@@ -38,26 +39,8 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
   }, [app]);
 
   const menuItems = useMemo(() => {
-    var items = [
-      {
-        label: "Settings",
-        onClick: (event: MouseEvent) => {
-          event.stopPropagation();
-          navigate(`/${owner}/${app.appName}/settings`);
-        },
-      },
-    ];
-
+    var items = [];
     if (app.defaultBranch) {
-      items.push({
-        label: "View Logs",
-        onClick: (event: MouseEvent) => {
-          event.stopPropagation();
-          navigate(
-            `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
-          );
-        },
-      });
       if (app.status === "running") {
         items.push({
           label: `View in Console`,
@@ -67,7 +50,23 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
           },
         });
       }
+      items.push({
+        label: "View Logs",
+        onClick: (event: MouseEvent) => {
+          event.stopPropagation();
+          navigate(
+            `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
+          );
+        },
+      });
     }
+    items.push({
+      label: "Settings",
+      onClick: (event: MouseEvent) => {
+        event.stopPropagation();
+        navigate(`/${owner}/${app.appName}/settings`);
+      },
+    });
 
     return items;
   }, [app, owner]);
@@ -76,9 +75,12 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
     <div
       className={clsx(
         "w-full h-full rounded-md",
+        "w-full h-full rounded-md",
         "text-left border",
         theme.bgInput,
         theme.borderInput,
+        "shadow-sm hover:shadow",
+        "relative",
         "shadow-sm hover:shadow",
         "relative",
       )}
@@ -87,6 +89,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
         className={clsx("absolute inset-0 rounded-md z-0", theme.focusInput)}
         to={`/${owner}/${app.appName}`}
       />
+
       <div
         className={clsx(
           "flex items-center gap-x-4 p-4 rounded-t-md",
@@ -96,16 +99,19 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
         )}
       >
         <AppIcon app={app} />
-        <div
+        <Link
           className={clsx(
             "text-sm font-medium leading-6",
             theme.text1,
             theme.text1Hover,
-            "hover:underline",
+            "hover:underline z-10 cursor-pointer",
+            "truncate",
           )}
+          to={`/${owner}/${app.appName}`}
         >
           {app.appName}
-        </div>
+        </Link>
+
         <div className="flex flex-grow justify-end">
           <Menu
             icon={
@@ -123,31 +129,32 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
           />
         </div>
       </div>
+
       <div className="p-4 space-y-4">
-        <Link
-          className={clsx(
-            "flex grow gap-x-2 truncate",
-            "truncate",
-            "text-xs font-medium",
-            theme.text2,
-            theme.text2Hover,
-            theme.focusInput,
-            "focus:underline hover:underline z-10",
-          )}
-          onClick={(event) => event.stopPropagation()}
-          target="_blank"
-          to={projectUrl}
-        >
-          <div className="flex grow gap-x-2 truncate items-center">
+        <div className="flex grow gap-x-2">
+          <Link
+            className={clsx(
+              "truncate",
+              "text-xs font-medium",
+              "flex gap-x-2 truncate items-center z-10 group",
+              theme.text2,
+              theme.text2Hover,
+              theme.focusInput,
+            )}
+            onClick={(event) => event.stopPropagation()}
+            target="_blank"
+            to={projectUrl}
+          >
             <GithubIcon className="w-4 h-4 shrink-0" />
-            <div className="truncate">
+            <div className="truncate group-hover:underline group-focus:underline">
               {app.repoOwner}/{app.repoName}
             </div>
-            <div className="flex grow justify-end">
-              {app.status && <StatusPill status={app.status} />}
-            </div>
+          </Link>
+          <div className="flex grow justify-end">
+            {app.status && <StatusPill status={app.status} />}
           </div>
-        </Link>
+        </div>
+
         <div className="leading-6 space-y-1">
           <div className="flex justify-between gap-x-4">
             <div className="flex gap-x-2 truncate">
@@ -169,11 +176,10 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
               </Link>
             </div>
           </div>
+
           <div className="flex justify-between gap-x-4">
             <div className="flex grow gap-x-1 truncate">
-              {app.lastCommitDate && (
-                <div className={clsx("text-xs", theme.text4)}>{timeAgo} on</div>
-              )}
+              <div className={clsx("text-xs", theme.text4)}>{timeAgo} on</div>
               {app.defaultBranch && (
                 <div
                   className={clsx("flex grow text-xs truncate", theme.text2)}

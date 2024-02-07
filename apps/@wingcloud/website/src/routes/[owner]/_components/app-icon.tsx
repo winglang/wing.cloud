@@ -11,7 +11,7 @@ export const AppIcon = ({ app }: { app: App }) => {
   if (app.entrypoint.endsWith(".ts")) {
     return (
       <TypeScriptIcon
-        className="w-8 h-8 text-[#2f74c0]"
+        className="w-8 h-8 text-[#2f74c0] shrink-0"
         title={app.entrypoint.endsWith(".ts") ? "TypeScript" : "Winglang"}
       />
     );
@@ -19,7 +19,7 @@ export const AppIcon = ({ app }: { app: App }) => {
   if (app.entrypoint.endsWith(".w")) {
     return (
       <WingIcon
-        className="w-8 h-8 text-[#8bc6bc]"
+        className="w-8 h-8 text-[#8bc6bc] shrink-0"
         title={app.entrypoint.endsWith(".ts") ? "TypeScript" : "Winglang"}
       />
     );
@@ -28,7 +28,7 @@ export const AppIcon = ({ app }: { app: App }) => {
   return (
     <div
       className={clsx(
-        "w-8 h-8 flex items-center justify-center rounded",
+        "w-8 h-8 flex items-center justify-center rounded shrink-0",
         theme.bg2,
       )}
     >

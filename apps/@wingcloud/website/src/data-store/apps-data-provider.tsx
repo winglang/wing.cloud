@@ -3,6 +3,7 @@ import {
   type PropsWithChildren,
   useEffect,
   useState,
+  useMemo,
 } from "react";
 
 import type { App } from "../utils/wrpc.js";
@@ -11,12 +12,16 @@ import { wrpc } from "../utils/wrpc.js";
 export interface AppsDataProviderContext {
   apps: App[];
   isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
+  noApps: boolean;
 }
 const DEFAULT_CONTEXT: AppsDataProviderContext = {
   apps: [],
   isLoading: true,
+  isFetching: false,
   isError: false,
+  noApps: true,
 };
 export const AppsDataProviderContext =
   createContext<AppsDataProviderContext>(DEFAULT_CONTEXT);
@@ -51,12 +56,23 @@ export const AppsDataProvider = ({ children }: PropsWithChildren) => {
     setApps(listAppsQuery.data.apps);
   }, [listAppsQuery.data]);
 
+  const noApps = useMemo(() => {
+    return (
+      !listAppsQuery.data?.apps.length &&
+      !listAppsQuery.isLoading &&
+      !listAppsQuery.isError &&
+      !listAppsQuery.isFetching
+    );
+  }, [listAppsQuery]);
+
   return (
     <AppsDataProviderContext.Provider
       value={{
         apps,
         isLoading: listAppsQuery.isLoading,
+        isFetching: listAppsQuery.isFetching,
         isError: listAppsQuery.isError,
+        noApps,
       }}
     >
       {children}
