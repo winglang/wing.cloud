@@ -1,11 +1,11 @@
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 import { GithubLogin } from "../components/github-login.js";
+import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
 import { Button } from "../design-system/button.js";
 import { Modal } from "../design-system/modal.js";
-import { wrpc } from "../utils/wrpc.js";
 
 export const Component = () => {
   const navigate = useNavigate();
@@ -25,18 +25,15 @@ export const Component = () => {
     return url.toString();
   })();
 
-  const user = wrpc["auth.check"].useQuery(undefined, {
-    throwOnError: false,
-    retry: false,
-  });
+  const { error } = useContext(AuthDataProviderContext);
 
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    if (user.error !== null) {
+    if (error) {
       setShowModal(true);
     }
-  }, [user.error]);
+  }, [error]);
 
   return (
     <>

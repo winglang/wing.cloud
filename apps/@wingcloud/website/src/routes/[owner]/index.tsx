@@ -20,19 +20,18 @@ import { AppCard } from "./_components/app-card.js";
 const OwnerPage = () => {
   const { owner } = useParams();
   const { theme } = useTheme();
-  const { apps, isLoading, isFetching, noApps } = useContext(
-    AppsDataProviderContext,
-  );
+  const { apps, isLoading, isFetching } = useContext(AppsDataProviderContext);
 
   const loading = useMemo(() => {
-    return isLoading || (apps.length === 0 && isFetching);
-  }, [isLoading, isFetching, apps.length]);
+    // Show loading if there are no apps until we redirect to add page
+    return isLoading || apps.length === 0;
+  }, [isLoading, apps.length]);
 
   useEffect(() => {
-    if (noApps) {
+    if (apps.length === 0 && !isFetching) {
       navigate("/add");
     }
-  }, [noApps]);
+  }, [apps, isFetching]);
 
   const navigate = useNavigate();
 
@@ -78,7 +77,7 @@ const OwnerPage = () => {
         )}
       </div>
 
-      {!loading && !noApps && filteredApps.length === 0 && (
+      {!loading && filteredApps.length === 0 && (
         <div className="text-center">
           <FolderPlusIcon className={clsx("w-12 h-12 mx-auto", theme.text2)} />
           <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
@@ -110,7 +109,7 @@ const OwnerPage = () => {
           "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
         )}
       >
-        {(loading || noApps) &&
+        {loading &&
           Array.from({
             length:
               apps.length > 0 ? apps.length : Math.floor(Math.random() * 4) + 3,

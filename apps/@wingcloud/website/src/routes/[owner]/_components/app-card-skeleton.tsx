@@ -18,7 +18,7 @@ export const AppCardSkeleton = () => {
     >
       <div
         className={clsx(
-          "flex items-center gap-x-4 p-4",
+          "flex items-center gap-x-4 p-4 rounded-t-md",
           theme.bg4,
           theme.borderInput,
           "border-b",
@@ -31,12 +31,12 @@ export const AppCardSkeleton = () => {
         </div>
       </div>
 
-      <div className="p-4 text-sm leading-6 space-y-1">
-        <div className="pb-2">
-          <SkeletonLoader className="w-1/3 h-4 pb-2" loading />
+      <div className="p-4 space-y-4">
+        <SkeletonLoader className="w-3/5 h-4 pb-2" loading />
+        <div className="space-y-2">
+          <SkeletonLoader className="w-2/3 h-4" loading />
+          <SkeletonLoader className="w-1/3 h-4" loading />
         </div>
-        <SkeletonLoader className="w-3/4 h-4" loading />
-        <SkeletonLoader className="w-1/3 h-4" loading />
       </div>
     </div>
   );

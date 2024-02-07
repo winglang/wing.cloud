@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { ErrorBoundary } from "../../components/error-boundary.js";
 import { Header } from "../../components/header.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
+import { AuthDataProviderContext } from "../../data-store/auth-data-provider.js";
 import { InstallationsDataProviderContext } from "../../data-store/installations-data-provider.js";
 import { ReposDataProviderContext } from "../../data-store/repos-data-provider.js";
 import { useNotifications } from "../../design-system/notification.js";
@@ -44,23 +45,21 @@ const AddAppPage = () => {
   const [createAppLoading, setCreateAppLoading] = useState(false);
   const [repositoryId, setRepositoryId] = useState<string>();
 
-  const [loading, setLoading] = useState(true);
-
-  const user = wrpc["auth.check"].useQuery();
+  const { user } = useContext(AuthDataProviderContext);
 
   const {
     installations,
     installationId,
     setInstallationId,
     isLoading: installationsIsLoading,
-    isFetching: installationsIsFetching,
+    isRefetching: installationsIsRefetching,
     refetch: refetchInstallations,
   } = useContext(InstallationsDataProviderContext);
 
   const {
     repos,
     isLoading: reposIsLoading,
-    isFetching: reposIsFetching,
+    isRefetching: reposIsRefetching,
     refetch: refetchRepos,
   } = useContext(ReposDataProviderContext);
 
@@ -71,18 +70,20 @@ const AddAppPage = () => {
     }
   }, [repos]);
 
-  useEffect(() => {
-    // Prevent turning off loading state if refetching
-    if (installationsIsFetching || reposIsFetching) {
-      return;
-    }
-    setLoading(installationsIsLoading || reposIsLoading);
+  const loading = useMemo(() => {
+    return (
+      installationsIsLoading ||
+      reposIsLoading ||
+      installationsIsRefetching ||
+      reposIsRefetching
+    );
   }, [
     installationsIsLoading,
     reposIsLoading,
-    installationsIsFetching,
-    reposIsFetching,
+    installationsIsRefetching,
+    reposIsRefetching,
   ]);
+
   const selectedRepo = useMemo(() => {
     if (!repos || !repositoryId) {
       return;
@@ -93,14 +94,14 @@ const AddAppPage = () => {
   const createAppMutation = wrpc["app.create"].useMutation();
 
   const createApp = useCallback(async () => {
-    if (!installationId || !selectedRepo || !user.data?.user) {
+    if (!installationId || !selectedRepo || !user) {
       return;
     }
     setCreateAppLoading(true);
     try {
       const app = await createAppMutation.mutateAsync(
         {
-          owner: user.data.user.username,
+          owner: user?.username,
           appName: selectedRepo.name,
           defaultBranch: selectedRepo.default_branch,
           description: selectedRepo.description ?? "",
@@ -125,10 +126,9 @@ const AddAppPage = () => {
         setRepositoryId("");
       }
     }
-  }, [installationId, selectedRepo, user.data?.user]);
+  }, [installationId, selectedRepo, user]);
 
   const onCloseMissingRepoModal = useCallback(async () => {
-    setLoading(true);
     setRepoItems([]);
     await refetchInstallations();
     if (installationId) {

@@ -9,6 +9,7 @@ import { useContext, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 
 import { AppsDataProvider } from "./data-store/apps-data-provider.js";
+import { AuthDataProvider } from "./data-store/auth-data-provider.js";
 import { InstallationsDataProvider } from "./data-store/installations-data-provider.js";
 import { ReposDataProvider } from "./data-store/repos-data-provider.js";
 import { NotificationsProvider } from "./design-system/notification.js";
@@ -62,21 +63,23 @@ export const App = () => {
     <QueryClientProvider client={queryClient}>
       <WRPCProvider value={{ url: API_URL.toString() }}>
         <InvalidateQueryProvider url={WS_URL.toString()}>
-          <AnalyticsIdentityProvider>
-            <ThemeProvider mode="light" theme={DefaultTheme}>
-              <NotificationsProvider>
-                <PopupWindowProvider>
-                  <AppsDataProvider>
-                    <InstallationsDataProvider>
-                      <ReposDataProvider>
-                        <RouterProvider router={router} />
-                      </ReposDataProvider>
-                    </InstallationsDataProvider>
-                  </AppsDataProvider>
-                </PopupWindowProvider>
-              </NotificationsProvider>
-            </ThemeProvider>
-          </AnalyticsIdentityProvider>
+          <AuthDataProvider>
+            <AnalyticsIdentityProvider>
+              <ThemeProvider mode="light" theme={DefaultTheme}>
+                <NotificationsProvider>
+                  <PopupWindowProvider>
+                    <AppsDataProvider>
+                      <InstallationsDataProvider>
+                        <ReposDataProvider>
+                          <RouterProvider router={router} />
+                        </ReposDataProvider>
+                      </InstallationsDataProvider>
+                    </AppsDataProvider>
+                  </PopupWindowProvider>
+                </NotificationsProvider>
+              </ThemeProvider>
+            </AnalyticsIdentityProvider>
+          </AuthDataProvider>
         </InvalidateQueryProvider>
       </WRPCProvider>
     </QueryClientProvider>
