@@ -103,6 +103,11 @@ let rntm = new runtime.RuntimeService(
   publicEndpointFullDomainName: publicEndpointFullDomainName,
 );
 
+let runtimeUrlParam = new parameter.Parameter(
+  name: "runtime-url",
+  value: rntm.api.url,
+);
+
 let dashboardPort = 5174;
 let dashboard = new ex.ReactApp(
   projectPath: "../website",
@@ -175,7 +180,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   endpoints: endpoints,
   endpointProvider: endpointProvider,
   certificate: environmentServerCertificate,
-  runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
+  runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: runtimeUrlParam),
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
   analytics: analytics,
