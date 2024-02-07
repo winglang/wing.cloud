@@ -6,7 +6,7 @@ import { wrpc } from "../utils/wrpc.js";
 import { AuthDataProviderContext } from "./auth-data-provider.js";
 
 export interface AppsDataProviderContext {
-  apps: App[] | undefined;
+  apps?: App[];
   isLoading: boolean;
   isFetching: boolean;
   isError: boolean;
