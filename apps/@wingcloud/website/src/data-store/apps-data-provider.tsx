@@ -4,50 +4,50 @@ import {
   useEffect,
   useState,
   useMemo,
+  useContext,
 } from "react";
 
 import type { App } from "../utils/wrpc.js";
 import { wrpc } from "../utils/wrpc.js";
+
+import { AuthDataProviderContext } from "./auth-data-provider.js";
 
 export interface AppsDataProviderContext {
   apps: App[];
   isLoading: boolean;
   isFetching: boolean;
   isError: boolean;
-  noApps: boolean;
 }
 const DEFAULT_CONTEXT: AppsDataProviderContext = {
   apps: [],
   isLoading: true,
   isFetching: false,
   isError: false,
-  noApps: true,
 };
 export const AppsDataProviderContext =
   createContext<AppsDataProviderContext>(DEFAULT_CONTEXT);
 
 export const AppsDataProvider = ({ children }: PropsWithChildren) => {
   const [apps, setApps] = useState<App[]>([]);
-  const user = wrpc["auth.check"].useQuery(undefined, {
-    throwOnError: false,
-    retry: false,
-  });
+
+  const { user } = useContext(AuthDataProviderContext);
+
   const listAppsQuery = wrpc["app.list"].useQuery(
     {
-      owner: user?.data?.user.username!,
+      owner: user?.username!,
     },
     {
-      enabled: !!user?.data?.user.username,
+      enabled: !!user?.username,
     },
   );
 
   // trigger initial fetch only if owner is set
   useEffect(() => {
-    if (!user?.data?.user.username) {
+    if (!user?.username) {
       return;
     }
     listAppsQuery.refetch();
-  }, [user?.data?.user.username]);
+  }, [user?.username]);
 
   useEffect(() => {
     if (!listAppsQuery.data) {
@@ -56,15 +56,6 @@ export const AppsDataProvider = ({ children }: PropsWithChildren) => {
     setApps(listAppsQuery.data.apps);
   }, [listAppsQuery.data]);
 
-  const noApps = useMemo(() => {
-    return (
-      !listAppsQuery.data?.apps.length &&
-      !listAppsQuery.isLoading &&
-      !listAppsQuery.isError &&
-      !listAppsQuery.isFetching
-    );
-  }, [listAppsQuery]);
-
   return (
     <AppsDataProviderContext.Provider
       value={{
@@ -72,7 +63,6 @@ export const AppsDataProvider = ({ children }: PropsWithChildren) => {
         isLoading: listAppsQuery.isLoading,
         isFetching: listAppsQuery.isFetching,
         isError: listAppsQuery.isError,
-        noApps,
       }}
     >
       {children}

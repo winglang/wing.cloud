@@ -1,9 +1,9 @@
 import { UserIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { Fragment, useMemo } from "react";
-import { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Fragment, useContext, useMemo } from "react";
+import { Link } from "react-router-dom";
 
+import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
 import { Menu } from "../design-system/menu.js";
 import { useTheme } from "../design-system/theme-provider.js";
 import { WingIcon } from "../icons/wing-icon.js";
@@ -65,17 +65,14 @@ export interface HeaderProps {
 export const Header = (props: HeaderProps) => {
   const { theme } = useTheme();
 
-  const user = wrpc["auth.check"].useQuery(undefined, {
-    throwOnError: false,
-    retry: false,
-  });
+  const { user } = useContext(AuthDataProviderContext);
 
   const dashboardLink = useMemo(() => {
-    if (user.data?.user.username) {
-      return `/${user.data.user.username}`;
+    if (user?.username) {
+      return `/${user.username}`;
     }
     return "/dashboard";
-  }, [user.data?.user.username]);
+  }, [user?.username]);
 
   return (
     <header className={clsx("px-6 py-3 shadow z-30", theme.bgInput)}>
@@ -93,7 +90,7 @@ export const Header = (props: HeaderProps) => {
               to={dashboardLink}
               className="rounded hover:bg-slate-100 px-2 py-1 text-sm text-slate-800 font-medium flex items-center gap-1.5"
             >
-              {!user.data && (
+              {!user && (
                 <>
                   {/* <span className="w-5 h-5 rounded bg-slate-300 animate-pulse"></span> */}
                   <span className="w-32 bg-slate-300 animate-pulse rounded">
@@ -101,10 +98,10 @@ export const Header = (props: HeaderProps) => {
                   </span>
                 </>
               )}
-              {user.data && (
+              {user && (
                 <>
                   {/* <Avatar avatarURL={user.data.user.avatarUrl} /> */}
-                  <span>{user.data?.user.username}</span>
+                  <span>{user?.username}</span>
                 </>
               )}
             </Link>
@@ -133,7 +130,7 @@ export const Header = (props: HeaderProps) => {
 
         <div className="flex-grow"></div>
 
-        <UserMenu avatarURL={user.data?.user.avatarUrl} />
+        <UserMenu avatarURL={user?.avatarUrl} />
       </div>
     </header>
   );
