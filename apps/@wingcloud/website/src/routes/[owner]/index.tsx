@@ -59,13 +59,7 @@ const OwnerPage = () => {
   }, [apps, search]);
 
   return (
-    <div
-      className={clsx(
-        "w-full flex-grow overflow-auto",
-        "max-w-7xl mx-auto p-4 sm:p-6",
-        "space-y-4",
-      )}
-    >
+    <div className="w-full max-w-7xl overflow-auto mx-auto space-y-4 p-4 md:p-8">
       <div className="flex gap-x-2">
         <Input
           type="text"
