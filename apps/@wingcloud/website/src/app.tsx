@@ -8,7 +8,7 @@ import { WRPCProvider } from "@wingcloud/wrpc";
 import { useCallback, useContext, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 
-import { AppLoaderSkeleton } from "./app-loader-skeleton.js";
+import { AppLoaderSkeleton } from "./components/app-loader-skeleton.js";
 import { AppsDataProvider } from "./data-store/apps-data-provider.js";
 import { AuthDataProvider } from "./data-store/auth-data-provider.js";
 import { InstallationsDataProvider } from "./data-store/installations-data-provider.js";

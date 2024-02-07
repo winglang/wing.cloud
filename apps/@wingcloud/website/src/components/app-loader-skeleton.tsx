@@ -1,8 +1,10 @@
 import clsx from "clsx";
 
-import { SkeletonLoader } from "./design-system/skeleton-loader.js";
-import { useTheme } from "./design-system/theme-provider.js";
-import { WingIcon } from "./icons/wing-icon.js";
+import { SkeletonLoader } from "../design-system/skeleton-loader.js";
+import { useTheme } from "../design-system/theme-provider.js";
+import { WingIcon } from "../icons/wing-icon.js";
+
+import { AppLoaderImage } from "./app-loader-image.js";
 
 export const AppLoaderSkeleton = () => {
   const { theme } = useTheme();
@@ -29,6 +31,9 @@ export const AppLoaderSkeleton = () => {
         <div className="flex-grow"></div>
         <div className={"h-7 w-7 animate-pulse rounded-full bg-slate-300"} />
       </header>
+      <div className="flex flex-col self-center">
+        <AppLoaderImage />
+      </div>
     </div>
   );
 };
