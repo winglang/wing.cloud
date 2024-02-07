@@ -7,6 +7,7 @@ import { Header } from "../../../components/header.js";
 import { SpinnerLoader } from "../../../components/spinner-loader.js";
 import { Button } from "../../../design-system/button.js";
 import { Menu } from "../../../design-system/menu.js";
+import { SkeletonLoader } from "../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { MenuIcon } from "../../../icons/menu-icon.js";
 import { wrpc } from "../../../utils/wrpc.js";
@@ -52,17 +53,16 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   return (
-    <div
-      className={clsx(
-        "w-full flex-grow overflow-auto",
-        "max-w-5xl mx-auto p-4 sm:p-6",
-      )}
-    >
-      {app.isLoading && (
-        <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <SpinnerLoader />
+    <div className="w-full max-w-7xl overflow-auto mx-auto space-y-4 p-4 md:p-8">
+      <div className="space-y-1">
+        <div className={clsx("text-2xl font-semibold", theme.text1)}>
+          {appName}
         </div>
-      )}
+        <div className={clsx("text-sm", theme.text3)}>
+          {app.isLoading && <SkeletonLoader loading className="h-4 w-1/3" />}
+          {app.data?.app.description}
+        </div>
+      </div>
 
       {app.data && (
         <div className="space-y-4">
@@ -73,15 +73,6 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
               theme.borderInput,
             )}
           >
-            <div className="truncate flex flex-col justify-between">
-              <div className={clsx("text-xl truncate", theme.text1)}>
-                {appName}
-              </div>
-              <div className={clsx("text-xs truncate", theme.text2)}>
-                {app.data.app.description}
-              </div>
-            </div>
-
             <div className="flex grow justify-end items-end">
               <div className="flex flex-col justify-between gap-3 h-full items-end">
                 <Menu
