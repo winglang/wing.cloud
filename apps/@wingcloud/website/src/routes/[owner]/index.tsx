@@ -76,9 +76,7 @@ const OwnerPage = () => {
         />
         {apps && apps.length > 0 && (
           <Button
-            label="Add"
-            primary
-            icon={PlusIcon}
+            label="Add App"
             onClick={() => {
               navigate("/add");
             }}
