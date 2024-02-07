@@ -52,17 +52,25 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
     <div className="w-full max-w-7xl overflow-auto mx-auto space-y-4 p-4 md:p-8">
       <div className="space-y-4">
         <div className="flex">
-          <div className="space-y-1 flex-grow">
+          <div className="space-y-1 flex-grow truncate">
             <div className={clsx("text-2xl font-semibold", theme.text1)}>
               {appName}
             </div>
-            <div className={clsx("text-sm w-full", theme.text3)}>
-              <SkeletonLoader loading={app.isLoading}>
-                {app.data?.app.description || "No description."}
-              </SkeletonLoader>
+            <div className={clsx("text-sm w-full truncate", theme.text3)}>
+              {app.isLoading && (
+                <SkeletonLoader className="h-4 w-2/3" loading />
+              )}
+              {!app.isLoading && (
+                <span>{app.data?.app.description || "No description."}</span>
+              )}
             </div>
           </div>
           <div className="flex justify-end items-end gap-x-2">
+            <a href={repoUrl} target="_blank">
+              <Button className="truncate" disabled={!repoUrl || loading}>
+                Git Repository
+              </Button>
+            </a>
             <Button
               onClick={goToSettings}
               disabled={app.isLoading}
@@ -70,11 +78,6 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
             >
               Settings
             </Button>
-            <a href={repoUrl} target="_blank">
-              <Button className="truncate" disabled={!repoUrl || loading}>
-                Git Repository
-              </Button>
-            </a>
           </div>
         </div>
 

@@ -81,7 +81,7 @@ export const EnvironmentsList = ({
           </div>
 
           {loading && (
-            <Duplicator count={3}>
+            <Duplicator count={2}>
               <EnvironmentsListItemSkeleton />
             </Duplicator>
           )}
