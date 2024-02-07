@@ -1,8 +1,8 @@
 bring "./idns.w" as idns;
 
 class Util {
-  extern "./dnsimple.mts" pub static inflight createRecords(token: str, records: Array<idns.Record>);
-  extern "./dnsimple.mts" pub static inflight deleteRecords(token: str, records: Array<idns.Record>);
+  extern "./dnsimple.mts" pub static inflight createRecords(token: str, records: Array<idns.Record>): void;
+  extern "./dnsimple.mts" pub static inflight deleteRecords(token: str, records: Array<idns.Record>): void;
 }
 
 struct DNSProps {
