@@ -21,6 +21,7 @@ import { useTheme } from "../../design-system/theme-provider.js";
 import { TypeScriptIcon } from "../../icons/typescript-icon.js";
 import { WingIcon } from "../../icons/wing-icon.js";
 import { PopupWindowContext } from "../../utils/popup-window-provider.js";
+import { useQueryCache } from "../../utils/use-query-cache.js";
 import { wrpc, type Repository } from "../../utils/wrpc.js";
 
 import { AppTemplateItem } from "./_components/app-template-item.js";
@@ -92,6 +93,7 @@ const AddAppPage = () => {
   }, [repos, repositoryId]);
 
   const createAppMutation = wrpc["app.create"].useMutation();
+  const { addAppItemToAppList } = useQueryCache();
 
   const createApp = useCallback(async () => {
     if (!installationId || !selectedRepo || !user) {
@@ -113,9 +115,12 @@ const AddAppPage = () => {
             setCreateAppLoading(false);
             throw error;
           },
+          onSuccess: (data) => {
+            addAppItemToAppList(data.app);
+            navigate(`/${user.username}/${data.app.appName}`);
+          },
         },
       );
-      navigate(`/${app?.appFullName}`);
     } catch (error) {
       setCreateAppLoading(false);
       if (error instanceof Error) {

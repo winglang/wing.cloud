@@ -253,8 +253,7 @@ export const wrpc = createWRPCReact<{
       defaultBranch: string;
     },
     {
-      appId: string;
-      appFullName: string;
+      app: App;
     }
   >;
 }>();

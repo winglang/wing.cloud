@@ -24,11 +24,14 @@ const OwnerPage = () => {
 
   const loading = useMemo(() => {
     // Show loading if there are no apps until we redirect to add page
-    return isLoading || apps.length === 0;
-  }, [isLoading, apps.length]);
+    return isLoading || !apps || apps.length === 0;
+  }, [isLoading, apps]);
 
   useEffect(() => {
-    if (apps.length === 0 && !isFetching) {
+    if (!apps || isFetching) {
+      return;
+    }
+    if (apps.length === 0) {
       navigate("/add");
     }
   }, [apps, isFetching]);
@@ -38,9 +41,20 @@ const OwnerPage = () => {
   const [search, setSearch] = useState("");
 
   const filteredApps = useMemo(() => {
-    return apps.filter((app) =>
-      `${app.appName}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
-    );
+    if (!apps) {
+      return [];
+    }
+    return apps
+      .filter((app) =>
+        `${app.appName}`
+          .toLocaleLowerCase()
+          .includes(search.toLocaleLowerCase()),
+      )
+      .sort((a, b) => {
+        return (
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      });
   }, [apps, search]);
 
   return (
@@ -65,7 +79,7 @@ const OwnerPage = () => {
             setSearch(e.target.value);
           }}
         />
-        {apps.length > 0 && (
+        {apps && apps.length > 0 && (
           <Button
             label="Add"
             primary
@@ -83,23 +97,6 @@ const OwnerPage = () => {
           <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
             No apps found.
           </h3>
-
-          {apps.length === 0 && (
-            <div>
-              <p className={clsx("mt-1 text-sm", theme.text2)}>
-                Get started by adding an app.
-              </p>
-              <Button
-                label="Add app"
-                icon={PlusIcon}
-                primary
-                className="mt-6"
-                onClick={() => {
-                  navigate("/add");
-                }}
-              />
-            </div>
-          )}
         </div>
       )}
 
@@ -111,8 +108,7 @@ const OwnerPage = () => {
       >
         {loading &&
           Array.from({
-            length:
-              apps.length > 0 ? apps.length : Math.floor(Math.random() * 4) + 3,
+            length: apps && apps?.length > 0 ? apps.length : 5,
           }).map((_, i) => <AppCardSkeleton key={i} />)}
 
         {filteredApps.map((app) => (
