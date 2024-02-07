@@ -204,7 +204,6 @@ let wingCloudApi = new wingcloud_api.Api(
 
 let probotApp = new probot.ProbotApp(
   probotAdapter: probotAdapter,
-  runtimeUrl: rntm.api.url,
   environments: environments,
   users: users,
   apps: apps,

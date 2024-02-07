@@ -19,7 +19,6 @@ struct PostCommentProps {
 
 struct ProbotAppProps {
   probotAdapter: adapter.ProbotAdapter;
-  runtimeUrl: str;
   environments: environments.Environments;
   environmentManager: environment_manager.EnvironmentManager;
   users: users.Users;
@@ -29,7 +28,6 @@ struct ProbotAppProps {
 
 pub class ProbotApp {
   adapter: adapter.ProbotAdapter;
-  runtimeUrl: str;
   pub githubApp: github.GithubApp;
   environments: environments.Environments;
   environmentManager: environment_manager.EnvironmentManager;
@@ -37,7 +35,6 @@ pub class ProbotApp {
 
   new(props: ProbotAppProps) {
     this.adapter = props.probotAdapter;
-    this.runtimeUrl = props.runtimeUrl;
     this.environments = props.environments;
     this.environmentManager = props.environmentManager;
     this.apps = props.apps;
