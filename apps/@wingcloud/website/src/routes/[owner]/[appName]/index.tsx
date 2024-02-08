@@ -49,9 +49,9 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
   }, [owner, appName]);
 
   return (
-    <div className="w-full max-w-7xl overflow-auto mx-auto space-y-4 p-4 md:p-8">
-      <div className="space-y-4">
-        <div className="flex">
+    <div>
+      <div className={clsx("border-b", theme.border4, theme.bg4)}>
+        <div className="w-full max-w-7xl overflow-auto mx-auto p-4 md:p-8 flex">
           <div className="space-y-1 flex-grow truncate">
             <div className={clsx("text-2xl font-semibold", theme.text1)}>
               {appName}
@@ -80,18 +80,18 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
             </Button>
           </div>
         </div>
+      </div>
 
-        <div className="w-full mx-auto">
-          {owner && appName && (
-            <EnvironmentsList
-              environments={environments}
-              loading={environmentsQuery.isLoading}
-              owner={owner}
-              appName={appName}
-              repoUrl={repoUrl || ""}
-            />
-          )}
-        </div>
+      <div className="w-full max-w-7xl overflow-auto mx-auto px-4 py-2 md:px-8 md:py:4">
+        {owner && appName && (
+          <EnvironmentsList
+            environments={environments}
+            loading={environmentsQuery.isLoading}
+            owner={owner}
+            appName={appName}
+            repoUrl={repoUrl || ""}
+          />
+        )}
       </div>
     </div>
   );

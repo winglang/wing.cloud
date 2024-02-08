@@ -5,7 +5,11 @@ import { SkeletonLoader } from "../../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
 
-export const EnvironmentsListItemSkeleton = () => {
+export const EnvironmentsListItemSkeleton = ({
+  short = false,
+}: {
+  short?: boolean;
+}) => {
   const { theme } = useTheme();
 
   return (
@@ -30,9 +34,12 @@ export const EnvironmentsListItemSkeleton = () => {
           <StatusDot status="initializing" />
         </div>
 
-        <div className="w-full space-y-2.5">
+        <div className="w-full space-y-2 py-0.5">
           <SkeletonLoader className="h-4 w-1/5" loading />
-          <SkeletonLoader className="h-4 w-2/5" loading />
+          <SkeletonLoader
+            className={clsx("h-4", short ? "w-1/3" : "w-2/5")}
+            loading
+          />
         </div>
       </div>
     </div>
