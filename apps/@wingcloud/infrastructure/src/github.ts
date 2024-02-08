@@ -22,12 +22,16 @@ export const getUser = async (accessToken: string) => {
     auth: accessToken,
   });
   const { data: user } = await octokit.request("GET /user");
-
+  let email = user.email;
+  if (!email) {
+    const { data: emails } = await octokit.request("GET /user/emails");
+    email = emails.find((email) => email.primary)?.email ?? "";
+  }
   return {
     name: user.name,
     login: user.login,
     avatar_url: user.avatar_url ?? "",
-    email: user.email ?? "",
+    email,
   };
 };
 
