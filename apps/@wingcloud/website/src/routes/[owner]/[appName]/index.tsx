@@ -1,3 +1,4 @@
+import { PencilIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -42,8 +43,6 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
     return `https://github.com/${app.data?.app.repoOwner}/${app.data?.app.repoName}`;
   }, [app.data]);
 
-  const [loading, setLoading] = useState(false);
-
   const goToSettings = useCallback(async () => {
     navigate(`/${owner}/${appName}/settings`);
   }, [owner, appName]);
@@ -60,12 +59,26 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
               {app.isLoading && (
                 <SkeletonLoader className="h-5 w-1/3" loading />
               )}
-              {!app.isLoading && app.data?.app.description}
+              {!app.isLoading && (
+                <div className="group flex gap-x-1 items-center">
+                  <div>{app.data?.app.description}</div>
+                  <PencilIcon
+                    className={clsx(
+                      "w-3 h-3",
+                      theme.text2,
+                      theme.bgInputHover,
+                      "transition-all cursor-pointer",
+                      "opacity-0 group-hover:opacity-100 group-focus:opacity-100",
+                    )}
+                    onClick={goToSettings}
+                  />
+                </div>
+              )}
             </div>
           </div>
           <div className="flex justify-end items-end gap-x-2">
             <a href={repoUrl} target="_blank">
-              <Button className="truncate" disabled={!repoUrl || loading}>
+              <Button className="truncate" disabled={!repoUrl}>
                 Git Repository
               </Button>
             </a>
