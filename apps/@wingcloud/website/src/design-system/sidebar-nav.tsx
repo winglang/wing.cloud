@@ -29,8 +29,8 @@ const SideBarItem = ({ label, to, icon }: Item) => {
         "text-sm leading-6 font-semibold",
         theme.text1,
         theme.text1Hover,
-        !active && "hover:bg-gray-100 text-gray-800",
-        active && "bg-gray-100 text-gray-900",
+        !active && "hover:bg-gray-150 text-gray-800",
+        active && "bg-gray-200 text-gray-900",
       )}
     >
       {icon}
