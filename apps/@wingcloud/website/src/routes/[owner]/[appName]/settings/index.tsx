@@ -188,7 +188,7 @@ const SettingsPage = () => {
           >
             <div className={clsx("truncate", theme.text1)}>Advanced</div>
             <div className="flex">
-              <Button onClick={() => setDeleteModalOpen(true)}>
+              <Button onClick={() => setDeleteModalOpen(true)} small>
                 Delete App
               </Button>
             </div>

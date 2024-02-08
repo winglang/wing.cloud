@@ -56,7 +56,7 @@ export const Select = memo(
                 className={clsx(
                   btnClassName,
                   "w-full pr-6 text-left relative",
-                  "items-center px-2.5 py-2.5 border text-xs rounded-md",
+                  "items-center px-2.5 py-2 border text-xs rounded-md",
                   theme.bgInput,
                   theme.textInput,
                   theme.borderInput,

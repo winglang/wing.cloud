@@ -112,27 +112,29 @@ export const EnvironmentsList = ({
             {filteredPreviewEnvs.length === 0 && (
               <div
                 className={clsx(
+                  "space-y-2",
                   "p-4 w-full border text-center rounded-md",
                   theme.bgInput,
                   theme.borderInput,
                   theme.text1,
                 )}
               >
-                <BranchIcon className="w-12 h-12 mx-auto text-slate-400" />
-                <h3 className="mt-2 text-sm font-medium text-slate-900">
-                  No previews found.
+                <BranchIcon
+                  className={clsx("w-12 h-12 mx-auto", theme.text3)}
+                />
+                <h3 className={clsx("text-sm font-medium", theme.text2)}>
+                  No preview environments found.
                 </h3>
-
                 <p
                   className={clsx(
                     "mt-1 text-sm flex gap-x-1 w-full justify-center",
-                    theme.text2,
+                    theme.text3,
                   )}
                 >
                   <span>
                     Get started by{" "}
                     <a
-                      className="text-blue-600 hover:underline"
+                      className="text-sky-500 hover:underline hover:text-sky-600"
                       href={`${repoUrl}/compare`}
                       target="_blank"
                       rel="noopener noreferrer"
