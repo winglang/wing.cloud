@@ -88,12 +88,12 @@ export const Header = (props: HeaderProps) => {
           <div>
             <Link
               to={dashboardLink}
-              className="rounded hover:bg-slate-100 px-2 py-1 text-sm text-slate-800 font-medium flex items-center gap-1.5"
+              className="rounded hover:bg-gray-100 px-2 py-1 text-sm text-gray-800 font-medium flex items-center gap-1.5"
             >
               {!user && (
                 <>
-                  {/* <span className="w-5 h-5 rounded bg-slate-300 animate-pulse"></span> */}
-                  <span className="w-32 bg-slate-300 animate-pulse rounded">
+                  {/* <span className="w-5 h-5 rounded bg-gray-300 animate-pulse"></span> */}
+                  <span className="w-32 bg-gray-300 animate-pulse rounded">
                     &nbsp;
                   </span>
                 </>
@@ -108,10 +108,10 @@ export const Header = (props: HeaderProps) => {
           </div>
           {props.breadcrumbs?.map((breadcrumb, index) => (
             <Fragment key={index}>
-              <span className="text-slate-600 text-sm">/</span>
+              <span className="text-gray-600 text-sm">/</span>
               <Link
                 to={breadcrumb.to}
-                className="rounded hover:bg-slate-100 px-2 py-1 text-sm text-slate-800 font-medium flex items-center gap-1.5"
+                className="rounded hover:bg-gray-100 px-2 py-1 text-sm text-gray-800 font-medium flex items-center gap-1.5"
               >
                 {breadcrumb.icon ? (
                   <span className="-ml-1">{breadcrumb.icon}</span>

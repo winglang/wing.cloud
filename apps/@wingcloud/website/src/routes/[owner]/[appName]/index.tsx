@@ -49,7 +49,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
   }, [owner, appName]);
 
   return (
-    <div>
+    <div className="overflow-auto">
       <div className={clsx("border-b", theme.border4, theme.bg4)}>
         <div className="w-full max-w-7xl overflow-auto mx-auto p-4 md:p-8 flex">
           <div className="space-y-1 flex-grow truncate">
