@@ -209,6 +209,7 @@ const SettingsPage = () => {
 
       {appName && owner && (
         <DeleteModal
+          appId={app?.appId}
           owner={owner}
           appName={appName}
           show={deleteModalOpen}
