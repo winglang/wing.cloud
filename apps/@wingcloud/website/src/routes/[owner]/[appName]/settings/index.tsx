@@ -11,6 +11,7 @@ import { ErrorBoundary } from "../../../../components/error-boundary.js";
 import { Header } from "../../../../components/header.js";
 import { SpinnerLoader } from "../../../../components/spinner-loader.js";
 import { Button } from "../../../../design-system/button.js";
+import { Input } from "../../../../design-system/input.js";
 import { useNotifications } from "../../../../design-system/notification.js";
 import { Select } from "../../../../design-system/select.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
@@ -25,7 +26,8 @@ const SettingsPage = () => {
   const { owner, appName } = useParams();
   const { showNotification } = useNotifications();
 
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [entrypointConfirmModalOpen, setEntrypointConfirmModalOpen] =
+    useState(false);
 
   const appQuery = wrpc["app.getByName"].useQuery(
     { owner: owner!, appName: appName! },
@@ -35,6 +37,12 @@ const SettingsPage = () => {
   const app = useMemo(() => {
     return appQuery.data?.app;
   }, [appQuery.data]);
+
+  const [description, setDescription] = useState<string>();
+
+  const [entrypoint, setEntrypoint] = useState(app?.entrypoint);
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const repositoryQuery = wrpc["github.getRepository"].useQuery(
     {
@@ -57,6 +65,29 @@ const SettingsPage = () => {
     },
   );
 
+  const updateAppDescriptionMutation =
+    wrpc["app.updateDescription"].useMutation();
+
+  const updateAppDescription = useCallback(async () => {
+    if (description === app?.description) {
+      return;
+    }
+    try {
+      await updateAppDescriptionMutation.mutateAsync({
+        appId: app?.appId!,
+        description: description || "",
+      });
+      showNotification("Succefully updated the app's description");
+    } catch (error) {
+      if (error instanceof Error) {
+        showNotification("Failed to update the app's description", {
+          body: error.message,
+          type: "error",
+        });
+      }
+    }
+  }, [app?.appId, description, updateAppDescriptionMutation]);
+
   const isValidEntrypoint = useMemo(() => {
     if (!app?.entrypoint || !entrypointsQuery.data) {
       return true;
@@ -73,27 +104,18 @@ const SettingsPage = () => {
     );
   }, [app, entrypointsQuery.data]);
 
-  const [entrypoint, setEntrypoint] = useState(app?.entrypoint);
-
   const updateEntrypointMutation = wrpc["app.updateEntrypoint"].useMutation();
-
-  const [loading, setLoading] = useState(false);
-
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const updateEntrypoint = useCallback(async () => {
     try {
-      setLoading(true);
       await updateEntrypointMutation.mutateAsync({
         appId: app?.appId!,
         entrypoint: entrypoint!,
       });
       showNotification("Succefully updated the app's entrypoint");
-      setLoading(false);
-      setConfirmModalOpen(false);
+      setEntrypointConfirmModalOpen(false);
     } catch (error) {
-      setLoading(false);
-      setConfirmModalOpen(false);
+      setEntrypointConfirmModalOpen(false);
       if (error instanceof Error) {
         showNotification("Failed to update the app's entrypoint", {
           body: error.message,
@@ -110,106 +132,159 @@ const SettingsPage = () => {
         "max-w-7xl mx-auto p-4 sm:p-6",
       )}
     >
-      {!app && (
-        <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <SpinnerLoader />
-        </div>
-      )}
-
-      {app && (
-        <div className="space-y-4">
-          <div
-            className={clsx(
-              "space-y-2",
-              "flex flex-col gap-x-2 rounded-md p-4 border",
-              theme.bgInput,
-              theme.borderInput,
-            )}
-          >
-            <div className={clsx("flex flex-col text-x truncate", theme.text1)}>
-              <div className="flex flex-row items-center gap-2">
-                <span>App Entrypoint</span>
-                {!isValidEntrypoint && !entrypointsQuery.isLoading && (
-                  <ExclamationTriangleIcon
-                    title="The configured entrypoint file could not be found in this repository."
-                    className="h-4 w-4 flex-shrink-0 text-orange-600"
-                  />
-                )}
-              </div>
+      <div className="space-y-4">
+        <div
+          className={clsx(
+            "space-y-2",
+            "flex flex-col gap-x-2 rounded-md p-4 border",
+            theme.bgInput,
+            theme.borderInput,
+          )}
+        >
+          <div className={clsx("flex flex-col text-x truncate", theme.text1)}>
+            <div className="flex flex-row items-center gap-2">
+              <span>App Description</span>
             </div>
-            <div className="flex gap-x-2">
-              <Select
-                items={entrypoints}
-                value={entrypoint || app.entrypoint}
-                onChange={setEntrypoint}
-                disabled={
-                  entrypointsQuery.isLoading ||
-                  entrypointsQuery.data === undefined
-                }
-                className="w-full"
-              />
-              <Button
-                onClick={() => setConfirmModalOpen(true)}
-                disabled={
-                  loading || !entrypoint || app.entrypoint === entrypoint
-                }
-                className="truncate"
+          </div>
+          <div className="flex gap-x-2">
+            <Input
+              value={
+                description === undefined ? app?.description || "" : description
+              }
+              type="text"
+              containerClassName="w-full"
+              placeholder={
+                appQuery.isLoading ? "Loading..." : "Describe your app here..."
+              }
+              onChange={(event) => setDescription(event.target.value)}
+              disabled={
+                !app ||
+                appQuery.isLoading ||
+                updateAppDescriptionMutation.isPending
+              }
+              className="w-full"
+            />
+            <Button
+              onClick={updateAppDescription}
+              disabled={
+                appQuery.isLoading ||
+                updateAppDescriptionMutation.isPending ||
+                description === undefined ||
+                description === app?.description
+              }
+              className="truncate space-x-1"
+            >
+              {updateAppDescriptionMutation.isPending && (
+                <SpinnerLoader size="xs" />
+              )}
+              <span>Save</span>
+            </Button>
+          </div>
+        </div>
+
+        <div
+          className={clsx(
+            "space-y-2",
+            "flex flex-col gap-x-2 rounded-md p-4 border",
+            theme.bgInput,
+            theme.borderInput,
+          )}
+        >
+          <div className={clsx("flex flex-col text-x truncate", theme.text1)}>
+            <div className="flex flex-row items-center gap-2">
+              <span>App Entrypoint</span>
+              {!isValidEntrypoint && !entrypointsQuery.isLoading && (
+                <ExclamationTriangleIcon
+                  title="The configured entrypoint file could not be found in this repository."
+                  className="h-4 w-4 flex-shrink-0 text-orange-600"
+                />
+              )}
+            </div>
+          </div>
+          <div className="flex gap-x-2">
+            <Select
+              items={entrypoints}
+              value={entrypoint || app?.entrypoint || ""}
+              placeholder={
+                appQuery.isLoading ? "Loading..." : "Select entrypoint"
+              }
+              onChange={setEntrypoint}
+              disabled={
+                updateEntrypointMutation.isPending ||
+                appQuery.isLoading ||
+                entrypointsQuery.isLoading ||
+                entrypointsQuery.data === undefined
+              }
+              className="w-full"
+            />
+            <Button
+              onClick={() => setEntrypointConfirmModalOpen(true)}
+              disabled={
+                updateEntrypointMutation.isPending ||
+                !entrypoint ||
+                app?.entrypoint === entrypoint
+              }
+              className="truncate"
+            >
+              Save
+            </Button>
+          </div>
+          <hr className="h-px mt-4 mb-2 bg-slate-200 border-0 dark:bg-slate-700" />
+          <div className="flex flex-row gap-2">
+            <ExclamationCircleIcon
+              className={clsx("h-4 w-4 flex-shrink-0", theme.text2)}
+            />
+            <span className={clsx("text-xs truncate", theme.text2)}>
+              Updating this property will restart all active environments. Learn
+              more about{" "}
+              <a
+                className="text-blue-600"
+                href="https://www.winglang.io/docs/language-reference#112-execution-model"
+                target="_blank"
               >
-                Save
-              </Button>
-            </div>
-            <hr className="h-px mt-4 mb-2 bg-slate-200 border-0 dark:bg-slate-700" />
-            <div className="flex flex-row gap-2">
-              <ExclamationCircleIcon
-                className={clsx("h-4 w-4 flex-shrink-0", theme.text2)}
-              />
-              <span className={clsx("text-xs truncate", theme.text2)}>
-                Updating this property will restart all active environments.
-                Learn more about{" "}
-                <a
-                  className="text-blue-600"
-                  href="https://www.winglang.io/docs/language-reference#112-execution-model"
-                  target="_blank"
-                >
-                  Entrypoints
-                </a>{" "}
-              </span>
-            </div>
-          </div>
-
-          <SecretsList appId={app.appId} />
-
-          <div
-            className={clsx(
-              "flex flex-col gap-2 rounded-md p-4 border",
-              theme.bgInput,
-              theme.borderInput,
-            )}
-          >
-            <div className={clsx("truncate", theme.text1)}>Advanced</div>
-            <div className="flex">
-              <Button onClick={() => setDeleteModalOpen(true)} small>
-                Delete App
-              </Button>
-            </div>
+                Entrypoints
+              </a>{" "}
+            </span>
           </div>
         </div>
-      )}
+
+        <SecretsList appId={app?.appId || ""} />
+
+        <div
+          className={clsx(
+            "flex flex-col gap-2 rounded-md p-4 border",
+            theme.bgInput,
+            theme.borderInput,
+          )}
+        >
+          <div className={clsx("truncate", theme.text1)}>Advanced</div>
+          <div className="flex">
+            <Button
+              onClick={() => setDeleteModalOpen(true)}
+              small
+              disabled={appQuery.isLoading}
+              className="truncate"
+            >
+              Delete App
+            </Button>
+          </div>
+        </div>
+      </div>
 
       {appName && app?.appId && (
         <EntrypointUpdateModal
           appName={appName}
-          show={confirmModalOpen}
+          show={entrypointConfirmModalOpen}
           isIdle={updateEntrypointMutation.isIdle}
-          isPending={loading}
-          onClose={setConfirmModalOpen}
+          isPending={updateEntrypointMutation.isPending}
+          onClose={setEntrypointConfirmModalOpen}
           onConfirm={updateEntrypoint}
         />
       )}
 
-      {appName && owner && (
+      {appName && owner && app?.appId && (
         <DeleteModal
-          appId={app?.appId}
+          appId={app.appId}
           owner={owner}
           appName={appName}
           show={deleteModalOpen}

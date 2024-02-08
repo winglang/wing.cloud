@@ -968,6 +968,35 @@ pub class Api {
       };
     });
 
+    api.post("/wrpc/app.updateDescription", inflight (request) => {
+      let userId = getUserIdFromCookie(request);
+      let input = Json.parse(request.body ?? "");
+      let appId = input.get("appId").asStr();
+
+      let app = apps.get(appId: appId);
+      checkAppAccessRights(userId, app);
+
+      let description = input.get("description").asStr();
+      apps.updateDescription(
+        appId: appId,
+        appName: app.appName,
+        repoId: app.repoId,
+        userId: userId,
+        description: description,
+      );
+
+      invalidateQuery.invalidate(userId: userId, queries: [
+        "app.getByName?appName={app.appName}",
+        "app.list",
+      ]);
+
+      return {
+        body: {
+          appId: appId,
+        },
+      };
+    });
+
     api.get("/wrpc/app.environment.logs", inflight (request) => {
       let userId = getUserIdFromCookie(request);
       checkOwnerAccessRights(request, request.query.get("owner"));

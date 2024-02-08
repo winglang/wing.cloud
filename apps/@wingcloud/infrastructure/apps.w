@@ -94,6 +94,14 @@ struct UpdateStatusOptions {
   status: str;
 }
 
+struct UpdateDescriptionOptions {
+  appId: str;
+  appName: str;
+  userId: str;
+  repoId: str;
+  description: str;
+}
+
 pub class Apps {
   table: ex.DynamodbTable;
 
@@ -528,6 +536,78 @@ pub class Apps {
           },
           expressionAttributeValues: {
             ":status": options.status,
+          },
+        }
+      },
+    ]);
+  }
+
+  pub inflight updateDescription(options: UpdateDescriptionOptions): void {
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "APP#{options.appId}",
+            sk: "#",
+          },
+          updateExpression: "SET #description = :description",
+          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
+          expressionAttributeNames: {
+            "#pk": "pk",
+            "#description": "description",
+            "#userId": "userId",
+          },
+          expressionAttributeValues: {
+            ":userId": options.userId,
+            ":description": options.description,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "APP#{options.appId}",
+          },
+          updateExpression: "SET #description = :description",
+          expressionAttributeNames: {
+            "#description": "description",
+
+          },
+          expressionAttributeValues: {
+            ":description": options.description,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "APP_NAME#{options.appName}",
+          },
+          updateExpression: "SET #description = :description",
+          expressionAttributeNames: {
+            "#description": "description",
+
+          },
+          expressionAttributeValues: {
+            ":description": options.description,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "REPOSITORY#{options.repoId}",
+            sk: "APP#{options.appId}",
+          },
+          updateExpression: "SET #description = :description",
+          expressionAttributeNames: {
+            "#description": "description",
+
+          },
+          expressionAttributeValues: {
+            ":description": options.description,
           },
         }
       },

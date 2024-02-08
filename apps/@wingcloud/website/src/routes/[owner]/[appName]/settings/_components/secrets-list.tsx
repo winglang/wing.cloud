@@ -5,24 +5,24 @@ import { useState, useMemo, useCallback } from "react";
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
 import { useNotifications } from "../../../../../design-system/notification.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
-import { type App, type Secret } from "../../../../../utils/wrpc.js";
+import { type Secret } from "../../../../../utils/wrpc.js";
 import { wrpc } from "../../../../../utils/wrpc.js";
 import type { EnvironmentType } from "../../../../../utils/wrpc.js";
 
 import { NewSecret } from "./new-secret.js";
 import { SecretsListItem } from "./secrets-list-item.js";
 
-export const SecretsList = ({ appId }: { appId: string }) => {
+export const SecretsList = ({ appId }: { appId?: string }) => {
   const { showNotification } = useNotifications();
   const { theme } = useTheme();
   const [updatingSecrets, setUpdatingSecrets] = useState(false);
 
   const secretsQuery = wrpc["app.listSecrets"].useQuery(
     {
-      appId: appId || "",
+      appId: appId!,
     },
     {
-      enabled: appId != undefined,
+      enabled: !!appId,
     },
   );
 
@@ -35,6 +35,9 @@ export const SecretsList = ({ appId }: { appId: string }) => {
   const onCreate = useCallback(
     async (name: string, value: string, environmentType: EnvironmentType) => {
       try {
+        if (!appId) {
+          throw new Error("App ID is required");
+        }
         setUpdatingSecrets(true);
         await createMutation.mutateAsync({
           appId: appId,
@@ -120,7 +123,9 @@ export const SecretsList = ({ appId }: { appId: string }) => {
     return [...groups.entries()];
   }, [secrets]);
 
-  const loading = secretsQuery.isLoading;
+  const loading = useMemo(() => {
+    return !appId || secretsQuery.isLoading;
+  }, [appId, secretsQuery.isLoading]);
 
   return (
     <div
