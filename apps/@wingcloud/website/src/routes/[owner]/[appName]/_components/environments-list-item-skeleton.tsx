@@ -35,7 +35,10 @@ export const EnvironmentsListItemSkeleton = ({
         </div>
 
         <div className="w-full space-y-2 py-0.5">
-          <SkeletonLoader className="h-4 w-1/5" loading />
+          <SkeletonLoader
+            className={clsx("h-4", short ? "w-1/6" : "w-1/5")}
+            loading
+          />
           <SkeletonLoader
             className={clsx("h-4", short ? "w-1/3" : "w-2/5")}
             loading

@@ -135,7 +135,7 @@ export const EnvironmentsListItem = ({
                 <Link
                   to={`/${owner}/${appName}/${environment.branch}/#${TEST_LOGS_ID}`}
                   className={clsx(
-                    "flex items-end gap-x-0.5",
+                    "flex items-center gap-x-0.5",
                     "rounded-xl px-1 py-0.5",
                     "border",
                     theme.bg3,
