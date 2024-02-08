@@ -19,7 +19,10 @@ const SettingsPage = () => {
               label: "Entrypoints",
               to: `/${owner}/${appName}/settings/entrypoints`,
             },
-            { label: "Secrets", to: `/${owner}/${appName}/settings/secrets` },
+            {
+              label: "Secrets",
+              to: `/${owner}/${appName}/settings/secrets`,
+            },
           ]}
         />
       </div>
