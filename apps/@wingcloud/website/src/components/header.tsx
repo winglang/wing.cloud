@@ -91,19 +91,11 @@ export const Header = (props: HeaderProps) => {
               className="rounded hover:bg-gray-100 px-2 py-1 text-sm text-gray-800 font-medium flex items-center gap-1.5"
             >
               {!user && (
-                <>
-                  {/* <span className="w-5 h-5 rounded bg-gray-300 animate-pulse"></span> */}
-                  <span className="w-32 bg-gray-300 animate-pulse rounded">
-                    &nbsp;
-                  </span>
-                </>
+                <span className="w-32 bg-gray-300 animate-pulse rounded">
+                  &nbsp;
+                </span>
               )}
-              {user && (
-                <>
-                  {/* <Avatar avatarURL={user.data.user.avatarUrl} /> */}
-                  <span>{user?.username}</span>
-                </>
-              )}
+              {user && <span>{user?.username}</span>}
             </Link>
           </div>
           {props.breadcrumbs?.map((breadcrumb, index) => (
