@@ -24,13 +24,13 @@ const SideBarItem = ({ label, to, icon }: Item) => {
     <Link
       to={to}
       className={clsx(
-        "flex items-center gap-x-2",
-        "py-1.5 pl-3 pr-20 rounded-md",
-        "text-sm leading-6 font-semibold",
+        "flex items-center gap-x-2 truncate",
+        "py-1.5 pl-3 rounded-md",
+        "text-sm leading-6",
         theme.text1,
         theme.text1Hover,
-        !active && "hover:bg-gray-150 text-gray-800",
-        active && "bg-gray-200 text-gray-900",
+        !active && "hover:bg-gray-150",
+        active && "bg-gray-200 font-semibold",
       )}
     >
       {icon}
