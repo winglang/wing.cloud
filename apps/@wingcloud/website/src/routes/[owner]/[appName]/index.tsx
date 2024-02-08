@@ -58,7 +58,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
             </div>
             <div className={clsx("text-sm w-full truncate", theme.text3)}>
               {app.isLoading && (
-                <SkeletonLoader className="h-5 w-2/3" loading />
+                <SkeletonLoader className="h-5 w-1/3" loading />
               )}
               {!app.isLoading && (
                 <span>{app.data?.app.description || "No description."}</span>

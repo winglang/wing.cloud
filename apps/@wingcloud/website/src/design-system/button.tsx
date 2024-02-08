@@ -50,6 +50,7 @@ export const Button = forwardRef<
         ref={ref}
         type={type}
         className={clsx(
+          "break-keep",
           "inline-flex gap-2 items-center text-xs font-medium outline-none rounded",
           theme.focusInput,
           primary &&
