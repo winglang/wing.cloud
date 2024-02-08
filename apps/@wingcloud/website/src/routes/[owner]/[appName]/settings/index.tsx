@@ -120,7 +120,8 @@ const SettingsPage = () => {
         <div className="space-y-4">
           <div
             className={clsx(
-              "flex flex-col gap-x-2 rounded p-4 border",
+              "space-y-2",
+              "flex flex-col gap-x-2 rounded-md p-4 border",
               theme.bgInput,
               theme.borderInput,
             )}
@@ -136,32 +137,26 @@ const SettingsPage = () => {
                 )}
               </div>
             </div>
-            <div className="w-full flex flex-row mt-2">
-              <div className="w-full space-y-2">
-                <div className="flex gap-2 w-full items-center">
-                  <Select
-                    items={entrypoints}
-                    value={entrypoint || app.entrypoint}
-                    onChange={setEntrypoint}
-                    disabled={
-                      entrypointsQuery.isLoading ||
-                      entrypointsQuery.data === undefined
-                    }
-                    className="w-full"
-                  />
-                </div>
-              </div>
-              <div className="pl-2">
-                <Button
-                  onClick={() => setConfirmModalOpen(true)}
-                  disabled={
-                    loading || !entrypoint || app.entrypoint === entrypoint
-                  }
-                  className="truncate"
-                >
-                  Save
-                </Button>
-              </div>
+            <div className="flex gap-x-2">
+              <Select
+                items={entrypoints}
+                value={entrypoint || app.entrypoint}
+                onChange={setEntrypoint}
+                disabled={
+                  entrypointsQuery.isLoading ||
+                  entrypointsQuery.data === undefined
+                }
+                className="w-full"
+              />
+              <Button
+                onClick={() => setConfirmModalOpen(true)}
+                disabled={
+                  loading || !entrypoint || app.entrypoint === entrypoint
+                }
+                className="truncate"
+              >
+                Save
+              </Button>
             </div>
             <hr className="h-px mt-4 mb-2 bg-slate-200 border-0 dark:bg-slate-700" />
             <div className="flex flex-row gap-2">
@@ -186,17 +181,14 @@ const SettingsPage = () => {
 
           <div
             className={clsx(
-              "flex flex-col gap-2 rounded p-4 border",
+              "flex flex-col gap-2 rounded-md p-4 border",
               theme.bgInput,
               theme.borderInput,
             )}
           >
             <div className={clsx("truncate", theme.text1)}>Advanced</div>
             <div className="flex">
-              <Button
-                onClick={() => setDeleteModalOpen(true)}
-                className="bg-red-500 hover:bg-red-400 text-white"
-              >
+              <Button onClick={() => setDeleteModalOpen(true)}>
                 Delete App
               </Button>
             </div>

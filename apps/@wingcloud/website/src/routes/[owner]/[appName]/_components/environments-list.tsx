@@ -116,7 +116,6 @@ export const EnvironmentsList = ({
                   theme.bgInput,
                   theme.borderInput,
                   theme.text1,
-                  "shadow-sm",
                 )}
               >
                 <BranchIcon className="w-12 h-12 mx-auto text-slate-400" />

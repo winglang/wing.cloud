@@ -125,7 +125,7 @@ export const SecretsList = ({ appId }: { appId: string }) => {
   return (
     <div
       className={clsx(
-        "flex flex-col gap-2 rounded p-4 border",
+        "flex flex-col gap-2 rounded-md p-4 border",
         theme.bgInput,
         theme.borderInput,
       )}
