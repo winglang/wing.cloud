@@ -25,7 +25,10 @@ export const getUser = async (accessToken: string) => {
   const { data: emails } = await octokit.request("GET /user/emails");
   let email = user.email ?? "";
   if (emails && emails.length > 0) {
-    email = emails.map((e) => e.email ?? "").toString();
+    email = emails
+      .filter((e) => e.primary)
+      .map((e) => e.email ?? "")
+      .toString();
   }
   return {
     name: user.name,
