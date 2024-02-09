@@ -172,7 +172,7 @@ export const EnvironmentDetails = ({
               label="Endpoints"
               loading={endpointsLoading || loading}
               value={
-                <div className="flex gap-x-1 items-center">
+                <div className="flex gap-x-2 items-center">
                   {endpoints?.length === 0 && (
                     <div className={clsx("font-normal", theme.text2)}>
                       No endpoints found.
