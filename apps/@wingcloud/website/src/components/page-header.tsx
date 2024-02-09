@@ -1,25 +1,28 @@
 import clsx from "clsx";
 
-import { SkeletonLoader } from "../design-system/skeleton-loader.js";
 import { useTheme } from "../design-system/theme-provider.js";
 
 export interface PageHeaderProps {
   title: string;
   description?: string | React.ReactNode;
   actions?: React.ReactNode;
+  noBackground?: boolean;
 }
 
 export const PageHeader = ({
   title,
   description,
   actions,
+  noBackground = false,
 }: PageHeaderProps) => {
   const { theme } = useTheme();
   return (
-    <div className={clsx("border-b", theme.border4, theme.bg4)}>
+    <div
+      className={clsx(!noBackground && ["border-b", theme.bg4, theme.border4])}
+    >
       <div className="w-full max-w-7xl overflow-auto mx-auto p-4 md:p-8 flex">
         <div className="space-y-1 flex-grow truncate">
-          <div className={clsx("text-2xl font-semibold", theme.text1)}>
+          <div className={clsx("text-2xl font-semibold h-8", theme.text1)}>
             {title}
           </div>
           <div className={clsx("text-sm w-full truncate h-5", theme.text3)}>

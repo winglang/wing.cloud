@@ -1,11 +1,13 @@
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { Input } from "../../../../design-system/input.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
-import type { Environment } from "../../../../utils/wrpc.js";
+import type { Endpoint, Environment } from "../../../../utils/wrpc.js";
+import { EnvironmentDetails } from "../[branch]/_components/environment-details.js";
 
 import { EnvironmentsListItemSkeleton } from "./environments-list-item-skeleton.js";
 import { EnvironmentsListItem } from "./environments-list-item.js";
@@ -16,6 +18,8 @@ interface EnvironmentsListProps {
   appName: string;
   repoUrl: string;
   loading?: boolean;
+  endpoints: Endpoint[];
+  endpointsLoading?: boolean;
 }
 
 export const EnvironmentsList = ({
@@ -24,16 +28,18 @@ export const EnvironmentsList = ({
   appName,
   repoUrl,
   loading,
+  endpoints,
+  endpointsLoading = false,
 }: EnvironmentsListProps) => {
   const { theme } = useTheme();
 
   const [search, setSearch] = useState("");
 
-  const productionEnvs = useMemo(() => {
+  const productionEnvironment = useMemo(() => {
     if (!environments) {
-      return [];
+      return;
     }
-    return environments.filter((env) => env.type === "production");
+    return environments.find((env) => env.type === "production");
   }, [environments, search]);
 
   const previewEnvs = useMemo(() => {
@@ -59,18 +65,21 @@ export const EnvironmentsList = ({
       <div className="space-y-2">
         <div className={clsx("text-lg pt-2", theme.text1)}>Production</div>
 
-        {productionEnvs.length === 0 && <EnvironmentsListItemSkeleton />}
-        {productionEnvs.length > 0 &&
-          productionEnvs.map((environment) => (
-            <div key={environment.id}>
-              <EnvironmentsListItem
-                key={environment.id}
-                owner={owner}
-                appName={appName}
-                environment={environment}
-              />
-            </div>
-          ))}
+        <div className="w-full relative">
+          <Link
+            aria-disabled={productionEnvironment === undefined}
+            to={`/${owner}/${appName}/${productionEnvironment?.branch}`}
+            className="absolute inset-0 cursor-pointer"
+          />
+          <EnvironmentDetails
+            owner={owner}
+            appName={appName}
+            environment={productionEnvironment}
+            endpoints={endpoints}
+            loading={!productionEnvironment}
+            endpointsLoading={endpointsLoading}
+          />
+        </div>
       </div>
 
       <div className="space-y-2">

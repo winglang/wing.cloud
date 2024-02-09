@@ -7,7 +7,7 @@ export const StatusPill = ({
 }: PropsWithChildren<{ status: string }>) => {
   const statusString = useMemo(() => {
     if (status === "running-server") {
-      return "Running Server";
+      return "Starting";
     }
     if (status === "running-tests") {
       return "Running Tests";

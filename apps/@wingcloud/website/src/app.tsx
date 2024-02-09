@@ -9,6 +9,7 @@ import { useCallback, useContext, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 
 import { AppLoaderSkeleton } from "./components/app-loader-skeleton.js";
+import { AppDataProvider } from "./data-store/app-data-provider.js";
 import { AppsDataProvider } from "./data-store/apps-data-provider.js";
 import { AuthDataProvider } from "./data-store/auth-data-provider.js";
 import { InstallationsDataProvider } from "./data-store/installations-data-provider.js";
@@ -78,12 +79,14 @@ export const App = () => {
                 <NotificationsProvider>
                   <PopupWindowProvider>
                     <AppsDataProvider>
-                      <InstallationsDataProvider>
-                        <ReposDataProvider>
-                          {!routesReady && <AppLoaderSkeleton />}
-                          <RouterProvider router={router(onRouterReady)} />
-                        </ReposDataProvider>
-                      </InstallationsDataProvider>
+                      <AppDataProvider>
+                        <InstallationsDataProvider>
+                          <ReposDataProvider>
+                            {!routesReady && <AppLoaderSkeleton />}
+                            <RouterProvider router={router(onRouterReady)} />
+                          </ReposDataProvider>
+                        </InstallationsDataProvider>
+                      </AppDataProvider>
                     </AppsDataProvider>
                   </PopupWindowProvider>
                 </NotificationsProvider>

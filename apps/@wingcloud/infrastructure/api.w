@@ -156,7 +156,7 @@ pub class Api {
     props.environmentManager.onEnvironmentChange(inflight (environment) => {
       if let app = apps.tryGet(appId: environment.appId) {
         let updatedEnvironment = props.environments.get(id: environment.id);
-        let queries = MutArray<str>["app.environment"];
+        let queries = MutArray<str>["app.listEnvironments", "app.environment"];
         if environment.type == "production" && (updatedEnvironment.status != app.status ?? "") {
           apps.updateStatus(
             appId: app.appId,
@@ -166,7 +166,7 @@ pub class Api {
             status: updatedEnvironment.status,
           );
           // update the app list when a production environment is modified.
-          queries.push("app.list");
+          queries.concat(MutArray<str>["app.list", "app.getByName?appName={app.appName}"]);
         }
         invalidateQuery.invalidate(userId: app.userId, queries: queries.copy());
       }

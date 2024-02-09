@@ -1,21 +1,40 @@
+import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { Button } from "../../../../../design-system/button.js";
+import Popover from "../../../../../design-system/popover.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
+import { BranchIcon } from "../../../../../icons/branch-icon.js";
+import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js";
 import { getDateTime } from "../../../../../utils/time.js";
-import type { Environment } from "../../../../../utils/wrpc.js";
+import type { Endpoint, Environment } from "../../../../../utils/wrpc.js";
 
 import { InfoItem } from "./info-item.js";
 
-export interface InfoItemProps {
+export interface EvironmentDetailsProps {
   loading?: boolean;
+  owner: string;
+  appName: string;
   environment?: Environment;
+  endpoints?: Endpoint[];
+  endpointsLoading?: boolean;
 }
 
-export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
+export const EnvironmentDetails = ({
+  owner,
+  appName,
+  loading,
+  environment,
+  endpoints,
+  endpointsLoading,
+}: EvironmentDetailsProps) => {
   const { theme } = useTheme();
+
+  const firstEndpoint = useMemo(() => {
+    return endpoints?.[0];
+  }, [endpoints]);
 
   const statusString = useMemo(() => {
     if (environment?.status === "running-server") {
@@ -36,38 +55,27 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
   return (
     <div
       className={clsx(
-        "p-4 w-full rounded gap-4 flex border",
+        "p-4 sm:p-6 w-full rounded-md gap-4 sm:gap-6 flex border",
+        "shadow-sm",
         theme.bgInput,
         theme.borderInput,
       )}
     >
-      <div className="flex flex-grow flex-col gap-4 sm:gap-6 truncate transition-all">
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 transition-all">
-          <InfoItem
-            label="Branch"
-            loading={loading}
-            value={
-              <a
-                className="hover:underline truncate w-full h-full"
-                href={`https://github.com/${environment?.repo}/tree/${environment?.branch}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {environment?.branch}
-              </a>
-            }
-          />
+      <div
+        className={clsx(
+          "rounded flex items-center justify-center cursor-pointer",
+          "w-60 h-40 p-4 md:p-8 shrink-0",
+          "border",
+          "shadow-sm hover:shadow-md",
+          theme.borderInput,
+          theme.bg3,
+        )}
+      >
+        <ConsolePreviewIcon />
+      </div>
 
-          <InfoItem
-            label="Environment"
-            loading={loading}
-            value={
-              <div className="rounded-lg px-2 py-0.5 capitalize bg-slate-100 dark:bg-slate-750 text-center truncate">
-                {environment?.type}
-              </div>
-            }
-          />
-
+      <div className="flex flex-col flex-grow gap-4 sm:gap-6 transition-all">
+        <div className="flex gap-4 sm:gap-8">
           <InfoItem
             label="Status"
             loading={loading}
@@ -91,41 +99,136 @@ export const EnvironmentDetails = ({ loading, environment }: InfoItemProps) => {
                     environment?.status === "stopped" && "bg-slate-400",
                   )}
                 />
-                <div className="rounded-xl px-2 py-0.5 capitalize truncate">
+                <div
+                  className={clsx(
+                    "rounded-xl px-2 py-0.5 capitalize truncate font-semibold",
+                    theme.text1,
+                  )}
+                >
                   {statusString}
                 </div>
               </div>
             }
           />
-
           <InfoItem
-            label="Updated"
+            label="Created at"
             loading={loading}
-            value={environment && getDateTime(environment?.createdAt)}
+            value={
+              <div className={clsx("font-semibold", theme.text1)}>
+                {environment && getDateTime(environment?.createdAt)}
+              </div>
+            }
           />
+        </div>
 
-          <div className="col-span-2 sm:col-span-5 transition-all">
+        <InfoItem
+          label="Source"
+          loading={loading}
+          value={
+            <Link
+              className="hover:underline truncate w-full h-full z-10"
+              to={`https://github.com/${environment?.repo}/tree/${environment?.branch}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className="flex gap-x-1">
+                <BranchIcon className={clsx("w-4 h-4", theme.text1)} />
+                <div className={clsx("font-semibold", theme.text1)}>
+                  {environment?.branch}
+                </div>
+              </div>
+            </Link>
+          }
+        />
+
+        {(endpoints !== undefined || endpointsLoading) && (
+          <div className="col-span-2 transition-all w-2/4">
             <InfoItem
-              label="URLs"
-              loading={loading}
+              label="Endpoints"
+              loading={endpointsLoading}
               value={
-                <div className="truncate">
-                  <a
-                    className="hover:underline truncate"
-                    href={`https://github.com/${environment?.repo}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <div className="flex gap-x-2">
+                  {endpoints?.length === 0 && (
+                    <div className={clsx("font-normal", theme.text2)}>
+                      No endpoints found.
+                    </div>
+                  )}
+
+                  {firstEndpoint && (
+                    <Link
+                      className={clsx(
+                        "hover:underline truncate relative z-10 flex gap-x-1",
+                        theme.text3,
+                      )}
+                      to={firstEndpoint.publicUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <div className="truncate">{firstEndpoint.path}</div>
+                    </Link>
+                  )}
+
+                  <Popover
+                    button={
+                      <div
+                        className={clsx(
+                          "rounded-full py-0.5 px-1.5 flex text-xs font-semibold",
+                          theme.text1,
+                          theme.bg1,
+                        )}
+                      >
+                        {endpoints &&
+                          endpoints?.length > 1 &&
+                          `+${endpoints.length}`}
+                      </div>
+                    }
                   >
-                    {`https://github.com/${environment?.repo}`}
-                  </a>
+                    <div className="flex gap-x-3">
+                      <div className="space-y-0.5">
+                        {endpoints?.map((endpoint) => (
+                          <div
+                            key={endpoint.id}
+                            className="flex gap-2 items-center"
+                          >
+                            <DocumentDuplicateIcon
+                              className={clsx(
+                                "cursor-pointer",
+                                "w-4 h-4",
+                                theme.text1,
+                                theme.text1Hover,
+                              )}
+                              onClick={() => {
+                                navigator.clipboard.writeText(endpoint.path);
+                              }}
+                            />
+                            <Link
+                              className={clsx(
+                                "hover:underline truncate relative z-10 flex gap-x-1",
+                                theme.text3,
+                              )}
+                              to={endpoint.publicUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {endpoint.path}
+                            </Link>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Popover>
                 </div>
               }
             />
           </div>
-        </div>
+        )}
       </div>
+
       <div className="flex justify-end items-start">
-        <Link to="./console">
+        <Link
+          to={`/${owner}/${appName}/${environment?.branch}/console`}
+          className="z-10"
+        >
           <Button disabled={environment?.status !== "running"}>Console</Button>
         </Link>
       </div>

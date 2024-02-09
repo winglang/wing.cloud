@@ -16,19 +16,11 @@ export const InfoItem = ({
   const { theme } = useTheme();
 
   return (
-    <div className="flex flex-col gap-1 truncate">
-      <div className={clsx("text-xs", theme.text2)}>{label}</div>
+    <div className="flex flex-col gap-1">
+      <div className={clsx("text-xs truncate", theme.text2)}>{label}</div>
 
       <SkeletonLoader loading={loading}>
-        <div
-          className={clsx(
-            "truncate text-xs font-medium",
-            theme.text1,
-            "h-5 flex",
-          )}
-        >
-          {value}
-        </div>
+        <div className="min-h-[20px] text-sm">{value}</div>
       </SkeletonLoader>
     </div>
   );
