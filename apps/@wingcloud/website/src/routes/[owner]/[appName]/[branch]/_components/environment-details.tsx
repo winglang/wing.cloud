@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { Button } from "../../../../../design-system/button.js";
+import { useNotifications } from "../../../../../design-system/notification.js";
 import Popover from "../../../../../design-system/popover.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
@@ -31,6 +32,7 @@ export const EnvironmentDetails = ({
   endpointsLoading,
 }: EvironmentDetailsProps) => {
   const { theme } = useTheme();
+  const { showNotification } = useNotifications();
 
   const firstEndpoint = useMemo(() => {
     return endpoints?.[0];
@@ -199,6 +201,7 @@ export const EnvironmentDetails = ({
                               )}
                               onClick={() => {
                                 navigator.clipboard.writeText(endpoint.path);
+                                showNotification("Copied to clipboard");
                               }}
                             />
                             <Link
