@@ -4,31 +4,25 @@ import {
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
 
 import { Button } from "../../../../design-system/button.js";
 import { useNotifications } from "../../../../design-system/notification.js";
 import { Select } from "../../../../design-system/select.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
-import { wrpc } from "../../../../utils/wrpc.js";
+import { wrpc, type App } from "../../../../utils/wrpc.js";
 
 import { EntrypointUpdateModal } from "./_components/entrypoint-update-modal.js";
 
-export const Component = () => {
+export interface EntrypointsProps {
+  app?: App;
+  loading: boolean;
+}
+
+export const Entrypoints = ({ app, loading }: EntrypointsProps) => {
   const { theme } = useTheme();
-  const { owner, appName } = useParams();
   const { showNotification } = useNotifications();
 
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
-
-  const appQuery = wrpc["app.getByName"].useQuery(
-    { owner: owner!, appName: appName! },
-    { refetchOnMount: true },
-  );
-
-  const app = useMemo(() => {
-    return appQuery.data?.app;
-  }, [appQuery.data]);
 
   const [entrypoint, setEntrypoint] = useState<string>();
 
@@ -118,13 +112,11 @@ export const Component = () => {
               value={
                 entrypoint === undefined ? app?.entrypoint || "" : entrypoint
               }
-              placeholder={
-                appQuery.isLoading ? "Loading..." : "Select entrypoint"
-              }
+              placeholder={loading ? "Loading..." : "Select entrypoint"}
               onChange={setEntrypoint}
               disabled={
                 updateEntrypointMutation.isPending ||
-                appQuery.isLoading ||
+                loading ||
                 entrypointsQuery.isLoading ||
                 entrypointsQuery.data === undefined
               }
@@ -162,16 +154,14 @@ export const Component = () => {
         </div>
       </div>
 
-      {appName && app?.appId && (
-        <EntrypointUpdateModal
-          appName={appName}
-          show={confirmationModalOpen}
-          isIdle={updateEntrypointMutation.isIdle}
-          isPending={updateEntrypointMutation.isPending}
-          onClose={setConfirmationModalOpen}
-          onConfirm={updateEntrypoint}
-        />
-      )}
+      <EntrypointUpdateModal
+        appName={app?.appName || ""}
+        show={confirmationModalOpen}
+        isIdle={updateEntrypointMutation.isIdle}
+        isPending={updateEntrypointMutation.isPending}
+        onClose={setConfirmationModalOpen}
+        onConfirm={updateEntrypoint}
+      />
     </div>
   );
 };

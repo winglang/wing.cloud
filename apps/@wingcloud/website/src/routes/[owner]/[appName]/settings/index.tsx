@@ -1,11 +1,19 @@
 import { Cog6ToothIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { Outlet, useParams } from "react-router-dom";
+import { useCallback, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../../../components/error-boundary.js";
 import { Header } from "../../../../components/header.js";
-import { SideBarNav } from "../../../../design-system/sidebar-nav.js";
+import { Button } from "../../../../design-system/button.js";
+import { Input } from "../../../../design-system/input.js";
+import { useNotifications } from "../../../../design-system/notification.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
+import { wrpc } from "../../../../utils/wrpc.js";
+import { DeleteModal } from "../_components/delete-modal.js";
+
+import { SecretsList } from "./_components/secrets-list.js";
+import { Entrypoints } from "./entrypoints.js";
 
 const SettingsPage = ({
   owner,
@@ -15,6 +23,42 @@ const SettingsPage = ({
   appName: string;
 }) => {
   const { theme } = useTheme();
+  const { showNotification } = useNotifications();
+
+  const [description, setDescription] = useState<string>();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const appQuery = wrpc["app.getByName"].useQuery(
+    { owner: owner!, appName: appName! },
+    { refetchOnMount: true },
+  );
+
+  const app = useMemo(() => {
+    return appQuery.data?.app;
+  }, [appQuery.data]);
+
+  const updateAppDescriptionMutation =
+    wrpc["app.updateDescription"].useMutation();
+
+  const updateAppDescription = useCallback(async () => {
+    if (description === app?.description) {
+      return;
+    }
+    try {
+      await updateAppDescriptionMutation.mutateAsync({
+        appId: app?.appId!,
+        description: description || "",
+      });
+      showNotification("Succefully updated the app's description");
+    } catch (error) {
+      if (error instanceof Error) {
+        showNotification("Failed to update the app's description", {
+          body: error.message,
+          type: "error",
+        });
+      }
+    }
+  }, [app?.appId, description, updateAppDescriptionMutation]);
 
   return (
     <>
@@ -30,31 +74,94 @@ const SettingsPage = ({
           </div>
         </div>
       </div>
-      <div
-        className={clsx(
-          "w-full max-w-7xl overflow-auto h-full mx-auto",
-          "gap-x-4 md:gap-x-8",
-          "p-4 md:p-8",
-          "flex",
-        )}
-      >
-        <div className="w-40">
-          <SideBarNav
-            items={[
-              { label: "Overview", to: `/${owner}/${appName}/settings` },
-              {
-                label: "Entrypoints",
-                to: `/${owner}/${appName}/settings/entrypoints`,
-              },
-              {
-                label: "Secrets",
-                to: `/${owner}/${appName}/settings/secrets`,
-              },
-            ]}
-          />
-        </div>
-        <div className="flex-grow">
-          <Outlet />
+      <div className="w-full max-w-7xl overflow-auto mx-auto p-4 md:p-8 relative">
+        <div className="flex-grow space-y-4">
+          <div
+            className={clsx(
+              "space-y-2",
+              "flex flex-col gap-x-2 rounded-md p-4 border",
+              theme.bgInput,
+              theme.borderInput,
+            )}
+          >
+            <div className={clsx("flex flex-col text-x truncate", theme.text1)}>
+              <div className="flex flex-row items-center gap-2">
+                <span>App Description</span>
+              </div>
+            </div>
+            <div className="flex gap-x-2">
+              <Input
+                value={
+                  description === undefined
+                    ? app?.description || ""
+                    : description
+                }
+                type="text"
+                containerClassName="w-full"
+                placeholder={
+                  appQuery.isLoading
+                    ? "Loading..."
+                    : "Describe your app here..."
+                }
+                onChange={(event) => setDescription(event.target.value)}
+                disabled={
+                  !app ||
+                  appQuery.isLoading ||
+                  updateAppDescriptionMutation.isPending
+                }
+                className="w-full"
+              />
+              <Button
+                onClick={updateAppDescription}
+                disabled={
+                  appQuery.isLoading ||
+                  updateAppDescriptionMutation.isPending ||
+                  description === undefined ||
+                  description === app?.description
+                }
+                className="truncate space-x-1"
+              >
+                {updateAppDescriptionMutation.isPending && (
+                  <SpinnerLoader size="xs" />
+                )}
+                <span>Save</span>
+              </Button>
+            </div>
+          </div>
+
+          <Entrypoints app={app} loading={appQuery.isLoading} />
+
+          <SecretsList appId={app?.appId} />
+
+          <div
+            className={clsx(
+              "flex flex-col gap-2 rounded-md p-4 border",
+              theme.bgInput,
+              theme.borderInput,
+            )}
+          >
+            <div className={clsx("truncate", theme.text1)}>Advanced</div>
+            <div className="flex">
+              <Button
+                onClick={() => setDeleteModalOpen(true)}
+                small
+                disabled={appQuery.isLoading}
+                className="truncate"
+              >
+                Delete App
+              </Button>
+            </div>
+          </div>
+
+          {appName && owner && app?.appId && (
+            <DeleteModal
+              appId={app.appId}
+              owner={owner}
+              appName={appName}
+              show={deleteModalOpen}
+              onClose={setDeleteModalOpen}
+            />
+          )}
         </div>
       </div>
     </>

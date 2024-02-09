@@ -33,29 +33,6 @@ export const router = (onReady: () => void) => {
         {
           path: "/:owner/:appName/settings",
           lazy: () => import("./routes/[owner]/[appName]/settings/index.js"),
-          children: [
-            {
-              path: "/:owner/:appName/settings",
-              lazy: () =>
-                lazyLoading(
-                  import("./routes/[owner]/[appName]/settings/settings.js"),
-                ),
-            },
-            {
-              path: "/:owner/:appName/settings/entrypoints",
-              lazy: () =>
-                lazyLoading(
-                  import("./routes/[owner]/[appName]/settings/entrypoints.js"),
-                ),
-            },
-            {
-              path: "/:owner/:appName/settings/secrets",
-              lazy: () =>
-                lazyLoading(
-                  import("./routes/[owner]/[appName]/settings/secrets.js"),
-                ),
-            },
-          ],
         },
         {
           path: "/:owner/:appName/:branch",
