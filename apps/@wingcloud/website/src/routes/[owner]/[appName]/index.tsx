@@ -1,4 +1,3 @@
-import { PencilIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -6,10 +5,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ErrorBoundary } from "../../../components/error-boundary.js";
 import { Header } from "../../../components/header.js";
 import { Button } from "../../../design-system/button.js";
-import { Menu } from "../../../design-system/menu.js";
 import { SkeletonLoader } from "../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
-import { MenuIcon } from "../../../icons/menu-icon.js";
 import { wrpc } from "../../../utils/wrpc.js";
 
 import { EnvironmentsList } from "./_components/environments-list.js";
@@ -59,21 +56,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
               {app.isLoading && (
                 <SkeletonLoader className="h-5 w-1/3" loading />
               )}
-              {!app.isLoading && (
-                <div className="group flex gap-x-1 items-center">
-                  <div>{app.data?.app.description}</div>
-                  <PencilIcon
-                    className={clsx(
-                      "w-3 h-3",
-                      theme.text2,
-                      theme.bgInputHover,
-                      "transition-all cursor-pointer",
-                      "opacity-0 group-hover:opacity-100 group-focus:opacity-100",
-                    )}
-                    onClick={goToSettings}
-                  />
-                </div>
-              )}
+              {!app.isLoading && app.data?.app.description}
             </div>
           </div>
           <div className="flex justify-end items-end gap-x-2">

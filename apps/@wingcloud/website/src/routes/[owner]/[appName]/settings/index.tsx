@@ -140,7 +140,7 @@ const SettingsPage = ({
               theme.borderInput,
             )}
           >
-            <div className={clsx("truncate", theme.text1)}>Advanced</div>
+            <div className={clsx("truncate", theme.text1)}>Delete App</div>
             <div className="flex">
               <Button
                 onClick={() => setDeleteModalOpen(true)}
@@ -148,7 +148,7 @@ const SettingsPage = ({
                 disabled={appQuery.isLoading}
                 className="truncate"
               >
-                Delete App
+                Delete
               </Button>
             </div>
           </div>
