@@ -17,10 +17,12 @@ export const InfoItem = ({
 
   return (
     <div className="flex flex-col gap-1">
-      <div className={clsx("text-xs truncate", theme.text2)}>{label}</div>
+      <div className={clsx("text-sm truncate", theme.text2)}>{label}</div>
 
       <SkeletonLoader loading={loading}>
-        <div className="min-h-[20px] text-sm">{value}</div>
+        <div className={clsx("min-h-[20px] text-xs", loading && "h-5")}>
+          {value}
+        </div>
       </SkeletonLoader>
     </div>
   );

@@ -9,6 +9,7 @@ import Popover from "../../../../../design-system/popover.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
 import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js";
+import { GithubIcon } from "../../../../../icons/github-icon.js";
 import { getDateTime } from "../../../../../utils/time.js";
 import type { Endpoint, Environment } from "../../../../../utils/wrpc.js";
 
@@ -36,6 +37,9 @@ export const EnvironmentDetails = ({
 
   const firstEndpoint = useMemo(() => {
     return endpoints?.[0];
+  }, [endpoints]);
+  const endpointsList = useMemo(() => {
+    return endpoints?.slice(1) || [];
   }, [endpoints]);
 
   const statusString = useMemo(() => {
@@ -127,29 +131,48 @@ export const EnvironmentDetails = ({
           label="Source"
           loading={loading}
           value={
-            <Link
-              className="hover:underline truncate w-full h-full z-10"
-              to={`https://github.com/${environment?.repo}/tree/${environment?.branch}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <div className="flex gap-x-1">
-                <BranchIcon className={clsx("w-4 h-4", theme.text1)} />
-                <div className={clsx("font-semibold", theme.text1)}>
-                  {environment?.branch}
-                </div>
+            <div className="space-y-1">
+              <div>
+                <Link
+                  className="hover:underline truncate w-full h-full z-10"
+                  to={`https://github.com/${environment?.repo}/tree/${environment?.branch}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="flex gap-x-2">
+                    <BranchIcon className={clsx("w-4 h-4", theme.text1)} />
+                    <div className={clsx("font-semibold", theme.text1)}>
+                      {environment?.branch}
+                    </div>
+                  </div>
+                </Link>
               </div>
-            </Link>
+              <div>
+                <Link
+                  className="hover:underline truncate w-full h-full z-10"
+                  to={`https://github.com/${environment?.repo}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="flex gap-x-2">
+                    <GithubIcon className={clsx("w-4 h-4", theme.text1)} />
+                    <div className={clsx("font-semibold", theme.text1)}>
+                      Repository
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            </div>
           }
         />
 
-        {(endpoints !== undefined || endpointsLoading) && (
-          <div className="col-span-2 transition-all w-2/4">
+        {(endpoints !== undefined || endpointsLoading || loading) && (
+          <div className="col-span-2 transition-all w-3/4">
             <InfoItem
               label="Endpoints"
-              loading={endpointsLoading}
+              loading={endpointsLoading || loading}
               value={
-                <div className="flex gap-x-2">
+                <div className="flex gap-x-1 items-center">
                   {endpoints?.length === 0 && (
                     <div className={clsx("font-normal", theme.text2)}>
                       No endpoints found.
@@ -169,57 +192,56 @@ export const EnvironmentDetails = ({
                       <div className="truncate">{firstEndpoint.path}</div>
                     </Link>
                   )}
-
-                  <Popover
-                    button={
-                      <div
-                        className={clsx(
-                          "rounded-full py-0.5 px-1.5 flex text-xs font-semibold",
-                          theme.text1,
-                          theme.bg1,
-                        )}
-                      >
-                        {endpoints &&
-                          endpoints?.length > 1 &&
-                          `+${endpoints.length}`}
-                      </div>
-                    }
-                  >
-                    <div className="flex gap-x-3">
-                      <div className="space-y-0.5">
-                        {endpoints?.map((endpoint) => (
-                          <div
-                            key={endpoint.id}
-                            className="flex gap-2 items-center"
-                          >
-                            <DocumentDuplicateIcon
-                              className={clsx(
-                                "cursor-pointer",
-                                "w-4 h-4",
-                                theme.text1,
-                                theme.text1Hover,
-                              )}
-                              onClick={() => {
-                                navigator.clipboard.writeText(endpoint.path);
-                                showNotification("Copied to clipboard");
-                              }}
-                            />
-                            <Link
-                              className={clsx(
-                                "hover:underline truncate relative z-10 flex gap-x-1",
-                                theme.text3,
-                              )}
-                              to={endpoint.publicUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                  {endpointsList.length > 1 && (
+                    <Popover
+                      button={
+                        <div
+                          className={clsx(
+                            "rounded-full py-0.5 px-1.5 flex text-xs font-semibold",
+                            theme.text1,
+                            theme.bg1,
+                          )}
+                        >
+                          {`+${endpointsList.length}`}
+                        </div>
+                      }
+                    >
+                      <div className="flex gap-x-3">
+                        <div className="space-y-0.5">
+                          {endpointsList.map((endpoint) => (
+                            <div
+                              key={endpoint.id}
+                              className="flex gap-2 items-center"
                             >
-                              {endpoint.path}
-                            </Link>
-                          </div>
-                        ))}
+                              <DocumentDuplicateIcon
+                                className={clsx(
+                                  "cursor-pointer",
+                                  "w-4 h-4",
+                                  theme.text1,
+                                  theme.text1Hover,
+                                )}
+                                onClick={() => {
+                                  navigator.clipboard.writeText(endpoint.path);
+                                  showNotification("Copied to clipboard");
+                                }}
+                              />
+                              <Link
+                                className={clsx(
+                                  "hover:underline truncate relative z-10 flex gap-x-1",
+                                  theme.text3,
+                                )}
+                                to={endpoint.publicUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {endpoint.path}
+                              </Link>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  </Popover>
+                    </Popover>
+                  )}
                 </div>
               }
             />
