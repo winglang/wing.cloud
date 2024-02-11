@@ -374,7 +374,7 @@ pub class RuntimeService {
       }
     }, timeout: 5m);
 
-    this.api = new cloud.Api();
+    this.api = new cloud.Api() as "runtime-service";
     this.api.post("/", inflight (req) => {
       let body = Json.parse(req.body ?? "");
       let message = Message.fromJson(body);
