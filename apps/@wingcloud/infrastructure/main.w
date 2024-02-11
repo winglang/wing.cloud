@@ -68,7 +68,7 @@ let api = new cloud.Api(
 let apiUrlParam = new parameter.Parameter(
   name: "api-url",
   value: api.url,
-);
+) as "api-url";
 
 let table = new ex.DynamodbTable(
   name: "data",
