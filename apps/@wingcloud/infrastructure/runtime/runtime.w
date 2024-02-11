@@ -60,7 +60,7 @@ struct RuntimeStopOptions {
 
 interface IRuntimeHandler {
   inflight start(opts: RuntimeStartOptions): str;
-  inflight stop(opts: RuntimeStopOptions);
+  inflight stop(opts: RuntimeStopOptions): void;
 }
 
 class RuntimeHandler_sim impl IRuntimeHandler {
@@ -335,7 +335,7 @@ pub class RuntimeService {
       }
     }
 
-    let queue = new fifoqueue.FifoQueue(timeout: 15m);
+    let queue = new fifoqueue.FifoQueue(timeout: 15m) as "runtime fifo";
     queue.setConsumer(inflight (message) => {
       try {
         // hack to get bucket in this environment
@@ -374,7 +374,7 @@ pub class RuntimeService {
       }
     }, timeout: 5m);
 
-    this.api = new cloud.Api();
+    this.api = new cloud.Api() as "runtime-service";
     this.api.post("/", inflight (req) => {
       let body = Json.parse(req.body ?? "");
       let message = Message.fromJson(body);

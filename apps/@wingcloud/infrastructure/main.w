@@ -63,12 +63,12 @@ let api = new cloud.Api(
   corsOptions: cloud.ApiCorsOptions {
     allowOrigin: ["*"],
   }
-);
+) as "wrpc";
 
 let apiUrlParam = new parameter.Parameter(
   name: "api-url",
   value: api.url,
-);
+) as "api-url";
 
 let table = new ex.DynamodbTable(
   name: "data",
@@ -103,6 +103,11 @@ let rntm = new runtime.RuntimeService(
   publicEndpointFullDomainName: publicEndpointFullDomainName,
 );
 
+let runtimeUrlParam = new parameter.Parameter(
+  name: "runtime-url",
+  value: rntm.api.url,
+) as "runtime-url";
+
 let dashboardPort = 5174;
 let dashboard = new ex.ReactApp(
   projectPath: "../website",
@@ -110,7 +115,7 @@ let dashboard = new ex.ReactApp(
   buildCommand: "pnpm vite build",
   buildDir: "dist",
   localPort: dashboardPort,
-);
+) as "webapp";
 dashboard.addEnvironment("SEGMENT_WRITE_KEY", segmentWriteKey);
 dashboard.addEnvironment("ENABLE_ANALYTICS", "{enableAnalytics}");
 dashboard.addEnvironment("API_URL", "{api.url}");
@@ -175,7 +180,7 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   endpoints: endpoints,
   endpointProvider: endpointProvider,
   certificate: environmentServerCertificate,
-  runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
+  runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: runtimeUrlParam),
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
   analytics: analytics,
@@ -204,7 +209,6 @@ let wingCloudApi = new wingcloud_api.Api(
 
 let probotApp = new probot.ProbotApp(
   probotAdapter: probotAdapter,
-  runtimeUrl: rntm.api.url,
   environments: environments,
   users: users,
   apps: apps,
@@ -239,7 +243,7 @@ let proxyUrl = (() => {
       dashboardDomainName: getDomainName(dashboard.url),
       zoneName: util.env("PROXY_ZONE_NAME"),
       subDomain: util.tryEnv("PROXY_SUBDOMAIN"),
-    );
+    ) as "website proxy";
 
     return proxy.url;
   } elif util.env("WING_TARGET") == "sim" {
@@ -273,7 +277,7 @@ let proxyUrl = (() => {
 
 new cloud.Endpoint(proxyUrl, browserSupport: true) as "Proxy Endpoint";
 
-let var webhookUrl = probotApp.githubApp.webhookUrl;
+let var webhookUrl = probotApp.githubApp.api.url;
 if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" {
   bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
 
@@ -283,14 +287,14 @@ if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" 
   );
 
   webhookUrl = devNgrok.url;
-
-  let updateGithubWebhook = inflight () => {
-    probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
-    log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
-  };
-
-  new cloud.OnDeploy(updateGithubWebhook);
 }
+
+let updateGithubWebhook = inflight () => {
+  probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
+  log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
+};
+
+new cloud.OnDeploy(updateGithubWebhook);
 
 new EnvironmentCleaner.EnvironmentCleaner(apps: apps, environmentManager: environmentManager, environments: environments);
 
@@ -303,6 +307,6 @@ api.get("/wrpc/health", inflight () => {
 
 new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";
-new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
+new cdktf.TerraformOutput(value: probotApp.githubApp.api.url) as "Probot API URL";
 new cdktf.TerraformOutput(value: proxyUrl) as "Proxy URL";
 new cdktf.TerraformOutput(value: siteURL) as "Site URL";

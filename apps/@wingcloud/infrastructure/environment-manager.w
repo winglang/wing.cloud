@@ -127,7 +127,7 @@ pub class EnvironmentManager {
     this.mrq = new queue.MostRecentQueue(handler: inflight (message) => {
       let body = QueueMessage.parseJson(message.body);
       this.handle(body);
-    });
+    }) as "Environments most recent queue";
   }
 
   pub inflight handle(body: QueueMessage) {
