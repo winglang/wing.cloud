@@ -243,7 +243,7 @@ let proxyUrl = (() => {
       dashboardDomainName: getDomainName(dashboard.url),
       zoneName: util.env("PROXY_ZONE_NAME"),
       subDomain: util.tryEnv("PROXY_SUBDOMAIN"),
-    );
+    ) as "website proxy";
 
     return proxy.url;
   } elif util.env("WING_TARGET") == "sim" {
