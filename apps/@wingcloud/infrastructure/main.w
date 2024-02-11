@@ -115,7 +115,7 @@ let dashboard = new ex.ReactApp(
   buildCommand: "pnpm vite build",
   buildDir: "dist",
   localPort: dashboardPort,
-);
+) as "webapp";
 dashboard.addEnvironment("SEGMENT_WRITE_KEY", segmentWriteKey);
 dashboard.addEnvironment("ENABLE_ANALYTICS", "{enableAnalytics}");
 dashboard.addEnvironment("API_URL", "{api.url}");
