@@ -63,7 +63,7 @@ let api = new cloud.Api(
   corsOptions: cloud.ApiCorsOptions {
     allowOrigin: ["*"],
   }
-);
+) as "wrpc";
 
 let apiUrlParam = new parameter.Parameter(
   name: "api-url",
