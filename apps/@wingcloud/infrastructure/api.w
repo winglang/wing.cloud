@@ -145,7 +145,7 @@ pub class Api {
     let apps = props.apps;
     let users = props.users;
     let logs = props.logs;
-    let environmentsQueue = new cloud.Queue() as "Environments Queue";
+    let environmentsQueue = new cloud.Queue() as "Environments";
 
     let INVALIDATE_SUBSCRIPTION_ID = "invalidateQuery";
     let invalidateQuery = new InvalidateQuery.InvalidateQuery(
@@ -497,7 +497,7 @@ pub class Api {
       }
     });
 
-    let productionEnvironmentQueue = new cloud.Queue() as "Production Environment Queue";
+    let productionEnvironmentQueue = new cloud.Queue() as "Production Environment";
     productionEnvironmentQueue.setConsumer(inflight (event) => {
       let input = CreateProductionEnvironmentMessage.fromJson(Json.parse(event));
       if let accessToken = githubAccessTokens.get(input.userId)?.access_token {
@@ -668,7 +668,7 @@ pub class Api {
       throw httpError.HttpError.notFound();
     });
 
-    let deleteAppQueue = new cloud.Queue() as "Delete App Queue";
+    let deleteAppQueue = new cloud.Queue() as "Delete App";
     deleteAppQueue.setConsumer(inflight (event) => {
       let input = DeleteAppMessage.fromJson(Json.parse(event));
 
@@ -1029,7 +1029,7 @@ pub class Api {
     });
 
 
-    let notifyEnvReportQueue = new cloud.Queue() as "Environment Report Queue";
+    let notifyEnvReportQueue = new cloud.Queue() as "Environment Report";
     notifyEnvReportQueue.setConsumer(inflight (event) => {
       let input = EnvironmentReportMessage.fromJson(Json.parse(event));
 
