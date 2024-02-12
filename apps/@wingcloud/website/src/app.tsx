@@ -9,9 +9,9 @@ import { useCallback, useContext, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 
 import { AppLoaderSkeleton } from "./components/app-loader-skeleton.js";
-import { CurrentAppDataProvider } from "./data-store/app-data-provider.js";
 import { AppsDataProvider } from "./data-store/apps-data-provider.js";
 import { AuthDataProvider } from "./data-store/auth-data-provider.js";
+import { CurrentAppDataProvider } from "./data-store/current-app-data-provider.js";
 import { InstallationsDataProvider } from "./data-store/installations-data-provider.js";
 import { ReposDataProvider } from "./data-store/repos-data-provider.js";
 import { NotificationsProvider } from "./design-system/notification.js";

@@ -26,7 +26,6 @@ export interface EvironmentDetailsProps {
 export const EnvironmentDetails = ({
   owner,
   appName,
-  loading,
   environment,
   endpoints,
   endpointsLoading,
@@ -66,14 +65,13 @@ export const EnvironmentDetails = ({
       <div
         className={clsx(
           "rounded flex items-center justify-center cursor-pointer",
-          "w-60 h-40 p-4 md:p-8 shrink-0",
-          "border",
+          "shrink-0 border",
           "shadow-sm hover:shadow-md",
           theme.borderInput,
           theme.bg3,
         )}
       >
-        <ConsolePreviewIcon />
+        <ConsolePreviewIcon className="w-60 lg:w-80 p-4 lg:p-8 transition-all" />
       </div>
 
       <div className="grid grid-cols-3 flex-grow gap-4 md:gap-6 transition-all">
