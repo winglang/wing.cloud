@@ -230,7 +230,7 @@ export const EnvironmentDetails = ({
                           <Link
                             className={clsx(
                               "hover:underline truncate relative z-10 flex gap-x-1",
-                              theme.text3,
+                              theme.text1,
                             )}
                             to={endpoint.publicUrl}
                             target="_blank"
