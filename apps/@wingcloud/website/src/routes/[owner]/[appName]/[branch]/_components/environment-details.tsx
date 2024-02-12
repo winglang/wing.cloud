@@ -41,10 +41,6 @@ export const EnvironmentDetails = ({
     );
   }, [environment, endpointsLoading]);
 
-  const showEndpoints = useMemo(() => {
-    return endpoints !== undefined || endpointsLoading;
-  }, [endpoints, endpointsLoading]);
-
   const deployingEndpoints = useMemo(() => {
     return (
       environment &&
@@ -53,6 +49,14 @@ export const EnvironmentDetails = ({
       )
     );
   }, [environment]);
+
+  const showEndpoints = useMemo(() => {
+    return (
+      environment?.status === "running" &&
+      (endpoints !== undefined || endpointsLoading) &&
+      !deployingEndpoints
+    );
+  }, [endpoints, endpointsLoading, environment]);
 
   const firstEndpoint = useMemo(() => {
     if (!endpoints || endpoints.length === 0 || deployingEndpoints) {
@@ -174,7 +178,6 @@ export const EnvironmentDetails = ({
                 theme.text3,
               )}
             >
-              {deployingEndpoints && <div className="italic">Deploying...</div>}
               {environmentStopped && (
                 <div className="italic">Environment {statusString}.</div>
               )}
