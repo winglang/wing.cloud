@@ -203,11 +203,6 @@ export const EnvironmentDetails = ({
                   {showEndpointsLoading && (
                     <SkeletonLoader className="h-5 w-2/3" loading />
                   )}
-                  {!showEndpointsLoading && endpoints?.length === 0 && (
-                    <div className={clsx("font-normal", theme.text2)}>
-                      No endpoints found.
-                    </div>
-                  )}
 
                   {firstEndpoint && (
                     <div className="flex truncate">
