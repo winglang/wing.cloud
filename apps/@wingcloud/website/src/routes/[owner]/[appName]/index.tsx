@@ -70,17 +70,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
   return (
     <>
       <PageHeader
-        title="App Details"
-        description={
-          <div className="flex gap-x-2">
-            <div className={clsx(theme.text2)}>{appName}</div>
-            {!isLoading && <div>-</div>}
-            <div className="w-full">
-              {isLoading && <SkeletonLoader className="h-5 w-3/5" loading />}
-              {!isLoading && (app?.description || "No description.")}
-            </div>
-          </div>
-        }
+        title="Overview"
         actions={
           <>
             <a href={repoUrl} target="_blank">

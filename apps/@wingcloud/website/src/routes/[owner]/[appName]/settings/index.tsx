@@ -64,7 +64,7 @@ const SettingsPage = ({
 
   return (
     <>
-      <PageHeader title="App Settings" description={appName} />
+      <PageHeader title="App Settings" />
       <div className="overflow-auto">
         <div className="max-w-7xl mx-auto p-4 md:p-8 relative">
           <div className="flex-grow space-y-4">

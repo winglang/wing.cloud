@@ -96,7 +96,7 @@ const EnvironmentPage = ({
 
   return (
     <div className="overflow-auto">
-      <PageHeader title="Environment Details" description={appName} />
+      <PageHeader title="Environment" />
 
       <div
         className={clsx(

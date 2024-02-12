@@ -1,10 +1,13 @@
-import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
+import {
+  BoltIcon,
+  DocumentDuplicateIcon,
+  GlobeAltIcon,
+} from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { Button } from "../../../../../design-system/button.js";
-import { useNotifications } from "../../../../../design-system/notification.js";
 import Popover from "../../../../../design-system/popover.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
@@ -33,7 +36,6 @@ export const EnvironmentDetails = ({
   endpointsLoading,
 }: EvironmentDetailsProps) => {
   const { theme } = useTheme();
-  const { showNotification } = useNotifications();
 
   const firstEndpoint = useMemo(() => {
     return endpoints?.[0];
@@ -133,6 +135,7 @@ export const EnvironmentDetails = ({
               <div>
                 <Link
                   className="hover:underline truncate z-10"
+                  aria-disabled={environment?.status === "stopped"}
                   to={`https://github.com/${environment?.repo}/tree/${environment?.branch}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -169,7 +172,7 @@ export const EnvironmentDetails = ({
         />
 
         {(endpoints !== undefined || endpointsLoading || loading) && (
-          <div className="transition-all truncate">
+          <div className="transition-all">
             <InfoItem
               label="Endpoints"
               loading={endpointsLoading || loading}
@@ -191,7 +194,12 @@ export const EnvironmentDetails = ({
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <div className="truncate">{firstEndpoint.path}</div>
+                      {firstEndpoint.browserSupport ? (
+                        <GlobeAltIcon className="w-4 h-4 mr-1 text-violet-700 dark:text-violet-400" />
+                      ) : (
+                        <BoltIcon className="w-4 h-4 mr-1 text-amber-500 dark:text-amber-400" />
+                      )}
+                      {firstEndpoint.path}
                     </Link>
                   )}
                   {endpointsList.length > 1 && (
@@ -215,18 +223,6 @@ export const EnvironmentDetails = ({
                               key={endpoint.id}
                               className="flex gap-2 items-center"
                             >
-                              <DocumentDuplicateIcon
-                                className={clsx(
-                                  "cursor-pointer",
-                                  "w-4 h-4",
-                                  theme.text1,
-                                  theme.text1Hover,
-                                )}
-                                onClick={() => {
-                                  navigator.clipboard.writeText(endpoint.path);
-                                  showNotification("Copied to clipboard");
-                                }}
-                              />
                               <Link
                                 className={clsx(
                                   "hover:underline truncate relative z-10 flex gap-x-1",
@@ -236,6 +232,11 @@ export const EnvironmentDetails = ({
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
+                                {endpoint.browserSupport ? (
+                                  <GlobeAltIcon className="w-4 h-4 mr-1 text-violet-700 dark:text-violet-400" />
+                                ) : (
+                                  <BoltIcon className="w-4 h-4 mr-1 text-amber-500 dark:text-amber-400" />
+                                )}
                                 {endpoint.path}
                               </Link>
                             </div>
