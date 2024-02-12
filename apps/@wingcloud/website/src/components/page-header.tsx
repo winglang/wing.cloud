@@ -24,7 +24,12 @@ export const PageHeader = ({
     <div
       className={clsx(!noBackground && ["border-b", theme.bg4, theme.border4])}
     >
-      <div className="w-full max-w-7xl overflow-auto mx-auto p-4 md:px-8 flex">
+      <div
+        className={clsx(
+          "w-full max-w-7xl overflow-auto mx-auto pt-4 md:px-8 flex",
+          !tabs && "pb-4",
+        )}
+      >
         <div className="space-y-1 flex-grow items-center">
           <div
             className={clsx("text-2xl font-semibold truncate h-8", theme.text1)}
@@ -37,12 +42,16 @@ export const PageHeader = ({
             </div>
           )}
           {tabs && (
-            <div className="pt-2">
+            <div className="pt-3">
               <Tabs tabs={tabs} />
             </div>
           )}
         </div>
-        <div className="flex justify-end items-end gap-x-2">{actions}</div>
+        <div
+          className={clsx("flex justify-end items-end gap-x-2", tabs && "pb-4")}
+        >
+          {actions}
+        </div>
       </div>
     </div>
   );

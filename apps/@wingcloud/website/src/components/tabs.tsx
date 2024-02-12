@@ -34,20 +34,27 @@ export const Tabs = ({ tabs }: TabsProps) => {
   return (
     <nav className="flex space-x-2" aria-label="Tabs">
       {tabs.map((tab) => (
-        <Link
-          key={tab.name}
-          to={tab.to}
+        <div
           className={clsx(
-            "rounded-md px-3 py-1.5 text-sm font-medium",
-            theme.textInput,
-            theme.focusInput,
-            current?.name === tab.name && [theme.bg2, theme.bg2Hover],
-            current?.name !== tab.name && [theme.bgInput, theme.bgInputHover],
+            "pb-2",
+            "border-gray-600",
+            current?.name === tab.name && "border-b-2",
           )}
-          aria-current={current ? "page" : undefined}
         >
-          {tab.name}
-        </Link>
+          <Link
+            key={tab.name}
+            to={tab.to}
+            className={clsx(
+              "rounded-md px-3 py-1.5 text-sm font-medium",
+              theme.text1,
+              theme.bgInput,
+              theme.bg3Hover,
+            )}
+            aria-current={current ? "page" : undefined}
+          >
+            {tab.name}
+          </Link>
+        </div>
       ))}
     </nav>
   );
