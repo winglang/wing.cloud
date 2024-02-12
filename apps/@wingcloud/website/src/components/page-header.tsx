@@ -5,7 +5,7 @@ import { useTheme } from "../design-system/theme-provider.js";
 import { Tabs, type Tab } from "./tabs.js";
 
 export interface PageHeaderProps {
-  title: string;
+  title?: string;
   description?: string | React.ReactNode;
   actions?: React.ReactNode;
   noBackground?: boolean;
@@ -31,11 +31,16 @@ export const PageHeader = ({
         )}
       >
         <div className="space-y-1 flex-grow items-center">
-          <div
-            className={clsx("text-2xl font-semibold truncate h-8", theme.text1)}
-          >
-            {title}
-          </div>
+          {title && (
+            <div
+              className={clsx(
+                "text-2xl font-semibold truncate h-8",
+                theme.text1,
+              )}
+            >
+              {title}
+            </div>
+          )}
           {description && (
             <div className={clsx("text-sm w-full truncate h-5", theme.text3)}>
               {description}

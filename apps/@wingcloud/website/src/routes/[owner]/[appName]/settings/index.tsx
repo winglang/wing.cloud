@@ -65,19 +65,6 @@ const SettingsPage = ({
 
   return (
     <>
-      <PageHeader
-        title={appName}
-        tabs={[
-          {
-            name: "Overview",
-            to: `/${owner}/${appName}`,
-          },
-          {
-            name: "Settings",
-            to: `/${owner}/${appName}/settings`,
-          },
-        ]}
-      />
       <div className="overflow-auto">
         <div className="max-w-7xl mx-auto p-4 md:p-8 relative">
           <div className="flex-grow space-y-4">
@@ -205,7 +192,19 @@ export const Component = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <Header breadcrumbs={[{ label: appName!, to: `/${owner}/${appName}` }]} />
+      <Header
+        breadcrumbs={[{ label: appName!, to: `/${owner}/${appName}` }]}
+        tabs={[
+          {
+            name: "Application",
+            to: `/${owner}/${appName}`,
+          },
+          {
+            name: "Settings",
+            to: `/${owner}/${appName}/settings`,
+          },
+        ]}
+      />
       <ErrorBoundary>
         <SettingsPage owner={owner!} appName={appName!} />
       </ErrorBoundary>

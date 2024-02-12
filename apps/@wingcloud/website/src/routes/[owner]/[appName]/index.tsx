@@ -1,14 +1,19 @@
-import { useCallback, useContext, useEffect, useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { MagnifyingGlassCircleIcon } from "@heroicons/react/24/outline";
+import clsx from "clsx";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../../components/error-boundary.js";
 import { Header } from "../../../components/header.js";
-import { PageHeader } from "../../../components/page-header.js";
 import { CurrentAppDataProviderContext } from "../../../data-store/current-app-data-provider.js";
-import { Button } from "../../../design-system/button.js";
+import { Input } from "../../../design-system/input.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
+import { BranchIcon } from "../../../icons/branch-icon.js";
 import { wrpc } from "../../../utils/wrpc.js";
 
+import { EnvironmentDetails } from "./[branch]/_components/environment-details.js";
+import { EnvironmentsListItemSkeleton } from "./_components/environments-list-item-skeleton.js";
+import { EnvironmentsListItem } from "./_components/environments-list-item.js";
 import { EnvironmentsList } from "./_components/environments-list.js";
 
 const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
@@ -29,6 +34,11 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
       enabled: !!owner && !!appName,
     },
   );
+
+  const loading = useMemo(() => {
+    return environmentsQuery.isLoading;
+  }, [environmentsQuery]);
+
   const environments = useMemo(() => {
     return (
       environmentsQuery.data?.environments.sort(
@@ -42,7 +52,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
     return environments.find((env) => env.type === "production");
   }, [environments]);
 
-  const endpoints = wrpc["app.environment.endpoints"].useQuery(
+  const endpointsQuery = wrpc["app.environment.endpoints"].useQuery(
     {
       appName: appName!,
       branch: productionEnvironment?.branch!,
@@ -52,6 +62,28 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
     },
   );
 
+  const { theme } = useTheme();
+
+  const [search, setSearch] = useState("");
+
+  const previewEnvs = useMemo(() => {
+    if (!environments) {
+      return [];
+    }
+    return environments.filter((env) => env.type === "preview");
+  }, [environments, search]);
+
+  const filteredPreviewEnvs = useMemo(() => {
+    if (!previewEnvs) {
+      return [];
+    }
+    return previewEnvs.filter((env) =>
+      `${env.prTitle}${env.branch}${env.status}`
+        .toLocaleLowerCase()
+        .includes(search.toLocaleLowerCase()),
+    );
+  }, [previewEnvs, search]);
+
   const repoUrl = useMemo(() => {
     if (!app) return;
     return `https://github.com/${app?.repoOwner}/${app?.repoName}`;
@@ -59,38 +91,113 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
 
   return (
     <>
-      <PageHeader
-        title={appName}
-        tabs={[
-          {
-            name: "Overview",
-            to: `/${owner}/${appName}`,
-          },
-          {
-            name: "Settings",
-            to: `/${owner}/${appName}/settings`,
-          },
-        ]}
-        actions={
-          <a href={repoUrl} target="_blank">
-            <Button className="truncate" disabled={!repoUrl}>
-              Git Repository
-            </Button>
-          </a>
-        }
-      />
       <div className="overflow-auto">
         <div className="max-w-7xl mx-auto px-4 py-2 md:px-8 md:py:4">
           {owner && appName && (
-            <EnvironmentsList
-              endpoints={endpoints.data?.endpoints || []}
-              environments={environments}
-              loading={environmentsQuery.isLoading}
-              endpointsLoading={endpoints.isLoading}
-              owner={owner}
-              appName={appName}
-              repoUrl={repoUrl || ""}
-            />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className={clsx("text-lg pt-2", theme.text1)}>
+                  Production
+                </div>
+
+                <div className="w-full relative">
+                  <Link
+                    aria-disabled={productionEnvironment === undefined}
+                    to={`/${owner}/${appName}/${productionEnvironment?.branch}`}
+                    className="absolute inset-0 cursor-pointer"
+                  />
+                  <EnvironmentDetails
+                    owner={owner}
+                    appName={appName}
+                    environment={productionEnvironment}
+                    loading={!productionEnvironment}
+                    endpoints={endpointsQuery.data?.endpoints}
+                    endpointsLoading={
+                      endpointsQuery.isLoading ||
+                      endpointsQuery.data === undefined
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className={clsx("text-lg pt-2", theme.text1)}>
+                  Preview Environments
+                </div>
+
+                {loading && <EnvironmentsListItemSkeleton short />}
+
+                {!loading && (
+                  <>
+                    {filteredPreviewEnvs.length > 0 && (
+                      <Input
+                        type="text"
+                        leftIcon={MagnifyingGlassCircleIcon}
+                        className="block w-full"
+                        containerClassName="w-full"
+                        name="search"
+                        id="search"
+                        placeholder="Search..."
+                        value={search}
+                        onChange={(e) => {
+                          setSearch(e.target.value);
+                        }}
+                      />
+                    )}
+
+                    {filteredPreviewEnvs.map((environment) => (
+                      <EnvironmentsListItem
+                        key={environment.id}
+                        owner={owner}
+                        appName={appName}
+                        environment={environment}
+                      />
+                    ))}
+
+                    {filteredPreviewEnvs.length === 0 && (
+                      <div
+                        className={clsx(
+                          "space-y-2",
+                          "p-4 w-full border text-center rounded-md",
+                          theme.bgInput,
+                          theme.borderInput,
+                          theme.text1,
+                        )}
+                      >
+                        <BranchIcon
+                          className={clsx("w-12 h-12 mx-auto", theme.text3)}
+                        />
+                        <h3
+                          className={clsx("text-sm font-medium", theme.text2)}
+                        >
+                          No preview environments found.
+                        </h3>
+                        <p
+                          className={clsx(
+                            "mt-1 text-sm flex gap-x-1 w-full justify-center",
+                            theme.text3,
+                          )}
+                        >
+                          <span>
+                            Get started by{" "}
+                            <a
+                              className="text-sky-500 hover:underline hover:text-sky-600"
+                              href={`${repoUrl}/compare`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-disabled={repoUrl === ""}
+                            >
+                              opening a Pull Request
+                            </a>
+                            .
+                          </span>
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -103,7 +210,19 @@ export const Component = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <Header breadcrumbs={[{ label: appName!, to: `/${owner}/${appName}` }]} />
+      <Header
+        breadcrumbs={[{ label: appName!, to: `/${owner}/${appName}` }]}
+        tabs={[
+          {
+            name: "Application",
+            to: `/${owner}/${appName}`,
+          },
+          {
+            name: "Settings",
+            to: `/${owner}/${appName}/settings`,
+          },
+        ]}
+      />
       <ErrorBoundary>
         <AppPage owner={owner!} appName={appName!} />
       </ErrorBoundary>

@@ -45,14 +45,6 @@ export const EnvironmentDetails = ({
 
   const statusString = useStatus(environment?.status);
 
-  const showEndpointsLoading = useMemo(() => {
-    return (
-      !environment ||
-      endpointsLoading ||
-      !["running", "error", "stopped"].includes(environment.status)
-    );
-  }, [environment, endpointsLoading]);
-
   return (
     <div
       className={clsx(
@@ -177,7 +169,7 @@ export const EnvironmentDetails = ({
                       <div
                         className={clsx("font-semibold truncate", theme.text1)}
                       >
-                        Repository
+                        {environment.repo}
                       </div>
                     </div>
                   </Link>
@@ -188,16 +180,27 @@ export const EnvironmentDetails = ({
         </div>
 
         <div className="col-span-2">
-          {(endpoints !== undefined || showEndpointsLoading) && (
+          {(endpoints !== undefined || endpointsLoading) && (
             <div className="transition-all">
               <div className="flex flex-col gap-1">
                 <div className={clsx("text-sm truncate", theme.text2)}>
                   Endpoints
                 </div>
                 <div className="text-xs flex gap-x-2 items-center w-full">
-                  {showEndpointsLoading && (
+                  {endpointsLoading && (
                     <SkeletonLoader className="h-5 w-2/3" loading />
                   )}
+                  {environment &&
+                    [
+                      "initializing",
+                      "running-server",
+                      "running-tests",
+                      "deploying",
+                    ].includes(environment.status) && (
+                      <div className={clsx(theme.text3)}>
+                        Building Environment...
+                      </div>
+                    )}
 
                   {firstEndpoint && (
                     <div className="flex truncate">

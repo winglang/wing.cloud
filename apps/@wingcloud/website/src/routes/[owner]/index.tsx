@@ -119,9 +119,18 @@ const OwnerPage = () => {
 };
 
 export const Component = () => {
+  const { owner } = useParams();
+
   return (
     <div className="flex flex-col h-full">
-      <Header />
+      <Header
+        tabs={[
+          {
+            name: "Overview",
+            to: `/${owner}`,
+          },
+        ]}
+      />
       <ErrorBoundary>
         <OwnerPage />
       </ErrorBoundary>

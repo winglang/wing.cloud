@@ -96,8 +96,6 @@ const EnvironmentPage = ({
 
   return (
     <div className="overflow-auto">
-      <PageHeader title="Environment" />
-
       <div
         className={clsx(
           "w-full flex-grow overflow-auto",
@@ -161,6 +159,12 @@ export const Component = () => {
             label: branch!,
             to: `/${owner}/${appName}/${branch}`,
             icon: <BranchIcon className="w-4 h-4 text-slate-700" />,
+          },
+        ]}
+        tabs={[
+          {
+            name: "Environment",
+            to: `/${owner}/${appName}/${branch}`,
           },
         ]}
       />
