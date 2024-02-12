@@ -218,6 +218,7 @@ export const EnvironmentDetails = ({
                     theme.focusInput,
                     theme.bg1,
                     theme.bg2Hover,
+                    "transition-all",
                   )}
                   button={`+${endpointsList.length}`}
                 >
