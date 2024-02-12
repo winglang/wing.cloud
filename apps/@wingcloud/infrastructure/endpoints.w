@@ -1,6 +1,7 @@
 bring ex;
 bring "./nanoid62.w" as nanoid62;
 bring "./status-reports.w" as status_report;
+bring "./util.w" as util;
 
 pub struct Endpoint {
   id: str;
@@ -135,17 +136,27 @@ pub class Endpoints {
   }
 
   pub inflight list(options: ListEndpointsOptions): Array<Endpoint> {
-    let result = this.table.query(
-      keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-      expressionAttributeValues: {
-        ":pk": "ENVIRONMENT#{options.environmentId}",
-        ":sk": "ENDPOINT#",
+    let var exclusiveStartKey: Json? = nil;
+    let var endpoints: Array<Endpoint> = [];
+    util.Util.do_while(
+      handler: () => {
+        let result = this.table.query(
+          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          expressionAttributeValues: {
+            ":pk": "ENVIRONMENT#{options.environmentId}",
+            ":sk": "ENDPOINT#",
+          },
+          exclusiveStartKey: exclusiveStartKey,
+        );
+        for item in result.items {
+          endpoints = endpoints.concat([this.fromDB(item)]);
+        }
+        exclusiveStartKey = result.lastEvaluatedKey;
+      },
+      condition: () => {
+        return exclusiveStartKey?;
       },
     );
-    let var endpoints: Array<Endpoint> = [];
-    for item in result.items {
-      endpoints = endpoints.concat([this.fromDB(item)]);
-    }
     return endpoints;
   }
 
