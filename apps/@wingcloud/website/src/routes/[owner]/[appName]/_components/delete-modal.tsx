@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { ConfirmationModal } from "../../../../components/confirmation-modal.js";
@@ -7,6 +7,7 @@ import { useQueryCache } from "../../../../utils/use-query-cache.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 
 export interface DeleteModalProps {
+  appId: string;
   owner: string;
   appName: string;
   show: boolean;
@@ -14,23 +15,29 @@ export interface DeleteModalProps {
 }
 
 export const DeleteModal = ({
+  appId,
   owner,
   appName,
   show,
   onClose,
 }: DeleteModalProps) => {
   const { showNotification } = useNotifications();
+  const [disabled, setDisabled] = useState(false);
 
   const navigate = useNavigate();
 
   const { deleteAppItemFromAppList } = useQueryCache();
   const deleteApp = wrpc["app.delete"].useMutation({
+    onMutate() {
+      setDisabled(true);
+    },
     onSuccess() {
       showNotification(`App ${appName} deleted`, { type: "success" });
-      deleteAppItemFromAppList(appName);
+      deleteAppItemFromAppList(appId);
       navigate(`/${owner}`);
     },
     onError(error) {
+      setDisabled(false);
       if (error instanceof Error) {
         showNotification(error.message, { type: "error" });
       } else {
@@ -58,11 +65,12 @@ export const DeleteModal = ({
     <ConfirmationModal
       show={show}
       isIdle={deleteApp.isIdle}
-      isPending={deleteApp.isPending}
+      isPending={disabled}
       onClose={onClose}
       onConfirm={() => deleteApp.mutate({ owner, appName })}
       modalTitle={"Delete App"}
       modalBody={dialogBody}
+      confirmButtonTextPending="Deleting..."
     />
   );
 };

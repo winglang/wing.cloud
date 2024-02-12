@@ -50,7 +50,8 @@ export const Button = forwardRef<
         ref={ref}
         type={type}
         className={clsx(
-          "inline-flex gap-2 items-center text-xs font-medium outline-none rounded",
+          "whitespace-nowrap",
+          "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
           theme.focusInput,
           primary &&
             !transparent && [
@@ -69,7 +70,8 @@ export const Button = forwardRef<
             [theme.borderInput]: !primary,
             "border-sky-700": primary,
             "px-2.5": label || children,
-            "py-1.5": !small,
+            "py-2": !small,
+            "py-1.5": small,
             "cursor-not-allowed opacity-50": disabled,
           },
           className,
