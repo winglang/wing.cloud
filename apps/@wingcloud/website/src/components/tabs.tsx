@@ -35,6 +35,7 @@ export const Tabs = ({ tabs }: TabsProps) => {
     <nav className="flex space-x-2" aria-label="Tabs">
       {tabs.map((tab) => (
         <div
+          key={tab.name}
           className={clsx(
             "pb-2",
             "border-gray-600",
@@ -42,7 +43,6 @@ export const Tabs = ({ tabs }: TabsProps) => {
           )}
         >
           <Link
-            key={tab.name}
             to={tab.to}
             className={clsx(
               "rounded-md px-3 py-1.5 text-sm font-medium",
