@@ -26,6 +26,7 @@
     "@wingcloud/platform": "workspace:^",
     "@wingcloud/probot": "workspace:^",
     "@wingcloud/simutils": "workspace:^",
+    "@wingcloud/vite": "workspace:^",
     "@winglibs/websockets": "^0.1.2",
     "aws-cdk-lib": "^2.121.1",
     "case": "^1.6.3",
@@ -47,7 +48,7 @@
     "punycode": "^2.3.1",
     "semver": "^7.5.4",
     "table": "^6.8.1",
-    "winglang": "^0.57.9",
+    "winglang": "0.57.9",
     "yaml": "^2.3.4"
   },
   "devDependencies": {
