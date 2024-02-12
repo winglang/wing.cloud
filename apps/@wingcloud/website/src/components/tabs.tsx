@@ -34,14 +34,7 @@ export const Tabs = ({ tabs }: TabsProps) => {
   return (
     <nav className="flex space-x-2" aria-label="Tabs">
       {tabs.map((tab) => (
-        <div
-          key={tab.name}
-          className={clsx(
-            "pb-2",
-            "border-gray-600",
-            current?.name === tab.name && "border-b-2",
-          )}
-        >
+        <div key={tab.name}>
           <Link
             to={tab.to}
             className={clsx(
@@ -54,6 +47,13 @@ export const Tabs = ({ tabs }: TabsProps) => {
           >
             {tab.name}
           </Link>
+          <div
+            className={clsx(
+              "pb-2 mx-1",
+              "border-gray-600",
+              current?.name === tab.name && "border-b-2",
+            )}
+          />
         </div>
       ))}
     </nav>
