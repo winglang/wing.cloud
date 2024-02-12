@@ -16,7 +16,6 @@ struct SpawnOptions {
 	arguments: Array<str>;
 	cwd: str;
 	env: Map<str>;
-	// onData: (inflight (str): void)?;
 	onData: inflight (str): void;
 }
 
@@ -65,15 +64,7 @@ class ViteTfAws {
 			},
 		);
 
-		// let bucket = new cloud.Bucket();
 		let distDir = "{props.root}/dist";
-		// let files = Util.readFiles(distDir);
-		// for file in files {
-		// 	bucket.addFile(
-		// 		file,
-		// 		"{distDir}/{file}",
-		// 	);
-		// }
 
 		let website = new cloud.Website(
 			path: "{props.root}/dist",
