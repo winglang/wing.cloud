@@ -1,22 +1,14 @@
 import clsx from "clsx";
 import { useMemo, type PropsWithChildren } from "react";
 
+import { useStatus } from "../utils/status.js";
+import type { EnvironmentStatus } from "../utils/wrpc.js";
+
 export const StatusPill = ({
   status,
   children,
-}: PropsWithChildren<{ status: string }>) => {
-  const statusString = useMemo(() => {
-    if (status === "running-server") {
-      return "Starting";
-    }
-    if (status === "running-tests") {
-      return "Running Tests";
-    }
-    if (status === "initializing" || status === "deploying") {
-      return "Deploying";
-    }
-    return status;
-  }, [status]);
+}: PropsWithChildren<{ status: EnvironmentStatus }>) => {
+  const statusString = useStatus(status);
 
   return (
     <div
