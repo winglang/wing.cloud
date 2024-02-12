@@ -39,7 +39,9 @@ export const Tabs = ({ tabs }: TabsProps) => {
             to={tab.to}
             className={clsx(
               "rounded-md px-3 py-1.5 text-sm font-medium",
-              theme.text1,
+              "transition-all",
+              current?.name === tab.name && [theme.text1],
+              current?.name !== tab.name && [theme.text3, theme.text1Hover],
               theme.bgInput,
               theme.bg3Hover,
             )}
