@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
+import { StatusWithDot } from "../../../../../components/status-with-dot.js";
 import { Button } from "../../../../../design-system/button.js";
 import Popover from "../../../../../design-system/popover.js";
 import { SkeletonLoader } from "../../../../../design-system/skeleton-loader.js";
@@ -33,8 +34,12 @@ export const EnvironmentDetails = ({
   const { theme } = useTheme();
 
   const environmentStopped = useMemo(() => {
-    return environment && ["stopped", "error"].includes(environment.status);
-  }, [environment]);
+    return (
+      !endpointsLoading &&
+      environment &&
+      ["stopped", "error"].includes(environment.status)
+    );
+  }, [environment, endpointsLoading]);
 
   const showEndpoints = useMemo(() => {
     return endpoints !== undefined || endpointsLoading;
@@ -47,7 +52,7 @@ export const EnvironmentDetails = ({
         environment.status,
       )
     );
-  }, [endpointsLoading, environment]);
+  }, [environment]);
 
   const firstEndpoint = useMemo(() => {
     if (!endpoints || endpoints.length === 0 || deployingEndpoints) {
@@ -93,38 +98,7 @@ export const EnvironmentDetails = ({
           {!environment && (
             <SkeletonLoader className="h-5 w-28 max-w-full" loading />
           )}
-          {environment && (
-            <div className="text-xs">
-              <div className="flex items-center truncate">
-                <div
-                  title={environment?.status}
-                  className={clsx(
-                    "w-2.5 h-2.5",
-                    "rounded-full shrink-0",
-                    environment.status === "initializing" &&
-                      "bg-yellow-300 animate-pulse",
-                    environment.status === "running-server" &&
-                      "bg-yellow-300 animate-pulse",
-                    environment.status === "running-tests" &&
-                      "bg-yellow-300 animate-pulse",
-                    environment.status === "deploying" &&
-                      "bg-yellow-300 animate-pulse",
-                    environment.status === "running" && "bg-green-300",
-                    environment.status === "error" && "bg-red-300",
-                    environment.status === "stopped" && "bg-slate-400",
-                  )}
-                />
-                <div
-                  className={clsx(
-                    "rounded-xl px-2 py-0.5 capitalize truncate font-semibold",
-                    theme.text1,
-                  )}
-                >
-                  {statusString}
-                </div>
-              </div>
-            </div>
-          )}
+          {environment && <StatusWithDot status={environment.status} />}
         </div>
 
         <div className="flex flex-col gap-1">
@@ -210,26 +184,26 @@ export const EnvironmentDetails = ({
             <div className={clsx("text-sm truncate", theme.text2)}>
               Endpoints
             </div>
-            <div className="text-xs flex gap-x-2 items-center w-full">
-              {endpointsLoading && (
-                <SkeletonLoader className="h-5 w-2/3" loading />
+            <div
+              className={clsx(
+                "text-xs flex gap-x-2 items-center w-full",
+                theme.text3,
               )}
-              {deployingEndpoints && (
-                <div className={clsx(theme.text3, "italic")}>Deploying...</div>
-              )}
+            >
+              {deployingEndpoints && <div className="italic">Deploying...</div>}
               {environmentStopped && (
-                <div className={clsx(theme.text3, "italic")}>
-                  Environment {statusString}.
-                </div>
+                <div className="italic">Environment {statusString}.</div>
               )}
+              {!deployingEndpoints &&
+                !environmentStopped &&
+                endpointsLoading && (
+                  <SkeletonLoader className="h-5 w-2/3" loading />
+                )}
 
               {firstEndpoint && (
                 <div className="flex truncate">
                   <Link
-                    className={clsx(
-                      "hover:underline truncate relative z-10 flex gap-x-1",
-                      theme.text3,
-                    )}
+                    className="hover:underline truncate relative z-10 flex gap-x-1"
                     to={firstEndpoint.publicUrl}
                     target="_blank"
                     rel="noopener noreferrer"

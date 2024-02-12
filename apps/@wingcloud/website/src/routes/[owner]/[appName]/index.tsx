@@ -102,7 +102,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
 
                 <div className="w-full relative">
                   <Link
-                    aria-disabled={productionEnvironment === undefined}
+                    aria-disabled={!productionEnvironment?.branch}
                     to={`/${owner}/${appName}/${productionEnvironment?.branch}`}
                     className="absolute inset-0 cursor-pointer"
                   />
