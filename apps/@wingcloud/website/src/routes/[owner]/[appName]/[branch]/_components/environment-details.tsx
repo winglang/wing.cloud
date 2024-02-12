@@ -32,15 +32,36 @@ export const EnvironmentDetails = ({
 }: EvironmentDetailsProps) => {
   const { theme } = useTheme();
 
+  const environmentStopped = useMemo(() => {
+    return environment && ["stopped", "error"].includes(environment.status);
+  }, [environment]);
+
+  const showEndpoints = useMemo(() => {
+    return endpoints !== undefined || endpointsLoading;
+  }, [endpoints, endpointsLoading]);
+
+  const deployingEndpoints = useMemo(() => {
+    return (
+      environment &&
+      ["initializing", "running-server", "running-tests", "deploying"].includes(
+        environment.status,
+      )
+    );
+  }, [endpointsLoading, environment]);
+
   const firstEndpoint = useMemo(() => {
-    if (!endpoints || endpoints.length === 0) {
+    if (!endpoints || endpoints.length === 0 || deployingEndpoints) {
       return;
     }
     return endpoints[0];
   }, [endpoints]);
 
   const endpointsList = useMemo(() => {
-    return endpoints?.slice(1) || [];
+    if (!endpoints || endpoints.length === 0 || deployingEndpoints) {
+      return [];
+    }
+
+    return endpoints.slice(1);
   }, [endpoints]);
 
   const statusString = useStatus(environment?.status);
@@ -129,7 +150,12 @@ export const EnvironmentDetails = ({
           </Link>
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div
+          className={clsx(
+            "flex flex-col gap-1",
+            !showEndpoints && "col-span-2",
+          )}
+        >
           <div className={clsx("text-sm truncate", theme.text2)}>Source</div>
           <div className="text-xs">
             <div className="space-y-1">
@@ -179,98 +205,91 @@ export const EnvironmentDetails = ({
           </div>
         </div>
 
-        <div className="col-span-2">
-          {(endpoints !== undefined || endpointsLoading) && (
-            <div className="transition-all">
-              <div className="flex flex-col gap-1">
-                <div className={clsx("text-sm truncate", theme.text2)}>
-                  Endpoints
-                </div>
-                <div className="text-xs flex gap-x-2 items-center w-full">
-                  {endpointsLoading && (
-                    <SkeletonLoader className="h-5 w-2/3" loading />
-                  )}
-                  {environment &&
-                    [
-                      "initializing",
-                      "running-server",
-                      "running-tests",
-                      "deploying",
-                    ].includes(environment.status) && (
-                      <div className={clsx(theme.text3)}>
-                        Building Environment...
-                      </div>
-                    )}
-
-                  {firstEndpoint && (
-                    <div className="flex truncate">
-                      <Link
-                        className={clsx(
-                          "hover:underline truncate relative z-10 flex gap-x-1",
-                          theme.text3,
-                        )}
-                        to={firstEndpoint.publicUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <div className="flex gap-x-1 truncate">
-                          {firstEndpoint.browserSupport ? (
-                            <GlobeAltIcon className="w-4 h-4 text-violet-700 dark:text-violet-400 shrink-0" />
-                          ) : (
-                            <BoltIcon className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0" />
-                          )}
-                          <div className="truncate">{firstEndpoint.path}</div>
-                        </div>
-                      </Link>
-                    </div>
-                  )}
-
-                  {endpointsList.length > 1 && (
-                    <Popover
-                      classNames={clsx(
-                        "rounded-full py-0.5 px-1.5 flex text-xs font-semibold",
-                        theme.textInput,
-                        "border",
-                        theme.borderInput,
-                        theme.focusInput,
-                        theme.bg1,
-                      )}
-                      button={`+${endpointsList.length}`}
-                    >
-                      <div className="flex gap-x-3">
-                        <div className="space-y-0.5">
-                          {endpointsList.map((endpoint) => (
-                            <div
-                              key={endpoint.id}
-                              className="flex gap-2 items-center"
-                            >
-                              <Link
-                                className={clsx(
-                                  "hover:underline truncate relative z-10 flex gap-x-1",
-                                  theme.text3,
-                                )}
-                                to={endpoint.publicUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {endpoint.browserSupport ? (
-                                  <GlobeAltIcon className="w-4 h-4 mr-1 text-violet-700 dark:text-violet-400" />
-                                ) : (
-                                  <BoltIcon className="w-4 h-4 mr-1 text-amber-500 dark:text-amber-400" />
-                                )}
-                                {endpoint.path}
-                              </Link>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </Popover>
-                  )}
-                </div>
-              </div>
+        {showEndpoints && (
+          <div className="col-span-2 transition-all flex flex-col gap-1">
+            <div className={clsx("text-sm truncate", theme.text2)}>
+              Endpoints
             </div>
-          )}
-        </div>
+            <div className="text-xs flex gap-x-2 items-center w-full">
+              {endpointsLoading && (
+                <SkeletonLoader className="h-5 w-2/3" loading />
+              )}
+              {deployingEndpoints && (
+                <div className={clsx(theme.text3, "italic")}>Deploying...</div>
+              )}
+              {environmentStopped && (
+                <div className={clsx(theme.text3, "italic")}>
+                  Environment {statusString}.
+                </div>
+              )}
+
+              {firstEndpoint && (
+                <div className="flex truncate">
+                  <Link
+                    className={clsx(
+                      "hover:underline truncate relative z-10 flex gap-x-1",
+                      theme.text3,
+                    )}
+                    to={firstEndpoint.publicUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className="flex gap-x-1 truncate">
+                      {firstEndpoint.browserSupport ? (
+                        <GlobeAltIcon className="w-4 h-4 text-violet-700 dark:text-violet-400 shrink-0" />
+                      ) : (
+                        <BoltIcon className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0" />
+                      )}
+                      <div className="truncate">{firstEndpoint.path}</div>
+                    </div>
+                  </Link>
+                </div>
+              )}
+
+              {endpointsList.length > 1 && (
+                <Popover
+                  classNames={clsx(
+                    "rounded-full py-0.5 px-1.5 flex text-xs font-semibold",
+                    theme.textInput,
+                    "border",
+                    theme.borderInput,
+                    theme.focusInput,
+                    theme.bg1,
+                  )}
+                  button={`+${endpointsList.length}`}
+                >
+                  <div className="flex gap-x-3">
+                    <div className="space-y-0.5">
+                      {endpointsList.map((endpoint) => (
+                        <div
+                          key={endpoint.id}
+                          className="flex gap-2 items-center"
+                        >
+                          <Link
+                            className={clsx(
+                              "hover:underline truncate relative z-10 flex gap-x-1",
+                              theme.text3,
+                            )}
+                            to={endpoint.publicUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {endpoint.browserSupport ? (
+                              <GlobeAltIcon className="w-4 h-4 mr-1 text-violet-700 dark:text-violet-400" />
+                            ) : (
+                              <BoltIcon className="w-4 h-4 mr-1 text-amber-500 dark:text-amber-400" />
+                            )}
+                            {endpoint.path}
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Popover>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

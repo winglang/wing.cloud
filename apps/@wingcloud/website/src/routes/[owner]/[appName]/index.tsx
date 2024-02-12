@@ -58,7 +58,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
       branch: productionEnvironment?.branch!,
     },
     {
-      enabled: !!appName && !!productionEnvironment,
+      enabled: !!appName && productionEnvironment?.status === "running",
     },
   );
 

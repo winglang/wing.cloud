@@ -26,8 +26,8 @@ export const PageHeader = ({
     >
       <div
         className={clsx(
-          "w-full max-w-7xl overflow-auto mx-auto pt-4 md:px-8 flex",
-          !tabs && "pb-4",
+          "w-full max-w-7xl overflow-auto mx-auto pt-4 md:pt-8 md:px-8 flex",
+          !tabs && "pb-4 md:pb-8",
         )}
       >
         <div className="space-y-1 flex-grow items-center">
@@ -53,7 +53,10 @@ export const PageHeader = ({
           )}
         </div>
         <div
-          className={clsx("flex justify-end items-end gap-x-2", tabs && "pb-4")}
+          className={clsx(
+            "flex justify-end items-end gap-x-2",
+            tabs && "pb-4 md:pb-8",
+          )}
         >
           {actions}
         </div>
