@@ -1,6 +1,7 @@
 bring ex;
 bring "./http-error.w" as httpError;
 bring "./nanoid62.w" as nanoid62;
+bring "./util.w" as util;
 
 pub struct App {
   appId: str;
@@ -226,17 +227,27 @@ pub class Apps {
   }
 
   pub inflight list(options: ListAppsOptions): Array<App> {
-    let result = this.table.query(
-      keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-      expressionAttributeValues: {
-        ":pk": "USER#{options.userId}",
-        ":sk": "APP#",
+    let var exclusiveStartKey: Json? = nil;
+    let var apps: Array<App> = [];
+    util.Util.do_while(
+      handler: () => {
+        let result = this.table.query(
+          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          expressionAttributeValues: {
+            ":pk": "USER#{options.userId}",
+            ":sk": "APP#",
+          },
+          exclusiveStartKey: exclusiveStartKey,
+        );
+        for item in result.items {
+          apps = apps.concat([App.fromJson(item)]);
+        }
+        exclusiveStartKey = result.lastEvaluatedKey;
+      },
+      condition: () => {
+        return exclusiveStartKey?;
       },
     );
-    let var apps: Array<App> = [];
-    for item in result.items {
-      apps = apps.concat([App.fromJson(item)]);
-    }
     return apps;
   }
 
@@ -302,17 +313,27 @@ pub class Apps {
   }
 
   pub inflight listByRepository(options: ListAppByRepositoryOptions): Array<App> {
-    let result = this.table.query(
-      keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-      expressionAttributeValues: {
-        ":pk": "REPOSITORY#{options.repository}",
-        ":sk": "APP#",
+    let var exclusiveStartKey: Json? = nil;
+    let var apps: Array<App> = [];
+    util.Util.do_while(
+      handler: () => {
+        let result = this.table.query(
+          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          expressionAttributeValues: {
+            ":pk": "REPOSITORY#{options.repository}",
+            ":sk": "APP#",
+          },
+          exclusiveStartKey: exclusiveStartKey,
+        );
+        for item in result.items {
+          apps = apps.concat([App.fromJson(item)]);
+        }
+        exclusiveStartKey = result.lastEvaluatedKey;
+      },
+      condition: () => {
+        return exclusiveStartKey?;
       },
     );
-    let var apps: Array<App> = [];
-    for item in result.items {
-      apps = apps.concat([App.fromJson(item)]);
-    }
     return apps;
   }
 
