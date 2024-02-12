@@ -1,15 +1,9 @@
-import {
-  createContext,
-  useEffect,
-  useState,
-  type PropsWithChildren,
-} from "react";
-import { useParams } from "react-router-dom";
+import { createContext, useState, type PropsWithChildren } from "react";
 
 import type { App } from "../utils/wrpc.js";
 import { wrpc } from "../utils/wrpc.js";
 
-export interface AppDataProviderContext {
+export interface CurrentAppDataProviderContext {
   app?: App;
   setOwner: (owner: string) => void;
   setAppName: (appName: string) => void;
@@ -17,7 +11,7 @@ export interface AppDataProviderContext {
   isFetching: boolean;
   isError: boolean;
 }
-const DEFAULT_CONTEXT: AppDataProviderContext = {
+const DEFAULT_CONTEXT: CurrentAppDataProviderContext = {
   setOwner: () => {},
   setAppName: () => {},
   app: undefined,
@@ -25,10 +19,10 @@ const DEFAULT_CONTEXT: AppDataProviderContext = {
   isFetching: false,
   isError: false,
 };
-export const AppDataProviderContext =
-  createContext<AppDataProviderContext>(DEFAULT_CONTEXT);
+export const CurrentAppDataProviderContext =
+  createContext<CurrentAppDataProviderContext>(DEFAULT_CONTEXT);
 
-export const AppDataProvider = ({ children }: PropsWithChildren) => {
+export const CurrentAppDataProvider = ({ children }: PropsWithChildren) => {
   const [owner, setOwner] = useState<string>();
   const [appName, setAppName] = useState<string>();
 
@@ -43,7 +37,7 @@ export const AppDataProvider = ({ children }: PropsWithChildren) => {
   );
 
   return (
-    <AppDataProviderContext.Provider
+    <CurrentAppDataProviderContext.Provider
       value={{
         app: getAppQuery.data?.app,
         setOwner,
@@ -54,6 +48,6 @@ export const AppDataProvider = ({ children }: PropsWithChildren) => {
       }}
     >
       {children}
-    </AppDataProviderContext.Provider>
+    </CurrentAppDataProviderContext.Provider>
   );
 };

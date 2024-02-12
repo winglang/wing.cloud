@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ErrorBoundary } from "../../../components/error-boundary.js";
 import { Header } from "../../../components/header.js";
 import { PageHeader } from "../../../components/page-header.js";
-import { AppDataProviderContext } from "../../../data-store/app-data-provider.js";
+import { CurrentAppDataProviderContext } from "../../../data-store/app-data-provider.js";
 import { Button } from "../../../design-system/button.js";
 import { SkeletonLoader } from "../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
@@ -18,7 +18,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
   const { theme } = useTheme();
 
   const { app, setOwner, setAppName, isLoading } = useContext(
-    AppDataProviderContext,
+    CurrentAppDataProviderContext,
   );
   useEffect(() => {
     setOwner(owner);

@@ -80,96 +80,96 @@ export const EnvironmentDetails = ({
         <ConsolePreviewIcon />
       </div>
 
-      <div className="flex flex-col flex-grow gap-4 sm:gap-6 transition-all">
-        <div className="flex gap-4 sm:gap-8">
-          <InfoItem
-            label="Status"
-            loading={loading}
-            value={
-              <div className="flex items-center truncate">
-                <div
-                  title={environment?.status}
-                  className={clsx(
-                    "w-2.5 h-2.5",
-                    "rounded-full shrink-0",
-                    environment?.status === "initializing" &&
-                      "bg-yellow-300 animate-pulse",
-                    environment?.status === "running-server" &&
-                      "bg-yellow-300 animate-pulse",
-                    environment?.status === "running-tests" &&
-                      "bg-yellow-300 animate-pulse",
-                    environment?.status === "deploying" &&
-                      "bg-yellow-300 animate-pulse",
-                    environment?.status === "running" && "bg-green-300",
-                    environment?.status === "error" && "bg-red-300",
-                    environment?.status === "stopped" && "bg-slate-400",
-                  )}
-                />
-                <div
-                  className={clsx(
-                    "rounded-xl px-2 py-0.5 capitalize truncate font-semibold",
-                    theme.text1,
-                  )}
-                >
-                  {statusString}
-                </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 flex-grow gap-4 sm:gap-6 transition-all">
+        <InfoItem
+          label="Status"
+          loading={loading}
+          value={
+            <div className="flex items-center truncate">
+              <div
+                title={environment?.status}
+                className={clsx(
+                  "w-2.5 h-2.5",
+                  "rounded-full shrink-0",
+                  environment?.status === "initializing" &&
+                    "bg-yellow-300 animate-pulse",
+                  environment?.status === "running-server" &&
+                    "bg-yellow-300 animate-pulse",
+                  environment?.status === "running-tests" &&
+                    "bg-yellow-300 animate-pulse",
+                  environment?.status === "deploying" &&
+                    "bg-yellow-300 animate-pulse",
+                  environment?.status === "running" && "bg-green-300",
+                  environment?.status === "error" && "bg-red-300",
+                  environment?.status === "stopped" && "bg-slate-400",
+                )}
+              />
+              <div
+                className={clsx(
+                  "rounded-xl px-2 py-0.5 capitalize truncate font-semibold",
+                  theme.text1,
+                )}
+              >
+                {statusString}
               </div>
-            }
-          />
-          <InfoItem
-            label="Created at"
-            loading={loading}
-            value={
-              <div className={clsx("font-semibold", theme.text1)}>
-                {environment && getDateTime(environment?.createdAt)}
-              </div>
-            }
-          />
-        </div>
+            </div>
+          }
+        />
+        <InfoItem
+          label="Created at"
+          loading={loading}
+          value={
+            <div className={clsx("font-semibold truncate", theme.text1)}>
+              {environment && getDateTime(environment?.createdAt)}
+            </div>
+          }
+        />
 
-        <div className="w-full md:w-1/2">
-          <InfoItem
-            label="Source"
-            loading={loading}
-            value={
-              <div className="space-y-1">
-                <div>
-                  <Link
-                    className="hover:underline truncate z-10"
-                    to={`https://github.com/${environment?.repo}/tree/${environment?.branch}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div className="flex gap-x-2">
-                      <BranchIcon className={clsx("w-4 h-4", theme.text1)} />
-                      <div className={clsx("font-semibold", theme.text1)}>
-                        {environment?.branch}
-                      </div>
+        <InfoItem
+          label="Source"
+          loading={loading}
+          value={
+            <div className="space-y-1">
+              <div>
+                <Link
+                  className="hover:underline truncate z-10"
+                  to={`https://github.com/${environment?.repo}/tree/${environment?.branch}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="flex gap-x-2">
+                    <BranchIcon className={clsx("w-4 h-4", theme.text1)} />
+                    <div
+                      className={clsx("font-semibold truncate", theme.text1)}
+                    >
+                      {environment?.branch}
                     </div>
-                  </Link>
-                </div>
-                <div>
-                  <Link
-                    className="hover:underline truncate z-10"
-                    to={`https://github.com/${environment?.repo}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div className="flex gap-x-2">
-                      <GithubIcon className={clsx("w-4 h-4", theme.text1)} />
-                      <div className={clsx("font-semibold", theme.text1)}>
-                        Repository
-                      </div>
-                    </div>
-                  </Link>
-                </div>
+                  </div>
+                </Link>
               </div>
-            }
-          />
-        </div>
+              <div>
+                <Link
+                  className="hover:underline truncate z-10"
+                  to={`https://github.com/${environment?.repo}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="flex gap-x-2">
+                    <GithubIcon className={clsx("w-4 h-4", theme.text1)} />
+                    <div
+                      className={clsx("font-semibold truncate", theme.text1)}
+                    >
+                      Repository
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            </div>
+          }
+        />
 
         {(endpoints !== undefined || endpointsLoading || loading) && (
-          <div className="col-span-2 transition-all w-full md:w-3/4 truncate">
+          <div className="transition-all truncate">
             <InfoItem
               label="Endpoints"
               loading={endpointsLoading || loading}
