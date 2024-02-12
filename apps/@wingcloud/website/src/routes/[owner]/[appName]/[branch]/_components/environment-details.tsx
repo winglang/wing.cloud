@@ -210,7 +210,7 @@ export const EnvironmentDetails = ({
                   )}
 
                   {firstEndpoint && (
-                    <div className="flex flex-grow truncate">
+                    <div className="flex truncate">
                       <Link
                         className={clsx(
                           "hover:underline truncate relative z-10 flex gap-x-1",
@@ -234,17 +234,15 @@ export const EnvironmentDetails = ({
 
                   {endpointsList.length > 1 && (
                     <Popover
-                      button={
-                        <div
-                          className={clsx(
-                            "rounded-full py-0.5 px-1.5 flex text-xs font-semibold",
-                            theme.text1,
-                            theme.bg1,
-                          )}
-                        >
-                          {`+${endpointsList.length}`}
-                        </div>
-                      }
+                      classNames={clsx(
+                        "rounded-full py-0.5 px-1.5 flex text-xs font-semibold",
+                        theme.textInput,
+                        "border",
+                        theme.borderInput,
+                        theme.focusInput,
+                        theme.bg1,
+                      )}
+                      button={`+${endpointsList.length}`}
                     >
                       <div className="flex gap-x-3">
                         <div className="space-y-0.5">

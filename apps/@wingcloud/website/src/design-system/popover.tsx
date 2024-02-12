@@ -1,5 +1,4 @@
 import { Popover as HeadlessPopover, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { Fragment, type PropsWithChildren } from "react";
 
@@ -7,10 +6,12 @@ import { useTheme } from "./theme-provider.js";
 
 export interface PopoverProps {
   button: React.ReactNode;
+  classNames?: string;
 }
 
 export default function Popover({
   button,
+  classNames,
   children,
 }: PropsWithChildren<PopoverProps>) {
   const { theme } = useTheme();
@@ -20,7 +21,9 @@ export default function Popover({
       <HeadlessPopover className="relative">
         {({ open }) => (
           <>
-            <HeadlessPopover.Button>{button}</HeadlessPopover.Button>
+            <HeadlessPopover.Button className={classNames}>
+              {button}
+            </HeadlessPopover.Button>
             <Transition
               as={Fragment}
               enter="transition ease-out duration-200"
