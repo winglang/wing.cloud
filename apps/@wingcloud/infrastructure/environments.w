@@ -2,6 +2,7 @@ bring ex;
 bring "./nanoid62.w" as nanoid62;
 bring "./status-reports.w" as status_report;
 bring "./http-error.w" as httpError;
+bring "./util.w" as util;
 
 pub struct Environment {
   id: str;
@@ -797,33 +798,52 @@ pub class Environments {
   }
 
   pub inflight list(options: ListEnvironmentOptions): Array<Environment> {
-    let result = this.table.query(
-      keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-      expressionAttributeValues: {
-        ":pk": "APP#{options.appId}",
-        ":sk": "ENVIRONMENT#",
+    let var exclusiveStartKey: Json? = nil;
+    let var environments: Array<Environment> = [];
+    util.Util.do_while(
+      handler: () => {
+        let result = this.table.query(
+          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          expressionAttributeValues: {
+            ":pk": "APP#{options.appId}",
+            ":sk": "ENVIRONMENT#",
+          },
+          exclusiveStartKey: exclusiveStartKey,
+        );
+        for item in result.items {
+          environments = environments.concat([this.fromDB(item)]);
+        }
+        exclusiveStartKey = result.lastEvaluatedKey;
+      },
+      condition: () => {
+        return exclusiveStartKey?;
       },
     );
-    let var environments: Array<Environment> = [];
-    for item in result.items {
-      environments = environments.concat([this.fromDB(item)]);
-    }
     return environments;
   }
 
   pub inflight listDeployedAt(options: ListEnvironmentDeployedAtOptions): Array<Environment> {
     let statusUpdatedAt = "{options.deployedAt.dayOfMonth}_{options.deployedAt.month}";
-    let result = this.table.query(
-      keyConditionExpression: "pk = :pk",
-      expressionAttributeValues: {
-        ":pk": "DEPLOYED#{statusUpdatedAt}",
+    let var exclusiveStartKey: Json? = nil;
+    let var environments: Array<Environment> = [];
+    util.Util.do_while(
+      handler: () => {
+        let result = this.table.query(
+          keyConditionExpression: "pk = :pk",
+          expressionAttributeValues: {
+            ":pk": "DEPLOYED#{statusUpdatedAt}",
+          },
+          exclusiveStartKey: exclusiveStartKey,
+        );
+        for item in result.items {
+          environments = environments.concat([this.fromDB(item)]);
+        }
+        exclusiveStartKey = result.lastEvaluatedKey;
+      },
+      condition: () => {
+        return exclusiveStartKey?;
       },
     );
-    let var environments: Array<Environment> = [];
-    for item in result.items {
-      let environment = this.fromDB(item);
-      environments = environments.concat([environment]);
-    }
     return environments;
   }
 

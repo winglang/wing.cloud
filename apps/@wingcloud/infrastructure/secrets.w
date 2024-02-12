@@ -2,6 +2,7 @@ bring ex;
 bring "./crypto/crypto.w" as crypto;
 bring "./crypto/icrypto.w" as icrypto;
 bring "./http-error.w" as httpError;
+bring "./util.w" as util;
 
 
 pub struct Secret {
@@ -122,21 +123,28 @@ pub class Secrets {
   }
 
   pub inflight list(options: ListSecretsOptions): Array<Secret> {
+    let var exclusiveStartKey: Json? = nil;
     let var secrets = MutArray<Secret>[];
-
-    let result = this.table.query(
-      keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-      expressionAttributeValues: {
-        ":pk": "APP#{options.appId}",
-        ":sk": "SECRET#TYPE#{options.environmentType}#"
+    util.Util.do_while(
+      handler: () => {
+        let result = this.table.query(
+          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          expressionAttributeValues: {
+            ":pk": "APP#{options.appId}",
+            ":sk": "SECRET#TYPE#{options.environmentType}#",
+          },
+          exclusiveStartKey: exclusiveStartKey,
+        );
+        for item in result.items {
+          let secret = Secret.fromJson(this.fromDB(item, options.decryptValues ?? false));
+          secrets.push(secret);
+        }
+        exclusiveStartKey = result.lastEvaluatedKey;
+      },
+      condition: () => {
+        return exclusiveStartKey?;
       },
     );
-
-    for item in result.items {
-      let secret = Secret.fromJson(this.fromDB(item, options.decryptValues ?? false));
-      secrets.push(secret);
-    }
-
     return secrets.copy();
   }
 
