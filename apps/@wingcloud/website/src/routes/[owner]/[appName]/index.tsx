@@ -14,7 +14,6 @@ import { wrpc } from "../../../utils/wrpc.js";
 import { EnvironmentDetails } from "./[branch]/_components/environment-details.js";
 import { EnvironmentsListItemSkeleton } from "./_components/environments-list-item-skeleton.js";
 import { EnvironmentsListItem } from "./_components/environments-list-item.js";
-import { EnvironmentsList } from "./_components/environments-list.js";
 
 const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
   const { app, setOwner, setAppName } = useContext(
@@ -90,118 +89,114 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
   }, [app]);
 
   return (
-    <>
-      <div className="overflow-auto">
-        <div className="max-w-7xl mx-auto px-4 py-2 md:px-8 md:py:4">
-          {owner && appName && (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className={clsx("text-lg pt-2", theme.text1)}>
-                  Production
-                </div>
-
-                <div className="w-full relative">
-                  <Link
-                    aria-disabled={!productionEnvironment?.branch}
-                    to={`/${owner}/${appName}/${productionEnvironment?.branch}`}
-                    className="absolute inset-0 cursor-pointer"
-                  />
-                  <EnvironmentDetails
-                    owner={owner}
-                    appName={appName}
-                    environment={productionEnvironment}
-                    loading={!productionEnvironment}
-                    endpoints={endpointsQuery.data?.endpoints}
-                    endpointsLoading={
-                      endpointsQuery.isLoading ||
-                      endpointsQuery.data === undefined
-                    }
-                  />
-                </div>
+    <div className="overflow-auto">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-2 md:py-4">
+        {owner && appName && (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className={clsx("text-lg pt-2", theme.text1)}>
+                Production
               </div>
 
-              <div className="space-y-2">
-                <div className={clsx("text-lg pt-2", theme.text1)}>
-                  Preview Environments
-                </div>
-
-                {loading && <EnvironmentsListItemSkeleton short />}
-
-                {!loading && (
-                  <>
-                    {filteredPreviewEnvs.length > 0 && (
-                      <Input
-                        type="text"
-                        leftIcon={MagnifyingGlassCircleIcon}
-                        className="block w-full"
-                        containerClassName="w-full"
-                        name="search"
-                        id="search"
-                        placeholder="Search..."
-                        value={search}
-                        onChange={(e) => {
-                          setSearch(e.target.value);
-                        }}
-                      />
-                    )}
-
-                    {filteredPreviewEnvs.map((environment) => (
-                      <EnvironmentsListItem
-                        key={environment.id}
-                        owner={owner}
-                        appName={appName}
-                        environment={environment}
-                      />
-                    ))}
-
-                    {filteredPreviewEnvs.length === 0 && (
-                      <div
-                        className={clsx(
-                          "space-y-2",
-                          "p-4 w-full border text-center rounded-md",
-                          theme.bgInput,
-                          theme.borderInput,
-                          theme.text1,
-                        )}
-                      >
-                        <BranchIcon
-                          className={clsx("w-12 h-12 mx-auto", theme.text3)}
-                        />
-                        <h3
-                          className={clsx("text-sm font-medium", theme.text2)}
-                        >
-                          No preview environments found.
-                        </h3>
-                        <p
-                          className={clsx(
-                            "mt-1 text-sm flex gap-x-1 w-full justify-center",
-                            theme.text3,
-                          )}
-                        >
-                          <span>
-                            Get started by{" "}
-                            <a
-                              className="text-sky-500 hover:underline hover:text-sky-600"
-                              href={`${repoUrl}/compare`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              aria-disabled={repoUrl === ""}
-                            >
-                              opening a Pull Request
-                            </a>
-                            .
-                          </span>
-                        </p>
-                      </div>
-                    )}
-                  </>
-                )}
+              <div className="w-full relative">
+                <Link
+                  aria-disabled={!productionEnvironment?.branch}
+                  to={`/${owner}/${appName}/${productionEnvironment?.branch}`}
+                  className="absolute inset-0 cursor-pointer"
+                />
+                <EnvironmentDetails
+                  owner={owner}
+                  appName={appName}
+                  environment={productionEnvironment}
+                  loading={!productionEnvironment}
+                  endpoints={endpointsQuery.data?.endpoints}
+                  endpointsLoading={
+                    endpointsQuery.isLoading ||
+                    endpointsQuery.data === undefined
+                  }
+                />
               </div>
             </div>
-          )}
-        </div>
+
+            <div className="space-y-2">
+              <div className={clsx("text-lg pt-2", theme.text1)}>
+                Preview Environments
+              </div>
+
+              {loading && <EnvironmentsListItemSkeleton short />}
+
+              {!loading && (
+                <>
+                  {filteredPreviewEnvs.length > 0 && (
+                    <Input
+                      type="text"
+                      leftIcon={MagnifyingGlassCircleIcon}
+                      className="block w-full"
+                      containerClassName="w-full"
+                      name="search"
+                      id="search"
+                      placeholder="Search..."
+                      value={search}
+                      onChange={(e) => {
+                        setSearch(e.target.value);
+                      }}
+                    />
+                  )}
+
+                  {filteredPreviewEnvs.map((environment) => (
+                    <EnvironmentsListItem
+                      key={environment.id}
+                      owner={owner}
+                      appName={appName}
+                      environment={environment}
+                    />
+                  ))}
+
+                  {filteredPreviewEnvs.length === 0 && (
+                    <div
+                      className={clsx(
+                        "space-y-2",
+                        "p-4 w-full border text-center rounded-md",
+                        theme.bgInput,
+                        theme.borderInput,
+                        theme.text1,
+                      )}
+                    >
+                      <BranchIcon
+                        className={clsx("w-12 h-12 mx-auto", theme.text3)}
+                      />
+                      <h3 className={clsx("text-sm font-medium", theme.text2)}>
+                        No preview environments found.
+                      </h3>
+                      <p
+                        className={clsx(
+                          "mt-1 text-sm flex gap-x-1 w-full justify-center",
+                          theme.text3,
+                        )}
+                      >
+                        <span>
+                          Get started by{" "}
+                          <a
+                            className="text-sky-500 hover:underline hover:text-sky-600"
+                            href={`${repoUrl}/compare`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-disabled={repoUrl === ""}
+                          >
+                            opening a Pull Request
+                          </a>
+                          .
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
