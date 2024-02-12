@@ -127,47 +127,49 @@ export const EnvironmentDetails = ({
           />
         </div>
 
-        <InfoItem
-          label="Source"
-          loading={loading}
-          value={
-            <div className="space-y-1">
-              <div>
-                <Link
-                  className="hover:underline truncate w-full h-full z-10"
-                  to={`https://github.com/${environment?.repo}/tree/${environment?.branch}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="flex gap-x-2">
-                    <BranchIcon className={clsx("w-4 h-4", theme.text1)} />
-                    <div className={clsx("font-semibold", theme.text1)}>
-                      {environment?.branch}
+        <div className="w-full md:w-1/2">
+          <InfoItem
+            label="Source"
+            loading={loading}
+            value={
+              <div className="space-y-1">
+                <div>
+                  <Link
+                    className="hover:underline truncate z-10"
+                    to={`https://github.com/${environment?.repo}/tree/${environment?.branch}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className="flex gap-x-2">
+                      <BranchIcon className={clsx("w-4 h-4", theme.text1)} />
+                      <div className={clsx("font-semibold", theme.text1)}>
+                        {environment?.branch}
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              </div>
-              <div>
-                <Link
-                  className="hover:underline truncate w-full h-full z-10"
-                  to={`https://github.com/${environment?.repo}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="flex gap-x-2">
-                    <GithubIcon className={clsx("w-4 h-4", theme.text1)} />
-                    <div className={clsx("font-semibold", theme.text1)}>
-                      Repository
+                  </Link>
+                </div>
+                <div>
+                  <Link
+                    className="hover:underline truncate z-10"
+                    to={`https://github.com/${environment?.repo}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className="flex gap-x-2">
+                      <GithubIcon className={clsx("w-4 h-4", theme.text1)} />
+                      <div className={clsx("font-semibold", theme.text1)}>
+                        Repository
+                      </div>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               </div>
-            </div>
-          }
-        />
+            }
+          />
+        </div>
 
         {(endpoints !== undefined || endpointsLoading || loading) && (
-          <div className="col-span-2 transition-all w-3/4">
+          <div className="col-span-2 transition-all w-full md:w-3/4 truncate">
             <InfoItem
               label="Endpoints"
               loading={endpointsLoading || loading}

@@ -60,7 +60,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
   // TODO: Gather this URL from the app data
   const repoUrl = useMemo(() => {
     if (!app) return;
-   return `https://github.com/${app?.repoOwner}/${app?.repoName}`;
+    return `https://github.com/${app?.repoOwner}/${app?.repoName}`;
   }, [app]);
 
   const goToSettings = useCallback(async () => {
