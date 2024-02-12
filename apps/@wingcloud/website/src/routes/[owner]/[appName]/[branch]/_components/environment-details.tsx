@@ -133,48 +133,32 @@ export const EnvironmentDetails = ({
           <div className={clsx("text-sm truncate", theme.text2)}>Source</div>
           <div className="text-xs">
             <div className="space-y-1">
-              <div>
-                {!environment && (
-                  <SkeletonLoader className="h-5 w-2/3" loading />
-                )}
-                {environment && (
-                  <Link
-                    className="hover:underline truncate z-10"
-                    aria-disabled={environment.status === "stopped"}
-                    to={`https://github.com/${environment.repo}/tree/${environment.branch}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div className="flex gap-x-2">
-                      <BranchIcon className={clsx("w-4 h-4", theme.text1)} />
-                      <div
-                        className={clsx("font-semibold truncate", theme.text1)}
-                      >
-                        {environment.branch}
-                      </div>
-                    </div>
-                  </Link>
-                )}
-              </div>
-              <div>
-                {environment && (
-                  <Link
-                    className="hover:underline truncate z-10"
-                    to={`https://github.com/${environment.repo}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <div className="flex gap-x-2">
-                      <GithubIcon className={clsx("w-4 h-4", theme.text1)} />
-                      <div
-                        className={clsx("font-semibold truncate", theme.text1)}
-                      >
-                        {environment.repo}
-                      </div>
-                    </div>
-                  </Link>
-                )}
-              </div>
+              {!environment && <SkeletonLoader className="h-5 w-2/3" loading />}
+              {environment && (
+                <Link
+                  className="hover:underline truncate relative z-10 flex gap-x-1"
+                  aria-disabled={environment.status === "stopped"}
+                  to={`https://github.com/${environment.repo}/tree/${environment.branch}`}
+                  target="_blank"
+                >
+                  <BranchIcon className={clsx("w-4 h-4", theme.text1)} />
+                  <div className={clsx("font-semibold truncate", theme.text1)}>
+                    {environment.branch}
+                  </div>
+                </Link>
+              )}
+              {environment && (
+                <Link
+                  className="hover:underline truncate relative z-10 flex gap-x-1"
+                  to={`https://github.com/${environment.repo}`}
+                  target="_blank"
+                >
+                  <GithubIcon className={clsx("w-4 h-4", theme.text1)} />
+                  <div className={clsx("font-semibold truncate", theme.text1)}>
+                    {environment.repo}
+                  </div>
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -214,7 +198,11 @@ export const EnvironmentDetails = ({
                       ) : (
                         <BoltIcon className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0" />
                       )}
-                      <div className="truncate">{firstEndpoint.path}</div>
+                      <div
+                        className={clsx("font-semibold truncate", theme.text1)}
+                      >
+                        {firstEndpoint.path}
+                      </div>
                     </div>
                   </Link>
                 </div>
