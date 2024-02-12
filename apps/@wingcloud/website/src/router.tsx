@@ -32,8 +32,7 @@ export const router = (onReady: () => void) => {
         },
         {
           path: "/:owner/:appName/settings",
-          lazy: () =>
-            lazyLoading(import("./routes/[owner]/[appName]/settings/index.js")),
+          lazy: () => import("./routes/[owner]/[appName]/settings/index.js"),
         },
         {
           path: "/:owner/:appName/:branch",

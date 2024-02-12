@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 
-import type { App } from "./wrpc.js";
+import type { App, Environment } from "./wrpc.js";
 
 export const useQueryCache = () => {
   const queryClient = useQueryClient();
@@ -15,13 +15,21 @@ export const useQueryCache = () => {
     );
   };
 
-  const deleteAppItemFromAppList = (appNameToRemove: string) => {
+  const deleteAppItemFromAppList = (appId: string) => {
     queryClient.setQueriesData(
       { queryKey: ["app.list"] },
       (apps: { apps: App[] } | undefined) => {
-        const newApps =
-          apps?.apps?.filter((app) => app.appName !== appNameToRemove) || [];
+        const newApps = apps?.apps?.filter((app) => app.appId !== appId) || [];
         return { apps: newApps };
+      },
+    );
+    queryClient.setQueriesData(
+      { queryKey: ["app.listEnvironments"] },
+      (environments: { environments: Environment[] } | undefined) => {
+        const newEnvs =
+          environments?.environments?.filter((env) => env.appId !== appId) ||
+          [];
+        return { environments: newEnvs };
       },
     );
   };

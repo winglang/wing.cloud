@@ -38,6 +38,24 @@ const getTimeFromNow = (datetime?: string, short: boolean = false) => {
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(months / 12);
+
+  if (years > 0) {
+    if (short) {
+      return `${years}y ago`;
+    }
+    const label = years === 1 ? "year" : "years";
+    return `${years} ${label} ago`;
+  }
+
+  if (months > 0) {
+    if (short) {
+      return `${months}mo ago`;
+    }
+    const label = months === 1 ? "month" : "months";
+    return `${months} ${label} ago`;
+  }
 
   if (hours > 24) {
     if (short) {

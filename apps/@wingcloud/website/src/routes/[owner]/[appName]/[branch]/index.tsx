@@ -4,6 +4,7 @@ import { useLocation, useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../../../components/error-boundary.js";
 import { Header } from "../../../../components/header.js";
+import { PageHeader } from "../../../../components/page-header.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 export const TEST_LOGS_ID = "test-logs";
@@ -16,12 +17,18 @@ import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
 import { TestsLogs } from "./_components/tests-logs.js";
 
-const EnvironmentPage = () => {
-  const { owner, appName, branch } = useParams();
-
-  const [testLogsOpen, setTestLogsOpen] = useState(false);
-  const [deploymentLogsOpen, setDeploymentLogsOpen] = useState(false);
-  const [runtimeLogsOpen, setRuntimeLogsOpen] = useState(false);
+const EnvironmentPage = ({
+  owner,
+  appName,
+  branch,
+}: {
+  owner: string;
+  appName: string;
+  branch: string;
+}) => {
+  const [testLogsOpen, setTestLogsOpen] = useState(true);
+  const [deploymentLogsOpen, setDeploymentLogsOpen] = useState(true);
+  const [runtimeLogsOpen, setRuntimeLogsOpen] = useState(true);
 
   const environment = wrpc["app.environment"].useQuery({
     owner: owner!,
@@ -88,51 +95,55 @@ const EnvironmentPage = () => {
   }, [locationHash, logs.data?.tests, selectedTestId]);
 
   return (
-    <div
-      className={clsx(
-        "w-full flex-grow overflow-auto",
-        "max-w-5xl mx-auto p-4 sm:p-6",
-        "space-y-4",
-      )}
-    >
-      <EnvironmentDetails
-        loading={environment.isLoading}
-        environment={environment.data?.environment}
-      />
-      <Endpoints
-        id={ENDPOINTS_ID}
-        isOpen={true}
-        endpoints={endpoints.data?.endpoints || []}
-        loading={endpoints.isLoading}
-        environment={environment.data?.environment}
-      />
-      <AppLogs
-        id={DEPLOYMENT_LOGS_ID}
-        title="Deployment"
-        isOpen={deploymentLogsOpen}
-        setIsOpen={setDeploymentLogsOpen}
-        logs={logs.data?.deploy || []}
-        loading={logs.isLoading}
-      />
-      <AppLogs
-        id={RUNTIME_LOGS_ID}
-        title="Runtime"
-        isOpen={runtimeLogsOpen}
-        setIsOpen={setRuntimeLogsOpen}
-        logs={logs.data?.runtime || []}
-        loading={logs.isLoading}
-      />
-      <TestsLogs
-        id={TEST_LOGS_ID}
-        isOpen={testLogsOpen}
-        setIsOpen={setTestLogsOpen}
-        testResults={
-          environment.data?.environment.testResults?.testResults || []
-        }
-        selectedTestId={selectedTestId}
-        logs={logs.data?.tests || []}
-        loading={logs.isLoading}
-      />
+    <div className="overflow-auto">
+      <div
+        className={clsx(
+          "w-full flex-grow overflow-auto",
+          "max-w-7xl mx-auto p-4 sm:p-6",
+          "space-y-4",
+        )}
+      >
+        <EnvironmentDetails
+          owner={owner}
+          appName={appName}
+          loading={environment.isLoading}
+          environment={environment.data?.environment}
+        />
+        <Endpoints
+          id={ENDPOINTS_ID}
+          isOpen={true}
+          endpoints={endpoints.data?.endpoints || []}
+          loading={endpoints.isLoading}
+          environment={environment.data?.environment}
+        />
+        <AppLogs
+          id={DEPLOYMENT_LOGS_ID}
+          title="Deployment"
+          isOpen={deploymentLogsOpen}
+          setIsOpen={setDeploymentLogsOpen}
+          logs={logs.data?.deploy || []}
+          loading={logs.isLoading}
+        />
+        <AppLogs
+          id={RUNTIME_LOGS_ID}
+          title="Runtime"
+          isOpen={runtimeLogsOpen}
+          setIsOpen={setRuntimeLogsOpen}
+          logs={logs.data?.runtime || []}
+          loading={logs.isLoading}
+        />
+        <TestsLogs
+          id={TEST_LOGS_ID}
+          isOpen={testLogsOpen}
+          setIsOpen={setTestLogsOpen}
+          testResults={
+            environment.data?.environment.testResults?.testResults || []
+          }
+          selectedTestId={selectedTestId}
+          logs={logs.data?.tests || []}
+          loading={logs.isLoading}
+        />
+      </div>
     </div>
   );
 };
@@ -150,9 +161,15 @@ export const Component = () => {
             icon: <BranchIcon className="w-4 h-4 text-slate-700" />,
           },
         ]}
+        tabs={[
+          {
+            name: "Environment",
+            to: `/${owner}/${appName}/${branch}`,
+          },
+        ]}
       />
       <ErrorBoundary>
-        <EnvironmentPage />
+        <EnvironmentPage owner={owner!} appName={appName!} branch={branch!} />
       </ErrorBoundary>
     </div>
   );

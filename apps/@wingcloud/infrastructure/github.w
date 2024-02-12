@@ -36,6 +36,7 @@ struct Owner {
 struct Repository {
   id: num;
   name: str;
+  description: str?;
   full_name: str;
   private: bool;
   owner: Owner;

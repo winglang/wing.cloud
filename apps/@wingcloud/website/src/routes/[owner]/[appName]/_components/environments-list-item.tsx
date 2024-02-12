@@ -62,17 +62,23 @@ export const EnvironmentsListItem = ({
   return (
     <div
       className={clsx(
-        "rounded p-4 text-left w-full block",
+        "rounded-md p-4 text-left w-full block",
         theme.bgInput,
         "border",
         theme.borderInput,
+        "shadow-sm hover:shadow",
+        "relative",
       )}
     >
+      <Link
+        className={clsx("absolute inset-0 rounded-md z-0", theme.focusInput)}
+        to={`/${owner}/${appName}/${environment.branch}`}
+      />
       <div className="flex items-center gap-x-4">
         <div className="relative">
           <BranchIcon
             className={clsx(
-              "w-8 h-8 ",
+              "w-8 h-8",
               "rounded-full border-slate-300 border",
               theme.text2,
             )}
@@ -85,28 +91,36 @@ export const EnvironmentsListItem = ({
             <Link
               to={`/${owner}/${appName}/${environment.branch}`}
               className={clsx(
-                "font-medium truncate hover:underline",
+                "font-medium truncate relative",
                 theme.text1,
+                theme.text1Hover,
+                "hover:underline z-10 cursor-pointer",
               )}
-              rel="noopener noreferrer"
             >
               {environment.prTitle}
             </Link>
 
             <div className="truncate flex gap-x-2 sm:gap-x-5">
-              <div className={clsx("flex gap-x-1 items-center", theme.text2)}>
+              <div
+                className={clsx(
+                  "flex gap-x-1 items-center",
+                  "leading-5 py-0.5",
+                  theme.text2,
+                )}
+              >
                 <GithubIcon className="w-3 h-3 inline-block" />
-                <a
-                  href={`https://github.com/${environment.repo}/tree/${environment.branch}`}
+                <Link
+                  to={`https://github.com/${environment.repo}/tree/${environment.branch}`}
                   target="_blank"
-                  rel="noopener noreferrer"
                   className={clsx(
-                    "truncate hover:underline items-end flex font-mono",
+                    "truncate items-end flex font-mono",
                     theme.text2,
+                    theme.text2Hover,
+                    "hover:underline z-10 cursor-pointer",
                   )}
                 >
                   {environment.branch}
-                </a>
+                </Link>
                 <span
                   className={clsx(
                     "truncate items-center flex opacity-70",
@@ -121,12 +135,13 @@ export const EnvironmentsListItem = ({
                 <Link
                   to={`/${owner}/${appName}/${environment.branch}/#${TEST_LOGS_ID}`}
                   className={clsx(
-                    "flex items-end gap-x-0.5",
+                    "flex items-center gap-x-0.5",
                     "rounded-xl px-1 py-0.5",
                     "border",
                     theme.bg3,
                     theme.bg3Hover,
                     theme.border3,
+                    "hover:underline z-10 cursor-pointer",
                   )}
                   title={`tests ${testStatus}`}
                 >
@@ -146,7 +161,12 @@ export const EnvironmentsListItem = ({
             {linkEnabled && (
               <Link
                 to={`/${owner}/${appName}/${environment.branch}/console`}
-                className={clsx("text-xs hover:underline ", theme.text1)}
+                className={clsx(
+                  "text-xs",
+                  theme.text1,
+                  theme.text1Hover,
+                  "hover:underline z-10 cursor-pointer",
+                )}
               >
                 Visit Console
               </Link>
@@ -156,7 +176,7 @@ export const EnvironmentsListItem = ({
                 {status === "error" && (
                   <Link
                     to={`/${owner}/${appName}/${environment.branch}/#${DEPLOYMENT_LOGS_ID}`}
-                    className="hover:underline"
+                    className="hover:underline z-10"
                   >
                     {status}
                   </Link>
