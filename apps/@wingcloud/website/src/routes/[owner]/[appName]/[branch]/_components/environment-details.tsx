@@ -165,9 +165,6 @@ export const EnvironmentDetails = ({
                 )}
               </div>
               <div>
-                {!environment && (
-                  <SkeletonLoader className="h-5 w-3/5" loading />
-                )}
                 {environment && (
                   <Link
                     className="hover:underline truncate z-10"
