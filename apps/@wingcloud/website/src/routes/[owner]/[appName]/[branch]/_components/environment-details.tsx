@@ -217,6 +217,7 @@ export const EnvironmentDetails = ({
                     theme.borderInput,
                     theme.focusInput,
                     theme.bg1,
+                    theme.bg2Hover,
                   )}
                   button={`+${endpointsList.length}`}
                 >
