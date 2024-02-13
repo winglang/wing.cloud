@@ -1,11 +1,12 @@
 import { useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { SectionTitle } from "../../../../components/section-title.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
+import { Button } from "../../../../design-system/button.js";
 
 const Overview = ({
   owner,
@@ -52,6 +53,16 @@ const Overview = ({
           appName={appName}
           loading={environmentQuery.isLoading}
           environment={environment}
+          actions={
+            <Link
+              to={`/${owner}/${appName}/${environment?.branch}/console`}
+              className="z-10"
+            >
+              <Button disabled={environment?.status !== "running"}>
+                Console
+              </Button>
+            </Link>
+          }
         />
       </div>
       <div className="space-y-2">

@@ -23,6 +23,7 @@ export interface EvironmentDetailsProps {
   endpoints?: Endpoint[];
   endpointsLoading?: boolean;
   onClick?: () => void;
+  actions?: React.ReactNode;
 }
 
 export const EnvironmentDetails = ({
@@ -32,6 +33,7 @@ export const EnvironmentDetails = ({
   endpoints,
   endpointsLoading,
   onClick,
+  actions,
 }: EvironmentDetailsProps) => {
   const { theme } = useTheme();
 
@@ -83,13 +85,12 @@ export const EnvironmentDetails = ({
         <button onClick={onClick} className="absolute inset-0 cursor-pointer" />
       )}
       <Link
+        to={`/${owner}/${appName}/${environment?.branch}/console`}
         onClick={(event) => {
           if (environment?.status !== "running") {
             event.preventDefault();
           }
         }}
-        to={`/${owner}/${appName}/${environment?.branch}/console`}
-        className="cursor-pointer"
       >
         <div
           className={clsx(
@@ -129,16 +130,7 @@ export const EnvironmentDetails = ({
           </div>
         </div>
 
-        <div className="flex justify-end items-start">
-          <Link
-            to={`/${owner}/${appName}/${environment?.branch}/console`}
-            className="z-10"
-          >
-            <Button disabled={environment?.status !== "running"}>
-              Console
-            </Button>
-          </Link>
-        </div>
+        <div className="flex justify-end items-start">{actions}</div>
 
         <div
           className={clsx(

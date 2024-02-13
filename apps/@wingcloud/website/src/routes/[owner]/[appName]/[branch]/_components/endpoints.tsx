@@ -1,6 +1,6 @@
 import { GlobeAltIcon, BoltIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { useCallback, useContext, useMemo } from "react";
+import { useCallback, useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
@@ -130,11 +130,7 @@ const EndpointItem = ({
             <Link
               to={endpoint.publicUrl}
               target="_blank"
-              className={clsx(
-                "truncate items-end flex font-mono",
-                theme.text2,
-                theme.text2Hover,
-              )}
+              className={clsx(theme.text2, theme.text2Hover)}
             >
               <ArrowTopRightOnSquareIcon className="w-4 h-4" />
             </Link>

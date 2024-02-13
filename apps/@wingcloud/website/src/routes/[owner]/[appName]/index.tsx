@@ -1,4 +1,7 @@
-import { MagnifyingGlassCircleIcon } from "@heroicons/react/24/outline";
+import {
+  MagnifyingGlassCircleIcon,
+  ArrowTopRightOnSquareIcon,
+} from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -123,6 +126,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
                     `/${owner}/${appName}/${productionEnvironment.branch}`,
                   );
                 }}
+                actions={<ArrowTopRightOnSquareIcon className="w-4 h-4" />}
               />
             </div>
 
