@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useMemo } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import { useTheme } from "../design-system/theme-provider.js";
 
@@ -17,15 +17,6 @@ interface TabsProps {
 export const Tabs = ({ tabs }: TabsProps) => {
   const { theme } = useTheme();
   const location = useLocation();
-
-  const items = useMemo(() => {
-    return tabs.map((tab) => {
-      return {
-        name: tab.name,
-        value: tab.to,
-      };
-    });
-  }, [tabs]);
 
   const current = useMemo(() => {
     return tabs.find((tab) => tab.to == location.pathname);

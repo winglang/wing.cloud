@@ -29,6 +29,20 @@ export const router = (onReady: () => void) => {
           path: "/:owner/:appName",
           lazy: () =>
             lazyLoading(import("./routes/[owner]/[appName]/index.js")),
+          children: [
+            {
+              path: "/:owner/:appName",
+              lazy: () =>
+                lazyLoading(import("./routes/[owner]/[appName]/overview.js")),
+            },
+            {
+              path: "/:owner/:appName/settings",
+              lazy: () =>
+                lazyLoading(
+                  import("./routes/[owner]/[appName]/settings/index.js"),
+                ),
+            },
+          ],
         },
         {
           path: "/:owner/:appName/settings",
@@ -38,6 +52,29 @@ export const router = (onReady: () => void) => {
           path: "/:owner/:appName/:branch",
           lazy: () =>
             lazyLoading(import("./routes/[owner]/[appName]/[branch]/index.js")),
+          children: [
+            {
+              path: "/:owner/:appName/:branch",
+              lazy: () =>
+                lazyLoading(
+                  import("./routes/[owner]/[appName]/[branch]/overview.js"),
+                ),
+            },
+            {
+              path: "/:owner/:appName/:branch/logs",
+              lazy: () =>
+                lazyLoading(
+                  import("./routes/[owner]/[appName]/[branch]/logs.js"),
+                ),
+            },
+            {
+              path: "/:owner/:appName/:branch/tests",
+              lazy: () =>
+                lazyLoading(
+                  import("./routes/[owner]/[appName]/[branch]/tests-page.js"),
+                ),
+            },
+          ],
         },
         {
           path: "/:owner/:appName/:branch/console",

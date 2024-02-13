@@ -14,7 +14,8 @@ import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../../utils/time.js";
 import type { Environment } from "../../../../utils/wrpc.js";
-import { DEPLOYMENT_LOGS_ID, TEST_LOGS_ID } from "../[branch]/index.js";
+import { DEPLOYMENT_LOGS_ID } from "../[branch]/logs.js";
+import { TEST_LOGS_ID } from "../[branch]/tests-page.js";
 
 type ErrorStatus = "failed" | "passed";
 
@@ -103,6 +104,7 @@ export const EnvironmentsListItem = ({
             <div className="truncate flex gap-x-2 sm:gap-x-5">
               <div
                 className={clsx(
+                  "truncate",
                   "flex gap-x-1 items-center",
                   "leading-5 py-0.5",
                   theme.text2,
