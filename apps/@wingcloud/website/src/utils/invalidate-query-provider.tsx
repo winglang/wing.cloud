@@ -16,7 +16,9 @@ export const InvalidateQueryProvider = ({
   children,
 }: PropsWithChildren<{ url: string }>) => {
   const queryClient = useQueryClient();
-  const auth = wrpc["ws.invalidateQuery.auth"].useQuery();
+  const auth = wrpc["ws.invalidateQuery.auth"].useQuery(undefined, {
+    throwOnError: false,
+  });
 
   const [ws, setWs] = useState<WebSocket | undefined>(undefined);
 
