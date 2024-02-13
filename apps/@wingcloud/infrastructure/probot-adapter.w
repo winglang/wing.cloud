@@ -26,10 +26,12 @@ pub class ProbotAdapter {
   }
 
   pub inflight handlePullRequstOpened(handler: inflight (probot.IPullRequestOpenedContext): void) {
+    log("this.instance?.webhooks?.on('pull_request.opened', handler);");
     this.instance?.webhooks?.on("pull_request.opened", handler);
   }
 
   pub inflight handlePullRequstReopened(handler: inflight (probot.IPullRequestOpenedContext): void) {
+    log("this.instance?.webhooks?.on('pull_request.reopened', handler);");
     this.instance?.webhooks?.on("pull_request.reopened", handler);
   }
 
@@ -46,6 +48,7 @@ pub class ProbotAdapter {
   }
 
   pub inflight verifyAndReceive(props: probot.VerifyAndReceieveProps) {
+    log("this.instance?.webhooks?.verifyAndReceive(props);");
     this.instance?.webhooks?.verifyAndReceive(props);
   }
 

@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { StatusWithDot } from "../../../../../components/status-with-dot.js";
-import { Button } from "../../../../../design-system/button.js";
 import Popover from "../../../../../design-system/popover.js";
 import { SkeletonLoader } from "../../../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
@@ -22,6 +21,8 @@ export interface EvironmentDetailsProps {
   environment?: Environment;
   endpoints?: Endpoint[];
   endpointsLoading?: boolean;
+  onClick?: () => void;
+  actions?: React.ReactNode;
 }
 
 export const EnvironmentDetails = ({
@@ -30,6 +31,8 @@ export const EnvironmentDetails = ({
   environment,
   endpoints,
   endpointsLoading,
+  onClick,
+  actions,
 }: EvironmentDetailsProps) => {
   const { theme } = useTheme();
 
@@ -41,32 +44,22 @@ export const EnvironmentDetails = ({
     );
   }, [environment, endpointsLoading]);
 
-  const deployingEndpoints = useMemo(() => {
-    return (
-      environment &&
-      ["initializing", "running-server", "running-tests", "deploying"].includes(
-        environment.status,
-      )
-    );
-  }, [environment]);
-
   const showEndpoints = useMemo(() => {
     return (
       environment?.status === "running" &&
-      (endpoints !== undefined || endpointsLoading) &&
-      !deployingEndpoints
+      (endpoints !== undefined || endpointsLoading)
     );
   }, [endpoints, endpointsLoading, environment]);
 
   const firstEndpoint = useMemo(() => {
-    if (!endpoints || endpoints.length === 0 || deployingEndpoints) {
+    if (!endpoints || endpoints.length === 0) {
       return;
     }
     return endpoints[0];
   }, [endpoints]);
 
-  const endpointsList = useMemo(() => {
-    if (!endpoints || endpoints.length === 0 || deployingEndpoints) {
+  const endpointsRemainingList = useMemo(() => {
+    if (!endpoints || endpoints.length === 0) {
       return [];
     }
 
@@ -78,23 +71,43 @@ export const EnvironmentDetails = ({
   return (
     <div
       className={clsx(
-        "p-4 sm:p-6 w-full rounded-md gap-4 sm:gap-6 flex border",
+        "p-4 md:p-6 w-full rounded-md flex border",
         "shadow-sm",
+        "gap-0 sm:gap-4 md:gap-6",
+        onClick && "hover:shadow",
         theme.bgInput,
         theme.borderInput,
+        "relative",
       )}
     >
-      <div
-        className={clsx(
-          "rounded flex items-center justify-center cursor-pointer",
-          "shrink-0 border",
-          "shadow-sm hover:shadow-md",
-          theme.borderInput,
-          theme.bg3,
-        )}
+      {environment && onClick && (
+        <button onClick={onClick} className="absolute inset-0 cursor-pointer" />
+      )}
+      <Link
+        to={`/${owner}/${appName}/${environment?.branch}/console`}
+        onClick={(event) => {
+          if (environment?.status !== "running") {
+            event.preventDefault();
+          }
+        }}
       >
-        <ConsolePreviewIcon className="w-60 lg:w-80 p-4 lg:p-8 transition-all" />
-      </div>
+        <div
+          className={clsx(
+            "hidden sm:flex",
+            "rounded items-center justify-center",
+            "shrink-0 border",
+            "transition-all",
+            theme.borderInput,
+            theme.bg3,
+            environment?.status === "running" && [
+              "relative z-10 shadow-sm hover:shadow",
+              "cursor-pointer",
+            ],
+          )}
+        >
+          <ConsolePreviewIcon className="w-64 md:w-80 p-8 transition-all" />
+        </div>
+      </Link>
 
       <div className="grid grid-cols-3 flex-grow gap-4 md:gap-6 transition-all">
         <div className="flex flex-col gap-1">
@@ -117,16 +130,7 @@ export const EnvironmentDetails = ({
           </div>
         </div>
 
-        <div className="flex justify-end items-start">
-          <Link
-            to={`/${owner}/${appName}/${environment?.branch}/console`}
-            className="z-10"
-          >
-            <Button disabled={environment?.status !== "running"}>
-              Console
-            </Button>
-          </Link>
-        </div>
+        <div className="flex justify-end items-start">{actions}</div>
 
         <div
           className={clsx(
@@ -139,29 +143,43 @@ export const EnvironmentDetails = ({
             <div className="space-y-1">
               {!environment && <SkeletonLoader className="h-5 w-2/3" loading />}
               {environment && (
-                <Link
-                  className="hover:underline truncate relative z-10 flex gap-x-1"
-                  aria-disabled={environment.status === "stopped"}
-                  to={`https://github.com/${environment.repo}/tree/${environment.branch}`}
-                  target="_blank"
-                >
+                <div className="flex gap-x-1">
                   <BranchIcon className={clsx("w-4 h-4", theme.text1)} />
-                  <div className={clsx("font-semibold truncate", theme.text1)}>
+                  <Link
+                    className={clsx(
+                      "font-semibold truncate",
+                      theme.text1,
+                      "hover:underline truncate relative z-10",
+                    )}
+                    onClick={(event) => {
+                      if (environment.status === "stopped") {
+                        event.preventDefault();
+                      }
+                    }}
+                    to={`https://github.com/${environment.repo}/tree/${environment.branch}`}
+                    target="_blank"
+                  >
                     {environment.branch}
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               )}
               {environment && (
-                <Link
-                  className="hover:underline truncate relative z-10 flex gap-x-1"
-                  to={`https://github.com/${environment.repo}`}
-                  target="_blank"
-                >
-                  <GithubIcon className={clsx("w-4 h-4", theme.text1)} />
-                  <div className={clsx("font-semibold truncate", theme.text1)}>
+                <div className="flex gap-x-1">
+                  <GithubIcon
+                    className={clsx("w-4 h-4 shrink-0", theme.text1)}
+                  />
+                  <Link
+                    className={clsx(
+                      "hover:underline truncate relative z-10",
+                      "font-semibold truncate",
+                      theme.text1,
+                    )}
+                    to={`https://github.com/${environment.repo}`}
+                    target="_blank"
+                  >
                     {environment.repo}
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               )}
             </div>
           </div>
@@ -181,11 +199,9 @@ export const EnvironmentDetails = ({
               {environmentStopped && (
                 <div className="italic">Environment {statusString}.</div>
               )}
-              {!deployingEndpoints &&
-                !environmentStopped &&
-                endpointsLoading && (
-                  <SkeletonLoader className="h-5 w-2/3" loading />
-                )}
+              {!environmentStopped && endpointsLoading && (
+                <SkeletonLoader className="h-5 w-2/3" loading />
+              )}
 
               {firstEndpoint && (
                 <div className="flex truncate">
@@ -211,7 +227,7 @@ export const EnvironmentDetails = ({
                 </div>
               )}
 
-              {endpointsList.length > 1 && (
+              {endpointsRemainingList.length > 0 && (
                 <Popover
                   classNames={clsx(
                     "rounded-full py-0.5 px-1.5 flex text-xs font-semibold",
@@ -223,11 +239,11 @@ export const EnvironmentDetails = ({
                     theme.bg2Hover,
                     "transition-all",
                   )}
-                  button={`+${endpointsList.length}`}
+                  button={`+${endpointsRemainingList.length}`}
                 >
                   <div className="flex gap-x-3">
                     <div className="space-y-0.5">
-                      {endpointsList.map((endpoint) => (
+                      {endpointsRemainingList.map((endpoint) => (
                         <div
                           key={endpoint.id}
                           className="flex gap-2 items-center"
