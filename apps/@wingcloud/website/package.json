@@ -47,7 +47,6 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "compile": "vite build",
     "default": "projen default",
     "build": "projen build",
     "lint": "projen lint"
