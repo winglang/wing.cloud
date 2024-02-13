@@ -70,8 +70,9 @@ export const EnvironmentDetails = ({
   return (
     <div
       className={clsx(
-        "p-4 md:p-6 w-full rounded-md gap-4 md:gap-6 flex border",
+        "p-4 md:p-6 w-full rounded-md flex border",
         "shadow-sm",
+        "gap-0 sm:gap-4 md:gap-6",
         onClick && "hover:shadow",
         theme.bgInput,
         theme.borderInput,
@@ -92,7 +93,8 @@ export const EnvironmentDetails = ({
       >
         <div
           className={clsx(
-            "rounded flex items-center justify-center cursor-pointer",
+            "hidden sm:flex",
+            "rounded items-center justify-center cursor-pointer",
             "shrink-0 border",
             "transition-all",
             theme.borderInput,

@@ -104,6 +104,7 @@ export const EnvironmentsListItem = ({
             <div className="truncate flex gap-x-2 sm:gap-x-5">
               <div
                 className={clsx(
+                  "truncate",
                   "flex gap-x-1 items-center",
                   "leading-5 py-0.5",
                   theme.text2,
