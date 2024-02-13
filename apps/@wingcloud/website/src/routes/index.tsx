@@ -11,7 +11,8 @@ export const Component = () => {
   const navigate = useNavigate();
 
   // TODO: Use state to prevent man-in-the-middle attacks.
-  const GITHUB_APP_CLIENT_ID = import.meta.env.VITE_GITHUB_APP_CLIENT_ID;
+  // @ts-ignore-next-line
+  const GITHUB_APP_CLIENT_ID = window["wingEnv"]["GITHUB_CLIENT_ID"];
 
   const AUTHORIZE_URL = (() => {
     const url = new URL("https://github.com/login/oauth/authorize");
