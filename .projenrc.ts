@@ -128,17 +128,17 @@ new TypescriptConfig(website, {
 });
 new Eslint(website);
 
-new Turbo(website, {
-  pipeline: {
-    compile: {
-      dotEnv: [".env"],
-      outputs: ["dist/**"],
-    },
-  },
-});
+// new Turbo(website, {
+//   pipeline: {
+//     compile: {
+//       dotEnv: [".env"],
+//       outputs: ["dist/**"],
+//     },
+//   },
+// });
 
 website.addDeps("vite");
-website.addScript("compile", "vite build");
+// website.addScript("compile", "vite build");
 website.addGitIgnore("/dist/");
 website.addGitIgnore("/public/wing.js");
 
