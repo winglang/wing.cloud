@@ -6,6 +6,8 @@ export const TEST_LOGS_ID = "test-logs";
 
 import { TestsLogs } from "./_components/tests-logs.js";
 
+import { SectionTitle } from "../../../../components/section-title.js";
+
 const TestsPage = ({
   owner,
   appName,
@@ -67,15 +69,18 @@ const TestsPage = ({
   }, [locationHash, logs.data?.tests, selectedTestId]);
 
   return (
-    <TestsLogs
-      id={TEST_LOGS_ID}
-      isOpen={testLogsOpen}
-      setIsOpen={setTestLogsOpen}
-      testResults={environment.data?.environment.testResults?.testResults || []}
-      selectedTestId={selectedTestId}
-      logs={logs.data?.tests || []}
-      loading={logs.isLoading}
-    />
+    <div className="space-y-2">
+      <SectionTitle>Tests Logs</SectionTitle>
+      <TestsLogs
+        id={TEST_LOGS_ID}
+        testResults={
+          environment.data?.environment.testResults?.testResults || []
+        }
+        selectedTestId={selectedTestId}
+        logs={logs.data?.tests || []}
+        loading={logs.isLoading}
+      />
+    </div>
   );
 };
 

@@ -49,15 +49,6 @@ export const router = (onReady: () => void) => {
                 ),
             },
             {
-              path: "/:owner/:appName/:branch/endpoints",
-              lazy: () =>
-                lazyLoading(
-                  import(
-                    "./routes/[owner]/[appName]/[branch]/endpoints-page.js"
-                  ),
-                ),
-            },
-            {
               path: "/:owner/:appName/:branch/logs",
               lazy: () =>
                 lazyLoading(

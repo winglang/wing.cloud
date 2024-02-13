@@ -22,6 +22,7 @@ export interface EvironmentDetailsProps {
   environment?: Environment;
   endpoints?: Endpoint[];
   endpointsLoading?: boolean;
+  onClick?: () => void;
 }
 
 export const EnvironmentDetails = ({
@@ -30,6 +31,7 @@ export const EnvironmentDetails = ({
   environment,
   endpoints,
   endpointsLoading,
+  onClick,
 }: EvironmentDetailsProps) => {
   const { theme } = useTheme();
 
@@ -69,17 +71,15 @@ export const EnvironmentDetails = ({
     <div
       className={clsx(
         "p-4 md:p-6 w-full rounded-md gap-4 md:gap-6 flex border",
-        "shadow-sm hover:shadow",
+        "shadow-sm",
+        onClick && "hover:shadow",
         theme.bgInput,
         theme.borderInput,
         "relative",
       )}
     >
-      {environment && (
-        <Link
-          to={`/${owner}/${appName}/${environment.branch}`}
-          className="absolute inset-0 cursor-pointer"
-        />
+      {environment && onClick && (
+        <button onClick={onClick} className="absolute inset-0 cursor-pointer" />
       )}
       <Link
         aria-disabled={environment?.status !== "running"}

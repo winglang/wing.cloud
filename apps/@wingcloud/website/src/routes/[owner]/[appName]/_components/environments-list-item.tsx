@@ -14,7 +14,8 @@ import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../../utils/time.js";
 import type { Environment } from "../../../../utils/wrpc.js";
-import { DEPLOYMENT_LOGS_ID, TEST_LOGS_ID } from "../[branch]/index.js";
+import { DEPLOYMENT_LOGS_ID } from "../[branch]/logs-page.js";
+import { TEST_LOGS_ID } from "../[branch]/tests-page.js";
 
 type ErrorStatus = "failed" | "passed";
 

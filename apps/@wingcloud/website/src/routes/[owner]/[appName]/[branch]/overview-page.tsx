@@ -1,13 +1,13 @@
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 
+import { SectionTitle } from "../../../../components/section-title.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 
-import { AppLogs } from "./_components/app-logs.js";
+import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
 
-export const RUNTIME_LOGS_ID = "runtime-logs";
-
-const OVerview = ({
+const Overview = ({
   owner,
   appName,
   branch,
@@ -16,45 +16,49 @@ const OVerview = ({
   appName: string;
   branch: string;
 }) => {
-  const environment = wrpc["app.environment"].useQuery({
+  const environmentQuery = wrpc["app.environment"].useQuery({
     owner: owner!,
     appName: appName!,
     branch: branch!,
   });
+  const environment = useMemo(() => {
+    return environmentQuery.data?.environment;
+  }, [environmentQuery.data]);
 
-  const logs = wrpc["app.environment.logs"].useQuery(
+  const endpointsQuery = wrpc["app.environment.endpoints"].useQuery(
     {
-      owner: owner!,
       appName: appName!,
-      branch: branch!,
+      branch: environment?.branch!,
     },
     {
-      // TODO: use query invalidation once logs are not stored in a file
-      refetchInterval: 3 * 1000,
+      enabled: !!appName && environment?.status === "running",
     },
   );
 
   return (
-    <>
-      <EnvironmentDetails
-        owner={owner}
-        appName={appName}
-        loading={environment.isLoading}
-        environment={environment.data?.environment}
-      />
-      <AppLogs
-        id={RUNTIME_LOGS_ID}
-        title="Runtime"
-        isOpen={true}
-        setIsOpen={() => {}}
-        logs={logs.data?.runtime || []}
-        loading={logs.isLoading}
-      />
-    </>
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <SectionTitle>Overview</SectionTitle>
+        <EnvironmentDetails
+          owner={owner}
+          appName={appName}
+          loading={environmentQuery.isLoading}
+          environment={environment}
+        />
+      </div>
+      <div className="space-y-2">
+        <SectionTitle>Endpoints</SectionTitle>
+        <Endpoints
+          endpoints={endpointsQuery.data?.endpoints || []}
+          loading={endpointsQuery.isLoading}
+          environment={environment}
+        />
+      </div>
+    </div>
   );
 };
 
 export const Component = () => {
   const { owner, appName, branch } = useParams();
-  return <OVerview owner={owner!} appName={appName!} branch={branch!} />;
+  return <Overview owner={owner!} appName={appName!} branch={branch!} />;
 };

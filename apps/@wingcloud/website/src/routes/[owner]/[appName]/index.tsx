@@ -1,10 +1,11 @@
 import { MagnifyingGlassCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useContext, useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../../components/error-boundary.js";
 import { Header } from "../../../components/header.js";
+import { SectionTitle } from "../../../components/section-title.js";
 import { CurrentAppDataProviderContext } from "../../../data-store/current-app-data-provider.js";
 import { Input } from "../../../design-system/input.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
@@ -23,6 +24,8 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
     setOwner(owner);
     setAppName(appName);
   }, [owner, appName]);
+
+  const navigate = useNavigate();
 
   const environmentsQuery = wrpc["app.listEnvironments"].useQuery(
     {
@@ -94,10 +97,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
         {owner && appName && (
           <div className="space-y-4">
             <div className="space-y-2">
-              <div className={clsx("text-lg pt-2", theme.text1)}>
-                Production
-              </div>
-
+              <SectionTitle>Production</SectionTitle>
               <EnvironmentDetails
                 owner={owner}
                 appName={appName}
@@ -107,13 +107,16 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
                 endpointsLoading={
                   endpointsQuery.isLoading || endpointsQuery.data === undefined
                 }
+                onClick={() =>
+                  navigate(
+                    `/${owner}/${appName}/${productionEnvironment?.branch}`,
+                  )
+                }
               />
             </div>
 
             <div className="space-y-2">
-              <div className={clsx("text-lg pt-2", theme.text1)}>
-                Preview Environments
-              </div>
+              <SectionTitle>Preview Environments</SectionTitle>
 
               {loading && <EnvironmentsListItemSkeleton short />}
 

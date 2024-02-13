@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useTheme } from "../design-system/theme-provider.js";
@@ -17,15 +17,7 @@ interface TabsProps {
 export const Tabs = ({ tabs }: TabsProps) => {
   const { theme } = useTheme();
   const location = useLocation();
-
-  const items = useMemo(() => {
-    return tabs.map((tab) => {
-      return {
-        name: tab.name,
-        value: tab.to,
-      };
-    });
-  }, [tabs]);
+  const [loadingTab, setLoadingTab] = useState("");
 
   const current = useMemo(() => {
     return tabs.find((tab) => tab.to == location.pathname);
@@ -37,11 +29,16 @@ export const Tabs = ({ tabs }: TabsProps) => {
         <div key={tab.name}>
           <Link
             to={tab.to}
+            aria-disabled={loadingTab !== ""}
+            onClick={() => setLoadingTab(tab.name)}
             className={clsx(
               "rounded-md px-3 py-1.5 text-sm font-medium",
               "transition-all",
-              current?.name === tab.name && [theme.text1],
-              current?.name !== tab.name && [theme.text3, theme.text1Hover],
+              (current?.name === tab.name || loadingTab === tab.name) && [
+                theme.text1,
+              ],
+              current?.name !== tab.name &&
+                loadingTab !== tab.name && [theme.text3, theme.text1Hover],
               theme.bgInput,
               theme.bg3Hover,
             )}

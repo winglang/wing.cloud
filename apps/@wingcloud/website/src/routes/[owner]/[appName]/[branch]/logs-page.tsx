@@ -1,6 +1,9 @@
 import { useParams } from "react-router-dom";
 
+import { SectionTitle } from "../../../../components/section-title.js";
 import { wrpc } from "../../../../utils/wrpc.js";
+
+export const RUNTIME_LOGS_ID = "runtime-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 
 import { AppLogs } from "./_components/app-logs.js";
@@ -27,14 +30,26 @@ const LogsPage = ({
   );
 
   return (
-    <AppLogs
-      id={DEPLOYMENT_LOGS_ID}
-      title="Deployment"
-      isOpen={true}
-      setIsOpen={() => {}}
-      logs={logs.data?.deploy || []}
-      loading={logs.isLoading}
-    />
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <SectionTitle>Deployment</SectionTitle>
+        <AppLogs
+          id={DEPLOYMENT_LOGS_ID}
+          label="Deployment"
+          logs={logs.data?.deploy || []}
+          loading={logs.isLoading}
+        />
+      </div>
+      <div className="space-y-2">
+        <SectionTitle>Runtime</SectionTitle>
+        <AppLogs
+          id={RUNTIME_LOGS_ID}
+          label="Runtime"
+          logs={logs.data?.runtime || []}
+          loading={logs.isLoading}
+        />
+      </div>
+    </div>
   );
 };
 

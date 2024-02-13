@@ -24,11 +24,7 @@ export const Component = () => {
             to: `/${owner}/${appName}/${branch}`,
           },
           {
-            name: "Endpoints",
-            to: `/${owner}/${appName}/${branch}/endpoints`,
-          },
-          {
-            name: "Deployment Logs",
+            name: "Logs",
             to: `/${owner}/${appName}/${branch}/logs`,
           },
           {
@@ -39,13 +35,7 @@ export const Component = () => {
       />
       <ErrorBoundary>
         <div className="overflow-auto">
-          <div
-            className={clsx(
-              "w-full flex-grow overflow-auto",
-              "max-w-7xl mx-auto p-4 sm:p-6",
-              "space-y-4",
-            )}
-          >
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-2 md:py-4">
             <Outlet />
           </div>
         </div>
