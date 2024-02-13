@@ -90,9 +90,12 @@ pub class ProbotApp {
 
   inflight listen(props: probot.VerifyAndReceieveProps) {
     let onPullRequestOpen = inflight (context: probot.IPullRequestOpenedContext): void => {
+      log("onPullRequestOpen");
+      log(Json.stringify(context.payload, indent: 2));
       let branch = context.payload.pull_request.head.ref;
 
       let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
+      log("apps: {Json.stringify(apps, indent: 2)}");
       for app in apps {
         if let installation = context.payload.installation {
           let time = datetime.fromIso(context.payload.pull_request.updated_at ?? datetime.utcNow().toIso());
