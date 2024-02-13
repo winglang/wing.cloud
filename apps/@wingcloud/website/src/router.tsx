@@ -38,6 +38,40 @@ export const router = (onReady: () => void) => {
           path: "/:owner/:appName/:branch",
           lazy: () =>
             lazyLoading(import("./routes/[owner]/[appName]/[branch]/index.js")),
+          children: [
+            {
+              path: "/:owner/:appName/:branch",
+              lazy: () =>
+                lazyLoading(
+                  import(
+                    "./routes/[owner]/[appName]/[branch]/overview-page.js"
+                  ),
+                ),
+            },
+            {
+              path: "/:owner/:appName/:branch/endpoints",
+              lazy: () =>
+                lazyLoading(
+                  import(
+                    "./routes/[owner]/[appName]/[branch]/endpoints-page.js"
+                  ),
+                ),
+            },
+            {
+              path: "/:owner/:appName/:branch/logs",
+              lazy: () =>
+                lazyLoading(
+                  import("./routes/[owner]/[appName]/[branch]/logs-page.js"),
+                ),
+            },
+            {
+              path: "/:owner/:appName/:branch/tests",
+              lazy: () =>
+                lazyLoading(
+                  import("./routes/[owner]/[appName]/[branch]/tests-page.js"),
+                ),
+            },
+          ],
         },
         {
           path: "/:owner/:appName/:branch/console",
