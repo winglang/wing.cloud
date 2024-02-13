@@ -63,6 +63,14 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
       enabled: !!appName && productionEnvironment?.status === "running",
     },
   );
+  const endpoints = useMemo(() => {
+    if (!endpointsQuery.data) {
+      return [];
+    }
+    return endpointsQuery.data?.endpoints.sort((a, b) => {
+      return a.label.localeCompare(b.label);
+    });
+  }, [endpointsQuery.data]);
 
   const { theme } = useTheme();
 
@@ -103,7 +111,7 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
                 appName={appName}
                 environment={productionEnvironment}
                 loading={!productionEnvironment}
-                endpoints={endpointsQuery.data?.endpoints}
+                endpoints={endpoints}
                 endpointsLoading={
                   endpointsQuery.isLoading || endpointsQuery.data === undefined
                 }
