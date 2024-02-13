@@ -56,6 +56,7 @@ pub class ProbotApp {
     queue.setConsumer(inflight (message) => {
       log("receive message: {message}");
       let props = probot.VerifyAndReceieveProps.fromJson(Json.parse(message));
+      log("props: {Json.stringify(props, indent: 2)}");
       this.listen(props);
     });
   }
@@ -89,10 +90,15 @@ pub class ProbotApp {
   }
 
   inflight listen(props: probot.VerifyAndReceieveProps) {
+    log("listen");
+
     let onPullRequestOpen = inflight (context: probot.IPullRequestOpenedContext): void => {
+      log("onPullRequestOpen");
+      log(Json.stringify(context.payload, indent: 2));
       let branch = context.payload.pull_request.head.ref;
 
       let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
+      log("apps: {Json.stringify(apps, indent: 2)}");
       for app in apps {
         if let installation = context.payload.installation {
           let time = datetime.fromIso(context.payload.pull_request.updated_at ?? datetime.utcNow().toIso());
@@ -121,11 +127,13 @@ pub class ProbotApp {
     };
 
     this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestOpenedContext): void => {
+      log("handlePullRequstOpened");
       // TODO [sa] open a bug for this workaround
       onPullRequestOpen(context);
     });
 
     this.adapter.handlePullRequstReopened(inflight (context: probot.IPullRequestOpenedContext): void => {
+      log("handlePullRequstReopened");
       // TODO [sa] open a bug for this workaround
       onPullRequestOpen(context);
     });
