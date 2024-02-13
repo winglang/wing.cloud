@@ -45,7 +45,9 @@ export const AppLogs = ({ id, logs, loading, label }: AppLogsProps) => {
                   "w-full flex gap-2 px-1 py-0.5",
                 )}
               >
-                <div className={clsx(theme.text2)}>
+                <div
+                  className={clsx(theme.text2, "break-keep whitespace-nowrap")}
+                >
                   {getTime(log.timestamp)}
                 </div>
                 <div
