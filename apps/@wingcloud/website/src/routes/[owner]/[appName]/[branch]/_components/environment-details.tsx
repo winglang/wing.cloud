@@ -83,11 +83,15 @@ export const EnvironmentDetails = ({
       )}
       <Link
         aria-disabled={environment?.status !== "running"}
+        onClick={(event) => {
+          if (environment?.status !== "running") {
+            event.preventDefault();
+          }
+        }}
         to={`/${owner}/${appName}/${environment?.branch}/console`}
         className="cursor-pointer"
       >
-        <button
-          disabled={environment?.status !== "running"}
+        <div
           className={clsx(
             "rounded flex items-center justify-center cursor-pointer",
             "shrink-0 border",
@@ -100,7 +104,7 @@ export const EnvironmentDetails = ({
           )}
         >
           <ConsolePreviewIcon className="w-64 md:w-80 p-8 transition-all" />
-        </button>
+        </div>
       </Link>
 
       <div className="grid grid-cols-3 flex-grow gap-4 md:gap-6 transition-all">
@@ -149,6 +153,11 @@ export const EnvironmentDetails = ({
                 <Link
                   className="hover:underline truncate relative z-10 flex gap-x-1"
                   aria-disabled={environment.status === "stopped"}
+                  onClick={(event) => {
+                    if (environment.status === "stopped") {
+                      event.preventDefault();
+                    }
+                  }}
                   to={`https://github.com/${environment.repo}/tree/${environment.branch}`}
                   target="_blank"
                 >
