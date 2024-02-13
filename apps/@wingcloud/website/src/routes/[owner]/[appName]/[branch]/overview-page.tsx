@@ -34,6 +34,11 @@ const Overview = ({
       enabled: !!appName && environment?.status === "running",
     },
   );
+  const endpoints = useMemo(() => {
+    return endpointsQuery.data?.endpoints.sort((a, b) => {
+      return a.label.localeCompare(b.label);
+    });
+  }, [endpointsQuery.data]);
 
   return (
     <div className="space-y-4">
@@ -49,7 +54,7 @@ const Overview = ({
       <div className="space-y-2">
         <SectionTitle>Endpoints</SectionTitle>
         <Endpoints
-          endpoints={endpointsQuery.data?.endpoints || []}
+          endpoints={endpoints || []}
           loading={endpointsQuery.isLoading}
           environment={environment}
         />

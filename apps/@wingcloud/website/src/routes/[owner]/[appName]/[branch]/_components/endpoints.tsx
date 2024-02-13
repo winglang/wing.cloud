@@ -53,7 +53,7 @@ export const Endpoints = ({
         </div>
       )}
       {!loading && (
-        <div className="space-y-2">
+        <div className="space-y-1">
           {(endpoints.length === 0 || environment?.status !== "running") && (
             <div className={clsx(theme.text2, "w-full py-4 text-center")}>
               No Endpoints.
