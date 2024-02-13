@@ -41,32 +41,22 @@ export const EnvironmentDetails = ({
     );
   }, [environment, endpointsLoading]);
 
-  const deployingEndpoints = useMemo(() => {
-    return (
-      environment &&
-      ["initializing", "running-server", "running-tests", "deploying"].includes(
-        environment.status,
-      )
-    );
-  }, [environment]);
-
   const showEndpoints = useMemo(() => {
     return (
       environment?.status === "running" &&
-      (endpoints !== undefined || endpointsLoading) &&
-      !deployingEndpoints
+      (endpoints !== undefined || endpointsLoading)
     );
   }, [endpoints, endpointsLoading, environment]);
 
   const firstEndpoint = useMemo(() => {
-    if (!endpoints || endpoints.length === 0 || deployingEndpoints) {
+    if (!endpoints || endpoints.length === 0) {
       return;
     }
     return endpoints[0];
   }, [endpoints]);
 
   const endpointsList = useMemo(() => {
-    if (!endpoints || endpoints.length === 0 || deployingEndpoints) {
+    if (!endpoints || endpoints.length === 0) {
       return [];
     }
 
@@ -78,23 +68,39 @@ export const EnvironmentDetails = ({
   return (
     <div
       className={clsx(
-        "p-4 sm:p-6 w-full rounded-md gap-4 sm:gap-6 flex border",
-        "shadow-sm",
+        "p-4 md:p-6 w-full rounded-md gap-4 md:gap-6 flex border",
+        "shadow-sm hover:shadow",
         theme.bgInput,
         theme.borderInput,
+        "relative",
       )}
     >
-      <div
-        className={clsx(
-          "rounded flex items-center justify-center cursor-pointer",
-          "shrink-0 border",
-          "shadow-sm hover:shadow-md",
-          theme.borderInput,
-          theme.bg3,
-        )}
+      {environment && (
+        <Link
+          to={`/${owner}/${appName}/${environment.branch}`}
+          className="absolute inset-0 cursor-pointer"
+        />
+      )}
+      <Link
+        aria-disabled={environment?.status !== "running"}
+        to={`/${owner}/${appName}/${environment?.branch}/console`}
+        className="cursor-pointer"
       >
-        <ConsolePreviewIcon className="w-60 lg:w-80 p-4 lg:p-8 transition-all" />
-      </div>
+        <div
+          className={clsx(
+            "rounded flex items-center justify-center cursor-pointer",
+            "shrink-0 border",
+            "transition-all",
+            theme.borderInput,
+            theme.bg3,
+            environment?.status === "running" && [
+              "relative z-10 shadow-sm hover:shadow ",
+            ],
+          )}
+        >
+          <ConsolePreviewIcon className="w-64 md:w-80 p-8 transition-all" />
+        </div>
+      </Link>
 
       <div className="grid grid-cols-3 flex-grow gap-4 md:gap-6 transition-all">
         <div className="flex flex-col gap-1">
@@ -157,7 +163,9 @@ export const EnvironmentDetails = ({
                   to={`https://github.com/${environment.repo}`}
                   target="_blank"
                 >
-                  <GithubIcon className={clsx("w-4 h-4", theme.text1)} />
+                  <GithubIcon
+                    className={clsx("w-4 h-4 shrink-0", theme.text1)}
+                  />
                   <div className={clsx("font-semibold truncate", theme.text1)}>
                     {environment.repo}
                   </div>
@@ -181,11 +189,9 @@ export const EnvironmentDetails = ({
               {environmentStopped && (
                 <div className="italic">Environment {statusString}.</div>
               )}
-              {!deployingEndpoints &&
-                !environmentStopped &&
-                endpointsLoading && (
-                  <SkeletonLoader className="h-5 w-2/3" loading />
-                )}
+              {!environmentStopped && endpointsLoading && (
+                <SkeletonLoader className="h-5 w-2/3" loading />
+              )}
 
               {firstEndpoint && (
                 <div className="flex truncate">

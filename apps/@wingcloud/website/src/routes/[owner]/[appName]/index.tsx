@@ -98,24 +98,16 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
                 Production
               </div>
 
-              <div className="w-full relative">
-                <Link
-                  aria-disabled={!productionEnvironment?.branch}
-                  to={`/${owner}/${appName}/${productionEnvironment?.branch}`}
-                  className="absolute inset-0 cursor-pointer"
-                />
-                <EnvironmentDetails
-                  owner={owner}
-                  appName={appName}
-                  environment={productionEnvironment}
-                  loading={!productionEnvironment}
-                  endpoints={endpointsQuery.data?.endpoints}
-                  endpointsLoading={
-                    endpointsQuery.isLoading ||
-                    endpointsQuery.data === undefined
-                  }
-                />
-              </div>
+              <EnvironmentDetails
+                owner={owner}
+                appName={appName}
+                environment={productionEnvironment}
+                loading={!productionEnvironment}
+                endpoints={endpointsQuery.data?.endpoints}
+                endpointsLoading={
+                  endpointsQuery.isLoading || endpointsQuery.data === undefined
+                }
+              />
             </div>
 
             <div className="space-y-2">
