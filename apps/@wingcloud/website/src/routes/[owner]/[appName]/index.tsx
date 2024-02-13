@@ -179,7 +179,11 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
                             href={`${repoUrl}/compare`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-disabled={repoUrl === ""}
+                            onClick={(e) => {
+                              if (repoUrl === "") {
+                                e.preventDefault();
+                              }
+                            }}
                           >
                             opening a Pull Request
                           </a>

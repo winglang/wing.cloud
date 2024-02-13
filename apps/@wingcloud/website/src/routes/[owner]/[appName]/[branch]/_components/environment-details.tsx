@@ -82,7 +82,6 @@ export const EnvironmentDetails = ({
         <button onClick={onClick} className="absolute inset-0 cursor-pointer" />
       )}
       <Link
-        aria-disabled={environment?.status !== "running"}
         onClick={(event) => {
           if (environment?.status !== "running") {
             event.preventDefault();
@@ -152,7 +151,6 @@ export const EnvironmentDetails = ({
               {environment && (
                 <Link
                   className="hover:underline truncate relative z-10 flex gap-x-1"
-                  aria-disabled={environment.status === "stopped"}
                   onClick={(event) => {
                     if (environment.status === "stopped") {
                       event.preventDefault();
