@@ -63,6 +63,7 @@ jobs:
           FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
           FLY_TOKEN: ${{ secrets.FLY_TOKEN }}
           BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
+          BOT_GITHUB_APP_NAME: ${{ secrets.BOT_GITHUB_APP_NAME }}
           BOT_GITHUB_CLIENT_ID: ${{ secrets.BOT_GITHUB_CLIENT_ID }}
           BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
           BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}
