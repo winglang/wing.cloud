@@ -90,10 +90,15 @@ export const TestsLogs = ({
                           <XCircleIcon className="w-4 h-4 text-red-400" />
                         )}
                       </div>
-                      <div className={clsx(theme.text2)}>
+                      <div
+                        className={clsx(
+                          theme.text3,
+                          "break-keep whitespace-nowrap",
+                        )}
+                      >
                         {getTime(log.timestamp)}
                       </div>
-                      <div className="flex gap-1 truncate">
+                      <div className="flex gap-3 truncate">
                         <div className={clsx(theme.text1, "truncate")}>
                           {log.path.split("/").pop()}
                         </div>
@@ -104,8 +109,20 @@ export const TestsLogs = ({
                     </div>
 
                     {log.traces.map((trace, index) => (
-                      <div key={index} className="flex gap-2 pl-6 py-0.5">
-                        <div className={clsx(theme.text2)}>
+                      <div
+                        key={index}
+                        className={clsx(
+                          theme.bgInputHover,
+                          "pl-6",
+                          "w-full flex gap-3 px-1 py-0.5",
+                        )}
+                      >
+                        <div
+                          className={clsx(
+                            theme.text3,
+                            "break-keep whitespace-nowrap",
+                          )}
+                        >
                           {getTime(trace.timestamp)}
                         </div>
                         <div

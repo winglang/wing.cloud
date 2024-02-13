@@ -42,11 +42,11 @@ export const AppLogs = ({ id, logs, loading, label }: AppLogsProps) => {
                 key={index}
                 className={clsx(
                   theme.bgInputHover,
-                  "w-full flex gap-2 px-1 py-0.5",
+                  "w-full flex gap-3 px-1 py-0.5",
                 )}
               >
                 <div
-                  className={clsx(theme.text2, "break-keep whitespace-nowrap")}
+                  className={clsx(theme.text3, "break-keep whitespace-nowrap")}
                 >
                   {getTime(log.timestamp)}
                 </div>
