@@ -127,7 +127,7 @@ const OverviewPage = ({
           }}
           actions={
             <>
-              {productionEnvironment?.branch === "running" && (
+              {productionEnvironment?.branch && (
                 <Link
                   to={`/${owner}/${appName}/${productionEnvironment.branch}`}
                   className={clsx(
