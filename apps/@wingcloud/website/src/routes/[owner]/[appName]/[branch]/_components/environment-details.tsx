@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { StatusWithDot } from "../../../../../components/status-with-dot.js";
-import { Button } from "../../../../../design-system/button.js";
 import Popover from "../../../../../design-system/popover.js";
 import { SkeletonLoader } from "../../../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
