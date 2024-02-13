@@ -126,23 +126,22 @@ const OverviewPage = ({
             navigate(`/${owner}/${appName}/${productionEnvironment.branch}`);
           }}
           actions={
-            <Link
-              to={`/${owner}/${appName}/${productionEnvironment?.branch}`}
-              onClick={(event) => {
-                if (productionEnvironment?.status !== "running") {
-                  event.preventDefault();
-                }
-              }}
-              className={clsx(
-                theme.text2,
-                theme.text3Hover,
-                theme.bg4Hover,
-                "transition-all",
-                "z-10 rounded-full p-1.5",
+            <>
+              {productionEnvironment?.branch === "running" && (
+                <Link
+                  to={`/${owner}/${appName}/${productionEnvironment.branch}`}
+                  className={clsx(
+                    theme.text2,
+                    theme.text3Hover,
+                    theme.bg4Hover,
+                    "transition-all",
+                    "z-10 rounded-full p-1.5",
+                  )}
+                >
+                  <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                </Link>
               )}
-            >
-              <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-            </Link>
+            </>
           }
         />
       </div>
