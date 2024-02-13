@@ -107,11 +107,14 @@ const AppPage = ({ owner, appName }: { owner: string; appName: string }) => {
                 endpointsLoading={
                   endpointsQuery.isLoading || endpointsQuery.data === undefined
                 }
-                onClick={() =>
+                onClick={() => {
+                  if (!productionEnvironment?.branch) {
+                    return;
+                  }
                   navigate(
-                    `/${owner}/${appName}/${productionEnvironment?.branch}`,
-                  )
-                }
+                    `/${owner}/${appName}/${productionEnvironment.branch}`,
+                  );
+                }}
               />
             </div>
 
