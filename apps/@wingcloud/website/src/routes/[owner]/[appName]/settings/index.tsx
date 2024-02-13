@@ -64,150 +64,119 @@ const SettingsPage = ({
   }, [app?.appId, description, updateAppDescriptionMutation]);
 
   return (
-    <>
-      <div className="overflow-auto">
-        <div className="max-w-7xl mx-auto p-4 md:p-8 relative">
-          <div className="flex-grow space-y-4">
-            <div
-              className={clsx(
-                "flex flex-col gap-x-2 rounded-md p-4 border",
-                theme.bgInput,
-                theme.borderInput,
-                "relative",
-              )}
-            >
-              <div
-                className={clsx(
-                  "absolute inset-0 flex items-center justify-center",
-                  "transition-all",
-                  isLoading && "bg-opacity-50 z-10",
-                  !isLoading && "bg-opacity-0 -z-10",
-                  theme.bg3,
-                )}
-              >
-                <SpinnerLoader size="sm" />
-              </div>
+    <div className="flex-grow space-y-4">
+      <div
+        className={clsx(
+          "flex flex-col gap-x-2 rounded-md p-4 border",
+          theme.bgInput,
+          theme.borderInput,
+          "relative",
+        )}
+      >
+        <div
+          className={clsx(
+            "absolute inset-0 flex items-center justify-center",
+            "transition-all",
+            isLoading && "bg-opacity-50 z-10",
+            !isLoading && "bg-opacity-0 -z-10",
+            theme.bg3,
+          )}
+        >
+          <SpinnerLoader size="sm" />
+        </div>
 
-              <div className="space-y-2">
-                <div
-                  className={clsx("flex flex-col text-x truncate", theme.text1)}
-                >
-                  <div className="flex flex-row items-center gap-2">
-                    <span>App Description</span>
-                  </div>
-                </div>
-                <div className="flex gap-x-2">
-                  <Input
-                    value={
-                      description === undefined
-                        ? app?.description || ""
-                        : description
-                    }
-                    type="text"
-                    containerClassName="w-full"
-                    placeholder={
-                      isLoading ? "Loading..." : "Describe your app here..."
-                    }
-                    onChange={(event) => setDescription(event.target.value)}
-                    disabled={
-                      !app ||
-                      isLoading ||
-                      updateAppDescriptionMutation.isPending
-                    }
-                    className="w-full"
-                  />
-                  <Button
-                    onClick={updateAppDescription}
-                    disabled={
-                      isLoading ||
-                      updateAppDescriptionMutation.isPending ||
-                      description === undefined ||
-                      description === app?.description
-                    }
-                    className="truncate space-x-1"
-                  >
-                    {updateAppDescriptionMutation.isPending && (
-                      <SpinnerLoader size="xs" />
-                    )}
-                    <span>Save</span>
-                  </Button>
-                </div>
-              </div>
+        <div className="space-y-2">
+          <div className={clsx("flex flex-col text-x truncate", theme.text1)}>
+            <div className="flex flex-row items-center gap-2">
+              <span>App Description</span>
             </div>
-
-            <Entrypoints app={app} loading={isLoading} />
-
-            <SecretsList appId={app?.appId} />
-
-            <div
-              className={clsx(
-                "flex flex-col gap-2 rounded-md p-4 border",
-                theme.bgInput,
-                theme.borderInput,
-                "relative",
-              )}
+          </div>
+          <div className="flex gap-x-2">
+            <Input
+              value={
+                description === undefined ? app?.description || "" : description
+              }
+              type="text"
+              containerClassName="w-full"
+              placeholder={
+                isLoading ? "Loading..." : "Describe your app here..."
+              }
+              onChange={(event) => setDescription(event.target.value)}
+              disabled={
+                !app || isLoading || updateAppDescriptionMutation.isPending
+              }
+              className="w-full"
+            />
+            <Button
+              onClick={updateAppDescription}
+              disabled={
+                isLoading ||
+                updateAppDescriptionMutation.isPending ||
+                description === undefined ||
+                description === app?.description
+              }
+              className="truncate space-x-1"
             >
-              <div
-                className={clsx(
-                  "absolute inset-0 flex items-center justify-center",
-                  "transition-all",
-                  isLoading && "bg-opacity-50 z-10",
-                  !isLoading && "bg-opacity-0 -z-10",
-                  theme.bg3,
-                )}
-              >
-                <SpinnerLoader size="sm" />
-              </div>
-              <div className={clsx("truncate", theme.text1)}>Delete App</div>
-              <div className="flex">
-                <Button
-                  onClick={() => setDeleteModalOpen(true)}
-                  small
-                  disabled={isLoading}
-                  className="truncate"
-                >
-                  Delete
-                </Button>
-              </div>
-            </div>
-
-            {appName && owner && app?.appId && (
-              <DeleteModal
-                appId={app.appId}
-                owner={owner}
-                appName={appName}
-                show={deleteModalOpen}
-                onClose={setDeleteModalOpen}
-              />
-            )}
+              {updateAppDescriptionMutation.isPending && (
+                <SpinnerLoader size="xs" />
+              )}
+              <span>Save</span>
+            </Button>
           </div>
         </div>
       </div>
-    </>
+
+      <Entrypoints app={app} loading={isLoading} />
+
+      <SecretsList appId={app?.appId} />
+
+      <div
+        className={clsx(
+          "flex flex-col gap-2 rounded-md p-4 border",
+          theme.bgInput,
+          theme.borderInput,
+          "relative",
+        )}
+      >
+        <div
+          className={clsx(
+            "absolute inset-0 flex items-center justify-center",
+            "transition-all",
+            isLoading && "bg-opacity-50 z-10",
+            !isLoading && "bg-opacity-0 -z-10",
+            theme.bg3,
+          )}
+        >
+          <SpinnerLoader size="sm" />
+        </div>
+        <div className={clsx("truncate", theme.text1)}>Delete App</div>
+        <div className="flex">
+          <Button
+            onClick={() => setDeleteModalOpen(true)}
+            small
+            disabled={isLoading}
+            className="truncate"
+          >
+            Delete
+          </Button>
+        </div>
+      </div>
+
+      {appName && owner && app?.appId && (
+        <DeleteModal
+          appId={app.appId}
+          owner={owner}
+          appName={appName}
+          show={deleteModalOpen}
+          onClose={setDeleteModalOpen}
+        />
+      )}
+    </div>
   );
 };
 
 export const Component = () => {
   const { owner, appName } = useParams();
 
-  return (
-    <div className="flex flex-col h-full">
-      <Header
-        breadcrumbs={[{ label: appName!, to: `/${owner}/${appName}` }]}
-        tabs={[
-          {
-            name: "Application",
-            to: `/${owner}/${appName}`,
-          },
-          {
-            name: "Settings",
-            to: `/${owner}/${appName}/settings`,
-          },
-        ]}
-      />
-      <ErrorBoundary>
-        <SettingsPage owner={owner!} appName={appName!} />
-      </ErrorBoundary>
-    </div>
-  );
+  return <SettingsPage owner={owner!} appName={appName!} />;
 };

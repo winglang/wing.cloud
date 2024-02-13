@@ -29,6 +29,20 @@ export const router = (onReady: () => void) => {
           path: "/:owner/:appName",
           lazy: () =>
             lazyLoading(import("./routes/[owner]/[appName]/index.js")),
+          children: [
+            {
+              path: "/:owner/:appName",
+              lazy: () =>
+                lazyLoading(import("./routes/[owner]/[appName]/overview.js")),
+            },
+            {
+              path: "/:owner/:appName/settings",
+              lazy: () =>
+                lazyLoading(
+                  import("./routes/[owner]/[appName]/settings/index.js"),
+                ),
+            },
+          ],
         },
         {
           path: "/:owner/:appName/settings",
@@ -43,16 +57,14 @@ export const router = (onReady: () => void) => {
               path: "/:owner/:appName/:branch",
               lazy: () =>
                 lazyLoading(
-                  import(
-                    "./routes/[owner]/[appName]/[branch]/overview-page.js"
-                  ),
+                  import("./routes/[owner]/[appName]/[branch]/overview.js"),
                 ),
             },
             {
               path: "/:owner/:appName/:branch/logs",
               lazy: () =>
                 lazyLoading(
-                  import("./routes/[owner]/[appName]/[branch]/logs-page.js"),
+                  import("./routes/[owner]/[appName]/[branch]/logs.js"),
                 ),
             },
             {

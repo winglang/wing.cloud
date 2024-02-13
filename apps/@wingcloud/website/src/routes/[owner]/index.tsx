@@ -59,60 +59,56 @@ const OwnerPage = () => {
   }, [apps, search]);
 
   return (
-    <div className="overflow-auto">
-      <div className="max-w-7xl mx-auto space-y-4 p-4 md:p-8">
-        <div className="flex gap-x-2">
-          <Input
-            type="text"
-            leftIcon={MagnifyingGlassIcon}
-            className="block w-full"
-            containerClassName="w-full"
-            name="search"
-            id="search"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
+    <div className="space-y-4">
+      <div className="flex gap-x-2">
+        <Input
+          type="text"
+          leftIcon={MagnifyingGlassIcon}
+          className="block w-full"
+          containerClassName="w-full"
+          name="search"
+          id="search"
+          placeholder="Search..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+          }}
+        />
+        {apps && apps.length > 0 && (
+          <Button
+            icon={PlusIcon}
+            label="New App"
+            onClick={() => {
+              navigate("/add");
             }}
           />
-          {apps && apps.length > 0 && (
-            <Button
-              icon={PlusIcon}
-              label="New App"
-              onClick={() => {
-                navigate("/add");
-              }}
-            />
-          )}
-        </div>
+        )}
+      </div>
 
-        {!loading && filteredApps.length === 0 && (
-          <div className="text-center">
-            <FolderPlusIcon
-              className={clsx("w-12 h-12 mx-auto", theme.text2)}
-            />
-            <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
-              No apps found.
-            </h3>
-          </div>
+      {!loading && filteredApps.length === 0 && (
+        <div className="text-center">
+          <FolderPlusIcon className={clsx("w-12 h-12 mx-auto", theme.text2)} />
+          <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
+            No apps found.
+          </h3>
+        </div>
+      )}
+
+      <div
+        className={clsx(
+          "flex flex-wrap gap-6 w-full",
+          "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
+        )}
+      >
+        {loading && (
+          <Duplicator count={5}>
+            <AppCardSkeleton />
+          </Duplicator>
         )}
 
-        <div
-          className={clsx(
-            "flex flex-wrap gap-6 w-full",
-            "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
-          )}
-        >
-          {loading && (
-            <Duplicator count={5}>
-              <AppCardSkeleton />
-            </Duplicator>
-          )}
-
-          {filteredApps.map((app) => (
-            <AppCard key={app.appId} owner={owner || ""} app={app} />
-          ))}
-        </div>
+        {filteredApps.map((app) => (
+          <AppCard key={app.appId} owner={owner || ""} app={app} />
+        ))}
       </div>
     </div>
   );
@@ -132,7 +128,11 @@ export const Component = () => {
         ]}
       />
       <ErrorBoundary>
-        <OwnerPage />
+        <div className="overflow-auto">
+          <div className="max-w-7xl mx-auto p-4 md:p-8 relative">
+            <OwnerPage />
+          </div>
+        </div>
       </ErrorBoundary>
     </div>
   );
