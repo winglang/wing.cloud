@@ -9,6 +9,8 @@ import { useTheme } from "../design-system/theme-provider.js";
 import { WingIcon } from "../icons/wing-icon.js";
 import { wrpc } from "../utils/wrpc.js";
 
+import { Tabs, type Tab } from "./tabs.js";
+
 export interface Breadcrumb {
   label: string;
   to: string;
@@ -60,9 +62,10 @@ const UserMenu = (props: UserMenuProps) => {
 
 export interface HeaderProps {
   breadcrumbs?: Breadcrumb[];
+  tabs?: Tab[];
 }
 
-export const Header = (props: HeaderProps) => {
+export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
   const { theme } = useTheme();
 
   const { user } = useContext(AuthDataProviderContext);
@@ -75,7 +78,9 @@ export const Header = (props: HeaderProps) => {
   }, [user?.username]);
 
   return (
-    <header className={clsx("px-6 py-3 shadow z-30", theme.bgInput)}>
+    <header
+      className={clsx("px-6 shadow z-30 pt-3", theme.bgInput, !tabs && "pb-3")}
+    >
       <div className="flex items-center gap-6">
         <Link
           to={dashboardLink}
@@ -88,30 +93,22 @@ export const Header = (props: HeaderProps) => {
           <div>
             <Link
               to={dashboardLink}
-              className="rounded hover:bg-slate-100 px-2 py-1 text-sm text-slate-800 font-medium flex items-center gap-1.5"
+              className="rounded hover:bg-gray-100 px-2 py-1 text-sm text-gray-800 font-medium flex items-center gap-1.5"
             >
               {!user && (
-                <>
-                  {/* <span className="w-5 h-5 rounded bg-slate-300 animate-pulse"></span> */}
-                  <span className="w-32 bg-slate-300 animate-pulse rounded">
-                    &nbsp;
-                  </span>
-                </>
+                <span className="w-32 bg-gray-300 animate-pulse rounded">
+                  &nbsp;
+                </span>
               )}
-              {user && (
-                <>
-                  {/* <Avatar avatarURL={user.data.user.avatarUrl} /> */}
-                  <span>{user?.username}</span>
-                </>
-              )}
+              {user && <span>{user?.username}</span>}
             </Link>
           </div>
-          {props.breadcrumbs?.map((breadcrumb, index) => (
+          {breadcrumbs?.map((breadcrumb, index) => (
             <Fragment key={index}>
-              <span className="text-slate-600 text-sm">/</span>
+              <span className="text-gray-600 text-sm">/</span>
               <Link
                 to={breadcrumb.to}
-                className="rounded hover:bg-slate-100 px-2 py-1 text-sm text-slate-800 font-medium flex items-center gap-1.5"
+                className="rounded hover:bg-gray-100 px-2 py-1 text-sm text-gray-800 font-medium flex items-center gap-1.5"
               >
                 {breadcrumb.icon ? (
                   <span className="-ml-1">{breadcrumb.icon}</span>
@@ -132,6 +129,11 @@ export const Header = (props: HeaderProps) => {
 
         <UserMenu avatarURL={user?.avatarUrl} />
       </div>
+      {tabs && (
+        <div className="pt-3">
+          <Tabs tabs={tabs} />
+        </div>
+      )}
     </header>
   );
 };

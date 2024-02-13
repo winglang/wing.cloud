@@ -91,7 +91,7 @@ export const GitRepoSelect = ({
                       theme.text1,
                     )}
                   />
-                  {item.label}
+                  <span className="truncate">{item.label}</span>
                 </div>
               );
             }}

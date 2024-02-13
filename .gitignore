@@ -12,3 +12,4 @@ node_modules/
 !/.prettierrc.json
 !/.editorconfig
 examples/**/target/
+!/.projenrc.ts

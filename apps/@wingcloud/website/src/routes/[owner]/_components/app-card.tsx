@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { StatusPill } from "../../../components/status-pill.js";
 import { Menu } from "../../../design-system/menu.js";
+import { SkeletonLoader } from "../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../icons/github-icon.js";
@@ -154,33 +155,47 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
 
         <div className="leading-6 space-y-1">
           <div className="flex justify-between gap-x-4">
-            <div className="flex gap-x-2 truncate">
-              <Link
-                className={clsx(
-                  "truncate",
-                  "text-xs",
-                  theme.text3,
-                  theme.text3Hover,
-                  theme.focusInput,
-                  "focus:underline hover:underline z-10",
-                )}
-                target="_blank"
-                to={commitUrl}
-                onClick={(event) => event.stopPropagation()}
-                title="View commit on GitHub"
-              >
-                {app.lastCommitMessage || "View on GitHub"}
-              </Link>
+            <div className="flex gap-x-2 truncate w-full">
+              {app.lastCommitMessage && (
+                <Link
+                  className={clsx(
+                    "truncate",
+                    "text-xs",
+                    theme.text3,
+                    theme.text3Hover,
+                    theme.focusInput,
+                    "focus:underline hover:underline z-10",
+                  )}
+                  target="_blank"
+                  to={commitUrl}
+                  onClick={(event) => event.stopPropagation()}
+                  title="View commit on GitHub"
+                >
+                  {app.lastCommitMessage}
+                </Link>
+              )}
+              {app.status === "initializing" && !app.lastCommitMessage && (
+                <SkeletonLoader className="h-4 w-2/3" loading />
+              )}
+              {app.status !== "initializing" && !app.lastCommitMessage && (
+                <div className={clsx("text-xs", theme.text4)}>
+                  No commit message
+                </div>
+              )}
             </div>
           </div>
 
           <div className="flex justify-between gap-x-4">
-            <div className="flex grow gap-x-1 truncate">
-              <div className={clsx("text-xs", theme.text4)}>{timeAgo} on</div>
+            <div className="flex grow gap-x-1 truncate w-full">
+              {app.status === "initializing" && !timeAgo && (
+                <SkeletonLoader className="h-4 w-20" loading />
+              )}
+              <div className={clsx("text-xs", theme.text4)}>{timeAgo}</div>
               {app.defaultBranch && (
                 <div
                   className={clsx("flex grow text-xs truncate", theme.text2)}
                 >
+                  <div className={clsx("text-xs mr-1", theme.text4)}>on</div>
                   <BranchIcon className="w-4 h-4 shrink-0" />
                   <Link
                     className={clsx(

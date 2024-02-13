@@ -38,7 +38,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           disabled={disabled}
           className={clsx(
             "border-slate-300 dark:border-slate-900",
-            "inline-flex gap-2 items-center px-2.5 py-2.5 border text-xs rounded-md",
+            "inline-flex gap-2 items-center px-2.5 py-2 border text-xs rounded-md",
             "outline-none",
             "shadow-inner",
             LeftIcon && "pl-7",

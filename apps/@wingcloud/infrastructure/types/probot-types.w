@@ -33,15 +33,17 @@ struct IPullRequestInstallation {
   id: num;
 }
 
-struct ICommitter {
-  date: str?;
+struct IAuthor {
   name: str;
   email: str;
+  username: str;
 }
 
 struct IHeadCommit {
-  committer: ICommitter;
+  author: IAuthor;
+  committer: IAuthor;
   message: str;
+  timestamp: str;
 }
 
 struct IPullRequestPayload {

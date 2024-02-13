@@ -5,24 +5,24 @@ import { useState, useMemo, useCallback } from "react";
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
 import { useNotifications } from "../../../../../design-system/notification.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
-import { type App, type Secret } from "../../../../../utils/wrpc.js";
+import { type Secret } from "../../../../../utils/wrpc.js";
 import { wrpc } from "../../../../../utils/wrpc.js";
 import type { EnvironmentType } from "../../../../../utils/wrpc.js";
 
 import { NewSecret } from "./new-secret.js";
 import { SecretsListItem } from "./secrets-list-item.js";
 
-export const SecretsList = ({ appId }: { appId: string }) => {
+export const SecretsList = ({ appId }: { appId?: string }) => {
   const { showNotification } = useNotifications();
   const { theme } = useTheme();
   const [updatingSecrets, setUpdatingSecrets] = useState(false);
 
   const secretsQuery = wrpc["app.listSecrets"].useQuery(
     {
-      appId: appId || "",
+      appId: appId!,
     },
     {
-      enabled: appId != undefined,
+      enabled: !!appId,
     },
   );
 
@@ -35,6 +35,9 @@ export const SecretsList = ({ appId }: { appId: string }) => {
   const onCreate = useCallback(
     async (name: string, value: string, environmentType: EnvironmentType) => {
       try {
+        if (!appId) {
+          throw new Error("App ID is required");
+        }
         setUpdatingSecrets(true);
         await createMutation.mutateAsync({
           appId: appId,
@@ -120,26 +123,41 @@ export const SecretsList = ({ appId }: { appId: string }) => {
     return [...groups.entries()];
   }, [secrets]);
 
-  const loading = secretsQuery.isLoading;
+  const loading = useMemo(() => {
+    return !appId || secretsQuery.isLoading;
+  }, [appId, secretsQuery.isLoading]);
 
   return (
     <div
       className={clsx(
-        "flex flex-col gap-2 rounded p-4 border",
+        "flex flex-col gap-2 rounded-md p-4 border",
         theme.bgInput,
         theme.borderInput,
+        "relative",
       )}
     >
+      <div
+        className={clsx(
+          "absolute inset-0 flex items-center justify-center",
+          "transition-all",
+          loading && "bg-opacity-50 z-10",
+          !loading && "bg-opacity-0 -z-10",
+          theme.bg3,
+        )}
+      >
+        <SpinnerLoader size="sm" />
+      </div>
+
       <div className={clsx("truncate", theme.text1)}>Secrets</div>
       <div className="flex flex-col h-full">
         <NewSecret loading={updatingSecrets} onCreate={onCreate} />
         <div className="w-full flex flex-col gap-2 relative py-4">
-          {(loading || updatingSecrets) && (
+          {updatingSecrets && (
             <div className="flex items-center justify-center absolute inset-0 z-10">
               <SpinnerLoader size="sm" className="z-20" />
             </div>
           )}
-          {!loading && !updatingSecrets && groupedSecrets.length === 0 && (
+          {!updatingSecrets && groupedSecrets.length === 0 && (
             <div className="text-xs flex flex-col truncate items-center gap-2">
               <LockClosedIcon
                 className={clsx("w-5 h-5 rounded-full", theme.text2)}
@@ -147,29 +165,28 @@ export const SecretsList = ({ appId }: { appId: string }) => {
               <span className={clsx("font-bold", theme.text1)}>No secrets</span>
             </div>
           )}
-          {!loading &&
-            groupedSecrets.map((group) => (
-              <div
-                className={clsx(
-                  "w-full flex flex-col gap-2",
-                  updatingSecrets && "opacity-50",
-                )}
-                key={group[0]}
-              >
-                <div className={clsx("capitalize text-sm", theme.text1)}>
-                  {group[0]}
-                </div>
-                {group[1].map((secret, index) => (
-                  <SecretsListItem
-                    key={`${secret.id}`}
-                    secret={secret}
-                    onDecrypt={onDecrypt}
-                    onDelete={onDelete}
-                    loading={updatingSecrets}
-                  />
-                ))}
+          {groupedSecrets.map((group) => (
+            <div
+              className={clsx(
+                "w-full flex flex-col gap-2",
+                updatingSecrets && "opacity-50",
+              )}
+              key={group[0]}
+            >
+              <div className={clsx("capitalize text-sm", theme.text1)}>
+                {group[0]}
               </div>
-            ))}
+              {group[1].map((secret, index) => (
+                <SecretsListItem
+                  key={`${secret.id}`}
+                  secret={secret}
+                  onDecrypt={onDecrypt}
+                  onDelete={onDelete}
+                  loading={updatingSecrets}
+                />
+              ))}
+            </div>
+          ))}
         </div>
       </div>
       <hr className="h-px bg-slate-200 border-0 dark:bg-slate-700" />

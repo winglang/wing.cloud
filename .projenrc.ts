@@ -104,10 +104,18 @@ const vite = new NodeEsmProject({
   monorepo,
   name: "@wingcloud/vite",
 });
-vite.addFields({ types: "./src/index.d.ts" });
+vite.addFields({
+  types: "./src/index.d.ts",
+  exports: {
+    ".": "./src/index.js",
+    "./src/util.cjs": "./src/util.cjs",
+  },
+});
 
 vite.addDevDeps("vite");
 vite.addDeps("dotenv");
+
+vite.addDeps("constructs", "cdktf", "@cdktf/provider-aws");
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
@@ -121,17 +129,17 @@ new TypescriptConfig(website, {
 });
 new Eslint(website);
 
-new Turbo(website, {
-  pipeline: {
-    compile: {
-      dotEnv: [".env"],
-      outputs: ["dist/**"],
-    },
-  },
-});
+// new Turbo(website, {
+//   pipeline: {
+//     compile: {
+//       dotEnv: [".env"],
+//       outputs: ["dist/**"],
+//     },
+//   },
+// });
 
 website.addDeps("vite");
-website.addScript("compile", "vite build");
+// website.addScript("compile", "vite build");
 website.addGitIgnore("/dist/");
 website.addGitIgnore("/public/wing.js");
 
@@ -236,11 +244,11 @@ const platform = new TypescriptProject({
 platform.addFields({ type: "commonjs" });
 platform.addFields({ types: "./lib/index.d.ts" });
 platform.addFields({ main: "./lib/index.js" });
-platform.addDevDeps(`@winglang/compiler`);
-platform.addDevDeps(`@winglang/sdk`);
-platform.addDevDeps(`cdktf`);
-platform.addDevDeps(`constructs`);
-platform.addDevDeps(`@cdktf/provider-aws`);
+platform.addDevDeps("@winglang/compiler");
+platform.addDevDeps("@winglang/sdk");
+platform.addDevDeps("cdktf");
+platform.addDevDeps("constructs");
+platform.addDevDeps("@cdktf/provider-aws");
 
 platform.addGitIgnore("**/target/");
 platform.addGitIgnore("tmp/");
@@ -260,6 +268,8 @@ infrastructure.addGitIgnore("!/.env.example");
 
 infrastructure.addGitIgnore("**/target/");
 infrastructure.addDeps("winglang");
+
+infrastructure.addDeps(vite.name);
 
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");

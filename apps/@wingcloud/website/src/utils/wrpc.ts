@@ -34,6 +34,15 @@ interface Commit {
   date: string;
 }
 
+export type EnvironmentStatus =
+  | "initializing"
+  | "running-server"
+  | "running-tests"
+  | "deploying"
+  | "running"
+  | "error"
+  | "stopped";
+
 export interface App {
   appId: string;
   appName: string;
@@ -48,7 +57,7 @@ export interface App {
   lastCommitMessage?: string;
   lastCommitDate?: string;
   lastCommitSha?: string;
-  status?: string;
+  status?: EnvironmentStatus;
 }
 
 export interface TestResult {
@@ -59,20 +68,6 @@ export interface TestResult {
 interface TestResults {
   testResults: TestResult[];
 }
-
-interface StatusReport {
-  environmentId: string;
-  status: string;
-}
-
-export type EnvironmentStatus =
-  | "initializing"
-  | "running-server"
-  | "running-tests"
-  | "deploying"
-  | "running"
-  | "error"
-  | "stopped";
 
 export interface Environment {
   id: string;
@@ -234,6 +229,10 @@ export const wrpc = createWRPCReact<{
     { appId: string; entrypoint: string },
     {}
   >;
+  "app.updateDescription": MutationProcedure<
+    { appId: string; description: string },
+    {}
+  >;
   "app.delete": MutationProcedure<{ owner: string; appName: string }, {}>;
   "app.list": QueryProcedure<
     {
@@ -253,8 +252,7 @@ export const wrpc = createWRPCReact<{
       defaultBranch: string;
     },
     {
-      appId: string;
-      appFullName: string;
+      app: App;
     }
   >;
 }>();

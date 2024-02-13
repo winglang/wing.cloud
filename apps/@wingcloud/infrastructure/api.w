@@ -156,7 +156,7 @@ pub class Api {
     props.environmentManager.onEnvironmentChange(inflight (environment) => {
       if let app = apps.tryGet(appId: environment.appId) {
         let updatedEnvironment = props.environments.get(id: environment.id);
-        let queries = MutArray<str>["app.environment"];
+        let queries = MutArray<str>["app.listEnvironments", "app.environment"];
         if environment.type == "production" && (updatedEnvironment.status != app.status ?? "") {
           apps.updateStatus(
             appId: app.appId,
@@ -166,7 +166,7 @@ pub class Api {
             status: updatedEnvironment.status,
           );
           // update the app list when a production environment is modified.
-          queries.push("app.list");
+          queries.concat(MutArray<str>["app.list", "app.getByName?appName={app.appName}"]);
         }
         invalidateQuery.invalidate(userId: app.userId, queries: queries.copy());
       }
@@ -280,7 +280,7 @@ pub class Api {
           },
         };
       } catch {
-        log("User not authenticated. Rejecting websocket connection");
+        throw httpError.HttpError.unauthorized();
       }
     });
 
@@ -610,7 +610,7 @@ pub class Api {
           };
         }
 
-        let appId = apps.create(
+        let createAppOptions = {
           appName: appName,
           description: input.tryGet("description")?.tryAsStr() ?? "",
           repoId: repoId,
@@ -621,28 +621,36 @@ pub class Api {
           createdAt: datetime.utcNow().toIso(),
           defaultBranch: defaultBranch,
           status: "initializing",
-        );
+        };
+
+        let appId = apps.create(createAppOptions);
+
+        let appOptions = Json.deepCopyMut(createAppOptions);
+        appOptions.set("appId", appId);
+
+        let app = Apps.App.fromJson(appOptions);
 
         productionEnvironmentQueue.push(Json.stringify(CreateProductionEnvironmentMessage {
-          appName: appName,
-          userId: user.userId,
-          repoId: repoId,
-          repoOwner: repoOwner,
-          repoName: repoName,
+          appId: app.appId,
+          appName: app.appName,
+          userId: app.userId,
+          repoId: app.repoId,
+          repoOwner: app.repoOwner,
+          repoName: app.repoName,
+          entrypoint: app.entrypoint,
           defaultBranch: defaultBranch,
           installationId: installationId,
-          appId: appId,
-          entrypoint: entrypoint,
           timestamp: datetime.utcNow().timestampMs,
         }));
 
         invalidateQuery.invalidate(userId: user.userId, queries: ["app.list"]);
 
+
+
         return {
           body: {
-            appId: appId,
-            appName: appName,
             appFullName: "{user.username}/{appName}",
+            app: app,
           },
         };
       } else {
@@ -951,6 +959,35 @@ pub class Api {
 
       invalidateQuery.invalidate(userId: userId, queries: [
         "app.listEntrypoints",
+      ]);
+
+      return {
+        body: {
+          appId: appId,
+        },
+      };
+    });
+
+    api.post("/wrpc/app.updateDescription", inflight (request) => {
+      let userId = getUserIdFromCookie(request);
+      let input = Json.parse(request.body ?? "");
+      let appId = input.get("appId").asStr();
+
+      let app = apps.get(appId: appId);
+      checkAppAccessRights(userId, app);
+
+      let description = input.get("description").asStr();
+      apps.updateDescription(
+        appId: appId,
+        appName: app.appName,
+        repoId: app.repoId,
+        userId: userId,
+        description: description,
+      );
+
+      invalidateQuery.invalidate(userId: userId, queries: [
+        "app.getByName?appName={app.appName}",
+        "app.list",
       ]);
 
       return {

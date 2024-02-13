@@ -60,7 +60,7 @@ export const TestsLogs = ({
   return (
     <div
       className={clsx(
-        "w-full rounded border",
+        "w-full rounded-md border",
         theme.bgInput,
         theme.borderInput,
       )}
@@ -69,8 +69,8 @@ export const TestsLogs = ({
         id={id}
         className={clsx(
           "flex items-center justify-between w-full text-left p-4 outline-none",
-          isOpen && "border-b rounded-t shadow-sm",
-          !isOpen && "rounded",
+          isOpen && "border-b rounded-t-md shadow-sm",
+          !isOpen && "rounded-md",
           theme.borderInput,
           theme.textInput,
           loading && "cursor-not-allowed opacity-50",

@@ -1,6 +1,8 @@
 import clsx from "clsx";
 
-export const StatusDot = ({ status }: { status: string }) => {
+import type { EnvironmentStatus } from "../utils/wrpc.js";
+
+export const StatusDot = ({ status }: { status: EnvironmentStatus }) => {
   return (
     <div
       title={status}
