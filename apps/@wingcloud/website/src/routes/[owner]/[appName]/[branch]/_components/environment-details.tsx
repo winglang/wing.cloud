@@ -86,7 +86,8 @@ export const EnvironmentDetails = ({
         to={`/${owner}/${appName}/${environment?.branch}/console`}
         className="cursor-pointer"
       >
-        <div
+        <button
+          disabled={environment?.status !== "running"}
           className={clsx(
             "rounded flex items-center justify-center cursor-pointer",
             "shrink-0 border",
@@ -99,7 +100,7 @@ export const EnvironmentDetails = ({
           )}
         >
           <ConsolePreviewIcon className="w-64 md:w-80 p-8 transition-all" />
-        </div>
+        </button>
       </Link>
 
       <div className="grid grid-cols-3 flex-grow gap-4 md:gap-6 transition-all">
