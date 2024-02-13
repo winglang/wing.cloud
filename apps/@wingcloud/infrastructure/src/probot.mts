@@ -5,6 +5,7 @@ export const createProbot = async (
   privateKey: string,
   webhookSecret: string,
 ) => {
+  console.log("createProbot");
   const probot = createProbotAdapter({
     overrides: {
       appId,
@@ -12,8 +13,8 @@ export const createProbot = async (
       secret: webhookSecret,
     },
   });
-  probot.onError(c => {
+  probot.onError((c) => {
     console.log("probot error", c.message);
-  })
+  });
   return probot;
 };
