@@ -31,8 +31,8 @@ bring "./patches/react-app.patch.w" as reactAppPatch;
 
 let appSecret = util.env("APP_SECRET");
 let wsSecret = util.env("WS_SECRET");
-let segmentWriteKey = util.env("SEGMENT_WRITE_KEY");
-let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true";
+let segmentWriteKey = util.tryEnv("SEGMENT_WRITE_KEY") ?? "";
+let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true" && segmentWriteKey != "";
 
 let publicEndpointDomain = (): str => {
   if util.env("WING_TARGET") == "sim" {
@@ -276,24 +276,26 @@ let proxyUrl = (() => {
 
 new cloud.Endpoint(proxyUrl, browserSupport: true) as "Proxy Endpoint";
 
-let var webhookUrl = probotApp.githubApp.api.url;
-if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" {
-  bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
+if util.tryEnv("DISABLE_NGROK") != "true" {
+  let var webhookUrl = probotApp.githubApp.api.url;
+  if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" {
+    bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
 
-  let devNgrok = new ngrok.Ngrok(
-    url: webhookUrl,
-    domain: util.tryEnv("NGROK_DOMAIN"),
-  );
+    let devNgrok = new ngrok.Ngrok(
+      url: webhookUrl,
+      domain: util.tryEnv("NGROK_DOMAIN"),
+    );
 
-  webhookUrl = devNgrok.url;
+    webhookUrl = devNgrok.url;
+  }
+
+  let updateGithubWebhook = inflight () => {
+    probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
+    log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
+  };
+
+  new cloud.OnDeploy(updateGithubWebhook);
 }
-
-let updateGithubWebhook = inflight () => {
-  probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
-  log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
-};
-
-new cloud.OnDeploy(updateGithubWebhook);
 
 new EnvironmentCleaner.EnvironmentCleaner(apps: apps, environmentManager: environmentManager, environments: environments);
 
