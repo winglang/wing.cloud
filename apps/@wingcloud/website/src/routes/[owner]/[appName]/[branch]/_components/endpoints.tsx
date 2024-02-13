@@ -45,7 +45,7 @@ export const Endpoints = ({
         </div>
       )}
       {!loading && (
-        <div className="space-y-1">
+        <div className="space-y-2">
           {(endpoints.length === 0 || environment?.status !== "running") && (
             <div
               className={clsx(
