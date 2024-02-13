@@ -117,7 +117,7 @@ let dashboard = new vite.Vite(
     "ENABLE_ANALYTICS": "{enableAnalytics}",
     "API_URL": "{api.url}",
     "WS_URL": "{ws.url}",
-    "GITHUB_CLIENT_ID": util.env("VITE_GITHUB_CLIENT_ID"),
+    "GITHUB_APP_CLIENT_ID": util.env("VITE_GITHUB_APP_CLIENT_ID"),
     "GITHUB_APP_NAME": util.env("VITE_GITHUB_APP_NAME"),
   },
 );
