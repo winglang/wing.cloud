@@ -36,7 +36,6 @@ apps/@wingcloud/website/.projen/files.json linguist-generated=true
 apps/@wingcloud/website/.projen/tasks.json linguist-generated=true
 apps/@wingcloud/website/package.json linguist-generated=true
 apps/@wingcloud/website/tsconfig.json linguist-generated=true
-apps/@wingcloud/website/turbo.json linguist-generated=true
 aws/.gitattributes linguist-generated=true
 aws/.gitignore linguist-generated=true
 aws/.projen/deps.json linguist-generated=true

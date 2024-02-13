@@ -36,7 +36,8 @@ export interface AddAppContainerProps {
 }
 
 const AddAppPage = () => {
-  const GITHUB_APP_NAME = import.meta.env["VITE_GITHUB_APP_NAME"];
+  // @ts-ignore-next-line
+  const GITHUB_APP_NAME = window["wingEnv"]["GITHUB_APP_NAME"];
 
   const navigate = useNavigate();
   const { theme } = useTheme();

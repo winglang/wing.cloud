@@ -280,7 +280,7 @@ pub class Api {
           },
         };
       } catch {
-        log("User not authenticated. Rejecting websocket connection");
+        throw httpError.HttpError.unauthorized();
       }
     });
 

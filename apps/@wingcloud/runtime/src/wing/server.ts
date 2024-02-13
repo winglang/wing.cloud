@@ -179,6 +179,7 @@ export async function prepareServer({
           },
           set(key: any, value: any) {},
         },
+        requireSignIn: false,
         onExpressCreated: (app: Application) => {
           app.get("/health", async (req, res) => {
             res.sendStatus(200);
