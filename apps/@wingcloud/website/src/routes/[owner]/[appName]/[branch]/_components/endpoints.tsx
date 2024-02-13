@@ -39,14 +39,14 @@ export const Endpoints = ({
 
   return (
     <div>
-      {loading && (
+      {(loading || !environment) && (
         <div className="flex items-center justify-center p-4">
-          <SpinnerLoader size="sm" />
+          <SpinnerLoader />
         </div>
       )}
-      {!loading && (
+      {!loading && environment && (
         <div className="space-y-2">
-          {(endpoints.length === 0 || environment?.status !== "running") && (
+          {(endpoints.length === 0 || environment.status !== "running") && (
             <div
               className={clsx(
                 "space-y-2",
@@ -61,7 +61,7 @@ export const Endpoints = ({
               </h3>
             </div>
           )}
-          {environment?.status === "running" &&
+          {environment.status === "running" &&
             endpoints.map((endpoint, index) => (
               <EndpointItem
                 key={index}
