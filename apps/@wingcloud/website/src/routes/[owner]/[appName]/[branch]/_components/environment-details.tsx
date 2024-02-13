@@ -151,35 +151,43 @@ export const EnvironmentDetails = ({
             <div className="space-y-1">
               {!environment && <SkeletonLoader className="h-5 w-2/3" loading />}
               {environment && (
-                <Link
-                  className="hover:underline truncate relative z-10 flex gap-x-1"
-                  onClick={(event) => {
-                    if (environment.status === "stopped") {
-                      event.preventDefault();
-                    }
-                  }}
-                  to={`https://github.com/${environment.repo}/tree/${environment.branch}`}
-                  target="_blank"
-                >
+                <div className="flex gap-x-1">
                   <BranchIcon className={clsx("w-4 h-4", theme.text1)} />
-                  <div className={clsx("font-semibold truncate", theme.text1)}>
+                  <Link
+                    className={clsx(
+                      "font-semibold truncate",
+                      theme.text1,
+                      "hover:underline truncate relative z-10",
+                    )}
+                    onClick={(event) => {
+                      if (environment.status === "stopped") {
+                        event.preventDefault();
+                      }
+                    }}
+                    to={`https://github.com/${environment.repo}/tree/${environment.branch}`}
+                    target="_blank"
+                  >
                     {environment.branch}
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               )}
               {environment && (
-                <Link
-                  className="hover:underline truncate relative z-10 flex gap-x-1"
-                  to={`https://github.com/${environment.repo}`}
-                  target="_blank"
-                >
+                <div className="flex gap-x-1">
                   <GithubIcon
                     className={clsx("w-4 h-4 shrink-0", theme.text1)}
                   />
-                  <div className={clsx("font-semibold truncate", theme.text1)}>
+                  <Link
+                    className={clsx(
+                      "hover:underline truncate relative z-10",
+                      "font-semibold truncate",
+                      theme.text1,
+                    )}
+                    to={`https://github.com/${environment.repo}`}
+                    target="_blank"
+                  >
                     {environment.repo}
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               )}
             </div>
           </div>
