@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { useMemo, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useMemo } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 import { useTheme } from "../design-system/theme-provider.js";
 

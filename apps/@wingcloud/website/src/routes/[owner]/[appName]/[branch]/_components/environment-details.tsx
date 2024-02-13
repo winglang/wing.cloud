@@ -58,7 +58,7 @@ export const EnvironmentDetails = ({
     return endpoints[0];
   }, [endpoints]);
 
-  const endpointsList = useMemo(() => {
+  const endpointsRemainingList = useMemo(() => {
     if (!endpoints || endpoints.length === 0) {
       return [];
     }
@@ -227,7 +227,7 @@ export const EnvironmentDetails = ({
                 </div>
               )}
 
-              {endpointsList.length > 1 && (
+              {endpointsRemainingList.length > 0 && (
                 <Popover
                   classNames={clsx(
                     "rounded-full py-0.5 px-1.5 flex text-xs font-semibold",
@@ -239,11 +239,11 @@ export const EnvironmentDetails = ({
                     theme.bg2Hover,
                     "transition-all",
                   )}
-                  button={`+${endpointsList.length}`}
+                  button={`+${endpointsRemainingList.length}`}
                 >
                   <div className="flex gap-x-3">
                     <div className="space-y-0.5">
-                      {endpointsList.map((endpoint) => (
+                      {endpointsRemainingList.map((endpoint) => (
                         <div
                           key={endpoint.id}
                           className="flex gap-2 items-center"

@@ -31,7 +31,6 @@ export const EnvironmentsListItemSkeleton = ({
               theme.text2,
             )}
           />
-          <StatusDot status="initializing" />
         </div>
 
         <div className="w-full space-y-2 py-0.5">
