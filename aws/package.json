@@ -5,7 +5,7 @@
   "sideEffects": false,
   "dependencies": {
     "@cdktf/provider-aws": "^18.0.7",
-    "cdktf": "^0.19.1",
+    "cdktf": "^0.20.3",
     "constructs": "^10.3.0"
   },
   "scripts": {

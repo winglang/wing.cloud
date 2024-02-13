@@ -75,7 +75,7 @@ jobs:
           TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
           TF_BACKEND_STATE_FILE: "${{ inputs.TF_BACKEND_STATE_FILE }}"
           WING_ENV: "production" # both staging and production have the same resource config for now
-        run: pnpm wing compile --platform @wingcloud/platform main.w
+        run: pnpm wing compile --value wrpc/mergeLambdas=true --value wrpc-function/concurrency=10 --platform @wingcloud/platform main.w
         working-directory: "apps/@wingcloud/infrastructure"
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4

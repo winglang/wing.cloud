@@ -190,7 +190,7 @@ pub class ProbotApp {
             userId: app.userId,
             lastCommitMessage: context.payload.head_commit.message,
             lastCommitSha: context.payload.after,
-            lastCommitDate: context.payload.head_commit.committer.date,
+            lastCommitDate: context.payload.head_commit.committer.date ?? "",
           );
 
           this.environmentManager.restart(

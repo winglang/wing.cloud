@@ -50,7 +50,8 @@ pub class ProbotAdapter {
   }
 
   pub inflight auth(installationId: num): octokit.OctoKit {
-    if let kit = this.instance?.auth?.call(this.instance, installationId) {
+    // use unsafeCast because of the circular type reference
+    if let kit = this.instance?.auth?.call(unsafeCast(this.instance), installationId) {
       return kit;
     } else {
       throw "auth: fail to get octokit";

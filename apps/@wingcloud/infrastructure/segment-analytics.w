@@ -17,7 +17,7 @@ struct SegmentAnalyticsOptions {
 
 interface Analytics {
   inflight identify(options: SegmentIdentifyOptions): void;
-  inflight track(SegmentTrackOptions): void;
+  inflight track(options: SegmentTrackOptions): void;
 }
 
 inflight class MockSegmentAnalytics impl Analytics {
