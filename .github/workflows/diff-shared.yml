@@ -61,8 +61,6 @@ jobs:
           BOT_GITHUB_CALLBACK_ORIGIN: ${{ secrets.BOT_GITHUB_CALLBACK_ORIGIN }}
           TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}
           ## Preflight
-          VITE_GITHUB_APP_CLIENT_ID: ${{ secrets.VITE_GITHUB_APP_CLIENT_ID }}
-          VITE_GITHUB_APP_NAME: ${{ secrets.VITE_GITHUB_APP_NAME }}
           PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
           PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
           LANDING_DOMAIN: ${{ secrets.LANDING_DOMAIN }}
