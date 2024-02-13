@@ -95,14 +95,14 @@ pub class GithubComment {
                 testRes = "✅ Passed";
                 passedTests += 1;
               }
-  
+
               let testId = testResult.id;
               let pathParts = testResult.path.split(":");
               let testName = pathParts.at(pathParts.length - 1);
               let testResourcePath = pathParts.at(0);
               let var link = "";
               if environment.status == "running" && appOwner? {
-                link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}?testId={testId}\">Logs</a>";
+                link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/tests?testId={testId}\">Logs</a>";
               }
               testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
               i += 1;
