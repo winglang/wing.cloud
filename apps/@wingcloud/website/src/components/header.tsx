@@ -57,9 +57,6 @@ const UserMenu = ({ user }: UserMenuProps) => {
     >
       {user?.email && (
         <div className="px-4 py-3" role="none">
-          <p className="text-sm" role="none">
-            Signed in as
-          </p>
           <p className="truncate text-sm font-medium text-gray-900" role="none">
             {user?.email}
           </p>
