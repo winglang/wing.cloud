@@ -1,6 +1,6 @@
 import { Menu as HeadlessMenu, Transition } from "@headlessui/react";
 import clsx from "clsx";
-import { Fragment, type MouseEvent } from "react";
+import { Fragment, type MouseEvent, type PropsWithChildren } from "react";
 
 import { useTheme } from "./theme-provider.js";
 
@@ -24,20 +24,27 @@ export const Menu = ({
   items = [],
   btnClassName,
   onClick,
-}: MenuProps) => {
+  children,
+}: PropsWithChildren<MenuProps>) => {
   const { theme } = useTheme();
   return (
     <div className="relative items-center flex">
       <HeadlessMenu as="div" className="relative inline-block text-left">
         <div>
           <HeadlessMenu.Button
-            className={clsx(btnClassName, theme.focusInput)}
+            className={clsx(
+              btnClassName,
+              theme.text1,
+              theme.bgInputHover,
+              "flex items-center text-sm gap-x-2",
+              "font-semibold",
+            )}
             onClick={(event) => {
               onClick?.(event);
             }}
           >
+            {title && <div className="pl-2">{title}</div>}
             {icon}
-            {title && <span className="ml-2">{title}</span>}
           </HeadlessMenu.Button>
         </div>
         <Transition
@@ -58,7 +65,8 @@ export const Menu = ({
               theme.focusInput,
             )}
           >
-            <div className="px-1 py-1 ">
+            {children}
+            <div className="p-1">
               {items.map((item) => (
                 <HeadlessMenu.Item key={item.label}>
                   {({ active }) => (
