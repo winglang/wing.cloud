@@ -23,12 +23,12 @@ export const Component = () => {
             to: `/${owner}/${appName}/${branch}`,
           },
           {
-            name: "Logs",
-            to: `/${owner}/${appName}/${branch}/logs`,
-          },
-          {
             name: "Tests",
             to: `/${owner}/${appName}/${branch}/tests`,
+          },
+          {
+            name: "Logs",
+            to: `/${owner}/${appName}/${branch}/logs`,
           },
         ]}
       />
