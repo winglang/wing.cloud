@@ -94,13 +94,14 @@ export const EnvironmentDetails = ({
         <div
           className={clsx(
             "hidden sm:flex",
-            "rounded items-center justify-center cursor-pointer",
+            "rounded items-center justify-center",
             "shrink-0 border",
             "transition-all",
             theme.borderInput,
             theme.bg3,
             environment?.status === "running" && [
-              "relative z-10 shadow-sm hover:shadow ",
+              "relative z-10 shadow-sm hover:shadow",
+              "cursor-pointer",
             ],
           )}
         >

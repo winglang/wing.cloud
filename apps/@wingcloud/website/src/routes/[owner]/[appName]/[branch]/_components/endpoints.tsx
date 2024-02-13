@@ -47,8 +47,18 @@ export const Endpoints = ({
       {!loading && (
         <div className="space-y-1">
           {(endpoints.length === 0 || environment?.status !== "running") && (
-            <div className={clsx(theme.text2, "w-full py-4 text-center")}>
-              No Endpoints.
+            <div
+              className={clsx(
+                "space-y-2",
+                "p-4 w-full border text-center rounded-md",
+                theme.bgInput,
+                theme.borderInput,
+                theme.text1,
+              )}
+            >
+              <h3 className={clsx("text-sm font-medium", theme.text2)}>
+                No Endpoints found.
+              </h3>
             </div>
           )}
           {environment?.status === "running" &&
