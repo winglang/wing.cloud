@@ -6,6 +6,8 @@ bring http;
 
 bring "cdktf" as cdktf;
 
+bring "./node_modules/@wingcloud/vite/src" as vite;
+
 bring "./users.w" as Users;
 bring "./apps.w" as Apps;
 bring "./environments.w" as Environments;
@@ -108,20 +110,15 @@ let runtimeUrlParam = new parameter.Parameter(
   value: rntm.api.url,
 ) as "runtime-url";
 
-let dashboardPort = 5174;
-let dashboard = new ex.ReactApp(
-  projectPath: "../website",
-  startCommand: "pnpm vite --port {dashboardPort}",
-  buildCommand: "pnpm vite build",
-  buildDir: "dist",
-  localPort: dashboardPort,
-) as "webapp";
-dashboard.addEnvironment("SEGMENT_WRITE_KEY", segmentWriteKey);
-dashboard.addEnvironment("ENABLE_ANALYTICS", "{enableAnalytics}");
-dashboard.addEnvironment("API_URL", "{api.url}");
-dashboard.addEnvironment("WS_URL", "{ws.url}");
-
-reactAppPatch.ReactAppPatch.apply(dashboard);
+let dashboard = new vite.Vite(
+  root: "../website",
+  env: {
+    "SEGMENT_WRITE_KEY": segmentWriteKey,
+    "ENABLE_ANALYTICS": "{enableAnalytics}",
+    "API_URL": "{api.url}",
+    "WS_URL": "{ws.url}",
+  },
+);
 
 let siteURL = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
