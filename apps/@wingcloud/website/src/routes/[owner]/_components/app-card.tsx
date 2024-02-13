@@ -11,7 +11,7 @@ import { GithubIcon } from "../../../icons/github-icon.js";
 import { MenuIcon } from "../../../icons/menu-icon.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import type { App } from "../../../utils/wrpc.js";
-import { RUNTIME_LOGS_ID } from "../[appName]/[branch]/overview-page.js";
+import { RUNTIME_LOGS_ID } from "../[appName]/[branch]/logs-page.js";
 
 import { AppIcon } from "./app-icon.js";
 
