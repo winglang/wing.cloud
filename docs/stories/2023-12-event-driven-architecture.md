@@ -162,3 +162,6 @@ Focusing on foundational robustness rather than feature expansion is more benefi
 
 - Check out the 2023 updated version of my favorite reinvent talk, serverlesspresso, at https://www.youtube.com/watch?v=cOQClEYryvU. It provides an excellent overview of these concepts.
 - Visit https://aws.amazon.com/what-is/eda/ for more on event-driven architecture.
+- Miro Board https://miro.com/app/board/uXjVNB9oG9o=/
+
+![miro board eda](./eda.png)
