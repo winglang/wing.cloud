@@ -193,13 +193,15 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
               <div className={clsx("text-xs", theme.text4)}>{timeAgo}</div>
               {app.defaultBranch && (
                 <div
-                  className={clsx("flex grow text-xs truncate", theme.text2)}
+                  className={clsx(
+                    "flex grow text-xs truncate items-center",
+                    theme.text2,
+                  )}
                 >
                   <div className={clsx("text-xs mr-1", theme.text4)}>on</div>
-                  <BranchIcon className="w-4 h-4 shrink-0" />
+                  <BranchIcon className="w-3 h-3 shrink-0 mr-0.5" />
                   <Link
                     className={clsx(
-                      "flex-grow",
                       "truncate",
                       "text-xs",
                       theme.text2Hover,

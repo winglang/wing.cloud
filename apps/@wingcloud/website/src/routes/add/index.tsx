@@ -161,100 +161,93 @@ const AddAppPage = () => {
         noBackground
       />
       <div className="overflow-auto">
-        <div className="max-w-7xl mx-auto space-y-4 px-4 pb-4 md:px-8 md:pb-8">
+        <div className="max-w-7xl mx-auto space-y-4 px-4 pb-4 sm:px-8 sm:pb-8">
           <div className="block space-y-4 lg:space-y-0 lg:flex gap-4 lg:gap-8">
             <div
               className={clsx(
-                "w-full rounded-md p-8 space-y-8 border",
+                "w-full rounded-md p-6 sm:p-8 space-y-4 border",
                 "shadow",
                 theme.bg4,
                 theme.borderInput,
               )}
             >
-              <div className="space-y-8">
-                <div className="w-full space-y-4">
-                  <div className={clsx("text-lg font-semibold", theme.text1)}>
-                    Connect a Git Repository
+              <div className={clsx("text-lg font-semibold", theme.text1)}>
+                Connect a Git Repository
+              </div>
+              <div className="w-full relative space-y-4">
+                {createAppLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center z-10">
+                    <div className="absolute inset-0 bg-white dark:bg-gray-900 opacity-50" />
+                    <SpinnerLoader className="z-20" />
                   </div>
-                  <div className="w-full relative space-y-4">
-                    {createAppLoading && (
-                      <div className="absolute inset-0 flex items-center justify-center z-10">
-                        <div className="absolute inset-0 bg-white dark:bg-gray-900 opacity-50" />
-                        <SpinnerLoader className="z-20" />
-                      </div>
-                    )}
+                )}
 
-                    <GitRepoSelect
-                      installationId={installationId}
-                      setInstallationId={setInstallationId}
-                      repositoryId={repositoryId || ""}
-                      setRepositoryId={setRepositoryId}
-                      installations={installations}
-                      repos={repoItems}
-                      loading={loading}
-                      disabled={createAppLoading}
-                    />
+                <GitRepoSelect
+                  installationId={installationId}
+                  setInstallationId={setInstallationId}
+                  repositoryId={repositoryId || ""}
+                  setRepositoryId={setRepositoryId}
+                  installations={installations}
+                  repos={repoItems}
+                  loading={loading}
+                  disabled={createAppLoading}
+                />
 
-                    <div className="text-xs flex gap-1 items-center pt-4 border-t border-gray-200">
-                      <span className={clsx(theme.text1)}>
-                        Missing a repository?
-                      </span>
-                      <button
-                        className="text-sky-600 text-left"
-                        onClick={() =>
-                          openPopupWindow({
-                            url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
-                            onClose: onCloseMissingRepoModal,
-                          })
-                        }
-                      >
-                        Adjust GitHub App Permissions
-                      </button>
-                    </div>
-                  </div>
+                <div className="text-xs flex gap-1 items-center pt-4 border-t border-gray-200">
+                  <span className={clsx(theme.text1)}>
+                    Missing a repository?
+                  </span>
+                  <button
+                    className="text-sky-600 text-left hover:underline"
+                    onClick={() =>
+                      openPopupWindow({
+                        url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
+                        onClose: onCloseMissingRepoModal,
+                      })
+                    }
+                  >
+                    Adjust GitHub App Permissions
+                  </button>
                 </div>
               </div>
             </div>
 
             <div
               className={clsx(
-                "w-full rounded-md p-8 space-y-8 border",
+                "w-full rounded-md p-6 sm:p-8 space-y-4 border",
                 theme.bg4,
                 theme.borderInput,
                 "shadow-sm",
                 "opacity-50 cursor-default",
+                "flex flex-col",
               )}
             >
-              <div className="space-y-8">
-                <div className="mb-4 flex flex-col w-full space-y-4">
-                  <div className={clsx("text-lg font-semibold", theme.text1)}>
-                    Clone a Template
-                  </div>
-                  <div className="w-full">
-                    <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
-                      <AppTemplateItem
-                        title="Wing app"
-                        description="Create a new Wing app from a template."
-                        icon={<WingIcon className="text-[#8bc6bc]" />}
-                        disabled
-                        classname="cursor-default"
-                      />
-                      <AppTemplateItem
-                        title="TypeScript"
-                        description="Create a new TypeScript app from a template."
-                        icon={<TypeScriptIcon className="text-[#2f74c0]" />}
-                        disabled
-                        classname="cursor-default"
-                      />
-                      <AppTemplateItem
-                        title=""
-                        description="More coming soon!"
-                        icon={<SquaresPlusIcon />}
-                        disabled
-                        classname="cursor-default"
-                      />
-                    </div>
-                  </div>
+              <div className={clsx("text-lg font-semibold", theme.text1)}>
+                Clone a Template
+              </div>
+              <div className="w-full">
+                <div className="gap-4 grid grid-cols-1 sm:grid-cols-2">
+                  <AppTemplateItem
+                    title="Wing app"
+                    description="Create a new Wing app from a template."
+                    icon={<WingIcon className="text-[#8bc6bc]" />}
+                    disabled
+                    classname="cursor-default"
+                  />
+                  <AppTemplateItem
+                    title="TypeScript"
+                    description="Create a new TypeScript app from a template."
+                    icon={<TypeScriptIcon className="text-[#2f74c0]" />}
+                    disabled
+                    classname="cursor-default"
+                  />
+                  <AppTemplateItem
+                    title=""
+                    description="More coming soon!"
+                    icon={<SquaresPlusIcon />}
+                    disabled
+                    classname="cursor-default"
+                  />
                 </div>
               </div>
             </div>

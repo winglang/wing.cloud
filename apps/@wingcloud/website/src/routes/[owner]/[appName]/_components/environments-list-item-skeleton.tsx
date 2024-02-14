@@ -1,6 +1,5 @@
 import clsx from "clsx";
 
-import { StatusDot } from "../../../../components/status-dot.js";
 import { SkeletonLoader } from "../../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";

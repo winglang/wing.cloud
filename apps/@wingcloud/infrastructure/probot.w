@@ -61,37 +61,7 @@ pub class ProbotApp {
     });
   }
 
-  inflight getVerifyAndReceievePropsProps(req: cloud.ApiRequest): probot.VerifyAndReceieveProps {
-    let lowkeysHeaders = lowkeys.LowkeysMap.fromMap(req.headers ?? {});
-    if !lowkeysHeaders.has("x-github-delivery") {
-      throw "getVerifyProps: missing id header";
-    }
-
-    let id = lowkeysHeaders.get("x-github-delivery");
-
-    if !lowkeysHeaders.has("x-github-event") {
-      throw "getVerifyProps: missing name header";
-    }
-
-    let name = lowkeysHeaders.get("x-github-event");
-
-    let signature = lowkeysHeaders.get("x-hub-signature-256");
-
-    if let payload = req.body {
-      return {
-        id: id,
-        name: name,
-        signature: signature,
-        payload: payload,
-      };
-    }
-
-    throw "getVerifyProps: missing body";
-  }
-
-  inflight listen(props: probot.VerifyAndReceieveProps) {
-    log("listen");
-
+  inflight new() {
     let onPullRequestOpen = inflight (context: probot.IPullRequestOpenedContext): void => {
       log("onPullRequestOpen");
       log(Json.stringify(context.payload, indent: 2));
@@ -211,7 +181,38 @@ pub class ProbotApp {
         }
       }
     });
+  }
 
+  inflight getVerifyAndReceievePropsProps(req: cloud.ApiRequest): probot.VerifyAndReceieveProps {
+    let lowkeysHeaders = lowkeys.LowkeysMap.fromMap(req.headers ?? {});
+    if !lowkeysHeaders.has("x-github-delivery") {
+      throw "getVerifyProps: missing id header";
+    }
+
+    let id = lowkeysHeaders.get("x-github-delivery");
+
+    if !lowkeysHeaders.has("x-github-event") {
+      throw "getVerifyProps: missing name header";
+    }
+
+    let name = lowkeysHeaders.get("x-github-event");
+
+    let signature = lowkeysHeaders.get("x-hub-signature-256");
+
+    if let payload = req.body {
+      return {
+        id: id,
+        name: name,
+        signature: signature,
+        payload: payload,
+      };
+    }
+
+    throw "getVerifyProps: missing body";
+  }
+
+  inflight listen(props: probot.VerifyAndReceieveProps) {
+    log("listen");
     this.adapter.verifyAndReceive(props);
   }
 }
