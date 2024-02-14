@@ -26,7 +26,7 @@ export const PageHeader = ({
     >
       <div
         className={clsx(
-          "w-full max-w-7xl overflow-auto mx-auto pt-4 md:pt-8 md:px-8 flex",
+          "w-full max-w-7xl overflow-auto mx-auto pt-4 md:pt-8 px-4 md:px-8 flex",
           !tabs && "pb-4 md:pb-8",
         )}
       >
