@@ -137,8 +137,7 @@ const OverviewPage = ({
                     theme.text1Hover,
                     theme.bg4Hover,
                     "transition-all",
-                    "absolute z-10 rounded-full p-1.5 right-4 top-4",
-                    "opacity-0 group-hover:opacity-100",
+                    "z-10 rounded-full p-1.5",
                   )}
                 >
                   <ArrowRightIcon className="w-4 h-4" />

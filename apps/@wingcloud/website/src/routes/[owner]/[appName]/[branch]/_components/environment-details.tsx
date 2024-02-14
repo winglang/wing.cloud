@@ -9,10 +9,10 @@ import { SkeletonLoader } from "../../../../../design-system/skeleton-loader.js"
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
 import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js";
+import { GithubIcon } from "../../../../../icons/github-icon.js";
 import { useStatus } from "../../../../../utils/status.js";
 import { getDateTime } from "../../../../../utils/time.js";
-import type { App, Endpoint, Environment } from "../../../../../utils/wrpc.js";
-import { CommitIcon } from "../../../../../icons/commit-icon.js";
+import type { Endpoint, Environment } from "../../../../../utils/wrpc.js";
 
 export interface EvironmentDetailsProps {
   loading?: boolean;
@@ -109,8 +109,8 @@ export const EnvironmentDetails = ({
         </div>
       </Link>
 
-      <div className="grid grid-cols-3 flex-grow gap-4 md:gap-6 transition-all">
-        <div className="flex flex-col gap-1">
+      <div className="grid grid-cols-9 flex-grow gap-4 md:gap-6 transition-all">
+        <div className="flex col-span-4 flex-col gap-1">
           <div className={clsx("text-sm truncate", theme.text2)}>Status</div>
           {!environment && (
             <SkeletonLoader className="h-5 w-28 max-w-full" loading />
@@ -118,7 +118,7 @@ export const EnvironmentDetails = ({
           {environment && <StatusWithDot status={environment.status} />}
         </div>
 
-        <div className="flex flex-col gap-1">
+        <div className="flex col-span-4 flex-col gap-1">
           <div className={clsx("text-sm truncate", theme.text2)}>
             Created at
           </div>
@@ -135,7 +135,8 @@ export const EnvironmentDetails = ({
         <div
           className={clsx(
             "flex flex-col gap-1",
-            !showEndpoints && "col-span-2",
+            showEndpoints && "col-span-4",
+            !showEndpoints && "col-span-8",
           )}
         >
           <div className={clsx("text-sm truncate", theme.text2)}>Source</div>
@@ -165,8 +166,8 @@ export const EnvironmentDetails = ({
               )}
               {environment && (
                 <div className="flex gap-x-1">
-                  <CommitIcon
-                    className={clsx("w-4 h-4 shrink-0", theme.text3)}
+                  <GithubIcon
+                    className={clsx("w-4 h-4 shrink-0", theme.text1)}
                   />
                   <Link
                     className={clsx(
@@ -174,20 +175,10 @@ export const EnvironmentDetails = ({
                       "font-semibold truncate",
                       theme.text2,
                     )}
-                    to={`https://github.com/${environment.repo}/commit/${app?.lastCommitSha}`}
-                    onClick={(event) => {
-                      if (!environment) {
-                        event.preventDefault();
-                      }
-                    }}
+                    to={`https://github.com/${environment.repo}`}
                     target="_blank"
                   >
-                    <div className="flex gap-x-2 truncate">
-                      <code>{environment?.lastCommitSha?.slice(0, 7)}</code>
-                      <div className="truncate">
-                        {environment?.lastCommitMessage}
-                      </div>
-                    </div>
+                    {environment.repo}
                   </Link>
                 </div>
               )}
@@ -196,7 +187,7 @@ export const EnvironmentDetails = ({
         </div>
 
         {showEndpoints && (
-          <div className="col-span-2 transition-all flex flex-col gap-1">
+          <div className="col-span-4 transition-all flex flex-col gap-1">
             <div className={clsx("text-sm truncate", theme.text2)}>
               Endpoints
             </div>
