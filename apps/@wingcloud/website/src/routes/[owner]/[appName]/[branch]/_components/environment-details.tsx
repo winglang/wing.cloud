@@ -167,7 +167,7 @@ export const EnvironmentDetails = ({
               {environment && (
                 <div className="flex gap-x-1">
                   <GithubIcon
-                    className={clsx("w-4 h-4 shrink-0", theme.text1)}
+                    className={clsx("w-4 h-4 shrink-0", theme.text3)}
                   />
                   <Link
                     className={clsx(
