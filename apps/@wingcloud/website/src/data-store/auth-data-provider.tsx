@@ -18,6 +18,7 @@ export const AuthDataProvider = ({ children }: PropsWithChildren) => {
   const user = wrpc["auth.check"].useQuery(undefined, {
     throwOnError: false,
     retry: false,
+    refetchInterval: 1000 * 60 * 15,
   });
 
   return (

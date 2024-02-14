@@ -278,7 +278,7 @@ pub class Api {
           secure: true,
           sameSite: "strict",
           path: "/",
-          maxAge: 10,
+          maxAge: 1h.seconds,
         },
       );
     };
@@ -311,7 +311,7 @@ pub class Api {
         // check if user exists in the db
         let user = users.get(userId: userId);
 
-        let authCookie = getAuthCookie(userId);
+        let authCookie = getAuthCookie(user.id);
 
         return {
           body: {
