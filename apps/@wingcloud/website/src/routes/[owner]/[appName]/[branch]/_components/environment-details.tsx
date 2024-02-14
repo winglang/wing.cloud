@@ -184,8 +184,7 @@ export const EnvironmentDetails = ({
                     target="_blank"
                   >
                     <div className="flex gap-x-2 truncate">
-                      <code>{app?.lastCommitSha?.slice(0, 7)}</code>
-                      <div className="truncate">{app?.lastCommitMessage}</div>
+                      {app?.lastCommitMessage}
                     </div>
                   </Link>
                 </div>
