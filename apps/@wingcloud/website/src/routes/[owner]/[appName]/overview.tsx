@@ -1,6 +1,8 @@
 import {
   MagnifyingGlassCircleIcon,
   ArrowTopRightOnSquareIcon,
+  ArrowRightCircleIcon,
+  ArrowRightIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useContext, useEffect, useMemo, useState } from "react";
@@ -114,7 +116,7 @@ const OverviewPage = ({
           owner={owner}
           appName={appName}
           environment={productionEnvironment}
-          loading={!productionEnvironment}
+          loading={loading}
           endpoints={endpoints}
           endpointsLoading={
             endpointsQuery.isLoading || endpointsQuery.data === undefined
@@ -132,13 +134,14 @@ const OverviewPage = ({
                   to={`/${owner}/${appName}/${productionEnvironment.branch}`}
                   className={clsx(
                     theme.text2,
-                    theme.text3Hover,
+                    theme.text1Hover,
                     theme.bg4Hover,
                     "transition-all",
-                    "z-10 rounded-full p-1.5",
+                    "absolute z-10 rounded-full p-1.5 right-4 top-4",
+                    "opacity-0 group-hover:opacity-100",
                   )}
                 >
-                  <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                  <ArrowRightIcon className="w-4 h-4" />
                 </Link>
               )}
             </>

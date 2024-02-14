@@ -9,10 +9,10 @@ import { SkeletonLoader } from "../../../../../design-system/skeleton-loader.js"
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
 import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js";
-import { GithubIcon } from "../../../../../icons/github-icon.js";
 import { useStatus } from "../../../../../utils/status.js";
 import { getDateTime } from "../../../../../utils/time.js";
-import type { Endpoint, Environment } from "../../../../../utils/wrpc.js";
+import type { App, Endpoint, Environment } from "../../../../../utils/wrpc.js";
+import { CommitIcon } from "../../../../../icons/commit-icon.js";
 
 export interface EvironmentDetailsProps {
   loading?: boolean;
@@ -72,7 +72,7 @@ export const EnvironmentDetails = ({
     <div
       className={clsx(
         "p-4 md:p-6 w-full rounded-md flex border",
-        "shadow-sm",
+        "shadow-sm group",
         "gap-0 sm:gap-4 md:gap-6",
         onClick && "hover:shadow",
         theme.bgInput,
@@ -122,7 +122,7 @@ export const EnvironmentDetails = ({
           <div className={clsx("text-sm truncate", theme.text2)}>
             Created at
           </div>
-          <div className={clsx("text-xs font-semibold truncate", theme.text1)}>
+          <div className={clsx("text-xs font-semibold truncate", theme.text2)}>
             {!environment && (
               <SkeletonLoader className="h-5 w-24 max-w-full" loading />
             )}
@@ -144,11 +144,11 @@ export const EnvironmentDetails = ({
               {!environment && <SkeletonLoader className="h-5 w-2/3" loading />}
               {environment && (
                 <div className="flex gap-x-1">
-                  <BranchIcon className={clsx("w-4 h-4", theme.text1)} />
+                  <BranchIcon className={clsx("w-4 h-4", theme.text3)} />
                   <Link
                     className={clsx(
                       "font-semibold truncate",
-                      theme.text1,
+                      theme.text2,
                       "hover:underline truncate relative z-10",
                     )}
                     onClick={(event) => {
@@ -165,19 +165,29 @@ export const EnvironmentDetails = ({
               )}
               {environment && (
                 <div className="flex gap-x-1">
-                  <GithubIcon
-                    className={clsx("w-4 h-4 shrink-0", theme.text1)}
+                  <CommitIcon
+                    className={clsx("w-4 h-4 shrink-0", theme.text3)}
                   />
                   <Link
                     className={clsx(
                       "hover:underline truncate relative z-10",
                       "font-semibold truncate",
-                      theme.text1,
+                      theme.text2,
                     )}
-                    to={`https://github.com/${environment.repo}`}
+                    to={`https://github.com/${environment.repo}/commit/${app?.lastCommitSha}`}
+                    onClick={(event) => {
+                      if (!environment) {
+                        event.preventDefault();
+                      }
+                    }}
                     target="_blank"
                   >
-                    {environment.repo}
+                    <div className="flex gap-x-2 truncate">
+                      <code>{environment?.lastCommitSha?.slice(0, 7)}</code>
+                      <div className="truncate">
+                        {environment?.lastCommitMessage}
+                      </div>
+                    </div>
                   </Link>
                 </div>
               )}
@@ -218,7 +228,7 @@ export const EnvironmentDetails = ({
                         <BoltIcon className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0" />
                       )}
                       <div
-                        className={clsx("font-semibold truncate", theme.text1)}
+                        className={clsx("font-semibold truncate", theme.text2)}
                       >
                         {firstEndpoint.path}
                       </div>
@@ -251,7 +261,7 @@ export const EnvironmentDetails = ({
                           <Link
                             className={clsx(
                               "hover:underline truncate relative z-10 flex gap-x-1",
-                              theme.text1,
+                              theme.text2,
                             )}
                             to={endpoint.publicUrl}
                             target="_blank"

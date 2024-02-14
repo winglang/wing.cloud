@@ -33,7 +33,7 @@ export const StatusWithDot = ({
         <div
           className={clsx(
             "rounded-xl px-2 py-0.5 capitalize truncate font-semibold",
-            theme.text1,
+            theme.text2,
           )}
         >
           {statusString}
