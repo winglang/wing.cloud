@@ -9,6 +9,7 @@ import { App as CustomApp } from "./app.js";
 import { ProductionPlatform } from "./platform-production.js";
 import { TestPlatform } from "./platform-test.js";
 import { EnableXray } from "./production/enable_xray.js";
+import { OverrideApiGatewayDeployment } from "./production/cyclic_hack.js";
 
 const WING_ENV = process.env["WING_ENV"] || "production";
 
@@ -80,6 +81,7 @@ export class Platform implements IPlatform {
     // see https://github.com/winglang/wing/issues/5151
     // once fixed, this can be moved to the ./pla
     Aspects.of(app).add(new EnableXray(app));
+    Aspects.of(app).add(new OverrideApiGatewayDeployment());
 
     // We used provisioned concurrency to test the response time,
     // which was consistent between 200ms and 450ms after enabling
