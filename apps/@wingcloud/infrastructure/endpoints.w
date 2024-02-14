@@ -1,13 +1,15 @@
 bring ex;
 bring "./nanoid62.w" as nanoid62;
 bring "./status-reports.w" as status_report;
+bring "./util.w" as util;
 
 pub struct Endpoint {
   id: str;
   appId: str;
   environmentId: str;
   path: str;
-  type: str;
+  label: str;
+  browserSupport: bool;
   localUrl: str;
   publicUrl: str;
   port: num;
@@ -25,7 +27,8 @@ pub struct CreateEndpointOptions {
   appId: str;
   environmentId: str;
   path: str;
-  type: str;
+  label: str;
+  browserSupport: bool;
   localUrl: str;
   publicUrl: str;
   port: num;
@@ -65,7 +68,8 @@ pub class Endpoints {
       appId: options.appId,
       environmentId: options.environmentId,
       path: options.path,
-      type: options.type,
+      label: options.label,
+      browserSupport: options.browserSupport,
       localUrl: options.localUrl,
       publicUrl: options.publicUrl,
       port: options.port,
@@ -82,7 +86,8 @@ pub class Endpoints {
         appId: endpoint.appId,
         environmentId: endpoint.environmentId,
         path: endpoint.path,
-        type: endpoint.type,
+        label: endpoint.label,
+        browserSupport: endpoint.browserSupport,
         localUrl: endpoint.localUrl,
         publicUrl: endpoint.publicUrl,
         port: endpoint.port,
@@ -121,7 +126,7 @@ pub class Endpoints {
     throw "Endpoint [{options.id}] not found";
   }
 
-  pub inflight delete(options: DeleteEndpointOptions): Endpoint {
+  pub inflight delete(options: DeleteEndpointOptions) {
     let result = this.table.deleteItem(
       key: {
         pk: "ENVIRONMENT#{options.environmentId}",
@@ -131,17 +136,27 @@ pub class Endpoints {
   }
 
   pub inflight list(options: ListEndpointsOptions): Array<Endpoint> {
-    let result = this.table.query(
-      keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-      expressionAttributeValues: {
-        ":pk": "ENVIRONMENT#{options.environmentId}",
-        ":sk": "ENDPOINT#",
+    let var exclusiveStartKey: Json? = nil;
+    let var endpoints: Array<Endpoint> = [];
+    util.Util.do_while(
+      handler: () => {
+        let result = this.table.query(
+          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          expressionAttributeValues: {
+            ":pk": "ENVIRONMENT#{options.environmentId}",
+            ":sk": "ENDPOINT#",
+          },
+          exclusiveStartKey: exclusiveStartKey,
+        );
+        for item in result.items {
+          endpoints = endpoints.concat([this.fromDB(item)]);
+        }
+        exclusiveStartKey = result.lastEvaluatedKey;
+      },
+      condition: () => {
+        return exclusiveStartKey?;
       },
     );
-    let var endpoints: Array<Endpoint> = [];
-    for item in result.items {
-      endpoints = endpoints.concat([this.fromDB(item)]);
-    }
     return endpoints;
   }
 
@@ -151,7 +166,8 @@ pub class Endpoints {
       appId: item.get("appId").asStr(),
       environmentId: item.get("environmentId").asStr(),
       path: item.get("path").asStr(),
-      type: item.get("type").asStr(),
+      label: item.get("label").asStr(),
+      browserSupport: item.get("browserSupport").asBool(),
       localUrl: item.get("localUrl").asStr(),
       publicUrl: item.get("publicUrl").asStr(),
       port: item.get("port").asNum(),

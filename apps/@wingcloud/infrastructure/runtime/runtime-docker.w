@@ -12,6 +12,6 @@ pub class RuntimeDockerImage {
     this.image = new flyioImage.DockerImage(name: "runtime-environment", org: props.flyOrgSlug, build: {
       context: RuntimeDockerImage.getRuntimeProjectPath(this),
       platform: "linux/amd64"
-    });
+    }) as "runtime-environment";
   }
 }

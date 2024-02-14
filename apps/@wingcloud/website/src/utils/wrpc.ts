@@ -10,6 +10,7 @@ export interface User {
   id: string;
   username: string;
   avatarUrl: string;
+  email: string;
 }
 
 export interface Installation {
@@ -25,8 +26,22 @@ export interface Repository {
   private: boolean;
   owner: { login: string; avatar_url: string };
   default_branch: string;
-  html_url: string;
 }
+
+interface Commit {
+  sha: string;
+  message: string;
+  date: string;
+}
+
+export type EnvironmentStatus =
+  | "initializing"
+  | "running-server"
+  | "running-tests"
+  | "deploying"
+  | "running"
+  | "error"
+  | "stopped";
 
 export interface App {
   appId: string;
@@ -37,6 +52,12 @@ export interface App {
   repoOwner: string;
   userId: string;
   entrypoint: string;
+  createdAt: string;
+  defaultBranch?: string;
+  lastCommitMessage?: string;
+  lastCommitDate?: string;
+  lastCommitSha?: string;
+  status?: EnvironmentStatus;
 }
 
 export interface TestResult {
@@ -47,19 +68,6 @@ export interface TestResult {
 interface TestResults {
   testResults: TestResult[];
 }
-
-interface StatusReport {
-  environmentId: string;
-  status: string;
-}
-
-export type EnvironmentStatus =
-  | "initializing"
-  | "tests"
-  | "deploying"
-  | "running"
-  | "error"
-  | "stopped";
 
 export interface Environment {
   id: string;
@@ -116,7 +124,8 @@ export interface Endpoint {
   runId: string;
   environmentId: string;
   path: string;
-  type: string;
+  label: string;
+  browserSupport: boolean;
   localUrl: string;
   publicUrl: string;
   port: number;
@@ -126,6 +135,13 @@ export interface Endpoint {
 }
 
 export const wrpc = createWRPCReact<{
+  "ws.invalidateQuery.auth": QueryProcedure<
+    undefined,
+    {
+      token: string;
+      subscriptionId: string;
+    }
+  >;
   "auth.check": QueryProcedure<
     undefined,
     {
@@ -213,6 +229,10 @@ export const wrpc = createWRPCReact<{
     { appId: string; entrypoint: string },
     {}
   >;
+  "app.updateDescription": MutationProcedure<
+    { appId: string; description: string },
+    {}
+  >;
   "app.delete": MutationProcedure<{ owner: string; appName: string }, {}>;
   "app.list": QueryProcedure<
     {
@@ -230,11 +250,9 @@ export const wrpc = createWRPCReact<{
       repoName: string;
       repoOwner: string;
       defaultBranch: string;
-      installationId: string;
     },
     {
-      appId: string;
-      appFullName: string;
+      app: App;
     }
   >;
 }>();

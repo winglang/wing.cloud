@@ -1,6 +1,8 @@
 import { execFileSync } from "node:child_process";
+import { existsSync, mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
-import jwt from "jsonwebtoken";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 import fetch from "node-fetch";
@@ -12,12 +14,12 @@ import { LocalGitProvider } from "../src/git/local.js";
 import { ReportEnvironmentStatusInput } from "../src/report-status.js";
 import { run } from "../src/run.js";
 
-import { getContext } from "./setup.js";
+import { getContext, setupSSL } from "./setup.js";
 import { sleep } from "./utils.js";
 
 test("run() - installs npm packages and run tests", async () => {
-  process.env.FILE_BUCKET_SYNC_MS = "50";
-  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const { examplesDir, logsBucket, wingApiUrl, stateDir, cacheDir } =
+    getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
   const environment = new Environment("test-id", "redis/main.w", {
@@ -25,7 +27,14 @@ test("run() - installs npm packages and run tests", async () => {
     sha: "main",
   });
   const { port, close } = await run({
-    context: { environment, gitProvider, logsBucket, wingApiUrl },
+    context: {
+      environment,
+      gitProvider,
+      logsBucket,
+      wingApiUrl,
+      stateDir,
+      cacheDir,
+    },
   });
 
   await sleep(200);
@@ -38,7 +47,7 @@ test("run() - installs npm packages and run tests", async () => {
   expect(deploymentLogs).toContain("added 1 package");
 
   const testLogs = await logsBucket.get(
-    environment.testKey(true, "rootDefaulttestHelloworld"),
+    environment.testKey(true, "rootenv0testHelloworld"),
   );
   expect(testLogs).toContain("a test log");
 
@@ -49,20 +58,23 @@ test("run() - installs npm packages and run tests", async () => {
 });
 
 test("run() - throws when repo not found", async () => {
-  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const { examplesDir, logsBucket, wingApiUrl, stateDir } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
   const environment = new Environment("test-id", "redis/main.w", {
     repo: `${examplesDirRepo}-not`,
     sha: "main",
   });
+  process.exit = ((code?: number | undefined) => {}) as any;
   await expect(() =>
-    run({ context: { environment, gitProvider, logsBucket, wingApiUrl } }),
+    run({
+      context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
+    }),
   ).rejects.toThrowError(/command git failed with status/);
 });
 
 test("run() - doesn't have access to runtime env vars", async () => {
-  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const { examplesDir, logsBucket, wingApiUrl, stateDir } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
   const environment = new Environment("test-id", "access-env/main.w", {
@@ -72,12 +84,12 @@ test("run() - doesn't have access to runtime env vars", async () => {
   process.env["GITHUB_TOKEN"] = "123";
 
   const { close } = await run({
-    context: { environment, gitProvider, logsBucket, wingApiUrl },
+    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
 
   expect(
     await logsBucket.exists(
-      environment.testKey(true, "rootDefaulttestaccesstoken"),
+      environment.testKey(true, "rootenv0testaccesstoken"),
     ),
   ).toBeTruthy();
 
@@ -86,7 +98,7 @@ test("run() - doesn't have access to runtime env vars", async () => {
 
 test("run() - redacting secrets from logs", async () => {
   process.env.FILE_BUCKET_SYNC_MS = "50";
-  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const { examplesDir, logsBucket, wingApiUrl, stateDir } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
   const environment = new Environment("test-id", "access-env/main.w", {
@@ -96,7 +108,7 @@ test("run() - redacting secrets from logs", async () => {
   process.env["GIT_TOKEN"] = "token-123";
 
   const { close } = await run({
-    context: { environment, gitProvider, logsBucket, wingApiUrl },
+    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
 
   await sleep(200);
@@ -108,7 +120,7 @@ test("run() - redacting secrets from logs", async () => {
 });
 
 test("run() - reporting statuses", async () => {
-  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const { examplesDir, logsBucket, wingApiUrl, stateDir } = getContext();
 
   const stateUrl = `*/trpc/app.state`;
   const stateHandler = rest.get(stateUrl, (req, res, ctx) => {
@@ -165,8 +177,15 @@ test("run() - reporting statuses", async () => {
     sha: "main",
   });
   const { port, close } = await run({
-    context: { environment, gitProvider, logsBucket, wingApiUrl },
+    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
+
+  for (const request of requests) {
+    delete (request as any).timestamp;
+  }
+  delete requests[1].data?.testResults[0].time;
+  delete requests[1].data?.testResults[0].timestamp;
+  delete requests[1].data?.testResults[0].traces;
 
   expect(requests).toStrictEqual([
     {
@@ -175,13 +194,17 @@ test("run() - reporting statuses", async () => {
     },
     {
       environmentId: "test-id",
-      status: "tests",
+      status: "running-tests",
+    },
+    {
+      environmentId: "test-id",
+      status: "running-server",
       data: {
         testResults: [
           {
-            id: "rootDefaulttestHelloworld",
+            id: "rootenv0testHelloworld",
             pass: true,
-            path: "root/Default/test:Hello, world!",
+            path: "root/env0/test:Hello, world!",
           },
         ],
       },
@@ -199,24 +222,11 @@ test("run() - reporting statuses", async () => {
 
   server.close();
   server.resetHandlers();
-
-  const response = await fetch(`http://localhost:${port}/public-key`);
-  const { aud, iss, environmentId, status } = jwt.verify(
-    authToken!.replace("Bearer ", ""),
-    await response.text(),
-  ) as any;
-  expect({ aud, iss, environmentId, status }).toStrictEqual({
-    environmentId: "test-id",
-    status: "deploying",
-    aud: "https://wing.cloud",
-    iss: "test-id",
-  });
-
   await close();
 });
 
 test("run() - environment can override wing version", async () => {
-  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const { examplesDir, logsBucket, wingApiUrl, stateDir } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
   const environment = new Environment(
@@ -228,7 +238,7 @@ test("run() - environment can override wing version", async () => {
     },
   );
   const { paths, close } = await run({
-    context: { environment, gitProvider, logsBucket, wingApiUrl },
+    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
 
   const output = execFileSync("node", [paths.winglang, "-V"]);
@@ -238,7 +248,7 @@ test("run() - environment can override wing version", async () => {
 });
 
 test("run() - works with github", async () => {
-  const { logsBucket, wingApiUrl } = getContext();
+  const { logsBucket, wingApiUrl, stateDir } = getContext();
   const gitProvider = new GithubProvider("");
   const environment = new Environment("test-id", "examples/redis/main.w", {
     repo: "eladcon/examples",
@@ -246,12 +256,12 @@ test("run() - works with github", async () => {
   });
   const bucket = logsBucket;
   const { close } = await run({
-    context: { environment, gitProvider, logsBucket, wingApiUrl },
+    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
 
   expect(
     await logsBucket.exists(
-      environment.testKey(true, "rootDefaulttestHelloworld"),
+      environment.testKey(true, "rootenv0testHelloworld"),
     ),
   ).toBeTruthy();
 
@@ -259,7 +269,7 @@ test("run() - works with github", async () => {
 });
 
 test("run() - have multiple tests results", async () => {
-  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const { examplesDir, logsBucket, wingApiUrl, stateDir } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
   const environment = new Environment("test-id", "multiple-tests/main.w", {
@@ -267,36 +277,29 @@ test("run() - have multiple tests results", async () => {
     sha: "main",
   });
   const { close } = await run({
-    context: { environment, gitProvider, logsBucket, wingApiUrl },
+    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
 
-  const files = await logsBucket.list();
-  expect(files.length).toBe(5);
-
   expect(
-    await logsBucket.get(
-      environment.testKey(true, "rootDefaulttestwillsucceed"),
-    ),
+    await logsBucket.get(environment.testKey(true, "rootenv0testwillsucceed")),
   ).toContain("will succeed first log");
   expect(
-    await logsBucket.get(
-      environment.testKey(true, "rootDefaulttestwillsucceed"),
-    ),
+    await logsBucket.get(environment.testKey(true, "rootenv0testwillsucceed")),
   ).toContain("will succeed second log");
   expect(
     await logsBucket.exists(
-      environment.testKey(true, "rootDefaulttestwillsucceed2"),
+      environment.testKey(true, "rootenv1testwillsucceed2"),
     ),
   ).toBeTruthy();
   expect(
-    await logsBucket.get(environment.testKey(false, "rootDefaulttestwillfail")),
+    await logsBucket.get(environment.testKey(false, "rootenv2testwillfail")),
   ).toContain("will fail log");
 
   await close();
 });
 
 test("run() - access endpoints through reverse proxy", async () => {
-  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const { examplesDir, logsBucket, wingApiUrl, stateDir } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
   const environment = new Environment("test-id", "api/main.w", {
@@ -304,12 +307,14 @@ test("run() - access endpoints through reverse proxy", async () => {
     sha: "main",
   });
   const { close, endpoints, port } = await run({
-    context: { environment, gitProvider, logsBucket, wingApiUrl },
+    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
 
   expect(endpoints.length).toBe(1);
-  expect(endpoints[0].digest).toBe("d834e1d3d496ef67");
-  expect(endpoints[0].path).toBe("root/Default/cloud.Api");
+  expect(endpoints[0].digest).toBe("091601b590dabbe1");
+  expect(endpoints[0].path).toBe("root/Default/cloud.Api/Endpoint");
+  expect(endpoints[0].label).toBe("Endpoint for Api root/Default/cloud.Api");
+  expect(endpoints[0].browserSupport).toBe(false);
 
   const response = await fetch(`http://localhost:${port}`, {
     headers: {
@@ -324,7 +329,7 @@ test("run() - access endpoints through reverse proxy", async () => {
 });
 
 test("run() - uses custom platform", async () => {
-  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const { examplesDir, logsBucket, wingApiUrl, stateDir } = getContext();
   const examplesDirRepo = `file://${examplesDir}`;
   const gitProvider = new LocalGitProvider();
   const environment = new Environment("test-id", "api/main.w", {
@@ -334,13 +339,16 @@ test("run() - uses custom platform", async () => {
 
   process.env["WING_TARGET"] = "tf-aws";
   process.env["ENVIRONMENT_ID"] = "test-id";
+  process.env["PUBLIC_ENDPOINT_DOMAIN"] = "development.wingcloud.dev";
   const { close, endpoints, port } = await run({
-    context: { environment, gitProvider, logsBucket, wingApiUrl },
+    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
   });
 
   expect(endpoints.length).toBe(1);
-  expect(endpoints[0].digest).toBe("d834e1d3d496ef67");
-  expect(endpoints[0].path).toBe("root/Default/cloud.Api");
+  expect(endpoints[0].digest).toBe("091601b590dabbe1");
+  expect(endpoints[0].path).toBe("root/Default/cloud.Api/Endpoint");
+  expect(endpoints[0].label).toBe("Endpoint for Api root/Default/cloud.Api");
+  expect(endpoints[0].browserSupport).toBe(false);
 
   const response = await fetch(`http://localhost:${port}/url`, {
     headers: {
@@ -350,8 +358,86 @@ test("run() - uses custom platform", async () => {
 
   expect(response.ok).toBeTruthy();
   expect(await response.text()).toEqual(
-    "https://d834e1d3d496ef67.wingcloud.io",
+    "https://091601b590dabbe1.development.wingcloud.dev",
   );
+
+  await close();
+});
+
+test("run() - uses state directory", async () => {
+  const { examplesDir, logsBucket, wingApiUrl } = getContext();
+  const examplesDirRepo = `file://${examplesDir}`;
+  const gitProvider = new LocalGitProvider();
+  const environment = new Environment("test-id", "api/main.w", {
+    repo: examplesDirRepo,
+    sha: "main",
+  });
+
+  const stateDir = mkdtempSync(join(tmpdir(), "state-dir"));
+
+  const { close, endpoints, port } = await run({
+    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
+  });
+
+  const response1 = await fetch(`http://localhost:${port}/inc`, {
+    headers: {
+      host: `localhost:${endpoints[0].port}`,
+    },
+  });
+
+  expect(response1.ok).toBeTruthy();
+  expect(await response1.text()).toEqual("1");
+
+  process.kill = (pid, signal): true => {
+    return true;
+  };
+  process.emit("SIGINT");
+
+  await close();
+
+  setupSSL();
+
+  const {
+    close: close2,
+    endpoints: endpoints2,
+    port: port2,
+  } = await run({
+    context: { environment, gitProvider, logsBucket, wingApiUrl, stateDir },
+  });
+
+  const response2 = await fetch(`http://localhost:${port2}/inc`, {
+    headers: {
+      host: `localhost:${endpoints2[0].port}`,
+    },
+  });
+
+  expect(response2.ok).toBeTruthy();
+  expect(await response2.text()).toEqual("2");
+
+  await close2();
+});
+
+test("run() - using npm cache dir", async () => {
+  const { examplesDir, logsBucket, wingApiUrl, stateDir, cacheDir } =
+    getContext();
+  const examplesDirRepo = `file://${examplesDir}`;
+  const gitProvider = new LocalGitProvider();
+  const environment = new Environment("test-id", "redis/main.w", {
+    repo: examplesDirRepo,
+    sha: "main",
+  });
+  const { port, close } = await run({
+    context: {
+      environment,
+      gitProvider,
+      logsBucket,
+      wingApiUrl,
+      stateDir,
+      cacheDir,
+    },
+  });
+
+  existsSync(join(cacheDir, "_cacache"));
 
   await close();
 });

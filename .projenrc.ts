@@ -72,6 +72,12 @@ const nanoid = new WingLibProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const dateutils = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/dateutils",
+});
+
+///////////////////////////////////////////////////////////////////////////////
 const simutils = new WingLibProject({
   monorepo,
   name: "@wingcloud/simutils",
@@ -97,10 +103,18 @@ const vite = new NodeEsmProject({
   monorepo,
   name: "@wingcloud/vite",
 });
-vite.addFields({ types: "./src/index.d.ts" });
+vite.addFields({
+  types: "./src/index.d.ts",
+  exports: {
+    ".": "./src/index.js",
+    "./src/util.cjs": "./src/util.cjs",
+  },
+});
 
 vite.addDevDeps("vite");
 vite.addDeps("dotenv");
+
+vite.addDeps("constructs", "cdktf", "@cdktf/provider-aws");
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
@@ -114,17 +128,17 @@ new TypescriptConfig(website, {
 });
 new Eslint(website);
 
-new Turbo(website, {
-  pipeline: {
-    compile: {
-      dotEnv: [".env"],
-      outputs: ["dist/**"],
-    },
-  },
-});
+// new Turbo(website, {
+//   pipeline: {
+//     compile: {
+//       dotEnv: [".env"],
+//       outputs: ["dist/**"],
+//     },
+//   },
+// });
 
 website.addDeps("vite");
-website.addScript("compile", "vite build");
+// website.addScript("compile", "vite build");
 website.addGitIgnore("/dist/");
 website.addGitIgnore("/public/wing.js");
 
@@ -192,7 +206,6 @@ runtime.addDeps("@wingconsole/app");
 runtime.addDeps("express");
 runtime.addDeps("http-proxy");
 runtime.addDeps("jsonwebtoken");
-runtime.addDeps("jwk-to-pem");
 runtime.addDeps("jose");
 runtime.addDeps("node-fetch");
 runtime.addDeps("which");
@@ -200,11 +213,11 @@ runtime.addDeps("redact-env");
 runtime.addDeps("codespan-wasm");
 runtime.addDeps("chalk");
 runtime.addDeps("stacktracey");
+runtime.addDeps("chokidar");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/http-proxy");
 runtime.addDevDeps("@types/jsonwebtoken");
-runtime.addDevDeps("@types/jwk-to-pem");
 runtime.addDevDeps("simple-git");
 runtime.addDevDeps("msw@1");
 runtime.addDevDeps("@types/which");
@@ -230,10 +243,11 @@ const platform = new TypescriptProject({
 platform.addFields({ type: "commonjs" });
 platform.addFields({ types: "./lib/index.d.ts" });
 platform.addFields({ main: "./lib/index.js" });
-platform.addDevDeps(`@winglang/compiler`);
-platform.addDevDeps(`@winglang/sdk`);
-platform.addDevDeps(`cdktf`);
-platform.addDevDeps(`constructs`);
+platform.addDevDeps("@winglang/compiler");
+platform.addDevDeps("@winglang/sdk");
+platform.addDevDeps("cdktf");
+platform.addDevDeps("constructs");
+platform.addDevDeps("@cdktf/provider-aws");
 
 platform.addGitIgnore("**/target/");
 platform.addGitIgnore("tmp/");
@@ -253,6 +267,9 @@ infrastructure.addGitIgnore("!/.env.example");
 
 infrastructure.addGitIgnore("**/target/");
 infrastructure.addDeps("winglang");
+
+infrastructure.addDeps(vite.name);
+
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
@@ -335,6 +352,7 @@ infrastructure.addDeps(
   probot.name,
   containers.name,
   nanoid.name,
+  dateutils.name,
   simutils.name,
   ngrok.name,
   platform.name,
@@ -354,16 +372,40 @@ infrastructure.addDeps(
 infrastructure.addDeps("cookie-es");
 infrastructure.addDeps("jose@4");
 infrastructure.addDeps("octokit", "node-fetch");
-infrastructure.addDeps("@aws-sdk/client-kms");
 infrastructure.addDeps("dnsimple");
 infrastructure.addDeps("@segment/analytics-node");
-
-infrastructure.addDeps("@aws-sdk/client-ssm");
+infrastructure.addDeps("@aws-sdk/client-kms@3.449.0");
+infrastructure.addDeps("@aws-sdk/client-sqs@3.449.0");
+infrastructure.addDeps("@aws-sdk/client-ssm@3.449.0");
 
 infrastructure.addDevDeps("@octokit/rest");
 
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(runtime.name);
+
+infrastructure.addDeps("@winglibs/websockets");
+
+// TODO: We need to install all of these deps because of we are using pnpm
+// and wing is not resolving deps correctly.
+// https://github.com/winglang/wing/issues/5252#issuecomment-1893857213
+infrastructure.addDeps("@aws-cdk/asset-awscli-v1");
+infrastructure.addDeps("@aws-cdk/asset-kubectl-v20");
+infrastructure.addDeps("@aws-cdk/asset-node-proxy-agent-v6");
+infrastructure.addDeps("@balena/dockerignore");
+infrastructure.addDeps("case");
+infrastructure.addDeps("fs-extra");
+infrastructure.addDeps("ignore");
+infrastructure.addDeps("jsonschema");
+infrastructure.addDeps("minimatch");
+infrastructure.addDeps("punycode");
+infrastructure.addDeps("semver");
+infrastructure.addDeps("table");
+infrastructure.addDeps("yaml");
+
+infrastructure.addDeps("@cdktf/provider-aws");
+infrastructure.addDeps("cdktf");
+infrastructure.addDeps("constructs");
+infrastructure.addDeps("aws-cdk-lib");
 
 ///////////////////////////////////////////////////////////////////////////////
 

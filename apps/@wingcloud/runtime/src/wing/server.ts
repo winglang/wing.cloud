@@ -29,6 +29,7 @@ interface ConsoleError {
 
 export interface PrepareServerProps {
   environmentId: string;
+  stateDir: string;
   requestedSSLPort?: number;
 }
 
@@ -43,6 +44,7 @@ export interface StartServerProps {
 
 export async function prepareServer({
   environmentId,
+  stateDir,
   requestedSSLPort,
 }: PrepareServerProps) {
   let consolePort: number | undefined;
@@ -163,6 +165,7 @@ export async function prepareServer({
         expressApp: app,
         requestedPort,
         platform: platforms,
+        stateDir,
         log: {
           info: log,
           error: log,
@@ -176,11 +179,8 @@ export async function prepareServer({
           },
           set(key: any, value: any) {},
         },
+        requireSignIn: false,
         onExpressCreated: (app: Application) => {
-          app.get("/public-key", async (req, res) => {
-            const data = keyStore.publicKey();
-            res.send(data);
-          });
           app.get("/health", async (req, res) => {
             res.sendStatus(200);
           });

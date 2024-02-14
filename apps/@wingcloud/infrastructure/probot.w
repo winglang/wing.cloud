@@ -19,7 +19,6 @@ struct PostCommentProps {
 
 struct ProbotAppProps {
   probotAdapter: adapter.ProbotAdapter;
-  runtimeUrl: str;
   environments: environments.Environments;
   environmentManager: environment_manager.EnvironmentManager;
   users: users.Users;
@@ -29,7 +28,6 @@ struct ProbotAppProps {
 
 pub class ProbotApp {
   adapter: adapter.ProbotAdapter;
-  runtimeUrl: str;
   pub githubApp: github.GithubApp;
   environments: environments.Environments;
   environmentManager: environment_manager.EnvironmentManager;
@@ -37,12 +35,11 @@ pub class ProbotApp {
 
   new(props: ProbotAppProps) {
     this.adapter = props.probotAdapter;
-    this.runtimeUrl = props.runtimeUrl;
     this.environments = props.environments;
     this.environmentManager = props.environmentManager;
     this.apps = props.apps;
 
-    let queue = new cloud.Queue(timeout: 6m);
+    let queue = new cloud.Queue(timeout: 6m) as "Probot app";
     this.githubApp = new github.GithubApp(
       this.adapter.appId,
       this.adapter.secretKey,
@@ -59,6 +56,7 @@ pub class ProbotApp {
     queue.setConsumer(inflight (message) => {
       log("receive message: {message}");
       let props = probot.VerifyAndReceieveProps.fromJson(Json.parse(message));
+      log("props: {Json.stringify(props, indent: 2)}");
       this.listen(props);
     });
   }
@@ -92,15 +90,22 @@ pub class ProbotApp {
   }
 
   inflight listen(props: probot.VerifyAndReceieveProps) {
+    log("listen");
+
     let onPullRequestOpen = inflight (context: probot.IPullRequestOpenedContext): void => {
+      log("onPullRequestOpen");
+      log(Json.stringify(context.payload, indent: 2));
       let branch = context.payload.pull_request.head.ref;
 
       let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
+      log("apps: {Json.stringify(apps, indent: 2)}");
       for app in apps {
         if let installation = context.payload.installation {
+          let time = datetime.fromIso(context.payload.pull_request.updated_at ?? datetime.utcNow().toIso());
           this.environmentManager.create(
             createEnvironment: {
               branch: branch,
+              sha: context.payload.pull_request.head.sha,
               appId: app.appId,
               type: "preview",
               repo: context.payload.repository.full_name,
@@ -113,6 +118,7 @@ pub class ProbotApp {
             appId: app.appId,
             entrypoint: app.entrypoint,
             sha: context.payload.pull_request.head.sha,
+            timestamp: time.timestampMs,
           );
         } else {
           throw "handlePullRequstOpened: missing installation id";
@@ -121,11 +127,13 @@ pub class ProbotApp {
     };
 
     this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestOpenedContext): void => {
+      log("handlePullRequstOpened");
       // TODO [sa] open a bug for this workaround
       onPullRequestOpen(context);
     });
 
     this.adapter.handlePullRequstReopened(inflight (context: probot.IPullRequestOpenedContext): void => {
+      log("handlePullRequstReopened");
       // TODO [sa] open a bug for this workaround
       onPullRequestOpen(context);
     });
@@ -140,10 +148,13 @@ pub class ProbotApp {
             continue;
           }
 
+          let time = datetime.fromIso(context.payload.pull_request.closed_at ?? datetime.utcNow().toIso());
           this.environmentManager.stop(
             appId: app.appId,
             appName: app.appName,
             environment: environment,
+            timestamp: time.timestampMs,
+            delete: false,
           );
         }
       }
@@ -164,6 +175,7 @@ pub class ProbotApp {
             appId: app.appId,
             entrypoint: app.entrypoint,
             sha: context.payload.pull_request.head.sha,
+            timestamp: datetime.utcNow().timestampMs,
           );
         }
       }
@@ -179,11 +191,22 @@ pub class ProbotApp {
             continue;
           }
 
+          this.apps.updatLastCommit(
+            appId: app.appId,
+            appName: app.appName,
+            repoId: app.repoId,
+            userId: app.userId,
+            lastCommitMessage: context.payload.head_commit.message,
+            lastCommitSha: context.payload.after,
+            lastCommitDate: context.payload.head_commit.timestamp,
+          );
+
           this.environmentManager.restart(
             environment: environment,
             appId: app.appId,
             entrypoint: app.entrypoint,
             sha: context.payload.after,
+            timestamp: datetime.utcNow().timestampMs,
           );
         }
       }

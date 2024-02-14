@@ -1,4 +1,6 @@
 // import fetch from "node-fetch";
+import { url } from "node:inspector";
+
 import { Octokit } from "octokit";
 
 const getNextPage = (page: number, total: number, perPage: number) => {
@@ -20,7 +22,17 @@ export const getUser = async (accessToken: string) => {
     auth: accessToken,
   });
   const { data: user } = await octokit.request("GET /user");
-  return user;
+  let email = user.email;
+  if (!email) {
+    const { data: emails } = await octokit.request("GET /user/emails");
+    email = emails.find((email) => email.primary)?.email ?? "";
+  }
+  return {
+    name: user.name,
+    login: user.login,
+    avatar_url: user.avatar_url ?? "",
+    email,
+  };
 };
 
 export const listUserInstallations = async (
@@ -40,8 +52,15 @@ export const listUserInstallations = async (
       per_page: perPage,
     });
 
+  const data = installations.installations.map((installation) => ({
+    id: installation.id,
+    account: {
+      login: (installation.account as any)?.login ?? "",
+    },
+  }));
+
   return {
-    data: installations.installations,
+    data,
     nextPage: getNextPage(page, installations.total_count, perPage),
     prevPage: getPreviousPage(page),
     total: installations.total_count,
@@ -68,8 +87,20 @@ export const listInstallationRepos = async (
       per_page: perPage,
     });
 
+  const data = orgRepos.repositories.map((repository) => ({
+    id: repository.id,
+    name: repository.name,
+    full_name: repository.full_name,
+    owner: {
+      login: repository.owner.login,
+      avatar_url: repository.owner.avatar_url,
+    },
+    default_branch: repository.default_branch,
+    description: repository.description,
+  }));
+
   return {
-    data: orgRepos.repositories,
+    data: data,
     nextPage: getNextPage(page, orgRepos.total_count, perPage),
     prevPage: getPreviousPage(page),
     total: orgRepos.total_count,

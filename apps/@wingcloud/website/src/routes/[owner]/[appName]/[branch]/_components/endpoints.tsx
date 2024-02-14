@@ -5,131 +5,71 @@ import { useParams } from "react-router-dom";
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { AnalyticsContext } from "../../../../../utils/analytics-provider.js";
-import type { Endpoint } from "../../../../../utils/wrpc.js";
+import type { Endpoint, Environment } from "../../../../../utils/wrpc.js";
+import { EndpointItem } from "./endpoint-item.js";
 
 export interface EndpointsProps {
-  id: string;
-  isOpen: boolean;
   endpoints: Endpoint[];
   loading?: boolean;
-  environmentType?: string;
+  environment?: Environment;
 }
 
 export const Endpoints = ({
-  id,
-  isOpen,
   endpoints,
   loading,
-  environmentType,
+  environment,
 }: EndpointsProps) => {
   const { theme } = useTheme();
   const { track } = useContext(AnalyticsContext);
   const { appName, branch } = useParams();
+
   const onEndpointClick = useCallback(
     (endpoint: Endpoint) => {
       track("cloud_endpoint_visited", {
         repo: appName,
         branch,
-        type: environmentType,
+        type: environment?.type,
         endpoint_path: endpoint.path,
         endpoint_url: endpoint.publicUrl,
-        endpoint_type: endpoint.type,
+        endpoint_label: endpoint.label,
       });
     },
-    [track, branch, appName, environmentType],
+    [track, branch, appName, environment],
   );
+
   return (
-    <div
-      className={clsx(
-        "w-full rounded border",
-        theme.bgInput,
-        theme.borderInput,
-      )}
-    >
-      <button
-        id={id}
-        className={clsx(
-          "flex items-center justify-between w-full text-left p-4 outline-none",
-          isOpen && "border-b rounded-t shadow-sm",
-          !isOpen && "rounded",
-          theme.borderInput,
-          theme.textInput,
-          loading && "cursor-not-allowed opacity-50",
-        )}
-      >
-        <div className="flex items-center flex-grow gap-2">
-          <div className="font-medium text-sm pl-6">Endpoints</div>
+    <div>
+      {(loading || !environment) && (
+        <div className="flex items-center justify-center p-4">
+          <SpinnerLoader />
         </div>
-      </button>
-
-      {isOpen && (
-        <>
-          {loading && (
-            <div className="flex items-center justify-center p-4">
-              <SpinnerLoader size="sm" />
-            </div>
-          )}
-          {!loading && (
-            <div className="text-2xs font-mono">
-              {endpoints.length === 0 && (
-                <div className={clsx(theme.text2, "w-full py-4 text-center")}>
-                  No Endpoints.
-                </div>
+      )}
+      {!loading && environment && (
+        <div className="space-y-2">
+          {(endpoints.length === 0 || environment.status !== "running") && (
+            <div
+              className={clsx(
+                "space-y-2",
+                "p-4 w-full border text-center rounded-md",
+                theme.bgInput,
+                theme.borderInput,
+                theme.text1,
               )}
-              {endpoints.map((endpoint, index) => (
-                <div
-                  key={index}
-                  className="flex flex-grow flex-row px-4 py-2 gap-4 sm:gap-6 transition-all w-full pl-10"
-                >
-                  <div className="flex flex-col gap-1 truncate w-1/3">
-                    <div className={clsx("text-xs", theme.text2)}>Type</div>
-                    <div
-                      className={clsx(
-                        "truncate text-xs font-medium",
-                        theme.text1,
-                      )}
-                    >
-                      {endpoint.type.replace("@winglang/sdk.", "")}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1 w-1/3">
-                    <div className={clsx("text-xs", theme.text2)}>Path</div>
-                    <div
-                      className={clsx(
-                        "truncate text-xs font-medium",
-                        theme.text1,
-                      )}
-                    >
-                      {endpoint.path}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1 w-1/3">
-                    <div className={clsx("text-xs", theme.text2)}>URL</div>
-                    <div
-                      className={clsx(
-                        "truncate text-xs font-medium",
-                        theme.text1,
-                        "h-5 flex",
-                      )}
-                    >
-                      <a
-                        className="hover:underline truncate h-full"
-                        href={endpoint.publicUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => onEndpointClick(endpoint)}
-                      >
-                        {endpoint.publicUrl}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            >
+              <h3 className={clsx("text-sm font-medium", theme.text2)}>
+                No Endpoints found.
+              </h3>
             </div>
           )}
-        </>
+          {environment.status === "running" &&
+            endpoints.map((endpoint, index) => (
+              <EndpointItem
+                key={index}
+                endpoint={endpoint}
+                onClick={onEndpointClick}
+              />
+            ))}
+        </div>
       )}
     </div>
   );

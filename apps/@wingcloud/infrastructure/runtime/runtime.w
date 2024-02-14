@@ -3,6 +3,7 @@ bring http;
 bring ex;
 bring util;
 bring fs;
+bring sim;
 bring "constructs" as constructs;
 bring "../containers.w" as containers;
 bring "../flyio" as flyio;
@@ -12,10 +13,27 @@ bring "@cdktf/provider-aws" as awsprovider;
 bring "../components/parameter/iparameter.w" as parameter;
 bring "../components/certificate/icertificate.w" as certificate;
 bring "../nanoid62.w" as nanoid62;
+bring "../components/queues/fifoqueue" as fifoqueue;
 
 class Consts {
   pub static inflight secretsPath(): str {
     return "/root/.wing/secrets.json";
+  }
+
+  pub static inflight statePath(): str {
+    return "/root/.wing/.state";
+  }
+
+  pub static inflight cachePath(): str {
+    return "/root/.wing/.state/cache";
+  }
+
+  pub static inflight volumeName(): str {
+    return "state";
+  }
+
+  pub static inflight region(): str {
+    return "lhr";
   }
 }
 
@@ -32,6 +50,8 @@ struct RuntimeStartOptions {
   environmentId: str;
   secrets: Map<str>;
   certificate: certificate.Certificate;
+  privateKey: str;
+  publicEndpointFullDomainName: str;
 }
 
 struct RuntimeStopOptions {
@@ -40,17 +60,22 @@ struct RuntimeStopOptions {
 
 interface IRuntimeHandler {
   inflight start(opts: RuntimeStartOptions): str;
-  inflight stop(opts: RuntimeStopOptions);
+  inflight stop(opts: RuntimeStopOptions): void;
 }
 
 class RuntimeHandler_sim impl IRuntimeHandler {
   container: containers.Container_sim;
+  stateDir: str;
   new() {
     this.container = new containers.Container_sim(name: "previews-runtime", image: "../runtime", args: {
       "SETUP_DOCKER": "false",
     },  port: 3000, privileged: true);
 
+    let stateVolume = new sim.State();
+    this.stateDir = stateVolume.token("volume");
+
     new cloud.Service(inflight () => {
+      stateVolume.set("volume", fs.mkdtemp("state-dir"));
       return () => {
         this.container.stopAll();
       };
@@ -71,6 +96,13 @@ class RuntimeHandler_sim impl IRuntimeHandler {
     fs.writeFile(secretsFile, Json.stringify(opts.secrets), encoding: "utf8");
     volumes.set(secretsFile, Consts.secretsPath());
 
+    // setup the state directory
+    let environmentStateDir = fs.join(this.stateDir, opts.environmentId);
+    if !fs.exists(environmentStateDir) {
+      fs.mkdir(environmentStateDir, recursive: true);
+    }
+    volumes.set(environmentStateDir, Consts.statePath());
+
     let env = MutMap<str>{
       "GIT_REPO" => repo,
       "GIT_SHA" => opts.gitSha,
@@ -81,7 +113,10 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "ENVIRONMENT_ID" => opts.environmentId,
       "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
       "SSL_PRIVATE_KEY" => util.base64Encode(opts.certificate.privateKey),
-      "SSL_CERTIFICATE" => util.base64Encode(opts.certificate.certificate)
+      "SSL_CERTIFICATE" => util.base64Encode(opts.certificate.certificate),
+      "ENVIRONMENT_PRIVATE_KEY" => opts.privateKey,
+      "CACHE_DIR" => Consts.cachePath(),
+      "PUBLIC_ENDPOINT_DOMAIN" => opts.publicEndpointFullDomainName,
     };
 
     if let token = opts.gitToken {
@@ -124,8 +159,22 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     let fly = new flyio.Fly(flyClient);
     let app = fly.app(this.appNameFromEnvironment(opts.environmentId));
     let exists = app.exists();
+    let mounts = MutArray<flyio.Mount>[];
     if !exists {
       app.create();
+      let volume = app.addVolume(name: Consts.volumeName(), region: Consts.region(), size: 1);
+      mounts.push({
+        name: Consts.volumeName(),
+        path: Consts.statePath(),
+        volume: volume.id,
+      });
+    } else {
+      let volumes = app.listVolumes();
+      mounts.push({
+        name: Consts.volumeName(),
+        path: Consts.statePath(),
+        volume: volumes.at(0).id,
+      });
     }
 
     app.addSecrets({
@@ -150,6 +199,9 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "AWS_ACCESS_KEY_ID" => opts.awsAccessKeyId,
       "AWS_SECRET_ACCESS_KEY" => opts.awsSecretAccessKey,
       "AWS_REGION" => opts.logsBucketRegion,
+      "ENVIRONMENT_PRIVATE_KEY" => opts.privateKey,
+      "CACHE_DIR" => Consts.cachePath(),
+      "PUBLIC_ENDPOINT_DOMAIN" => opts.publicEndpointFullDomainName,
     };
 
     if let token = opts.gitToken {
@@ -157,7 +209,13 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
     }
 
     let createOptions: flyio.ICreateMachineProps = {
-      imageName: this.image.image.imageName, env: env.copy(), memoryMb: 2048, files: files, services: [{
+      region: Consts.region(),
+      imageName: this.image.image.imageName,
+      env: env.copy(),
+      memoryMb: 2048,
+      files: files,
+      mounts: mounts.copy(),
+      services: [{
         protocol: "tcp",
         internal_port: 3000,
         ports: [{
@@ -172,12 +230,17 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
         }]
       }]
     };
-  
+
     if exists {
-      log("updating machine in app ${app.props.name}");
-      app.update(createOptions);
+      if let machine = app.machinesInfo().tryAt(0) {
+        log("updating machine in app {app.props.name} {machine.id}");
+        app.updateMachine(machine.id, createOptions);
+      } else {
+        log("deleting and creating machine in app {app.props.name}");
+        app.update(createOptions);
+      }
     } else {
-      log("adding machine to app ${app.props.name}");
+      log("adding machine to app {app.props.name}");
       app.addMachine(createOptions);
     }
 
@@ -204,6 +267,7 @@ pub struct Message {
   token: str?;
   secrets: Map<str>;
   certificate: certificate.Certificate;
+  privateKey: str;
 }
 
 struct RuntimeServiceProps {
@@ -212,9 +276,9 @@ struct RuntimeServiceProps {
   flyOrgSlug: str?;
   environments: environments.Environments;
   logs: cloud.Bucket;
+  publicEndpointFullDomainName: str;
 }
 
-bring "@cdktf/provider-aws" as aws;
 bring "cdktf" as cdktf;
 
 // Previews environment runtime
@@ -235,13 +299,13 @@ pub class RuntimeService {
       let bucketAddr = this.logs.node.addr;
       bucketName = "BUCKET_HANDLE_{bucketAddr.substring(bucketAddr.length - 8, bucketAddr.length)}";
     } else {
-      let awsUser = new aws.iamUser.IamUser(name: "{this.node.addr}-user");
+      let awsUser = new awsprovider.iamUser.IamUser(name: "{this.node.addr}-user");
       let bucket: awsprovider.s3Bucket.S3Bucket = unsafeCast(this.logs)?.bucket;
       let bucketArn: str = bucket.arn;
       bucketName = bucket.bucket;
       bucketRegion = bucket.region;
       bucket.forceDestroy = true;
-      let awsPolicy = new aws.iamUserPolicy.IamUserPolicy(
+      let awsPolicy = new awsprovider.iamUserPolicy.IamUserPolicy(
         user: awsUser.name,
         policy: Json.stringify({
           Version: "2012-10-17",
@@ -254,7 +318,7 @@ pub class RuntimeService {
           ],
         }),
       );
-      let awsAccessKey = new aws.iamAccessKey.IamAccessKey(user: awsUser.name);
+      let awsAccessKey = new awsprovider.iamAccessKey.IamAccessKey(user: awsUser.name);
       awsAccessKeyId = awsAccessKey.id;
       awsSecretAccessKey = awsAccessKey.secret;
       if let flyToken = props.flyToken {
@@ -271,7 +335,7 @@ pub class RuntimeService {
       }
     }
 
-    let queue = new cloud.Queue(timeout: 15m);
+    let queue = new fifoqueue.FifoQueue(timeout: 15m) as "runtime fifo";
     queue.setConsumer(inflight (message) => {
       try {
         // hack to get bucket in this environment
@@ -290,10 +354,12 @@ pub class RuntimeService {
           environmentId: msg.environmentId,
           secrets: msg.secrets,
           certificate: msg.certificate,
+          privateKey: msg.privateKey,
           logsBucketName: bucketName,
           logsBucketRegion: bucketRegion,
           awsAccessKeyId: awsAccessKeyId,
           awsSecretAccessKey: awsSecretAccessKey,
+          publicEndpointFullDomainName: props.publicEndpointFullDomainName,
         );
 
         log("preview environment url: {url}");
@@ -308,11 +374,11 @@ pub class RuntimeService {
       }
     }, timeout: 5m);
 
-    this.api = new cloud.Api();
+    this.api = new cloud.Api() as "runtime-service";
     this.api.post("/", inflight (req) => {
       let body = Json.parse(req.body ?? "");
       let message = Message.fromJson(body);
-      queue.push(Json.stringify(message));
+      queue.push(Json.stringify(message), groupId: message.environmentId);
       return {
         status: 200,
       };

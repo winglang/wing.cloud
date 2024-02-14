@@ -3,12 +3,13 @@ bring "../apps.w" as apps;
 bring "../environments.w" as environments;
 bring "./runtime.w" as runtime;
 bring "../components/certificate/icertificate.w" as certificate;
+bring "../components/parameter/parameter.w" as parameter;
 
 struct RuntimeClientProps {
-  runtimeUrl: str;
+  runtimeUrl: parameter.Parameter;
 }
 
-struct RuntimeClientCreateOptions {
+pub struct RuntimeClientCreateOptions {
   appId: str;
   entrypoint: str;
   environment: environments.Environment;
@@ -16,6 +17,7 @@ struct RuntimeClientCreateOptions {
   certificate: certificate.Certificate;
   token: str;
   sha: str;
+  privateKey: str;
 }
 
 struct RuntimeClientDeleteOptions {
@@ -23,14 +25,14 @@ struct RuntimeClientDeleteOptions {
 }
 
 pub class RuntimeClient {
-  runtimeUrl: str;
+  runtimeUrl: parameter.Parameter;
 
   new(props: RuntimeClientProps) {
     this.runtimeUrl = props.runtimeUrl;
   }
 
   pub inflight create(options: RuntimeClientCreateOptions) {
-    let res = http.post(this.runtimeUrl, body: Json.stringify(runtime.Message {
+    let res = http.post(this.runtimeUrl.get(), body: Json.stringify(runtime.Message {
       repo: options.environment.repo,
       sha: options.sha,
       entrypoint: options.entrypoint,
@@ -39,6 +41,7 @@ pub class RuntimeClient {
       token: options.token,
       secrets: options.secrets,
       certificate: options.certificate,
+      privateKey: options.privateKey,
     }));
 
     if !res.ok {
@@ -47,7 +50,7 @@ pub class RuntimeClient {
   }
 
   pub inflight delete(options: RuntimeClientDeleteOptions) {
-    let res = http.delete(this.runtimeUrl, body: Json.stringify({
+    let res = http.delete(this.runtimeUrl.get(), body: Json.stringify({
       environmentId: options.environment.id,
     }));
 

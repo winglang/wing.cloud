@@ -15,3 +15,5 @@ exports.parseLog = (log) => {
     message: match ? match[2] : log,
   };
 };
+
+exports.encodeURIComponent = encodeURIComponent;

@@ -5,8 +5,9 @@ import {
   useEffect,
 } from "react";
 
+import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
+
 import { AnalyticsContext } from "./analytics-provider.js";
-import { wrpc } from "./wrpc.js";
 
 export interface AnalyticsIdentityContext {}
 export const AnalyticsIdentityContext = createContext<AnalyticsIdentityContext>(
@@ -14,19 +15,17 @@ export const AnalyticsIdentityContext = createContext<AnalyticsIdentityContext>(
 );
 export const AnalyticsIdentityProvider = ({ children }: PropsWithChildren) => {
   const { setIdentity } = useContext(AnalyticsContext);
-  const { data: queryData } = wrpc["auth.check"].useQuery(undefined, {
-    throwOnError: false,
-    retry: false,
-  });
+  const { user } = useContext(AuthDataProviderContext);
 
   useEffect(() => {
-    if (queryData?.user) {
+    if (user) {
       setIdentity({
-        name: queryData.user.username,
-        id: queryData.user.id,
+        name: user.username,
+        email: user.email,
+        id: user.id,
       });
     }
-  }, [queryData]);
+  }, [user]);
 
   return (
     <AnalyticsIdentityContext.Provider value={{}}>

@@ -126,7 +126,7 @@ pub class Container_sim {
 
     args.push(tag);
 
-    Container_sim.shell("docker", ["rm", "-f", containerName]);
+    this.stopContainer(containerName);
     Container_sim.shell("docker", args.copy());
     let out = Json.parse(Container_sim.shell("docker", ["inspect", containerName]));
 
@@ -169,9 +169,15 @@ pub class Container_sim {
   }
 
   inflight stopContainer(containerName: str) {
+    // seng SIGINT and remove container
     log("stopping container {containerName}");
-    Container_sim.shell("docker", ["rm", "-f", containerName]);
-    this.table.delete(containerName);
+    try {
+      Container_sim.shell("docker", ["kill", "--signal=2", containerName]);
+      Container_sim.shell("docker", ["rm", "-f", containerName]);
+      this.table.delete(containerName);
+    } catch err {
+      log("stopContainer: {err}");
+    }
   }
 
   extern "./src/shell.js" static inflight shell(command: str, args: Array<str>, cwd: str?): str;

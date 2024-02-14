@@ -4,48 +4,62 @@ import {
   PlusIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { Duplicator } from "../../components/duplicator.js";
 import { ErrorBoundary } from "../../components/error-boundary.js";
 import { Header } from "../../components/header.js";
-import { SpinnerLoader } from "../../components/spinner-loader.js";
+import { AppsDataProviderContext } from "../../data-store/apps-data-provider.js";
 import { Button } from "../../design-system/button.js";
 import { Input } from "../../design-system/input.js";
 import { useTheme } from "../../design-system/theme-provider.js";
-import { wrpc } from "../../utils/wrpc.js";
 
+import { AppCardSkeleton } from "./_components/app-card-skeleton.js";
 import { AppCard } from "./_components/app-card.js";
 
 const OwnerPage = () => {
   const { owner } = useParams();
   const { theme } = useTheme();
+  const { apps, isLoading, isFetching } = useContext(AppsDataProviderContext);
+
+  const loading = useMemo(() => {
+    // Show loading if there are no apps until we redirect to add page
+    return isLoading || !apps || apps.length === 0;
+  }, [isLoading, apps]);
+
+  useEffect(() => {
+    if (!apps || isFetching) {
+      return;
+    }
+    if (apps.length === 0) {
+      navigate("/add");
+    }
+  }, [apps, isFetching]);
 
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-  const listAppsQuery = wrpc["app.list"].useQuery({
-    owner: owner!,
-  });
-
-  const apps = useMemo(() => {
-    return listAppsQuery.data?.apps ?? [];
-  }, [listAppsQuery.data]);
 
   const filteredApps = useMemo(() => {
-    return apps.filter((app) =>
-      `${app.appName}`.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
-    );
-  }, [listAppsQuery.data, search]);
+    if (!apps) {
+      return [];
+    }
+    return apps
+      .filter((app) =>
+        `${app.appName}`
+          .toLocaleLowerCase()
+          .includes(search.toLocaleLowerCase()),
+      )
+      .sort((a, b) => {
+        return (
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      });
+  }, [apps, search]);
 
   return (
-    <div
-      className={clsx(
-        "w-full flex-grow overflow-auto",
-        "max-w-5xl mx-auto p-4 sm:p-6",
-        "space-y-4",
-      )}
-    >
+    <div className="space-y-4">
       <div className="flex gap-x-2">
         <Input
           type="text"
@@ -60,11 +74,10 @@ const OwnerPage = () => {
             setSearch(e.target.value);
           }}
         />
-        {apps.length > 0 && (
+        {apps && apps.length > 0 && (
           <Button
-            label="Add"
-            primary
             icon={PlusIcon}
+            label="New App"
             onClick={() => {
               navigate("/add");
             }}
@@ -72,71 +85,54 @@ const OwnerPage = () => {
         )}
       </div>
 
-      {listAppsQuery.isLoading && (
-        <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <SpinnerLoader />
+      {!loading && filteredApps.length === 0 && (
+        <div className="text-center">
+          <FolderPlusIcon className={clsx("w-12 h-12 mx-auto", theme.text2)} />
+          <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
+            No apps found.
+          </h3>
         </div>
       )}
-      {!listAppsQuery.isLoading && (
-        <>
-          {filteredApps.length === 0 && (
-            <div className="text-center">
-              <FolderPlusIcon
-                className={clsx("w-12 h-12 mx-auto", theme.text2)}
-              />
-              <h3 className={clsx("mt-2 text-sm font-medium", theme.text1)}>
-                No apps found.
-              </h3>
 
-              {apps.length === 0 && (
-                <div>
-                  <p className={clsx("mt-1 text-sm", theme.text2)}>
-                    Get started by adding an app.
-                  </p>
-                  <Button
-                    label="Add app"
-                    icon={PlusIcon}
-                    primary
-                    className="mt-6"
-                    onClick={() => {
-                      navigate("/add");
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-          )}
+      <div
+        className={clsx(
+          "flex flex-wrap gap-6 w-full",
+          "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
+        )}
+      >
+        {loading && (
+          <Duplicator count={5}>
+            <AppCardSkeleton />
+          </Duplicator>
+        )}
 
-          {filteredApps.length > 0 && (
-            <div
-              className={clsx(
-                "flex flex-wrap gap-6 w-full",
-                "grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1",
-              )}
-            >
-              {filteredApps.map((app) => (
-                <AppCard
-                  key={app.appId}
-                  onClick={() => {
-                    navigate(`/${owner}/${app.appName}`);
-                  }}
-                  app={app}
-                />
-              ))}
-            </div>
-          )}
-        </>
-      )}
+        {filteredApps.map((app) => (
+          <AppCard key={app.appId} owner={owner || ""} app={app} />
+        ))}
+      </div>
     </div>
   );
 };
 
 export const Component = () => {
+  const { owner } = useParams();
+
   return (
     <div className="flex flex-col h-full">
-      <Header />
+      <Header
+        tabs={[
+          {
+            name: "Overview",
+            to: `/${owner}`,
+          },
+        ]}
+      />
       <ErrorBoundary>
-        <OwnerPage />
+        <div className="overflow-auto">
+          <div className="max-w-7xl mx-auto p-4 md:p-8 relative">
+            <OwnerPage />
+          </div>
+        </div>
       </ErrorBoundary>
     </div>
   );

@@ -1,6 +1,7 @@
 bring ex;
 bring "./http-error.w" as httpError;
 bring "./nanoid62.w" as nanoid62;
+bring "./util.w" as util;
 
 pub struct App {
   appId: str;
@@ -12,6 +13,11 @@ pub struct App {
   userId: str;
   entrypoint: str;
   createdAt: str;
+  defaultBranch: str?;
+  lastCommitMessage: str?;
+  lastCommitDate: str?;
+  lastCommitSha: str?;
+  status: str?;
 }
 
 struct Item extends App {
@@ -28,6 +34,11 @@ struct CreateAppOptions {
   userId: str;
   entrypoint: str;
   createdAt: str;
+  defaultBranch: str;
+  status: str;
+  lastCommitMessage: str?;
+  lastCommitDate: str?;
+  lastCommitSha: str?;
 }
 
 struct GetAppOptions {
@@ -66,6 +77,32 @@ struct UpdateEntrypointOptions {
   entrypoint: str;
 }
 
+struct UpdateLastCommitOptions {
+  appId: str;
+  appName: str;
+  userId: str;
+  repoId: str;
+  lastCommitMessage: str;
+  lastCommitDate: str;
+  lastCommitSha: str;
+}
+
+struct UpdateStatusOptions {
+  appId: str;
+  appName: str;
+  userId: str;
+  repoId: str;
+  status: str;
+}
+
+struct UpdateDescriptionOptions {
+  appId: str;
+  appName: str;
+  userId: str;
+  repoId: str;
+  description: str;
+}
+
 pub class Apps {
   table: ex.DynamodbTable;
 
@@ -90,6 +127,11 @@ pub class Apps {
         userId: options.userId,
         entrypoint: options.entrypoint,
         createdAt: options.createdAt,
+        defaultBranch: options.defaultBranch,
+        status: options.status,
+        lastCommitMessage: options.lastCommitMessage ?? "",
+        lastCommitDate: options.lastCommitDate ?? "",
+        lastCommitSha: options.lastCommitSha ?? "",
       };
     };
 
@@ -158,7 +200,15 @@ pub class Apps {
       return App.fromJson(item);
     }
 
-    throw httpError.HttpError.notFound("App '{options.appId}' not found");
+    throw httpError.HttpError.notFound("Get App: '{options.appId}' not found");
+  }
+
+  pub inflight tryGet(options: GetAppOptions): App? {
+    try {
+      return this.get(options);
+    } catch error {
+      return nil;
+    }
   }
 
   pub inflight getByName(options: GetAppByNameOptions): App {
@@ -177,17 +227,27 @@ pub class Apps {
   }
 
   pub inflight list(options: ListAppsOptions): Array<App> {
-    let result = this.table.query(
-      keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-      expressionAttributeValues: {
-        ":pk": "USER#{options.userId}",
-        ":sk": "APP#",
+    let var exclusiveStartKey: Json? = nil;
+    let var apps: Array<App> = [];
+    util.Util.do_while(
+      handler: () => {
+        let result = this.table.query(
+          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          expressionAttributeValues: {
+            ":pk": "USER#{options.userId}",
+            ":sk": "APP#",
+          },
+          exclusiveStartKey: exclusiveStartKey,
+        );
+        for item in result.items {
+          apps = apps.concat([App.fromJson(item)]);
+        }
+        exclusiveStartKey = result.lastEvaluatedKey;
+      },
+      condition: () => {
+        return exclusiveStartKey?;
       },
     );
-    let var apps: Array<App> = [];
-    for item in result.items {
-      apps = apps.concat([App.fromJson(item)]);
-    }
     return apps;
   }
 
@@ -249,21 +309,31 @@ pub class Apps {
       return;
     }
 
-    throw httpError.HttpError.notFound("App '{options.appId}' not found");
+    throw httpError.HttpError.notFound("Delete App: '{options.appId}' not found");
   }
 
   pub inflight listByRepository(options: ListAppByRepositoryOptions): Array<App> {
-    let result = this.table.query(
-      keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-      expressionAttributeValues: {
-        ":pk": "REPOSITORY#{options.repository}",
-        ":sk": "APP#",
+    let var exclusiveStartKey: Json? = nil;
+    let var apps: Array<App> = [];
+    util.Util.do_while(
+      handler: () => {
+        let result = this.table.query(
+          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          expressionAttributeValues: {
+            ":pk": "REPOSITORY#{options.repository}",
+            ":sk": "APP#",
+          },
+          exclusiveStartKey: exclusiveStartKey,
+        );
+        for item in result.items {
+          apps = apps.concat([App.fromJson(item)]);
+        }
+        exclusiveStartKey = result.lastEvaluatedKey;
+      },
+      condition: () => {
+        return exclusiveStartKey?;
       },
     );
-    let var apps: Array<App> = [];
-    for item in result.items {
-      apps = apps.concat([App.fromJson(item)]);
-    }
     return apps;
   }
 
@@ -330,6 +400,235 @@ pub class Apps {
           },
           expressionAttributeValues: {
             ":entrypoint": options.entrypoint,
+          },
+        }
+      },
+    ]);
+  }
+
+  pub inflight updatLastCommit(options: UpdateLastCommitOptions): void {
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "APP#{options.appId}",
+            sk: "#",
+          },
+          updateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate, #lastCommitSha = :lastCommitSha",
+          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
+          expressionAttributeNames: {
+            "#pk": "pk",
+            "#lastCommitMessage": "lastCommitMessage",
+            "#lastCommitDate": "lastCommitDate",
+            "#lastCommitSha": "lastCommitSha",
+            "#userId": "userId",
+          },
+          expressionAttributeValues: {
+            ":userId": options.userId,
+            ":lastCommitMessage": options.lastCommitMessage,
+            ":lastCommitDate": options.lastCommitDate,
+            ":lastCommitSha": options.lastCommitSha,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "APP#{options.appId}",
+          },
+          updateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate, #lastCommitSha = :lastCommitSha",
+          expressionAttributeNames: {
+            "#lastCommitMessage": "lastCommitMessage",
+            "#lastCommitDate": "lastCommitDate",
+            "#lastCommitSha": "lastCommitSha",
+          },
+          expressionAttributeValues: {
+            ":lastCommitMessage": options.lastCommitMessage,
+            ":lastCommitDate": options.lastCommitDate,
+            ":lastCommitSha": options.lastCommitSha,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "APP_NAME#{options.appName}",
+          },
+          updateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate, #lastCommitSha = :lastCommitSha",
+          expressionAttributeNames: {
+            "#lastCommitMessage": "lastCommitMessage",
+            "#lastCommitDate": "lastCommitDate",
+            "#lastCommitSha": "lastCommitSha",
+          },
+          expressionAttributeValues: {
+            ":lastCommitMessage": options.lastCommitMessage,
+            ":lastCommitDate": options.lastCommitDate,
+            ":lastCommitSha": options.lastCommitSha,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "REPOSITORY#{options.repoId}",
+            sk: "APP#{options.appId}",
+          },
+          updateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate, #lastCommitSha = :lastCommitSha",
+          expressionAttributeNames: {
+            "#lastCommitMessage": "lastCommitMessage",
+            "#lastCommitDate": "lastCommitDate",
+            "#lastCommitSha": "lastCommitSha",
+          },
+          expressionAttributeValues: {
+            ":lastCommitMessage": options.lastCommitMessage,
+            ":lastCommitDate": options.lastCommitDate,
+            ":lastCommitSha": options.lastCommitSha,
+          },
+        }
+      },
+    ]);
+  }
+
+  pub inflight updateStatus(options: UpdateStatusOptions): void {
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "APP#{options.appId}",
+            sk: "#",
+          },
+          updateExpression: "SET #status = :status",
+          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
+          expressionAttributeNames: {
+            "#pk": "pk",
+            "#status": "status",
+            "#userId": "userId",
+          },
+          expressionAttributeValues: {
+            ":userId": options.userId,
+            ":status": options.status,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "APP#{options.appId}",
+          },
+          updateExpression: "SET #status = :status",
+          expressionAttributeNames: {
+            "#status": "status",
+
+          },
+          expressionAttributeValues: {
+            ":status": options.status,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "APP_NAME#{options.appName}",
+          },
+          updateExpression: "SET #status = :status",
+          expressionAttributeNames: {
+            "#status": "status",
+
+          },
+          expressionAttributeValues: {
+            ":status": options.status,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "REPOSITORY#{options.repoId}",
+            sk: "APP#{options.appId}",
+          },
+          updateExpression: "SET #status = :status",
+          expressionAttributeNames: {
+            "#status": "status",
+
+          },
+          expressionAttributeValues: {
+            ":status": options.status,
+          },
+        }
+      },
+    ]);
+  }
+
+  pub inflight updateDescription(options: UpdateDescriptionOptions): void {
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "APP#{options.appId}",
+            sk: "#",
+          },
+          updateExpression: "SET #description = :description",
+          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
+          expressionAttributeNames: {
+            "#pk": "pk",
+            "#description": "description",
+            "#userId": "userId",
+          },
+          expressionAttributeValues: {
+            ":userId": options.userId,
+            ":description": options.description,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "APP#{options.appId}",
+          },
+          updateExpression: "SET #description = :description",
+          expressionAttributeNames: {
+            "#description": "description",
+
+          },
+          expressionAttributeValues: {
+            ":description": options.description,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "APP_NAME#{options.appName}",
+          },
+          updateExpression: "SET #description = :description",
+          expressionAttributeNames: {
+            "#description": "description",
+
+          },
+          expressionAttributeValues: {
+            ":description": options.description,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "REPOSITORY#{options.repoId}",
+            sk: "APP#{options.appId}",
+          },
+          updateExpression: "SET #description = :description",
+          expressionAttributeNames: {
+            "#description": "description",
+
+          },
+          expressionAttributeValues: {
+            ":description": options.description,
           },
         }
       },

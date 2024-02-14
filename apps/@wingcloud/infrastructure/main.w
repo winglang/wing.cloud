@@ -1,18 +1,23 @@
 // And the sun, and the moon, and the stars, and the flowers.
 bring cloud;
+bring ex;
 bring util;
 bring http;
-bring ex;
+
 bring "cdktf" as cdktf;
+
+bring "./node_modules/@wingcloud/vite/src" as vite;
 
 bring "./users.w" as Users;
 bring "./apps.w" as Apps;
 bring "./environments.w" as Environments;
 bring "./endpoints.w" as Endpoints;
 bring "./environment-manager.w" as EnvironmentManager;
+bring "./environment-cleaner.w" as EnvironmentCleaner;
 bring "./secrets.w" as Secrets;
 bring "./api.w" as wingcloud_api;
 bring "./segment-analytics.w" as SegmentAnalytics;
+bring "./authenticated-websocket-server.w" as wsServer;
 
 bring "./runtime/runtime.w" as runtime;
 bring "./runtime/runtime-client.w" as runtime_client;
@@ -25,8 +30,33 @@ bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 
 let appSecret = util.env("APP_SECRET");
-let segmentWriteKey = util.env("SEGMENT_WRITE_KEY");
-let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true";
+let wsSecret = util.env("WS_SECRET");
+let segmentWriteKey = util.tryEnv("SEGMENT_WRITE_KEY") ?? "";
+let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true" && segmentWriteKey != "";
+
+let publicEndpointDomain = (): str => {
+  if util.env("WING_TARGET") == "sim" {
+    return "127.0.0.1";
+  } else {
+    return util.env("PUBLIC_ENDPOINT_DOMAIN");
+  }
+}();
+let publicEndpointSubdomain = (): str? => {
+  if let subdomain = util.tryEnv("PUBLIC_ENDPOINT_SUBDOMAIN") {
+    if subdomain != "" {
+      return subdomain;
+    }
+  }
+
+  return nil;
+}();
+let publicEndpointFullDomainName = (): str => {
+  if let subdomain = publicEndpointSubdomain {
+    return "{subdomain}.{publicEndpointDomain}";
+  } else {
+    return publicEndpointDomain;
+  }
+}();
 
 let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey, enableAnalytics);
 
@@ -35,12 +65,12 @@ let api = new cloud.Api(
   corsOptions: cloud.ApiCorsOptions {
     allowOrigin: ["*"],
   }
-);
+) as "wrpc";
 
 let apiUrlParam = new parameter.Parameter(
   name: "api-url",
   value: api.url,
-);
+) as "api-url";
 
 let table = new ex.DynamodbTable(
   name: "data",
@@ -56,6 +86,7 @@ let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
 let secrets = new Secrets.Secrets();
 let endpoints = new Endpoints.Endpoints(table);
+let ws = new wsServer.AuthenticatedWebsocketServer(secret: wsSecret) as "WebsocketServer";
 
 let probotAdapter = new adapter.ProbotAdapter(
   probotAppId: util.env("BOT_GITHUB_APP_ID"),
@@ -71,26 +102,34 @@ let rntm = new runtime.RuntimeService(
   flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
   environments: environments,
   logs: bucketLogs,
+  publicEndpointFullDomainName: publicEndpointFullDomainName,
 );
 
-let dashboardPort = 5174;
-let dashboard = new ex.ReactApp(
-  projectPath: "../website",
-  startCommand: "pnpm vite --port {dashboardPort}",
-  buildCommand: "pnpm vite build",
-  buildDir: "dist",
-  localPort: dashboardPort,
-);
-dashboard.addEnvironment("SEGMENT_WRITE_KEY", segmentWriteKey);
-dashboard.addEnvironment("ENABLE_ANALYTICS", "{enableAnalytics}");
+let runtimeUrlParam = new parameter.Parameter(
+  name: "runtime-url",
+  value: rntm.api.url,
+) as "runtime-url";
 
-reactAppPatch.ReactAppPatch.apply(dashboard);
+let dashboard = new vite.Vite(
+  root: "../website",
+  env: {
+    "SEGMENT_WRITE_KEY": segmentWriteKey,
+    "ENABLE_ANALYTICS": "{enableAnalytics}",
+    "API_URL": "{api.url}",
+    "WS_URL": "{ws.url}",
+    "GITHUB_APP_CLIENT_ID": util.env("BOT_GITHUB_CLIENT_ID"),
+    "GITHUB_APP_NAME": util.env("BOT_GITHUB_APP_NAME"),
+  },
+);
 
 let siteURL = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
-    let subDomain = util.env("PROXY_SUBDOMAIN");
+    let var subDomain = util.tryEnv("PROXY_SUBDOMAIN");
+    if subDomain? && subDomain != "" {
+      subDomain = "{subDomain}.";
+    }
     let zoneName = util.env("PROXY_ZONE_NAME");
-    return "https://{subDomain}.{zoneName}";
+    return "https://{subDomain}{zoneName}";
   } else {
     return "http://localhost:3900";
   }
@@ -103,13 +142,11 @@ let dns = new Dns.DNS(token: (): str? => {
     return nil;
   }
 }());
-let endpointProvider = new PublicEndpoint.PublicEndpointProvider(dns: dns, domain: (): str => {
-  if util.env("WING_TARGET") == "sim" {
-    return "127.0.0.1";
-  } else {
-    return "wingcloud.io";
-  }
-}());
+let endpointProvider = new PublicEndpoint.PublicEndpointProvider(
+  dns: dns,
+  domain: publicEndpointDomain,
+  subdomain: publicEndpointSubdomain
+);
 
 let environmentServerCertificate = new certificate.Certificate(
   privateKeyFile: (): str => {
@@ -142,14 +179,16 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   endpoints: endpoints,
   endpointProvider: endpointProvider,
   certificate: environmentServerCertificate,
-  runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: rntm.api.url),
+  runtimeClient: new runtime_client.RuntimeClient(runtimeUrl: runtimeUrlParam),
   probotAdapter: probotAdapter,
   siteDomain: siteURL,
-  analytics: analytics
+  analytics: analytics,
+  logs: bucketLogs,
 );
 
 let wingCloudApi = new wingcloud_api.Api(
   api: api,
+  ws: ws,
   apps: apps,
   users: users,
   environments: environments,
@@ -159,13 +198,16 @@ let wingCloudApi = new wingcloud_api.Api(
   probotAdapter: probotAdapter,
   githubAppClientId: util.env("BOT_GITHUB_CLIENT_ID"),
   githubAppClientSecret: util.env("BOT_GITHUB_CLIENT_SECRET"),
+  githubAppCallbackOrigin: util.env("BOT_GITHUB_CALLBACK_ORIGIN"),
   appSecret: appSecret,
+  wsSecret: wsSecret,
   logs: bucketLogs,
+  analytics: analytics,
+  segmentWriteKey: segmentWriteKey,
 );
 
 let probotApp = new probot.ProbotApp(
   probotAdapter: probotAdapter,
-  runtimeUrl: rntm.api.url,
   environments: environments,
   users: users,
   apps: apps,
@@ -199,8 +241,8 @@ let proxyUrl = (() => {
       landingDomainName: util.env("LANDING_DOMAIN"),
       dashboardDomainName: getDomainName(dashboard.url),
       zoneName: util.env("PROXY_ZONE_NAME"),
-      subDomain: util.env("PROXY_SUBDOMAIN"),
-    );
+      subDomain: util.tryEnv("PROXY_SUBDOMAIN"),
+    ) as "website proxy";
 
     return proxy.url;
   } elif util.env("WING_TARGET") == "sim" {
@@ -232,27 +274,40 @@ let proxyUrl = (() => {
   }
 })();
 
-let var webhookUrl = probotApp.githubApp.webhookUrl;
-if util.tryEnv("WING_TARGET") == "sim" {
-  bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
+new cloud.Endpoint(proxyUrl, browserSupport: true) as "Proxy Endpoint";
 
-  let devNgrok = new ngrok.Ngrok(
-    url: webhookUrl,
-    domain: util.tryEnv("NGROK_DOMAIN"),
-  );
+if util.tryEnv("DISABLE_NGROK") != "true" {
+  let var webhookUrl = probotApp.githubApp.api.url;
+  if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" {
+    bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
 
-  webhookUrl = devNgrok.url;
+    let devNgrok = new ngrok.Ngrok(
+      url: webhookUrl,
+      domain: util.tryEnv("NGROK_DOMAIN"),
+    );
+
+    webhookUrl = devNgrok.url;
+  }
+
+  let updateGithubWebhook = inflight () => {
+    probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
+    log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
+  };
+
+  new cloud.OnDeploy(updateGithubWebhook);
 }
 
-let updateGithubWebhook = inflight () => {
-  probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
-  log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
-};
+new EnvironmentCleaner.EnvironmentCleaner(apps: apps, environmentManager: environmentManager, environments: environments);
 
-new cloud.OnDeploy(updateGithubWebhook);
+// Smoke Tests
+api.get("/wrpc/health", inflight () => {
+  return {
+    status: 200,
+  };
+});
 
 new cdktf.TerraformOutput(value: api.url) as "API URL";
 new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";
-new cdktf.TerraformOutput(value: probotApp.githubApp.webhookUrl) as "Probot API URL";
+new cdktf.TerraformOutput(value: probotApp.githubApp.api.url) as "Probot API URL";
 new cdktf.TerraformOutput(value: proxyUrl) as "Proxy URL";
 new cdktf.TerraformOutput(value: siteURL) as "Site URL";

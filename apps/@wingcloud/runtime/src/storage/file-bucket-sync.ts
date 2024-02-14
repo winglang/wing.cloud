@@ -1,10 +1,7 @@
 import { readFileSync } from "node:fs";
 
 import { cloud } from "@winglang/sdk";
-
-const fileBucketSyncMs = Number.parseInt(
-  process.env["FILE_BUCKET_SYNC_MS"] || "5000",
-);
+import chokidar from "chokidar";
 
 export interface FileBucketSyncProps {
   file: string;
@@ -13,26 +10,23 @@ export interface FileBucketSyncProps {
 }
 
 export function fileBucketSync({ file, key, bucket }: FileBucketSyncProps) {
-  let clear: NodeJS.Timeout;
-  const sync = async (continueSync = true) => {
+  const sync = async () => {
     try {
       const contents = readFileSync(file, "utf8");
-
       await bucket.put(key, contents);
     } catch (error) {
-      console.error("failed to sync logs, retrying...", error);
-    } finally {
-      if (continueSync) {
-        clear = setTimeout(sync, fileBucketSyncMs);
-      }
+      console.error("failed to sync logs", error);
     }
   };
 
+  const watcher = chokidar.watch(file);
+  watcher.on("change", sync);
   sync();
 
   return {
     cancelSync: async () => {
-      return sync(false);
+      await watcher.close();
+      return sync();
     },
   };
 }

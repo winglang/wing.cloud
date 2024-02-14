@@ -31,7 +31,7 @@ Complete the missing `.env` variables (commented variables are optional).
 
 ### Creating the App Secret
 
-For the `APP_SECRET` environment variable, you can generate a random string with the following command:
+For the `APP_SECRET` and the `WS_SECRET` environment variables, you can generate a random string with the following command:
 
 ```sh
 openssl rand -hex 32
@@ -52,6 +52,7 @@ For the `BOT_GITHUB_*` variables, you'll need a [GitHub App](https://docs.github
   - Issues: Read & Write
   - Metadata: Read Only
   - Pull Requests: Read & Write
+  - Administration: Read & Write
 - The required events are:
   - Pull Request
   - Push
@@ -107,7 +108,7 @@ The [staging](https://staging.wingcloud.io) environment is deployed continously 
 
 ### Production
 
-The [production](https://production.wingcloud.io) environment is *not* continously deployed from `main` at the moment. Deployments are based on the `production` branch.
+The [production](https://wing.cloud) environment is _not_ continously deployed from `main` at the moment. Deployments are based on the `production` branch.
 
 The `production` branch is supposed to eventually mirror `main`. This means, make sure that all new features / fixes are going through `main`.
 
@@ -120,7 +121,7 @@ The `production` branch is supposed to eventually mirror `main`. This means, mak
 - name the pull request: "release: my new release"
 - wait for the Terraform production diff to be commented on the PR
 - make sure the Terraform plan applies cleanly and reflects the intended changes
-- Merge with a *Merge Commit* - don't squash - the pull request into `production`
+- Merge with a _Merge Commit_ - don't squash - the pull request into `production`
 
 ![base](./docs/pr-base-branch.png)
 ![diff](./docs/pr-diff-comment.png)

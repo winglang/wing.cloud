@@ -1,13 +1,15 @@
 import { UserIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { Fragment, useMemo } from "react";
-import { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Fragment, useContext, useMemo } from "react";
+import { Link, useParams } from "react-router-dom";
 
+import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
 import { Menu } from "../design-system/menu.js";
 import { useTheme } from "../design-system/theme-provider.js";
 import { WingIcon } from "../icons/wing-icon.js";
-import { wrpc } from "../utils/wrpc.js";
+import { wrpc, type User } from "../utils/wrpc.js";
+
+import { Tabs, type Tab } from "./tabs.js";
 
 export interface Breadcrumb {
   label: string;
@@ -30,12 +32,10 @@ const Avatar = ({ avatarURL }: { avatarURL?: string }) => {
 };
 
 interface UserMenuProps {
-  avatarURL?: string;
+  user?: User;
 }
 
-const UserMenu = (props: UserMenuProps) => {
-  const { theme } = useTheme();
-
+const UserMenu = ({ user }: UserMenuProps) => {
   const signOut = wrpc["auth.signOut"].useMutation({
     onSuccess(d) {
       location.href = "/";
@@ -53,38 +53,40 @@ const UserMenu = (props: UserMenuProps) => {
           },
         },
       ]}
-      icon={<Avatar avatarURL={props.avatarURL} />}
-    />
+      icon={<Avatar avatarURL={user?.avatarUrl} />}
+    >
+      {user?.email && (
+        <div className="px-4 py-3" role="none">
+          <p className="truncate text-sm font-medium text-gray-900" role="none">
+            {user?.email}
+          </p>
+        </div>
+      )}
+    </Menu>
   );
 };
 
 export interface HeaderProps {
   breadcrumbs?: Breadcrumb[];
+  tabs?: Tab[];
 }
 
-export const Header = (props: HeaderProps) => {
+export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
   const { theme } = useTheme();
 
-  const user = wrpc["auth.check"].useQuery(undefined, {
-    throwOnError: false,
-    retry: false,
-  });
-
-  useEffect(() => {
-    if (user.isError) {
-      window.location.href = "/";
-    }
-  }, [user.isError]);
+  const { user } = useContext(AuthDataProviderContext);
 
   const dashboardLink = useMemo(() => {
-    if (user.data?.user.username) {
-      return `/${user.data.user.username}`;
+    if (user?.username) {
+      return `/${user.username}`;
     }
     return "/dashboard";
-  }, [user.data?.user.username]);
+  }, [user?.username]);
 
   return (
-    <header className={clsx("px-6 py-3 shadow z-30", theme.bgInput)}>
+    <header
+      className={clsx("px-6 shadow z-30 pt-3", theme.bgInput, !tabs && "pb-3")}
+    >
       <div className="flex items-center gap-6">
         <Link
           to={dashboardLink}
@@ -97,30 +99,28 @@ export const Header = (props: HeaderProps) => {
           <div>
             <Link
               to={dashboardLink}
-              className="rounded hover:bg-slate-100 px-2 py-1 text-sm text-slate-800 font-medium flex items-center gap-1.5"
+              className={clsx(
+                "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                theme.text1,
+              )}
             >
-              {!user.data && (
-                <>
-                  {/* <span className="w-5 h-5 rounded bg-slate-300 animate-pulse"></span> */}
-                  <span className="w-32 bg-slate-300 animate-pulse rounded">
-                    &nbsp;
-                  </span>
-                </>
+              {!user && (
+                <span className="w-32 bg-gray-300 animate-pulse rounded">
+                  &nbsp;
+                </span>
               )}
-              {user.data && (
-                <>
-                  {/* <Avatar avatarURL={user.data.user.avatarUrl} /> */}
-                  <span>{user.data?.user.username}</span>
-                </>
-              )}
+              {user && <span>{user.username}</span>}
             </Link>
           </div>
-          {props.breadcrumbs?.map((breadcrumb, index) => (
+          {breadcrumbs?.map((breadcrumb, index) => (
             <Fragment key={index}>
-              <span className="text-slate-600 text-sm">/</span>
+              <span className="text-gray-600 text-sm">/</span>
               <Link
                 to={breadcrumb.to}
-                className="rounded hover:bg-slate-100 px-2 py-1 text-sm text-slate-800 font-medium flex items-center gap-1.5"
+                className={clsx(
+                  "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                  theme.text1,
+                )}
               >
                 {breadcrumb.icon ? (
                   <span className="-ml-1">{breadcrumb.icon}</span>
@@ -137,10 +137,15 @@ export const Header = (props: HeaderProps) => {
           ))}
         </div>
 
-        <div className="flex-grow"></div>
-
-        <UserMenu avatarURL={user.data?.user.avatarUrl} />
+        <div className="flex flex-grow justify-end items-center gap-x-2">
+          <UserMenu user={user} />
+        </div>
       </div>
+      {tabs && (
+        <div className="pt-3">
+          <Tabs tabs={tabs} />
+        </div>
+      )}
     </header>
   );
 };

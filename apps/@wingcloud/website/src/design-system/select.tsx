@@ -55,8 +55,8 @@ export const Select = memo(
                 aria-disabled={disabled}
                 className={clsx(
                   btnClassName,
-                  "w-full pr-8 text-left relative",
-                  "items-center px-2.5 py-1.5 border text-xs rounded",
+                  "w-full pr-6 text-left relative",
+                  "items-center px-2.5 py-2 border text-xs rounded-md",
                   theme.bgInput,
                   theme.textInput,
                   theme.borderInput,
@@ -97,7 +97,7 @@ export const Select = memo(
                   "absolute",
                   theme.bgInput,
                   theme.textInput,
-                  "z-10 mt-1 max-h-60 w-full overflow-auto rounded",
+                  "z-10 mt-1 max-h-60 w-full overflow-auto rounded-md",
                   "py-1 text-xs shadow-lg ring-1 ring-black ring-opacity-5 outline-none",
                 )}
               >

@@ -1,12 +1,13 @@
 import { Menu as HeadlessMenu, Transition } from "@headlessui/react";
 import clsx from "clsx";
-import { Fragment } from "react";
+import { Fragment, type MouseEvent, type PropsWithChildren } from "react";
 
 import { useTheme } from "./theme-provider.js";
 
 interface Item {
   label?: string;
-  onClick: () => void;
+  onClick?: (event: MouseEvent) => void;
+  disabled?: boolean;
 }
 
 export interface MenuProps {
@@ -14,9 +15,17 @@ export interface MenuProps {
   icon?: React.ReactNode;
   items: Item[];
   btnClassName?: string;
+  onClick?: (event: MouseEvent) => void;
 }
 
-export const Menu = ({ title, icon, items = [], btnClassName }: MenuProps) => {
+export const Menu = ({
+  title,
+  icon,
+  items = [],
+  btnClassName,
+  onClick,
+  children,
+}: PropsWithChildren<MenuProps>) => {
   const { theme } = useTheme();
   return (
     <div className="relative items-center flex">
@@ -24,12 +33,18 @@ export const Menu = ({ title, icon, items = [], btnClassName }: MenuProps) => {
         <div>
           <HeadlessMenu.Button
             className={clsx(
-              "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
               btnClassName,
+              theme.text1,
+              theme.bgInputHover,
+              "flex items-center text-sm gap-x-2",
+              "font-semibold",
             )}
+            onClick={(event) => {
+              onClick?.(event);
+            }}
           >
+            {title && <div className="pl-2">{title}</div>}
             {icon}
-            {title && <span className="ml-2">{title}</span>}
           </HeadlessMenu.Button>
         </div>
         <Transition
@@ -44,17 +59,19 @@ export const Menu = ({ title, icon, items = [], btnClassName }: MenuProps) => {
           <HeadlessMenu.Items
             className={clsx(
               "absolute right-0 mt-2 w-56 origin-top-right",
-              "rounded shadow-lg z-10",
+              "rounded shadow-lg z-20",
               "divide-y divide-slate-100 dark:divide-slate-700",
               theme.bgInput,
               theme.focusInput,
             )}
           >
-            <div className="px-1 py-1 ">
+            {children}
+            <div className="p-1">
               {items.map((item) => (
                 <HeadlessMenu.Item key={item.label}>
                   {({ active }) => (
                     <button
+                      disabled={item.disabled}
                       key={item.label}
                       onClick={item.onClick}
                       className={clsx(

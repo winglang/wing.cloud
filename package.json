@@ -4,15 +4,15 @@
   "type": "module",
   "sideEffects": false,
   "dependencies": {
-    "turbo": "^1.10.16"
+    "turbo": "^1.12.3"
   },
   "devDependencies": {
-    "@skyrpex/wingen": "^0.6.18",
+    "@skyrpex/wingen": "^0.6.94",
     "@types/node": "20",
-    "prettier": "^3.1.0",
-    "projen": "^0.77.3",
-    "tsx": "^4.6.0",
-    "typescript": "^5.3.2"
+    "prettier": "^3.2.5",
+    "projen": "^0.79.17",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",

@@ -1,10 +1,8 @@
-import { XCircleIcon } from "@heroicons/react/24/outline";
 import {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
 } from "@wingcloud/wrpc";
-import clsx from "clsx";
 import type { PropsWithChildren } from "react";
 import { useMemo } from "react";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";

@@ -7,12 +7,15 @@ import clsx from "clsx";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
+import { StatusDot } from "../../../../components/status-dot.js";
+import { StatusPill } from "../../../../components/status-pill.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../../utils/time.js";
 import type { Environment } from "../../../../utils/wrpc.js";
-import { DEPLOYMENT_LOGS_ID, TEST_LOGS_ID } from "../[branch]/index.js";
+import { DEPLOYMENT_LOGS_ID } from "../[branch]/logs.js";
+import { TEST_LOGS_ID } from "../[branch]/tests-page.js";
 
 type ErrorStatus = "failed" | "passed";
 
@@ -57,46 +60,31 @@ export const EnvironmentsListItem = ({
 
   const updatedAt = useTimeAgo(environment.updatedAt);
 
-  const statusString = useMemo(() => {
-    if (status === "tests") {
-      return "Running Tests";
-    }
-    if (status === "initializing" || status === "deploying") {
-      return "Deploying";
-    }
-    return status;
-  }, [status]);
-
   return (
     <div
       className={clsx(
-        "rounded p-4 text-left w-full block",
+        "rounded-md p-4 text-left w-full block",
         theme.bgInput,
         "border",
         theme.borderInput,
+        "shadow-sm hover:shadow",
+        "relative",
       )}
     >
+      <Link
+        className={clsx("absolute inset-0 rounded-md z-0", theme.focusInput)}
+        to={`/${owner}/${appName}/${environment.branch}`}
+      />
       <div className="flex items-center gap-x-4">
         <div className="relative">
           <BranchIcon
             className={clsx(
-              "w-8 h-8 ",
+              "w-8 h-8",
               "rounded-full border-slate-300 border",
               theme.text2,
             )}
           />
-          <div
-            title={status}
-            className={clsx(
-              "absolute -top-1.5 -right-1.5",
-              "w-2.5 h-2.5",
-              "rounded-full",
-              status === "initializing" && "bg-yellow-300 animate-pulse",
-              status === "deploying" && "bg-yellow-300 animate-pulse",
-              status === "running" && "bg-green-300",
-              status === "error" && "bg-red-300",
-            )}
-          />
+          <StatusDot status={status} />
         </div>
 
         <div className="flex justify-between items-center truncate grow">
@@ -104,28 +92,37 @@ export const EnvironmentsListItem = ({
             <Link
               to={`/${owner}/${appName}/${environment.branch}`}
               className={clsx(
-                "font-medium truncate hover:underline",
+                "font-medium truncate relative",
                 theme.text1,
+                theme.text1Hover,
+                "hover:underline z-10 cursor-pointer",
               )}
-              rel="noopener noreferrer"
             >
               {environment.prTitle}
             </Link>
 
             <div className="truncate flex gap-x-2 sm:gap-x-5">
-              <div className={clsx("flex gap-x-1 items-center", theme.text2)}>
+              <div
+                className={clsx(
+                  "truncate",
+                  "flex gap-x-1 items-center",
+                  "leading-5 py-0.5",
+                  theme.text2,
+                )}
+              >
                 <GithubIcon className="w-3 h-3 inline-block" />
-                <a
-                  href={`https://github.com/${environment.repo}/tree/${environment.branch}`}
+                <Link
+                  to={`https://github.com/${environment.repo}/tree/${environment.branch}`}
                   target="_blank"
-                  rel="noopener noreferrer"
                   className={clsx(
-                    "truncate hover:underline items-end flex font-mono",
+                    "truncate items-end flex font-mono",
                     theme.text2,
+                    theme.text2Hover,
+                    "hover:underline z-10 cursor-pointer",
                   )}
                 >
                   {environment.branch}
-                </a>
+                </Link>
                 <span
                   className={clsx(
                     "truncate items-center flex opacity-70",
@@ -140,12 +137,13 @@ export const EnvironmentsListItem = ({
                 <Link
                   to={`/${owner}/${appName}/${environment.branch}/#${TEST_LOGS_ID}`}
                   className={clsx(
-                    "flex items-end gap-x-0.5",
+                    "flex items-center gap-x-0.5",
                     "rounded-xl px-1 py-0.5",
                     "border",
                     theme.bg3,
                     theme.bg3Hover,
                     theme.border3,
+                    "hover:underline z-10 cursor-pointer",
                   )}
                   title={`tests ${testStatus}`}
                 >
@@ -165,32 +163,27 @@ export const EnvironmentsListItem = ({
             {linkEnabled && (
               <Link
                 to={`/${owner}/${appName}/${environment.branch}/console`}
-                className={clsx("text-xs hover:underline ", theme.text1)}
+                className={clsx(
+                  "text-xs",
+                  theme.text1,
+                  theme.text1Hover,
+                  "hover:underline z-10 cursor-pointer",
+                )}
               >
                 Visit Console
               </Link>
             )}
             {!linkEnabled && (
-              <div
-                className={clsx(
-                  status === "initializing" && "text-yellow-600 bg-yellow-100",
-                  status === "tests" && "text-yellow-600 bg-yellow-100",
-                  status === "deploying" && "text-yellow-600 bg-yellow-100",
-                  status === "error" && "text-red-600 bg-red-100",
-                  "text-xs rounded-xl px-2 py-0.5",
-                  "capitalize font-[500]",
-                )}
-              >
+              <StatusPill status={status}>
                 {status === "error" && (
                   <Link
                     to={`/${owner}/${appName}/${environment.branch}/#${DEPLOYMENT_LOGS_ID}`}
-                    className="hover:underline"
+                    className="hover:underline z-10"
                   >
-                    {statusString}
+                    {status}
                   </Link>
                 )}
-                {status !== "error" && statusString}
-              </div>
+              </StatusPill>
             )}
           </div>
         </div>

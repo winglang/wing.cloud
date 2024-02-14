@@ -39,4 +39,6 @@ export interface EnvironmentContext {
   gitProvider: GitProvider;
   logsBucket: cloud.IBucketClient;
   wingApiUrl: string;
+  stateDir: string;
+  cacheDir?: string;
 }

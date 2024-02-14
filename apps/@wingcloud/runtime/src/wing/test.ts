@@ -1,8 +1,8 @@
 import { compile as compileFn, BuiltinPlatform } from "@winglang/compiler";
 import { type simulator, type std } from "@winglang/sdk";
-import { Json } from "@winglang/sdk/lib/std/json.js";
 
 import { Environment } from "../environment.js";
+import type { BucketLogger } from "../logger/bucket-logger.js";
 import { prettyPrintError } from "../utils/enhanced-error.js";
 
 export interface WingTestProps {
@@ -10,6 +10,7 @@ export interface WingTestProps {
   wingSdkPath: string;
   entrypointPath: string;
   environment: Environment;
+  logger: BucketLogger;
   bucketWrite: (key: string, contents: string) => Promise<void>;
 }
 
@@ -21,6 +22,7 @@ export async function wingCompile(
   const compile: typeof compileFn = wingCompiler.compile;
   const simfile = await compile(entrypointPath, {
     platform: [BuiltinPlatform.SIM],
+    testing: true,
   });
   return simfile;
 }
@@ -52,12 +54,13 @@ async function runWingTest(
 }
 
 export async function runWingTests(props: WingTestProps) {
-  const simfile = await wingCompile(
-    props.wingCompilerPath,
-    props.entrypointPath,
-  );
-
   try {
+    props.logger.log("Starting wing tests app");
+    const simfile = await wingCompile(
+      props.wingCompilerPath,
+      props.entrypointPath,
+    );
+
     const wingSdk = await import(props.wingSdkPath);
 
     let simulatorLogs: { message: string; timestamp: string }[] = [];
@@ -87,6 +90,7 @@ export async function runWingTests(props: WingTestProps) {
     for (let test of await client.listTests()) {
       // reset simulator logs
       simulatorLogs = [];
+      props.logger.log("Running test", [test]);
       const result = await runWingTest(client, test, props);
 
       const id = test.replaceAll(/[^\dA-Za-z]/g, "");
@@ -106,8 +110,9 @@ export async function runWingTests(props: WingTestProps) {
 
     await simulator.stop();
 
-    return testResults;
+    return { testsRun: true, testResults };
   } catch (error) {
     console.error("failed to run wing tests", error);
+    return { testsRun: false, testResults: undefined, error };
   }
 }

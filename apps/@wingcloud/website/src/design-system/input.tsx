@@ -23,7 +23,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     ref,
   ) => {
     return (
-      <div className={clsx("relative rounded", containerClassName)}>
+      <div className={clsx("relative rounded-md", containerClassName)}>
         {LeftIcon && (
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
             <LeftIcon
@@ -38,7 +38,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           disabled={disabled}
           className={clsx(
             "border-slate-300 dark:border-slate-900",
-            "inline-flex gap-2 items-center px-2.5 py-1.5 border text-xs rounded",
+            "inline-flex gap-2 items-center px-2.5 py-2 border text-xs rounded-md",
             "outline-none",
             "shadow-inner",
             LeftIcon && "pl-7",

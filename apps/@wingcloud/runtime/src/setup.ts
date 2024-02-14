@@ -4,6 +4,7 @@ import { dirname, join } from "node:path";
 
 import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
+import { BucketLogger } from "./logger/bucket-logger.js";
 import { useBucketWrite } from "./storage/bucket-write.js";
 import { installWing } from "./wing/install.js";
 import { runWingTests } from "./wing/test.js";
@@ -11,6 +12,7 @@ import { runWingTests } from "./wing/test.js";
 export interface SetupProps {
   executer: Executer;
   context: EnvironmentContext;
+  logger: BucketLogger;
 }
 
 export interface WingPaths {
@@ -24,10 +26,12 @@ export class Setup {
   executer: Executer;
   context: EnvironmentContext;
   sourceDir: string;
+  logger: BucketLogger;
 
-  constructor({ executer, context }: SetupProps) {
+  constructor({ executer, context, logger }: SetupProps) {
     this.executer = executer;
     this.context = context;
+    this.logger = logger;
     this.sourceDir = mkdtempSync(join(tmpdir(), "source-"));
   }
 
@@ -51,11 +55,16 @@ export class Setup {
       wingSdkPath: wingPaths["@winglang/sdk"],
       entrypointPath: entrypoint,
       environment: this.context.environment,
+      logger: this.logger,
       bucketWrite: useBucketWrite({ bucket: this.context.logsBucket }),
     });
   }
 
   private async gitClone() {
+    this.logger.log("Cloning repo", [
+      this.context.environment.commit.repo,
+      this.context.environment.commit.sha,
+    ]);
     return this.context.gitProvider.clone(
       this.executer,
       this.context.environment.commit,
@@ -65,7 +74,12 @@ export class Setup {
 
   private async npmInstall(cwd: string) {
     if (existsSync(join(cwd, "package.json"))) {
-      return this.executer.exec("npm", ["install"], {
+      const installArgs = ["install"];
+      if (this.context.cacheDir) {
+        installArgs.push("--cache", this.context.cacheDir);
+      }
+      this.logger.log("Installing npm dependencies");
+      return this.executer.exec("npm", installArgs, {
         cwd,
         throwOnFailure: true,
       });
@@ -75,6 +89,7 @@ export class Setup {
   private async runCustomScript(cwd: string) {
     const scriptPath = join(cwd, "wing.sh");
     if (existsSync(scriptPath)) {
+      this.logger.log("Running custom install script", [scriptPath]);
       return this.executer.exec("sh", [scriptPath], {
         cwd,
         throwOnFailure: true,
@@ -83,6 +98,7 @@ export class Setup {
   }
 
   private async runInstallWing(cwd: string) {
+    this.logger.log("Installing Winglang");
     return installWing(cwd, this.executer);
   }
 }

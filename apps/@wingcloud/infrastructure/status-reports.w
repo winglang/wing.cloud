@@ -10,7 +10,8 @@ pub struct TestResults {
 
 pub struct Endpoint {
   path: str;
-  type: str;
+  label: str;
+  browserSupport: bool;
   url: str;
   port: num;
   digest: str;
@@ -27,5 +28,6 @@ pub struct Running {
 pub struct StatusReport {
   environmentId: str;
   status: str;
+  timestamp: num;
   data: Json?;
 }

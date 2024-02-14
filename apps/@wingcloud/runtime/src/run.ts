@@ -20,7 +20,13 @@ export const run = async function ({
   requestedPort,
   requestedSSLPort,
 }: RunProps) {
-  const keyStore = await createKeyStore(context.environment.id);
+  const privateKey = process.env["ENVIRONMENT_PRIVATE_KEY"];
+
+  if (!privateKey) {
+    throw new Error("Missing ENVIRONMENT_PRIVATE_KEY environment variable");
+  }
+
+  const keyStore = await createKeyStore(context.environment.id, privateKey);
   const report = useReportStatus(context, keyStore);
 
   const redact = redactSecrets();
@@ -40,13 +46,24 @@ export const run = async function ({
   const setup = new Setup({
     executer,
     context,
+    logger: deployLogger,
   });
 
-  let wingPaths;
+  let wingPaths: any;
+  deployLogger.log(
+    `Initializing wing server using app ${process.env["FLY_APP_NAME"] || "localhost"}`,
+  );
   const { startServer, closeSSL } = await prepareServer({
     environmentId: context.environment.id,
+    stateDir: context.stateDir,
     requestedSSLPort,
   });
+
+  process.on("uncaughtException", async (err) => {
+    await handleError(err);
+    process.exit(1);
+  });
+
   try {
     await report("deploying");
 
@@ -58,15 +75,18 @@ export const run = async function ({
     const { paths, entrypointPath } = await setup.run();
     wingPaths = paths;
 
+    await report("running-tests");
     const testResults = await setup.runWingTests(paths, entrypointPath);
 
-    if (testResults) {
-      await report("tests", { testResults });
+    if (testResults.testsRun) {
+      await report("running-server", { testResults: testResults.testResults });
     } else {
-      await report("error", { message: "failed to run tests" });
-      deployLogger.log("failed to run tests");
+      const message = `failed to run tests: ${testResults.error?.toString()}`;
+      await report("tests-error", { message });
+      deployLogger.log(message);
     }
 
+    deployLogger.log("Starting wing console server");
     const { port, close, endpoints } = await startServer({
       consolePath: paths["@wingconsole/app"],
       entrypointPath,
@@ -76,21 +96,34 @@ export const run = async function ({
       platform: wingPlatform,
     });
 
+    const closeAll = async () => {
+      deployLogger.stop();
+      runtimeLogger.stop();
+      await close();
+      closeSSL();
+    };
+
+    process.on("SIGINT", async () => {
+      await closeAll();
+      process.kill(0);
+    });
+
     await report("running", { objects: { endpoints } });
 
+    deployLogger.log("Wing console is running");
     return {
       paths,
       logfile: deployLogger.getLogfile(),
       port,
       endpoints,
-      close: async () => {
-        deployLogger.stop();
-        runtimeLogger.stop();
-        await close();
-        closeSSL();
-      },
+      close: closeAll,
     };
   } catch (error: any) {
+    await handleError(error);
+    throw error;
+  }
+
+  async function handleError(error: any) {
     let errorMessage = error.message;
 
     if (wingPaths) {
@@ -112,6 +145,5 @@ export const run = async function ({
     await deployLogger.stop();
     await runtimeLogger.stop();
     closeSSL();
-    throw error;
   }
 };

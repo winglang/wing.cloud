@@ -21,6 +21,13 @@ struct GithubCommentCreateProps {
   appName: str;
 }
 
+struct GithubCommentUpdateRepoProps {
+  octokit: octokit.OctoKit;
+  appId: str;
+  appName: str;
+  environmentId: str;
+}
+
 pub class GithubComment {
   environments: environments.Environments;
   endpoints: endpoints.Endpoints;
@@ -38,7 +45,10 @@ pub class GithubComment {
 
   inflight envStatusToString(status: str, repoOwner: str, appName: str, branch: str): str {
     let inspect = "<a target=\"_blank\" href=\"{this.siteDomain}/{repoOwner}/{appName}/{branch}\">Inspect</a>";
-    if status == "tests" {
+    if status == "running-server" {
+      return "Starting App";
+    }
+    if status == "running-tests" {
       return "Running Tests";
     }
     if status == "running" {
@@ -69,34 +79,34 @@ pub class GithubComment {
 
     let appOwner = this.getAppOwner(props.appId);
     for environment in this.environments.list(appId: props.appId) {
-      let shouldDisplayUrl = environment.status == "running";
-
       if environment.repo == props.repo && environment.prNumber == props.prNumber {
         let var testRows = "";
         let var passedTests = 0;
         let var failedTests = 0;
-        if let testResults = environment.testResults {
-          let var i = 0;
-          for testResult in testResults.testResults {
-            let var testRes = "";
-            if !testResult.pass {
-              testRes = "❌ Failed";
-              failedTests += 1;
-            } else {
-              testRes = "✅ Passed";
-              passedTests += 1;
-            }
+        if environment.status == "running" || environment.status == "running-server" {
+          if let testResults = environment.testResults {
+            let var i = 0;
+            for testResult in testResults.testResults {
+              let var testRes = "";
+              if !testResult.pass {
+                testRes = "❌ Failed";
+                failedTests += 1;
+              } else {
+                testRes = "✅ Passed";
+                passedTests += 1;
+              }
 
-            let testId = testResult.id;
-            let pathParts = testResult.path.split(":");
-            let testName = pathParts.at(pathParts.length - 1);
-            let testResourcePath = pathParts.at(0);
-            let var link = "";
-            if environment.status == "running" && appOwner? {
-              link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}?testId={testId}\">Logs</a>";
+              let testId = testResult.id;
+              let pathParts = testResult.path.split(":");
+              let testName = pathParts.at(pathParts.length - 1);
+              let testResourcePath = pathParts.at(0);
+              let var link = "";
+              if environment.status == "running" && appOwner? {
+                link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/tests?testId={testId}\">Logs</a>";
+              }
+              testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
+              i += 1;
             }
-            testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
-            i += 1;
           }
         }
 
@@ -111,10 +121,16 @@ pub class GithubComment {
         }
 
         let var endpointsString = "";
-        for endpoint in this.endpoints.list(environmentId: environment.id) {
-          let pathParts = endpoint.path.split("/");
-          let endpointUrl = "<a target=\"_blank\" href=\"{endpoint.publicUrl}\">{pathParts.at(pathParts.length - 1)}</a>";
-          endpointsString = "{endpointUrl}<br> {endpointsString}";
+        if environment.status == "running" {
+          for endpoint in this.endpoints.list(environmentId: environment.id) {
+            let var endpointText = endpoint.label;
+            let var endpointIcon = "🔗";
+            if endpoint.browserSupport {
+              endpointIcon = "🌐";
+            }
+            endpointText = "{endpointIcon} <a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.label}</a>";
+            endpointsString = "{endpointText}<br> {endpointsString}";
+          }
         }
 
         let date = std.Datetime.utcNow();
@@ -145,5 +161,16 @@ pub class GithubComment {
       let res = props.octokit.issues.createComment(owner: owner, repo: repo, issue_number: props.prNumber, body: commentBody);
       return res.data.id;
     }
+  }
+
+  pub inflight updateRepoInfo(props: GithubCommentUpdateRepoProps) {
+    let appOwner = this.getAppOwner(props.appId);
+    let environment = this.environments.get(id: props.environmentId);
+    let url = "{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}";
+    props.octokit.repos.update({
+      owner: environment.repo.split("/").at(0),
+      repo: environment.repo.split("/").at(1),
+      homepage: url,
+    });
   }
 }

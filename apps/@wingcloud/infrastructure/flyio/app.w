@@ -12,6 +12,13 @@ pub struct ICreateMachineProps {
   env: Map<str>;
   services: Array<client.IClientCreateMachineService>;
   files: Array<client.File>?;
+  mounts: Array<client.Mount>?;
+}
+
+pub struct ICreateVolumeProps {
+  name: str;
+  region: str;
+  size: num;
 }
 
 /**
@@ -95,6 +102,7 @@ inflight class FlyApp {
       memoryMb: props.memoryMb,
       env: props.env,
       files: props.files,
+      mounts: props.mounts,
       services: props.services,
     });
 
@@ -103,6 +111,26 @@ inflight class FlyApp {
       createMachineResult,
     );
     return createMachineResult;
+  }
+
+  pub updateMachine(machineId: str, props: ICreateMachineProps): client.ICreateMachineResult {
+    let updateMachineResult = this.props.client.updateMachine({
+      machineId: machineId,
+      appName: this.props.name,
+      imageName: props.imageName,
+      region: props.region,
+      memoryMb: props.memoryMb,
+      env: props.env,
+      files: props.files,
+      mounts: props.mounts,
+      services: props.services,
+    });
+
+    this.props.client.waitForMachineState(
+      this.props.name,
+      updateMachineResult,
+    );
+    return updateMachineResult;
   }
 
   /**
@@ -137,6 +165,18 @@ inflight class FlyApp {
 
   pub addSecrets(secrets: Map<str>) {
     this.props.client.createSecrets(this.props.name, secrets);
+  }
+
+  pub addVolume(props: ICreateVolumeProps): client.IClientVolume {
+    return this.props.client.createVolume(
+      appName: this.props.name,
+      name: props.name,
+      region: props.region,
+      size: props.size);
+  }
+
+  pub listVolumes(): Array<client.IClientVolume> {
+    return this.props.client.listVolumes(this.props.name);
   }
 }
 
