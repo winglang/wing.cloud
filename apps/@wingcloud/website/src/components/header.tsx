@@ -66,6 +66,23 @@ const UserMenu = ({ user }: UserMenuProps) => {
   );
 };
 
+const Separator = () => {
+  return (
+    <svg
+      className="h-5 w-5 flex-shrink-0 text-gray-400"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        fillRule="evenodd"
+        d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+};
+
 export interface HeaderProps {
   breadcrumbs?: Breadcrumb[];
   tabs?: Tab[];
@@ -95,7 +112,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
           <WingIcon className="h-5 w-auto" />
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto">
           <div>
             <Link
               to={dashboardLink}
@@ -114,7 +131,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
           </div>
           {breadcrumbs?.map((breadcrumb, index) => (
             <Fragment key={index}>
-              <span className="text-gray-600 text-sm">/</span>
+              <Separator />
               <Link
                 to={breadcrumb.to}
                 className={clsx(
@@ -126,9 +143,12 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
                   <span className="-ml-1">{breadcrumb.icon}</span>
                 ) : undefined}
                 <span
-                  className={clsx({
-                    "-ml-0.5": breadcrumb.icon,
-                  })}
+                  className={clsx(
+                    {
+                      "-ml-0.5": breadcrumb.icon,
+                    },
+                    "whitespace-nowrap",
+                  )}
                 >
                   {breadcrumb.label}
                 </span>
