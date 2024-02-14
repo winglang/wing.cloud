@@ -35,7 +35,7 @@ export default function Popover({
             >
               <HeadlessPopover.Panel
                 className={clsx(
-                  "absolute z-10 mt-3 transform px-4 right-0",
+                  "absolute z-20 mt-3 transform px-4 right-0",
                   theme.bgInput,
                   "border shadow-lg p-4 rounded-md",
                   theme.borderInput,

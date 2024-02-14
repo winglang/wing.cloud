@@ -7,6 +7,8 @@ import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { AnalyticsContext } from "../../../../../utils/analytics-provider.js";
 import type { Endpoint, Environment } from "../../../../../utils/wrpc.js";
 import { EndpointItem } from "./endpoint-item.js";
+import { Duplicator } from "../../../../../components/duplicator.js";
+import { EndpointItemSkeleton } from "./endpoint-item-skeleton.js";
 
 export interface EndpointsProps {
   endpoints: Endpoint[];
@@ -38,14 +40,14 @@ export const Endpoints = ({
   );
 
   return (
-    <div>
+    <div className="space-y-2">
       {(loading || !environment) && (
-        <div className="flex items-center justify-center p-4">
-          <SpinnerLoader />
-        </div>
+        <Duplicator count={3}>
+          <EndpointItemSkeleton />
+        </Duplicator>
       )}
       {!loading && environment && (
-        <div className="space-y-2">
+        <>
           {(endpoints.length === 0 || environment.status !== "running") && (
             <div
               className={clsx(
@@ -69,7 +71,7 @@ export const Endpoints = ({
                 onClick={onEndpointClick}
               />
             ))}
-        </div>
+        </>
       )}
     </div>
   );
