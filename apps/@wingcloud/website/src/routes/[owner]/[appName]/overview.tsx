@@ -114,7 +114,7 @@ const OverviewPage = ({
         <SectionTitle>Production</SectionTitle>
         <EnvironmentDetails
           owner={owner}
-          appName={appName}
+          app={app}
           environment={productionEnvironment}
           loading={loading}
           endpoints={endpoints}

@@ -9,15 +9,15 @@ import { SkeletonLoader } from "../../../../../design-system/skeleton-loader.js"
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
 import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js";
-import { GithubIcon } from "../../../../../icons/github-icon.js";
 import { useStatus } from "../../../../../utils/status.js";
 import { getDateTime } from "../../../../../utils/time.js";
-import type { Endpoint, Environment } from "../../../../../utils/wrpc.js";
+import type { App, Endpoint, Environment } from "../../../../../utils/wrpc.js";
+import { CommitIcon } from "../../../../../icons/commit-icon.js";
 
 export interface EvironmentDetailsProps {
   loading?: boolean;
   owner: string;
-  appName: string;
+  app?: App;
   environment?: Environment;
   endpoints?: Endpoint[];
   endpointsLoading?: boolean;
@@ -27,7 +27,7 @@ export interface EvironmentDetailsProps {
 
 export const EnvironmentDetails = ({
   owner,
-  appName,
+  app,
   environment,
   endpoints,
   endpointsLoading,
@@ -84,7 +84,7 @@ export const EnvironmentDetails = ({
         <button onClick={onClick} className="absolute inset-0 cursor-pointer" />
       )}
       <Link
-        to={`/${owner}/${appName}/${environment?.branch}/console`}
+        to={`/${owner}/${app?.appName}/${environment?.branch}/console`}
         onClick={(event) => {
           if (environment?.status !== "running") {
             event.preventDefault();
@@ -166,8 +166,8 @@ export const EnvironmentDetails = ({
               )}
               {environment && (
                 <div className="flex gap-x-1">
-                  <GithubIcon
-                    className={clsx("w-4 h-4 shrink-0", theme.text1)}
+                  <CommitIcon
+                    className={clsx("w-4 h-4 shrink-0", theme.text3)}
                   />
                   <Link
                     className={clsx(
@@ -175,10 +175,18 @@ export const EnvironmentDetails = ({
                       "font-semibold truncate",
                       theme.text2,
                     )}
-                    to={`https://github.com/${environment.repo}`}
+                    to={`https://github.com/${environment.repo}/commit/${app?.lastCommitSha}`}
+                    onClick={(event) => {
+                      if (!app) {
+                        event.preventDefault();
+                      }
+                    }}
                     target="_blank"
                   >
-                    {environment.repo}
+                    <div className="flex gap-x-2 truncate">
+                      <code>{app?.lastCommitSha?.slice(0, 7)}</code>
+                      <div className="truncate">{app?.lastCommitMessage}</div>
+                    </div>
                   </Link>
                 </div>
               )}

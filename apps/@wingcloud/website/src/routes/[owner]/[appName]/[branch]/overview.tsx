@@ -18,6 +18,19 @@ const Overview = ({
   appName: string;
   branch: string;
 }) => {
+  const { app, setOwner, setAppName } = useContext(
+    CurrentAppDataProviderContext,
+  );
+  setOwner(owner);
+  useEffect(() => {
+    setAppName(appName);
+  }, [appName]);
+
+  setAppName(appName);
+  useEffect(() => {
+    setAppName(appName);
+  }, [appName]);
+
   const environmentQuery = wrpc["app.environment"].useQuery({
     owner: owner!,
     appName: appName!,
@@ -51,6 +64,7 @@ const Overview = ({
         <SectionTitle>Overview</SectionTitle>
         <EnvironmentDetails
           owner={owner}
+          app={app}
           loading={environmentQuery.isLoading}
           environment={environment}
           actions={
