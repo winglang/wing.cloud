@@ -13,6 +13,7 @@ import { useStatus } from "../../../../../utils/status.js";
 import { getDateTime } from "../../../../../utils/time.js";
 import type { App, Endpoint, Environment } from "../../../../../utils/wrpc.js";
 import { CommitIcon } from "../../../../../icons/commit-icon.js";
+import { GithubIcon } from "../../../../../icons/github-icon.js";
 
 export interface EvironmentDetailsProps {
   loading?: boolean;
@@ -166,9 +167,10 @@ export const EnvironmentDetails = ({
                   </Link>
                 </div>
               )}
-              {environment && !app?.lastCommitMessage && (
+
+              {!app?.lastCommitSha && app?.appName && environment && (
                 <div className="flex gap-x-1 items-center">
-                  <CommitIcon
+                  <GithubIcon
                     className={clsx("w-4 h-4 shrink-0", theme.text3)}
                   />
                   <Link
@@ -177,19 +179,15 @@ export const EnvironmentDetails = ({
                       "font-semibold truncate",
                       theme.text2,
                     )}
-                    to={`https://github.com/${environment.repo}/commit/${app?.lastCommitSha}`}
-                    onClick={(event) => {
-                      if (!app) {
-                        event.preventDefault();
-                      }
-                    }}
+                    to={`https://github.com/${environment.repo}`}
                     target="_blank"
                   >
-                    {app?.lastCommitMessage}
+                    {app.appName}
                   </Link>
                 </div>
               )}
-              {environment && app?.lastCommitMessage && (
+
+              {app?.lastCommitMessage && environment && (
                 <div className="flex gap-x-1 items-center">
                   <CommitIcon
                     className={clsx("w-4 h-4 shrink-0", theme.text3)}
@@ -200,15 +198,10 @@ export const EnvironmentDetails = ({
                       "font-semibold truncate",
                       theme.text2,
                     )}
-                    to={`https://github.com/${environment.repo}/commit/${app?.lastCommitSha}`}
-                    onClick={(event) => {
-                      if (!app) {
-                        event.preventDefault();
-                      }
-                    }}
+                    to={`https://github.com/${environment.repo}/commit/${app.lastCommitSha}`}
                     target="_blank"
                   >
-                    {app?.lastCommitMessage}
+                    {app.lastCommitMessage}
                   </Link>
                 </div>
               )}
