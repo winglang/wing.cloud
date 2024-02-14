@@ -99,7 +99,9 @@ export const EnvironmentDetails = ({
             "transition-all",
             theme.borderInput,
             theme.bg3,
+            "cursor-default",
             environment?.status === "running" && [
+              "hover:cursor-pointer",
               "relative z-10 shadow-sm hover:shadow",
               "cursor-pointer",
             ],
