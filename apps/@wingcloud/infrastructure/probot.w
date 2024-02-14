@@ -32,6 +32,7 @@ pub class ProbotApp {
   environments: environments.Environments;
   environmentManager: environment_manager.EnvironmentManager;
   apps: apps.Apps;
+  inflight var initialized: bool;
 
   new(props: ProbotAppProps) {
     this.adapter = props.probotAdapter;
@@ -59,6 +60,10 @@ pub class ProbotApp {
       log("props: {Json.stringify(props, indent: 2)}");
       this.listen(props);
     });
+  }
+
+  inflight new() {
+    this.initialized = false;
   }
 
   inflight getVerifyAndReceievePropsProps(req: cloud.ApiRequest): probot.VerifyAndReceieveProps {
@@ -92,126 +97,131 @@ pub class ProbotApp {
   inflight listen(props: probot.VerifyAndReceieveProps) {
     log("listen");
 
-    let onPullRequestOpen = inflight (context: probot.IPullRequestOpenedContext): void => {
-      log("onPullRequestOpen");
-      log(Json.stringify(context.payload, indent: 2));
-      let branch = context.payload.pull_request.head.ref;
+    if (!this.initialized) {
+      log("not initialized");
+      
+      let onPullRequestOpen = inflight (context: probot.IPullRequestOpenedContext): void => {
+        log("onPullRequestOpen");
+        log(Json.stringify(context.payload, indent: 2));
+        let branch = context.payload.pull_request.head.ref;
 
-      let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
-      log("apps: {Json.stringify(apps, indent: 2)}");
-      for app in apps {
-        if let installation = context.payload.installation {
-          let time = datetime.fromIso(context.payload.pull_request.updated_at ?? datetime.utcNow().toIso());
-          this.environmentManager.create(
-            createEnvironment: {
-              branch: branch,
-              sha: context.payload.pull_request.head.sha,
+        let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
+        log("apps: {Json.stringify(apps, indent: 2)}");
+        for app in apps {
+          if let installation = context.payload.installation {
+            let time = datetime.fromIso(context.payload.pull_request.updated_at ?? datetime.utcNow().toIso());
+            this.environmentManager.create(
+              createEnvironment: {
+                branch: branch,
+                sha: context.payload.pull_request.head.sha,
+                appId: app.appId,
+                type: "preview",
+                repo: context.payload.repository.full_name,
+                status: "initializing",
+                installationId: installation.id,
+                prNumber: context.payload.pull_request.number,
+                prTitle: context.payload.pull_request.title,
+              },
+              owner: context.payload.repository.owner.login,
               appId: app.appId,
-              type: "preview",
-              repo: context.payload.repository.full_name,
-              status: "initializing",
-              installationId: installation.id,
-              prNumber: context.payload.pull_request.number,
-              prTitle: context.payload.pull_request.title,
-            },
-            owner: context.payload.repository.owner.login,
-            appId: app.appId,
-            entrypoint: app.entrypoint,
-            sha: context.payload.pull_request.head.sha,
-            timestamp: time.timestampMs,
-          );
-        } else {
-          throw "handlePullRequstOpened: missing installation id";
-        }
-      }
-    };
-
-    this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestOpenedContext): void => {
-      log("handlePullRequstOpened");
-      // TODO [sa] open a bug for this workaround
-      onPullRequestOpen(context);
-    });
-
-    this.adapter.handlePullRequstReopened(inflight (context: probot.IPullRequestOpenedContext): void => {
-      log("handlePullRequstReopened");
-      // TODO [sa] open a bug for this workaround
-      onPullRequestOpen(context);
-    });
-
-    this.adapter.handlePullRequstClosed(inflight (context: probot.IPullRequestClosedContext): void => {
-      let branch = context.payload.pull_request.head.ref;
-
-      let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
-      for app in apps {
-        for environment in this.environments.list(appId: app.appId) {
-          if environment.branch != branch || environment.status == "stopped" {
-            continue;
+              entrypoint: app.entrypoint,
+              sha: context.payload.pull_request.head.sha,
+              timestamp: time.timestampMs,
+            );
+          } else {
+            throw "handlePullRequstOpened: missing installation id";
           }
-
-          let time = datetime.fromIso(context.payload.pull_request.closed_at ?? datetime.utcNow().toIso());
-          this.environmentManager.stop(
-            appId: app.appId,
-            appName: app.appName,
-            environment: environment,
-            timestamp: time.timestampMs,
-            delete: false,
-          );
         }
-      }
-    });
+      };
 
-    this.adapter.handlePullRequstSync(inflight (context: probot.IPullRequestSyncContext): void => {
-      let branch = context.payload.pull_request.head.ref;
+      this.adapter.handlePullRequstOpened(inflight (context: probot.IPullRequestOpenedContext): void => {
+        log("handlePullRequstOpened");
+        // TODO [sa] open a bug for this workaround
+        onPullRequestOpen(context);
+      });
 
-      let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
-      for app in apps {
-        for environment in this.environments.list(appId: app.appId) {
-          if environment.branch != branch || environment.status == "stopped" {
-            continue;
+      this.adapter.handlePullRequstReopened(inflight (context: probot.IPullRequestOpenedContext): void => {
+        log("handlePullRequstReopened");
+        // TODO [sa] open a bug for this workaround
+        onPullRequestOpen(context);
+      });
+
+      this.adapter.handlePullRequstClosed(inflight (context: probot.IPullRequestClosedContext): void => {
+        let branch = context.payload.pull_request.head.ref;
+
+        let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
+        for app in apps {
+          for environment in this.environments.list(appId: app.appId) {
+            if environment.branch != branch || environment.status == "stopped" {
+              continue;
+            }
+
+            let time = datetime.fromIso(context.payload.pull_request.closed_at ?? datetime.utcNow().toIso());
+            this.environmentManager.stop(
+              appId: app.appId,
+              appName: app.appName,
+              environment: environment,
+              timestamp: time.timestampMs,
+              delete: false,
+            );
           }
-
-          this.environmentManager.restart(
-            environment: environment,
-            appId: app.appId,
-            entrypoint: app.entrypoint,
-            sha: context.payload.pull_request.head.sha,
-            timestamp: datetime.utcNow().timestampMs,
-          );
         }
-      }
-    });
+      });
 
-    this.adapter.handlePush(inflight (context: probot.IPushContext) => {
-      let branch = context.payload.ref.replace("refs/heads/", "");
+      this.adapter.handlePullRequstSync(inflight (context: probot.IPullRequestSyncContext): void => {
+        let branch = context.payload.pull_request.head.ref;
 
-      let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
-      for app in apps {
-        for environment in this.environments.list(appId: app.appId) {
-          if environment.branch != branch || environment.status == "stopped" || environment.type != "production" {
-            continue;
+        let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
+        for app in apps {
+          for environment in this.environments.list(appId: app.appId) {
+            if environment.branch != branch || environment.status == "stopped" {
+              continue;
+            }
+
+            this.environmentManager.restart(
+              environment: environment,
+              appId: app.appId,
+              entrypoint: app.entrypoint,
+              sha: context.payload.pull_request.head.sha,
+              timestamp: datetime.utcNow().timestampMs,
+            );
           }
-
-          this.apps.updatLastCommit(
-            appId: app.appId,
-            appName: app.appName,
-            repoId: app.repoId,
-            userId: app.userId,
-            lastCommitMessage: context.payload.head_commit.message,
-            lastCommitSha: context.payload.after,
-            lastCommitDate: context.payload.head_commit.timestamp,
-          );
-
-          this.environmentManager.restart(
-            environment: environment,
-            appId: app.appId,
-            entrypoint: app.entrypoint,
-            sha: context.payload.after,
-            timestamp: datetime.utcNow().timestampMs,
-          );
         }
-      }
-    });
+      });
 
+      this.adapter.handlePush(inflight (context: probot.IPushContext) => {
+        let branch = context.payload.ref.replace("refs/heads/", "");
+
+        let apps = this.apps.listByRepository(repository: context.payload.repository.full_name);
+        for app in apps {
+          for environment in this.environments.list(appId: app.appId) {
+            if environment.branch != branch || environment.status == "stopped" || environment.type != "production" {
+              continue;
+            }
+
+            this.apps.updatLastCommit(
+              appId: app.appId,
+              appName: app.appName,
+              repoId: app.repoId,
+              userId: app.userId,
+              lastCommitMessage: context.payload.head_commit.message,
+              lastCommitSha: context.payload.after,
+              lastCommitDate: context.payload.head_commit.timestamp,
+            );
+
+            this.environmentManager.restart(
+              environment: environment,
+              appId: app.appId,
+              entrypoint: app.entrypoint,
+              sha: context.payload.after,
+              timestamp: datetime.utcNow().timestampMs,
+            );
+          }
+        }
+      });
+    }
+
+    this.initialized = true;
     this.adapter.verifyAndReceive(props);
   }
 }
