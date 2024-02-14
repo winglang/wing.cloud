@@ -21,12 +21,9 @@ const Overview = ({
   const { app, setOwner, setAppName } = useContext(
     CurrentAppDataProviderContext,
   );
-  setOwner(owner);
   useEffect(() => {
-    setAppName(appName);
-  }, [appName]);
-
-  setAppName(appName);
+    setOwner(owner);
+  }, [owner]);
   useEffect(() => {
     setAppName(appName);
   }, [appName]);
