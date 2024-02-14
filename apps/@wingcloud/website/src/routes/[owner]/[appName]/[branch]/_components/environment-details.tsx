@@ -166,7 +166,30 @@ export const EnvironmentDetails = ({
                   </Link>
                 </div>
               )}
-              {environment && (
+              {environment && !app?.lastCommitMessage && (
+                <div className="flex gap-x-1 items-center">
+                  <CommitIcon
+                    className={clsx("w-4 h-4 shrink-0", theme.text3)}
+                  />
+                  <Link
+                    className={clsx(
+                      "hover:underline truncate relative z-10",
+                      "font-semibold truncate",
+                      theme.text2,
+                    )}
+                    to={`https://github.com/${environment.repo}/commit/${app?.lastCommitSha}`}
+                    onClick={(event) => {
+                      if (!app) {
+                        event.preventDefault();
+                      }
+                    }}
+                    target="_blank"
+                  >
+                    {app?.lastCommitMessage}
+                  </Link>
+                </div>
+              )}
+              {environment && app?.lastCommitMessage && (
                 <div className="flex gap-x-1 items-center">
                   <CommitIcon
                     className={clsx("w-4 h-4 shrink-0", theme.text3)}
