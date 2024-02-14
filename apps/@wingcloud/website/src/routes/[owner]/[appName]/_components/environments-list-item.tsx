@@ -82,12 +82,13 @@ export const EnvironmentsListItem = ({
               "w-8 h-8",
               "rounded-full border-slate-300 border",
               theme.text2,
+              "shrink-0",
             )}
           />
           <StatusDot status={status} />
         </div>
 
-        <div className="flex justify-between items-center truncate grow">
+        <div className="flex gap-x-2 justify-between items-center truncate grow">
           <div className="text-xs space-y-1 truncate">
             <Link
               to={`/${owner}/${appName}/${environment.branch}`}
@@ -100,32 +101,31 @@ export const EnvironmentsListItem = ({
             >
               {environment.prTitle}
             </Link>
-
-            <div className="truncate flex gap-x-2 sm:gap-x-5">
+            <div className="flex gap-x-2 sm:gap-x-5">
               <div
                 className={clsx(
-                  "truncate",
+                  "truncate w-full",
                   "flex gap-x-1 items-center",
                   "leading-5 py-0.5",
                   theme.text2,
                 )}
               >
-                <GithubIcon className="w-3 h-3 inline-block" />
+                <GithubIcon className="w-3 h-3 inline-block shrink-0" />
                 <Link
                   to={`https://github.com/${environment.repo}/tree/${environment.branch}`}
                   target="_blank"
                   className={clsx(
-                    "truncate items-end flex font-mono",
+                    "font-mono truncate",
                     theme.text2,
                     theme.text2Hover,
                     "hover:underline z-10 cursor-pointer",
                   )}
                 >
-                  {environment.branch}
+                  <div className="truncate">{environment.branch}</div>
                 </Link>
                 <span
                   className={clsx(
-                    "truncate items-center flex opacity-70",
+                    "truncate items-center opacity-70",
                     theme.text2,
                   )}
                 >
@@ -134,27 +134,29 @@ export const EnvironmentsListItem = ({
               </div>
 
               {testStatus && (
-                <Link
-                  to={`/${owner}/${appName}/${environment.branch}/#${TEST_LOGS_ID}`}
-                  className={clsx(
-                    "flex items-center gap-x-0.5",
-                    "rounded-xl px-1 py-0.5",
-                    "border",
-                    theme.bg3,
-                    theme.bg3Hover,
-                    theme.border3,
-                    "hover:underline z-10 cursor-pointer",
-                  )}
-                  title={`tests ${testStatus}`}
-                >
-                  <BeakerIcon className={clsx("w-4 h-4", theme.text2)} />
-                  {testStatus === "passed" && (
-                    <CheckCircleIcon className="w-4 h-4 text-green-500" />
-                  )}
-                  {testStatus === "failed" && (
-                    <XCircleIcon className="w-4 h-4 text-red-500" />
-                  )}
-                </Link>
+                <div>
+                  <Link
+                    to={`/${owner}/${appName}/${environment.branch}/#${TEST_LOGS_ID}`}
+                    className={clsx(
+                      "flex items-center gap-x-0.5",
+                      "rounded-xl px-1 py-0.5",
+                      "border",
+                      theme.bg3,
+                      theme.bg3Hover,
+                      theme.border3,
+                      "hover:underline z-10 cursor-pointer",
+                    )}
+                    title={`tests ${testStatus}`}
+                  >
+                    <BeakerIcon className={clsx("w-4 h-4", theme.text2)} />
+                    {testStatus === "passed" && (
+                      <CheckCircleIcon className="w-4 h-4 text-green-500" />
+                    )}
+                    {testStatus === "failed" && (
+                      <XCircleIcon className="w-4 h-4 text-red-500" />
+                    )}
+                  </Link>
+                </div>
               )}
             </div>
           </div>
