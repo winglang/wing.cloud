@@ -183,9 +183,7 @@ export const EnvironmentDetails = ({
                     }}
                     target="_blank"
                   >
-                    <div className="flex gap-x-2 truncate">
-                      {app?.lastCommitMessage}
-                    </div>
+                    {app?.lastCommitMessage}
                   </Link>
                 </div>
               )}
