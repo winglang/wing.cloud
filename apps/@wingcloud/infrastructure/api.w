@@ -264,6 +264,25 @@ pub class Api {
       throw httpError.HttpError.badRequest("Installation not found");
     };
 
+    let getAuthCookie = inflight (userId: str): str => {
+      let jwt = JWT.JWT.sign(
+        secret: props.appSecret,
+        userId: userId,
+      );
+
+      return Cookie.Cookie.serialize(
+        AUTH_COOKIE_NAME,
+        jwt,
+        {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+          maxAge: 10,
+        },
+      );
+    };
+
     api.get("/wrpc/ws.invalidateQuery.auth", inflight (request) => {
       try {
         let userId = getUserIdFromCookie(request);
@@ -292,9 +311,14 @@ pub class Api {
         // check if user exists in the db
         let user = users.get(userId: userId);
 
+        let authCookie = getAuthCookie(userId);
+
         return {
           body: {
             user: user
+          },
+          headers: {
+            "Set-Cookie": authCookie,
           },
         };
       } catch {
@@ -340,6 +364,7 @@ pub class Api {
           github: event.github,
         });
     });
+
     api.get("/wrpc/github.callback", inflight (request) => {
       let code = request.query.get("code");
 
@@ -360,22 +385,7 @@ pub class Api {
 
       githubAccessTokens.set(user.id, tokens);
 
-      let jwt = JWT.JWT.sign(
-        secret: props.appSecret,
-        userId: user.id,
-      );
-
-      let authCookie = Cookie.Cookie.serialize(
-        AUTH_COOKIE_NAME,
-        jwt,
-        {
-          httpOnly: true,
-          secure: true,
-          sameSite: "strict",
-          path: "/",
-          maxAge: 1h.seconds,
-        },
-      );
+      let authCookie = getAuthCookie(user.id);
 
       // The default redirect location is the user's profile page,
       // but in the case of the Console Sign In process, we want to redirect
