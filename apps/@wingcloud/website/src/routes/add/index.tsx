@@ -166,7 +166,6 @@ const AddAppPage = () => {
             <div
               className={clsx(
                 "w-full rounded-md p-6 sm:p-8 space-y-4 border",
-                "min-h-[500px]",
                 "shadow",
                 theme.bg4,
                 theme.borderInput,
@@ -199,7 +198,7 @@ const AddAppPage = () => {
                     Missing a repository?
                   </span>
                   <button
-                    className="text-sky-600 text-left"
+                    className="text-sky-600 text-left hover:underline"
                     onClick={() =>
                       openPopupWindow({
                         url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
