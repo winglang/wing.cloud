@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { SectionTitle } from "../../../../components/section-title.js";
@@ -7,7 +7,6 @@ import { wrpc } from "../../../../utils/wrpc.js";
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
 import { Button } from "../../../../design-system/button.js";
-import { CurrentAppDataProviderContext } from "../../../../data-store/current-app-data-provider.js";
 
 const Overview = ({
   owner,
@@ -51,6 +50,7 @@ const Overview = ({
         <SectionTitle>Overview</SectionTitle>
         <EnvironmentDetails
           owner={owner}
+          appName={appName}
           loading={environmentQuery.isLoading}
           environment={environment}
           actions={
