@@ -167,7 +167,7 @@ export const EnvironmentDetails = ({
                 </div>
               )}
               {environment && (
-                <div className="flex gap-x-1">
+                <div className="flex gap-x-1 items-center">
                   <CommitIcon
                     className={clsx("w-4 h-4 shrink-0", theme.text3)}
                   />
