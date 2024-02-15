@@ -120,7 +120,7 @@ let dashboard = new vite.Vite(
     "GITHUB_APP_CLIENT_ID": util.env("BOT_GITHUB_CLIENT_ID"),
     "GITHUB_APP_NAME": util.env("BOT_GITHUB_APP_NAME"),
   },
-);
+) as "website";
 
 let siteURL = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
@@ -242,7 +242,7 @@ let proxyUrl = (() => {
       dashboardDomainName: getDomainName(dashboard.url),
       zoneName: util.env("PROXY_ZONE_NAME"),
       subDomain: util.tryEnv("PROXY_SUBDOMAIN"),
-    ) as "website proxy";
+    ) as "wing proxy";
 
     return proxy.url;
   } elif util.env("WING_TARGET") == "sim" {
