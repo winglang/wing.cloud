@@ -285,16 +285,21 @@ pub class Api {
 
     api.addMiddleware(inflight (request, next) => {
       let response = next(request);
+      let headers = (response.headers ?? {}).copyMut();
+
+      if headers.has("Set-Cookie") {
+        return response;
+      }
+
       try {
         let userId = getUserIdFromCookie(request);
         let cookie = getAuthCookie(userId);
-        let headers = response.headers?.copyMut();
-        headers?.set("Set-Cookie", cookie);
+        headers.set("Set-Cookie", cookie);
 
         return {
           status: response.status,
           body: response.body,
-          headers: headers?.copy(),
+          headers: headers.copy(),
         };
       } catch {
         return response;
