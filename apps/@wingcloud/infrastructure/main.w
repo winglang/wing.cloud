@@ -108,7 +108,7 @@ let rntm = new runtime.RuntimeService(
 let runtimeUrlParam = new parameter.Parameter(
   name: "runtime-url",
   value: rntm.api.url,
-) as "runtime-url";
+) as "runtime-service-url";
 
 let dashboard = new vite.Vite(
   root: "../website",
