@@ -286,9 +286,9 @@ if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" 
 }
 if util.tryEnv("WING_TARGET") != "sim" {
   let webhookUrl = probotApp.githubApp.api.url;
-    let updateGithubWebhook = inflight () => {
-      probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
-      log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
+  let updateGithubWebhook = inflight () => {
+    probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
+    log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
   };
   new cloud.OnDeploy(updateGithubWebhook);
 }
