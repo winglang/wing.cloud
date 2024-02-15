@@ -114,6 +114,7 @@ vite.addFields({
 
 vite.addDevDeps("vite");
 vite.addDeps("dotenv");
+vite.addDeps("mime-types");
 
 vite.addDeps("constructs", "cdktf", "@cdktf/provider-aws");
 

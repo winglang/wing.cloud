@@ -577,6 +577,9 @@ importers:
       dotenv:
         specifier: ^16.4.3
         version: 16.4.3
+      mime-types:
+        specifier: ^2.1.35
+        version: 2.1.35
     devDependencies:
       vite:
         specifier: ^5.1.1
