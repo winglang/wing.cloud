@@ -107,7 +107,7 @@ return fn(event);
       "true"
     ) {
       const schedule = new Schedule(this, "Schedule", {
-        rate: Duration.fromMinutes(1),
+        rate: Duration.fromMinutes(5),
       });
       const onTickHandler = Testing.makeHandler(
         `
