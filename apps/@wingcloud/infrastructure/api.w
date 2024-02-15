@@ -145,7 +145,7 @@ pub class Api {
     let apps = props.apps;
     let users = props.users;
     let logs = props.logs;
-    let environmentsQueue = new cloud.Queue() as "Environments";
+    let environmentsQueue = new cloud.Queue() as "Environments-Queue";
 
     let INVALIDATE_SUBSCRIPTION_ID = "invalidateQuery";
     let invalidateQuery = new InvalidateQuery.InvalidateQuery(
@@ -366,7 +366,7 @@ pub class Api {
       };
     });
 
-    let analyticsSignInQueue = new cloud.Queue() as "AnalyticsSignInQueue";
+    let analyticsSignInQueue = new cloud.Queue() as "AnalyticsSignIn-Queue";
     analyticsSignInQueue.setConsumer(inflight (message) => {
       let event = AnalyticsSignInMessage.fromJson(Json.parse(message));
       props.analytics.identify(
@@ -527,7 +527,7 @@ pub class Api {
       }
     });
 
-    let productionEnvironmentQueue = new cloud.Queue() as "Production Environment";
+    let productionEnvironmentQueue = new cloud.Queue() as "ProductionEnvironment-Queue";
     productionEnvironmentQueue.setConsumer(inflight (event) => {
       let input = CreateProductionEnvironmentMessage.fromJson(Json.parse(event));
       if let accessToken = githubAccessTokens.get(input.userId)?.access_token {
@@ -706,7 +706,7 @@ pub class Api {
       throw httpError.HttpError.notFound();
     });
 
-    let deleteAppQueue = new cloud.Queue() as "Delete App";
+    let deleteAppQueue = new cloud.Queue() as "DeleteApp-Queue";
     deleteAppQueue.setConsumer(inflight (event) => {
       let input = DeleteAppMessage.fromJson(Json.parse(event));
 
@@ -1096,7 +1096,7 @@ pub class Api {
     });
 
 
-    let notifyEnvReportQueue = new cloud.Queue() as "Environment Report";
+    let notifyEnvReportQueue = new cloud.Queue() as "EnvironmentReport-Queue";
     notifyEnvReportQueue.setConsumer(inflight (event) => {
       let input = EnvironmentReportMessage.fromJson(Json.parse(event));
 
