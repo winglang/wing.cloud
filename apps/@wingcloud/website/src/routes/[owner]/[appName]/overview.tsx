@@ -3,18 +3,18 @@ import {
   ArrowRightIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { SectionTitle } from "../../../components/section-title.js";
 import { Input } from "../../../design-system/input.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
-import { BranchIcon } from "../../../icons/branch-icon.js";
 import { wrpc } from "../../../utils/wrpc.js";
 
 import { EnvironmentDetails } from "./[branch]/_components/environment-details.js";
 import { EnvironmentsListItemSkeleton } from "./_components/environments-list-item-skeleton.js";
 import { EnvironmentsListItem } from "./_components/environments-list-item.js";
+import { BranchIcon } from "../../../icons/branch-icon.js";
 
 const OverviewPage = ({
   owner,
@@ -197,7 +197,7 @@ const OverviewPage = ({
                 )}
               >
                 <BranchIcon
-                  className={clsx("w-12 h-12 mx-auto", theme.text3)}
+                  className={clsx("w-10 h-10 mx-auto", theme.text3)}
                 />
                 <h3 className={clsx("text-sm font-medium", theme.text2)}>
                   No preview environments found.

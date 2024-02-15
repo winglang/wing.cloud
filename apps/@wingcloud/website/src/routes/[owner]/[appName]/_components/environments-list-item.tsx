@@ -15,7 +15,7 @@ import { useTimeAgo } from "../../../../utils/time.js";
 import type { Environment } from "../../../../utils/wrpc.js";
 import { DEPLOYMENT_LOGS_ID } from "../[branch]/logs.js";
 import { TEST_LOGS_ID } from "../[branch]/tests-page.js";
-import { PreviewIcon } from "../../../../icons/preview-icon.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
 
 type ErrorStatus = "failed" | "passed";
 
@@ -76,10 +76,8 @@ export const EnvironmentsListItem = ({
         to={`/${owner}/${appName}/${environment.branch}`}
       />
       <div className="flex items-center justify-center gap-x-4">
-        <div
-          className={clsx("relative", "rounded-full border p-2", theme.border3)}
-        >
-          <PreviewIcon className={clsx("w-5 h-5", theme.text2, "shrink-0")} />
+        <div className="relative rounded-full p-2 bg-gray-50">
+          <BranchIcon className={clsx("w-6 h-6", theme.text2, "shrink-0")} />
           <StatusDot status={status} />
         </div>
 
