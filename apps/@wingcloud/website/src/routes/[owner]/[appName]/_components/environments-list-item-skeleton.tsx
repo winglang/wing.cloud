@@ -2,7 +2,7 @@ import clsx from "clsx";
 
 import { SkeletonLoader } from "../../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
-import { BranchIcon } from "../../../../icons/branch-icon.js";
+import { PreviewIcon } from "../../../../icons/preview-icon.js";
 
 export const EnvironmentsListItemSkeleton = ({
   short = false,
@@ -22,14 +22,10 @@ export const EnvironmentsListItemSkeleton = ({
       )}
     >
       <div className="flex items-center gap-x-4">
-        <div className="relative">
-          <BranchIcon
-            className={clsx(
-              "w-8 h-8 ",
-              "rounded-full border-slate-300 border",
-              theme.text2,
-            )}
-          />
+        <div
+          className={clsx("relative", "rounded-full border p-2", theme.border3)}
+        >
+          <PreviewIcon className={clsx("w-5 h-5", theme.text2, "shrink-0")} />
         </div>
 
         <div className="w-full space-y-2 py-0.5">
