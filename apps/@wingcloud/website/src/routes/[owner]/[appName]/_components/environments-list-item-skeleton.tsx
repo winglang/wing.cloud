@@ -18,7 +18,7 @@ export const EnvironmentsListItemSkeleton = ({
         theme.bgInput,
         "border",
         theme.borderInput,
-        "shadow-sm hover:shadow",
+        "shadow-sm",
       )}
     >
       <div className="flex items-center gap-x-4">
