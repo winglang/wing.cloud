@@ -40,14 +40,14 @@ pub class JsonApi {
 
       inflight applyMiddlewares(request: cloud.ApiRequest, index: num?): JsonApiResponse {
         if let middleware = middlewares.tryAt(index ?? 0) {
-          let callback = (request: cloud.ApiRequest): JsonApiResponse => {
+          let next = (request: cloud.ApiRequest): JsonApiResponse => {
             let newIndex = (index ?? 0) + 1;
             if newIndex < middlewares.length {
               return this.applyMiddlewares(request, newIndex);
             }
             return handler(request);
           };
-          return middleware.handle(request, callback);
+          return middleware.handle(request, next);
         }
         return handler(request);
       }
