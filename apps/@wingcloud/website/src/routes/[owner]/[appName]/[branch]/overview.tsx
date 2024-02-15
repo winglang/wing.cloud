@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { SectionTitle } from "../../../../components/section-title.js";
@@ -7,7 +7,6 @@ import { wrpc } from "../../../../utils/wrpc.js";
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
 import { Button } from "../../../../design-system/button.js";
-import { CurrentAppDataProviderContext } from "../../../../data-store/current-app-data-provider.js";
 
 const Overview = ({
   owner,
@@ -18,15 +17,18 @@ const Overview = ({
   appName: string;
   branch: string;
 }) => {
-  const { app, setOwner, setAppName } = useContext(
-    CurrentAppDataProviderContext,
+  const getAppQuery = wrpc["app.getByName"].useQuery(
+    {
+      owner: owner!,
+      appName: appName!,
+    },
+    {
+      enabled: !!owner && !!appName,
+    },
   );
-  useEffect(() => {
-    setOwner(owner);
-  }, [owner]);
-  useEffect(() => {
-    setAppName(appName);
-  }, [appName]);
+  const app = useMemo(() => {
+    return getAppQuery.data?.app;
+  }, [getAppQuery.data]);
 
   const environmentQuery = wrpc["app.environment"].useQuery({
     owner: owner!,

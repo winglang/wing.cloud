@@ -7,7 +7,6 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { SectionTitle } from "../../../components/section-title.js";
-import { CurrentAppDataProviderContext } from "../../../data-store/current-app-data-provider.js";
 import { Input } from "../../../design-system/input.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
@@ -24,13 +23,18 @@ const OverviewPage = ({
   owner: string;
   appName: string;
 }) => {
-  const { app, setOwner, setAppName } = useContext(
-    CurrentAppDataProviderContext,
+  const getAppQuery = wrpc["app.getByName"].useQuery(
+    {
+      owner: owner!,
+      appName: appName!,
+    },
+    {
+      enabled: !!owner && !!appName,
+    },
   );
-  useEffect(() => {
-    setOwner(owner);
-    setAppName(appName);
-  }, [owner, appName]);
+  const app = useMemo(() => {
+    return getAppQuery.data?.app;
+  }, [getAppQuery.data]);
 
   const navigate = useNavigate();
 
