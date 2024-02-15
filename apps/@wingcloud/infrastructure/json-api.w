@@ -58,6 +58,9 @@ pub class JsonApi {
             };
           }
 
+          log("Internal server error");
+          log(unsafeCast(error));
+
           return {
             status: 500,
             headers: {
