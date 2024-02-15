@@ -37,7 +37,6 @@ pub class JsonApi {
     middlewares: Array<Middleware>,
   ): inflight (cloud.ApiRequest): cloud.ApiResponse {
     class MyHandler {
-
       inflight applyMiddlewares(request: cloud.ApiRequest, index: num?): JsonApiResponse {
         if let middleware = middlewares.tryAt(index ?? 0) {
           let next = (request: cloud.ApiRequest): JsonApiResponse => {

@@ -264,7 +264,7 @@ pub class Api {
       throw httpError.HttpError.badRequest("Installation not found");
     };
 
-    let getAuthCookie = inflight (userId: str): str => {
+    let createAuthCookie = inflight (userId: str): str => {
       let jwt = JWT.JWT.sign(
         secret: props.appSecret,
         userId: userId,
@@ -283,6 +283,8 @@ pub class Api {
       );
     };
 
+    // This middleware refreshes the expiration time of the auth cookie,
+    // unless the cookie is already set during the response.
     api.addMiddleware(inflight (request, next) => {
       let response = next(request);
       let headers = (response.headers ?? {}).copyMut();
@@ -293,7 +295,7 @@ pub class Api {
 
       try {
         let userId = getUserIdFromCookie(request);
-        let cookie = getAuthCookie(userId);
+        let cookie = createAuthCookie(userId);
         headers.set("Set-Cookie", cookie);
 
         return {
@@ -403,7 +405,7 @@ pub class Api {
 
       githubAccessTokens.set(user.id, tokens);
 
-      let authCookie = getAuthCookie(user.id);
+      let authCookie = createAuthCookie(user.id);
 
       // The default redirect location is the user's profile page,
       // but in the case of the Console Sign In process, we want to redirect
