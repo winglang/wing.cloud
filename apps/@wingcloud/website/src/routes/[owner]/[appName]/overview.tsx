@@ -1,6 +1,6 @@
 import {
   MagnifyingGlassCircleIcon,
-  ArrowTopRightOnSquareIcon,
+  ArrowRightIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useContext, useEffect, useMemo, useState } from "react";
@@ -112,9 +112,9 @@ const OverviewPage = ({
         <SectionTitle>Production</SectionTitle>
         <EnvironmentDetails
           owner={owner}
-          appName={appName}
+          app={app}
           environment={productionEnvironment}
-          loading={!productionEnvironment}
+          loading={loading}
           endpoints={endpoints}
           endpointsLoading={
             endpointsQuery.isLoading || endpointsQuery.data === undefined
@@ -126,22 +126,24 @@ const OverviewPage = ({
             navigate(`/${owner}/${appName}/${productionEnvironment.branch}`);
           }}
           actions={
-            <>
-              {productionEnvironment?.branch && (
-                <Link
-                  to={`/${owner}/${appName}/${productionEnvironment.branch}`}
-                  className={clsx(
-                    theme.text2,
-                    theme.text3Hover,
-                    theme.bg4Hover,
-                    "transition-all",
-                    "z-10 rounded-full p-1.5",
-                  )}
-                >
-                  <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-                </Link>
+            <Link
+              to={`/${owner}/${appName}/${productionEnvironment?.branch}`}
+              onClick={(e) => {
+                if (!productionEnvironment?.branch) {
+                  e.preventDefault();
+                }
+              }}
+              className={clsx(
+                theme.text2,
+                theme.text1Hover,
+                theme.bg4Hover,
+                "transition-all",
+                "z-10 rounded-full p-1.5",
+                "sm:opacity-0 group-hover:opacity-100",
               )}
-            </>
+            >
+              <ArrowRightIcon className="w-4 h-4" />
+            </Link>
           }
         />
       </div>

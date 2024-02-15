@@ -41,23 +41,21 @@ export const EndpointItem = ({
       onClick={() => onClick}
     >
       <div className="flex items-center gap-x-4">
-        <div className="relative">
-          {endpoint.browserSupport && (
-            <GlobeAltIcon
-              className="w-4 h-4 mr-1 text-violet-700 dark:text-violet-400"
-              title="Website"
-            />
-          )}
-          {!endpoint.browserSupport && (
-            <BoltIcon
-              className="w-4 h-4 mr-1 text-amber-500 dark:text-amber-400"
-              title="Function"
-            />
-          )}
-        </div>
+        {endpoint.browserSupport && (
+          <GlobeAltIcon
+            className="w-4 h-4 mr-1 text-violet-700 dark:text-violet-400 shrink-0"
+            title="Website"
+          />
+        )}
+        {!endpoint.browserSupport && (
+          <BoltIcon
+            className="w-4 h-4 mr-1 text-amber-500 dark:text-amber-400 shrink-0"
+            title="Function"
+          />
+        )}
 
         <div className="flex justify-between items-center truncate grow">
-          <div className="text-xs space-y-1 truncate">
+          <div className="text-xs space-y-1 truncate w-full">
             <div
               className={clsx(
                 "font-medium truncate relative",
@@ -68,50 +66,48 @@ export const EndpointItem = ({
               {endpoint.label}
             </div>
 
-            <div className="truncate flex gap-x-2 sm:gap-x-5">
-              <div
-                className={clsx(
-                  "truncate",
-                  "flex gap-x-1 items-center",
-                  "leading-5 py-0.5",
-                  theme.text2,
-                )}
-              >
-                <div className="flex gap-x-1 items-center">
-                  <div className="group flex gap-x-1 items-center">
-                    <Link
-                      to={endpoint.publicUrl}
-                      target="_blank"
-                      className={clsx(
-                        "truncate items-end flex font-mono",
-                        theme.text2,
-                        theme.text2Hover,
-                        "hover:underline",
-                      )}
-                    >
-                      {endpoint.publicUrl}
-                    </Link>
-                    <DocumentDuplicateIcon
-                      className={clsx(
-                        "transition-all",
-                        "cursor-pointer",
-                        theme.text3,
-                        theme.text3Hover,
-                        "w-0 h-0 group-hover:block group-hover:w-4 group-hover:h-4",
-                        "z-10",
-                      )}
-                      onClick={copyEndpointLink}
-                    />
-                  </div>
-                  <span
+            <div
+              className={clsx(
+                "flex gap-x-1 items-center w-full",
+                "sm:gap-x-5 truncate",
+                "leading-5 py-0.5",
+                theme.text2,
+              )}
+            >
+              <div className="flex gap-x-1 w-full">
+                <div className="group flex gap-x-1 items-center truncate">
+                  <Link
+                    to={endpoint.publicUrl}
+                    target="_blank"
                     className={clsx(
-                      "truncate items-center flex opacity-70",
-                      "transition-all",
+                      "truncate items-end font-mono",
                       theme.text2,
+                      theme.text2Hover,
+                      "hover:underline",
                     )}
                   >
-                    updated {updatedAt}
-                  </span>
+                    {endpoint.publicUrl}
+                  </Link>
+                  <DocumentDuplicateIcon
+                    className={clsx(
+                      "transition-all",
+                      "cursor-pointer",
+                      theme.text3,
+                      theme.text3Hover,
+                      "w-0 h-0 group-hover:block group-hover:w-4 group-hover:h-4",
+                      "z-10 shrink-0",
+                    )}
+                    onClick={copyEndpointLink}
+                  />
+                </div>
+                <div
+                  className={clsx(
+                    "truncate items-center opacity-70",
+                    "transition-all",
+                    theme.text2,
+                  )}
+                >
+                  updated {updatedAt}
                 </div>
               </div>
             </div>
