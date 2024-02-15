@@ -11,4 +11,5 @@ node_modules/
 !/turbo.json
 !/.prettierrc.json
 !/.editorconfig
+examples/**/target/
 !/.projenrc.ts

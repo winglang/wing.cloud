@@ -7,10 +7,10 @@
     "turbo": "^1.12.3"
   },
   "devDependencies": {
-    "@skyrpex/wingen": "^0.6.94",
+    "@skyrpex/wingen": "^0.6.95",
     "@types/node": "20",
     "prettier": "^3.2.5",
-    "projen": "^0.79.17",
+    "projen": "^0.79.19",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3"
   },
