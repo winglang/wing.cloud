@@ -283,6 +283,25 @@ pub class Api {
       );
     };
 
+    api.addMiddleware(inflight (request, next) => {
+      if request.path == "/wrpc/github.callback" {
+        return next(request);
+      }
+
+      let userId = getUserIdFromCookie(request);
+      let cookie = getAuthCookie(userId);
+
+      let response = next(request);
+      let headers = response.headers?.copyMut();
+      headers?.set("Set-Cookie", cookie);
+
+      return {
+        status: response.status,
+        body: response.body,
+        headers: headers?.copy(),
+      };
+    });
+
     api.get("/wrpc/ws.invalidateQuery.auth", inflight (request) => {
       try {
         let userId = getUserIdFromCookie(request);
@@ -311,14 +330,9 @@ pub class Api {
         // check if user exists in the db
         let user = users.get(userId: userId);
 
-        let authCookie = getAuthCookie(user.id);
-
         return {
           body: {
             user: user
-          },
-          headers: {
-            "Set-Cookie": authCookie,
           },
         };
       } catch {
