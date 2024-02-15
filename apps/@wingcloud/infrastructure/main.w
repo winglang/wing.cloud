@@ -120,8 +120,6 @@ let dashboard = new vite.Vite(
     "GITHUB_APP_CLIENT_ID": util.env("BOT_GITHUB_CLIENT_ID"),
     "GITHUB_APP_NAME": util.env("BOT_GITHUB_APP_NAME"),
   },
-  // Ugly workaround to keep the distribution name in sync with the one in the previous website resource.
-  distributionName: "cloudWebsite_Distribution_B4E5579D"
 ) as "website";
 
 let siteURL = (() => {
