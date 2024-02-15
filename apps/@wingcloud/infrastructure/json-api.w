@@ -68,18 +68,21 @@ pub class JsonApi {
             headers: headers?.copy(),
             body: bodyStr,
           };
-        } catch err {
-          if let error = HttpErrorResponse.tryFromJson(Json.tryParse(err)) {
+        } catch error {
+          if let httpError = HttpErrorResponse.tryFromJson(Json.tryParse(error)) {
             return {
-              status: error.code,
+              status: httpError.code,
               headers: {
                 "content-type": "application/json",
               },
               body: Json.stringify({
-                error: error.message,
+                error: httpError.message,
               }),
             };
           }
+
+          log("Internal server error");
+          log(unsafeCast(error));
 
           return {
             status: 500,
@@ -87,7 +90,7 @@ pub class JsonApi {
               "content-type": "application/json",
             },
             body: Json.stringify({
-              error: err,
+              error: "Internal server error",
             }),
           };
         }

@@ -98,11 +98,13 @@ const OverviewPage = ({
     if (!previewEnvs) {
       return [];
     }
-    return previewEnvs.filter((env) =>
-      `${env.prTitle}${env.branch}${env.status}`
-        .toLocaleLowerCase()
-        .includes(search.toLocaleLowerCase()),
-    );
+    return previewEnvs
+      .filter((env) =>
+        `${env.prTitle}${env.branch}${env.status}`
+          .toLocaleLowerCase()
+          .includes(search.toLocaleLowerCase()),
+      )
+      .reverse();
   }, [previewEnvs, search]);
 
   const repoUrl = useMemo(() => {
@@ -159,7 +161,7 @@ const OverviewPage = ({
 
         {!loading && (
           <>
-            {filteredPreviewEnvs.length > 0 && (
+            {previewEnvs.length > 0 && (
               <Input
                 type="text"
                 leftIcon={MagnifyingGlassCircleIcon}
@@ -206,23 +208,25 @@ const OverviewPage = ({
                     theme.text3,
                   )}
                 >
-                  <span>
-                    Get started by{" "}
-                    <a
-                      className="text-sky-500 hover:underline hover:text-sky-600"
-                      href={`${repoUrl}/compare`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => {
-                        if (repoUrl === "") {
-                          e.preventDefault();
-                        }
-                      }}
-                    >
-                      opening a Pull Request
-                    </a>
-                    .
-                  </span>
+                  {previewEnvs.length === 0 && (
+                    <span>
+                      Get started by{" "}
+                      <a
+                        className="text-sky-500 hover:underline hover:text-sky-600"
+                        href={`${repoUrl}/compare`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                          if (repoUrl === "") {
+                            e.preventDefault();
+                          }
+                        }}
+                      >
+                        opening a Pull Request
+                      </a>
+                      .
+                    </span>
+                  )}
                 </p>
               </div>
             )}

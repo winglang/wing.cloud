@@ -7,7 +7,7 @@
     "@cdktf/provider-aws": "^19.5.0",
     "cdktf": "^0.20.3",
     "constructs": "^10.3.0",
-    "dotenv": "^16.4.2"
+    "dotenv": "^16.4.3"
   },
   "devDependencies": {
     "vite": "^5.1.1"
