@@ -276,13 +276,25 @@ let proxyUrl = (() => {
 
 new cloud.Endpoint(proxyUrl, browserSupport: true) as "Proxy Endpoint";
 
-if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" {
-  bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
+if util.tryEnv("DISABLE_NGROK") != "true" {
+  let var webhookUrl = probotApp.githubApp.api.url;
+  if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" {
+    bring "./node_modules/@wingcloud/ngrok/index.w" as ngrok;
 
-  let devNgrok = new ngrok.Ngrok(
-    url: probotApp.githubApp.api.url,
-    domain: util.tryEnv("NGROK_DOMAIN"),
-  );
+    let devNgrok = new ngrok.Ngrok(
+      url: webhookUrl,
+      domain: util.tryEnv("NGROK_DOMAIN"),
+    );
+
+    webhookUrl = devNgrok.url;
+  }
+
+  let updateGithubWebhook = inflight () => {
+    probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
+    log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
+  };
+
+  new cloud.OnDeploy(updateGithubWebhook);
 }
 
 new EnvironmentCleaner.EnvironmentCleaner(apps: apps, environmentManager: environmentManager, environments: environments);
