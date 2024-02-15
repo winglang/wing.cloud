@@ -52,7 +52,6 @@ pub class JsonApi {
         return handler(request);
       }
 
-
       inflight handle(request: cloud.ApiRequest): cloud.ApiResponse {
         try {
           let response = this.applyMiddlewares(request);

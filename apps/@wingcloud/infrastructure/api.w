@@ -284,22 +284,21 @@ pub class Api {
     };
 
     api.addMiddleware(inflight (request, next) => {
-      if request.path == "/wrpc/github.callback" {
-        return next(request);
-      }
-
-      let userId = getUserIdFromCookie(request);
-      let cookie = getAuthCookie(userId);
-
       let response = next(request);
-      let headers = response.headers?.copyMut();
-      headers?.set("Set-Cookie", cookie);
+      try {
+        let userId = getUserIdFromCookie(request);
+        let cookie = getAuthCookie(userId);
+        let headers = response.headers?.copyMut();
+        headers?.set("Set-Cookie", cookie);
 
-      return {
-        status: response.status,
-        body: response.body,
-        headers: headers?.copy(),
-      };
+        return {
+          status: response.status,
+          body: response.body,
+          headers: headers?.copy(),
+        };
+      } catch {
+        return response;
+      }
     });
 
     api.get("/wrpc/ws.invalidateQuery.auth", inflight (request) => {
