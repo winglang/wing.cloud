@@ -55,16 +55,16 @@ pub struct ViteProps {
 class ViteTfAws {
 	pub url: str;
 	new(props: ViteProps) {
-		// Util.spawnSync(
-		// 	command: "npx",
-		// 	arguments: ["vite", "build"],
-		// 	cwd: props.root,
-		// 	env: {
-		// 		HOME: util.env("HOME"),
-		// 		PATH: util.env("PATH"),
-		// 		VITE_WING_ENV: "<script>window.wingEnv={Json.stringify(props.env)}</script>",
-		// 	},
-		// );
+		Util.spawnSync(
+			command: "npx",
+			arguments: ["vite", "build"],
+			cwd: props.root,
+			env: {
+				HOME: util.env("HOME"),
+				PATH: util.env("PATH"),
+				VITE_WING_ENV: "<script>window.wingEnv={Json.stringify(props.env)}</script>",
+			},
+		);
 
 		let distDir = "{props.root}/dist";
 
@@ -75,8 +75,18 @@ class ViteTfAws {
       let key = "/{file}";
       let filename = fs.absolute("{distDir}/{file}");
       if file == "index.html" {
-        bucket.addFile("/{file}", "{distDir}/{file}");
+        new aws.s3Object.S3Object(
+          dependsOn: [terraformBucket],
+          key: key,
+          bucket: terraformBucket.bucket,
+          content: fs.readFile(filename),
+          contentType: Util.contentType(filename),
+        ) as "File{key.replace("/", "--")}";
       } else {
+        let var cacheControl = "public, max-age=0";
+        if key.startsWith("/assets/") {
+          cacheControl = "public, max-age=31536000";
+        }
         new aws.s3Object.S3Object(
           dependsOn: [terraformBucket],
           key: key,
@@ -84,6 +94,7 @@ class ViteTfAws {
           source: filename,
           sourceHash: cdktf.Fn.md5(filename),
           contentType: Util.contentType(filename),
+          cacheControl: cacheControl,
         ) as "File{key.replace("/", "--")}";
       }
 		});
@@ -152,20 +163,33 @@ class ViteTfAws {
 				cloudfrontDefaultCertificate: true,
 			},
 			orderedCacheBehavior: [
-				{
-					path_pattern: "/assets/*",
-					allowed_methods: ["GET", "HEAD"],
-					cached_methods: ["GET", "HEAD"],
-					target_origin_id: "s3Origin",
-					// See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
-					cache_policy_id: "658327ea-f89d-4fab-a63d-7e88639e58f6",
-					min_ttl: 1y.seconds,
-					default_ttl: 1y.seconds,
-					max_ttl: 1y.seconds,
-					compress: true,
-					viewer_protocol_policy: "redirect-to-https",
-				},
-			],
+        // {
+        //   path_pattern: "/assets/*",
+        //   allowed_methods: ["GET", "HEAD"],
+        //   cached_methods: ["GET", "HEAD"],
+        //   target_origin_id: "s3Origin",
+        //   // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
+        //   cache_policy_id: "658327ea-f89d-4fab-a63d-7e88639e58f6",
+        //   min_ttl: 1y.seconds,
+        //   default_ttl: 1y.seconds,
+        //   max_ttl: 1y.seconds,
+        //   compress: true,
+        //   viewer_protocol_policy: "redirect-to-https",
+        // }
+        {
+          pathPattern: "/assets/*",
+          allowedMethods: ["GET", "HEAD"],
+          cachedMethods: ["GET", "HEAD"],
+          targetOriginId: "s3Origin",
+          // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
+          cachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6",
+          // minTtl: 1y.seconds,
+          // defaultTtl: 1y.seconds,
+          // maxTtl: 1y.seconds,
+          compress: true,
+          viewerProtocolPolicy: "redirect-to-https",
+        },
+      ],
 		);
 
 		let allowDistributionReadOnly = new aws.dataAwsIamPolicyDocument.DataAwsIamPolicyDocument(
