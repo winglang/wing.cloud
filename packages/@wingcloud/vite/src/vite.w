@@ -50,6 +50,7 @@ pub struct ViteProps {
 	root: str;
 	env: Map<str>?;
 	cacheDuration: duration?;
+  distributionName: str?;
 }
 
 class ViteTfAws {
@@ -163,19 +164,6 @@ class ViteTfAws {
 				cloudfrontDefaultCertificate: true,
 			},
 			orderedCacheBehavior: [
-        // {
-        //   path_pattern: "/assets/*",
-        //   allowed_methods: ["GET", "HEAD"],
-        //   cached_methods: ["GET", "HEAD"],
-        //   target_origin_id: "s3Origin",
-        //   // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
-        //   cache_policy_id: "658327ea-f89d-4fab-a63d-7e88639e58f6",
-        //   min_ttl: 1y.seconds,
-        //   default_ttl: 1y.seconds,
-        //   max_ttl: 1y.seconds,
-        //   compress: true,
-        //   viewer_protocol_policy: "redirect-to-https",
-        // }
         {
           pathPattern: "/assets/*",
           allowedMethods: ["GET", "HEAD"],
@@ -183,14 +171,11 @@ class ViteTfAws {
           targetOriginId: "s3Origin",
           // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
           cachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6",
-          // minTtl: 1y.seconds,
-          // defaultTtl: 1y.seconds,
-          // maxTtl: 1y.seconds,
           compress: true,
           viewerProtocolPolicy: "redirect-to-https",
         },
       ],
-		);
+		) as props.distributionName!;
 
 		let allowDistributionReadOnly = new aws.dataAwsIamPolicyDocument.DataAwsIamPolicyDocument(
 			statement: [
