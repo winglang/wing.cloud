@@ -804,6 +804,7 @@ pub class Environments {
       handler: () => {
         let result = this.table.query(
           keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          scanIndexForward: false,
           expressionAttributeValues: {
             ":pk": "APP#{options.appId}",
             ":sk": "ENVIRONMENT#",
