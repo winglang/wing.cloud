@@ -1,13 +1,8 @@
-import { Cog6ToothIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { ErrorBoundary } from "../../../../components/error-boundary.js";
-import { Header } from "../../../../components/header.js";
-import { PageHeader } from "../../../../components/page-header.js";
 import { SpinnerLoader } from "../../../../components/spinner-loader.js";
-import { CurrentAppDataProviderContext } from "../../../../data-store/current-app-data-provider.js";
 import { Button } from "../../../../design-system/button.js";
 import { Input } from "../../../../design-system/input.js";
 import { useNotifications } from "../../../../design-system/notification.js";
@@ -32,13 +27,22 @@ const SettingsPage = ({
   const [description, setDescription] = useState<string>();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const { app, setOwner, setAppName, isLoading } = useContext(
-    CurrentAppDataProviderContext,
+  const getAppQuery = wrpc["app.getByName"].useQuery(
+    {
+      owner: owner!,
+      appName: appName!,
+    },
+    {
+      enabled: !!owner && !!appName,
+    },
   );
-  useEffect(() => {
-    setOwner(owner);
-    setAppName(appName);
-  }, [owner, appName]);
+  const app = useMemo(() => {
+    return getAppQuery.data?.app;
+  }, [getAppQuery.data]);
+
+  const isLoading = useMemo(() => {
+    return getAppQuery.isLoading;
+  }, [getAppQuery]);
 
   const updateAppDescriptionMutation =
     wrpc["app.updateDescription"].useMutation();
