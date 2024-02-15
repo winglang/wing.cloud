@@ -284,7 +284,7 @@ if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" 
     domain: util.tryEnv("NGROK_DOMAIN"),
   );
 } else {
-  let var webhookUrl = probotApp.githubApp.api.url;
+  let webhookUrl = probotApp.githubApp.api.url;
     let updateGithubWebhook = inflight () => {
       probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
       log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
