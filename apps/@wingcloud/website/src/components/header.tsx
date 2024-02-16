@@ -102,7 +102,13 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
 
   return (
     <header
-      className={clsx("px-6 shadow z-30 pt-3", theme.bgInput, !tabs && "pb-3")}
+      className={clsx(
+        "transition-all",
+        "pt-4 shadow z-30",
+        !tabs && "pb-4",
+        theme.bgInput,
+        theme.pagePadding,
+      )}
     >
       <div className="flex items-center gap-6">
         <Link

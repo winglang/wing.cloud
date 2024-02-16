@@ -6,7 +6,6 @@ import { SpinnerLoader } from "../../../../components/spinner-loader.js";
 import { Button } from "../../../../design-system/button.js";
 import { Input } from "../../../../design-system/input.js";
 import { useNotifications } from "../../../../design-system/notification.js";
-import { SkeletonLoader } from "../../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 import { DeleteModal } from "../_components/delete-modal.js";

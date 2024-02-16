@@ -21,6 +21,7 @@ import { AppCard } from "./_components/app-card.js";
 const OwnerPage = () => {
   const { owner } = useParams();
   const { theme } = useTheme();
+
   const { apps, isLoading, isFetching } = useContext(AppsDataProviderContext);
 
   const loading = useMemo(() => {
@@ -116,6 +117,7 @@ const OwnerPage = () => {
 
 export const Component = () => {
   const { owner } = useParams();
+  const { theme } = useTheme();
 
   return (
     <div className="flex flex-col h-full">
@@ -129,7 +131,14 @@ export const Component = () => {
       />
       <ErrorBoundary>
         <div className="overflow-auto">
-          <div className="max-w-7xl mx-auto p-4 md:p-8 relative">
+          <div
+            className={clsx(
+              "py-4 sm:py-8",
+              "relative transition-all",
+              theme.pageMaxWidth,
+              theme.pagePadding,
+            )}
+          >
             <OwnerPage />
           </div>
         </div>

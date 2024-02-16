@@ -161,7 +161,14 @@ const AddAppPage = () => {
         noBackground
       />
       <div className="overflow-auto">
-        <div className="max-w-7xl mx-auto space-y-4 px-4 pb-4 sm:px-8 sm:pb-8">
+        <div
+          className={clsx(
+            "space-y-4 pb-4 sm:pb-8",
+            "transition-all",
+            theme.pageMaxWidth,
+            theme.pagePadding,
+          )}
+        >
           <div className="block space-y-4 lg:space-y-0 lg:flex gap-4 lg:gap-8">
             <div
               className={clsx(
