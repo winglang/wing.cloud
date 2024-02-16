@@ -28,7 +28,7 @@ jobs:
   # This deploys into the "Wing Cloud Production" AWS account
   # https://wingcloud.awsapps.com/start
   deploy-production:
-    # needs: deploy-staging
+    needs: deploy-staging
     name: Deploy Production
     uses: ./.github/workflows/deploy-shared.yml
     with:
