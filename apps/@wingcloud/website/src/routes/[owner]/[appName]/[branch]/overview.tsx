@@ -7,6 +7,8 @@ import { wrpc } from "../../../../utils/wrpc.js";
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
 import { Button } from "../../../../design-system/button.js";
+import clsx from "clsx";
+import { useTheme } from "../../../../design-system/theme-provider.js";
 
 const Overview = ({
   owner,
@@ -17,6 +19,8 @@ const Overview = ({
   appName: string;
   branch: string;
 }) => {
+  const { theme } = useTheme();
+
   const getAppQuery = wrpc["app.getByName"].useQuery(
     {
       owner: owner!,
@@ -69,11 +73,23 @@ const Overview = ({
           actions={
             <Link
               to={`/${owner}/${appName}/${environment?.branch}/console`}
-              className="z-10"
+              onClick={(e) => {
+                if (environment?.status !== "running") {
+                  e.preventDefault();
+                }
+              }}
+              className={clsx(
+                "z-10",
+                "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
+                "px-2.5 py-2 border shadow-sm",
+                theme.borderInput,
+                theme.focusInput,
+                theme.bgInput,
+                theme.bgInputHover,
+                theme.textInput,
+              )}
             >
-              <Button disabled={environment?.status !== "running"}>
-                Console
-              </Button>
+              Console
             </Link>
           }
         />

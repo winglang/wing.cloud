@@ -57,7 +57,7 @@ const UserMenu = ({ user }: UserMenuProps) => {
     >
       {user?.email && (
         <div className="px-4 py-3" role="none">
-          <p className="truncate text-sm font-medium text-gray-900" role="none">
+          <p className="text-sm font-medium text-gray-900" role="none">
             {user?.email}
           </p>
         </div>
@@ -113,7 +113,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
       <div className="flex items-center gap-6">
         <Link
           to={dashboardLink}
-          className={clsx(theme.text1, theme.text1Hover)}
+          className={clsx(theme.text1, theme.text1Hover, theme.focusInput)}
         >
           <WingIcon className="h-5 w-auto" />
         </Link>
@@ -124,6 +124,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
               to={dashboardLink}
               className={clsx(
                 "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                "focus:bg-gray-50 focus:outline-none",
                 theme.text1,
               )}
             >
@@ -143,6 +144,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
                 className={clsx(
                   "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
                   theme.text1,
+                  "focus:bg-gray-50 focus:outline-none",
                 )}
               >
                 {breadcrumb.icon ? (
