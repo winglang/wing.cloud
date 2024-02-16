@@ -25,9 +25,6 @@ export const OwnerPage = (props: OwnerPageProps) => {
   const owner = useMemo(() => {
     return props.ownerParam ?? user?.username;
   }, [props.ownerParam, user?.username]);
-  useEffect(() => {
-    console.log("OwnerPage", { owner });
-  }, [owner]);
   const { theme } = useTheme();
   const { isLoading, data, isFetching } = wrpc["app.list"].useQuery(
     {
