@@ -166,7 +166,8 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
                 <span
                   className={clsx(
                     {
-                      "hidden sm:block": breadcrumb.icon && index > 0,
+                      "hidden sm:block":
+                        breadcrumb.icon && index === breadcrumbs.length - 1,
                       "-ml-0.5": breadcrumb.icon,
                     },
                     "whitespace-nowrap",
