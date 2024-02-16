@@ -100,6 +100,15 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
     return "/dashboard";
   }, [user?.username]);
 
+  const params = useParams();
+  const owner = useMemo(() => {
+    return params["owner"] ?? user?.username;
+  }, [params["owner"], user?.username]);
+
+  const ownerLink = useMemo(() => {
+    return `/${owner}`;
+  }, [owner]);
+
   return (
     <header
       className={clsx("px-6 shadow z-30 pt-3", theme.bgInput, !tabs && "pb-3")}
@@ -108,6 +117,9 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
         <Link
           to={dashboardLink}
           className={clsx(theme.text1, theme.text1Hover)}
+          // HACK: This is a workaround for a bug in React Router where the
+          // page components don't re-render when the URL changes.
+          // reloadDocument={dashboardLink !== ownerLink}
         >
           <WingIcon className="h-5 w-auto" />
         </Link>
@@ -115,18 +127,19 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
         <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto">
           <div>
             <Link
-              to={dashboardLink}
+              to={ownerLink}
               className={clsx(
                 "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
                 theme.text1,
               )}
             >
-              {!user && (
+              <UserIcon className="size-3.5" />
+              {!owner && (
                 <span className="w-32 bg-gray-300 animate-pulse rounded">
                   &nbsp;
                 </span>
               )}
-              {user && <span>{user.username}</span>}
+              {owner && <span>{owner}</span>}
             </Link>
           </div>
           {breadcrumbs?.map((breadcrumb, index) => (
