@@ -57,7 +57,7 @@ const UserMenu = ({ user }: UserMenuProps) => {
     >
       {user?.email && (
         <div className="px-4 py-3" role="none">
-          <p className="truncate text-sm font-medium text-gray-900" role="none">
+          <p className="text-sm font-medium text-gray-900" role="none">
             {user?.email}
           </p>
         </div>
@@ -111,12 +111,18 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
 
   return (
     <header
-      className={clsx("px-6 shadow z-30 pt-3", theme.bgInput, !tabs && "pb-3")}
+      className={clsx(
+        "transition-all",
+        "pt-4 shadow z-30",
+        !tabs && "pb-4",
+        theme.bgInput,
+        theme.pagePadding,
+      )}
     >
       <div className="flex items-center gap-6">
         <Link
           to={dashboardLink}
-          className={clsx(theme.text1, theme.text1Hover)}
+          className={clsx(theme.text1, theme.text1Hover, theme.focusInput)}
           // HACK: This is a workaround for a bug in React Router where the
           // page components don't re-render when the URL changes.
           // reloadDocument={dashboardLink !== ownerLink}
@@ -130,6 +136,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
               to={ownerLink}
               className={clsx(
                 "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                "focus:bg-gray-50 focus:outline-none",
                 theme.text1,
               )}
             >
@@ -150,6 +157,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
                 className={clsx(
                   "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
                   theme.text1,
+                  "focus:bg-gray-50 focus:outline-none",
                 )}
               >
                 {breadcrumb.icon ? (

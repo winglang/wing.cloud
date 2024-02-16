@@ -4,7 +4,7 @@ import {
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { SectionTitle } from "../../../components/section-title.js";
 import { Input } from "../../../design-system/input.js";
@@ -132,24 +132,15 @@ const OverviewPage = ({
             navigate(`/${owner}/${appName}/${productionEnvironment.branch}`);
           }}
           actions={
-            <Link
-              to={`/${owner}/${appName}/${productionEnvironment?.branch}`}
-              onClick={(e) => {
-                if (!productionEnvironment?.branch) {
-                  e.preventDefault();
-                }
-              }}
+            <div
               className={clsx(
-                theme.text2,
-                theme.text1Hover,
-                theme.bg4Hover,
                 "transition-all",
                 "z-10 rounded-full p-1.5",
-                "sm:opacity-0 group-hover:opacity-100",
+                "sm:opacity-0 group-hover:opacity-100 focus:opacity-100",
               )}
             >
               <ArrowRightIcon className="w-4 h-4" />
-            </Link>
+            </div>
           }
         />
       </div>
@@ -212,7 +203,7 @@ const OverviewPage = ({
                     <span>
                       Get started by{" "}
                       <a
-                        className="text-sky-500 hover:underline hover:text-sky-600"
+                        className="text-sky-500 hover:underline focus:underline hover:text-sky-600 outline-none"
                         href={`${repoUrl}/compare`}
                         target="_blank"
                         rel="noopener noreferrer"
