@@ -74,7 +74,10 @@ export const Component = () => {
     <div className="flex flex-col h-full">
       <Header
         breadcrumbs={[
-          { label: appName!, to: `/${owner}/${appName}` },
+          {
+            label: appName!,
+            to: `/${owner}/${appName}`,
+          },
           {
             label: branch!,
             to: `/${owner}/${appName}/${branch}`,

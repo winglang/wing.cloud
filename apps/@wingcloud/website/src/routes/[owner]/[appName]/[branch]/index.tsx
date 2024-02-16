@@ -15,11 +15,14 @@ export const Component = () => {
     <div className="flex flex-col h-full">
       <Header
         breadcrumbs={[
-          { label: appName!, to: `/${owner}/${appName}` },
+          {
+            label: appName!,
+            to: `/${owner}/${appName}`,
+          },
           {
             label: branch!,
             to: `/${owner}/${appName}/${branch}`,
-            icon: <BranchIcon className="w-4 h-4 text-slate-700" />,
+            icon: <BranchIcon className="size-4 text-slate-700" />,
           },
         ]}
         tabs={[

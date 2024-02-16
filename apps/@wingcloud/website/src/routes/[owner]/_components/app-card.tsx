@@ -96,7 +96,11 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
           "border-b",
         )}
       >
-        <AppIcon app={app} />
+        <AppIcon
+          appName={app.appName}
+          entrypoint={app.entrypoint}
+          classNames="size-8"
+        />
         <Link
           className={clsx(
             "text-sm font-medium leading-6",

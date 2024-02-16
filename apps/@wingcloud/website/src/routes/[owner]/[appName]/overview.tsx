@@ -17,6 +17,7 @@ import { EnvironmentsListItem } from "./_components/environments-list-item.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
 import { PageHeader } from "../../../components/page-header.js";
 import { GithubIcon } from "../../../icons/github-icon.js";
+import { AppIcon } from "../_components/app-icon.js";
 
 const OverviewPage = ({
   owner,
@@ -118,6 +119,13 @@ const OverviewPage = ({
     <>
       <PageHeader
         title={appName}
+        icon={
+          <AppIcon
+            appName={appName}
+            entrypoint={app?.entrypoint}
+            classNames="size-full"
+          />
+        }
         noBackground
         actions={
           <Link
