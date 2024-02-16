@@ -147,7 +147,7 @@ const OverviewPage = ({
       />
       <div
         className={clsx(
-          "space-y-4",
+          "space-y-4 pb-4",
           "relative transition-all",
           theme.pageMaxWidth,
           theme.pagePadding,

@@ -291,6 +291,9 @@ export const EnvironmentDetails = ({
                   </div>
                 </Popover>
               )}
+              {endpointsRemainingList.length === 0 && !endpointsLoading && (
+                <div>No endpoints found</div>
+              )}
             </div>
           </div>
         )}

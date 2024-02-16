@@ -39,11 +39,14 @@ export const Component = () => {
       />
       <ErrorBoundary>
         <div className="overflow-auto">
-          <PageHeader title={branch!} />
+          <PageHeader
+            icon={<BranchIcon className="size-full" />}
+            title={branch!}
+            noBackground
+          />
           <div
             className={clsx(
-              "py-4",
-              "relative transition-all",
+              "relative transition-all pb-4",
               theme.pageMaxWidth,
               theme.pagePadding,
             )}

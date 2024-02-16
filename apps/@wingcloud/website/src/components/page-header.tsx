@@ -7,6 +7,7 @@ import { Tabs, type Tab } from "./tabs.js";
 export interface PageHeaderProps {
   title?: string;
   description?: string | React.ReactNode;
+  icon?: React.ReactNode;
   actions?: React.ReactNode;
   noBackground?: boolean;
   tabs?: Tab[];
@@ -15,6 +16,7 @@ export interface PageHeaderProps {
 export const PageHeader = ({
   title,
   description,
+  icon,
   actions,
   noBackground = false,
   tabs,
@@ -34,16 +36,19 @@ export const PageHeader = ({
         )}
       >
         <div className="space-y-1 flex-grow items-center">
-          {title && (
-            <div
-              className={clsx(
-                "text-2xl font-semibold truncate h-8",
-                theme.text1,
-              )}
-            >
-              {title}
-            </div>
-          )}
+          <div className="flex gap-x-2 items-center">
+            {icon && <div className={clsx("size-6", theme.text1)}>{icon}</div>}
+            {title && (
+              <div
+                className={clsx(
+                  "text-2xl font-semibold truncate h-8",
+                  theme.text1,
+                )}
+              >
+                {title}
+              </div>
+            )}
+          </div>
           {description && (
             <div className={clsx("text-sm w-full truncate h-5", theme.text3)}>
               {description}
@@ -61,7 +66,7 @@ export const PageHeader = ({
             tabs && "pb-4 md:pb-8",
           )}
         >
-          {actions}
+          {actions || <span className="pt-2.5">&nbsp;</span>}
         </div>
       </div>
     </div>
