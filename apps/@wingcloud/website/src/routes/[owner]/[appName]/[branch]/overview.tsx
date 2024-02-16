@@ -6,7 +6,6 @@ import { wrpc } from "../../../../utils/wrpc.js";
 
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
-import { Button } from "../../../../design-system/button.js";
 import clsx from "clsx";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 
@@ -83,7 +82,7 @@ const Overview = ({
                 "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
                 "px-2.5 py-2 border shadow-sm",
                 theme.borderInput,
-                theme.focusInput,
+                theme.focusVisible,
                 theme.bgInput,
                 theme.bgInputHover,
                 theme.textInput,

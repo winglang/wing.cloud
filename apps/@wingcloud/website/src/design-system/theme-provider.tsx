@@ -31,6 +31,7 @@ export interface Theme {
   textFocus: string;
   textInput: string;
   focusInput: string;
+  focusVisible: string;
   borderInput: string;
   focusWithin: string;
   scrollbar: string;
@@ -70,6 +71,8 @@ export const DefaultTheme: Theme = {
     "text-gray-900 placeholder:text-gray-500 dark:text-gray-300 dark:placeholder:text-gray-500",
   focusInput:
     "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
+  focusVisible:
+    "focus-visible:ring-2 focus-visible:ring-sky-500/50 focus-visible:border-sky-500 outline-none",
   borderInput: "border-gray-200 dark:border-gray-800",
   focusWithin:
     "focus-within:ring-2 focus-within:ring-sky-500/50 focus-within:border-sky-500 outline-none",

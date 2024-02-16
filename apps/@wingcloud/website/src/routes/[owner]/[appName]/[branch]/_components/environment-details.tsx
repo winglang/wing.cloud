@@ -75,7 +75,7 @@ export const EnvironmentDetails = ({
         "shadow-sm group",
         "gap-0 sm:gap-4 md:gap-6",
         onClick && "hover:shadow",
-        !onClick && ["border", theme.borderInput],
+        ["border", theme.borderInput],
         theme.bgInput,
         "relative",
       )}
@@ -84,8 +84,9 @@ export const EnvironmentDetails = ({
         <button
           onClick={onClick}
           className={clsx(
+            "-m-px",
             "absolute inset-0 cursor-pointer rounded-md border",
-            theme.focusInput,
+            theme.focusVisible,
             theme.borderInput,
           )}
         />
@@ -93,7 +94,7 @@ export const EnvironmentDetails = ({
       <Link
         to={`/${owner}/${app?.appName}/${environment?.branch}/console`}
         className={clsx(
-          theme.focusInput,
+          theme.focusVisible,
           "rounded border-0 sm:border",
           theme.borderInput,
         )}
@@ -254,7 +255,7 @@ export const EnvironmentDetails = ({
                     theme.textInput,
                     "border",
                     theme.borderInput,
-                    theme.focusInput,
+                    theme.focusVisible,
                     theme.bg1,
                     theme.bg2Hover,
                     "transition-all",
@@ -290,6 +291,9 @@ export const EnvironmentDetails = ({
                     </div>
                   </div>
                 </Popover>
+              )}
+              {endpointsRemainingList.length === 0 && !endpointsLoading && (
+                <div>No endpoints found</div>
               )}
             </div>
           </div>
