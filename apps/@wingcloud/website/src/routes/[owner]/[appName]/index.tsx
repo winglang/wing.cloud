@@ -45,7 +45,10 @@ export const Component = () => {
         <PageHeader
           title={appName}
           actions={
-            <Link to={`https://github.com/${app?.repoOwner}/${app?.repoName}`}>
+            <Link
+              to={`https://github.com/${app?.repoOwner}/${app?.repoName}`}
+              target="_blank"
+            >
               <Button disabled={!app}>Git Repository</Button>
             </Link>
           }
