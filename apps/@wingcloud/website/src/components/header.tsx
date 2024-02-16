@@ -135,7 +135,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
             <Link
               to={ownerLink}
               className={clsx(
-                "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                "rounded hover:bg-gray-100 px-0 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
                 "focus:bg-gray-50 focus:outline-none",
                 theme.text1,
               )}
@@ -155,7 +155,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
               <Link
                 to={breadcrumb.to}
                 className={clsx(
-                  "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                  "rounded hover:bg-gray-100 px-0 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
                   theme.text1,
                   "focus:bg-gray-50 focus:outline-none",
                 )}
@@ -166,6 +166,8 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
                 <span
                   className={clsx(
                     {
+                      "hidden sm:block":
+                        breadcrumb.icon && breadcrumbs.length > 1,
                       "-ml-0.5": breadcrumb.icon,
                     },
                     "whitespace-nowrap",
