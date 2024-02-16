@@ -75,7 +75,7 @@ export const EnvironmentDetails = ({
         "shadow-sm group",
         "gap-0 sm:gap-4 md:gap-6",
         onClick && "hover:shadow",
-        !onClick && ["border", theme.borderInput],
+        ["border", theme.borderInput],
         theme.bgInput,
         "relative",
       )}
@@ -84,6 +84,7 @@ export const EnvironmentDetails = ({
         <button
           onClick={onClick}
           className={clsx(
+            "-m-px",
             "absolute inset-0 cursor-pointer rounded-md border",
             theme.focusVisible,
             theme.borderInput,
