@@ -85,7 +85,7 @@ export const EnvironmentDetails = ({
           onClick={onClick}
           className={clsx(
             "absolute inset-0 cursor-pointer rounded-md border",
-            theme.focusInput,
+            theme.focusVisible,
             theme.borderInput,
           )}
         />
@@ -93,7 +93,7 @@ export const EnvironmentDetails = ({
       <Link
         to={`/${owner}/${app?.appName}/${environment?.branch}/console`}
         className={clsx(
-          theme.focusInput,
+          theme.focusVisible,
           "rounded border-0 sm:border",
           theme.borderInput,
         )}
@@ -254,7 +254,7 @@ export const EnvironmentDetails = ({
                     theme.textInput,
                     "border",
                     theme.borderInput,
-                    theme.focusInput,
+                    theme.focusVisible,
                     theme.bg1,
                     theme.bg2Hover,
                     "transition-all",

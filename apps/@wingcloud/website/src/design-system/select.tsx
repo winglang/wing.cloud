@@ -60,7 +60,7 @@ export const Select = memo(
                   theme.bgInput,
                   theme.textInput,
                   theme.borderInput,
-                  theme.focusInput,
+                  theme.focusVisible,
                   disabled && "cursor-not-allowed opacity-50",
                 )}
               >

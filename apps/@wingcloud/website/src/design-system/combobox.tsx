@@ -101,7 +101,7 @@ export const Combobox = ({
             "absolute inset-0 flex items-center px-2 w-full",
             "rounded",
             theme.borderInput,
-            theme.focusInput,
+            theme.focusVisible,
           )}
         >
           <ChevronUpDownIcon

@@ -83,7 +83,7 @@ const Overview = ({
                 "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
                 "px-2.5 py-2 border shadow-sm",
                 theme.borderInput,
-                theme.focusInput,
+                theme.focusVisible,
                 theme.bgInput,
                 theme.bgInputHover,
                 theme.textInput,

@@ -137,7 +137,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
               "flex gap-x-2 truncate items-center z-10 group",
               theme.text2,
               theme.text2Hover,
-              theme.focusInput,
+              theme.focusVisible,
             )}
             onClick={(event) => event.stopPropagation()}
             target="_blank"
@@ -163,7 +163,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
                     "text-xs",
                     theme.text3,
                     theme.text3Hover,
-                    theme.focusInput,
+                    theme.focusVisible,
                     "focus:underline hover:underline z-10",
                   )}
                   target="_blank"
@@ -205,7 +205,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
                       "truncate",
                       "text-xs",
                       theme.text2Hover,
-                      theme.focusInput,
+                      theme.focusVisible,
                       "focus:underline hover:underline z-10",
                     )}
                     target="_blank"

@@ -27,7 +27,7 @@ export const PageHeader = ({
       <div
         className={clsx(
           "overflow-auto pt-4 sm:pt-8 flex",
-          !tabs && "pb-4 sm:pb-8",
+          !tabs && "pb-4",
           "transition-all",
           theme.pageMaxWidth,
           theme.pagePadding,
