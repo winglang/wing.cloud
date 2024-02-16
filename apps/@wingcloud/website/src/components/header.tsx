@@ -125,7 +125,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
           className={clsx(theme.text1, theme.text1Hover, theme.focusInput)}
           // HACK: This is a workaround for a bug in React Router where the
           // page components don't re-render when the URL changes.
-          // reloadDocument={dashboardLink !== ownerLink}
+          reloadDocument={dashboardLink !== ownerLink}
         >
           <WingIcon className="h-5 w-auto" />
         </Link>
