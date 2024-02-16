@@ -92,7 +92,11 @@ export const EnvironmentDetails = ({
       )}
       <Link
         to={`/${owner}/${app?.appName}/${environment?.branch}/console`}
-        className={clsx(theme.focusInput, "rounded border", theme.borderInput)}
+        className={clsx(
+          theme.focusInput,
+          "rounded border-0 sm:border",
+          theme.borderInput,
+        )}
         onClick={(event) => {
           if (environment?.status !== "running") {
             event.preventDefault();
