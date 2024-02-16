@@ -13,6 +13,18 @@ bring "./users.w" as users;
 bring "./apps.w" as apps;
 bring "./status-reports.w" as status_reports;
 
+/**
+ * Using probot to handle Github webhooks is highly unnecessary! Probot bundles the octokit, express, and some other stuff which is ~1MB.
+ *
+ * A minimalistic approach is to use the `@octokit/webhooks-methods` package to verify the signature and parse the payload.
+ * See https://github.com/octokit/webhooks-methods.js/tree/main?tab=readme-ov-file#verify.
+ *
+ * The Github API is also quite simple to use:
+ *
+ * - https://docs.github.com/en/rest/issues/comments?apiVersion=2022-11-28#update-an-issue-comment
+ * - https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation
+ */
+
 struct PostCommentProps {
   environmentId: str;
 }

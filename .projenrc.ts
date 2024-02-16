@@ -59,14 +59,6 @@ wrpc
   .addToArray("compilerOptions.lib", "DOM", "DOM.Iterable");
 
 ///////////////////////////////////////////////////////////////////////////////
-const probot = new WingLibProject({
-  monorepo,
-  name: "@wingcloud/probot",
-  devDeps: ["@probot/adapter-aws-lambda-serverless"],
-  typescript: true,
-});
-
-///////////////////////////////////////////////////////////////////////////////
 const nanoid = new WingLibProject({
   monorepo,
   name: "@wingcloud/nanoid",
@@ -351,7 +343,6 @@ infrastructure.addDevDeps("@types/express");
 infrastructure.addDeps("glob");
 
 infrastructure.addDeps(
-  probot.name,
   containers.name,
   nanoid.name,
   dateutils.name,
