@@ -1,20 +1,15 @@
-import { useEffect } from "react";
+import clsx from "clsx";
 import { useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../components/error-boundary.js";
 import { Header } from "../../components/header.js";
+import { useTheme } from "../../design-system/theme-provider.js";
 
 import { OwnerPage } from "./_components/owner-page.js";
-import clsx from "clsx";
-import { useTheme } from "../../design-system/theme-provider.js";
 
 export const Component = () => {
   const { owner } = useParams();
   const { theme } = useTheme();
-
-  useEffect(() => {
-    console.log("Component", { owner });
-  }, [owner]);
 
   return (
     <div className="flex flex-col h-full">
