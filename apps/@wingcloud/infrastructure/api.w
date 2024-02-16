@@ -145,7 +145,7 @@ pub class Api {
     let apps = props.apps;
     let users = props.users;
     let logs = props.logs;
-    let environmentsQueue = new cloud.Queue() as "Environments";
+    let environmentsQueue = new cloud.Queue() as "Environments-Queue";
 
     let INVALIDATE_SUBSCRIPTION_ID = "invalidateQuery";
     let invalidateQuery = new InvalidateQuery.InvalidateQuery(
@@ -264,6 +264,50 @@ pub class Api {
       throw httpError.HttpError.badRequest("Installation not found");
     };
 
+    let createAuthCookie = inflight (userId: str): str => {
+      let jwt = JWT.JWT.sign(
+        secret: props.appSecret,
+        userId: userId,
+      );
+
+      return Cookie.Cookie.serialize(
+        AUTH_COOKIE_NAME,
+        jwt,
+        {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+          maxAge: 1h.seconds,
+        },
+      );
+    };
+
+    // This middleware refreshes the expiration time of the auth cookie,
+    // unless the cookie is already set during the response.
+    api.addMiddleware(inflight (request, next) => {
+      let response = next(request);
+      let headers = (response.headers ?? {}).copyMut();
+
+      if headers.has("Set-Cookie") {
+        return response;
+      }
+
+      try {
+        let userId = getUserIdFromCookie(request);
+        let cookie = createAuthCookie(userId);
+        headers.set("Set-Cookie", cookie);
+
+        return {
+          status: response.status,
+          body: response.body,
+          headers: headers.copy(),
+        };
+      } catch {
+        return response;
+      }
+    });
+
     api.get("/wrpc/ws.invalidateQuery.auth", inflight (request) => {
       try {
         let userId = getUserIdFromCookie(request);
@@ -322,7 +366,7 @@ pub class Api {
       };
     });
 
-    let analyticsSignInQueue = new cloud.Queue() as "AnalyticsSignInQueue";
+    let analyticsSignInQueue = new cloud.Queue() as "AnalyticsSignIn-Queue";
     analyticsSignInQueue.setConsumer(inflight (message) => {
       let event = AnalyticsSignInMessage.fromJson(Json.parse(message));
       props.analytics.identify(
@@ -340,6 +384,7 @@ pub class Api {
           github: event.github,
         });
     });
+
     api.get("/wrpc/github.callback", inflight (request) => {
       let code = request.query.get("code");
 
@@ -360,22 +405,7 @@ pub class Api {
 
       githubAccessTokens.set(user.id, tokens);
 
-      let jwt = JWT.JWT.sign(
-        secret: props.appSecret,
-        userId: user.id,
-      );
-
-      let authCookie = Cookie.Cookie.serialize(
-        AUTH_COOKIE_NAME,
-        jwt,
-        {
-          httpOnly: true,
-          secure: true,
-          sameSite: "strict",
-          path: "/",
-          maxAge: 1h.seconds,
-        },
-      );
+      let authCookie = createAuthCookie(user.id);
 
       // The default redirect location is the user's profile page,
       // but in the case of the Console Sign In process, we want to redirect
@@ -497,7 +527,7 @@ pub class Api {
       }
     });
 
-    let productionEnvironmentQueue = new cloud.Queue() as "Production Environment";
+    let productionEnvironmentQueue = new cloud.Queue() as "ProductionEnvironment-Queue";
     productionEnvironmentQueue.setConsumer(inflight (event) => {
       let input = CreateProductionEnvironmentMessage.fromJson(Json.parse(event));
       if let accessToken = githubAccessTokens.get(input.userId)?.access_token {
@@ -676,7 +706,7 @@ pub class Api {
       throw httpError.HttpError.notFound();
     });
 
-    let deleteAppQueue = new cloud.Queue() as "Delete App";
+    let deleteAppQueue = new cloud.Queue() as "DeleteApp-Queue";
     deleteAppQueue.setConsumer(inflight (event) => {
       let input = DeleteAppMessage.fromJson(Json.parse(event));
 
@@ -1066,7 +1096,7 @@ pub class Api {
     });
 
 
-    let notifyEnvReportQueue = new cloud.Queue() as "Environment Report";
+    let notifyEnvReportQueue = new cloud.Queue() as "EnvironmentReport-Queue";
     notifyEnvReportQueue.setConsumer(inflight (event) => {
       let input = EnvironmentReportMessage.fromJson(Json.parse(event));
 

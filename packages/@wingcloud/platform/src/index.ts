@@ -1,10 +1,15 @@
-import { type AppProps, App } from "@winglang/sdk/lib/core";
+import { API_FQN } from "@winglang/sdk/lib/cloud";
+import { type AppProps, App, Lifting } from "@winglang/sdk/lib/core";
 import type { IPlatform } from "@winglang/sdk/lib/platform";
 import { Aspects } from "cdktf";
+import type { Construct } from "constructs";
 
+import { CustomApi } from "./api.js";
 import { App as CustomApp } from "./app.js";
 import { ProductionPlatform } from "./platform-production.js";
 import { TestPlatform } from "./platform-test.js";
+import { EnableXray } from "./production/enable_xray.js";
+import { OverrideApiGatewayDeployment } from "./production/cyclic_hack.js";
 
 const WING_ENV = process.env["WING_ENV"] || "production";
 
@@ -28,14 +33,43 @@ if (WING_ENV !== WingEnv.Production && WING_ENV !== WingEnv.Test) {
 const PlatformHandler =
   WING_ENV === WingEnv.Production ? ProductionPlatform : TestPlatform;
 
-import { EnableXray } from "./production/enable_xray.js";
-import { EnableConcurrentExecutions } from "./production/reserved-concurreny.js";
-
 export class Platform implements IPlatform {
   public readonly target = "tf-aws";
 
+  public readonly parameters = {
+    $schema: "http://json-schema.org/draft-07/schema#",
+    type: "object",
+    additionalProperties: {
+      type: "object",
+      properties: {
+        concurrency: {
+          type: "string",
+        },
+        mergeLambdas: {
+          type: "string",
+        },
+      },
+      required: [],
+    },
+  };
+
   newApp(appProps: AppProps): App {
     return new CustomApp(appProps);
+  }
+
+  public newInstance(
+    type: string,
+    scope: Construct,
+    id: string,
+    props: any,
+  ): any {
+    if (
+      type === API_FQN &&
+      App.of(scope).platformParameters.getParameterValue(id)?.mergeLambdas ===
+        "true"
+    ) {
+      return new CustomApi(scope, id, props);
+    }
   }
 
   preSynth(app: any): void {
@@ -47,6 +81,7 @@ export class Platform implements IPlatform {
     // see https://github.com/winglang/wing/issues/5151
     // once fixed, this can be moved to the ./pla
     Aspects.of(app).add(new EnableXray(app));
+    Aspects.of(app).add(new OverrideApiGatewayDeployment());
 
     // We used provisioned concurrency to test the response time,
     // which was consistent between 200ms and 450ms after enabling

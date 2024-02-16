@@ -35,6 +35,7 @@ export const Menu = ({
             className={clsx(
               btnClassName,
               theme.text1,
+              theme.focusInput,
               theme.bgInputHover,
               "flex items-center text-sm gap-x-2",
               "font-semibold",

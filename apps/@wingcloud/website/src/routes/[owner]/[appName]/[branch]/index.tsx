@@ -3,9 +3,14 @@ import { Outlet, useParams } from "react-router-dom";
 import { ErrorBoundary } from "../../../../components/error-boundary.js";
 import { Header } from "../../../../components/header.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
+import clsx from "clsx";
+import { PageHeader } from "../../../../components/page-header.js";
 
 export const Component = () => {
   const { owner, appName, branch } = useParams();
+  const { theme } = useTheme();
+
   return (
     <div className="flex flex-col h-full">
       <Header
@@ -34,7 +39,15 @@ export const Component = () => {
       />
       <ErrorBoundary>
         <div className="overflow-auto">
-          <div className="max-w-7xl mx-auto p-4 md:p-8 relative">
+          <PageHeader title={branch!} />
+          <div
+            className={clsx(
+              "py-4",
+              "relative transition-all",
+              theme.pageMaxWidth,
+              theme.pagePadding,
+            )}
+          >
             <Outlet />
           </div>
         </div>

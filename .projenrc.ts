@@ -44,6 +44,7 @@ const monorepo = new MonorepoProject({
   name: "@wingcloud/monorepo",
 });
 
+monorepo.addGitIgnore("examples/**/target/");
 monorepo.devTask.reset("turbo dev --concurrency 12");
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -105,6 +106,7 @@ vite.addFields({
 
 vite.addDevDeps("vite");
 vite.addDeps("dotenv");
+vite.addDeps("mime-types");
 
 vite.addDeps("constructs", "cdktf", "@cdktf/provider-aws");
 

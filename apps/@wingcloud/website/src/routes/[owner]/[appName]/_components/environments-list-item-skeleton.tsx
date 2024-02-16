@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { SkeletonLoader } from "../../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
+import { StatusDot } from "../../../../components/status-dot.js";
 
 export const EnvironmentsListItemSkeleton = ({
   short = false,
@@ -18,18 +19,12 @@ export const EnvironmentsListItemSkeleton = ({
         theme.bgInput,
         "border",
         theme.borderInput,
-        "shadow-sm hover:shadow",
+        "shadow-sm",
       )}
     >
       <div className="flex items-center gap-x-4">
-        <div className="relative">
-          <BranchIcon
-            className={clsx(
-              "w-8 h-8 ",
-              "rounded-full border-slate-300 border",
-              theme.text2,
-            )}
-          />
+        <div className="relative rounded-full p-2 bg-gray-50">
+          <BranchIcon className={clsx("w-6 h-6", theme.text2, "shrink-0")} />
         </div>
 
         <div className="w-full space-y-2 py-0.5">

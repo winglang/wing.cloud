@@ -70,7 +70,7 @@ let api = new cloud.Api(
 let apiUrlParam = new parameter.Parameter(
   name: "api-url",
   value: api.url,
-) as "api-url";
+) as "wrpc-url";
 
 let table = new ex.DynamodbTable(
   name: "data",
@@ -108,7 +108,7 @@ let rntm = new runtime.RuntimeService(
 let runtimeUrlParam = new parameter.Parameter(
   name: "runtime-url",
   value: rntm.api.url,
-) as "runtime-url";
+) as "runtime-service-url";
 
 let dashboard = new vite.Vite(
   root: "../website",
@@ -120,7 +120,7 @@ let dashboard = new vite.Vite(
     "GITHUB_APP_CLIENT_ID": util.env("BOT_GITHUB_CLIENT_ID"),
     "GITHUB_APP_NAME": util.env("BOT_GITHUB_APP_NAME"),
   },
-);
+) as "website";
 
 let siteURL = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
@@ -242,7 +242,7 @@ let proxyUrl = (() => {
       dashboardDomainName: getDomainName(dashboard.url),
       zoneName: util.env("PROXY_ZONE_NAME"),
       subDomain: util.tryEnv("PROXY_SUBDOMAIN"),
-    ) as "website proxy";
+    ) as "wing proxy";
 
     return proxy.url;
   } elif util.env("WING_TARGET") == "sim" {
@@ -283,6 +283,14 @@ if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" 
     url: probotApp.githubApp.api.url,
     domain: util.tryEnv("NGROK_DOMAIN"),
   );
+}
+if util.tryEnv("WING_TARGET") != "sim" {
+  let webhookUrl = probotApp.githubApp.api.url;
+  let updateGithubWebhook = inflight () => {
+    probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
+    log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
+  };
+  new cloud.OnDeploy(updateGithubWebhook);
 }
 
 new EnvironmentCleaner.EnvironmentCleaner(apps: apps, environmentManager: environmentManager, environments: environments);

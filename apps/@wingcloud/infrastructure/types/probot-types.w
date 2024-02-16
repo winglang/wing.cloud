@@ -93,7 +93,9 @@ pub interface IProbotWebhooks {
 }
 
 pub interface IProbotAuth {
-  inflight call(ProbotInstance, installationId: num): octokit.OctoKit;
+  // instance should be of type `ProbotInstance`,
+  // but its not supported yet since its a circular reference
+  inflight call(instance: str, installationId: num): octokit.OctoKit;
 }
 
 pub struct ProbotInstance {

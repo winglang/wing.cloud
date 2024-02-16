@@ -335,7 +335,7 @@ pub class RuntimeService {
       }
     }
 
-    let queue = new fifoqueue.FifoQueue(timeout: 15m) as "runtime fifo";
+    let queue = new fifoqueue.FifoQueue(timeout: 15m) as "RuntimeFifo-Queue";
     queue.setConsumer(inflight (message) => {
       try {
         // hack to get bucket in this environment
@@ -374,7 +374,7 @@ pub class RuntimeService {
       }
     }, timeout: 5m);
 
-    this.api = new cloud.Api() as "runtime-service";
+    this.api = new cloud.Api() as "runtime";
     this.api.post("/", inflight (req) => {
       let body = Json.parse(req.body ?? "");
       let message = Message.fromJson(body);

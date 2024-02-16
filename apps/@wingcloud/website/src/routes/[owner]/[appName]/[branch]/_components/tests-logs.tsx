@@ -28,7 +28,6 @@ export const TestsLogs = ({
   useEffect(() => {
     if (animateLogId) {
       const element = document.querySelector(`#${selectedTestId}`);
-      console.log(selectedTestId, element);
 
       element?.scrollIntoView({
         behavior: "smooth",

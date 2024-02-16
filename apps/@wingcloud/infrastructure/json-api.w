@@ -15,22 +15,45 @@ struct HttpErrorResponse {
   message: str;
 }
 
+interface Middleware {
+  inflight handle(request: cloud.ApiRequest, next: inflight (cloud.ApiRequest): JsonApiResponse): JsonApiResponse;
+}
+
 pub class JsonApi {
   api: cloud.Api;
   pub url: str;
   var handlerCount: num;
+  var middlewares: MutArray<Middleware>;
 
   new(props: JsonApiProps) {
     this.api = props.api;
     this.url = this.api.url;
     this.handlerCount = 0;
+    this.middlewares = MutArray<Middleware>[];
   }
 
-  wrapHandler(handler: inflight (cloud.ApiRequest): JsonApiResponse): inflight (cloud.ApiRequest): cloud.ApiResponse {
+  wrapHandler(
+    handler: inflight (cloud.ApiRequest): JsonApiResponse,
+    middlewares: Array<Middleware>,
+  ): inflight (cloud.ApiRequest): cloud.ApiResponse {
     class MyHandler {
+      inflight applyMiddlewares(request: cloud.ApiRequest, index: num?): JsonApiResponse {
+        if let middleware = middlewares.tryAt(index ?? 0) {
+          let next = (request: cloud.ApiRequest): JsonApiResponse => {
+            let newIndex = (index ?? 0) + 1;
+            if newIndex < middlewares.length {
+              return this.applyMiddlewares(request, newIndex);
+            }
+            return handler(request);
+          };
+          return middleware.handle(request, next);
+        }
+        return handler(request);
+      }
+
       inflight handle(request: cloud.ApiRequest): cloud.ApiResponse {
         try {
-          let response = handler(request);
+          let response = this.applyMiddlewares(request);
 
           let headers = response.headers?.copyMut();
           headers?.set("content-type", "application/json");
@@ -45,18 +68,21 @@ pub class JsonApi {
             headers: headers?.copy(),
             body: bodyStr,
           };
-        } catch err {
-          if let error = HttpErrorResponse.tryFromJson(Json.tryParse(err)) {
+        } catch error {
+          if let httpError = HttpErrorResponse.tryFromJson(Json.tryParse(error)) {
             return {
-              status: error.code,
+              status: httpError.code,
               headers: {
                 "content-type": "application/json",
               },
               body: Json.stringify({
-                error: error.message,
+                error: httpError.message,
               }),
             };
           }
+
+          log("Internal server error");
+          log(unsafeCast(error));
 
           return {
             status: 500,
@@ -64,7 +90,7 @@ pub class JsonApi {
               "content-type": "application/json",
             },
             body: Json.stringify({
-              error: err,
+              error: "Internal server error",
             }),
           };
         }
@@ -74,15 +100,19 @@ pub class JsonApi {
     return new MyHandler() as "Handler{this.handlerCount}";
   }
 
+  pub addMiddleware(middleware: Middleware) {
+    this.middlewares.push(middleware);
+  }
+
   pub get(path: str, handler: inflight (cloud.ApiRequest): JsonApiResponse) {
-    this.api.get(path, this.wrapHandler(handler));
+    this.api.get(path, this.wrapHandler(handler, this.middlewares.copy()));
   }
 
   pub post(path: str, handler: inflight (cloud.ApiRequest): JsonApiResponse) {
-    this.api.post(path, this.wrapHandler(handler));
+    this.api.post(path, this.wrapHandler(handler, this.middlewares.copy()));
   }
 
   pub put(path: str, handler: inflight (cloud.ApiRequest): JsonApiResponse) {
-    this.api.put(path, this.wrapHandler(handler));
+    this.api.put(path, this.wrapHandler(handler, this.middlewares.copy()));
   }
 }

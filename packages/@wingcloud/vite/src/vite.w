@@ -2,6 +2,7 @@ bring cloud;
 bring sim;
 bring util;
 bring fs;
+bring "cdktf" as cdktf;
 bring "@cdktf/provider-aws" as aws;
 
 struct SpawnSyncOptions {
@@ -24,6 +25,7 @@ struct SpawnChild {
 }
 
 class Util {
+	extern "./util.cjs" pub static contentType(filename: str): str;
 	extern "./util.cjs" pub static spawnSync(options: SpawnSyncOptions): void;
 	extern "./util.cjs" pub static inflight spawn(options: SpawnOptions): SpawnChild;
 	extern "./util.cjs" pub static inflight getURLFromText(text: str): str?;
@@ -66,51 +68,172 @@ class ViteTfAws {
 
 		let distDir = "{props.root}/dist";
 
-		let website = new cloud.Website(
-			path: "{props.root}/dist",
-		);
+		let bucket = new cloud.Bucket();
 
-		let bucket = unsafeCast(std.Node.of(website).findChild("WebsiteBucket"));
-		new aws.s3Object.S3Object(
-			bucket: bucket?.bucket,
-			key: "/index.html",
-			content: fs.readFile("{distDir}/index.html"),
-			contentType: "text/html; charset=utf-8",
-		);
-
-		let distribution = unsafeCast(std.Node.of(website).findChild("Distribution"));
-
-		// Fallback to `/index.html`.
-		distribution?.addOverride("custom_error_response", [
-		  {
-			error_code: 403,
-			response_code: 200,
-			response_page_path: "/index.html",
-		  },
-		]);
-
-		// Set a short default TTL.
-		let cacheDuration = props.cacheDuration ?? 1m;
-		distribution?.addOverride("default_cache_behavior.default_ttl", cacheDuration.seconds);
-		distribution?.addOverride("default_cache_behavior.min_ttl", cacheDuration.seconds);
-
-		// Cache assets forever.
-		distribution?.addOverride("ordered_cache_behavior", {
-		  path_pattern: "/assets/*",
-		  allowed_methods: ["GET", "HEAD"],
-		  cached_methods: ["GET", "HEAD"],
-		  target_origin_id: "s3Origin",
-		  // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
-		  cache_policy_id: "658327ea-f89d-4fab-a63d-7e88639e58f6",
-		  min_ttl: 1y.seconds,
-		  default_ttl: 1y.seconds,
-		  max_ttl: 1y.seconds,
-		  compress: true,
-		  viewer_protocol_policy: "redirect-to-https",
+		let terraformBucket: aws.s3Bucket.S3Bucket = unsafeCast(bucket.node.defaultChild);
+		this.listAllFiles(distDir, (file) => {
+      let key = "/{file}";
+      let filename = fs.absolute("{distDir}/{file}");
+      if file == "index.html" {
+        new aws.s3Object.S3Object(
+          dependsOn: [terraformBucket],
+          key: key,
+          bucket: terraformBucket.bucket,
+          content: fs.readFile(filename),
+          contentType: Util.contentType(filename),
+        ) as "File{key.replace("/", "--")}";
+      } else {
+        let var cacheControl = "public, max-age=0";
+        if key.startsWith("/assets/") {
+          cacheControl = "public, max-age=31536000";
+        }
+        new aws.s3Object.S3Object(
+          dependsOn: [terraformBucket],
+          key: key,
+          bucket: terraformBucket.bucket,
+          source: filename,
+          sourceHash: cdktf.Fn.md5(filename),
+          contentType: Util.contentType(filename),
+          cacheControl: cacheControl,
+        ) as "File{key.replace("/", "--")}";
+      }
 		});
 
-		this.url = website.url;
+		new aws.s3BucketWebsiteConfiguration.S3BucketWebsiteConfiguration(
+			bucket: terraformBucket.bucket,
+			indexDocument: {
+				suffix: "index.html",
+			},
+			errorDocument: {
+				key: "index.html",
+			},
+		);
+
+		let originAccessControl = new aws.cloudfrontOriginAccessControl.CloudfrontOriginAccessControl(
+			name: "{this.node.path}-cloudfront-oac",
+			originAccessControlOriginType: "s3",
+			signingBehavior: "always",
+			signingProtocol: "sigv4",
+		);
+
+		let cacheDuration = props.cacheDuration ?? 1m;
+		let distribution = new aws.cloudfrontDistribution.CloudfrontDistribution(
+			enabled: true,
+			defaultRootObject: "index.html",
+			customErrorResponse: [
+				{
+					errorCode: 403,
+					responseCode: 200,
+					responsePagePath: "/index.html",
+				},
+				{
+					errorCode: 404,
+					responseCode: 200,
+					responsePagePath: "/index.html",
+				},
+			],
+			origin: [
+				{
+					domainName: terraformBucket.bucketRegionalDomainName,
+					originId: "s3Origin",
+					originAccessControlId: originAccessControl.id,
+				},
+			],
+			defaultCacheBehavior: {
+				allowedMethods: ["GET", "HEAD"],
+				cachedMethods: ["GET", "HEAD"],
+				targetOriginId: "s3Origin",
+				forwardedValues: {
+					queryString: false,
+					cookies: { forward: "none" },
+				},
+				viewerProtocolPolicy: "redirect-to-https",
+				compress: true,
+				minTtl: cacheDuration.seconds,
+				defaultTtl: cacheDuration.seconds,
+				maxTtl: 1y.seconds,
+			},
+			priceClass: "PriceClass_100",
+			restrictions: {
+				geoRestriction: {
+				restrictionType: "none",
+				},
+			},
+			viewerCertificate: {
+				cloudfrontDefaultCertificate: true,
+			},
+			orderedCacheBehavior: [
+        // {
+        //   path_pattern: "/assets/*",
+        //   allowed_methods: ["GET", "HEAD"],
+        //   cached_methods: ["GET", "HEAD"],
+        //   target_origin_id: "s3Origin",
+        //   // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
+        //   cache_policy_id: "658327ea-f89d-4fab-a63d-7e88639e58f6",
+        //   min_ttl: 1y.seconds,
+        //   default_ttl: 1y.seconds,
+        //   max_ttl: 1y.seconds,
+        //   compress: true,
+        //   viewer_protocol_policy: "redirect-to-https",
+        // }
+        {
+          pathPattern: "/assets/*",
+          allowedMethods: ["GET", "HEAD"],
+          cachedMethods: ["GET", "HEAD"],
+          targetOriginId: "s3Origin",
+          // See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-caching-optimized.
+          cachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6",
+          // minTtl: 1y.seconds,
+          // defaultTtl: 1y.seconds,
+          // maxTtl: 1y.seconds,
+          compress: true,
+          viewerProtocolPolicy: "redirect-to-https",
+        },
+      ],
+		);
+
+		let allowDistributionReadOnly = new aws.dataAwsIamPolicyDocument.DataAwsIamPolicyDocument(
+			statement: [
+				{
+					actions: ["s3:GetObject"],
+					condition: [
+					{
+						test: "StringEquals",
+						values: [distribution.arn],
+						variable: "AWS:SourceArn",
+					},
+					],
+					principals: [
+					{
+						identifiers: ["cloudfront.amazonaws.com"],
+						type: "Service",
+					},
+					],
+					resources: ["{terraformBucket.arn}/*"],
+				},
+			],
+		);
+
+		new aws.s3BucketPolicy.S3BucketPolicy({
+			bucket: terraformBucket.id,
+			policy: allowDistributionReadOnly.json,
+		});
+
+    this.url = "https://{distribution.domainName}";
 	}
+
+  listAllFiles(directory: str, handler: (str): void, cwd: str?): void {
+    let files = fs.readdir(directory);
+    let cwdLength = (cwd ?? directory).length + 1;
+    for file in files {
+      let path = "{directory}/{file}";
+      if (fs.isDir(path)) {
+        this.listAllFiles(path, handler, cwd ?? directory);
+      } else {
+        handler(path.substring(cwdLength));
+      }
+    }
+  }
 }
 
 class ViteSim {

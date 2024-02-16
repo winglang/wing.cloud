@@ -34,6 +34,8 @@ export interface Theme {
   borderInput: string;
   focusWithin: string;
   scrollbar: string;
+  pagePadding: string;
+  pageMaxWidth: string;
 }
 
 export type Mode = "dark" | "light" | "auto";
@@ -73,6 +75,8 @@ export const DefaultTheme: Theme = {
     "focus-within:ring-2 focus-within:ring-sky-500/50 focus-within:border-sky-500 outline-none",
   scrollbar:
     "scrollbar hover:scrollbar-bg-gray-500/10 hover:scrollbar-thumb-gray-700/30 scrollbar-thumb-hover-gray-700/40 scrollbar-thumb-active-gray-700/60 dark:hover:scrollbar-bg-gray-400/10 dark:hover:scrollbar-thumb-gray-400/30 dark:scrollbar-thumb-hover-gray-400/40 dark:scrollbar-thumb-active-gray-400/60",
+  pagePadding: "px-4 sm:px-8",
+  pageMaxWidth: "w-full max-w-7xl mx-auto",
 };
 
 export interface ThemeProviderProps {

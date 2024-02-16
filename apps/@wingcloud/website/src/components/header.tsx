@@ -57,7 +57,7 @@ const UserMenu = ({ user }: UserMenuProps) => {
     >
       {user?.email && (
         <div className="px-4 py-3" role="none">
-          <p className="truncate text-sm font-medium text-gray-900" role="none">
+          <p className="text-sm font-medium text-gray-900" role="none">
             {user?.email}
           </p>
         </div>
@@ -100,14 +100,32 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
     return "/dashboard";
   }, [user?.username]);
 
+  const params = useParams();
+  const owner = useMemo(() => {
+    return params["owner"] ?? user?.username;
+  }, [params["owner"], user?.username]);
+
+  const ownerLink = useMemo(() => {
+    return `/${owner}`;
+  }, [owner]);
+
   return (
     <header
-      className={clsx("px-6 shadow z-30 pt-3", theme.bgInput, !tabs && "pb-3")}
+      className={clsx(
+        "transition-all",
+        "pt-4 shadow z-30",
+        !tabs && "pb-4",
+        theme.bgInput,
+        theme.pagePadding,
+      )}
     >
       <div className="flex items-center gap-6">
         <Link
           to={dashboardLink}
-          className={clsx(theme.text1, theme.text1Hover)}
+          className={clsx(theme.text1, theme.text1Hover, theme.focusInput)}
+          // HACK: This is a workaround for a bug in React Router where the
+          // page components don't re-render when the URL changes.
+          reloadDocument={dashboardLink !== ownerLink}
         >
           <WingIcon className="h-5 w-auto" />
         </Link>
@@ -115,18 +133,21 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
         <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto">
           <div>
             <Link
-              to={dashboardLink}
+              to={ownerLink}
               className={clsx(
-                "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                "transition-all",
+                "rounded hover:bg-gray-100 px-0 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                "focus:bg-gray-50 focus:outline-none",
                 theme.text1,
               )}
             >
-              {!user && (
+              <UserIcon className="size-3.5" />
+              {!owner && (
                 <span className="w-32 bg-gray-300 animate-pulse rounded">
                   &nbsp;
                 </span>
               )}
-              {user && <span>{user.username}</span>}
+              {owner && <span>{owner}</span>}
             </Link>
           </div>
           {breadcrumbs?.map((breadcrumb, index) => (
@@ -135,8 +156,10 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
               <Link
                 to={breadcrumb.to}
                 className={clsx(
-                  "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                  "transition-all",
+                  "rounded hover:bg-gray-100 px-0 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
                   theme.text1,
+                  "focus:bg-gray-50 focus:outline-none",
                 )}
               >
                 {breadcrumb.icon ? (
@@ -145,6 +168,8 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
                 <span
                   className={clsx(
                     {
+                      "hidden sm:block":
+                        breadcrumb.icon && index === breadcrumbs.length - 1,
                       "-ml-0.5": breadcrumb.icon,
                     },
                     "whitespace-nowrap",

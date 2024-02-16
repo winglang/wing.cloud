@@ -1,10 +1,10 @@
 import * as cdktf from "@cdktf/provider-aws";
 import type { LambdaFunction } from "@cdktf/provider-aws/lib/lambda-function";
-import { App, Function } from "@winglang/sdk/lib/target-tf-aws";
+import { Function } from "@winglang/sdk/lib/target-tf-aws";
 import { Construct } from "constructs";
 
 export class EnableConcurrentExecutions {
-  constructor(private app: App) {}
+  constructor(private count: number) {}
 
   isLambdaFunction(node: Construct): boolean {
     return (
@@ -23,7 +23,7 @@ export class EnableConcurrentExecutions {
       "provisioned-concurrency",
       {
         functionName: cdktfFunction.functionName,
-        provisionedConcurrentExecutions: 2,
+        provisionedConcurrentExecutions: this.count,
         qualifier: cdktfFunction.version,
       },
     );

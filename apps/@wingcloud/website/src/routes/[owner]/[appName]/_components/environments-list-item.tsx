@@ -10,12 +10,12 @@ import { Link } from "react-router-dom";
 import { StatusDot } from "../../../../components/status-dot.js";
 import { StatusPill } from "../../../../components/status-pill.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
-import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../../utils/time.js";
 import type { Environment } from "../../../../utils/wrpc.js";
 import { DEPLOYMENT_LOGS_ID } from "../[branch]/logs.js";
 import { TEST_LOGS_ID } from "../[branch]/tests-page.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
 
 type ErrorStatus = "failed" | "passed";
 
@@ -75,16 +75,9 @@ export const EnvironmentsListItem = ({
         className={clsx("absolute inset-0 rounded-md z-0", theme.focusInput)}
         to={`/${owner}/${appName}/${environment.branch}`}
       />
-      <div className="flex items-center gap-x-4">
-        <div className="relative">
-          <BranchIcon
-            className={clsx(
-              "w-8 h-8",
-              "rounded-full border-slate-300 border",
-              theme.text2,
-              "shrink-0",
-            )}
-          />
+      <div className="flex items-center justify-center gap-x-4">
+        <div className="relative rounded-full p-2 bg-gray-50">
+          <BranchIcon className={clsx("w-6 h-6", theme.text2, "shrink-0")} />
           <StatusDot status={status} />
         </div>
 

@@ -71,20 +71,32 @@ export const EnvironmentDetails = ({
   return (
     <div
       className={clsx(
-        "p-4 md:p-6 w-full rounded-md flex border",
+        "p-4 md:p-6 w-full rounded-md flex",
         "shadow-sm group",
         "gap-0 sm:gap-4 md:gap-6",
         onClick && "hover:shadow",
+        !onClick && ["border", theme.borderInput],
         theme.bgInput,
-        theme.borderInput,
         "relative",
       )}
     >
       {environment && onClick && (
-        <button onClick={onClick} className="absolute inset-0 cursor-pointer" />
+        <button
+          onClick={onClick}
+          className={clsx(
+            "absolute inset-0 cursor-pointer rounded-md border",
+            theme.focusInput,
+            theme.borderInput,
+          )}
+        />
       )}
       <Link
         to={`/${owner}/${app?.appName}/${environment?.branch}/console`}
+        className={clsx(
+          theme.focusInput,
+          "rounded border-0 sm:border",
+          theme.borderInput,
+        )}
         onClick={(event) => {
           if (environment?.status !== "running") {
             event.preventDefault();
@@ -95,9 +107,8 @@ export const EnvironmentDetails = ({
           className={clsx(
             "hidden sm:flex",
             "rounded items-center justify-center",
-            "shrink-0 border",
+            "shrink-0",
             "transition-all",
-            theme.borderInput,
             theme.bg3,
             "cursor-default",
             environment?.status === "running" && [
@@ -150,9 +161,10 @@ export const EnvironmentDetails = ({
                   <BranchIcon className={clsx("w-4 h-4", theme.text3)} />
                   <Link
                     className={clsx(
+                      "hover:underline focus:underline outline-none",
                       "font-semibold truncate",
                       theme.text2,
-                      "hover:underline truncate relative z-10",
+                      "truncate relative z-10",
                     )}
                     onClick={(event) => {
                       if (environment.status === "stopped") {
@@ -174,7 +186,8 @@ export const EnvironmentDetails = ({
                   />
                   <Link
                     className={clsx(
-                      "hover:underline truncate relative z-10",
+                      "hover:underline focus:underline outline-none",
+                      "truncate relative z-10",
                       "font-semibold truncate",
                       theme.text2,
                     )}
@@ -210,7 +223,10 @@ export const EnvironmentDetails = ({
               {firstEndpoint && (
                 <div className="flex truncate">
                   <Link
-                    className="hover:underline truncate relative z-10 flex gap-x-1"
+                    className={clsx(
+                      "hover:underline focus:underline outline-none",
+                      "truncate relative z-10 flex gap-x-1",
+                    )}
                     to={firstEndpoint.publicUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -254,7 +270,8 @@ export const EnvironmentDetails = ({
                         >
                           <Link
                             className={clsx(
-                              "hover:underline truncate relative z-10 flex gap-x-1",
+                              "hover:underline focus:underline outline-none",
+                              "truncate relative z-10 flex gap-x-1",
                               theme.text2,
                             )}
                             to={endpoint.publicUrl}

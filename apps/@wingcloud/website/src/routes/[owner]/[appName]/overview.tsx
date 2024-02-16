@@ -3,19 +3,18 @@ import {
   ArrowRightIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useContext, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { SectionTitle } from "../../../components/section-title.js";
-import { CurrentAppDataProviderContext } from "../../../data-store/current-app-data-provider.js";
 import { Input } from "../../../design-system/input.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
-import { BranchIcon } from "../../../icons/branch-icon.js";
 import { wrpc } from "../../../utils/wrpc.js";
 
 import { EnvironmentDetails } from "./[branch]/_components/environment-details.js";
 import { EnvironmentsListItemSkeleton } from "./_components/environments-list-item-skeleton.js";
 import { EnvironmentsListItem } from "./_components/environments-list-item.js";
+import { BranchIcon } from "../../../icons/branch-icon.js";
 
 const OverviewPage = ({
   owner,
@@ -24,13 +23,18 @@ const OverviewPage = ({
   owner: string;
   appName: string;
 }) => {
-  const { app, setOwner, setAppName } = useContext(
-    CurrentAppDataProviderContext,
+  const getAppQuery = wrpc["app.getByName"].useQuery(
+    {
+      owner: owner!,
+      appName: appName!,
+    },
+    {
+      enabled: !!owner && !!appName,
+    },
   );
-  useEffect(() => {
-    setOwner(owner);
-    setAppName(appName);
-  }, [owner, appName]);
+  const app = useMemo(() => {
+    return getAppQuery.data?.app;
+  }, [getAppQuery.data]);
 
   const navigate = useNavigate();
 
@@ -94,11 +98,13 @@ const OverviewPage = ({
     if (!previewEnvs) {
       return [];
     }
-    return previewEnvs.filter((env) =>
-      `${env.prTitle}${env.branch}${env.status}`
-        .toLocaleLowerCase()
-        .includes(search.toLocaleLowerCase()),
-    );
+    return previewEnvs
+      .filter((env) =>
+        `${env.prTitle}${env.branch}${env.status}`
+          .toLocaleLowerCase()
+          .includes(search.toLocaleLowerCase()),
+      )
+      .reverse();
   }, [previewEnvs, search]);
 
   const repoUrl = useMemo(() => {
@@ -126,24 +132,15 @@ const OverviewPage = ({
             navigate(`/${owner}/${appName}/${productionEnvironment.branch}`);
           }}
           actions={
-            <Link
-              to={`/${owner}/${appName}/${productionEnvironment?.branch}`}
-              onClick={(e) => {
-                if (!productionEnvironment?.branch) {
-                  e.preventDefault();
-                }
-              }}
+            <div
               className={clsx(
-                theme.text2,
-                theme.text1Hover,
-                theme.bg4Hover,
                 "transition-all",
                 "z-10 rounded-full p-1.5",
-                "sm:opacity-0 group-hover:opacity-100",
+                "sm:opacity-0 group-hover:opacity-100 focus:opacity-100",
               )}
             >
               <ArrowRightIcon className="w-4 h-4" />
-            </Link>
+            </div>
           }
         />
       </div>
@@ -155,7 +152,7 @@ const OverviewPage = ({
 
         {!loading && (
           <>
-            {filteredPreviewEnvs.length > 0 && (
+            {previewEnvs.length > 0 && (
               <Input
                 type="text"
                 leftIcon={MagnifyingGlassCircleIcon}
@@ -191,7 +188,7 @@ const OverviewPage = ({
                 )}
               >
                 <BranchIcon
-                  className={clsx("w-12 h-12 mx-auto", theme.text3)}
+                  className={clsx("w-10 h-10 mx-auto", theme.text3)}
                 />
                 <h3 className={clsx("text-sm font-medium", theme.text2)}>
                   No preview environments found.
@@ -202,23 +199,25 @@ const OverviewPage = ({
                     theme.text3,
                   )}
                 >
-                  <span>
-                    Get started by{" "}
-                    <a
-                      className="text-sky-500 hover:underline hover:text-sky-600"
-                      href={`${repoUrl}/compare`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => {
-                        if (repoUrl === "") {
-                          e.preventDefault();
-                        }
-                      }}
-                    >
-                      opening a Pull Request
-                    </a>
-                    .
-                  </span>
+                  {previewEnvs.length === 0 && (
+                    <span>
+                      Get started by{" "}
+                      <a
+                        className="text-sky-500 hover:underline focus:underline hover:text-sky-600 outline-none"
+                        href={`${repoUrl}/compare`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                          if (repoUrl === "") {
+                            e.preventDefault();
+                          }
+                        }}
+                      >
+                        opening a Pull Request
+                      </a>
+                      .
+                    </span>
+                  )}
                 </p>
               </div>
             )}

@@ -16,7 +16,7 @@ pub class EnvironmentCleaner {
   new(props: EnvironmentCleanerProps) {
     this.environments = props.environments;
 
-    let cleaner = new cloud.Schedule(rate: 60m) as "environment cleaner";
+    let cleaner = new cloud.Schedule(rate: 60m) as "EnvironmentCleaner";
     cleaner.onTick(inflight () => {
       let expiredDate = datetime.fromIso(dateutils.addDays(datetime.utcNow().toIso(), -7));
       for environment in this.environments.listDeployedAt(deployedAt: expiredDate) {
