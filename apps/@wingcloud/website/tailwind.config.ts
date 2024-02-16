@@ -10,7 +10,7 @@ export default {
     ...ui.theme,
     fontFamily: {
       ...defaultTheme.fontFamily,
-      sans: ["IBM Plex Sans", "Inter", ...defaultTheme.fontFamily.sans],
+      sans: ["IBM Plex Sans Var", ...defaultTheme.fontFamily.sans],
       mono: ["IBM Plex Mono", ...defaultTheme.fontFamily.mono],
     },
   },
