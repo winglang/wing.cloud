@@ -52,7 +52,7 @@ export const GitRepoSelect = ({
     return repos.map((repo) => {
       return {
         ...repo,
-        used: apps.some((app) => app.repoId === repo.full_name),
+        used: apps?.some((app) => app.repoId === repo.full_name),
       };
     });
   }, [repos, apps]);
