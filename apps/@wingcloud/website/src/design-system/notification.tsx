@@ -130,7 +130,7 @@ function NotificationsContainer() {
                         className={clsx(
                           theme.text2,
                           theme.text4Hover,
-                          theme.focusInput,
+                          theme.focusVisible,
                           "rounded-md inline-flex",
                         )}
                         onClick={() => {

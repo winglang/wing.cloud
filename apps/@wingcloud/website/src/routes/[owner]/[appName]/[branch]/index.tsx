@@ -15,11 +15,14 @@ export const Component = () => {
     <div className="flex flex-col h-full">
       <Header
         breadcrumbs={[
-          { label: appName!, to: `/${owner}/${appName}` },
+          {
+            label: appName!,
+            to: `/${owner}/${appName}`,
+          },
           {
             label: branch!,
             to: `/${owner}/${appName}/${branch}`,
-            icon: <BranchIcon className="w-4 h-4 text-slate-700" />,
+            icon: <BranchIcon className="size-4 text-slate-700" />,
           },
         ]}
         tabs={[
@@ -39,11 +42,14 @@ export const Component = () => {
       />
       <ErrorBoundary>
         <div className="overflow-auto">
-          <PageHeader title={branch!} />
+          <PageHeader
+            icon={<BranchIcon className="size-full" />}
+            title={branch!}
+            noBackground
+          />
           <div
             className={clsx(
-              "py-4",
-              "relative transition-all",
+              "relative transition-all pb-4",
               theme.pageMaxWidth,
               theme.pagePadding,
             )}

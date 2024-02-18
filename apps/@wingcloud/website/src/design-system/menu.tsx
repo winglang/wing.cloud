@@ -35,7 +35,7 @@ export const Menu = ({
             className={clsx(
               btnClassName,
               theme.text1,
-              theme.focusInput,
+              theme.focusVisible,
               theme.bgInputHover,
               "flex items-center text-sm gap-x-2",
               "font-semibold",
@@ -63,7 +63,7 @@ export const Menu = ({
               "rounded shadow-lg z-20",
               "divide-y divide-slate-100 dark:divide-slate-700",
               theme.bgInput,
-              theme.focusInput,
+              theme.focusVisible,
             )}
           >
             {children}

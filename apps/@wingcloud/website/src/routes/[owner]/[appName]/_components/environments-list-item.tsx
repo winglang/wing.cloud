@@ -72,7 +72,7 @@ export const EnvironmentsListItem = ({
       )}
     >
       <Link
-        className={clsx("absolute inset-0 rounded-md z-0", theme.focusInput)}
+        className={clsx("absolute inset-0 rounded-md z-0", theme.focusVisible)}
         to={`/${owner}/${appName}/${environment.branch}`}
       />
       <div className="flex items-center justify-center gap-x-4">

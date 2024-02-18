@@ -4,7 +4,7 @@ import {
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { SectionTitle } from "../../../components/section-title.js";
 import { Input } from "../../../design-system/input.js";
@@ -15,6 +15,9 @@ import { EnvironmentDetails } from "./[branch]/_components/environment-details.j
 import { EnvironmentsListItemSkeleton } from "./_components/environments-list-item-skeleton.js";
 import { EnvironmentsListItem } from "./_components/environments-list-item.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
+import { PageHeader } from "../../../components/page-header.js";
+import { GithubIcon } from "../../../icons/github-icon.js";
+import { AppIcon } from "../_components/app-icon.js";
 
 const OverviewPage = ({
   owner,
@@ -113,118 +116,163 @@ const OverviewPage = ({
   }, [app]);
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <SectionTitle>Production</SectionTitle>
-        <EnvironmentDetails
-          owner={owner}
-          app={app}
-          environment={productionEnvironment}
-          loading={loading}
-          endpoints={endpoints}
-          endpointsLoading={
-            endpointsQuery.isLoading || endpointsQuery.data === undefined
-          }
-          onClick={() => {
-            if (!productionEnvironment?.branch) {
-              return;
-            }
-            navigate(`/${owner}/${appName}/${productionEnvironment.branch}`);
-          }}
-          actions={
-            <div
-              className={clsx(
-                "transition-all",
-                "z-10 rounded-full p-1.5",
-                "sm:opacity-0 group-hover:opacity-100 focus:opacity-100",
-              )}
-            >
-              <ArrowRightIcon className="w-4 h-4" />
-            </div>
-          }
-        />
-      </div>
-
-      <div className="space-y-2">
-        <SectionTitle>Preview Environments</SectionTitle>
-
-        {loading && <EnvironmentsListItemSkeleton short />}
-
-        {!loading && (
-          <>
-            {previewEnvs.length > 0 && (
-              <Input
-                type="text"
-                leftIcon={MagnifyingGlassCircleIcon}
-                className="block w-full"
-                containerClassName="w-full"
-                name="search"
-                id="search"
-                placeholder="Search..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                }}
-              />
+    <>
+      <PageHeader
+        title={appName}
+        icon={
+          <AppIcon
+            appName={appName}
+            entrypoint={app?.entrypoint}
+            classNames="size-full"
+          />
+        }
+        noBackground
+        actions={
+          <Link
+            to={`https://github.com/${app?.repoOwner}/${app?.repoName}`}
+            onClick={(e) => {
+              if (app?.repoName == "") {
+                e.preventDefault();
+              }
+            }}
+            className={clsx(
+              "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
+              "px-2.5 py-2 border shadow-sm",
+              theme.borderInput,
+              theme.focusVisible,
+              theme.bgInput,
+              theme.bgInputHover,
+              theme.textInput,
             )}
-
-            {filteredPreviewEnvs.map((environment) => (
-              <EnvironmentsListItem
-                key={environment.id}
-                owner={owner}
-                appName={appName}
-                environment={environment}
-              />
-            ))}
-
-            {filteredPreviewEnvs.length === 0 && (
+            target="_blank"
+          >
+            <GithubIcon className="size-4" />
+            <div>
+              {app?.repoOwner}/{app?.repoName}
+            </div>
+          </Link>
+        }
+      />
+      <div
+        className={clsx(
+          "space-y-4 pb-4",
+          "relative transition-all",
+          theme.pageMaxWidth,
+          theme.pagePadding,
+        )}
+      >
+        <div className="space-y-2">
+          <SectionTitle>Production</SectionTitle>
+          <EnvironmentDetails
+            owner={owner}
+            app={app}
+            environment={productionEnvironment}
+            loading={loading}
+            endpoints={endpoints}
+            endpointsLoading={
+              endpointsQuery.isLoading || endpointsQuery.data === undefined
+            }
+            onClick={() => {
+              if (!productionEnvironment?.branch) {
+                return;
+              }
+              navigate(`/${owner}/${appName}/${productionEnvironment.branch}`);
+            }}
+            actions={
               <div
                 className={clsx(
-                  "space-y-2",
-                  "p-4 w-full border text-center rounded-md",
-                  theme.bgInput,
-                  theme.borderInput,
-                  theme.text1,
+                  "transition-all",
+                  "z-10 rounded-full p-1.5",
+                  "sm:opacity-0 group-hover:opacity-100 focus:opacity-100",
                 )}
               >
-                <BranchIcon
-                  className={clsx("w-10 h-10 mx-auto", theme.text3)}
+                <ArrowRightIcon className="w-4 h-4" />
+              </div>
+            }
+          />
+        </div>
+
+        <div className="space-y-2">
+          <SectionTitle>Preview Environments</SectionTitle>
+
+          {loading && <EnvironmentsListItemSkeleton short />}
+
+          {!loading && (
+            <>
+              {previewEnvs.length > 0 && (
+                <Input
+                  type="text"
+                  leftIcon={MagnifyingGlassCircleIcon}
+                  className="block w-full"
+                  containerClassName="w-full"
+                  name="search"
+                  id="search"
+                  placeholder="Search..."
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                  }}
                 />
-                <h3 className={clsx("text-sm font-medium", theme.text2)}>
-                  No preview environments found.
-                </h3>
-                <p
+              )}
+
+              {filteredPreviewEnvs.map((environment) => (
+                <EnvironmentsListItem
+                  key={environment.id}
+                  owner={owner}
+                  appName={appName}
+                  environment={environment}
+                />
+              ))}
+
+              {filteredPreviewEnvs.length === 0 && (
+                <div
                   className={clsx(
-                    "mt-1 text-sm flex gap-x-1 w-full justify-center",
-                    theme.text3,
+                    "space-y-2",
+                    "p-4 w-full border text-center rounded-md",
+                    theme.bgInput,
+                    theme.borderInput,
+                    theme.text1,
                   )}
                 >
-                  {previewEnvs.length === 0 && (
-                    <span>
-                      Get started by{" "}
-                      <a
-                        className="text-sky-500 hover:underline focus:underline hover:text-sky-600 outline-none"
-                        href={`${repoUrl}/compare`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => {
-                          if (repoUrl === "") {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        opening a Pull Request
-                      </a>
-                      .
-                    </span>
-                  )}
-                </p>
-              </div>
-            )}
-          </>
-        )}
+                  <BranchIcon
+                    className={clsx("w-10 h-10 mx-auto", theme.text3)}
+                  />
+                  <h3 className={clsx("text-sm font-medium", theme.text2)}>
+                    No preview environments found.
+                  </h3>
+                  <p
+                    className={clsx(
+                      "mt-1 text-sm flex gap-x-1 w-full justify-center",
+                      theme.text3,
+                    )}
+                  >
+                    {previewEnvs.length === 0 && (
+                      <span>
+                        Get started by{" "}
+                        <a
+                          className="text-sky-500 hover:underline focus:underline hover:text-sky-600 outline-none"
+                          href={`${repoUrl}/compare`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => {
+                            if (repoUrl === "") {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          opening a Pull Request
+                        </a>
+                        .
+                      </span>
+                    )}
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

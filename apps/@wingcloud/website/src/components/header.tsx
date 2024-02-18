@@ -24,7 +24,7 @@ const Avatar = ({ avatarURL }: { avatarURL?: string }) => {
       {avatarURL && <img src={avatarURL} alt="User avatar" />}
       {!avatarURL && (
         <div className="p-0.5">
-          <UserIcon className={clsx(theme.text2, theme.focusInput)} />
+          <UserIcon className={clsx(theme.text2, theme.focusVisible)} />
         </div>
       )}
     </div>
@@ -122,7 +122,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
       <div className="flex items-center gap-6">
         <Link
           to={dashboardLink}
-          className={clsx(theme.text1, theme.text1Hover, theme.focusInput)}
+          className={clsx(theme.text1, theme.text1Hover, theme.focusVisible)}
           // HACK: This is a workaround for a bug in React Router where the
           // page components don't re-render when the URL changes.
           reloadDocument={dashboardLink !== ownerLink}
@@ -137,7 +137,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
               className={clsx(
                 "transition-all",
                 "rounded hover:bg-gray-100 px-0 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
-                "focus:bg-gray-50 focus:outline-none",
+                "focus-visible:bg-gray-50 outline-none",
                 theme.text1,
               )}
             >
@@ -159,7 +159,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
                   "transition-all",
                   "rounded hover:bg-gray-100 px-0 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
                   theme.text1,
-                  "focus:bg-gray-50 focus:outline-none",
+                  "focus-visible:bg-gray-50 outline-none",
                 )}
               >
                 {breadcrumb.icon ? (

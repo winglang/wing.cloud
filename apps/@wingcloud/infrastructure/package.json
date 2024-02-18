@@ -24,7 +24,6 @@
     "@wingcloud/nanoid": "workspace:^",
     "@wingcloud/ngrok": "workspace:^",
     "@wingcloud/platform": "workspace:^",
-    "@wingcloud/probot": "workspace:^",
     "@wingcloud/simutils": "workspace:^",
     "@wingcloud/vite": "workspace:^",
     "@winglibs/websockets": "^0.1.2",

@@ -31,7 +31,7 @@ export const AppTemplateItem = ({
         "border rounded transition-all",
         "shadow-sm",
         theme.text1,
-        !disabled && [theme.focusInput, theme.bgInputHover],
+        !disabled && [theme.focusVisible, theme.bgInputHover],
         theme.bgInput,
         theme.borderInput,
       )}

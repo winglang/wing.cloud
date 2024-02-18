@@ -52,7 +52,7 @@ export const Button = forwardRef<
         className={clsx(
           "whitespace-nowrap",
           "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
-          theme.focusInput,
+          theme.focusVisible,
           primary &&
             !transparent && [
               "text-white",

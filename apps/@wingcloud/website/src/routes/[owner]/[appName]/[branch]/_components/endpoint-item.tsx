@@ -35,7 +35,7 @@ export const EndpointItem = ({
         theme.bgInput,
         "border",
         theme.borderInput,
-        theme.focusInput,
+        theme.focusVisible,
         "shadow-sm hover:shadow cursor-default",
         "relative",
       )}
@@ -122,7 +122,7 @@ export const EndpointItem = ({
                 theme.text2,
                 theme.text3Hover,
                 theme.bg4Hover,
-                theme.focusInput,
+                theme.focusVisible,
                 "transition-all",
                 "z-10 rounded-full p-1.5",
               )}
