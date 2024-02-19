@@ -187,8 +187,10 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
         </div>
       </div>
       {tabs && (
-        <div className="pt-3">
-          <Tabs tabs={tabs} />
+        <div className="pt-3 -mx-4">
+          <div className="px-2">
+            <Tabs tabs={tabs} />
+          </div>
         </div>
       )}
     </header>
