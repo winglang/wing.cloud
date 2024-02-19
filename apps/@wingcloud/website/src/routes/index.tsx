@@ -1,17 +1,22 @@
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { useContext, useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import { GithubLogin } from "../components/github-login.js";
 import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
 import { Button } from "../design-system/button.js";
 import { Modal } from "../design-system/modal.js";
+import { useMemo } from "react";
 
 export const Component = () => {
-  const navigate = useNavigate();
-
   // TODO: Use state to prevent man-in-the-middle attacks.
   const { GITHUB_APP_CLIENT_ID } = wing.env;
+
+  const HOME_URL = useMemo(() => {
+    const url = new URL(location.href);
+    url.pathname = "";
+    return url.toString();
+  }, [location.href]);
 
   const AUTHORIZE_URL = (() => {
     const url = new URL("https://github.com/login/oauth/authorize");
@@ -70,7 +75,13 @@ export const Component = () => {
                 >
                   Sign In
                 </Button>
-                <Button onClick={() => navigate("/")}>Home</Button>
+                <Button
+                  onClick={() => {
+                    location.href = HOME_URL;
+                  }}
+                >
+                  Home
+                </Button>
               </div>
             </div>
           </Modal>
