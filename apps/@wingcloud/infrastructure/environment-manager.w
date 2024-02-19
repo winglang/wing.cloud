@@ -172,19 +172,6 @@ pub class EnvironmentManager {
       octokit: octokit
     );
 
-    if options.environment.type == "production" {
-      try {
-        this.githubComment.updateRepoInfo(
-          octokit: octokit,
-          appId: options.appId,
-          appName: app.appName,
-          environmentId: options.environment.id,
-        );
-      } catch err {
-        log("unable to update repo url: {err}");
-      }
-    }
-
     let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: options.environment.installationId);
     if tokenRes.status >= 300 || tokenRes.status < 200 {
       throw "environment create: unable to create installation access token";
