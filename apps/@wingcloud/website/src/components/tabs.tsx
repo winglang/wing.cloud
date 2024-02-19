@@ -25,16 +25,16 @@ export const Tabs = ({ tabs }: TabsProps) => {
     return tabs.find((tab) => tab.to == location.pathname);
   }, [tabs]);
 
+  const changeTab = (index: number) => {
+    const to = tabs[index]?.to;
+    if (!to) {
+      return;
+    }
+    navigate(to);
+  };
+
   return (
-    <HeadlessTab.Group
-      onChange={(index) => {
-        const to = tabs[index]?.to;
-        if (!to) {
-          return;
-        }
-        navigate(to);
-      }}
-    >
+    <HeadlessTab.Group onChange={changeTab}>
       <HeadlessTab.List className="flex space-x-2">
         {tabs.map((tab) => (
           <div key={tab.name}>
