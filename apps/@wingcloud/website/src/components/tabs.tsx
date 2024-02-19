@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { Tab as HeadlessTab } from "@headlessui/react";
 import { useTheme } from "../design-system/theme-provider.js";
+import { Link } from "react-router-dom";
 
 export interface Tab {
   name: string;
@@ -39,7 +40,8 @@ export const Tabs = ({ tabs }: TabsProps) => {
         {tabs.map((tab) => (
           <div key={tab.name}>
             <HeadlessTab
-              onClick={() => navigate(tab.to)}
+              as={Link}
+              to={tab.to}
               className={clsx(
                 "rounded-md px-3 py-1.5 text-sm font-medium",
                 "transition-all",
@@ -54,7 +56,7 @@ export const Tabs = ({ tabs }: TabsProps) => {
             </HeadlessTab>
             <div
               className={clsx(
-                "pb-1 mx-1",
+                "pb-2 mx-1",
                 "border-gray-600",
                 current?.name === tab.name && "border-b-2",
               )}
