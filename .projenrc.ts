@@ -139,6 +139,8 @@ website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 website.addDevDeps("@aws-sdk/client-dynamodb");
 website.addGitIgnore("/.winglibs/");
 
+website.addDevDeps("get-port");
+
 website.addGitIgnore("/.env");
 website.addGitIgnore("/.env.*");
 website.addGitIgnore("!/.env.example");

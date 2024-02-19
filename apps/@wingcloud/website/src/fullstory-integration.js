@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/no-abusive-eslint-disable */
 /* eslint-disable */
-if (window.wingEnv.ENABLE_ANALYTICS === "true") {
+if (wing.env.ENABLE_ANALYTICS === "true") {
   window["_fs_host"] = "fullstory.com";
   window["_fs_script"] = "edge.fullstory.com/s/fs.js";
   window["_fs_org"] = "o-1CTP1V-na1";
