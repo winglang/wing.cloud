@@ -25,7 +25,7 @@
     "@wingcloud/ngrok": "workspace:^",
     "@wingcloud/platform": "workspace:^",
     "@wingcloud/simutils": "workspace:^",
-    "@winglibs/vite": "^0.0.3",
+    "@winglibs/vite": "^0.0.4",
     "@winglibs/websockets": "^0.1.2",
     "aws-cdk-lib": "^2.128.0",
     "case": "^1.6.3",
