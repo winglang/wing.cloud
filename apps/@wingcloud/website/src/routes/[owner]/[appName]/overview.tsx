@@ -147,7 +147,7 @@ const OverviewPage = ({
             target="_blank"
           >
             <GithubIcon className="size-4" />
-            <div>
+            <div className="hidden sm:block">
               {app?.repoOwner}/{app?.repoName}
             </div>
           </Link>
