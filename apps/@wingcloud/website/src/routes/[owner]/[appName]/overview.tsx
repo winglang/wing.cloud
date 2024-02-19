@@ -134,7 +134,7 @@ const OverviewPage = ({
                 to={`https://github.com/${app.repoOwner}/${app.repoName}`}
                 className={clsx(
                   "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
-                  "px-2.5 py-2 border shadow-sm",
+                  "p-1.5 sm:px-2.5 sm:py-1.5 border shadow-sm",
                   theme.borderInput,
                   theme.focusVisible,
                   theme.bgInput,

@@ -73,7 +73,7 @@ export const PageHeader = ({
             tabs && "pb-4 md:pb-8",
           )}
         >
-          {actions || <span className="pt-2.5">&nbsp;</span>}
+          {actions}
         </div>
       </div>
     </div>
