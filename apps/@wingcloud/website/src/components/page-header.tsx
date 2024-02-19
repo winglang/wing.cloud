@@ -36,8 +36,14 @@ export const PageHeader = ({
         )}
       >
         <div className="space-y-1 flex-grow items-center">
-          <div className="flex gap-x-2 items-center">
-            {icon && <div className={clsx("size-7", theme.text1)}>{icon}</div>}
+          <div className="flex gap-x-3 items-center">
+            {icon && (
+              <div
+                className={clsx("size-7 p-1 rounded", theme.text3, theme.bg2)}
+              >
+                {icon}
+              </div>
+            )}
             {title && (
               <div
                 className={clsx(

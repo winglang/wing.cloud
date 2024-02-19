@@ -128,29 +128,33 @@ const OverviewPage = ({
         }
         noBackground
         actions={
-          <Link
-            to={`https://github.com/${app?.repoOwner}/${app?.repoName}`}
-            onClick={(e) => {
-              if (app?.repoName == "") {
-                e.preventDefault();
-              }
-            }}
-            className={clsx(
-              "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
-              "px-2.5 py-2 border shadow-sm",
-              theme.borderInput,
-              theme.focusVisible,
-              theme.bgInput,
-              theme.bgInputHover,
-              theme.textInput,
+          <>
+            {app?.repoOwner && app?.repoName && (
+              <Link
+                to={`https://github.com/${app.repoOwner}/${app.repoName}`}
+                onClick={(e) => {
+                  if (app?.repoName == "") {
+                    e.preventDefault();
+                  }
+                }}
+                className={clsx(
+                  "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
+                  "px-2.5 py-2 border shadow-sm",
+                  theme.borderInput,
+                  theme.focusVisible,
+                  theme.bgInput,
+                  theme.bgInputHover,
+                  theme.textInput,
+                )}
+                target="_blank"
+              >
+                <GithubIcon className="size-4" />
+                <div className="hidden sm:block">
+                  {app.repoOwner}/{app.repoName}
+                </div>
+              </Link>
             )}
-            target="_blank"
-          >
-            <GithubIcon className="size-4" />
-            <div className="hidden sm:block">
-              {app?.repoOwner}/{app?.repoName}
-            </div>
-          </Link>
+          </>
         }
       />
       <div
@@ -182,7 +186,7 @@ const OverviewPage = ({
               <div
                 className={clsx(
                   "transition-all",
-                  "z-10 rounded-full p-1.5",
+                  "rounded-full p-1.5",
                   "sm:opacity-0 group-hover:opacity-100 focus:opacity-100",
                 )}
               >
