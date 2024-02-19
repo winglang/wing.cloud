@@ -7,7 +7,6 @@ packages:
   - packages/@wingcloud/simutils
   - packages/@wingcloud/ngrok
   - packages/@wingcloud/containers
-  - packages/@wingcloud/vite
   - apps/@wingcloud/website
   - apps/@wingcloud/runtime
   - packages/@wingcloud/platform

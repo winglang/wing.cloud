@@ -25,8 +25,8 @@ import { useAnalyticsEvents } from "./utils/use-analytics-events.js";
 const API_URL = new URL(location.origin);
 API_URL.pathname = "/wrpc";
 
-// @ts-ignore
-const WS_URL = new URL(window["wingEnv"]["WS_URL"]);
+const WS_URL = new URL(wing.env.WS_URL);
+
 export const App = () => {
   const { track } = useContext(AnalyticsContext);
   const { handleEvent } = useAnalyticsEvents({ track });
