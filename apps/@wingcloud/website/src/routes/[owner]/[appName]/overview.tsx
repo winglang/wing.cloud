@@ -132,11 +132,6 @@ const OverviewPage = ({
             {app?.repoOwner && app?.repoName && (
               <Link
                 to={`https://github.com/${app.repoOwner}/${app.repoName}`}
-                onClick={(e) => {
-                  if (app?.repoName == "") {
-                    e.preventDefault();
-                  }
-                }}
                 className={clsx(
                   "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
                   "px-2.5 py-2 border shadow-sm",
