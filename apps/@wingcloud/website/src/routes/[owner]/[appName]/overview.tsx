@@ -183,7 +183,7 @@ const OverviewPage = ({
                   "transition-all",
                   "rounded-full p-1.5",
                   "sm:opacity-0 group-hover:opacity-100",
-                  "sm:-translate-y-2 group-hover:translate-y-0",
+                  "sm:-translate-y-2 group-hover:translate-y-0 pointer-events-none",
                 )}
               >
                 <ArrowRightIcon className="w-4 h-4" />
