@@ -37,11 +37,12 @@ export const PageHeader = ({
       >
         <div className="space-y-1 flex-grow items-center">
           <div className="flex gap-x-2 items-center">
-            {icon && <div className={clsx("size-6", theme.text1)}>{icon}</div>}
+            {icon && <div className={clsx("size-7", theme.text1)}>{icon}</div>}
             {title && (
               <div
                 className={clsx(
-                  "text-2xl font-semibold truncate h-8",
+                  "text-2xl font-semibold truncate",
+                  "leading-7 py-0.5",
                   theme.text1,
                 )}
               >

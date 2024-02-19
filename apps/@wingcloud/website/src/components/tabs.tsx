@@ -1,7 +1,8 @@
 import clsx from "clsx";
 import { useMemo } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
+import { Tab as HeadlessTab } from "@headlessui/react";
 import { useTheme } from "../design-system/theme-provider.js";
 
 export interface Tab {
@@ -16,6 +17,8 @@ interface TabsProps {
 
 export const Tabs = ({ tabs }: TabsProps) => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
+
   const location = useLocation();
 
   const current = useMemo(() => {
@@ -23,33 +26,41 @@ export const Tabs = ({ tabs }: TabsProps) => {
   }, [tabs]);
 
   return (
-    <nav className="flex space-x-2" aria-label="Tabs">
-      {tabs.map((tab) => (
-        <div key={tab.name}>
-          <Link
-            to={tab.to}
-            className={clsx(
-              "rounded-md px-3 py-1.5 text-sm font-medium",
-              "transition-all",
-              current?.name === tab.name && [theme.text1],
-              current?.name !== tab.name && [theme.text3, theme.text1Hover],
-              theme.bgInput,
-              theme.focusVisible,
-              theme.bg3Hover,
-            )}
-            aria-current={current ? "page" : undefined}
-          >
-            {tab.name}
-          </Link>
-          <div
-            className={clsx(
-              "pb-2 mx-1",
-              "border-gray-600",
-              current?.name === tab.name && "border-b-2",
-            )}
-          />
-        </div>
-      ))}
-    </nav>
+    <HeadlessTab.Group
+      onChange={(index) => {
+        const to = tabs[index]?.to;
+        if (!to) {
+          return;
+        }
+        navigate(to);
+      }}
+    >
+      <HeadlessTab.List className="flex space-x-2">
+        {tabs.map((tab) => (
+          <div key={tab.name}>
+            <HeadlessTab
+              className={clsx(
+                "rounded-md px-3 py-1.5 text-sm font-medium",
+                "transition-all",
+                current?.name === tab.name && [theme.text1],
+                current?.name !== tab.name && [theme.text3, theme.text1Hover],
+                theme.bgInput,
+                theme.focusVisible,
+                theme.bg3Hover,
+              )}
+            >
+              {tab.name}
+            </HeadlessTab>
+            <div
+              className={clsx(
+                "pb-1 mx-1",
+                "border-gray-600",
+                current?.name === tab.name && "border-b-2",
+              )}
+            />
+          </div>
+        ))}
+      </HeadlessTab.List>
+    </HeadlessTab.Group>
   );
 };

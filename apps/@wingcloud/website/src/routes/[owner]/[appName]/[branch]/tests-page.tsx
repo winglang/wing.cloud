@@ -4,9 +4,11 @@ import { useLocation, useParams } from "react-router-dom";
 import { wrpc } from "../../../../utils/wrpc.js";
 export const TEST_LOGS_ID = "test-logs";
 
-import { TestsLogs } from "./_components/tests-logs.js";
-
 import { SectionTitle } from "../../../../components/section-title.js";
+import { TestsLogs } from "./_components/tests-logs.js";
+import clsx from "clsx";
+import { PageHeader } from "../../../../components/page-header.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
 
 const TestsPage = ({
   owner,
@@ -17,7 +19,7 @@ const TestsPage = ({
   appName: string;
   branch: string;
 }) => {
-  const [testLogsOpen, setTestLogsOpen] = useState(true);
+  const { theme } = useTheme();
 
   const environment = wrpc["app.environment"].useQuery({
     owner: owner!,
@@ -38,7 +40,6 @@ const TestsPage = ({
   );
 
   const location = useLocation();
-  const locationHash = useMemo(() => location.hash.slice(1), [location.hash]);
 
   const selectedTestId = useMemo(() => {
     if (!logs.data?.tests) {
@@ -53,34 +54,29 @@ const TestsPage = ({
     return logs.data?.tests.find((test) => test.id === testId)?.id;
   }, [logs.data?.tests, location.search]);
 
-  useEffect(() => {
-    switch (locationHash) {
-      case TEST_LOGS_ID: {
-        setTestLogsOpen(true);
-
-        break;
-      }
-      default: {
-        if (selectedTestId) {
-          setTestLogsOpen(true);
-        }
-      }
-    }
-  }, [locationHash, logs.data?.tests, selectedTestId]);
-
   return (
-    <div className="space-y-2">
-      <SectionTitle>Tests Logs</SectionTitle>
-      <TestsLogs
-        id={TEST_LOGS_ID}
-        testResults={
-          environment.data?.environment.testResults?.testResults || []
-        }
-        selectedTestId={selectedTestId}
-        logs={logs.data?.tests || []}
-        loading={logs.isLoading}
-      />
-    </div>
+    <>
+      <PageHeader title="Tests" noBackground />
+      <div
+        className={clsx(
+          "relative transition-all pb-4",
+          theme.pageMaxWidth,
+          theme.pagePadding,
+          "space-y-2",
+        )}
+      >
+        <SectionTitle>Tests Logs</SectionTitle>
+        <TestsLogs
+          id={TEST_LOGS_ID}
+          testResults={
+            environment.data?.environment.testResults?.testResults || []
+          }
+          selectedTestId={selectedTestId}
+          logs={logs.data?.tests || []}
+          loading={logs.isLoading}
+        />
+      </div>
+    </>
   );
 };
 

@@ -7,6 +7,9 @@ export const RUNTIME_LOGS_ID = "runtime-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 
 import { AppLogs } from "./_components/app-logs.js";
+import { PageHeader } from "../../../../components/page-header.js";
+import clsx from "clsx";
+import { useTheme } from "../../../../design-system/theme-provider.js";
 
 const LogsPage = ({
   owner,
@@ -17,6 +20,8 @@ const LogsPage = ({
   appName: string;
   branch: string;
 }) => {
+  const { theme } = useTheme();
+
   const logs = wrpc["app.environment.logs"].useQuery(
     {
       owner: owner!,
@@ -30,26 +35,36 @@ const LogsPage = ({
   );
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <SectionTitle>Deployment</SectionTitle>
-        <AppLogs
-          id={DEPLOYMENT_LOGS_ID}
-          label="Deployment"
-          logs={logs.data?.deploy || []}
-          loading={logs.isLoading}
-        />
+    <>
+      <PageHeader title="Logs" noBackground />
+      <div
+        className={clsx(
+          "relative transition-all pb-4",
+          theme.pageMaxWidth,
+          theme.pagePadding,
+          "space-y-4",
+        )}
+      >
+        <div className="space-y-2">
+          <SectionTitle>Deployment</SectionTitle>
+          <AppLogs
+            id={DEPLOYMENT_LOGS_ID}
+            label="Deployment"
+            logs={logs.data?.deploy || []}
+            loading={logs.isLoading}
+          />
+        </div>
+        <div className="space-y-2">
+          <SectionTitle>Runtime</SectionTitle>
+          <AppLogs
+            id={RUNTIME_LOGS_ID}
+            label="Runtime"
+            logs={logs.data?.runtime || []}
+            loading={logs.isLoading}
+          />
+        </div>
       </div>
-      <div className="space-y-2">
-        <SectionTitle>Runtime</SectionTitle>
-        <AppLogs
-          id={RUNTIME_LOGS_ID}
-          label="Runtime"
-          logs={logs.data?.runtime || []}
-          loading={logs.isLoading}
-        />
-      </div>
-    </div>
+    </>
   );
 };
 

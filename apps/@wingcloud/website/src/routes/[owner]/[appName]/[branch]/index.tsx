@@ -4,9 +4,6 @@ import { ErrorBoundary } from "../../../../components/error-boundary.js";
 import { Header } from "../../../../components/header.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
-import clsx from "clsx";
-import { PageHeader } from "../../../../components/page-header.js";
-
 export const Component = () => {
   const { owner, appName, branch } = useParams();
   const { theme } = useTheme();
@@ -42,20 +39,7 @@ export const Component = () => {
       />
       <ErrorBoundary>
         <div className="overflow-auto">
-          <PageHeader
-            icon={<BranchIcon className="size-full" />}
-            title={branch!}
-            noBackground
-          />
-          <div
-            className={clsx(
-              "relative transition-all pb-4",
-              theme.pageMaxWidth,
-              theme.pagePadding,
-            )}
-          >
-            <Outlet />
-          </div>
+          <Outlet />
         </div>
       </ErrorBoundary>
     </div>
