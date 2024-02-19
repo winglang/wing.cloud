@@ -97,8 +97,8 @@ importers:
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/simutils
       '@winglibs/vite':
-        specifier: ^0.0.3
-        version: 0.0.3(@types/node@20.11.19)(constructs@10.3.0)
+        specifier: ^0.0.4
+        version: 0.0.4(@types/node@20.11.19)(constructs@10.3.0)
       '@winglibs/websockets':
         specifier: ^0.1.2
         version: 0.1.2(cdktf@0.20.3)(constructs@10.3.0)(winglang@0.57.27)
@@ -5882,8 +5882,8 @@ packages:
       - uuid
       - yaml
 
-  /@winglibs/vite@0.0.3(@types/node@20.11.19)(constructs@10.3.0):
-    resolution: {integrity: sha512-EDUFyQK2aW9cScLA+Rxs/hSqSLnB0vxegaCr2k5G+hSyDEi6W9qnbM9JUpFwPxkTVmHRyF05eyzyaHwInmNFTg==}
+  /@winglibs/vite@0.0.4(@types/node@20.11.19)(constructs@10.3.0):
+    resolution: {integrity: sha512-QLBYEyphXlkJZtbHpkxCSPsYqBjvx/83pt90yaPIUK3Kvt/1ftPp+uQebjHB10HOM7hrfYwTRjFz6YNwdJ8djQ==}
     dependencies:
       '@cdktf/provider-aws': 19.6.0(cdktf@0.20.3)(constructs@10.3.0)
       cdktf: 0.20.3(constructs@10.3.0)
