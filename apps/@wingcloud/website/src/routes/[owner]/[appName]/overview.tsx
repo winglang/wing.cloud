@@ -187,7 +187,7 @@ const OverviewPage = ({
                 className={clsx(
                   "transition-all",
                   "rounded-full p-1.5",
-                  "sm:opacity-0 group-hover:opacity-100 focus:opacity-100",
+                  "sm:opacity-0 group-hover:opacity-100",
                 )}
               >
                 <ArrowRightIcon className="w-4 h-4" />
