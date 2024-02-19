@@ -8,6 +8,8 @@ import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
 import clsx from "clsx";
 import { useTheme } from "../../../../design-system/theme-provider.js";
+import { PageHeader } from "../../../../components/page-header.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
 
 const Overview = ({
   owner,
@@ -61,47 +63,61 @@ const Overview = ({
   }, [endpointsQuery.data]);
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <SectionTitle>Overview</SectionTitle>
-        <EnvironmentDetails
-          owner={owner}
-          app={app}
-          loading={environmentQuery.isLoading}
-          environment={environment}
-          actions={
-            <Link
-              to={`/${owner}/${appName}/${environment?.branch}/console`}
-              onClick={(e) => {
-                if (environment?.status !== "running") {
-                  e.preventDefault();
-                }
-              }}
-              className={clsx(
-                "z-10",
-                "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
-                "px-2.5 py-2 border shadow-sm",
-                theme.borderInput,
-                theme.focusVisible,
-                theme.bgInput,
-                theme.bgInputHover,
-                theme.textInput,
-              )}
-            >
-              Console
-            </Link>
-          }
-        />
+    <>
+      <PageHeader
+        icon={<BranchIcon className="size-full" />}
+        title={branch!}
+        noBackground
+      />
+      <div
+        className={clsx(
+          "relative transition-all pb-4",
+          theme.pageMaxWidth,
+          theme.pagePadding,
+          "space-y-4",
+        )}
+      >
+        <div className="space-y-2">
+          <SectionTitle>Overview</SectionTitle>
+          <EnvironmentDetails
+            owner={owner}
+            app={app}
+            loading={environmentQuery.isLoading}
+            environment={environment}
+            actions={
+              <Link
+                to={`/${owner}/${appName}/${environment?.branch}/console`}
+                onClick={(e) => {
+                  if (environment?.status !== "running") {
+                    e.preventDefault();
+                  }
+                }}
+                className={clsx(
+                  "z-10",
+                  "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
+                  "px-2.5 py-2 border shadow-sm",
+                  theme.borderInput,
+                  theme.focusVisible,
+                  theme.bgInput,
+                  theme.bgInputHover,
+                  theme.textInput,
+                )}
+              >
+                Console
+              </Link>
+            }
+          />
+        </div>
+        <div className="space-y-2">
+          <SectionTitle>Endpoints</SectionTitle>
+          <Endpoints
+            endpoints={endpoints}
+            loading={endpointsQuery.isLoading}
+            environment={environment}
+          />
+        </div>
       </div>
-      <div className="space-y-2">
-        <SectionTitle>Endpoints</SectionTitle>
-        <Endpoints
-          endpoints={endpoints}
-          loading={endpointsQuery.isLoading}
-          environment={environment}
-        />
-      </div>
-    </div>
+    </>
   );
 };
 
