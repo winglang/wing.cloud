@@ -45,18 +45,17 @@ export const Tabs = ({ tabs }: TabsProps) => {
               className={clsx(
                 "rounded-md px-3 py-1.5 text-sm font-medium",
                 "transition-all",
-                current?.name === tab.name && [theme.text1],
-                current?.name !== tab.name && [theme.text3, theme.text1Hover],
+                current?.name === tab.name && [theme.text1, theme.text1Hover],
+                current?.name !== tab.name && [theme.text3, theme.text3Hover],
                 theme.bgInput,
                 theme.focusVisible,
-                theme.bg3Hover,
               )}
             >
               {tab.name}
             </HeadlessTab>
             <div
               className={clsx(
-                "pb-2 mx-1",
+                "pb-2 mx-2",
                 "border-gray-600",
                 current?.name === tab.name && "border-b-2",
               )}
