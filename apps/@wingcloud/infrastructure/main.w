@@ -6,7 +6,7 @@ bring http;
 
 bring "cdktf" as cdktf;
 
-bring "./node_modules/@wingcloud/vite/src" as vite;
+bring "@winglibs/vite" as vite;
 
 bring "./users.w" as Users;
 bring "./apps.w" as Apps;
@@ -112,7 +112,7 @@ let runtimeUrlParam = new parameter.Parameter(
 
 let dashboard = new vite.Vite(
   root: "../website",
-  env: {
+  publicEnv: {
     "SEGMENT_WRITE_KEY": segmentWriteKey,
     "ENABLE_ANALYTICS": "{enableAnalytics}",
     "API_URL": "{api.url}",
