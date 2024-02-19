@@ -11,7 +11,15 @@ export const StatusPill = ({
   const { statusString, color } = useStatus(status);
 
   return (
-    <div className={clsx(`bg-${color}-100`, "rounded-xl px-2 py-0.5")}>
+    <div
+      className={clsx(
+        color === "gray" && "bg-gray-100",
+        color === "yellow" && "bg-yellow-100",
+        color === "green" && "bg-green-100",
+        color === "red" && "bg-red-100",
+        "rounded-xl px-2 py-0.5",
+      )}
+    >
       <div
         className={clsx(
           color === "gray" && "text-gray-600 animate-pulse",
