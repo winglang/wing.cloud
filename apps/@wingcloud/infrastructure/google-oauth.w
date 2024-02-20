@@ -85,7 +85,7 @@ pub struct GoogleOAuthCredentials {
 pub struct GoogleOAuthProps {
   api: json_api.JsonApi;
   credentials: GoogleOAuthCredentials;
-  redirectDomain: str;
+  redirectOrigin: str;
   analytics: segment_analytics.SegmentAnalytics;
 }
 
@@ -95,7 +95,7 @@ pub class GoogleOAuth {
       let port = request.query.get("port");
       let anonymousId = request.query.get("anonymousId");
       let state = Json.stringify([port, anonymousId]);
-      let redirectURI = "https://{props.redirectDomain}/wrpc/console.signIn/google/callback";
+      let redirectURI = "{props.redirectOrigin}/wrpc/console.signIn/google/callback";
       return {
         status: 302,
         headers: {
@@ -116,7 +116,7 @@ pub class GoogleOAuth {
         clientID: props.credentials.clientId,
         clientSecret: props.credentials.clientSecret,
         code: event.code,
-        redirectURI: "https://{props.redirectDomain}/wrpc/console.signIn/google/callback",
+        redirectURI: "{props.redirectOrigin}/wrpc/console.signIn/google/callback",
       );
 
       let userInfo = Util.getUserInfo(

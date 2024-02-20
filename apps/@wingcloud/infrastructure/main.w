@@ -214,7 +214,7 @@ new google_oauth.GoogleOAuth(
     clientId: util.env("GOOGLE_OAUTH_CLIENT_ID"),
     clientSecret: util.env("GOOGLE_OAUTH_CLIENT_SECRET"),
   },
-  redirectDomain: util.env("GOOGLE_OAUTH_REDIRECT_DOMAIN"),
+  redirectOrigin: util.env("GOOGLE_OAUTH_REDIRECT_ORIGIN"),
   analytics: analytics,
 );
 
