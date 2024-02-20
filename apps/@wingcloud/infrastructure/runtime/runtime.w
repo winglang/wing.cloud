@@ -212,7 +212,8 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       region: Consts.region(),
       imageName: this.image.image.imageName,
       env: env.copy(),
-      memoryMb: 2048,
+      memoryMb: 4096,
+      cpu: 2,
       files: files,
       mounts: mounts.copy(),
       services: [{
