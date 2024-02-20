@@ -22,7 +22,7 @@ export const Tabs = ({ tabs }: TabsProps) => {
 
   const current = useMemo(() => {
     return tabs.find((tab) => tab.to == location.pathname);
-  }, [tabs, location]);
+  }, [tabs, location.pathname]);
 
   return (
     <nav className="flex space-x-2">
