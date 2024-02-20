@@ -157,7 +157,11 @@ export const Entrypoints = ({ app, loading }: EntrypointsProps) => {
               Updating this property will restart all active environments. Learn
               more about{" "}
               <a
-                className="text-blue-600"
+                className={clsx(
+                  "text-blue-600",
+                  "focus:underline outline-none",
+                  "hover:underline z-10 cursor-pointer",
+                )}
                 href="https://www.winglang.io/docs/language-reference#112-execution-model"
                 target="_blank"
               >

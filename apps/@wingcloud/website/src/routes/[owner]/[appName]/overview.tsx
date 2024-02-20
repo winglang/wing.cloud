@@ -134,7 +134,7 @@ const OverviewPage = ({
                 to={`https://github.com/${app.repoOwner}/${app.repoName}`}
                 className={clsx(
                   "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
-                  "p-1.5 sm:px-2.5 sm:py-1.5 border shadow-sm",
+                  "p-1.5 sm:px-2.5 sm:py-1.5 border shadow-sm truncate",
                   theme.borderInput,
                   theme.focusVisible,
                   theme.bgInput,
@@ -143,7 +143,7 @@ const OverviewPage = ({
                 )}
                 target="_blank"
               >
-                <GithubIcon className="size-4" />
+                <GithubIcon className="size-4 shrink-0" />
                 <div className="hidden sm:block">
                   {app.repoOwner}/{app.repoName}
                 </div>

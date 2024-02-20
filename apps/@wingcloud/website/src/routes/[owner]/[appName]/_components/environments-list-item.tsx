@@ -89,6 +89,7 @@ export const EnvironmentsListItem = ({
                 "font-medium truncate relative",
                 theme.text1,
                 theme.text1Hover,
+                "focus:underline outline-none",
                 "hover:underline z-10 cursor-pointer",
               )}
             >
@@ -111,6 +112,7 @@ export const EnvironmentsListItem = ({
                     "font-mono truncate",
                     theme.text2,
                     theme.text2Hover,
+                    "focus:underline outline-none",
                     "hover:underline z-10 cursor-pointer",
                   )}
                 >
@@ -137,6 +139,7 @@ export const EnvironmentsListItem = ({
                       theme.bg3,
                       theme.bg3Hover,
                       theme.border3,
+                      "focus:underline outline-none",
                       "hover:underline z-10 cursor-pointer",
                     )}
                     title={`tests ${testStatus}`}
@@ -162,6 +165,7 @@ export const EnvironmentsListItem = ({
                   "text-xs",
                   theme.text1,
                   theme.text1Hover,
+                  "focus:underline outline-none",
                   "hover:underline z-10 cursor-pointer",
                 )}
               >
