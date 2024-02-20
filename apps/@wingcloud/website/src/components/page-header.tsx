@@ -35,11 +35,15 @@ export const PageHeader = ({
           theme.pagePadding,
         )}
       >
-        <div className="space-y-1 flex-grow items-center">
-          <div className="flex gap-x-3 items-center">
+        <div className="space-y-1 flex-grow items-center truncate">
+          <div className="flex gap-x-3 items-center truncate">
             {icon && (
               <div
-                className={clsx("size-7 p-1 rounded", theme.text3, theme.bg2)}
+                className={clsx(
+                  "size-7 p-1 rounded shrink-0",
+                  theme.text3,
+                  theme.bg2,
+                )}
               >
                 {icon}
               </div>
