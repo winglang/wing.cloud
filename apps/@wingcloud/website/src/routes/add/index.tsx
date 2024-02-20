@@ -76,11 +76,12 @@ const AddAppPage = () => {
   const loading = useMemo(() => {
     return (
       installationsIsLoading ||
-      reposIsLoading ||
+      (installationId && reposIsLoading) ||
       installationsIsRefetching ||
       reposIsRefetching
     );
   }, [
+    installationId,
     installationsIsLoading,
     reposIsLoading,
     installationsIsRefetching,
