@@ -7,8 +7,10 @@ bring sim;
 bring "constructs" as constructs;
 bring "../containers.w" as containers;
 bring "../flyio" as flyio;
+bring "./types.w" as types;
 bring "./runtime-docker.w" as runtimeDocker;
 bring "../environments.w" as environments;
+bring "../environment-manager.w" as environmentManager;
 bring "@cdktf/provider-aws" as awsprovider;
 bring "../components/parameter/iparameter.w" as parameter;
 bring "../components/certificate/icertificate.w" as certificate;
@@ -259,23 +261,13 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
   }
 }
 
-pub struct Message {
-  repo: str;
-  sha: str;
-  entrypoint: str;
-  appId: str;
-  environmentId: str;
-  token: str?;
-  secrets: Map<str>;
-  certificate: certificate.Certificate;
-  privateKey: str;
-}
-
 struct RuntimeServiceProps {
+  api: cloud.Api;
   wingCloudUrl: parameter.IParameter;
   flyToken: str?;
   flyOrgSlug: str?;
   environments: environments.Environments;
+  environmentManager: environmentManager.EnvironmentManager;
   logs: cloud.Bucket;
   publicEndpointFullDomainName: str;
 }
@@ -285,7 +277,6 @@ bring "cdktf" as cdktf;
 // Previews environment runtime
 pub class RuntimeService {
   logs: cloud.Bucket;
-  pub api: cloud.Api;
   runtimeHandler: IRuntimeHandler;
 
   new(props: RuntimeServiceProps) {
@@ -338,54 +329,65 @@ pub class RuntimeService {
 
     let queue = new fifoqueue.FifoQueue(timeout: 15m) as "RuntimeFifo-Queue";
     queue.setConsumer(inflight (message) => {
+      let var msg: types.Message? = nil;
+
       try {
         // hack to get bucket in this environment
         this.logs.put;
 
-        let msg = Message.fromJson(Json.parse(message));
-
-        log("wing url: {props.wingCloudUrl}");
-
-        let url = this.runtimeHandler.start(
-          gitToken: msg.token,
-          gitRepo: msg.repo,
-          gitSha: msg.sha,
-          entrypoint: msg.entrypoint,
-          wingCloudUrl: props.wingCloudUrl,
-          environmentId: msg.environmentId,
-          secrets: msg.secrets,
-          certificate: msg.certificate,
-          privateKey: msg.privateKey,
-          logsBucketName: bucketName,
-          logsBucketRegion: bucketRegion,
-          awsAccessKeyId: awsAccessKeyId,
-          awsSecretAccessKey: awsSecretAccessKey,
-          publicEndpointFullDomainName: props.publicEndpointFullDomainName,
-        );
-
-        log("preview environment url: {url}");
-
-        props.environments.updateUrl(
-          id: msg.environmentId,
-          appId: msg.appId,
-          url: url,
-        );
+        msg = types.Message.fromJson(Json.parse(message));
+        if let message = msg {
+          log("wing url: {props.wingCloudUrl}");
+  
+          let url = this.runtimeHandler.start(
+            gitToken: message.token,
+            gitRepo: message.repo,
+            gitSha: message.sha,
+            entrypoint: message.entrypoint,
+            wingCloudUrl: props.wingCloudUrl,
+            environmentId: message.environmentId,
+            secrets: message.secrets,
+            certificate: message.certificate,
+            privateKey: message.privateKey,
+            logsBucketName: bucketName,
+            logsBucketRegion: bucketRegion,
+            awsAccessKeyId: awsAccessKeyId,
+            awsSecretAccessKey: awsSecretAccessKey,
+            publicEndpointFullDomainName: props.publicEndpointFullDomainName,
+          );
+  
+          log("preview environment url: {url}");
+  
+          props.environments.updateUrl(
+            id: message.environmentId,
+            appId: message.appId,
+            url: url,
+          );
+        }
       } catch error {
+        if let message = msg {
+          props.environmentManager.updateStatus(
+            statusReport: {
+              environmentId: message.environmentId,
+              status: "error",
+              timestamp: datetime.utcNow().timestampMs,
+            }
+          );
+        }
         log(error);
       }
     }, timeout: 5m);
 
-    this.api = new cloud.Api() as "runtime";
-    this.api.post("/", inflight (req) => {
+    props.api.post("/", inflight (req) => {
       let body = Json.parse(req.body ?? "");
-      let message = Message.fromJson(body);
+      let message = types.Message.fromJson(body);
       queue.push(Json.stringify(message), groupId: message.environmentId);
       return {
         status: 200,
       };
     });
 
-    this.api.delete("/", inflight (req) => {
+    props.api.delete("/", inflight (req) => {
       let body = Json.parse(req.body ?? "");
       let environmentId = body.get("environmentId").asStr();
       this.runtimeHandler.stop(

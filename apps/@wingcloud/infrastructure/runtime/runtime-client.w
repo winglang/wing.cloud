@@ -1,7 +1,7 @@
 bring http;
 bring "../apps.w" as apps;
 bring "../environments.w" as environments;
-bring "./runtime.w" as runtime;
+bring "./types.w" as types;
 bring "../components/certificate/icertificate.w" as certificate;
 bring "../components/parameter/parameter.w" as parameter;
 
@@ -32,7 +32,7 @@ pub class RuntimeClient {
   }
 
   pub inflight create(options: RuntimeClientCreateOptions) {
-    let res = http.post(this.runtimeUrl.get(), body: Json.stringify(runtime.Message {
+    let res = http.post(this.runtimeUrl.get(), body: Json.stringify(types.Message {
       repo: options.environment.repo,
       sha: options.sha,
       entrypoint: options.entrypoint,
