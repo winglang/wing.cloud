@@ -6,7 +6,7 @@ import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
-import { useEncodeParams } from "../../../../utils/param-encoder.js";
+import { useEncodeParams } from "../../../../utils/encode-params.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 
 import { Endpoints } from "./_components/endpoints.js";

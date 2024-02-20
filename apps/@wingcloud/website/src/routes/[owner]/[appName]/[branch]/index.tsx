@@ -4,7 +4,7 @@ import { Outlet, useParams } from "react-router-dom";
 import { ErrorBoundary } from "../../../../components/error-boundary.js";
 import { Header } from "../../../../components/header.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
-import { useEncodeParams } from "../../../../utils/param-encoder.js";
+import { useEncodeParams } from "../../../../utils/encode-params.js";
 
 export const Component = () => {
   const { owner, appName, branch } = useParams();
@@ -14,6 +14,10 @@ export const Component = () => {
     appName: appName,
     branch: branch,
   });
+
+  const appUrl = useMemo(() => {
+    return `/${encodedParams.owner}/${encodedParams.appName}`;
+  }, [encodedParams]);
 
   const branchUrl = useMemo(() => {
     return `/${encodedParams.owner}/${encodedParams.appName}/${encodedParams.branch}`;
@@ -25,7 +29,7 @@ export const Component = () => {
         breadcrumbs={[
           {
             label: appName!,
-            to: `/${encodedParams.owner}/${encodedParams.appName}`,
+            to: appUrl,
           },
           {
             label: branch!,

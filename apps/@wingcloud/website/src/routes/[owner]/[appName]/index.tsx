@@ -3,7 +3,7 @@ import { Outlet, useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../../components/error-boundary.js";
 import { Header } from "../../../components/header.js";
-import { useEncodeParams } from "../../../utils/param-encoder.js";
+import { useEncodeParams } from "../../../utils/encode-params.js";
 
 export const Component = () => {
   const { owner, appName } = useParams();
