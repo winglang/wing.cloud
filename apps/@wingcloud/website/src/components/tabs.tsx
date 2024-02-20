@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useMemo } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useTheme } from "../design-system/theme-provider.js";
 import { Link } from "react-router-dom";
@@ -17,21 +17,12 @@ interface TabsProps {
 
 export const Tabs = ({ tabs }: TabsProps) => {
   const { theme } = useTheme();
-  const navigate = useNavigate();
 
   const location = useLocation();
 
   const current = useMemo(() => {
     return tabs.find((tab) => tab.to == location.pathname);
   }, [tabs]);
-
-  const changeTab = (index: number) => {
-    const to = tabs[index]?.to;
-    if (!to) {
-      return;
-    }
-    navigate(to);
-  };
 
   return (
     <nav className="flex space-x-2">
