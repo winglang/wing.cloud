@@ -1,5 +1,7 @@
-// bring ex;
+bring http;
+bring cloud;
 bring "./json-api.w" as json_api;
+bring "./segment-analytics.w" as segment_analytics;
 
 struct GetRedirectURLOptions {
   clientID: str;
@@ -34,11 +36,45 @@ struct GetUserInfoResponse {
   hd: str;
 }
 
+struct QueueMessage {
+  code: str;
+  anonymousId: str;
+}
+
 class Util {
   extern "./util.js" pub static inflight encodeURIComponent(value: str): str;
   extern "./google-oauth.mts" pub static inflight getRedirectURL(options: GetRedirectURLOptions): str;
-  extern "./google-oauth.mts" pub static inflight getToken(options: GetTokenOptions): GetTokenResponse;
-  extern "./google-oauth.mts" pub static inflight getUserInfo(options: GetUserInfoOptions): GetUserInfoResponse;
+
+  pub static inflight getToken(options: GetTokenOptions): GetTokenResponse {
+    let response = http.post(
+      "https://www.googleapis.com/oauth2/v4/token",
+      body: Json.stringify({
+        code: options.code,
+        client_id: options.clientID,
+        client_secret: options.clientSecret,
+        redirect_uri: options.redirectURI,
+        grant_type: "authorization_code",
+      }),
+    );
+    if !response.ok {
+      throw "Failed to get token from Google OAuth.";
+    }
+    return GetTokenResponse.parseJson(response.body);
+  }
+
+  pub static inflight getUserInfo(options: GetUserInfoOptions): GetUserInfoResponse {
+    let response = http.post(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      headers: {
+        Accept: "application/json",
+        Authorization: "Bearer {options.accessToken}",
+      },
+    );
+    if !response.ok {
+      throw "Failed to get user info from Google OAuth.";
+    }
+    return GetUserInfoResponse.parseJson(response.body);
+  }
 }
 
 pub struct GoogleOAuthCredentials {
@@ -50,16 +86,11 @@ pub struct GoogleOAuthProps {
   api: json_api.JsonApi;
   credentials: GoogleOAuthCredentials;
   redirectDomain: str;
+  analytics: segment_analytics.SegmentAnalytics;
 }
 
 pub class GoogleOAuth {
   new(props: GoogleOAuthProps) {
-    // let table = new ex.Table(
-    //   columns: {
-    //     "id": ex.ColumnType.STRING,
-    //     "name": ex.ColumnType.STRING,
-    //   },
-    // );
     props.api.get("/wrpc/console.signIn/google", inflight (request) => {
       let port = request.query.get("port");
       let anonymousId = request.query.get("anonymousId");
@@ -77,54 +108,54 @@ pub class GoogleOAuth {
       };
     });
 
-    props.api.get("/wrpc/console.signIn/google/callback", inflight (request) => {
-      let code = request.query.get("code");
-      let state = Json.parse(request.query.get("state"));
-      log("state = {state}");
-      let port = state.getAt(0).asStr();
-      let anonymousId = state.getAt(1).asStr();
-      log("code = {code}");
-      log("port = {port}");
-      log("anonymousId = {anonymousId}");
+    let queue = new cloud.Queue();
+    queue.setConsumer(inflight (message) => {
+      let event = QueueMessage.parseJson(message);
+
       let token = Util.getToken(
         clientID: props.credentials.clientId,
         clientSecret: props.credentials.clientSecret,
-        code: code,
+        code: event.code,
         redirectURI: "https://{props.redirectDomain}/wrpc/console.signIn/google/callback",
       );
-      log(unsafeCast(token));
 
       let userInfo = Util.getUserInfo(
         accessToken: token.access_token,
       );
-      log(unsafeCast(userInfo));
-      // let [port, anonymousId] = Json.parse(Util.inflight.decodeURIComponent(state));
-      // let response = props.api.post("https://accounts.google.com/o/oauth2/token", {
-      //   headers: {
-      //     "Content-Type": "application/x-www-form-urlencoded",
-      //   },
-      //   body: `code=${code}&client_id=${props.credentials.clientId}&client_secret=${props.credentials.clientSecret}&redirect_uri=http://localhost:${port}/wrpc/console.signIn/google/callback&grant_type=authorization_code`,
-      // });
-      // let json = Json.parse(response.body);
-      // let accessToken = json.access_token;
-      // let idToken = json.id_token;
-      // let userInfo = props.api.get("https://www.googleapis.com/oauth2/v1/userinfo", {
-      //   headers: {
-      //     "Authorization": `Bearer ${accessToken}`,
-      //   },
-      // });
-      // let user = Json.parse(userInfo.body);
-      // return {
-      //   status: 200,
-      //   body: Json.stringify({
-      //     idToken: idToken,
-      //     user: user,
-      //     anonymousId: anonymousId,
-      //   }),
-      // };
+
+      props.analytics.identify(
+        anonymousId: event.anonymousId,
+        traits: {
+          email: userInfo.email,
+          google: userInfo.sub,
+        },
+      );
+      props.analytics.track(
+        anonymousId: event.anonymousId,
+        event: "console_sign_in",
+        properties: {
+          email: userInfo.email,
+          google: userInfo.sub,
+        },
+      );
+    });
+
+    props.api.get("/wrpc/console.signIn/google/callback", inflight (request) => {
+      let code = request.query.get("code");
+      let state = Json.parse(request.query.get("state"));
+      let port = state.getAt(0).asStr();
+      let anonymousId = state.getAt(1).asStr();
+
+      queue.push(Json.stringify(QueueMessage {
+        code: code,
+        anonymousId: anonymousId,
+      }));
+
       return {
-        status: 200,
-        body: "ok",
+        status: 302,
+        headers: {
+          location: "http://localhost:{port}/?signedIn",
+        },
       };
     });
   }

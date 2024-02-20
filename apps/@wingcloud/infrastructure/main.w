@@ -16,7 +16,7 @@ bring util;
 // bring "./environment-cleaner.w" as EnvironmentCleaner;
 // bring "./secrets.w" as Secrets;
 // bring "./api.w" as wingcloud_api;
-// bring "./segment-analytics.w" as SegmentAnalytics;
+bring "./segment-analytics.w" as SegmentAnalytics;
 // bring "./authenticated-websocket-server.w" as wsServer;
 
 // bring "./runtime/runtime.w" as runtime;
@@ -33,8 +33,8 @@ bring "./json-api.w" as json_api;
 
 // let appSecret = util.env("APP_SECRET");
 // let wsSecret = util.env("WS_SECRET");
-// let segmentWriteKey = util.tryEnv("SEGMENT_WRITE_KEY") ?? "";
-// let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true" && segmentWriteKey != "";
+let segmentWriteKey = util.tryEnv("SEGMENT_WRITE_KEY") ?? "";
+let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true" && segmentWriteKey != "";
 
 // let publicEndpointDomain = (): str => {
 //   if util.env("WING_TARGET") == "sim" {
@@ -60,7 +60,7 @@ bring "./json-api.w" as json_api;
 //   }
 // }();
 
-// let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey, enableAnalytics);
+let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey, enableAnalytics);
 
 // let api = new cloud.Api(
 //   cors: true,
@@ -220,6 +220,7 @@ new google_oauth.GoogleOAuth(
     clientSecret: util.env("GOOGLE_OAUTH_CLIENT_SECRET"),
   },
   redirectDomain: util.env("GOOGLE_OAUTH_REDIRECT_DOMAIN"),
+  analytics: analytics,
 );
 
 new cloud.Service(inflight () => {

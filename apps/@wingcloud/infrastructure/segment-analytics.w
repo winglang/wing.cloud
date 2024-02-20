@@ -1,12 +1,13 @@
 struct SegmentTrackOptions {
-  userId: str;
+  userId: str?;
+  anonymousId: str?;
   event: str;
   properties: Json?;
   integrations: Json?;
 }
 
 struct SegmentIdentifyOptions {
-  userId: str;
+  userId: str?;
   anonymousId: str;
   traits: Json?;
 }
@@ -60,12 +61,12 @@ pub class SegmentAnalytics {
     this.analytics.identify(options);
   }
 
-  pub inflight track(userId: str, event: str, properties: Json) {
-    log("SegmentAnalytics.track: {userId}, {SegmentAnalytics.normilizeEventName(event)}, {Json.stringify(properties)}");
+  pub inflight track(options: SegmentTrackOptions) {
     this.analytics.track({
-      userId: userId,
-      event: SegmentAnalytics.normilizeEventName(event),
-      properties: properties,
+      userId: options.userId,
+      anonymousId: options.anonymousId,
+      event: SegmentAnalytics.normilizeEventName(options.event),
+      properties: options.properties,
       integrations: {
         "Actions Amplitude": {
           session_id: this.session,

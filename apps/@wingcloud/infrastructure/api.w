@@ -372,19 +372,22 @@ pub class Api {
     analyticsSignInQueue.setConsumer(inflight (message) => {
       let event = AnalyticsSignInMessage.fromJson(Json.parse(message));
       props.analytics.identify(
-          anonymousId: event.anonymousId,
-          userId: event.userId,
-          traits: {
-            email: event.email,
-            github: event.github,
-          },
-        );
-        props.analytics.track(event.userId, "console_sign_in", {
-          anonymousId: event.anonymousId,
-          userId: event.userId,
+        anonymousId: event.anonymousId,
+        userId: event.userId,
+        traits: {
           email: event.email,
           github: event.github,
-        });
+        },
+      );
+      props.analytics.track(
+        anonymousId: event.anonymousId,
+        userId: event.userId,
+        event: "console_sign_in",
+        properties: {
+          email: event.email,
+          github: event.github,
+        },
+      );
     });
 
     api.get("/wrpc/github.callback", inflight (request) => {
