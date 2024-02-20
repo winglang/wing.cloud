@@ -1047,18 +1047,34 @@ pub class Api {
 
       let envId = environment.id;
 
-      let deployMessages = logs.tryGet("{envId}/deployment.log")?.split("\n") ?? [];
-      let deployLogs = Util.parseLogs(deployMessages);
+      let var deployLogs = [];
+      try {
+        let deployMessages = logs.tryGet("{envId}/deployment.log")?.split("\n") ?? [];
+        deployLogs = Util.parseLogs(deployMessages);
+      } catch err {
+        deployLogs = [];
+        log("failed to parse deployment logs {err}");
+      }
 
-      let runtimeMessages = logs.tryGet("{envId}/runtime.log")?.split("\n") ?? [];
-      let runtimeLogs = Util.parseLogs(runtimeMessages);
+      let var runtimeLogs = [];
+      try {
+        let runtimeMessages = logs.tryGet("{envId}/runtime.log")?.split("\n") ?? [];
+        runtimeLogs = Util.parseLogs(runtimeMessages);
+      } catch err {
+        runtimeLogs = [];
+        log("failed to parse runtime logs {err}");
+      }
 
-      let testEntries = logs.list("{envId}/tests");
-      let testLogs = MutArray<TestLog>[];
-
-      for entry in testEntries {
-        let testResults = logs.getJson(entry);
-        testLogs.push(TestLog.fromJson(testResults));
+      let var testLogs = MutArray<TestLog>[];
+      try {
+        let testEntries = logs.list("{envId}/tests");
+        for entry in testEntries {
+          let testResults = logs.getJson(entry);
+          testLogs.push(TestLog.fromJson(testResults));
+        }
+      } catch err {
+        testLogs = MutArray<TestLog>[];
+        log("failed to parse test logs {err}");
       }
 
       return {
