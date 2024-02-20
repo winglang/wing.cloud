@@ -9,7 +9,12 @@ export const Component = () => {
   return (
     <div className="flex flex-col h-full">
       <Header
-        breadcrumbs={[{ label: appName!, to: `/${owner}/${appName}` }]}
+        breadcrumbs={[
+          {
+            label: appName!,
+            to: `/${owner}/${appName}`,
+          },
+        ]}
         tabs={[
           {
             name: "Application",
@@ -23,9 +28,7 @@ export const Component = () => {
       />
       <ErrorBoundary>
         <div className="overflow-auto">
-          <div className="max-w-7xl mx-auto p-4 md:p-8 relative">
-            <Outlet />
-          </div>
+          <Outlet />
         </div>
       </ErrorBoundary>
     </div>

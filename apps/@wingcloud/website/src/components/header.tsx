@@ -24,7 +24,7 @@ const Avatar = ({ avatarURL }: { avatarURL?: string }) => {
       {avatarURL && <img src={avatarURL} alt="User avatar" />}
       {!avatarURL && (
         <div className="p-0.5">
-          <UserIcon className={clsx(theme.text2, theme.focusInput)} />
+          <UserIcon className={clsx(theme.text2, theme.focusVisible)} />
         </div>
       )}
     </div>
@@ -36,6 +36,8 @@ interface UserMenuProps {
 }
 
 const UserMenu = ({ user }: UserMenuProps) => {
+  const { theme } = useTheme();
+
   const signOut = wrpc["auth.signOut"].useMutation({
     onSuccess(d) {
       location.href = "/";
@@ -56,8 +58,8 @@ const UserMenu = ({ user }: UserMenuProps) => {
       icon={<Avatar avatarURL={user?.avatarUrl} />}
     >
       {user?.email && (
-        <div className="px-4 py-3" role="none">
-          <p className="truncate text-sm font-medium text-gray-900" role="none">
+        <div className="px-3 py-3" role="none">
+          <p className={clsx("text-sm font-medium", theme.text2)} role="none">
             {user?.email}
           </p>
         </div>
@@ -100,14 +102,32 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
     return "/dashboard";
   }, [user?.username]);
 
+  const params = useParams();
+  const owner = useMemo(() => {
+    return params["owner"] ?? user?.username;
+  }, [params["owner"], user?.username]);
+
+  const ownerLink = useMemo(() => {
+    return `/${owner}`;
+  }, [owner]);
+
   return (
     <header
-      className={clsx("px-6 shadow z-30 pt-3", theme.bgInput, !tabs && "pb-3")}
+      className={clsx(
+        "transition-all",
+        "pt-4 shadow z-30",
+        !tabs && "pb-4",
+        theme.bgInput,
+        theme.pagePadding,
+      )}
     >
       <div className="flex items-center gap-6">
         <Link
           to={dashboardLink}
-          className={clsx(theme.text1, theme.text1Hover)}
+          className={clsx(theme.text1, theme.text1Hover, theme.focusVisible)}
+          // HACK: This is a workaround for a bug in React Router where the
+          // page components don't re-render when the URL changes.
+          reloadDocument={dashboardLink !== ownerLink}
         >
           <WingIcon className="h-5 w-auto" />
         </Link>
@@ -115,18 +135,21 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
         <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto">
           <div>
             <Link
-              to={dashboardLink}
+              to={ownerLink}
               className={clsx(
-                "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                "transition-all",
+                "rounded hover:bg-gray-100 px-0 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                "focus-visible:bg-gray-50 outline-none",
                 theme.text1,
               )}
             >
-              {!user && (
+              <UserIcon className="size-3.5" />
+              {!owner && (
                 <span className="w-32 bg-gray-300 animate-pulse rounded">
                   &nbsp;
                 </span>
               )}
-              {user && <span>{user.username}</span>}
+              {owner && <span>{owner}</span>}
             </Link>
           </div>
           {breadcrumbs?.map((breadcrumb, index) => (
@@ -135,8 +158,10 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
               <Link
                 to={breadcrumb.to}
                 className={clsx(
-                  "rounded hover:bg-gray-100 px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                  "transition-all",
+                  "rounded hover:bg-gray-100 px-0 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
                   theme.text1,
+                  "focus-visible:bg-gray-50 outline-none",
                 )}
               >
                 {breadcrumb.icon ? (
@@ -145,6 +170,8 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
                 <span
                   className={clsx(
                     {
+                      "hidden sm:block":
+                        breadcrumb.icon && index === breadcrumbs.length - 1,
                       "-ml-0.5": breadcrumb.icon,
                     },
                     "whitespace-nowrap",
@@ -162,8 +189,10 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
         </div>
       </div>
       {tabs && (
-        <div className="pt-3">
-          <Tabs tabs={tabs} />
+        <div className="pt-3 -mx-4">
+          <div className="px-2">
+            <Tabs tabs={tabs} />
+          </div>
         </div>
       )}
     </header>

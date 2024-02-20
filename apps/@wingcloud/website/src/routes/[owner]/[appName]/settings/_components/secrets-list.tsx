@@ -11,6 +11,7 @@ import type { EnvironmentType } from "../../../../../utils/wrpc.js";
 
 import { NewSecret } from "./new-secret.js";
 import { SecretsListItem } from "./secrets-list-item.js";
+import { SectionTitle } from "../../../../../components/section-title.js";
 
 export const SecretsList = ({ appId }: { appId?: string }) => {
   const { showNotification } = useNotifications();
@@ -128,78 +129,86 @@ export const SecretsList = ({ appId }: { appId?: string }) => {
   }, [appId, secretsQuery.isLoading]);
 
   return (
-    <div
-      className={clsx(
-        "flex flex-col gap-2 rounded-md p-4 border",
-        theme.bgInput,
-        theme.borderInput,
-        "relative",
-      )}
-    >
+    <div className="space-y-2">
+      <SectionTitle>Secrets</SectionTitle>
       <div
         className={clsx(
-          "absolute inset-0 flex items-center justify-center",
-          "transition-all",
-          loading && "bg-opacity-50 z-10",
-          !loading && "bg-opacity-0 -z-10",
-          theme.bg3,
+          "flex flex-col gap-2 rounded-md p-4 border",
+          theme.bgInput,
+          theme.borderInput,
+          "relative",
         )}
       >
-        <SpinnerLoader size="sm" />
-      </div>
-
-      <div className={clsx("truncate", theme.text1)}>Secrets</div>
-      <div className="flex flex-col h-full">
-        <NewSecret loading={updatingSecrets} onCreate={onCreate} />
-        <div className="w-full flex flex-col gap-2 relative py-4">
-          {updatingSecrets && (
-            <div className="flex items-center justify-center absolute inset-0 z-10">
-              <SpinnerLoader size="sm" className="z-20" />
-            </div>
+        <div
+          className={clsx(
+            "absolute inset-0 flex items-center justify-center",
+            "transition-all",
+            loading && "bg-opacity-50 z-10",
+            !loading && "bg-opacity-0 -z-10",
+            theme.bg3,
           )}
-          {!updatingSecrets && groupedSecrets.length === 0 && (
-            <div className="text-xs flex flex-col truncate items-center gap-2">
-              <LockClosedIcon
-                className={clsx("w-5 h-5 rounded-full", theme.text2)}
-              />
-              <span className={clsx("font-bold", theme.text1)}>No secrets</span>
-            </div>
-          )}
-          {groupedSecrets.map((group) => (
-            <div
-              className={clsx(
-                "w-full flex flex-col gap-2",
-                updatingSecrets && "opacity-50",
-              )}
-              key={group[0]}
-            >
-              <div className={clsx("capitalize text-sm", theme.text1)}>
-                {group[0]}
-              </div>
-              {group[1].map((secret, index) => (
-                <SecretsListItem
-                  key={`${secret.id}`}
-                  secret={secret}
-                  onDecrypt={onDecrypt}
-                  onDelete={onDelete}
-                  loading={updatingSecrets}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-      <hr className="h-px bg-slate-200 border-0 dark:bg-slate-700" />
-      <span className={clsx("text-xs truncate", theme.text2)}>
-        Learn more about{" "}
-        <a
-          className="text-blue-600"
-          href="https://www.winglang.io/docs/standard-library/cloud/secret"
-          target="_blank"
         >
-          Secrets
-        </a>{" "}
-      </span>
+          <SpinnerLoader size="sm" />
+        </div>
+
+        <div className="flex flex-col h-full">
+          <NewSecret loading={updatingSecrets} onCreate={onCreate} />
+          <div className="w-full flex flex-col gap-2 relative py-4">
+            {updatingSecrets && (
+              <div className="flex items-center justify-center absolute inset-0 z-10">
+                <SpinnerLoader size="sm" className="z-20" />
+              </div>
+            )}
+            {!updatingSecrets && groupedSecrets.length === 0 && (
+              <div className="text-xs flex flex-col truncate items-center gap-2">
+                <LockClosedIcon
+                  className={clsx("w-5 h-5 rounded-full", theme.text2)}
+                />
+                <span className={clsx("font-bold", theme.text1)}>
+                  No secrets
+                </span>
+              </div>
+            )}
+            {groupedSecrets.map((group) => (
+              <div
+                className={clsx(
+                  "w-full flex flex-col gap-2",
+                  updatingSecrets && "opacity-50",
+                )}
+                key={group[0]}
+              >
+                <div className={clsx("capitalize text-sm", theme.text1)}>
+                  {group[0]}
+                </div>
+                {group[1].map((secret, index) => (
+                  <SecretsListItem
+                    key={`${secret.id}`}
+                    secret={secret}
+                    onDecrypt={onDecrypt}
+                    onDelete={onDelete}
+                    loading={updatingSecrets}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+        <hr className="h-px bg-slate-200 border-0 dark:bg-slate-700" />
+        <span className={clsx("text-xs truncate", theme.text2)}>
+          Learn more about{" "}
+          <a
+            className={clsx(
+              "text-blue-600",
+              "focus:underline outline-none",
+              "hover:underline z-10 cursor-pointer",
+            )}
+            href="https://www.winglang.io/docs/standard-library/cloud/secret"
+            target="_blank"
+          >
+            Secrets
+          </a>{" "}
+        </span>
+      </div>
     </div>
   );
 };

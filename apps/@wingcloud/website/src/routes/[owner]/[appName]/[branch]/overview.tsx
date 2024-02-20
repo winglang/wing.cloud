@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { SectionTitle } from "../../../../components/section-title.js";
@@ -6,8 +6,10 @@ import { wrpc } from "../../../../utils/wrpc.js";
 
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
-import { Button } from "../../../../design-system/button.js";
-import { CurrentAppDataProviderContext } from "../../../../data-store/current-app-data-provider.js";
+import clsx from "clsx";
+import { useTheme } from "../../../../design-system/theme-provider.js";
+import { PageHeader } from "../../../../components/page-header.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
 
 const Overview = ({
   owner,
@@ -18,15 +20,20 @@ const Overview = ({
   appName: string;
   branch: string;
 }) => {
-  const { app, setOwner, setAppName } = useContext(
-    CurrentAppDataProviderContext,
+  const { theme } = useTheme();
+
+  const getAppQuery = wrpc["app.getByName"].useQuery(
+    {
+      owner: owner!,
+      appName: appName!,
+    },
+    {
+      enabled: !!owner && !!appName,
+    },
   );
-  useEffect(() => {
-    setOwner(owner);
-  }, [owner]);
-  useEffect(() => {
-    setAppName(appName);
-  }, [appName]);
+  const app = useMemo(() => {
+    return getAppQuery.data?.app;
+  }, [getAppQuery.data]);
 
   const environmentQuery = wrpc["app.environment"].useQuery({
     owner: owner!,
@@ -56,35 +63,63 @@ const Overview = ({
   }, [endpointsQuery.data]);
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <SectionTitle>Overview</SectionTitle>
-        <EnvironmentDetails
-          owner={owner}
-          app={app}
-          loading={environmentQuery.isLoading}
-          environment={environment}
-          actions={
-            <Link
-              to={`/${owner}/${appName}/${environment?.branch}/console`}
-              className="z-10"
-            >
-              <Button disabled={environment?.status !== "running"}>
+    <>
+      <PageHeader
+        icon={<BranchIcon className="size-full" />}
+        title={branch!}
+        noBackground
+      />
+      <div
+        className={clsx(
+          "relative transition-all pb-4",
+          theme.pageMaxWidth,
+          theme.pagePadding,
+          "space-y-4",
+        )}
+      >
+        <div className="space-y-2">
+          <SectionTitle>Overview</SectionTitle>
+          <EnvironmentDetails
+            owner={owner}
+            app={app}
+            loading={environmentQuery.isLoading}
+            environment={environment}
+            actions={
+              <Link
+                to={`/${owner}/${appName}/${environment?.branch}/console`}
+                onClick={(e) => {
+                  if (environment?.status !== "running") {
+                    e.preventDefault();
+                  }
+                }}
+                className={clsx(
+                  "z-10",
+                  "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
+                  "px-2.5 py-2 border shadow-sm",
+                  theme.borderInput,
+                  theme.focusVisible,
+                  theme.bgInput,
+                  theme.bgInputHover,
+                  theme.textInput,
+                  environment?.status !== "running" &&
+                    "cursor-not-allowed opacity-50",
+                )}
+              >
                 Console
-              </Button>
-            </Link>
-          }
-        />
+              </Link>
+            }
+          />
+        </div>
+        <div className="space-y-2">
+          <SectionTitle>Endpoints</SectionTitle>
+          <Endpoints
+            endpoints={endpoints}
+            loading={endpointsQuery.isLoading}
+            environment={environment}
+          />
+        </div>
       </div>
-      <div className="space-y-2">
-        <SectionTitle>Endpoints</SectionTitle>
-        <Endpoints
-          endpoints={endpoints}
-          loading={endpointsQuery.isLoading}
-          environment={environment}
-        />
-      </div>
-    </div>
+    </>
   );
 };
 

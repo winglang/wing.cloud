@@ -11,6 +11,8 @@ import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
 import { AnalyticsContext } from "../../../../../utils/analytics-provider.js";
 import { wrpc } from "../../../../../utils/wrpc.js";
+import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 const ConsolePage = () => {
   const { theme, mode } = useTheme();
@@ -36,7 +38,13 @@ const ConsolePage = () => {
   }, [appName, branch, track, environment.data?.environment]);
 
   const url = useMemo(() => {
-    return environment.data?.environment.url ?? "";
+    if (!environment.data?.environment) {
+      return;
+    }
+    if (environment.data?.environment.status !== "running") {
+      return;
+    }
+    return environment.data.environment.url;
   }, [environment.data?.environment.url]);
 
   return (
@@ -44,6 +52,23 @@ const ConsolePage = () => {
       {environment.isLoading && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
+        </div>
+      )}
+
+      {!url && (
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center space-y-4">
+            <ConsolePreviewIcon className="w-full text-slate-500" />
+            <div
+              className={clsx(
+                theme.text3,
+                "font-semibold flex items-center gap-1 justify-center text-sm",
+              )}
+            >
+              <ExclamationTriangleIcon className="w-5 h-5" />
+              <div>Environment is not running</div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -74,7 +99,10 @@ export const Component = () => {
     <div className="flex flex-col h-full">
       <Header
         breadcrumbs={[
-          { label: appName!, to: `/${owner}/${appName}` },
+          {
+            label: appName!,
+            to: `/${owner}/${appName}`,
+          },
           {
             label: branch!,
             to: `/${owner}/${appName}/${branch}`,

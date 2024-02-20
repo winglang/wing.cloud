@@ -1,13 +1,12 @@
 import react from "@vitejs/plugin-react-swc";
+import getPort from "get-port";
 import { defineConfig } from "vite";
 
-import { api } from "./plugins/index.js";
-
 export default defineConfig({
-  plugins: [api(), react()],
+  plugins: [react()],
   server: {
     hmr: {
-      port: 5800,
+      port: await getPort(),
     },
   },
 });

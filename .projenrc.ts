@@ -59,14 +59,6 @@ wrpc
   .addToArray("compilerOptions.lib", "DOM", "DOM.Iterable");
 
 ///////////////////////////////////////////////////////////////////////////////
-const probot = new WingLibProject({
-  monorepo,
-  name: "@wingcloud/probot",
-  devDeps: ["@probot/adapter-aws-lambda-serverless"],
-  typescript: true,
-});
-
-///////////////////////////////////////////////////////////////////////////////
 const nanoid = new WingLibProject({
   monorepo,
   name: "@wingcloud/nanoid",
@@ -98,24 +90,6 @@ const containers = new WingLibProject({
   name: "@wingcloud/containers",
   devDeps: [nanoid.name],
 });
-
-///////////////////////////////////////////////////////////////////////////////
-const vite = new NodeEsmProject({
-  monorepo,
-  name: "@wingcloud/vite",
-});
-vite.addFields({
-  types: "./src/index.d.ts",
-  exports: {
-    ".": "./src/index.js",
-    "./src/util.cjs": "./src/util.cjs",
-  },
-});
-
-vite.addDevDeps("vite");
-vite.addDeps("dotenv");
-
-vite.addDeps("constructs", "cdktf", "@cdktf/provider-aws");
 
 ///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
@@ -150,8 +124,6 @@ website.addDevDeps("@types/react", "@types/react-dom");
 website.addDeps("react-router-dom");
 website.addDeps("react-error-boundary");
 
-website.addDevDeps(vite.name);
-
 website.addDevDeps("tsx", "get-port", "zod");
 website.addDeps(wrpc.name);
 website.addDeps("@tanstack/react-query");
@@ -165,7 +137,9 @@ website.addDeps("@segment/analytics-next");
 website.addDevDeps("tailwindcss", "postcss", "autoprefixer");
 
 website.addDevDeps("@aws-sdk/client-dynamodb");
-website.addGitIgnore("/.wingcloud/");
+website.addGitIgnore("/.winglibs/");
+
+website.addDevDeps("get-port");
 
 website.addGitIgnore("/.env");
 website.addGitIgnore("/.env.*");
@@ -175,7 +149,7 @@ website.addGitIgnore("!/.env.example");
   const tsconfig = website.tryFindObjectFile("tsconfig.json")!;
   tsconfig.addOverride("compilerOptions.jsx", "react-jsx");
   tsconfig.addToArray("compilerOptions.lib", "DOM", "DOM.Iterable");
-  tsconfig.addToArray("include", "plugins/**/*", ".wingcloud/**/*");
+  tsconfig.addToArray("include", "plugins/**/*", ".winglibs/**/*");
 }
 
 website.addDevDeps("node-fetch");
@@ -268,8 +242,7 @@ infrastructure.addGitIgnore("!/.env.example");
 
 infrastructure.addGitIgnore("**/target/");
 infrastructure.addDeps("winglang");
-
-infrastructure.addDeps(vite.name);
+infrastructure.addDeps("@winglibs/vite");
 
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
@@ -350,7 +323,6 @@ infrastructure.addDevDeps("@types/express");
 infrastructure.addDeps("glob");
 
 infrastructure.addDeps(
-  probot.name,
   containers.name,
   nanoid.name,
   dateutils.name,

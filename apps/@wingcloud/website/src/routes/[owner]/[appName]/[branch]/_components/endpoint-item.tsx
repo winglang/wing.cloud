@@ -35,6 +35,7 @@ export const EndpointItem = ({
         theme.bgInput,
         "border",
         theme.borderInput,
+        theme.focusVisible,
         "shadow-sm hover:shadow cursor-default",
         "relative",
       )}
@@ -83,7 +84,7 @@ export const EndpointItem = ({
                       "truncate items-end font-mono",
                       theme.text2,
                       theme.text2Hover,
-                      "hover:underline",
+                      "hover:underline focus:underline outline-none",
                     )}
                   >
                     {endpoint.publicUrl}
@@ -113,7 +114,7 @@ export const EndpointItem = ({
             </div>
           </div>
 
-          <div className="flex gap-x-4 text-xs items-center justify-end">
+          <div className="flex gap-x-4 text-xs items-center justify-end mx-0.5">
             <Link
               to={endpoint.publicUrl}
               target="_blank"
@@ -121,6 +122,7 @@ export const EndpointItem = ({
                 theme.text2,
                 theme.text3Hover,
                 theme.bg4Hover,
+                theme.focusVisible,
                 "transition-all",
                 "z-10 rounded-full p-1.5",
               )}

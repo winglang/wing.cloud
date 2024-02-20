@@ -31,9 +31,12 @@ export interface Theme {
   textFocus: string;
   textInput: string;
   focusInput: string;
+  focusVisible: string;
   borderInput: string;
   focusWithin: string;
   scrollbar: string;
+  pagePadding: string;
+  pageMaxWidth: string;
 }
 
 export type Mode = "dark" | "light" | "auto";
@@ -58,21 +61,25 @@ export const DefaultTheme: Theme = {
   text2: "text-gray-600 dark:text-gray-300",
   text3: "text-gray-500 dark:text-gray-350",
   text4: "text-gray-450 dark:text-gray-400",
-  text1Hover: "hover:text-gray-750 dark:hover:text-gray-200",
-  text2Hover: "hover:text-gray-650 dark:hover:text-gray-250",
-  text3Hover: "hover:text-gray-550 dark:hover:text-gray-350",
-  text4Hover: "hover:text-gray-500 dark:hover:text-gray-300",
+  text1Hover: "hover:text-gray-800 dark:hover:text-gray-150",
+  text2Hover: "hover:text-gray-700 dark:hover:text-gray-200",
+  text3Hover: "hover:text-gray-600 dark:hover:text-gray-250",
+  text4Hover: "hover:text-gray-550 dark:hover:text-gray-300",
   text4GroupHover: "group-hover:text-gray-550 dark:group-hover:text-gray-350",
   textFocus: "text-sky-700 dark:text-sky-300",
   textInput:
-    "text-gray-900 placeholder:text-gray-500 dark:text-gray-300 dark:placeholder:text-gray-500",
+    "text-gray-800 placeholder:text-gray-500 dark:text-gray-300 dark:placeholder:text-gray-500",
   focusInput:
     "focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 outline-none",
+  focusVisible:
+    "focus-visible:ring-2 focus-visible:ring-sky-500/50 focus-visible:border-sky-500 outline-none",
   borderInput: "border-gray-200 dark:border-gray-800",
   focusWithin:
     "focus-within:ring-2 focus-within:ring-sky-500/50 focus-within:border-sky-500 outline-none",
   scrollbar:
     "scrollbar hover:scrollbar-bg-gray-500/10 hover:scrollbar-thumb-gray-700/30 scrollbar-thumb-hover-gray-700/40 scrollbar-thumb-active-gray-700/60 dark:hover:scrollbar-bg-gray-400/10 dark:hover:scrollbar-thumb-gray-400/30 dark:scrollbar-thumb-hover-gray-400/40 dark:scrollbar-thumb-active-gray-400/60",
+  pagePadding: "px-4 sm:px-8",
+  pageMaxWidth: "w-full max-w-7xl mx-auto",
 };
 
 export interface ThemeProviderProps {

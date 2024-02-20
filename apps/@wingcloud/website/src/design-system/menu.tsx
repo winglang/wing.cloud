@@ -35,6 +35,7 @@ export const Menu = ({
             className={clsx(
               btnClassName,
               theme.text1,
+              theme.focusVisible,
               theme.bgInputHover,
               "flex items-center text-sm gap-x-2",
               "font-semibold",
@@ -59,10 +60,11 @@ export const Menu = ({
           <HeadlessMenu.Items
             className={clsx(
               "absolute right-0 mt-2 w-56 origin-top-right",
-              "rounded shadow-lg z-20",
+              "rounded-md shadow-lg z-20 border",
               "divide-y divide-slate-100 dark:divide-slate-700",
               theme.bgInput,
-              theme.focusInput,
+              theme.borderInput,
+              theme.focusVisible,
             )}
           >
             {children}

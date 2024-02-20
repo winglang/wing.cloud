@@ -11,7 +11,7 @@ node_modules/
 !/.eslintignore
 /dist/
 /public/wing.js
-/.wingcloud/
+/.winglibs/
 /.env
 /.env.*
 !/.env.example

@@ -6,7 +6,7 @@ bring http;
 
 bring "cdktf" as cdktf;
 
-bring "./node_modules/@wingcloud/vite/src" as vite;
+bring "@winglibs/vite" as vite;
 
 bring "./users.w" as Users;
 bring "./apps.w" as Apps;
@@ -112,7 +112,7 @@ let runtimeUrlParam = new parameter.Parameter(
 
 let dashboard = new vite.Vite(
   root: "../website",
-  env: {
+  publicEnv: {
     "SEGMENT_WRITE_KEY": segmentWriteKey,
     "ENABLE_ANALYTICS": "{enableAnalytics}",
     "API_URL": "{api.url}",
@@ -283,11 +283,12 @@ if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" 
     url: probotApp.githubApp.api.url,
     domain: util.tryEnv("NGROK_DOMAIN"),
   );
-} else {
+}
+if util.tryEnv("WING_TARGET") != "sim" {
   let webhookUrl = probotApp.githubApp.api.url;
-    let updateGithubWebhook = inflight () => {
-      probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
-      log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
+  let updateGithubWebhook = inflight () => {
+    probotApp.githubApp.updateWebhookUrl("{webhookUrl}/webhook");
+    log("Update your GitHub callback url to: {proxyUrl}/wrpc/github.callback");
   };
   new cloud.OnDeploy(updateGithubWebhook);
 }
