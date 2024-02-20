@@ -9,7 +9,7 @@ import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../icons/github-icon.js";
 import { MenuIcon } from "../../../icons/menu-icon.js";
-import { useEncodeParams } from "../../../utils/encode-params.js";
+import { useEncodedParams } from "../../../utils/encoded-params.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import type { App } from "../../../utils/wrpc.js";
 
@@ -39,7 +39,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
     return `https://github.com/${app.repoOwner}/${app.repoName}/commit/${app.lastCommitSha}`;
   }, [app]);
 
-  const encodedParams = useEncodeParams({
+  const encodedParams = useEncodedParams({
     owner: owner,
     appName: app.appName,
     branch: app.defaultBranch,

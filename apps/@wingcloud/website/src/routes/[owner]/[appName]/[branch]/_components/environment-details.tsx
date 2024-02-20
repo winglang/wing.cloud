@@ -10,7 +10,7 @@ import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
 import { CommitIcon } from "../../../../../icons/commit-icon.js";
 import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js";
-import { useEncodeParams } from "../../../../../utils/encode-params.js";
+import { useEncodedParams } from "../../../../../utils/encoded-params.js";
 import { useStatus } from "../../../../../utils/status.js";
 import { getDateTime } from "../../../../../utils/time.js";
 import type { App, Endpoint, Environment } from "../../../../../utils/wrpc.js";
@@ -69,7 +69,7 @@ export const EnvironmentDetails = ({
 
   const { statusString } = useStatus(environment?.status);
 
-  const encodedParams = useEncodeParams({
+  const encodedParams = useEncodedParams({
     owner: owner,
     appName: app?.appName,
     branch: environment?.branch,

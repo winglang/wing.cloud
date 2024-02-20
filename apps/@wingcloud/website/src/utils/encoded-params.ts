@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 
-export const useEncodeParams = <K extends Record<string, any>>(
+export const useEncodedParams = <
+  K extends Record<string, string | number | boolean | undefined>,
+>(
   params: K,
 ): Record<keyof K, string> => {
   const encodedUrlParams = useMemo(() => {
@@ -8,11 +10,14 @@ export const useEncodeParams = <K extends Record<string, any>>(
 
     for (const [key, value] of Object.entries(params)) {
       if (value !== undefined) {
-        urlParams[key as keyof K] = encodeURIComponent(String(value));
+        urlParams[key as keyof K] = encodeURIComponent(value);
       }
     }
     return urlParams as Record<keyof K, string>;
   }, [params]);
+
+  console.log("params", params);
+  console.log("encodedUrlParams", encodedUrlParams);
 
   return encodedUrlParams;
 };

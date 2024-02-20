@@ -4,12 +4,12 @@ import { Outlet, useParams } from "react-router-dom";
 import { ErrorBoundary } from "../../../../components/error-boundary.js";
 import { Header } from "../../../../components/header.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
-import { useEncodeParams } from "../../../../utils/encode-params.js";
+import { useEncodedParams } from "../../../../utils/encoded-params.js";
 
 export const Component = () => {
   const { owner, appName, branch } = useParams();
 
-  const encodedParams = useEncodeParams({
+  const encodedParams = useEncodedParams({
     owner: owner,
     appName: appName,
     branch: branch,
