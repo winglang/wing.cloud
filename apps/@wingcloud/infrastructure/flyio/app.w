@@ -9,6 +9,7 @@ pub struct ICreateMachineProps {
   imageName: str;
   region: str?;
   memoryMb: num?;
+  cpu: num?;
   env: Map<str>;
   services: Array<client.IClientCreateMachineService>;
   files: Array<client.File>?;
@@ -100,6 +101,7 @@ inflight class FlyApp {
       imageName: props.imageName,
       region: props.region,
       memoryMb: props.memoryMb,
+      cpu: props.cpu,
       env: props.env,
       files: props.files,
       mounts: props.mounts,
