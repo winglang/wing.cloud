@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useMemo } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import { useTheme } from "../design-system/theme-provider.js";
 import { Link } from "react-router-dom";
@@ -36,29 +36,30 @@ export const Tabs = ({ tabs }: TabsProps) => {
   return (
     <nav className="flex space-x-2">
       {tabs.map((tab) => (
-        <li key={tab.name} className="relative pb-2 list-none">
+        <div key={tab.name}>
           <Link
             to={tab.to}
             className={clsx(
               "rounded-md px-2 py-1 text-sm font-medium",
               "transition-all",
-              current?.name === tab.name && [theme.text1, theme.text1Hover],
-              current?.name !== tab.name && [theme.text3, theme.text3Hover],
+              current?.name === tab.name && [theme.text1],
+              current?.name !== tab.name && [theme.text3, theme.text1Hover],
               theme.bgInput,
               theme.focusVisible,
+              theme.bg3Hover,
             )}
+            aria-current={current ? "page" : undefined}
           >
             {tab.name}
-            <div
-              className={clsx(
-                "absolute bottom-0 left-0 right-0 mx-1",
-                "pb-2",
-                "border-gray-600",
-                current?.name === tab.name && "border-b-2",
-              )}
-            />
           </Link>
-        </li>
+          <div
+            className={clsx(
+              "pb-2 mx-1",
+              "border-gray-600",
+              current?.name === tab.name && "border-b-2",
+            )}
+          />
+        </div>
       ))}
     </nav>
   );
