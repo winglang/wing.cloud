@@ -8,11 +8,11 @@ import Popover from "../../../../../design-system/popover.js";
 import { SkeletonLoader } from "../../../../../design-system/skeleton-loader.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
+import { CommitIcon } from "../../../../../icons/commit-icon.js";
 import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js";
 import { useStatus } from "../../../../../utils/status.js";
 import { getDateTime } from "../../../../../utils/time.js";
 import type { App, Endpoint, Environment } from "../../../../../utils/wrpc.js";
-import { CommitIcon } from "../../../../../icons/commit-icon.js";
 
 export interface EvironmentDetailsProps {
   loading?: boolean;
@@ -292,7 +292,7 @@ export const EnvironmentDetails = ({
                   </div>
                 </Popover>
               )}
-              {endpointsRemainingList.length === 0 && !endpointsLoading && (
+              {endpoints?.length === 0 && !endpointsLoading && (
                 <div>No endpoints found</div>
               )}
             </div>
