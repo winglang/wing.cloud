@@ -48,6 +48,9 @@ export class Platform implements IPlatform {
         mergeLambdas: {
           type: "string",
         },
+        warmLambdas: {
+          type: "string",
+        },
       },
       required: [],
     },
