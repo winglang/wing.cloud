@@ -101,7 +101,7 @@ importers:
         version: 0.0.4(@types/node@20.11.19)(constructs@10.3.0)
       '@winglibs/websockets':
         specifier: ^0.1.2
-        version: 0.1.2(cdktf@0.20.3)(constructs@10.3.0)(winglang@0.57.27)
+        version: 0.1.2(cdktf@0.20.3)(constructs@10.3.0)(winglang@0.58.16)
       aws-cdk-lib:
         specifier: ^2.128.0
         version: 2.128.0(constructs@10.3.0)
@@ -163,8 +163,8 @@ importers:
         specifier: ^6.8.1
         version: 6.8.1
       winglang:
-        specifier: ^0.57.27
-        version: 0.57.27(constructs@10.3.0)(typescript@5.3.3)
+        specifier: ^0.58.16
+        version: 0.58.16(constructs@10.3.0)(typescript@5.3.3)
       yaml:
         specifier: ^2.3.4
         version: 2.3.4
@@ -236,14 +236,14 @@ importers:
   apps/@wingcloud/runtime:
     dependencies:
       '@wingconsole/app':
-        specifier: ^0.57.27
-        version: 0.57.27(constructs@10.3.0)(typescript@5.3.3)
+        specifier: ^0.58.16
+        version: 0.58.16(constructs@10.3.0)(typescript@5.3.3)
       '@winglang/compiler':
-        specifier: ^0.57.27
-        version: 0.57.27(constructs@10.3.0)(typescript@5.3.3)
+        specifier: ^0.58.16
+        version: 0.58.16(constructs@10.3.0)(typescript@5.3.3)
       '@winglang/sdk':
-        specifier: ^0.57.27
-        version: 0.57.27(constructs@10.3.0)
+        specifier: ^0.58.16
+        version: 0.58.16(constructs@10.3.0)
       chalk:
         specifier: ^5.3.0
         version: 5.3.0
@@ -278,8 +278,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0
       winglang:
-        specifier: ^0.57.27
-        version: 0.57.27(constructs@10.3.0)(typescript@5.3.3)
+        specifier: ^0.58.16
+        version: 0.58.16(constructs@10.3.0)(typescript@5.3.3)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
         specifier: ^0.0.394
@@ -360,8 +360,8 @@ importers:
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/wrpc
       '@wingconsole/ui':
-        specifier: ^0.57.27
-        version: 0.57.27(@types/react@18.2.56)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^0.58.16
+        version: 0.58.16(@types/react@18.2.56)(react-dom@18.2.0)(react@18.2.0)
       clsx:
         specifier: ^2.1.0
         version: 2.1.0
@@ -503,11 +503,11 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(eslint@8.56.0)(typescript@5.3.3)
       '@winglang/compiler':
-        specifier: ^0.57.27
-        version: 0.57.27(constructs@10.3.0)(typescript@5.3.3)
+        specifier: ^0.58.16
+        version: 0.58.16(constructs@10.3.0)(typescript@5.3.3)
       '@winglang/sdk':
-        specifier: ^0.57.27
-        version: 0.57.27(constructs@10.3.0)
+        specifier: ^0.58.16
+        version: 0.58.16(constructs@10.3.0)
       cdktf:
         specifier: ^0.20.3
         version: 0.20.3(constructs@10.3.0)
@@ -2552,8 +2552,8 @@ packages:
     engines: {node: ^16.14.0 || >=18.0.0}
     dependencies:
       agent-base: 7.1.0
-      http-proxy-agent: 7.0.1
-      https-proxy-agent: 7.0.3
+      http-proxy-agent: 7.0.2
+      https-proxy-agent: 7.0.4
       lru-cache: 10.2.0
       socks-proxy-agent: 8.0.2
     transitivePeerDependencies:
@@ -3621,11 +3621,11 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /@sigstore/bundle@2.1.1:
-    resolution: {integrity: sha512-v3/iS+1nufZdKQ5iAlQKcCsoh0jffQyABvYIxKsZQFWc4ubuGjwZklFHpDgV6O6T7vvV78SW5NHI91HFKEcxKg==}
+  /@sigstore/bundle@2.2.0:
+    resolution: {integrity: sha512-5VI58qgNs76RDrwXNhpmyN/jKpq9evV/7f1XrcqcAfvxDl5SeVY/I5Rmfe96ULAV7/FK5dge9RBKGBJPhL1WsQ==}
     engines: {node: ^16.14.0 || >=18.0.0}
     dependencies:
-      '@sigstore/protobuf-specs': 0.2.1
+      '@sigstore/protobuf-specs': 0.3.0
     dev: false
 
   /@sigstore/core@1.0.0:
@@ -3633,40 +3633,40 @@ packages:
     engines: {node: ^16.14.0 || >=18.0.0}
     dev: false
 
-  /@sigstore/protobuf-specs@0.2.1:
-    resolution: {integrity: sha512-XTWVxnWJu+c1oCshMLwnKvz8ZQJJDVOlciMfgpJBQbThVjKTCG8dwyhgLngBD2KN0ap9F/gOV8rFDEx8uh7R2A==}
+  /@sigstore/protobuf-specs@0.3.0:
+    resolution: {integrity: sha512-zxiQ66JFOjVvP9hbhGj/F/qNdsZfkGb/dVXSanNRNuAzMlr4MC95voPUBX8//ZNnmv3uSYzdfR/JSkrgvZTGxA==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dev: false
 
-  /@sigstore/sign@2.2.2:
-    resolution: {integrity: sha512-mAifqvvGOCkb5BJ5d/SRrVP5+kKCGxtcHuti6lgqZalIfNxikxlJMMptOqFp9+xV5LAnJMSaMWtzvcgNZ3PlPA==}
+  /@sigstore/sign@2.2.3:
+    resolution: {integrity: sha512-LqlA+ffyN02yC7RKszCdMTS6bldZnIodiox+IkT8B2f8oRYXCB3LQ9roXeiEL21m64CVH1wyveYAORfD65WoSw==}
     engines: {node: ^16.14.0 || >=18.0.0}
     dependencies:
-      '@sigstore/bundle': 2.1.1
+      '@sigstore/bundle': 2.2.0
       '@sigstore/core': 1.0.0
-      '@sigstore/protobuf-specs': 0.2.1
+      '@sigstore/protobuf-specs': 0.3.0
       make-fetch-happen: 13.0.0
     transitivePeerDependencies:
       - supports-color
     dev: false
 
-  /@sigstore/tuf@2.3.0:
-    resolution: {integrity: sha512-S98jo9cpJwO1mtQ+2zY7bOdcYyfVYCUaofCG6wWRzk3pxKHVAkSfshkfecto2+LKsx7Ovtqbgb2LS8zTRhxJ9Q==}
+  /@sigstore/tuf@2.3.1:
+    resolution: {integrity: sha512-9Iv40z652td/QbV0o5n/x25H9w6IYRt2pIGbTX55yFDYlApDQn/6YZomjz6+KBx69rXHLzHcbtTS586mDdFD+Q==}
     engines: {node: ^16.14.0 || >=18.0.0}
     dependencies:
-      '@sigstore/protobuf-specs': 0.2.1
+      '@sigstore/protobuf-specs': 0.3.0
       tuf-js: 2.2.0
     transitivePeerDependencies:
       - supports-color
     dev: false
 
-  /@sigstore/verify@1.0.0:
-    resolution: {integrity: sha512-sRU6nblDBQ4pVTWni019Kij+XQj4RP75WXN5z3qHk81dt/L8A7r3v8RgRInTup4/Jf90WNods9CcbnWj7zJ26w==}
+  /@sigstore/verify@1.1.0:
+    resolution: {integrity: sha512-1fTqnqyTBWvV7cftUUFtDcHPdSox0N3Ub7C0lRyReYx4zZUlNTZjCV+HPy4Lre+r45dV7Qx5JLKvqqsgxuyYfg==}
     engines: {node: ^16.14.0 || >=18.0.0}
     dependencies:
-      '@sigstore/bundle': 2.1.1
+      '@sigstore/bundle': 2.2.0
       '@sigstore/core': 1.0.0
-      '@sigstore/protobuf-specs': 0.2.1
+      '@sigstore/protobuf-specs': 0.3.0
     dev: false
 
   /@sinclair/typebox@0.27.8:
@@ -5728,20 +5728,20 @@ packages:
       pretty-format: 29.7.0
     dev: true
 
-  /@wingcloud/framework@0.57.27(@winglang/sdk@0.57.27)(typescript@5.3.3):
-    resolution: {integrity: sha512-kjWHpDZxymOFxXZtXxD6KOGhYIBZqFPz9U+saZzl4heAlB/QT5Te5zcVzDy+3/ePzDb3Exu8eekmcxBIJjrf4A==}
+  /@wingcloud/framework@0.58.16(@winglang/sdk@0.58.16)(typescript@5.3.3):
+    resolution: {integrity: sha512-euuGSgd53aGEtPovVBEdZgtWyt+AvUCitqq9l1m2YB0TcYXIFOYcx4UmNwe/VPMFQwvMNNQdM1/910YwKXVrbA==}
     peerDependencies:
       '@winglang/sdk': '*'
       typescript: ^5.3.3
     dependencies:
-      '@winglang/sdk': 0.57.27(constructs@10.3.0)
+      '@winglang/sdk': 0.58.16(constructs@10.3.0)
       typescript: 5.3.3
 
-  /@wingconsole/app@0.57.27(constructs@10.3.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-p6GY4SGFKq4k8ThLpsDxFDGGn0qS1p3Ghnq9PpKRher0olnqjHoiLYKXwGnRDaB3mSfkiGGzdMv2HzlmSMMwUw==}
+  /@wingconsole/app@0.58.16(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-O/1oDUL3Zq6njlL54A8tic3UeENPNq7FX4uifOJdDzIrt16vPPBif70hog5+MjvStlRlL9YOwZzEg2qJ9FAlVQ==}
     dependencies:
       '@segment/analytics-node': 1.3.0
-      '@wingconsole/server': 0.57.27(constructs@10.3.0)(typescript@5.3.3)
+      '@wingconsole/server': 0.58.16(constructs@10.3.0)(typescript@5.3.3)
       cross-spawn: 7.0.3
       express: 4.18.2
       picocolors: 1.0.0
@@ -5752,8 +5752,8 @@ packages:
       - typescript
     dev: false
 
-  /@wingconsole/design-system@0.57.27:
-    resolution: {integrity: sha512-JRAVwcLxeaMh4Wau53yCOSK9s1xSohjDYfDLsInyHQjdu/FqgEEYmIqixIOrZ6SwakzIisxZ9nmMUq6gxO+bVQ==}
+  /@wingconsole/design-system@0.58.16:
+    resolution: {integrity: sha512-Rgl2zH16raOAQlNF8P3TCzSdGC5A09ZzCy+kJz7fIUAnaRjxOg8oqu6npZbv4zBSujH0abGWsz3cjhI9yrY/WQ==}
     dependencies:
       '@headlessui/react': 1.7.18(react-dom@18.2.0)(react@18.2.0)
       '@heroicons/react': 2.1.1(react@18.2.0)
@@ -5771,11 +5771,11 @@ packages:
       - ts-node
     dev: false
 
-  /@wingconsole/server@0.57.27(constructs@10.3.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-Lk4BThxE8DkJlhKBN4/xsBCcfZ42OX9wye7hLuW7K70mWypzPVmRuf6JAYuUeZf565ilMcMC/hS6wQ2UlY+m0A==}
+  /@wingconsole/server@0.58.16(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-3tH/yZPuYqi7Qckycoar9CGCod9mlQqM923L13qoiE8wnGmP5RfJZmw5r0mLj4DopRe65mTY1T35pNtk/8SnBw==}
     dependencies:
-      '@winglang/compiler': 0.57.27(constructs@10.3.0)(typescript@5.3.3)
-      '@winglang/sdk': 0.57.27(constructs@10.3.0)
+      '@winglang/compiler': 0.58.16(constructs@10.3.0)(typescript@5.3.3)
+      '@winglang/sdk': 0.58.16(constructs@10.3.0)
       codespan-wasm: 0.4.0
       debug: 4.3.4
       launch-editor: 2.6.1
@@ -5786,8 +5786,8 @@ packages:
       - typescript
     dev: false
 
-  /@wingconsole/ui@0.57.27(@types/react@18.2.56)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-92p+2uqDWTywyKWOmgMf293r8Bo6MTuKPNfG44+qxOf/Ff2mDtnS6Tv1L1HI243nG7e2kM3+rq4hWj87tqYUNA==}
+  /@wingconsole/ui@0.58.16(@types/react@18.2.56)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-5nxEDuNyf/cAu6mfd/7tSnnUbv5Ezfi5GI7H767yCZgkh/TRZDPckVby3aYzP/OJwAvEaFVEBqywtqXLvOCIeQ==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
@@ -5798,7 +5798,7 @@ packages:
       '@trpc/client': 10.45.1(@trpc/server@10.45.1)
       '@trpc/react-query': 10.45.1(@tanstack/react-query@4.36.1)(@trpc/client@10.45.1)(@trpc/server@10.45.1)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/server': 10.45.1
-      '@wingconsole/design-system': 0.57.27
+      '@wingconsole/design-system': 0.58.16
       classnames: 2.5.1
       elkjs: 0.8.2
       framer-motion: 10.18.0(react-dom@18.2.0)(react@18.2.0)
@@ -5821,20 +5821,20 @@ packages:
       - ts-node
     dev: false
 
-  /@winglang/compiler@0.57.27(constructs@10.3.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-/wPVrO8g5IapMLCEYPAFz7JEchyDlB/Siip7UXuKmia6z+9nQGmIC5CjCUiC079lUZmT80w3auEsIyUknKNlBQ==}
+  /@winglang/compiler@0.58.16(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-LLv03BdS4wJ/M85pRNAHrrvE4Ifun5V3inyD5h3gl5APAC3CWwCO1CL3ty1HHK0Jz/rhs9J0/kVSt7N6Bmd16w==}
     engines: {node: '>=v20.0.0'}
     dependencies:
-      '@wingcloud/framework': 0.57.27(@winglang/sdk@0.57.27)(typescript@5.3.3)
-      '@winglang/sdk': 0.57.27(constructs@10.3.0)
+      '@wingcloud/framework': 0.58.16(@winglang/sdk@0.58.16)(typescript@5.3.3)
+      '@winglang/sdk': 0.58.16(constructs@10.3.0)
     transitivePeerDependencies:
       - constructs
       - typescript
     bundledDependencies:
       - wasi-js
 
-  /@winglang/sdk@0.57.27(constructs@10.3.0):
-    resolution: {integrity: sha512-FyuJ2uy+Eh6Sgp3uXzqvi8Our2rbdc3U8qiAByVDxBM4V/sxHgw7RL1GjH+glF096DVneY46k7354x3v1EEzaQ==}
+  /@winglang/sdk@0.58.16(constructs@10.3.0):
+    resolution: {integrity: sha512-SflGsxisMHUP0yuitH3ALu+xPPx5AwptoLslOONmdvJylvfxe1skRm+oF00HWIinaOegQ+8fxXdEgX2hyQApNA==}
     engines: {node: '>= 20.0.0'}
     peerDependencies:
       constructs: ^10.3
@@ -5900,7 +5900,7 @@ packages:
       - terser
     dev: false
 
-  /@winglibs/websockets@0.1.2(cdktf@0.20.3)(constructs@10.3.0)(winglang@0.57.27):
+  /@winglibs/websockets@0.1.2(cdktf@0.20.3)(constructs@10.3.0)(winglang@0.58.16):
     resolution: {integrity: sha512-xXkVF5Q/A9LHGTGl4XbwKXZr0o2kd3zlcOB2Cv3827N/4Ll1dgZkIHjq852w51LaDQqain6h0xqQDYEmaP87PA==}
     peerDependencies:
       cdktf: ^0.19.1
@@ -5911,7 +5911,7 @@ packages:
       aws-cdk-lib: 2.128.0(constructs@10.3.0)
       cdktf: 0.20.3(constructs@10.3.0)
       get-port: 7.0.0
-      winglang: 0.57.27(constructs@10.3.0)(typescript@5.3.3)
+      winglang: 0.58.16(constructs@10.3.0)(typescript@5.3.3)
       ws: 8.16.0
     transitivePeerDependencies:
       - aws-crt
@@ -7624,7 +7624,7 @@ packages:
     resolution: {integrity: sha512-CYcENa+FtcUKLmhhqyctpclsq7QF38pKjZHsGNiSQF5r4FtoKDWabFDl3hzaEQMvT1LHEysw5twgLvpYYb4vbw==}
     engines: {node: ^10.12.0 || >=12.0.0}
     dependencies:
-      flatted: 3.2.9
+      flatted: 3.3.0
       keyv: 4.5.4
       rimraf: 3.0.2
     dev: true
@@ -7633,8 +7633,8 @@ packages:
     resolution: {integrity: sha512-4zPxDyhCyiN2wIAtSLI6gc82/EjqZc1onI4Mz/l0pWrAlsSfYH/2ZIcU+e3oA2wDwbzIWNKwa23F8rh6+DRWkw==}
     dev: false
 
-  /flatted@3.2.9:
-    resolution: {integrity: sha512-36yxDn5H7OFZQla0/jFJmbIKTdZAQHngCedGxiMmpNfEZM0sdEeT+WczLQrjK6D7o2aiyLYDnkw0R3JK0Qv1RQ==}
+  /flatted@3.3.0:
+    resolution: {integrity: sha512-noqGuLw158+DuD9UPRKHpJ2hGxpFyDlYYrfM0mWt4XhT4n0lwzTLh70Tkdyy4kyTmyTT9Bv7bWAJqw7cgkEXDg==}
     dev: true
 
   /follow-redirects@1.15.3:
@@ -8038,8 +8038,8 @@ packages:
       toidentifier: 1.0.1
     dev: false
 
-  /http-proxy-agent@7.0.1:
-    resolution: {integrity: sha512-My1KCEPs6A0hb4qCVzYp8iEvA8j8YqcvXLZZH8C9OFuTYpYjHE7N2dtG3mRl1HMD4+VGXpF3XcDVcxGBT7yDZQ==}
+  /http-proxy-agent@7.0.2:
+    resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.0
@@ -8069,8 +8069,8 @@ packages:
       - supports-color
     dev: false
 
-  /https-proxy-agent@7.0.3:
-    resolution: {integrity: sha512-kCnwztfX0KZJSLOBrcL0emLeFako55NWMovvyPP2AjsghNk9RB1yjSI+jVumPHYZsNXegNoqupSW9IY3afSH8w==}
+  /https-proxy-agent@7.0.4:
+    resolution: {integrity: sha512-wlwpilI7YdjSkWaQ/7omYBMTliDcmCN8OLihO6I9B86g06lMyAoqgoDpV0XqoaPOKj+0DIdAvnsWfyAAhmimcg==}
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.0
@@ -9884,7 +9884,7 @@ packages:
       promise-retry: 2.0.1
       read-package-json: 7.0.0
       read-package-json-fast: 3.0.2
-      sigstore: 2.2.1
+      sigstore: 2.2.2
       ssri: 10.0.5
       tar: 6.2.0
     transitivePeerDependencies:
@@ -10959,16 +10959,16 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
-  /sigstore@2.2.1:
-    resolution: {integrity: sha512-OBBSKvmjr4DCyUb+IC2p7wooOCsCNwaqvCilTJVNPo0y8lJl+LsCrfz4LtMwnw3Gn+8frt816wi1+DWZTUCpBQ==}
+  /sigstore@2.2.2:
+    resolution: {integrity: sha512-2A3WvXkQurhuMgORgT60r6pOWiCOO5LlEqY2ADxGBDGVYLSo5HN0uLtb68YpVpuL/Vi8mLTe7+0Dx2Fq8lLqEg==}
     engines: {node: ^16.14.0 || >=18.0.0}
     dependencies:
-      '@sigstore/bundle': 2.1.1
+      '@sigstore/bundle': 2.2.0
       '@sigstore/core': 1.0.0
-      '@sigstore/protobuf-specs': 0.2.1
-      '@sigstore/sign': 2.2.2
-      '@sigstore/tuf': 2.3.0
-      '@sigstore/verify': 1.0.0
+      '@sigstore/protobuf-specs': 0.3.0
+      '@sigstore/sign': 2.2.3
+      '@sigstore/tuf': 2.3.1
+      '@sigstore/verify': 1.1.0
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -12177,17 +12177,17 @@ packages:
       string-width: 4.2.3
     dev: false
 
-  /winglang@0.57.27(constructs@10.3.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-GdLKwZxfOQWhy74KxPTGPOuakZDEvCTYWbiegNBPmlMhtmx4Fn8hSpx2EXZjaxTWDitilaFIheK0kFEyfMW84w==}
+  /winglang@0.58.16(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-7lw9Vf18JT5buOYazJC3s8+1o0vDpXsdlrJ1BEX2jX65VtmGDopPaitJfF+IAtXs4sSyubk1/Rn9sV1hlOngug==}
     engines: {node: '>=v18.0.0'}
     hasBin: true
     dependencies:
       '@npmcli/arborist': 7.3.1
       '@segment/analytics-node': 1.3.0
-      '@wingconsole/app': 0.57.27(constructs@10.3.0)(typescript@5.3.3)
-      '@wingconsole/server': 0.57.27(constructs@10.3.0)(typescript@5.3.3)
-      '@winglang/compiler': 0.57.27(constructs@10.3.0)(typescript@5.3.3)
-      '@winglang/sdk': 0.57.27(constructs@10.3.0)
+      '@wingconsole/app': 0.58.16(constructs@10.3.0)(typescript@5.3.3)
+      '@wingconsole/server': 0.58.16(constructs@10.3.0)(typescript@5.3.3)
+      '@winglang/compiler': 0.58.16(constructs@10.3.0)(typescript@5.3.3)
+      '@winglang/sdk': 0.58.16(constructs@10.3.0)
       chalk: 4.1.2
       codespan-wasm: 0.4.0
       commander: 10.0.1

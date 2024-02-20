@@ -51,7 +51,13 @@ pub class ProbotApp {
     this.environmentManager = props.environmentManager;
     this.apps = props.apps;
 
-    let queue = new cloud.Queue(timeout: 6m) as "ProbotApp-Queue";
+    let var queueProps: cloud.QueueProps = {};
+    if util.env("WING_TARGET") != "sim" {
+      queueProps = {
+        timeout: 6m,
+      };
+    }
+    let queue = new cloud.Queue(queueProps) as "ProbotApp-Queue";
     this.githubApp = new github.GithubApp(
       this.adapter.appId,
       this.adapter.secretKey,
