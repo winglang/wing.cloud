@@ -139,8 +139,10 @@ struct EnvironmentAction {
 }
 
 pub class Api {
+  pub api: json_api.JsonApi;
   new(props: ApiProps) {
     let api = new json_api.JsonApi(api: props.api);
+    this.api = api;
     let ws = props.ws;
     let apps = props.apps;
     let users = props.users;

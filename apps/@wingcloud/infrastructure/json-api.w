@@ -1,4 +1,5 @@
 bring cloud;
+bring util;
 
 struct JsonApiProps {
   api: cloud.Api;
@@ -83,6 +84,18 @@ pub class JsonApi {
 
           log("Internal server error");
           log(unsafeCast(error));
+
+          if util.env("WING_TARGET") == "sim" {
+            return {
+              status: 500,
+              headers: {
+                "content-type": "application/json",
+              },
+              body: Json.stringify({
+                error,
+              }),
+            };
+          }
 
           return {
             status: 500,
