@@ -365,6 +365,7 @@ pub class RuntimeService {
           );
         }
       } catch error {
+        log(error);
         if let message = msg {
           props.environmentManager.updateStatus(
             statusReport: {
@@ -374,7 +375,6 @@ pub class RuntimeService {
             }
           );
         }
-        log(error);
       }
     }, timeout: 5m);
 
