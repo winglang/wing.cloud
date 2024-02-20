@@ -104,7 +104,11 @@ export const NewSecret = ({
         <span className={clsx("text-xs truncate", theme.text2)}>
           Learn more about{" "}
           <a
-            className="text-blue-600"
+            className={clsx(
+              "text-blue-600",
+              "focus:underline outline-none",
+              "hover:underline z-10 cursor-pointer",
+            )}
             href="https://www.winglang.io/docs/language-reference#112-execution-model"
             target="_blank"
           >
