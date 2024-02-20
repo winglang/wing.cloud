@@ -37,7 +37,6 @@ export const Tabs = ({ tabs }: TabsProps) => {
               current?.name !== tab.name && [theme.text3, theme.text3Hover],
               theme.bgInput,
               theme.focusVisible,
-              theme.bg3Hover,
             )}
             aria-current={current ? "page" : undefined}
           >
