@@ -1,10 +1,21 @@
+import { useMemo } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../../components/error-boundary.js";
 import { Header } from "../../../components/header.js";
+import { useEncodeParams } from "../../../utils/param-encoder.js";
 
 export const Component = () => {
   const { owner, appName } = useParams();
+
+  const encodedParams = useEncodeParams({
+    owner: owner,
+    appName: appName,
+  });
+
+  const appUrl = useMemo(() => {
+    return `/${encodedParams.owner}/${encodedParams.appName}`;
+  }, [encodedParams]);
 
   return (
     <div className="flex flex-col h-full">
@@ -12,17 +23,17 @@ export const Component = () => {
         breadcrumbs={[
           {
             label: appName!,
-            to: `/${owner}/${appName}`,
+            to: appUrl,
           },
         ]}
         tabs={[
           {
             name: "Application",
-            to: `/${owner}/${appName}`,
+            to: appUrl,
           },
           {
             name: "Settings",
-            to: `/${owner}/${appName}/settings`,
+            to: `${appUrl}/settings`,
           },
         ]}
       />

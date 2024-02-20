@@ -6,18 +6,19 @@ import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { PageHeader } from "../../../components/page-header.js";
 import { SectionTitle } from "../../../components/section-title.js";
 import { Input } from "../../../design-system/input.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
+import { BranchIcon } from "../../../icons/branch-icon.js";
+import { GithubIcon } from "../../../icons/github-icon.js";
+import { useEncodeParams } from "../../../utils/param-encoder.js";
 import { wrpc } from "../../../utils/wrpc.js";
+import { AppIcon } from "../_components/app-icon.js";
 
 import { EnvironmentDetails } from "./[branch]/_components/environment-details.js";
 import { EnvironmentsListItemSkeleton } from "./_components/environments-list-item-skeleton.js";
 import { EnvironmentsListItem } from "./_components/environments-list-item.js";
-import { BranchIcon } from "../../../icons/branch-icon.js";
-import { PageHeader } from "../../../components/page-header.js";
-import { GithubIcon } from "../../../icons/github-icon.js";
-import { AppIcon } from "../_components/app-icon.js";
 
 const OverviewPage = ({
   owner,
@@ -115,6 +116,12 @@ const OverviewPage = ({
     return `https://github.com/${app?.repoOwner}/${app?.repoName}`;
   }, [app]);
 
+  const encodedParams = useEncodeParams({
+    owner: owner,
+    appName: appName,
+    branch: productionEnvironment?.branch!,
+  });
+
   return (
     <>
       <PageHeader
@@ -172,10 +179,12 @@ const OverviewPage = ({
               endpointsQuery.isLoading || endpointsQuery.data === undefined
             }
             onClick={() => {
-              if (!productionEnvironment?.branch) {
+              if (!encodedParams?.branch) {
                 return;
               }
-              navigate(`/${owner}/${appName}/${productionEnvironment.branch}`);
+              navigate(
+                `/${encodedParams.owner}/${encodedParams.appName}/${encodedParams.branch}`,
+              );
             }}
             actions={
               <>

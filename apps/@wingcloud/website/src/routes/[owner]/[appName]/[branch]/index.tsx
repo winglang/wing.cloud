@@ -1,12 +1,23 @@
+import { useMemo } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../../../components/error-boundary.js";
 import { Header } from "../../../../components/header.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
-import { useTheme } from "../../../../design-system/theme-provider.js";
+import { useEncodeParams } from "../../../../utils/param-encoder.js";
+
 export const Component = () => {
   const { owner, appName, branch } = useParams();
-  const { theme } = useTheme();
+
+  const encodedParams = useEncodeParams({
+    owner: owner,
+    appName: appName,
+    branch: branch,
+  });
+
+  const branchUrl = useMemo(() => {
+    return `/${encodedParams.owner}/${encodedParams.appName}/${encodedParams.branch}`;
+  }, [encodedParams]);
 
   return (
     <div className="flex flex-col h-full">
@@ -14,26 +25,26 @@ export const Component = () => {
         breadcrumbs={[
           {
             label: appName!,
-            to: `/${owner}/${appName}`,
+            to: `/${encodedParams.owner}/${encodedParams.appName}`,
           },
           {
             label: branch!,
-            to: `/${owner}/${appName}/${branch}`,
+            to: branchUrl,
             icon: <BranchIcon className="size-4 text-slate-700" />,
           },
         ]}
         tabs={[
           {
             name: "Environment",
-            to: `/${owner}/${appName}/${branch}`,
+            to: branchUrl,
           },
           {
             name: "Tests",
-            to: `/${owner}/${appName}/${branch}/tests`,
+            to: `${branchUrl}/tests`,
           },
           {
             name: "Logs",
-            to: `/${owner}/${appName}/${branch}/logs`,
+            to: `${branchUrl}/logs`,
           },
         ]}
       />

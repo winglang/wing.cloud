@@ -9,9 +9,9 @@ import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../icons/github-icon.js";
 import { MenuIcon } from "../../../icons/menu-icon.js";
+import { useEncodeParams } from "../../../utils/param-encoder.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import type { App } from "../../../utils/wrpc.js";
-import { RUNTIME_LOGS_ID } from "../[appName]/[branch]/logs.js";
 
 import { AppIcon } from "./app-icon.js";
 
@@ -39,15 +39,23 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
     return `https://github.com/${app.repoOwner}/${app.repoName}/commit/${app.lastCommitSha}`;
   }, [app]);
 
+  const encodedParams = useEncodeParams({
+    owner: owner,
+    appName: app.appName,
+    branch: app.defaultBranch,
+  });
+
   const menuItems = useMemo(() => {
     var items = [];
-    if (app.defaultBranch) {
+    if (encodedParams.branch) {
       if (app.status === "running") {
         items.push({
           label: `View in Console`,
           onClick: (event: MouseEvent) => {
             event.stopPropagation();
-            navigate(`/${owner}/${app.appName}/${app.defaultBranch}/console`);
+            navigate(
+              `/${encodedParams.owner}/${encodedParams.appName}/${encodedParams.branch}/console`,
+            );
           },
         });
       }
@@ -56,7 +64,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
         onClick: (event: MouseEvent) => {
           event.stopPropagation();
           navigate(
-            `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
+            `/${encodedParams.owner}/${encodedParams.appName}/${encodedParams.branch}/logs`,
           );
         },
       });
@@ -65,12 +73,12 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
       label: "Settings",
       onClick: (event: MouseEvent) => {
         event.stopPropagation();
-        navigate(`/${owner}/${app.appName}/settings`);
+        navigate(`/${encodedParams.owner}/${encodedParams.appName}/settings`);
       },
     });
 
     return items;
-  }, [app, owner]);
+  }, [app, encodedParams, navigate]);
 
   return (
     <div

@@ -1,15 +1,16 @@
+import clsx from "clsx";
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
+import { useEncodeParams } from "../../../../utils/param-encoder.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
-import clsx from "clsx";
-import { useTheme } from "../../../../design-system/theme-provider.js";
-import { PageHeader } from "../../../../components/page-header.js";
-import { BranchIcon } from "../../../../icons/branch-icon.js";
 
 const Overview = ({
   owner,
@@ -62,6 +63,12 @@ const Overview = ({
     });
   }, [endpointsQuery.data]);
 
+  const encodedParams = useEncodeParams({
+    owner: owner,
+    appName: app?.appName,
+    branch: environment?.branch,
+  });
+
   return (
     <>
       <PageHeader
@@ -86,7 +93,7 @@ const Overview = ({
             environment={environment}
             actions={
               <Link
-                to={`/${owner}/${appName}/${environment?.branch}/console`}
+                to={`/${encodedParams.owner}/${encodedParams.appName}/${encodedParams.branch}/console`}
                 onClick={(e) => {
                   if (environment?.status !== "running") {
                     e.preventDefault();
