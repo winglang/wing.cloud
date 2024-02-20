@@ -22,7 +22,7 @@ export const Tabs = ({ tabs }: TabsProps) => {
 
   const current = useMemo(() => {
     return tabs.find((tab) => tab.to == location.pathname);
-  }, [tabs]);
+  }, [tabs, location]);
 
   return (
     <nav className="flex space-x-2">
@@ -38,7 +38,7 @@ export const Tabs = ({ tabs }: TabsProps) => {
               theme.bgInput,
               theme.focusVisible,
             )}
-            aria-current={current ? "page" : undefined}
+            aria-current={current?.name === tab.name ? "page" : undefined}
           >
             {tab.name}
           </Link>
