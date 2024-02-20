@@ -66,7 +66,7 @@ export const EnvironmentDetails = ({
     return endpoints.slice(1);
   }, [endpoints]);
 
-  const statusString = useStatus(environment?.status);
+  const { statusString } = useStatus(environment?.status);
 
   return (
     <div
