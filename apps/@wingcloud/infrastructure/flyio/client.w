@@ -35,6 +35,7 @@ pub struct IClientCreateMachineProps {
   services: Array<IClientCreateMachineService>;
   region: str?;
   memoryMb: num?;
+  cpu: num?;
   env: Map<str>?;
   files: Array<File>?;
   mounts: Array<Mount>?;
@@ -247,7 +248,7 @@ pub inflight class Client {
       region: props.region,
       config: {
         guest: {
-          cpus: 1,
+          cpus: props.cpu ?? 1,
           cpu_kind: "shared",
           memory_mb: props.memoryMb ?? 512,
         },
