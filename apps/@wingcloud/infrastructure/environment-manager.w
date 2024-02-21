@@ -440,7 +440,6 @@ pub class EnvironmentManager {
   inflight postComment(props: PostCommentOptions) {
     let environment = this.environments.get(id: props.environmentId);
     let app = this.apps.get(appId: props.appId);
-    let user = this.users.get(userId: app.userId);
 
     if let prNumber = environment.prNumber {
       let commentId = this.githubComment.createOrUpdate(
@@ -449,7 +448,7 @@ pub class EnvironmentManager {
         repo: environment.repo,
         appId: props.appId,
         appName: props.appName,
-        username: user.username,
+        appFullName: app.appFullName,
       );
 
       if !environment.commentId? {

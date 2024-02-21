@@ -47,6 +47,7 @@ export type EnvironmentStatus =
 export interface App {
   appId: string;
   appName: string;
+  appFullName?: string;
   description: string;
   repoId: string;
   repoName: string;

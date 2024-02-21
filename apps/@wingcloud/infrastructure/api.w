@@ -642,6 +642,7 @@ pub class Api {
 
         let createAppOptions = {
           appName: appName,
+          appFullName: "{user.username}/{appName}",
           description: input.tryGet("description")?.tryAsStr() ?? "",
           repoId: repoId,
           repoName: repoName,
@@ -679,7 +680,6 @@ pub class Api {
 
         return {
           body: {
-            appFullName: "{user.username}/{appName}",
             app: app,
           },
         };

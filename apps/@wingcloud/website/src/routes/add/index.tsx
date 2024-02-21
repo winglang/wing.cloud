@@ -120,7 +120,7 @@ const AddAppPage = () => {
           },
           onSuccess: (data) => {
             addAppItemToAppList(data.app);
-            navigate(`/${user.username}/${data.app.appName}`);
+            navigate(`/${data.app.appFullName}`);
           },
         },
       );
