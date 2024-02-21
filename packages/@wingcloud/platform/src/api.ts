@@ -21,8 +21,9 @@ import {
   type NameOptions,
 } from "@winglang/sdk/lib/shared/resource-names.js";
 import { Testing } from "@winglang/sdk/lib/simulator";
-import { Node } from "@winglang/sdk/lib/std";
+import { Duration, Node } from "@winglang/sdk/lib/std";
 import { App as TfAwsApp } from "@winglang/sdk/lib/target-tf-aws/app.js";
+import { Schedule } from "@winglang/sdk/lib/target-tf-aws/schedule.js";
 import type { Construct } from "constructs";
 
 import { CustomFunction } from "./function.js";
@@ -96,14 +97,39 @@ return fn(event);
       sourceArn: `${api.executionArn}/*/*`,
     });
 
-    this.endpoint = new Endpoint(
-      this,
-      "Endpoint",
-      `https://${api.id}.execute-api.${(App.of(this) as TfAwsApp).region}.amazonaws.com/${stageName}`,
-      {
-        label: `Api ${this.node.path}`,
-      },
-    );
+    const url = `https://${api.id}.execute-api.${(App.of(this) as TfAwsApp).region}.amazonaws.com/${stageName}`;
+    this.endpoint = new Endpoint(this, "Endpoint", url, {
+      label: `Api ${this.node.path}`,
+    });
+
+    if (
+      App.of(scope).platformParameters.getParameterValue(id)?.warmLambdas ===
+      "true"
+    ) {
+      const schedule = new Schedule(this, "Schedule", {
+        rate: Duration.fromMinutes(5),
+      });
+      const onTickHandler = Testing.makeHandler(
+        `
+  async handle(event) {
+    try {
+      console.log("Warming up");
+      const promises = [];
+      for (let i = 0; i < 50; i++) {
+        promises.push(fetch(this.url + "/_ready"));
+      }
+      await Promise.all(promises);
+      console.log("Warming up done");
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  `,
+        { url: { obj: url, ops: [] } },
+      );
+      const onTickFn = schedule.onTick(onTickHandler);
+      Lifting.lift(onTickHandler, onTickFn, ["handle"]);
+    }
   }
 
   protected get _endpoint(): Endpoint {
@@ -194,6 +220,19 @@ return fn(event);
 
   public _preSynthesize(): void {
     super._preSynthesize();
+
+    const readyHandler = Testing.makeHandler(`
+async handle(event) {
+  return {
+    "isBase64Encoded" : false,
+    "statusCode": 200,
+    "headers": {},
+    "body": "OK"
+  };
+}
+`);
+
+    this.handlers["GET__/_ready"] = readyHandler;
 
     for (const [id, handler] of Object.entries(this.handlers)) {
       const lines = this.getHandlerLines(id, handler);

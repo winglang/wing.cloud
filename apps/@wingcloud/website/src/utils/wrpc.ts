@@ -40,6 +40,7 @@ export type EnvironmentStatus =
   | "running-tests"
   | "deploying"
   | "running"
+  | "tests-error"
   | "error"
   | "stopped";
 

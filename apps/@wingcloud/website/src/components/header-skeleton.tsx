@@ -8,10 +8,16 @@ export const HeaderSkeleton = () => {
   const { theme } = useTheme();
 
   return (
-    <header className={clsx("px-6 py-3 shadow flex flex-row", theme.bgInput)}>
+    <header
+      className={clsx(
+        "py-4 shadow flex flex-row",
+        theme.bgInput,
+        theme.pagePadding,
+      )}
+    >
       <div className="flex items-center gap-6">
-        <WingIcon className="h-5 w-auto" />
-        <div className="flex items-center gap-2">
+        <WingIcon className={clsx("h-5 w-auto", theme.text1)} />
+        <div className="flex items-center gap-1 sm:gap-2">
           <div>
             <SkeletonLoader
               className="w-32 h-5 bg-slate-300 animate-pulse rounded px-2 py-1"

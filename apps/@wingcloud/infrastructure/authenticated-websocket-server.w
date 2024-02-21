@@ -130,10 +130,6 @@ pub class AuthenticatedWebsocketServer {
     this.ws.onDisconnect(inflight(id: str): void => {
       deleteConnection(id);
     });
-
-    /* This method is temporarily required only for local execution (target sim) and will be deprecated in the future.
-    */
-    this.ws.initialize();
   }
 
   pub inflight sendMessage(opts: SendMessageOptions): void {

@@ -1,17 +1,24 @@
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { useContext, useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import { GithubLogin } from "../components/github-login.js";
 import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
-import { Button } from "../design-system/button.js";
 import { Modal } from "../design-system/modal.js";
+import { useMemo } from "react";
+import clsx from "clsx";
+import { useTheme } from "../design-system/theme-provider.js";
 
 export const Component = () => {
-  const navigate = useNavigate();
-
   // TODO: Use state to prevent man-in-the-middle attacks.
   const { GITHUB_APP_CLIENT_ID } = wing.env;
+  const { theme } = useTheme();
+
+  const HOME_URL = useMemo(() => {
+    const url = new URL(location.href);
+    url.pathname = "";
+    return url.toString();
+  }, [location.href]);
 
   const AUTHORIZE_URL = (() => {
     const url = new URL("https://github.com/login/oauth/authorize");
@@ -62,15 +69,35 @@ export const Component = () => {
                 </div>
               </div>
               <div className="flex flex-row-reverse gap-2">
-                <Button
-                  primary
-                  onClick={() => {
-                    location.href = AUTHORIZE_URL;
-                  }}
+                <a
+                  href={AUTHORIZE_URL}
+                  className={clsx(
+                    "whitespace-nowrap",
+                    "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
+                    theme.focusVisible,
+                    "text-white",
+                    "bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600 border-sky-700 ",
+                    "px-2.5 py-2",
+                    "border shadow-sm",
+                  )}
                 >
                   Sign In
-                </Button>
-                <Button onClick={() => navigate("/")}>Home</Button>
+                </a>
+                <a
+                  href={HOME_URL}
+                  className={clsx(
+                    "whitespace-nowrap",
+                    "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
+                    theme.focusVisible,
+                    theme.bgInput,
+                    theme.bgInputHover,
+                    theme.textInput,
+                    "px-2.5 py-2",
+                    "border shadow-sm",
+                  )}
+                >
+                  Home
+                </a>
               </div>
             </div>
           </Modal>
