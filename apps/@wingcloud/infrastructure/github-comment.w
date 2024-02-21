@@ -4,6 +4,7 @@ bring "./users.w" as users;
 bring "./apps.w" as apps;
 bring "./status-reports.w" as status_reports;
 bring "./types/octokit-types.w" as octokit;
+bring "./query-string.w" as queryString;
 
 struct GithubCommentProps {
   environments: environments.Environments;
@@ -83,6 +84,10 @@ pub class GithubComment {
         let var testRows = "";
         let var passedTests = 0;
         let var failedTests = 0;
+        let owner = queryString.QueryString.encodeURIComponent(appOwner ?? "");
+        let appName = queryString.QueryString.encodeURIComponent(props.appName);
+        let branch = queryString.QueryString.encodeURIComponent(environment.branch);
+
         if environment.status == "running" || environment.status == "running-server" {
           if let testResults = environment.testResults {
             let var i = 0;
@@ -101,8 +106,8 @@ pub class GithubComment {
               let testName = pathParts.at(pathParts.length - 1);
               let testResourcePath = pathParts.at(0);
               let var link = "";
-              if environment.status == "running" && appOwner? {
-                link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/tests?testId={testId}\">Logs</a>";
+              if environment.status == "running" && owner != "" {
+                link = "<a target=\"_blank\" href=\"{this.siteDomain}/{owner}/{appName}/{branch}/tests?testId={testId}\">Logs</a>";
               }
               testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
               i += 1;
@@ -113,10 +118,10 @@ pub class GithubComment {
         let var previewUrl = "";
         let var appNameLink = props.appName;
 
-        if appOwner? {
-          appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}\">{props.appName}</a>";
+        if owner != "" {
+          appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{owner}/{appName}\">{props.appName}</a>";
           if environment.status == "running" {
-            previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/console\">Visit</a>";
+            previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{owner}/{appName}/{branch}/console\">Visit</a>";
           }
         }
 
@@ -135,7 +140,7 @@ pub class GithubComment {
 
         let date = std.Datetime.utcNow();
         let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
-        let envStatus = this.envStatusToString(environment.status, appOwner ?? "", props.appName, environment.branch);
+        let envStatus = this.envStatusToString(environment.status, appOwner ?? "", appName, branch);
         let tableRows = "<tr><td>{appNameLink}</td><td>{envStatus}</td><td>{previewUrl}</td><td>{endpointsString}</td><td>{dateStr}</td></tr>";
         let testSummary = "Tests: ✅ {passedTests} Passed  | ❌ {failedTests} Failed";
         let testsSection = "<details><summary>{testSummary}</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
