@@ -29,7 +29,6 @@ bring "./components/public-endpoint/public-endpoint.w" as PublicEndpoint;
 bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 bring "./google-oauth.w" as google_oauth;
-bring "./json-api.w" as json_api;
 
 let appSecret = util.env("APP_SECRET");
 let wsSecret = util.env("WS_SECRET");
