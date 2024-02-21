@@ -101,6 +101,7 @@ pub class EnvironmentManager {
   environmentEvents: cloud.Topic;
   endpointEvents: cloud.Topic;
   logs: cloud.Bucket;
+  users: users.Users;
 
   new(props: EnvironmentsProps) {
     this.apps = props.apps;
@@ -112,6 +113,7 @@ pub class EnvironmentManager {
     this.runtimeClient = props.runtimeClient;
     this.probotAdapter = props.probotAdapter;
     this.logs = props.logs;
+    this.users = props.users;
 
     this.environmentEvents = new cloud.Topic() as "environment creation events";
     this.endpointEvents = new cloud.Topic() as "endpoint creation events";
@@ -437,6 +439,9 @@ pub class EnvironmentManager {
 
   inflight postComment(props: PostCommentOptions) {
     let environment = this.environments.get(id: props.environmentId);
+    let app = this.apps.get(appId: props.appId);
+    let user = this.users.get(userId: app.userId);
+
     if let prNumber = environment.prNumber {
       let commentId = this.githubComment.createOrUpdate(
         octokit: props.octokit,
@@ -444,6 +449,7 @@ pub class EnvironmentManager {
         repo: environment.repo,
         appId: props.appId,
         appName: props.appName,
+        username: user.username,
       );
 
       if !environment.commentId? {
