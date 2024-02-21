@@ -16,8 +16,5 @@ export const useEncodedParams = <
     return urlParams as Record<keyof K, string>;
   }, [params]);
 
-  console.log("params", params);
-  console.log("encodedUrlParams", encodedUrlParams);
-
   return encodedUrlParams;
 };
