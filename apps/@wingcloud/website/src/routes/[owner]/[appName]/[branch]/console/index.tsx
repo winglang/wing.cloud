@@ -1,3 +1,4 @@
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { CommandLineIcon } from "@heroicons/react/24/solid";
 import { Console } from "@wingconsole/ui";
 import clsx from "clsx";
@@ -9,10 +10,10 @@ import { Header } from "../../../../../components/header.js";
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
-import { AnalyticsContext } from "../../../../../utils/analytics-provider.js";
-import { wrpc } from "../../../../../utils/wrpc.js";
 import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { AnalyticsContext } from "../../../../../utils/analytics-provider.js";
+import { useEncodedParams } from "../../../../../utils/encoded-params.js";
+import { wrpc } from "../../../../../utils/wrpc.js";
 
 const ConsolePage = () => {
   const { theme, mode } = useTheme();
@@ -95,22 +96,28 @@ const ConsolePage = () => {
 
 export const Component = () => {
   const { owner, appName, branch } = useParams();
+  const encodedParams = useEncodedParams({
+    owner: owner,
+    appName: appName,
+    branch: branch,
+  });
+
   return (
     <div className="flex flex-col h-full">
       <Header
         breadcrumbs={[
           {
             label: appName!,
-            to: `/${owner}/${appName}`,
+            to: `/${encodedParams.owner}/${encodedParams.appName}`,
           },
           {
             label: branch!,
-            to: `/${owner}/${appName}/${branch}`,
+            to: `/${encodedParams.owner}/${encodedParams.appName}/${encodedParams.branch}`,
             icon: <BranchIcon className="w-4 h-4 text-slate-700" />,
           },
           {
             label: "Console",
-            to: `/${owner}/${appName}/${branch}/console`,
+            to: `/${encodedParams.owner}/${encodedParams.appName}/${encodedParams.branch}/console`,
             icon: <CommandLineIcon className="w-4 h-4 text-slate-500" />,
           },
         ]}
