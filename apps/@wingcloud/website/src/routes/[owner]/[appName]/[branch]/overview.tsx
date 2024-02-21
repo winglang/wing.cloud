@@ -101,6 +101,8 @@ const Overview = ({
                   theme.bgInput,
                   theme.bgInputHover,
                   theme.textInput,
+                  environment?.status !== "running" &&
+                    "cursor-not-allowed opacity-50",
                 )}
               >
                 Console

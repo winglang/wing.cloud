@@ -36,6 +36,8 @@ interface UserMenuProps {
 }
 
 const UserMenu = ({ user }: UserMenuProps) => {
+  const { theme } = useTheme();
+
   const signOut = wrpc["auth.signOut"].useMutation({
     onSuccess(d) {
       location.href = "/";
@@ -56,8 +58,8 @@ const UserMenu = ({ user }: UserMenuProps) => {
       icon={<Avatar avatarURL={user?.avatarUrl} />}
     >
       {user?.email && (
-        <div className="px-4 py-3" role="none">
-          <p className="text-sm font-medium text-gray-900" role="none">
+        <div className="px-3 py-3" role="none">
+          <p className={clsx("text-sm font-medium", theme.text2)} role="none">
             {user?.email}
           </p>
         </div>

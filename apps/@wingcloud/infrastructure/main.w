@@ -97,31 +97,11 @@ let probotAdapter = new adapter.ProbotAdapter(
 
 let bucketLogs = new cloud.Bucket() as "deployment logs";
 
-let rntm = new runtime.RuntimeService(
-  wingCloudUrl: apiUrlParam,
-  flyToken: util.tryEnv("FLY_TOKEN"),
-  flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
-  environments: environments,
-  logs: bucketLogs,
-  publicEndpointFullDomainName: publicEndpointFullDomainName,
-);
-
+let runtimeApi = new cloud.Api() as "runtime";
 let runtimeUrlParam = new parameter.Parameter(
   name: "runtime-url",
-  value: rntm.api.url,
+  value: runtimeApi.url,
 ) as "runtime-service-url";
-
-let dashboard = new vite.Vite(
-  root: "../website",
-  publicEnv: {
-    "SEGMENT_WRITE_KEY": segmentWriteKey,
-    "ENABLE_ANALYTICS": "{enableAnalytics}",
-    "API_URL": "{api.url}",
-    "WS_URL": "{ws.url}",
-    "GITHUB_APP_CLIENT_ID": util.env("BOT_GITHUB_CLIENT_ID"),
-    "GITHUB_APP_NAME": util.env("BOT_GITHUB_APP_NAME"),
-  },
-) as "website";
 
 let siteURL = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
@@ -186,6 +166,29 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   analytics: analytics,
   logs: bucketLogs,
 );
+
+let rntm = new runtime.RuntimeService(
+  api: runtimeApi,
+  wingCloudUrl: apiUrlParam,
+  flyToken: util.tryEnv("FLY_TOKEN"),
+  flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
+  environments: environments,
+  environmentManager: environmentManager,
+  logs: bucketLogs,
+  publicEndpointFullDomainName: publicEndpointFullDomainName,
+);
+
+let dashboard = new vite.Vite(
+  root: "../website",
+  publicEnv: {
+    "SEGMENT_WRITE_KEY": segmentWriteKey,
+    "ENABLE_ANALYTICS": "{enableAnalytics}",
+    "API_URL": "{api.url}",
+    "WS_URL": "{ws.url}",
+    "GITHUB_APP_CLIENT_ID": util.env("BOT_GITHUB_CLIENT_ID"),
+    "GITHUB_APP_NAME": util.env("BOT_GITHUB_APP_NAME"),
+  },
+) as "website";
 
 let wingCloudApi = new wingcloud_api.Api(
   api: api,

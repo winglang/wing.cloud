@@ -134,7 +134,7 @@ const OverviewPage = ({
                 to={`https://github.com/${app.repoOwner}/${app.repoName}`}
                 className={clsx(
                   "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
-                  "px-2.5 py-2 border shadow-sm",
+                  "p-1.5 sm:px-2.5 sm:py-1.5 border shadow-sm truncate",
                   theme.borderInput,
                   theme.focusVisible,
                   theme.bgInput,
@@ -143,7 +143,7 @@ const OverviewPage = ({
                 )}
                 target="_blank"
               >
-                <GithubIcon className="size-4" />
+                <GithubIcon className="size-4 shrink-0" />
                 <div className="hidden sm:block">
                   {app.repoOwner}/{app.repoName}
                 </div>
@@ -178,16 +178,20 @@ const OverviewPage = ({
               navigate(`/${owner}/${appName}/${productionEnvironment.branch}`);
             }}
             actions={
-              <div
-                className={clsx(
-                  "transition-all",
-                  "rounded-full p-1.5",
-                  "sm:opacity-0 group-hover:opacity-100",
-                  "sm:-translate-y-2 group-hover:translate-y-0",
+              <>
+                {productionEnvironment && (
+                  <div
+                    className={clsx(
+                      "transition-all",
+                      "rounded-full p-1.5",
+                      "sm:opacity-0 group-hover:opacity-100",
+                      "sm:-translate-y-2 group-hover:translate-y-0 pointer-events-none",
+                    )}
+                  >
+                    <ArrowRightIcon className="w-4 h-4" />
+                  </div>
                 )}
-              >
-                <ArrowRightIcon className="w-4 h-4" />
-              </div>
+              </>
             }
           />
         </div>
