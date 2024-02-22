@@ -44,8 +44,8 @@ pub class GithubComment {
     this.siteDomain = props.siteDomain;
   }
 
-  inflight envStatusToString(status: str, repoOwner: str, appName: str, branch: str): str {
-    let inspect = "<a target=\"_blank\" href=\"{this.siteDomain}/{repoOwner}/{appName}/{branch}\">Inspect</a>";
+  inflight envStatusToString(status: str, fullAppName: str, branch: str): str {
+    let inspect = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/{branch}\">Inspect</a>";
     if status == "running-server" {
       return "Starting App";
     }
@@ -78,7 +78,13 @@ pub class GithubComment {
     let tableHeader = "<tr><th>App</th><th>Status</th><th>Console</th><th>Endpoints</th><th>Updated (UTC)</th></tr>";
     let var commentBody = "<table>{tableHeader}";
 
-    let appOwner = this.getAppOwner(props.appId);
+    let var fullAppName = props.appFullName;
+    if !fullAppName? {
+      if let appOwner = this.getAppOwner(props.appId) {
+        fullAppName = "${appOwner}/${props.appName}";
+      }
+    }
+
     for environment in this.environments.list(appId: props.appId) {
       if environment.repo == props.repo && environment.prNumber == props.prNumber {
         let var testRows = "";
@@ -102,8 +108,8 @@ pub class GithubComment {
               let testName = pathParts.at(pathParts.length - 1);
               let testResourcePath = pathParts.at(0);
               let var link = "";
-              if environment.status == "running" && appOwner? {
-                link = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/tests?testId={testId}\">Logs</a>";
+              if environment.status == "running" && fullAppName? {
+                link = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/{environment.branch}/tests?testId={testId}\">Logs</a>";
               }
               testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
               i += 1;
@@ -114,10 +120,10 @@ pub class GithubComment {
         let var previewUrl = "";
         let var appNameLink = props.appName;
 
-        if appOwner? {
-          appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}\">{props.appFullName ?? props.appName}</a>";
+        if fullAppName? {
+          appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}\">{props.appFullName ?? props.appName}</a>";
           if environment.status == "running" {
-            previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/console\">Visit</a>";
+            previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/{environment.branch}/console\">Visit</a>";
           }
         }
 
@@ -136,7 +142,7 @@ pub class GithubComment {
 
         let date = std.Datetime.utcNow();
         let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
-        let envStatus = this.envStatusToString(environment.status, appOwner ?? "", props.appName, environment.branch);
+        let envStatus = this.envStatusToString(environment.status, fullAppName ?? "", environment.branch);
         let tableRows = "<tr><td>{appNameLink}</td><td>{envStatus}</td><td>{previewUrl}</td><td>{endpointsString}</td><td>{dateStr}</td></tr>";
         let testSummary = "Tests: ✅ {passedTests} Passed  | ❌ {failedTests} Failed";
         let testsSection = "<details><summary>{testSummary}</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
