@@ -166,7 +166,7 @@ pub class WebsiteProxy {
           cachePolicyId: passthroughCachePolicy.id,
         },
         {
-          targetOriginId: "landing_dashboard",
+          targetOriginId: "dashboard",
           pathPattern: "/assets/*",
           allowedMethods: ["GET", "HEAD"],
           cachedMethods: ["GET", "HEAD"],
