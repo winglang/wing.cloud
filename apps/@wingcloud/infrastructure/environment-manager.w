@@ -203,11 +203,15 @@ pub class EnvironmentManager {
       environments.CreateEnvironmentOptions.fromJson(item)
     );
 
-    this.analytics.track(options.owner, "cloud_environment_created", {
-      branch: environment.branch,
-      repo: environment.repo,
-      type: environment.type,
-    });
+    this.analytics.track(
+      event: "cloud_environment_created",
+      userId: options.owner,
+      properties: {
+        branch: environment.branch,
+        repo: environment.repo,
+        type: environment.type,
+      },
+    );
 
     this.mrq.enqueue(
       groupId: environment.id,
