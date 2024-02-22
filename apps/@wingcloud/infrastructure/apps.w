@@ -6,6 +6,7 @@ bring "./util.w" as util;
 pub struct App {
   appId: str;
   appName: str;
+  appFullName: str?;
   description: str?;
   repoOwner: str;
   repoName: str;
@@ -27,6 +28,7 @@ struct Item extends App {
 
 struct CreateAppOptions {
   appName: str;
+  appFullName: str;
   description: str;
   repoOwner: str;
   repoName: str;
@@ -120,6 +122,7 @@ pub class Apps {
         sk: ops.sk,
         appId: ops.appId,
         appName: options.appName,
+        appFullName: options.appFullName,
         description: options.description,
         repoId: options.repoId,
         repoOwner: options.repoOwner,

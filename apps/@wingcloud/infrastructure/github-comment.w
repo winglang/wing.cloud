@@ -19,6 +19,7 @@ struct GithubCommentCreateProps {
   repo: str;
   appId: str;
   appName: str;
+  appFullName: str?;
 }
 
 struct GithubCommentUpdateRepoProps {
@@ -114,7 +115,7 @@ pub class GithubComment {
         let var appNameLink = props.appName;
 
         if appOwner? {
-          appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}\">{props.appName}</a>";
+          appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}\">{props.appFullName ?? props.appName}</a>";
           if environment.status == "running" {
             previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{appOwner}/{props.appName}/{environment.branch}/console\">Visit</a>";
           }
