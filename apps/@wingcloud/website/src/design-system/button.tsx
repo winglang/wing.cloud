@@ -84,7 +84,12 @@ export const Button = forwardRef<
       >
         {Icon && (
           <Icon
-            className={clsx(label && "-ml-0.5", "h-4 w-4", iconClassName)}
+            className={clsx(
+              label && "-ml-0.5",
+              "size-4",
+              theme.text3,
+              iconClassName,
+            )}
           />
         )}
         {label}

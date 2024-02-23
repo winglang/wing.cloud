@@ -1,5 +1,7 @@
+import { Cog8ToothIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
+import { CommandLineIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { useMemo, type MouseEvent } from "react";
+import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { StatusPill } from "../../../components/status-pill.js";
@@ -11,7 +13,6 @@ import { GithubIcon } from "../../../icons/github-icon.js";
 import { MenuIcon } from "../../../icons/menu-icon.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import type { App } from "../../../utils/wrpc.js";
-import { RUNTIME_LOGS_ID } from "../[appName]/[branch]/logs.js";
 
 import { AppIcon } from "./app-icon.js";
 
@@ -38,39 +39,6 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
     }
     return `https://github.com/${app.repoOwner}/${app.repoName}/commit/${app.lastCommitSha}`;
   }, [app]);
-
-  const menuItems = useMemo(() => {
-    var items = [];
-    if (app.defaultBranch) {
-      if (app.status === "running") {
-        items.push({
-          label: `View in Console`,
-          onClick: (event: MouseEvent) => {
-            event.stopPropagation();
-            navigate(`/${owner}/${app.appName}/${app.defaultBranch}/console`);
-          },
-        });
-      }
-      items.push({
-        label: "View Logs",
-        onClick: (event: MouseEvent) => {
-          event.stopPropagation();
-          navigate(
-            `/${owner}/${app.appName}/${app.defaultBranch}#${RUNTIME_LOGS_ID}`,
-          );
-        },
-      });
-    }
-    items.push({
-      label: "Settings",
-      onClick: (event: MouseEvent) => {
-        event.stopPropagation();
-        navigate(`/${owner}/${app.appName}/settings`);
-      },
-    });
-
-    return items;
-  }, [app, owner]);
 
   return (
     <div
@@ -129,7 +97,25 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
             }
             btnClassName="flex z-10"
             onClick={(event) => event.stopPropagation()}
-            items={menuItems}
+            items={[
+              {
+                label: "Console",
+                icon: <CommandLineIcon className="size-4" />,
+                disabled: app.status !== "running" || !app.defaultBranch,
+                link: `/${owner}/${app.appName}/${app.defaultBranch}/console`,
+              },
+              {
+                label: "Logs",
+                icon: <DocumentTextIcon className="size-4" />,
+                disabled: !app.defaultBranch,
+                link: `/${owner}/${app.appName}/${app.defaultBranch}/logs`,
+              },
+              {
+                label: "Settings",
+                icon: <Cog8ToothIcon className="size-4" />,
+                link: `/${owner}/${app.appName}/settings`,
+              },
+            ]}
           />
         </div>
       </div>

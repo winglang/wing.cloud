@@ -1,4 +1,5 @@
 import { Menu as HeadlessMenu, Transition } from "@headlessui/react";
+import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import {
   Fragment,
@@ -9,6 +10,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { usePopper } from "react-popper";
+import { Link } from "react-router-dom";
 
 import { useTheme } from "./theme-provider.js";
 
@@ -16,6 +18,7 @@ interface Item {
   icon?: React.ReactNode;
   label?: string;
   onClick?: (event: MouseEvent) => void;
+  link?: string;
   disabled?: boolean;
   type?: "button" | "separator";
 }
@@ -103,11 +106,34 @@ export const Menu = ({
                   {items.map((item, index) => (
                     <HeadlessMenu.Item key={item.label || index}>
                       {({ active }) => (
-                        <div>
-                          {item.type === "separator" && (
-                            <div className="h-[1px] bg-gray-100 my-0.5" />
+                        <div className="flex items-center">
+                          {item.link && (
+                            <Link
+                              key={item.label}
+                              to={item.link}
+                              aria-disabled={item.disabled}
+                              onClick={(event) => {
+                                if (item.disabled) {
+                                  event.preventDefault();
+                                }
+                              }}
+                              className={clsx(
+                                active && theme.bg3,
+                                "grow",
+                                "group flex w-full items-center rounded px-2 py-2 text-sm",
+                                theme.textInput,
+                                "flex gap-x-3",
+                              )}
+                            >
+                              {item.icon && (
+                                <span className={clsx(theme.text3)}>
+                                  {item.icon}
+                                </span>
+                              )}
+                              <div className="flex grow">{item.label}</div>
+                            </Link>
                           )}
-                          {item.type !== "separator" && (
+                          {item.type !== "separator" && !item.link && (
                             <button
                               key={item.label}
                               disabled={item.disabled}
@@ -122,12 +148,15 @@ export const Menu = ({
                               )}
                             >
                               {item.icon && (
-                                <span className={clsx(theme.text2)}>
+                                <span className={clsx(theme.text3)}>
                                   {item.icon}
                                 </span>
                               )}
                               <div className="flex grow">{item.label}</div>
                             </button>
+                          )}
+                          {item.type === "separator" && (
+                            <div className="h-[1px] bg-gray-100 my-0.5 w-full " />
                           )}
                         </div>
                       )}

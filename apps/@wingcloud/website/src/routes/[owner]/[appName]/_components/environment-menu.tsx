@@ -49,19 +49,15 @@ export const EnvironmentMenu = ({
             type: "separator",
           },
           {
-            label: "View Console",
+            label: "Console",
             icon: <CommandLineIcon className="size-4" />,
-            onClick: () => {
-              navigate(`/${owner}/${appName}/${environment.branch}/console`);
-            },
             disabled: environment.status !== "running",
+            link: `/${owner}/${appName}/${environment.branch}/console`,
           },
           {
             icon: <DocumentTextIcon className="size-4" />,
-            label: "View logs",
-            onClick: () => {
-              window.location.href = `/${owner}/${appName}/${environment.branch}/logs}`;
-            },
+            label: "Logs",
+            link: `/${owner}/${appName}/${environment.branch}/logs`,
           },
         ]}
       />

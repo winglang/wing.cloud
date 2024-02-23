@@ -1,3 +1,4 @@
+import { Cog8ToothIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -44,7 +45,11 @@ const SettingsPage = ({
 
   return (
     <>
-      <PageHeader title="Settings" noBackground />
+      <PageHeader
+        title="Settings"
+        noBackground
+        icon={<Cog8ToothIcon className="size-full" />}
+      />
 
       <div
         className={clsx(
