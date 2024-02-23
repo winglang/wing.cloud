@@ -92,7 +92,7 @@ export const Menu = ({
                 className={clsx(
                   "absolute right-0 mt-2 w-56 origin-top-right",
                   "rounded shadow-lg z-20 border",
-                  "divide-y divide-slate-100 dark:divide-slate-700",
+                  "divide-y divide-gray-100 dark:divide-gray-700",
                   theme.bgInput,
                   theme.borderInput,
                   theme.focusVisible,
