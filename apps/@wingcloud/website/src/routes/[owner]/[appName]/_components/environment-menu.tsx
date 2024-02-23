@@ -70,7 +70,7 @@ export const EnvironmentMenu = ({
         appName={appName}
         branch={environment.branch}
         show={showRestartModal}
-        onClose={setShowRestartModal}
+        onClose={() => setShowRestartModal(false)}
       />
     </>
   );
