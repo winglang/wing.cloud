@@ -1,6 +1,7 @@
 import {
   MagnifyingGlassCircleIcon,
   ArrowRightIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
@@ -8,6 +9,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../components/page-header.js";
 import { SectionTitle } from "../../../components/section-title.js";
+import { Button } from "../../../design-system/button.js";
 import { Input } from "../../../design-system/input.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
@@ -92,14 +94,6 @@ const OverviewPage = ({
   const [search, setSearch] = useState("");
 
   const previewEnvs = useMemo(() => {
-    return [
-      {
-        id: "1",
-        branch: "main",
-        prTitle: "Add new feature",
-        status: "error",
-      } as Environment,
-    ];
     if (!environments) {
       return [];
     }
@@ -167,6 +161,14 @@ const OverviewPage = ({
                 </div>
               </Link>
             )}
+            <Button
+              icon={ArrowPathIcon}
+              onClick={() => {
+                restartEnvironment(productionEnvironment!);
+              }}
+            >
+              Redeploy
+            </Button>
           </>
         }
       />
@@ -194,9 +196,6 @@ const OverviewPage = ({
                 return;
               }
               navigate(`/${owner}/${appName}/${productionEnvironment.branch}`);
-            }}
-            onRestartEnvironment={() => {
-              restartEnvironment(productionEnvironment);
             }}
             actions={
               <>

@@ -1,9 +1,11 @@
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
+import { Button } from "../../../../design-system/button.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { wrpc } from "../../../../utils/wrpc.js";
@@ -71,6 +73,16 @@ const Overview = ({
         icon={<BranchIcon className="size-full" />}
         title={branch!}
         noBackground
+        actions={
+          <Button
+            icon={ArrowPathIcon}
+            onClick={() => {
+              setShowRestartModal(true);
+            }}
+          >
+            Redeploy
+          </Button>
+        }
       />
       <div
         className={clsx(
@@ -87,7 +99,6 @@ const Overview = ({
             app={app}
             loading={environmentQuery.isLoading}
             environment={environment}
-            onRestartEnvironment={() => setShowRestartModal(true)}
             actions={
               <Link
                 to={`/${owner}/${appName}/${environment?.branch}/console`}
