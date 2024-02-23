@@ -111,11 +111,15 @@ export const Menu = ({
                                 active && theme.bg3,
                                 "group flex w-full items-center rounded px-2 py-2 text-sm",
                                 theme.textInput,
-                                "flex gap-x-1",
+                                "flex gap-x-3",
                               )}
                             >
+                              {item.icon && (
+                                <span className={clsx(theme.text2)}>
+                                  {item.icon}
+                                </span>
+                              )}
                               <div className="flex grow">{item.label}</div>
-                              {item.icon}
                             </button>
                           )}
                         </div>
