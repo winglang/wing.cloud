@@ -38,7 +38,6 @@ export interface EnvironmentsListItemProps {
   owner: string;
   appName: string;
   environment: Environment;
-  onRestartEnvironment: () => void;
 }
 
 export const EnvironmentsListItem = ({
