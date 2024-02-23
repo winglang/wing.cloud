@@ -76,6 +76,7 @@ export const RedeployEnvironmentModal = ({
 
   return (
     <ConfirmationModal
+      type="warning"
       show={show}
       isIdle={restartEnviornment.isIdle}
       isPending={disabled}
@@ -83,6 +84,7 @@ export const RedeployEnvironmentModal = ({
       onConfirm={() => restartEnviornment.mutate({ owner, appName, branch })}
       modalTitle={"Redeploy Environment"}
       modalBody={dialogBody}
+      confirmButtonText="Redeploy"
       confirmButtonTextPending="Redeploying..."
     />
   );

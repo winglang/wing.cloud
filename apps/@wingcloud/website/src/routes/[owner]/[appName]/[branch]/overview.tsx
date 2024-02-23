@@ -141,7 +141,7 @@ const Overview = ({
         appName={appName}
         branch={branch}
         show={showRestartModal}
-        onClose={(success) => {
+        onClose={() => {
           setShowRestartModal(false);
         }}
       />
