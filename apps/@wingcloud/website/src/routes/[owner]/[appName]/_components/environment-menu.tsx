@@ -49,15 +49,15 @@ export const EnvironmentMenu = ({
             type: "separator",
           },
           {
+            icon: <DocumentTextIcon className="size-4" />,
+            label: "Logs",
+            link: `/${owner}/${appName}/${environment.branch}/logs`,
+          },
+          {
             label: "Console",
             icon: <CommandLineIcon className="size-4" />,
             disabled: environment.status !== "running",
             link: `/${owner}/${appName}/${environment.branch}/console`,
-          },
-          {
-            icon: <DocumentTextIcon className="size-4" />,
-            label: "Logs",
-            link: `/${owner}/${appName}/${environment.branch}/logs`,
           },
         ]}
       />

@@ -99,17 +99,18 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
             onClick={(event) => event.stopPropagation()}
             items={[
               {
-                label: "Console",
-                icon: <CommandLineIcon className="size-4" />,
-                disabled: app.status !== "running" || !app.defaultBranch,
-                link: `/${owner}/${app.appName}/${app.defaultBranch}/console`,
-              },
-              {
                 label: "Logs",
                 icon: <DocumentTextIcon className="size-4" />,
                 disabled: !app.defaultBranch,
                 link: `/${owner}/${app.appName}/${app.defaultBranch}/logs`,
               },
+              {
+                label: "Console",
+                icon: <CommandLineIcon className="size-4" />,
+                disabled: app.status !== "running" || !app.defaultBranch,
+                link: `/${owner}/${app.appName}/${app.defaultBranch}/console`,
+              },
+
               {
                 label: "Settings",
                 icon: <Cog8ToothIcon className="size-4" />,
