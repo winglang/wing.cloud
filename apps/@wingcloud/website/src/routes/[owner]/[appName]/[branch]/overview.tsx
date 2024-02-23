@@ -1,15 +1,19 @@
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { CommandLineIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
 import { Button } from "../../../../design-system/button.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
-import { wrpc } from "../../../../utils/wrpc.js";
-import { RestartEnvironmentModal } from "../_components/restart-environment-modal.js";
+import { STARTING_STATUS, wrpc } from "../../../../utils/wrpc.js";
+import {
+  RedeployEnvironmentModal,
+  VALID_REDEPLOY_STATUS,
+} from "../_components/redeploy-environment-modal.js";
 
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
@@ -24,6 +28,7 @@ const Overview = ({
   branch: string;
 }) => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
 
   const getAppQuery = wrpc["app.getByName"].useQuery(
     {
@@ -67,6 +72,14 @@ const Overview = ({
 
   const [showRestartModal, setShowRestartModal] = useState(false);
 
+  const deploying = useMemo(() => {
+    if (!environment?.status) {
+      return false;
+    }
+
+    return STARTING_STATUS.includes(environment.status);
+  }, [environment?.status]);
+
   return (
     <>
       <PageHeader
@@ -74,14 +87,27 @@ const Overview = ({
         title={branch!}
         noBackground
         actions={
-          <Button
-            icon={ArrowPathIcon}
-            onClick={() => {
-              setShowRestartModal(true);
-            }}
-          >
-            Redeploy
-          </Button>
+          <>
+            <Button
+              disabled={environment?.status !== "running"}
+              icon={CommandLineIcon}
+              onClick={() => {
+                navigate(`/${owner}/${appName}/${environment?.branch}/console`);
+              }}
+            >
+              Console
+            </Button>
+            <Button
+              disabled={!VALID_REDEPLOY_STATUS.includes(environment?.status!)}
+              icon={ArrowPathIcon}
+              iconClassName={clsx(deploying && "animate-spin")}
+              onClick={() => {
+                setShowRestartModal(true);
+              }}
+            >
+              {deploying ? "Deploying..." : "Redeploy"}
+            </Button>
+          </>
         }
       />
       <div
@@ -99,30 +125,6 @@ const Overview = ({
             app={app}
             loading={environmentQuery.isLoading}
             environment={environment}
-            actions={
-              <Link
-                to={`/${owner}/${appName}/${environment?.branch}/console`}
-                onClick={(e) => {
-                  if (environment?.status !== "running") {
-                    e.preventDefault();
-                  }
-                }}
-                className={clsx(
-                  "z-10",
-                  "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
-                  "px-2.5 py-2 border shadow-sm",
-                  theme.borderInput,
-                  theme.focusVisible,
-                  theme.bgInput,
-                  theme.bgInputHover,
-                  theme.textInput,
-                  environment?.status !== "running" &&
-                    "cursor-not-allowed opacity-50",
-                )}
-              >
-                Console
-              </Link>
-            }
           />
         </div>
         <div className="space-y-2">
@@ -134,12 +136,14 @@ const Overview = ({
           />
         </div>
       </div>
-      <RestartEnvironmentModal
+      <RedeployEnvironmentModal
         owner={owner}
         appName={appName}
         branch={branch}
         show={showRestartModal}
-        onClose={setShowRestartModal}
+        onClose={(success) => {
+          setShowRestartModal(false);
+        }}
       />
     </>
   );

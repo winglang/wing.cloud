@@ -1,11 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { ConfirmationModal } from "../../../../components/confirmation-modal.js";
 import { useNotifications } from "../../../../design-system/notification.js";
 import { useQueryCache } from "../../../../utils/use-query-cache.js";
-import { wrpc } from "../../../../utils/wrpc.js";
+import { wrpc, type EnvironmentStatus } from "../../../../utils/wrpc.js";
 
-export interface RestartEnvironmentModalProps {
+export interface RedeployEnvironmentModalProps {
   owner: string;
   appName: string;
   branch: string;
@@ -13,13 +13,21 @@ export interface RestartEnvironmentModalProps {
   onClose: (value: boolean) => void;
 }
 
-export const RestartEnvironmentModal = ({
+export const VALID_REDEPLOY_STATUS: EnvironmentStatus[] = [
+  "running",
+  "error",
+  "stopped",
+];
+
+// create a new list
+
+export const RedeployEnvironmentModal = ({
   owner,
   appName,
   branch,
   show,
   onClose,
-}: RestartEnvironmentModalProps) => {
+}: RedeployEnvironmentModalProps) => {
   const { showNotification } = useNotifications();
   const [disabled, setDisabled] = useState(false);
 
@@ -32,8 +40,7 @@ export const RestartEnvironmentModal = ({
     onSuccess() {
       showNotification(`Environment ${appName} restarted`, { type: "success" });
       restartEnvironmentStatus(branch);
-      onClose(false);
-      setDisabled(false);
+      onClose(true);
     },
     onError(error) {
       setDisabled(false);
@@ -45,6 +52,14 @@ export const RestartEnvironmentModal = ({
       onClose(false);
     },
   });
+
+  useEffect(() => {
+    if (!show) {
+      setTimeout(() => {
+        setDisabled(false);
+      }, 500);
+    }
+  }, [show]);
 
   const dialogBody = useMemo(
     () => (
@@ -66,9 +81,9 @@ export const RestartEnvironmentModal = ({
       isPending={disabled}
       onClose={onClose}
       onConfirm={() => restartEnviornment.mutate({ owner, appName, branch })}
-      modalTitle={"Restart Environment"}
+      modalTitle={"Redeploy Environment"}
       modalBody={dialogBody}
-      confirmButtonTextPending="Restarting..."
+      confirmButtonTextPending="Redeploying..."
     />
   );
 };

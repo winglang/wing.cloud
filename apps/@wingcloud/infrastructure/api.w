@@ -853,6 +853,10 @@ pub class Api {
         appId: app.appId,
         branch: branch,
       );
+      let validStatus = ["error", "running"];
+      if !validStatus.contains(environment.status) {
+        throw httpError.HttpError.badRequest("Environment is not in a valid state to be restarted.");
+      }
 
       environmentsQueue.push(Json.stringify(EnvironmentAction {
         type: "restart",

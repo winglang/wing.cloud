@@ -13,9 +13,11 @@ import { usePopper } from "react-popper";
 import { useTheme } from "./theme-provider.js";
 
 interface Item {
+  icon?: React.ReactNode;
   label?: string;
   onClick?: (event: MouseEvent) => void;
   disabled?: boolean;
+  type?: "button" | "separator";
 }
 
 export interface MenuProps {
@@ -93,21 +95,30 @@ export const Menu = ({
               >
                 {children}
                 <div className="p-1">
-                  {items.map((item) => (
-                    <HeadlessMenu.Item key={item.label}>
+                  {items.map((item, index) => (
+                    <HeadlessMenu.Item key={item.label || index}>
                       {({ active }) => (
-                        <button
-                          disabled={item.disabled}
-                          key={item.label}
-                          onClick={item.onClick}
-                          className={clsx(
-                            active && theme.bg3,
-                            "group flex w-full items-center rounded px-2 py-2 text-sm",
-                            theme.textInput,
+                        <div>
+                          {item.type === "separator" && (
+                            <div className="h-[1px] bg-gray-100 my-0.5" />
                           )}
-                        >
-                          {item.label}
-                        </button>
+                          {item.type !== "separator" && (
+                            <button
+                              key={item.label}
+                              disabled={item.disabled}
+                              onClick={item.onClick}
+                              className={clsx(
+                                active && theme.bg3,
+                                "group flex w-full items-center rounded px-2 py-2 text-sm",
+                                theme.textInput,
+                                "flex gap-x-1",
+                              )}
+                            >
+                              <div className="flex grow">{item.label}</div>
+                              {item.icon}
+                            </button>
+                          )}
+                        </div>
                       )}
                     </HeadlessMenu.Item>
                   ))}

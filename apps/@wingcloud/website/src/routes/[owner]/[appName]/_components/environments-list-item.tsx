@@ -1,5 +1,4 @@
 import {
-  ArrowPathIcon,
   BeakerIcon,
   CheckCircleIcon,
   XCircleIcon,
@@ -10,16 +9,14 @@ import { Link } from "react-router-dom";
 
 import { StatusDot } from "../../../../components/status-dot.js";
 import { StatusPill } from "../../../../components/status-pill.js";
-import { Button } from "../../../../design-system/button.js";
-import { Menu } from "../../../../design-system/menu.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../../icons/github-icon.js";
-import { MenuIcon } from "../../../../icons/menu-icon.js";
 import { useTimeAgo } from "../../../../utils/time.js";
 import type { Environment } from "../../../../utils/wrpc.js";
-import { DEPLOYMENT_LOGS_ID } from "../[branch]/logs.js";
 import { TEST_LOGS_ID } from "../[branch]/tests-page.js";
+
+import { EnvironmentMenu } from "./environment-menu.js";
 
 type ErrorStatus = "failed" | "passed";
 
@@ -41,14 +38,13 @@ export interface EnvironmentsListItemProps {
   owner: string;
   appName: string;
   environment: Environment;
-  onRestartEnvironment?: () => void;
+  onRestartEnvironment: () => void;
 }
 
 export const EnvironmentsListItem = ({
   owner,
   appName,
   environment,
-  onRestartEnvironment,
 }: EnvironmentsListItemProps) => {
   const { theme } = useTheme();
 
@@ -60,7 +56,7 @@ export const EnvironmentsListItem = ({
     return getTestStatus(environment);
   }, [environment]);
 
-  const linkEnabled = useMemo(() => {
+  const environmentRunning = useMemo(() => {
     return environment?.url != "" && status === "running";
   }, [environment, status]);
 
@@ -164,26 +160,12 @@ export const EnvironmentsListItem = ({
           </div>
 
           <div className="flex gap-x-2 text-xs items-center justify-end">
-            {linkEnabled && (
-              <Link
-                to={`/${owner}/${appName}/${environment.branch}/console`}
-                className={clsx(
-                  "text-xs",
-                  theme.text1,
-                  theme.text1Hover,
-                  "focus:underline outline-none",
-                  "hover:underline z-10 cursor-pointer",
-                )}
-              >
-                Visit Console
-              </Link>
-            )}
-            {!linkEnabled && (
+            {!environmentRunning && (
               <div className="flex items-center gap-x-1">
                 <StatusPill status={status}>
                   {status === "error" && (
                     <Link
-                      to={`/${owner}/${appName}/${environment.branch}/#${DEPLOYMENT_LOGS_ID}`}
+                      to={`/${owner}/${appName}/${environment.branch}/logs`}
                       className="hover:underline z-10"
                     >
                       {status}
@@ -194,29 +176,14 @@ export const EnvironmentsListItem = ({
             )}
           </div>
         </div>
-        {onRestartEnvironment && (
-          <div className="relative z-20 -ml-2">
-            <Menu
-              icon={
-                <MenuIcon
-                  className={clsx(
-                    "w-6 h-6",
-                    "transition-all",
-                    "p-1 rounded-sm",
-                    theme.text2,
-                    theme.bgInputHover,
-                  )}
-                />
-              }
-              items={[
-                {
-                  label: "Redeploy",
-                  onClick: onRestartEnvironment,
-                },
-              ]}
-            />
-          </div>
-        )}
+
+        <div className="relative z-20 -ml-2">
+          <EnvironmentMenu
+            owner={owner}
+            appName={appName}
+            environment={environment}
+          />
+        </div>
       </div>
     </div>
   );

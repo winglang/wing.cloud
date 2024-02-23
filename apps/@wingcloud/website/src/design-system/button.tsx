@@ -15,6 +15,7 @@ interface ButtonProps {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   className?: string;
+  iconClassName?: string;
   icon?: ForwardRefExoticComponent<any>;
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
   small?: boolean;
@@ -34,6 +35,7 @@ export const Button = forwardRef<
       label,
       type = "button",
       className,
+      iconClassName,
       onClick,
       icon: Icon,
       children,
@@ -80,7 +82,11 @@ export const Button = forwardRef<
         disabled={disabled}
         onClick={onClick}
       >
-        {Icon && <Icon className={clsx(label && "-ml-0.5", "h-4 w-4")} />}
+        {Icon && (
+          <Icon
+            className={clsx(label && "-ml-0.5", "h-4 w-4", iconClassName)}
+          />
+        )}
         {label}
         {children}
       </button>

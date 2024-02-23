@@ -44,6 +44,13 @@ export type EnvironmentStatus =
   | "error"
   | "stopped";
 
+export const STARTING_STATUS: EnvironmentStatus[] = [
+  "initializing",
+  "running-server",
+  "running-tests",
+  "deploying",
+];
+
 export interface App {
   appId: string;
   appName: string;
