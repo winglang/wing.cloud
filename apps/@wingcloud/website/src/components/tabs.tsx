@@ -1,9 +1,9 @@
 import clsx from "clsx";
 import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 
 import { useTheme } from "../design-system/theme-provider.js";
+import { Link } from "react-router-dom";
 
 export interface Tab {
   name: string;
@@ -15,7 +15,7 @@ interface TabsProps {
   tabs: Tab[];
 }
 
-export const Tabs = ({ tabs, disabled = false }: TabsProps) => {
+export const Tabs = ({ tabs }: TabsProps) => {
   const { theme } = useTheme();
 
   const location = useLocation();
