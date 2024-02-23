@@ -184,6 +184,10 @@ export const wrpc = createWRPCReact<{
       environment: Environment;
     }
   >;
+  "app.environment.restart": MutationProcedure<
+    { owner: string; appName: string; branch: string },
+    {}
+  >;
   "app.environment.logs": QueryProcedure<
     { owner: string; appName: string; branch: string },
     {

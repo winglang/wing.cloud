@@ -13,6 +13,7 @@ import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js
 import { useStatus } from "../../../../../utils/status.js";
 import { getDateTime } from "../../../../../utils/time.js";
 import type { App, Endpoint, Environment } from "../../../../../utils/wrpc.js";
+import { RestartButton } from "../../_components/restart-button.js";
 
 export interface EvironmentDetailsProps {
   loading?: boolean;
@@ -23,6 +24,7 @@ export interface EvironmentDetailsProps {
   endpointsLoading?: boolean;
   onClick?: () => void;
   actions?: React.ReactNode;
+  onRestartEnvironment?: () => void;
 }
 
 export const EnvironmentDetails = ({
@@ -33,6 +35,7 @@ export const EnvironmentDetails = ({
   endpointsLoading,
   onClick,
   actions,
+  onRestartEnvironment,
 }: EvironmentDetailsProps) => {
   const { theme } = useTheme();
 
@@ -129,7 +132,12 @@ export const EnvironmentDetails = ({
           {!environment && (
             <SkeletonLoader className="h-5 w-28 max-w-full" loading />
           )}
-          {environment && <StatusWithDot status={environment.status} />}
+          <div className="flex gap-x-1 items-center">
+            {environment && <StatusWithDot status={environment.status} />}
+            {environment?.status === "error" && onRestartEnvironment && (
+              <RestartButton onClick={onRestartEnvironment} small />
+            )}
+          </div>
         </div>
 
         <div className="flex col-span-4 flex-col gap-1">

@@ -1,15 +1,16 @@
-import { useMemo } from "react";
+import clsx from "clsx";
+import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { wrpc } from "../../../../utils/wrpc.js";
+import { RestartEnvironmentModal } from "../_components/restart-environment-modal.js";
 
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
-import clsx from "clsx";
-import { useTheme } from "../../../../design-system/theme-provider.js";
-import { PageHeader } from "../../../../components/page-header.js";
-import { BranchIcon } from "../../../../icons/branch-icon.js";
 
 const Overview = ({
   owner,
@@ -62,6 +63,8 @@ const Overview = ({
     });
   }, [endpointsQuery.data]);
 
+  const [showRestartModal, setShowRestartModal] = useState(false);
+
   return (
     <>
       <PageHeader
@@ -84,6 +87,7 @@ const Overview = ({
             app={app}
             loading={environmentQuery.isLoading}
             environment={environment}
+            onRestartEnvironment={() => setShowRestartModal(true)}
             actions={
               <Link
                 to={`/${owner}/${appName}/${environment?.branch}/console`}
@@ -119,6 +123,13 @@ const Overview = ({
           />
         </div>
       </div>
+      <RestartEnvironmentModal
+        owner={owner}
+        appName={appName}
+        branch={branch}
+        show={showRestartModal}
+        onClose={setShowRestartModal}
+      />
     </>
   );
 };

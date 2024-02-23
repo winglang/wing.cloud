@@ -119,7 +119,9 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
             icon={
               <MenuIcon
                 className={clsx(
-                  "w-6 h-6 p-1 rounded",
+                  "w-6 h-6",
+                  "transition-all",
+                  "p-1 rounded-sm",
                   theme.text2,
                   theme.bgInputHover,
                 )}

@@ -3,21 +3,22 @@ import {
   ArrowRightIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { PageHeader } from "../../../components/page-header.js";
 import { SectionTitle } from "../../../components/section-title.js";
 import { Input } from "../../../design-system/input.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
-import { wrpc } from "../../../utils/wrpc.js";
+import { BranchIcon } from "../../../icons/branch-icon.js";
+import { GithubIcon } from "../../../icons/github-icon.js";
+import { wrpc, type Environment } from "../../../utils/wrpc.js";
+import { AppIcon } from "../_components/app-icon.js";
 
 import { EnvironmentDetails } from "./[branch]/_components/environment-details.js";
 import { EnvironmentsListItemSkeleton } from "./_components/environments-list-item-skeleton.js";
 import { EnvironmentsListItem } from "./_components/environments-list-item.js";
-import { BranchIcon } from "../../../icons/branch-icon.js";
-import { PageHeader } from "../../../components/page-header.js";
-import { GithubIcon } from "../../../icons/github-icon.js";
-import { AppIcon } from "../_components/app-icon.js";
+import { RestartEnvironmentModal } from "./_components/restart-environment-modal.js";
 
 const OverviewPage = ({
   owner,
@@ -91,6 +92,14 @@ const OverviewPage = ({
   const [search, setSearch] = useState("");
 
   const previewEnvs = useMemo(() => {
+    return [
+      {
+        id: "1",
+        branch: "main",
+        prTitle: "Add new feature",
+        status: "error",
+      } as Environment,
+    ];
     if (!environments) {
       return [];
     }
@@ -114,6 +123,15 @@ const OverviewPage = ({
     if (!app) return;
     return `https://github.com/${app?.repoOwner}/${app?.repoName}`;
   }, [app]);
+
+  const [environmentToRestart, setEnvironmentToRestart] =
+    useState<Environment>();
+  const [showRestartModal, setShowRestartModal] = useState(false);
+
+  const restartEnvironment = useCallback((environment: Environment) => {
+    setEnvironmentToRestart(environment);
+    setShowRestartModal(true);
+  }, []);
 
   return (
     <>
@@ -177,6 +195,9 @@ const OverviewPage = ({
               }
               navigate(`/${owner}/${appName}/${productionEnvironment.branch}`);
             }}
+            onRestartEnvironment={() => {
+              restartEnvironment(productionEnvironment);
+            }}
             actions={
               <>
                 {productionEnvironment && (
@@ -225,6 +246,9 @@ const OverviewPage = ({
                   owner={owner}
                   appName={appName}
                   environment={environment}
+                  onRestartEnvironment={() => {
+                    restartEnvironment(environment);
+                  }}
                 />
               ))}
 
@@ -276,6 +300,15 @@ const OverviewPage = ({
           )}
         </div>
       </div>
+      {environmentToRestart && (
+        <RestartEnvironmentModal
+          owner={owner}
+          appName={appName}
+          branch={environmentToRestart.branch}
+          show={showRestartModal}
+          onClose={setShowRestartModal}
+        />
+      )}
     </>
   );
 };

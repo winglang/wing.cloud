@@ -1,4 +1,5 @@
 import {
+  ArrowPathIcon,
   BeakerIcon,
   CheckCircleIcon,
   XCircleIcon,
@@ -9,13 +10,16 @@ import { Link } from "react-router-dom";
 
 import { StatusDot } from "../../../../components/status-dot.js";
 import { StatusPill } from "../../../../components/status-pill.js";
+import { Button } from "../../../../design-system/button.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../../utils/time.js";
 import type { Environment } from "../../../../utils/wrpc.js";
 import { DEPLOYMENT_LOGS_ID } from "../[branch]/logs.js";
 import { TEST_LOGS_ID } from "../[branch]/tests-page.js";
-import { BranchIcon } from "../../../../icons/branch-icon.js";
+
+import { RestartButton } from "./restart-button.js";
 
 type ErrorStatus = "failed" | "passed";
 
@@ -37,12 +41,14 @@ export interface EnvironmentsListItemProps {
   owner: string;
   appName: string;
   environment: Environment;
+  onRestartEnvironment?: () => void;
 }
 
 export const EnvironmentsListItem = ({
   owner,
   appName,
   environment,
+  onRestartEnvironment,
 }: EnvironmentsListItemProps) => {
   const { theme } = useTheme();
 
@@ -173,16 +179,21 @@ export const EnvironmentsListItem = ({
               </Link>
             )}
             {!linkEnabled && (
-              <StatusPill status={status}>
-                {status === "error" && (
-                  <Link
-                    to={`/${owner}/${appName}/${environment.branch}/#${DEPLOYMENT_LOGS_ID}`}
-                    className="hover:underline z-10"
-                  >
-                    {status}
-                  </Link>
+              <div className="flex items-center gap-x-1">
+                {status === "error" && onRestartEnvironment && (
+                  <RestartButton onClick={onRestartEnvironment} />
                 )}
-              </StatusPill>
+                <StatusPill status={status}>
+                  {status === "error" && (
+                    <Link
+                      to={`/${owner}/${appName}/${environment.branch}/#${DEPLOYMENT_LOGS_ID}`}
+                      className="hover:underline z-10"
+                    >
+                      {status}
+                    </Link>
+                  )}
+                </StatusPill>
+              </div>
             )}
           </div>
         </div>

@@ -833,6 +833,46 @@ pub class Api {
       throw httpError.HttpError.notFound();
     });
 
+    api.post("/wrpc/app.environment.restart", inflight (request) => {
+      let userId = getUserIdFromCookie(request);
+      let input = Json.parse(request.body ?? "");
+
+      let owner = input.get("owner").asStr();
+      let appName = input.get("appName").asStr();
+      let branch = input.get("branch").asStr();
+
+      checkOwnerAccessRights(request, owner);
+
+      let app = apps.getByName(
+        userId: userId,
+        appName: appName,
+      );
+      checkAppAccessRights(userId, app);
+
+      let environment = props.environments.getByBranch(
+        appId: app.appId,
+        branch: branch,
+      );
+
+      environmentsQueue.push(Json.stringify(EnvironmentAction {
+        type: "restart",
+        data: EnvironmentManager.RestartEnvironmentOptions {
+          appId: app.appId,
+          environment: environment,
+          entrypoint: app.entrypoint,
+          sha: environment.sha,
+          timestamp: datetime.utcNow().timestampMs,
+        },
+      }));
+
+      return {
+        body: {
+          appId: app.appId,
+        },
+      };
+    });
+
+
     api.get("/wrpc/app.listSecrets", inflight (request) => {
       let userId = getUserIdFromCookie(request);
       let appId = request.query.get("appId");
@@ -1170,6 +1210,10 @@ pub class Api {
           log("restart all environments event: {event}");
           let restartAllOptions = EnvironmentManager.RestartAllEnvironmentOptions.fromJson(action.data);
           props.environmentManager.restartAll(restartAllOptions);
+        } elif action.type == "restart" {
+          log("restart environment event: {event}");
+          let restartOptions = EnvironmentManager.RestartEnvironmentOptions.fromJson(action.data);
+          props.environmentManager.restart(restartOptions);
         }
       } catch err {
         log("failed to execute environment action {err}");
