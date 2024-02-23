@@ -32,15 +32,10 @@ export const EnvironmentMenu = ({
   return (
     <>
       <Menu
+        btnClassName={clsx(theme.bgInputHover, "rounded-sm")}
         icon={
           <MenuIcon
-            className={clsx(
-              "w-6 h-6",
-              "transition-all",
-              "p-1 rounded-sm",
-              theme.text2,
-              theme.bgInputHover,
-            )}
+            className={clsx("w-6 h-6", "transition-all", "p-1", theme.text2)}
           />
         }
         items={[

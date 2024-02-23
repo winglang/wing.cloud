@@ -61,7 +61,12 @@ export const Menu = ({
       <HeadlessMenu as="div" className="relative inline-block text-left">
         <HeadlessMenu.Button
           ref={setReferenceElement}
-          className={clsx(btnClassName, "flex")}
+          className={clsx(
+            btnClassName,
+            "flex",
+            theme.focusVisible,
+            "items-center",
+          )}
           onClick={(event) => {
             onClick?.(event);
           }}
