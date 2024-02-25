@@ -15,15 +15,7 @@ FROM docker:24.0.6-git
 
 RUN apk update
 RUN apk add bash ip6tables pigz sysstat procps lsof libstdc++
-ENV NODE_PACKAGE_URL https://unofficial-builds.nodejs.org/download/release/v20.11.1/node-v20.11.1-linux-x64-musl.tar.gz
-WORKDIR /opt
-RUN wget $NODE_PACKAGE_URL
-RUN mkdir -p /opt/nodejs
-RUN tar -zxvf *.tar.gz --directory /opt/nodejs --strip-components=1
-RUN rm *.tar.gz
-RUN ln -s /opt/nodejs/bin/node /usr/local/bin/node
-RUN ln -s /opt/nodejs/bin/npm /usr/local/bin/npm
-RUN npm install -g npm@10.4.0
+RUN apk add  --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main/ nodejs=20.11.1-r0 npm
 
 RUN npm i -g pnpm projen winglang@latest
 

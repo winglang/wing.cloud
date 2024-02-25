@@ -28,6 +28,7 @@ bring "./components/dns/dns.w" as Dns;
 bring "./components/public-endpoint/public-endpoint.w" as PublicEndpoint;
 bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
+bring "./google-oauth.w" as google_oauth;
 
 let appSecret = util.env("APP_SECRET");
 let wsSecret = util.env("WS_SECRET");
@@ -207,6 +208,16 @@ let wingCloudApi = new wingcloud_api.Api(
   logs: bucketLogs,
   analytics: analytics,
   segmentWriteKey: segmentWriteKey,
+);
+
+new google_oauth.GoogleOAuth(
+  api: wingCloudApi.api,
+  credentials: {
+    clientId: util.env("GOOGLE_OAUTH_CLIENT_ID"),
+    clientSecret: util.env("GOOGLE_OAUTH_CLIENT_SECRET"),
+  },
+  redirectOrigin: util.env("GOOGLE_OAUTH_REDIRECT_ORIGIN"),
+  analytics: analytics,
 );
 
 let probotApp = new probot.ProbotApp(

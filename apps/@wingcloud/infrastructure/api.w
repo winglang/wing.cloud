@@ -139,8 +139,10 @@ struct EnvironmentAction {
 }
 
 pub class Api {
+  pub api: json_api.JsonApi;
   new(props: ApiProps) {
     let api = new json_api.JsonApi(api: props.api);
+    this.api = api;
     let ws = props.ws;
     let apps = props.apps;
     let users = props.users;
@@ -370,19 +372,22 @@ pub class Api {
     analyticsSignInQueue.setConsumer(inflight (message) => {
       let event = AnalyticsSignInMessage.fromJson(Json.parse(message));
       props.analytics.identify(
-          anonymousId: event.anonymousId,
-          userId: event.userId,
-          traits: {
-            email: event.email,
-            github: event.github,
-          },
-        );
-        props.analytics.track(event.userId, "console_sign_in", {
-          anonymousId: event.anonymousId,
-          userId: event.userId,
+        anonymousId: event.anonymousId,
+        userId: event.userId,
+        traits: {
           email: event.email,
           github: event.github,
-        });
+        },
+      );
+      props.analytics.track(
+        anonymousId: event.anonymousId,
+        userId: event.userId,
+        event: "console_sign_in",
+        properties: {
+          email: event.email,
+          github: event.github,
+        },
+      );
     });
 
     api.get("/wrpc/github.callback", inflight (request) => {
@@ -642,6 +647,7 @@ pub class Api {
 
         let createAppOptions = {
           appName: appName,
+          appFullName: "{user.username}/{appName}",
           description: input.tryGet("description")?.tryAsStr() ?? "",
           repoId: repoId,
           repoName: repoName,
@@ -679,7 +685,6 @@ pub class Api {
 
         return {
           body: {
-            appFullName: "{user.username}/{appName}",
             app: app,
           },
         };

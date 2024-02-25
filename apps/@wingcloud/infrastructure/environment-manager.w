@@ -101,6 +101,7 @@ pub class EnvironmentManager {
   environmentEvents: cloud.Topic;
   endpointEvents: cloud.Topic;
   logs: cloud.Bucket;
+  users: users.Users;
 
   new(props: EnvironmentsProps) {
     this.apps = props.apps;
@@ -112,6 +113,7 @@ pub class EnvironmentManager {
     this.runtimeClient = props.runtimeClient;
     this.probotAdapter = props.probotAdapter;
     this.logs = props.logs;
+    this.users = props.users;
 
     this.environmentEvents = new cloud.Topic() as "environment creation events";
     this.endpointEvents = new cloud.Topic() as "endpoint creation events";
@@ -201,11 +203,15 @@ pub class EnvironmentManager {
       environments.CreateEnvironmentOptions.fromJson(item)
     );
 
-    this.analytics.track(options.owner, "cloud_environment_created", {
-      branch: environment.branch,
-      repo: environment.repo,
-      type: environment.type,
-    });
+    this.analytics.track(
+      event: "cloud_environment_created",
+      userId: options.owner,
+      properties: {
+        branch: environment.branch,
+        repo: environment.repo,
+        type: environment.type,
+      },
+    );
 
     this.mrq.enqueue(
       groupId: environment.id,
@@ -437,6 +443,8 @@ pub class EnvironmentManager {
 
   inflight postComment(props: PostCommentOptions) {
     let environment = this.environments.get(id: props.environmentId);
+    let app = this.apps.get(appId: props.appId);
+
     if let prNumber = environment.prNumber {
       let commentId = this.githubComment.createOrUpdate(
         octokit: props.octokit,
@@ -444,6 +452,7 @@ pub class EnvironmentManager {
         repo: environment.repo,
         appId: props.appId,
         appName: props.appName,
+        appFullName: app.appFullName,
       );
 
       if !environment.commentId? {

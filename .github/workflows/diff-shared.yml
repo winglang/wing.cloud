@@ -21,18 +21,18 @@ jobs:
       url: https://${{ inputs.ENVIRONMENT_NAME }}.wingcloud.io
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
         with:
           version: 8
-      - uses: hashicorp/setup-terraform@v2
+      - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.5.7"
       - name: Get pnpm store directory
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Setup pnpm cache
         with:
           path: ${{ env.STORE_PATH }}
@@ -60,6 +60,9 @@ jobs:
           BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}
           BOT_GITHUB_WEBHOOK_SECRET: ${{ secrets.BOT_GITHUB_WEBHOOK_SECRET }}
           BOT_GITHUB_CALLBACK_ORIGIN: ${{ secrets.BOT_GITHUB_CALLBACK_ORIGIN }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ vars.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REDIRECT_ORIGIN: ${{ vars.GOOGLE_OAUTH_REDIRECT_ORIGIN }}
           TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}
           ## Preflight
           PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
