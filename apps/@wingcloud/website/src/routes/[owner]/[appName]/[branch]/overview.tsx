@@ -1,9 +1,18 @@
-import { useMemo } from "react";
-import { Link, useParams } from "react-router-dom";
+import { CommandLineIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import clsx from "clsx";
+import { useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
-import { wrpc } from "../../../../utils/wrpc.js";
+import { Button } from "../../../../design-system/button.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
+import { STARTING_STATUS, wrpc } from "../../../../utils/wrpc.js";
+import {
+  VALID_REDEPLOY_STATUS,
+  RedeployEnvironmentModal,
+} from "../_components/redeploy-environment-modal.js";
 
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
