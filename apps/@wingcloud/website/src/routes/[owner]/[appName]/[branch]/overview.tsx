@@ -9,7 +9,6 @@ import { Button } from "../../../../design-system/button.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { STARTING_STATUS, wrpc } from "../../../../utils/wrpc.js";
-import { EnvironmentMenu } from "../_components/environment-menu.js";
 import {
   VALID_REDEPLOY_STATUS,
   RedeployEnvironmentModal,
