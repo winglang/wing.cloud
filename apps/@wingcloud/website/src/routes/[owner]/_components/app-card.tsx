@@ -102,13 +102,13 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
                 label: "Logs",
                 icon: <DocumentTextIcon className="size-4" />,
                 disabled: !app.defaultBranch,
-                link: `/${owner}/${app.appName}/${app.defaultBranch}/logs`,
+                link: `/${owner}/${app.appName}/logs/${app.defaultBranch}`,
               },
               {
                 label: "Console",
                 icon: <CommandLineIcon className="size-4" />,
                 disabled: app.status !== "running" || !app.defaultBranch,
-                link: `/${owner}/${app.appName}/${app.defaultBranch}/console`,
+                link: `/${owner}/${app.appName}/console/${app.defaultBranch}`,
               },
 
               {

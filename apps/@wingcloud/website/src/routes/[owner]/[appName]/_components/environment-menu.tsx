@@ -1,13 +1,12 @@
 import { ArrowPathIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 import { CommandLineIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
 
 import { Menu } from "../../../../design-system/menu.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { MenuIcon } from "../../../../icons/menu-icon.js";
-import type { Environment } from "../../../../utils/wrpc.js";
+import { STARTING_STATUS, type Environment } from "../../../../utils/wrpc.js";
 
 import {
   RedeployEnvironmentModal,
@@ -25,7 +24,12 @@ export const EnvironmentMenu = ({
 }) => {
   const { theme } = useTheme();
 
-  const navigate = useNavigate();
+  const redeployLabel = useMemo(() => {
+    if (STARTING_STATUS.includes(environment.status)) {
+      return "Deploying...";
+    }
+    return "Redeploy";
+  }, [environment.status]);
 
   const [showRestartModal, setShowRestartModal] = useState(false);
 
@@ -40,9 +44,17 @@ export const EnvironmentMenu = ({
         }
         items={[
           {
-            icon: <ArrowPathIcon className="size-4" />,
+            icon: (
+              <ArrowPathIcon
+                className={clsx(
+                  "size-4",
+                  STARTING_STATUS.includes(environment.status) &&
+                    "animate-spin",
+                )}
+              />
+            ),
             disabled: !VALID_REDEPLOY_STATUS.includes(environment.status),
-            label: "Redeploy",
+            label: redeployLabel,
             onClick: () => setShowRestartModal(true),
           },
           {
@@ -51,13 +63,13 @@ export const EnvironmentMenu = ({
           {
             icon: <DocumentTextIcon className="size-4" />,
             label: "Logs",
-            link: `/${owner}/${appName}/${environment.branch}/logs`,
+            link: `/${owner}/${appName}/logs/${environment.branch}`,
           },
           {
             label: "Console",
             icon: <CommandLineIcon className="size-4" />,
             disabled: environment.status !== "running",
-            link: `/${owner}/${appName}/${environment.branch}/console`,
+            link: `/${owner}/${appName}/console/${environment.branch}`,
           },
         ]}
       />

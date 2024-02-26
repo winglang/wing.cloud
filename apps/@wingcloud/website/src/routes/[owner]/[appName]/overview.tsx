@@ -9,7 +9,7 @@ import { Input } from "../../../design-system/input.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../icons/github-icon.js";
-import { wrpc, type Environment } from "../../../utils/wrpc.js";
+import { wrpc } from "../../../utils/wrpc.js";
 import { AppIcon } from "../_components/app-icon.js";
 
 import { EnvironmentDetails } from "./[branch]/_components/environment-details.js";
@@ -173,7 +173,9 @@ const OverviewPage = ({
               if (!productionEnvironment?.branch) {
                 return;
               }
-              navigate(`/${owner}/${appName}/${productionEnvironment.branch}`);
+              navigate(
+                `/${owner}/${appName}/environment/${productionEnvironment.branch}`,
+              );
             }}
             actions={
               <>

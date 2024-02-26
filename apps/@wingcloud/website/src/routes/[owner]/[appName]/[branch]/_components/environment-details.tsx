@@ -96,7 +96,7 @@ export const EnvironmentDetails = ({
         />
       )}
       <Link
-        to={`/${owner}/${app?.appName}/${environment?.branch}/console`}
+        to={`/${owner}/${app?.appName}/console/${environment?.branch}`}
         className={clsx(
           theme.focusVisible,
           "rounded border-0 sm:border",

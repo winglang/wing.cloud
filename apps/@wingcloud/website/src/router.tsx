@@ -1,6 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { HttpErrorPage } from "./components/http-error-page.js";
 export const router = (onReady: () => void) => {
   const lazyLoading = async (module: Promise<any>) => {
     return module.then((module) => {
@@ -49,26 +48,26 @@ export const router = (onReady: () => void) => {
           lazy: () => import("./routes/[owner]/[appName]/settings/index.js"),
         },
         {
-          path: "/:owner/:appName/:branch",
+          path: "/:owner/:appName",
           lazy: () =>
             lazyLoading(import("./routes/[owner]/[appName]/[branch]/index.js")),
           children: [
             {
-              path: "/:owner/:appName/:branch",
+              path: "/:owner/:appName/environment/*",
               lazy: () =>
                 lazyLoading(
                   import("./routes/[owner]/[appName]/[branch]/overview.js"),
                 ),
             },
             {
-              path: "/:owner/:appName/:branch/logs",
+              path: "/:owner/:appName/logs/*",
               lazy: () =>
                 lazyLoading(
                   import("./routes/[owner]/[appName]/[branch]/logs.js"),
                 ),
             },
             {
-              path: "/:owner/:appName/:branch/tests",
+              path: "/:owner/:appName/tests/*",
               lazy: () =>
                 lazyLoading(
                   import("./routes/[owner]/[appName]/[branch]/tests-page.js"),
@@ -77,7 +76,7 @@ export const router = (onReady: () => void) => {
           ],
         },
         {
-          path: "/:owner/:appName/:branch/console",
+          path: "/:owner/:appName/console/*",
           lazy: () =>
             lazyLoading(
               import("./routes/[owner]/[appName]/[branch]/console/index.js"),
@@ -87,13 +86,7 @@ export const router = (onReady: () => void) => {
     },
     {
       path: "*",
-      element: (
-        <HttpErrorPage
-          code={404}
-          title="Page not found"
-          message="Sorry, we couldn’t find the page you’re looking for."
-        />
-      ),
+      lazy: () => lazyLoading(import("./routes/not-found.js")),
     },
   ]);
 };
