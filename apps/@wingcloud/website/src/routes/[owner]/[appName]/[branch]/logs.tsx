@@ -1,18 +1,15 @@
+import clsx from "clsx";
 import { useParams } from "react-router-dom";
 
+import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 
 export const RUNTIME_LOGS_ID = "runtime-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 
 import { AppLogs } from "./_components/app-logs.js";
-
-import { PageHeader } from "../../../../components/page-header.js";
-
-import clsx from "clsx";
-
-import { useTheme } from "../../../../design-system/theme-provider.js";
 
 const LogsPage = ({
   owner,
