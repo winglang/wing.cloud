@@ -1,4 +1,5 @@
-import { CommandLineIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { CommandLineIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
