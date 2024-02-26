@@ -44,6 +44,13 @@ export type EnvironmentStatus =
   | "error"
   | "stopped";
 
+export const STARTING_STATUS: EnvironmentStatus[] = [
+  "initializing",
+  "running-server",
+  "running-tests",
+  "deploying",
+];
+
 export interface App {
   appId: string;
   appName: string;
@@ -183,6 +190,10 @@ export const wrpc = createWRPCReact<{
     {
       environment: Environment;
     }
+  >;
+  "app.environment.restart": MutationProcedure<
+    { owner: string; appName: string; branch: string },
+    {}
   >;
   "app.environment.logs": QueryProcedure<
     { owner: string; appName: string; branch: string },

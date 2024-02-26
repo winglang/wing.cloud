@@ -15,6 +15,8 @@ import { GithubIcon } from "../../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../../utils/time.js";
 import type { Environment } from "../../../../utils/wrpc.js";
 
+import { EnvironmentMenu } from "./environment-menu.js";
+
 type ErrorStatus = "failed" | "passed";
 
 const getTestStatus = (environment: Environment): ErrorStatus | undefined => {
@@ -52,7 +54,7 @@ export const EnvironmentsListItem = ({
     return getTestStatus(environment);
   }, [environment]);
 
-  const linkEnabled = useMemo(() => {
+  const environmentRunning = useMemo(() => {
     return environment?.url != "" && status === "running";
   }, [environment, status]);
 
@@ -73,7 +75,7 @@ export const EnvironmentsListItem = ({
         className={clsx("absolute inset-0 rounded-md z-0", theme.focusVisible)}
         to={`/${owner}/${appName}/environment/${environment.branch}`}
       />
-      <div className="flex items-center justify-center gap-x-4">
+      <div className="flex grow items-center justify-center gap-x-4">
         <div className="relative rounded-full p-2 bg-gray-50">
           <BranchIcon className={clsx("w-6 h-6", theme.text2, "shrink-0")} />
           <StatusDot status={status} />
@@ -155,34 +157,30 @@ export const EnvironmentsListItem = ({
             </div>
           </div>
 
-          <div className="flex gap-x-4 text-xs items-center justify-end">
-            {linkEnabled && (
-              <Link
-                to={`/${owner}/${appName}/console/${environment.branch}`}
-                className={clsx(
-                  "text-xs",
-                  theme.text1,
-                  theme.text1Hover,
-                  "focus:underline outline-none",
-                  "hover:underline z-10 cursor-pointer",
-                )}
-              >
-                Visit Console
-              </Link>
-            )}
-            {!linkEnabled && (
-              <StatusPill status={status}>
-                {status === "error" && (
-                  <Link
-                    to={`/${owner}/${appName}/logs/${environment.branch}`}
-                    className="hover:underline z-10"
-                  >
-                    {status}
-                  </Link>
-                )}
-              </StatusPill>
+          <div className="flex gap-x-2 text-xs items-center justify-end">
+            {!environmentRunning && (
+              <div className="flex items-center gap-x-1">
+                <StatusPill status={status}>
+                  {status === "error" && (
+                    <Link
+                      to={`/${owner}/${appName}/logs/${environment.branch}`}
+                      className="hover:underline z-10"
+                    >
+                      {status}
+                    </Link>
+                  )}
+                </StatusPill>
+              </div>
             )}
           </div>
+        </div>
+
+        <div className="relative z-20 -ml-2">
+          <EnvironmentMenu
+            owner={owner}
+            appName={appName}
+            environment={environment}
+          />
         </div>
       </div>
     </div>

@@ -1,11 +1,8 @@
-import clsx from "clsx";
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
-import { useTheme } from "../../../../design-system/theme-provider.js";
-import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 
 import { Endpoints } from "./_components/endpoints.js";
@@ -21,6 +18,7 @@ const Overview = ({
   branch: string;
 }) => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
 
   const getAppQuery = wrpc["app.getByName"].useQuery(
     {
@@ -62,12 +60,45 @@ const Overview = ({
     });
   }, [endpointsQuery.data]);
 
+  const [showRestartModal, setShowRestartModal] = useState(false);
+
+  const deploying = useMemo(() => {
+    if (!environment?.status) {
+      return false;
+    }
+
+    return STARTING_STATUS.includes(environment.status);
+  }, [environment?.status]);
+
   return (
     <>
       <PageHeader
         icon={<BranchIcon className="size-full" />}
         title={branch!}
         noBackground
+        actions={
+          <>
+            <Button
+              disabled={environment?.status !== "running"}
+              icon={CommandLineIcon}
+              onClick={() => {
+                navigate(`/${owner}/${appName}/${environment?.branch}/console`);
+              }}
+            >
+              Console
+            </Button>
+            <Button
+              disabled={!VALID_REDEPLOY_STATUS.includes(environment?.status!)}
+              icon={ArrowPathIcon}
+              iconClassName={clsx(deploying && "animate-spin")}
+              onClick={() => {
+                setShowRestartModal(true);
+              }}
+            >
+              {deploying ? "Deploying..." : "Redeploy"}
+            </Button>
+          </>
+        }
       />
       <div
         className={clsx(
@@ -86,7 +117,7 @@ const Overview = ({
             environment={environment}
             actions={
               <Link
-                to={`/${owner}/${appName}/console/${environment?.branch}`}
+                to={`/${owner}/${appName}/${environment?.branch}/console`}
                 onClick={(e) => {
                   if (environment?.status !== "running") {
                     e.preventDefault();
@@ -119,6 +150,15 @@ const Overview = ({
           />
         </div>
       </div>
+      <RedeployEnvironmentModal
+        owner={owner}
+        appName={appName}
+        branch={branch}
+        show={showRestartModal}
+        onClose={() => {
+          setShowRestartModal(false);
+        }}
+      />
     </>
   );
 };

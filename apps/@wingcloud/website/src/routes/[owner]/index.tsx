@@ -25,7 +25,7 @@ export const Component = () => {
         <div className="overflow-auto">
           <div
             className={clsx(
-              "py-4 sm:py-8",
+              "py-4 sm:py-6",
               "relative transition-all",
               theme.pageMaxWidth,
               theme.pagePadding,
