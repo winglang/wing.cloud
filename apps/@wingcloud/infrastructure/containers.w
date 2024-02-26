@@ -176,7 +176,7 @@ pub class Container_sim {
       Container_sim.shell("docker", ["kill", "--signal=2", containerName]);
       this.table.delete(containerName);
     } catch err {
-      log("stopContainer: {err}");
+      log("stopContainer (kill): {err}");
     }
 
     try {
