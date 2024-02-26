@@ -125,6 +125,5 @@ const Overview = ({
 
 export const Component = () => {
   const { owner, appName, "*": branch } = useParams();
-  console.log(useParams());
   return <Overview owner={owner!} appName={appName!} branch={branch!} />;
 };
