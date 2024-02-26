@@ -1,6 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { HttpErrorPage } from "./components/http-error-page.js";
 export const router = (onReady: () => void) => {
   const lazyLoading = async (module: Promise<any>) => {
     return module.then((module) => {
@@ -87,13 +86,7 @@ export const router = (onReady: () => void) => {
     },
     {
       path: "*",
-      element: (
-        <HttpErrorPage
-          code={404}
-          title="Page not found"
-          message="Sorry, we couldn’t find the page you’re looking for."
-        />
-      ),
+      lazy: () => lazyLoading(import("./routes/not-found.js")),
     },
   ]);
 };
