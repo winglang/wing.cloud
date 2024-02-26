@@ -36,7 +36,8 @@ struct GetUserInfoResponse {
   hd: str;
 }
 
-struct QueueMessage {
+// Wing confuses this `QueueMessage` with `environment-manager.w`'s `QueueMessage`!!
+struct GoogleOAuthQueueMessage {
   code: str;
   anonymousId: str;
 }
@@ -110,7 +111,7 @@ pub class GoogleOAuth {
 
     let queue = new cloud.Queue();
     queue.setConsumer(inflight (message) => {
-      let event = QueueMessage.parseJson(message);
+      let event = GoogleOAuthQueueMessage.parseJson(message);
 
       let token = Util.getToken(
         clientID: props.credentials.clientId,
@@ -146,7 +147,7 @@ pub class GoogleOAuth {
       let port = state.getAt(0).asStr();
       let anonymousId = state.getAt(1).asStr();
 
-      queue.push(Json.stringify(QueueMessage {
+      queue.push(Json.stringify(GoogleOAuthQueueMessage {
         code: code,
         anonymousId: anonymousId,
       }));
