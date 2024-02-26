@@ -2,15 +2,12 @@ import clsx from "clsx";
 
 import { useTheme } from "../design-system/theme-provider.js";
 
-import { Tabs, type Tab } from "./tabs.js";
-
 export interface PageHeaderProps {
   title?: string;
   description?: string | React.ReactNode;
   icon?: React.ReactNode;
   actions?: React.ReactNode;
   noBackground?: boolean;
-  tabs?: Tab[];
 }
 
 export const PageHeader = ({
@@ -19,7 +16,6 @@ export const PageHeader = ({
   icon,
   actions,
   noBackground = false,
-  tabs,
 }: PageHeaderProps) => {
   const { theme } = useTheme();
   return (
@@ -28,15 +24,15 @@ export const PageHeader = ({
     >
       <div
         className={clsx(
-          "overflow-auto pt-4 sm:pt-8 flex",
-          !tabs && "pb-4",
+          "overflow-auto py-4 sm:py-6 flex",
           "transition-all",
           theme.pageMaxWidth,
           theme.pagePadding,
+          "gap-2",
         )}
       >
         <div className="space-y-1 flex-grow items-center truncate">
-          <div className="flex gap-x-3 items-center truncate">
+          <div className="flex gap-x-2 sm:gap-x-3 items-center truncate">
             {icon && (
               <div
                 className={clsx(
@@ -52,7 +48,7 @@ export const PageHeader = ({
               <div
                 className={clsx(
                   "text-2xl font-semibold truncate",
-                  "leading-7 py-0.5",
+                  "leading-7 py-[1px]",
                   theme.text1,
                 )}
               >
@@ -65,18 +61,8 @@ export const PageHeader = ({
               {description}
             </div>
           )}
-          {tabs && (
-            <div className="pt-3">
-              <Tabs tabs={tabs} />
-            </div>
-          )}
         </div>
-        <div
-          className={clsx(
-            "flex justify-end items-end gap-x-2",
-            tabs && "pb-4 md:pb-8",
-          )}
-        >
+        <div className="flex justify-end items-end gap-x-1 sm:gap-x-2">
           {actions}
         </div>
       </div>

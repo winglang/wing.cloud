@@ -1,23 +1,21 @@
-import {
-  MagnifyingGlassCircleIcon,
-  ArrowRightIcon,
-} from "@heroicons/react/24/outline";
+import { MagnifyingGlassCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { PageHeader } from "../../../components/page-header.js";
 import { SectionTitle } from "../../../components/section-title.js";
 import { Input } from "../../../design-system/input.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
-import { wrpc } from "../../../utils/wrpc.js";
+import { BranchIcon } from "../../../icons/branch-icon.js";
+import { GithubIcon } from "../../../icons/github-icon.js";
+import { wrpc, type Environment } from "../../../utils/wrpc.js";
+import { AppIcon } from "../_components/app-icon.js";
 
 import { EnvironmentDetails } from "./[branch]/_components/environment-details.js";
+import { EnvironmentMenu } from "./_components/environment-menu.js";
 import { EnvironmentsListItemSkeleton } from "./_components/environments-list-item-skeleton.js";
 import { EnvironmentsListItem } from "./_components/environments-list-item.js";
-import { BranchIcon } from "../../../icons/branch-icon.js";
-import { PageHeader } from "../../../components/page-header.js";
-import { GithubIcon } from "../../../icons/github-icon.js";
-import { AppIcon } from "../_components/app-icon.js";
 
 const OverviewPage = ({
   owner,
@@ -179,17 +177,12 @@ const OverviewPage = ({
             }}
             actions={
               <>
-                {productionEnvironment && (
-                  <div
-                    className={clsx(
-                      "transition-all",
-                      "rounded-full p-1.5",
-                      "sm:opacity-0 group-hover:opacity-100",
-                      "sm:-translate-y-2 group-hover:translate-y-0 pointer-events-none",
-                    )}
-                  >
-                    <ArrowRightIcon className="w-4 h-4" />
-                  </div>
+                {productionEnvironment && app?.appName && (
+                  <EnvironmentMenu
+                    owner={owner}
+                    appName={app?.appName}
+                    environment={productionEnvironment}
+                  />
                 )}
               </>
             }

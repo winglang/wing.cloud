@@ -1,7 +1,7 @@
 import { BoltIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import { StatusWithDot } from "../../../../../components/status-with-dot.js";
 import Popover from "../../../../../design-system/popover.js";
@@ -13,6 +13,8 @@ import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js
 import { useStatus } from "../../../../../utils/status.js";
 import { getDateTime } from "../../../../../utils/time.js";
 import type { App, Endpoint, Environment } from "../../../../../utils/wrpc.js";
+import { EnvironmentMenu } from "../../_components/environment-menu.js";
+import { RedeployEnvironmentModal } from "../../_components/redeploy-environment-modal.js";
 
 export interface EvironmentDetailsProps {
   loading?: boolean;
@@ -67,6 +69,8 @@ export const EnvironmentDetails = ({
   }, [endpoints]);
 
   const { statusString } = useStatus(environment?.status);
+
+  const [showRestartModal, setShowRestartModal] = useState(false);
 
   return (
     <div
@@ -129,7 +133,9 @@ export const EnvironmentDetails = ({
           {!environment && (
             <SkeletonLoader className="h-5 w-28 max-w-full" loading />
           )}
-          {environment && <StatusWithDot status={environment.status} />}
+          <div className="flex gap-x-1 items-center">
+            {environment && <StatusWithDot status={environment.status} />}
+          </div>
         </div>
 
         <div className="flex col-span-4 flex-col gap-1">
@@ -297,6 +303,16 @@ export const EnvironmentDetails = ({
               )}
             </div>
           </div>
+        )}
+
+        {app && environment && (
+          <RedeployEnvironmentModal
+            owner={owner}
+            appName={app.appName}
+            branch={environment.branch}
+            show={showRestartModal}
+            onClose={setShowRestartModal}
+          />
         )}
       </div>
     </div>

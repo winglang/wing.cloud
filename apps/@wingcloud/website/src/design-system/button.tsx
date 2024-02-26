@@ -15,6 +15,7 @@ interface ButtonProps {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   className?: string;
+  iconClassName?: string;
   icon?: ForwardRefExoticComponent<any>;
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
   small?: boolean;
@@ -34,6 +35,7 @@ export const Button = forwardRef<
       label,
       type = "button",
       className,
+      iconClassName,
       onClick,
       icon: Icon,
       children,
@@ -70,8 +72,8 @@ export const Button = forwardRef<
             [theme.borderInput]: !primary,
             "border-sky-700": primary,
             "px-2.5": label || children,
-            "py-2": !small,
-            "py-1.5": small,
+            "py-1.5": !small,
+            "py-1": small,
             "cursor-not-allowed opacity-50": disabled,
           },
           className,
@@ -80,7 +82,16 @@ export const Button = forwardRef<
         disabled={disabled}
         onClick={onClick}
       >
-        {Icon && <Icon className={clsx(label && "-ml-0.5", "h-4 w-4")} />}
+        {Icon && (
+          <Icon
+            className={clsx(
+              label && "-ml-0.5",
+              "size-4",
+              theme.text3,
+              iconClassName,
+            )}
+          />
+        )}
         {label}
         {children}
       </button>

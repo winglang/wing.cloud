@@ -1,13 +1,26 @@
 import { Menu as HeadlessMenu, Transition } from "@headlessui/react";
+import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { Fragment, type MouseEvent, type PropsWithChildren } from "react";
+import {
+  Fragment,
+  useEffect,
+  useState,
+  type MouseEvent,
+  type PropsWithChildren,
+} from "react";
+import { createPortal } from "react-dom";
+import { usePopper } from "react-popper";
+import { Link } from "react-router-dom";
 
 import { useTheme } from "./theme-provider.js";
 
 interface Item {
+  icon?: React.ReactNode;
   label?: string;
   onClick?: (event: MouseEvent) => void;
+  link?: string;
   disabled?: boolean;
+  type?: "button" | "separator";
 }
 
 export interface MenuProps {
@@ -27,69 +40,134 @@ export const Menu = ({
   children,
 }: PropsWithChildren<MenuProps>) => {
   const { theme } = useTheme();
+
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(
+    // eslint-disable-next-line unicorn/no-null
+    null,
+  );
+  const [popperElement, setPopperElement] = useState<HTMLElement | null>(
+    // eslint-disable-next-line unicorn/no-null
+    null,
+  );
+  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    strategy: "fixed",
+  });
+
+  const [root] = useState(() => document.createElement("div"));
+  useEffect(() => {
+    document.body.append(root);
+    return () => root.remove();
+  }, [root]);
+
   return (
     <div className="relative items-center flex">
       <HeadlessMenu as="div" className="relative inline-block text-left">
-        <div>
-          <HeadlessMenu.Button
-            className={clsx(
-              btnClassName,
-              theme.text1,
-              theme.focusVisible,
-              theme.bgInputHover,
-              "flex items-center text-sm gap-x-2",
-              "font-semibold",
-            )}
-            onClick={(event) => {
-              onClick?.(event);
-            }}
-          >
-            {title && <div className="pl-2">{title}</div>}
-            {icon}
-          </HeadlessMenu.Button>
-        </div>
-        <Transition
-          as={Fragment}
-          enter="transition ease-out duration-100"
-          enterFrom="transform opacity-0 scale-95"
-          enterTo="transform opacity-100 scale-100"
-          leave="transition ease-in duration-75"
-          leaveFrom="transform opacity-100 scale-100"
-          leaveTo="transform opacity-0 scale-95"
+        <HeadlessMenu.Button
+          ref={setReferenceElement}
+          className={clsx(
+            btnClassName,
+            "flex",
+            theme.focusVisible,
+            "items-center",
+          )}
+          onClick={(event) => {
+            onClick?.(event);
+          }}
         >
-          <HeadlessMenu.Items
-            className={clsx(
-              "absolute right-0 mt-2 w-56 origin-top-right",
-              "rounded-md shadow-lg z-20 border",
-              "divide-y divide-slate-100 dark:divide-slate-700",
-              theme.bgInput,
-              theme.borderInput,
-              theme.focusVisible,
-            )}
+          {title && <div className="pl-2">{title}</div>}
+          {icon}
+        </HeadlessMenu.Button>
+
+        {createPortal(
+          <Transition
+            as={Fragment}
+            leave="transition ease-in duration-100"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            {children}
-            <div className="p-1">
-              {items.map((item) => (
-                <HeadlessMenu.Item key={item.label}>
-                  {({ active }) => (
-                    <button
-                      disabled={item.disabled}
-                      key={item.label}
-                      onClick={item.onClick}
-                      className={clsx(
-                        active && theme.bg3,
-                        "group flex w-full items-center rounded px-2 py-2 text-sm",
-                        theme.textInput,
+            <div
+              ref={setPopperElement}
+              className="z-50"
+              style={styles["popper"]}
+              {...attributes["popper"]}
+            >
+              <HeadlessMenu.Items
+                className={clsx(
+                  "absolute right-0 mt-2 w-56 origin-top-right",
+                  "rounded shadow-lg z-20 border",
+                  "divide-y divide-gray-100 dark:divide-gray-700",
+                  theme.bgInput,
+                  theme.borderInput,
+                  theme.focusVisible,
+                )}
+              >
+                {children}
+                <div className="p-1">
+                  {items.map((item, index) => (
+                    <HeadlessMenu.Item key={item.label || index}>
+                      {({ active }) => (
+                        <div className="flex items-center">
+                          {item.link && (
+                            <Link
+                              key={item.label}
+                              to={item.link}
+                              aria-disabled={item.disabled}
+                              onClick={(event) => {
+                                if (item.disabled) {
+                                  event.preventDefault();
+                                }
+                              }}
+                              className={clsx(
+                                active && theme.bg3,
+                                "grow",
+                                "group flex w-full items-center rounded px-2 py-2 text-sm",
+                                theme.textInput,
+                                "flex gap-x-3",
+                              )}
+                            >
+                              {item.icon && (
+                                <span className={clsx(theme.text3)}>
+                                  {item.icon}
+                                </span>
+                              )}
+                              <div className="flex grow">{item.label}</div>
+                            </Link>
+                          )}
+                          {item.type !== "separator" && !item.link && (
+                            <button
+                              key={item.label}
+                              disabled={item.disabled}
+                              onClick={item.onClick}
+                              className={clsx(
+                                active && theme.bg3,
+                                "group flex w-full items-center rounded px-2 py-2 text-sm",
+                                theme.textInput,
+                                "flex gap-x-3",
+                                item.disabled &&
+                                  "cursor-not-allowed opacity-50",
+                              )}
+                            >
+                              {item.icon && (
+                                <span className={clsx(theme.text3)}>
+                                  {item.icon}
+                                </span>
+                              )}
+                              <div className="flex grow">{item.label}</div>
+                            </button>
+                          )}
+                          {item.type === "separator" && (
+                            <div className="h-[1px] bg-gray-100 my-0.5 w-full " />
+                          )}
+                        </div>
                       )}
-                    >
-                      {item.label}
-                    </button>
-                  )}
-                </HeadlessMenu.Item>
-              ))}
+                    </HeadlessMenu.Item>
+                  ))}
+                </div>
+              </HeadlessMenu.Items>
             </div>
-          </HeadlessMenu.Items>
-        </Transition>
+          </Transition>,
+          root,
+        )}
       </HeadlessMenu>
     </div>
   );

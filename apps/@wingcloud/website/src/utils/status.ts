@@ -8,15 +8,19 @@ export const useStatus = (status?: EnvironmentStatus) => {
       case "initializing":
       case "running-server":
       case "running-tests":
-      case "deploying":
+      case "deploying": {
         return "yellow";
-      case "running":
+      }
+      case "running": {
         return "green";
+      }
       case "error":
-      case "tests-error":
+      case "tests-error": {
         return "red";
-      case "stopped":
+      }
+      case "stopped": {
         return "gray";
+      }
     }
   }, [status]) as "yellow" | "green" | "red" | "gray";
 

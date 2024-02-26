@@ -13,6 +13,7 @@ export interface ConfirmationModalProps {
   modalBody: React.ReactNode;
   confirmButtonText?: string;
   confirmButtonTextPending?: string;
+  type?: "danger" | "warning";
 }
 const defaultConfirmButtonText = "Confirm";
 const defaultConfirmButtonTextPending = "Loading...";
@@ -26,6 +27,7 @@ export const ConfirmationModal = ({
   modalBody,
   confirmButtonText = defaultConfirmButtonText,
   confirmButtonTextPending = defaultConfirmButtonTextPending,
+  type = "danger",
 }: ConfirmationModalProps) => {
   return (
     <Modal
@@ -37,9 +39,19 @@ export const ConfirmationModal = ({
       }}
     >
       <div className="sm:flex sm:items-start">
-        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+        <div
+          className={clsx(
+            "mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10",
+            type === "danger" && "bg-red-100",
+            type === "warning" && "bg-yellow-100",
+          )}
+        >
           <ExclamationTriangleIcon
-            className="h-6 w-6 text-red-600"
+            className={clsx(
+              "h-6 w-6",
+              type === "danger" && "text-red-600",
+              type === "warning" && "text-yellow-600",
+            )}
             aria-hidden="true"
           />
         </div>
@@ -57,7 +69,13 @@ export const ConfirmationModal = ({
         <button
           type="button"
           className={clsx(
-            "inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto",
+            "inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm sm:ml-3 sm:w-auto",
+            type === "danger" && "bg-red-600 hover:bg-red-500 text-white",
+            type === "warning" && [
+              "text-white",
+              "bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600",
+              "border-sky-700",
+            ],
             {
               "opacity-50 cursor-not-allowed": isPending,
             },

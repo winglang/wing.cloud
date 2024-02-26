@@ -1,7 +1,10 @@
+import { Cog8ToothIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import { PageHeader } from "../../../../components/page-header.js";
+import { SectionTitle } from "../../../../components/section-title.js";
 import { SpinnerLoader } from "../../../../components/spinner-loader.js";
 import { Button } from "../../../../design-system/button.js";
 import { useNotifications } from "../../../../design-system/notification.js";
@@ -11,8 +14,6 @@ import { DeleteModal } from "../_components/delete-modal.js";
 
 import { SecretsList } from "./_components/secrets-list.js";
 import { Entrypoints } from "./entrypoints.js";
-import { PageHeader } from "../../../../components/page-header.js";
-import { SectionTitle } from "../../../../components/section-title.js";
 
 const SettingsPage = ({
   owner,
@@ -44,7 +45,11 @@ const SettingsPage = ({
 
   return (
     <>
-      <PageHeader title="Settings" noBackground />
+      <PageHeader
+        title="Settings"
+        noBackground
+        icon={<Cog8ToothIcon className="size-full" />}
+      />
 
       <div
         className={clsx(
@@ -82,7 +87,6 @@ const SettingsPage = ({
             <div className="flex">
               <Button
                 onClick={() => setDeleteModalOpen(true)}
-                small
                 disabled={isLoading}
                 className="truncate"
               >
