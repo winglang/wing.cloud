@@ -171,9 +171,16 @@ pub class Container_sim {
   inflight stopContainer(containerName: str) {
     // seng SIGINT and remove container
     log("stopping container {containerName}");
+
     try {
-      Container_sim.shell("docker", ["rm", "-f", containerName]);
+      Container_sim.shell("docker", ["kill", "--signal=2", containerName]);
       this.table.delete(containerName);
+    } catch err {
+      log("stopContainer: {err}");
+    }
+
+    try {
+     Container_sim.shell("docker", ["rm", "-f", containerName]);
     } catch err {
       log("stopContainer: {err}");
     }
