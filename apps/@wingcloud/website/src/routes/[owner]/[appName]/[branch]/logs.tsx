@@ -7,8 +7,11 @@ export const RUNTIME_LOGS_ID = "runtime-logs";
 export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 
 import { AppLogs } from "./_components/app-logs.js";
+
 import { PageHeader } from "../../../../components/page-header.js";
+
 import clsx from "clsx";
+
 import { useTheme } from "../../../../design-system/theme-provider.js";
 
 const LogsPage = ({
@@ -69,6 +72,6 @@ const LogsPage = ({
 };
 
 export const Component = () => {
-  const { owner, appName, branch } = useParams();
+  const { owner, appName, "*": branch } = useParams();
   return <LogsPage owner={owner!} appName={appName!} branch={branch!} />;
 };

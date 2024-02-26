@@ -1,15 +1,15 @@
+import clsx from "clsx";
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 
 import { Endpoints } from "./_components/endpoints.js";
 import { EnvironmentDetails } from "./_components/environment-details.js";
-import clsx from "clsx";
-import { useTheme } from "../../../../design-system/theme-provider.js";
-import { PageHeader } from "../../../../components/page-header.js";
-import { BranchIcon } from "../../../../icons/branch-icon.js";
 
 const Overview = ({
   owner,
@@ -86,7 +86,7 @@ const Overview = ({
             environment={environment}
             actions={
               <Link
-                to={`/${owner}/${appName}/${environment?.branch}/console`}
+                to={`/${owner}/${appName}/console/${environment?.branch}`}
                 onClick={(e) => {
                   if (environment?.status !== "running") {
                     e.preventDefault();
@@ -124,6 +124,7 @@ const Overview = ({
 };
 
 export const Component = () => {
-  const { owner, appName, branch } = useParams();
+  const { owner, appName, "*": branch } = useParams();
+  console.log(useParams());
   return <Overview owner={owner!} appName={appName!} branch={branch!} />;
 };

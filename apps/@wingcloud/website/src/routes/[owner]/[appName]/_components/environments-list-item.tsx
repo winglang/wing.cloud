@@ -10,12 +10,12 @@ import { Link } from "react-router-dom";
 import { StatusDot } from "../../../../components/status-dot.js";
 import { StatusPill } from "../../../../components/status-pill.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../../icons/github-icon.js";
 import { useTimeAgo } from "../../../../utils/time.js";
 import type { Environment } from "../../../../utils/wrpc.js";
 import { DEPLOYMENT_LOGS_ID } from "../[branch]/logs.js";
 import { TEST_LOGS_ID } from "../[branch]/tests-page.js";
-import { BranchIcon } from "../../../../icons/branch-icon.js";
 
 type ErrorStatus = "failed" | "passed";
 
@@ -73,7 +73,7 @@ export const EnvironmentsListItem = ({
     >
       <Link
         className={clsx("absolute inset-0 rounded-md z-0", theme.focusVisible)}
-        to={`/${owner}/${appName}/${environment.branch}`}
+        to={`/${owner}/${appName}/environment/${environment.branch}`}
       />
       <div className="flex items-center justify-center gap-x-4">
         <div className="relative rounded-full p-2 bg-gray-50">
@@ -84,7 +84,7 @@ export const EnvironmentsListItem = ({
         <div className="flex gap-x-2 justify-between items-center truncate grow">
           <div className="text-xs space-y-1 truncate">
             <Link
-              to={`/${owner}/${appName}/${environment.branch}`}
+              to={`/${owner}/${appName}/environment/${environment.branch}`}
               className={clsx(
                 "font-medium truncate relative",
                 theme.text1,
@@ -131,7 +131,7 @@ export const EnvironmentsListItem = ({
               {testStatus && (
                 <div>
                   <Link
-                    to={`/${owner}/${appName}/${environment.branch}/#${TEST_LOGS_ID}`}
+                    to={`/${owner}/${appName}/tests/${environment.branch}`}
                     className={clsx(
                       "flex items-center gap-x-0.5",
                       "rounded-xl px-1 py-0.5",
@@ -160,7 +160,7 @@ export const EnvironmentsListItem = ({
           <div className="flex gap-x-4 text-xs items-center justify-end">
             {linkEnabled && (
               <Link
-                to={`/${owner}/${appName}/${environment.branch}/console`}
+                to={`/${owner}/${appName}/console/${environment.branch}`}
                 className={clsx(
                   "text-xs",
                   theme.text1,
@@ -176,7 +176,7 @@ export const EnvironmentsListItem = ({
               <StatusPill status={status}>
                 {status === "error" && (
                   <Link
-                    to={`/${owner}/${appName}/${environment.branch}/#${DEPLOYMENT_LOGS_ID}`}
+                    to={`/${owner}/${appName}/logs/${environment.branch}`}
                     className="hover:underline z-10"
                   >
                     {status}
