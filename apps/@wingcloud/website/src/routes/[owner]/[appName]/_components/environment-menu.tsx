@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Menu } from "../../../../design-system/menu.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { MenuIcon } from "../../../../icons/menu-icon.js";
-import type { Environment } from "../../../../utils/wrpc.js";
+import { STARTING_STATUS, type Environment } from "../../../../utils/wrpc.js";
 
 import {
   RedeployEnvironmentModal,
@@ -40,9 +40,19 @@ export const EnvironmentMenu = ({
         }
         items={[
           {
-            icon: <ArrowPathIcon className="size-4" />,
+            icon: (
+              <ArrowPathIcon
+                className={clsx(
+                  "size-4",
+                  STARTING_STATUS.includes(environment.status) &&
+                    "animate-spin",
+                )}
+              />
+            ),
             disabled: !VALID_REDEPLOY_STATUS.includes(environment.status),
-            label: "Redeploy",
+            label: STARTING_STATUS.includes(environment.status)
+              ? "Deploying..."
+              : "Redeploy",
             onClick: () => setShowRestartModal(true),
           },
           {

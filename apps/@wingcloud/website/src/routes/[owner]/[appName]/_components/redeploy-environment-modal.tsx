@@ -19,8 +19,6 @@ export const VALID_REDEPLOY_STATUS: EnvironmentStatus[] = [
   "stopped",
 ];
 
-// create a new list
-
 export const RedeployEnvironmentModal = ({
   owner,
   appName,
