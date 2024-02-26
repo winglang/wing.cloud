@@ -9,6 +9,7 @@ import { Button } from "../../../../design-system/button.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { STARTING_STATUS, wrpc } from "../../../../utils/wrpc.js";
+import { EnvironmentMenu } from "../_components/environment-menu.js";
 import {
   VALID_REDEPLOY_STATUS,
   RedeployEnvironmentModal,
@@ -124,30 +125,6 @@ const Overview = ({
             app={app}
             loading={environmentQuery.isLoading}
             environment={environment}
-            actions={
-              <Link
-                to={`/${owner}/${appName}/console/${environment?.branch}`}
-                onClick={(e) => {
-                  if (environment?.status !== "running") {
-                    e.preventDefault();
-                  }
-                }}
-                className={clsx(
-                  "z-10",
-                  "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
-                  "px-2.5 py-2 border shadow-sm",
-                  theme.borderInput,
-                  theme.focusVisible,
-                  theme.bgInput,
-                  theme.bgInputHover,
-                  theme.textInput,
-                  environment?.status !== "running" &&
-                    "cursor-not-allowed opacity-50",
-                )}
-              >
-                Console
-              </Link>
-            }
           />
         </div>
         <div className="space-y-2">
