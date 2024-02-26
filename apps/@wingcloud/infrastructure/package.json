@@ -47,7 +47,7 @@
     "punycode": "^2.3.1",
     "semver": "^7.6.0",
     "table": "^6.8.1",
-    "winglang": "^0.57.27",
+    "winglang": "^0.59.6",
     "yaml": "^2.3.4"
   },
   "devDependencies": {
