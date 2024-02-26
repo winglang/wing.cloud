@@ -182,7 +182,7 @@ pub class Container_sim {
     try {
      Container_sim.shell("docker", ["rm", "-f", containerName]);
     } catch err {
-      log("stopContainer: {err}");
+      log("stopContainer (rm): {err}");
     }
   }
 
