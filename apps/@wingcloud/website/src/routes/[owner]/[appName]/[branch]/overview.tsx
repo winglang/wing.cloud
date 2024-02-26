@@ -91,7 +91,7 @@ const Overview = ({
               disabled={environment?.status !== "running"}
               icon={CommandLineIcon}
               onClick={() => {
-                navigate(`/${owner}/${appName}/${environment?.branch}/console`);
+                navigate(`/${owner}/${appName}/console/${environment?.branch}`);
               }}
             >
               Console
@@ -126,7 +126,7 @@ const Overview = ({
             environment={environment}
             actions={
               <Link
-                to={`/${owner}/${appName}/${environment?.branch}/console`}
+                to={`/${owner}/${appName}/console/${environment?.branch}`}
                 onClick={(e) => {
                   if (environment?.status !== "running") {
                     e.preventDefault();
