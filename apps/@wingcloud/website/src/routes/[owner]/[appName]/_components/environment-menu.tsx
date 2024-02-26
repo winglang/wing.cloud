@@ -1,8 +1,7 @@
 import { ArrowPathIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 import { CommandLineIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMemo, useState } from "react";
 
 import { Menu } from "../../../../design-system/menu.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
@@ -25,7 +24,12 @@ export const EnvironmentMenu = ({
 }) => {
   const { theme } = useTheme();
 
-  const navigate = useNavigate();
+  const redeployLabel = useMemo(() => {
+    if (STARTING_STATUS.includes(environment.status)) {
+      return "Deploying...";
+    }
+    return "Redeploy";
+  }, [environment.status]);
 
   const [showRestartModal, setShowRestartModal] = useState(false);
 
@@ -50,9 +54,7 @@ export const EnvironmentMenu = ({
               />
             ),
             disabled: !VALID_REDEPLOY_STATUS.includes(environment.status),
-            label: STARTING_STATUS.includes(environment.status)
-              ? "Deploying..."
-              : "Redeploy",
+            label: redeployLabel,
             onClick: () => setShowRestartModal(true),
           },
           {
