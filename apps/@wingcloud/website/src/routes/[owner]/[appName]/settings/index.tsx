@@ -111,7 +111,7 @@ const SettingsPage = ({
 };
 
 export const Component = () => {
-  const { owner, appName, "*": branch } = useParams();
+  const { owner, appName } = useParams();
 
   return <SettingsPage owner={owner!} appName={appName!} />;
 };
