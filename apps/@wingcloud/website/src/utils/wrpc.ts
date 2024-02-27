@@ -191,6 +191,10 @@ export const wrpc = createWRPCReact<{
       environment: Environment;
     }
   >;
+  "app.environment.restartAll": MutationProcedure<
+    { owner: string; appName: string },
+    {}
+  >;
   "app.environment.restart": MutationProcedure<
     { owner: string; appName: string; branch: string },
     {}
@@ -226,7 +230,7 @@ export const wrpc = createWRPCReact<{
       name: string;
       value: string;
     },
-    {}
+    { secret: Secret }
   >;
   "app.deleteSecret": MutationProcedure<
     { appId: string; environmentType: string; secretId: string },

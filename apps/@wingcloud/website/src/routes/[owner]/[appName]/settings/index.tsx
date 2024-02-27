@@ -1,13 +1,12 @@
 import { Cog8ToothIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
 import { SpinnerLoader } from "../../../../components/spinner-loader.js";
 import { Button } from "../../../../design-system/button.js";
-import { useNotifications } from "../../../../design-system/notification.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 import { DeleteModal } from "../_components/delete-modal.js";
@@ -35,6 +34,7 @@ const SettingsPage = ({
       enabled: !!owner && !!appName,
     },
   );
+
   const app = useMemo(() => {
     return getAppQuery.data?.app;
   }, [getAppQuery.data]);
@@ -53,7 +53,7 @@ const SettingsPage = ({
 
       <div
         className={clsx(
-          "space-y-4",
+          "space-y-4 pb-4",
           "relative transition-all",
           theme.pageMaxWidth,
           theme.pagePadding,
@@ -61,7 +61,7 @@ const SettingsPage = ({
       >
         <Entrypoints app={app} loading={isLoading} />
 
-        <SecretsList appId={app?.appId} />
+        <SecretsList appId={app?.appId} appName={appName} owner={owner} />
 
         <div className="space-y-2">
           <SectionTitle>Delete App</SectionTitle>
@@ -111,7 +111,7 @@ const SettingsPage = ({
 };
 
 export const Component = () => {
-  const { owner, appName } = useParams();
+  const { owner, appName, "*": branch } = useParams();
 
   return <SettingsPage owner={owner!} appName={appName!} />;
 };
