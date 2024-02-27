@@ -3,7 +3,6 @@ import { useCallback, useContext } from "react";
 import { useParams } from "react-router-dom";
 
 import { Duplicator } from "../../../../../components/duplicator.js";
-import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { AnalyticsContext } from "../../../../../utils/analytics-provider.js";
 import type { Endpoint, Environment } from "../../../../../utils/wrpc.js";
@@ -65,11 +64,9 @@ export const Endpoints = ({
           )}
           {environment.status === "running" &&
             endpoints.map((endpoint, index) => (
-              <EndpointItem
-                key={index}
-                endpoint={endpoint}
-                onClick={onEndpointClick}
-              />
+              <div key={index} onClick={() => onEndpointClick(endpoint)}>
+                <EndpointItem key={index} endpoint={endpoint} />
+              </div>
             ))}
         </>
       )}

@@ -269,8 +269,8 @@ const AddAppPage = () => {
 export const Component = () => {
   return (
     <div className="flex flex-col h-full">
-      <Header />
       <ErrorBoundary>
+        <Header />
         <AddAppPage />
       </ErrorBoundary>
     </div>
