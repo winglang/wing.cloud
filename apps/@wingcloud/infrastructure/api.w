@@ -979,7 +979,7 @@ pub class Api {
         );
       }
 
-      let secret = props.secrets.create(appId: appId, environmentType: environmentType, name: name, value: value);;
+      let secret = props.secrets.create(appId: appId, environmentType: environmentType, name: name, value: value);
 
       invalidateQuery.invalidate(userId: app.userId, queries: [
         "app.listSecrets",
