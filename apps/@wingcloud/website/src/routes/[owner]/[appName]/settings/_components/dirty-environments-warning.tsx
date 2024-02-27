@@ -8,7 +8,7 @@ import clsx from "clsx";
 import { Button } from "../../../../../design-system/button.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 
-export const PendingChangesWarning = ({
+export const DirtyEnvironmentsWarning = ({
   show,
   onRestart,
   onClose,
@@ -41,7 +41,7 @@ export const PendingChangesWarning = ({
         <div className="flex items-center gap-2">
           <div className="flex grow items-center gap-2">
             <ExclamationTriangleIcon className="w-5 h-5" />
-            <span className="font-bold">Changes not deployed</span>
+            <span className="font-bold">Redeploy required</span>
           </div>
           <button
             className={clsx(

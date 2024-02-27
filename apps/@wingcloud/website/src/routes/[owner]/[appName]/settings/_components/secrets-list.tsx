@@ -13,8 +13,8 @@ import { wrpc } from "../../../../../utils/wrpc.js";
 import type { EnvironmentType } from "../../../../../utils/wrpc.js";
 import { RedeployAppEnvironmentsModal } from "../../_components/redeploy-app-enviroments-modal.js";
 
+import { DirtyEnvironmentsWarning } from "./dirty-environments-warning.js";
 import { NewSecret } from "./new-secret.js";
-import { PendingChangesWarning } from "./pending-changes-warning.js";
 import { SecretsListItem } from "./secrets-list-item.js";
 
 export const SecretsList = ({
@@ -156,7 +156,7 @@ export const SecretsList = ({
     <>
       <div className="space-y-2">
         <SectionTitle>Secrets</SectionTitle>
-        <PendingChangesWarning
+        <DirtyEnvironmentsWarning
           show={showWarning}
           onRestart={() => {
             setShowRedeployModal(true);
