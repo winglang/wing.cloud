@@ -13,15 +13,15 @@ export const Component = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <Header
-        tabs={[
-          {
-            name: "Overview",
-            to: `/${owner}`,
-          },
-        ]}
-      />
       <ErrorBoundary>
+        <Header
+          tabs={[
+            {
+              name: "Overview",
+              to: `/${owner}`,
+            },
+          ]}
+        />
         <div className="overflow-auto">
           <div
             className={clsx(

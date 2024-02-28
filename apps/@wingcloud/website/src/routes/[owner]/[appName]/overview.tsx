@@ -137,11 +137,11 @@ const OverviewPage = ({
                   theme.focusVisible,
                   theme.bgInput,
                   theme.bgInputHover,
-                  theme.textInput,
+                  theme.text1,
                 )}
                 target="_blank"
               >
-                <GithubIcon className="size-4 shrink-0" />
+                <GithubIcon className={clsx("size-4 shrink-0", theme.text2)} />
                 <div className="hidden sm:block">
                   {app.repoOwner}/{app.repoName}
                 </div>
