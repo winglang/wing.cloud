@@ -5,17 +5,13 @@ import {
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 
-import { Button } from "../../../../../design-system/button.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 
 export const DirtyEnvironmentsWarning = ({
   show,
-  onRestart,
   onClose,
-  loading,
 }: {
   show: boolean;
-  onRestart: () => void;
   onClose: () => void;
   loading?: boolean;
 }) => {
@@ -58,12 +54,7 @@ export const DirtyEnvironmentsWarning = ({
         </div>
         <div className="flex items-center">
           <div className="text-xs grow">
-            A redeploy is required for changes to take effect.
-          </div>
-          <div className="flex flex-col justify-between gap-2">
-            <Button onClick={onRestart} disabled={loading}>
-              {loading ? "Deploying..." : "Redeploy all enviroments"}
-            </Button>
+            Changes will not be applied until the environment is redeployed.
           </div>
         </div>
       </div>

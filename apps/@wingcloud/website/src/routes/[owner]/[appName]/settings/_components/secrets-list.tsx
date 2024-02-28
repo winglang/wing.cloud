@@ -4,14 +4,12 @@ import { useState, useMemo, useCallback } from "react";
 
 import { SectionTitle } from "../../../../../components/section-title.js";
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
-import { Button } from "../../../../../design-system/button.js";
 import { useNotifications } from "../../../../../design-system/notification.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { useQueryCache } from "../../../../../utils/use-query-cache.js";
 import { type Secret } from "../../../../../utils/wrpc.js";
 import { wrpc } from "../../../../../utils/wrpc.js";
 import type { EnvironmentType } from "../../../../../utils/wrpc.js";
-import { RedeployAppEnvironmentsModal } from "../../_components/redeploy-app-enviroments-modal.js";
 
 import { DirtyEnvironmentsWarning } from "./dirty-environments-warning.js";
 import { NewSecret } from "./new-secret.js";
@@ -149,20 +147,13 @@ export const SecretsList = ({
     return !appId || secretsQuery.isLoading;
   }, [appId, secretsQuery.isLoading]);
 
-  const [restartingApp, setRestartingApp] = useState(false);
-  const [showRedeployModal, setShowRedeployModal] = useState(false);
-
   return (
     <>
       <div className="space-y-2">
         <SectionTitle>Secrets</SectionTitle>
         <DirtyEnvironmentsWarning
           show={showWarning}
-          onRestart={() => {
-            setShowRedeployModal(true);
-          }}
           onClose={() => setShowWarning(false)}
-          loading={restartingApp}
         />
 
         <div
@@ -244,20 +235,6 @@ export const SecretsList = ({
           </span>
         </div>
       </div>
-      {appId && (
-        <RedeployAppEnvironmentsModal
-          owner={owner}
-          appId={appId}
-          appName={appName}
-          show={showRedeployModal}
-          onClose={(success) => {
-            if (success) {
-              setShowWarning(false);
-            }
-            setShowRedeployModal(false);
-          }}
-        />
-      )}
     </>
   );
 };

@@ -876,36 +876,6 @@ pub class Api {
       };
     });
 
-    api.post("/wrpc/app.environment.restartAll", inflight (request) => {
-      let userId = getUserIdFromCookie(request);
-      let input = Json.parse(request.body ?? "");
-
-      let owner = input.get("owner").asStr();
-      let appName = input.get("appName").asStr();
-
-      checkOwnerAccessRights(request, owner);
-
-      let app = apps.getByName(
-        userId: userId,
-        appName: appName,
-      );
-      checkAppAccessRights(userId, app);
-
-      environmentsQueue.push(Json.stringify(EnvironmentAction {
-        type: "restartAll",
-        data: EnvironmentManager.RestartAllEnvironmentOptions {
-          appId: app.appId,
-          entrypoint: app.entrypoint,
-          timestamp: datetime.utcNow().timestampMs,
-        },
-      }));
-
-      return {
-        body: {
-          appId: app.appId,
-        },
-      };
-    });
 
     api.get("/wrpc/app.listSecrets", inflight (request) => {
       let userId = getUserIdFromCookie(request);
