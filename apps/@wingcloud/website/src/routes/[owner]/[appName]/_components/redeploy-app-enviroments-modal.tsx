@@ -58,11 +58,11 @@ export const RedeployAppEnvironmentsModal = ({
   const dialogBody = useMemo(
     () => (
       <p className="text-sm text-slate-500">
-        The Environments of the App{" "}
+        All of the enviroments in the{" "}
         <span className="bg-slate-200 text-slate-700 px-1 rounded">
           {appName}
         </span>{" "}
-        will be redeployed. This action is irreversible and can not be undone.
+        application will be redeployed.
       </p>
     ),
     [appName],
@@ -76,9 +76,9 @@ export const RedeployAppEnvironmentsModal = ({
       isPending={disabled}
       onClose={onClose}
       onConfirm={() => restartApp.mutate({ owner, appName })}
-      modalTitle={"Redeploy Environments"}
+      modalTitle={"Redeploy all environments?"}
       modalBody={dialogBody}
-      confirmButtonText="Redeploy"
+      confirmButtonText="Redeploy all"
       confirmButtonTextPending="Redeploying..."
     />
   );
