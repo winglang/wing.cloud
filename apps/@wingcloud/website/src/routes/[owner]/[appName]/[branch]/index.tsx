@@ -10,34 +10,34 @@ export const Component = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <Header
-        breadcrumbs={[
-          {
-            label: appName!,
-            to: `/${owner}/${appName}`,
-          },
-          {
-            label: branch!,
-            to: `/${owner}/${appName}/environment/${branch}`,
-            icon: <BranchIcon className="size-4 text-slate-700" />,
-          },
-        ]}
-        tabs={[
-          {
-            name: "Environment",
-            to: `/${owner}/${appName}/environment/${branch}`,
-          },
-          {
-            name: "Tests",
-            to: `/${owner}/${appName}/tests/${branch}`,
-          },
-          {
-            name: "Logs",
-            to: `/${owner}/${appName}/logs/${branch}`,
-          },
-        ]}
-      />
       <ErrorBoundary>
+        <Header
+          breadcrumbs={[
+            {
+              label: appName!,
+              to: `/${owner}/${appName}`,
+            },
+            {
+              label: branch!,
+              to: `/${owner}/${appName}/environment/${branch}`,
+              icon: <BranchIcon className="size-4 text-slate-700" />,
+            },
+          ]}
+          tabs={[
+            {
+              name: "Environment",
+              to: `/${owner}/${appName}/environment/${branch}`,
+            },
+            {
+              name: "Tests",
+              to: `/${owner}/${appName}/tests/${branch}`,
+            },
+            {
+              name: "Logs",
+              to: `/${owner}/${appName}/logs/${branch}`,
+            },
+          ]}
+        />
         <div className="overflow-auto">
           <Outlet />
         </div>

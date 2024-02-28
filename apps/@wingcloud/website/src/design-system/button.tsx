@@ -87,7 +87,7 @@ export const Button = forwardRef<
             className={clsx(
               label && "-ml-0.5",
               "size-4",
-              theme.text3,
+              theme.text2,
               iconClassName,
             )}
           />
