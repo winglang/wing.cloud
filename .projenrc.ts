@@ -92,6 +92,44 @@ const containers = new WingLibProject({
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+const tunnels = new WingLibProject({
+  monorepo,
+  name: "@wingcloud/tunnels",
+});
+
+tunnels.addGitIgnore("target/");
+
+tunnels.addDeps("@cdktf/provider-aws");
+tunnels.addDeps("@cdktf/provider-dnsimple");
+tunnels.addDeps("@types/express");
+tunnels.addDeps("@types/ws");
+tunnels.addDeps("@winglibs/websockets");
+tunnels.addDeps("cdktf");
+tunnels.addDeps("constructs");
+tunnels.addDeps("express");
+tunnels.addDeps("get-port");
+tunnels.addDeps("node-fetch");
+tunnels.addDeps("ws");
+
+// TODO: We need to install all of these deps because of we are using pnpm
+// and wing is not resolving deps correctly.
+// https://github.com/winglang/wing/issues/5252#issuecomment-1893857213
+tunnels.addDeps("aws-cdk-lib");
+tunnels.addDeps("@aws-cdk/asset-awscli-v1");
+tunnels.addDeps("@aws-cdk/asset-kubectl-v20");
+tunnels.addDeps("@aws-cdk/asset-node-proxy-agent-v6");
+tunnels.addDeps("@balena/dockerignore");
+tunnels.addDeps("case");
+tunnels.addDeps("fs-extra");
+tunnels.addDeps("ignore");
+tunnels.addDeps("jsonschema");
+tunnels.addDeps("minimatch");
+tunnels.addDeps("punycode");
+tunnels.addDeps("semver");
+tunnels.addDeps("table");
+tunnels.addDeps("yaml");
+
+///////////////////////////////////////////////////////////////////////////////
 const website = new NodeProject({
   parent: monorepo,
   name: "@wingcloud/website",
@@ -243,6 +281,7 @@ infrastructure.addGitIgnore("!/.env.example");
 infrastructure.addGitIgnore("**/target/");
 infrastructure.addDeps("winglang");
 infrastructure.addDeps("@winglibs/vite");
+infrastructure.addDeps(tunnels.name);
 
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
