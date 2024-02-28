@@ -159,7 +159,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
                 to={breadcrumb.to}
                 className={clsx(
                   "transition-all",
-                  "rounded hover:bg-gray-100 px-0 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                  "rounded hover:bg-gray-100 px-1 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
                   theme.text1,
                   "focus-visible:bg-gray-50 outline-none",
                 )}

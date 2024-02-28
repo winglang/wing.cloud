@@ -1,13 +1,12 @@
 import { Cog8ToothIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
 import { SpinnerLoader } from "../../../../components/spinner-loader.js";
 import { Button } from "../../../../design-system/button.js";
-import { useNotifications } from "../../../../design-system/notification.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { wrpc } from "../../../../utils/wrpc.js";
 import { DeleteModal } from "../_components/delete-modal.js";

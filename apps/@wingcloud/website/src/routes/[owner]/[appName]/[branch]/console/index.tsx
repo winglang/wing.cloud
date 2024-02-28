@@ -95,25 +95,26 @@ export const Component = () => {
   const { owner, appName, "*": branch } = useParams();
   return (
     <div className="flex flex-col h-full">
-      <Header
-        breadcrumbs={[
-          {
-            label: appName!,
-            to: `/${owner}/${appName}`,
-          },
-          {
-            label: branch!,
-            to: `/${owner}/${appName}/environment/${branch}`,
-            icon: <BranchIcon className="w-4 h-4 text-slate-700" />,
-          },
-          {
-            label: "Console",
-            to: `/${owner}/${appName}/console/${branch}`,
-            icon: <CommandLineIcon className="w-4 h-4 text-slate-500" />,
-          },
-        ]}
-      />
       <ErrorBoundary>
+        <Header
+          breadcrumbs={[
+            {
+              label: appName!,
+              to: `/${owner}/${appName}`,
+            },
+            {
+              label: branch!,
+              to: `/${owner}/${appName}/environment/${branch}`,
+              icon: <BranchIcon className="w-4 h-4 text-slate-700" />,
+            },
+            {
+              label: "Console",
+              to: `/${owner}/${appName}/console/${branch}`,
+              icon: <CommandLineIcon className="w-4 h-4 text-slate-500" />,
+            },
+          ]}
+        />
+
         <ConsolePage />
       </ErrorBoundary>
     </div>

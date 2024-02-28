@@ -8,25 +8,25 @@ export const Component = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <Header
-        breadcrumbs={[
-          {
-            label: appName!,
-            to: `/${owner}/${appName}`,
-          },
-        ]}
-        tabs={[
-          {
-            name: "Application",
-            to: `/${owner}/${appName}`,
-          },
-          {
-            name: "Settings",
-            to: `/${owner}/${appName}/settings`,
-          },
-        ]}
-      />
       <ErrorBoundary>
+        <Header
+          breadcrumbs={[
+            {
+              label: appName!,
+              to: `/${owner}/${appName}`,
+            },
+          ]}
+          tabs={[
+            {
+              name: "Application",
+              to: `/${owner}/${appName}`,
+            },
+            {
+              name: "Settings",
+              to: `/${owner}/${appName}/settings`,
+            },
+          ]}
+        />
         <div className="overflow-auto">
           <Outlet />
         </div>
