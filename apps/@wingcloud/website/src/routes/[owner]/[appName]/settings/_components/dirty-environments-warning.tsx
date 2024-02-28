@@ -54,7 +54,7 @@ export const DirtyEnvironmentsWarning = ({
         </div>
         <div className="flex items-center">
           <div className="text-xs grow">
-            Changes will not be applied until the environment is redeployed.
+            Changes will be applied to new environment deployments.
           </div>
         </div>
       </div>
