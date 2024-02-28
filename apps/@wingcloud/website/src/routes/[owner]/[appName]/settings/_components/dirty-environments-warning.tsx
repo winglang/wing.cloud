@@ -13,7 +13,6 @@ export const DirtyEnvironmentsWarning = ({
 }: {
   show: boolean;
   onClose: () => void;
-  loading?: boolean;
 }) => {
   const { theme } = useTheme();
 
