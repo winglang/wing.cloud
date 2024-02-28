@@ -128,7 +128,7 @@ export const Menu = ({
                               )}
                             >
                               {item.icon && (
-                                <span className={clsx(theme.text3)}>
+                                <span className={clsx(theme.text2)}>
                                   {item.icon}
                                 </span>
                               )}
@@ -150,7 +150,7 @@ export const Menu = ({
                               )}
                             >
                               {item.icon && (
-                                <span className={clsx(theme.text3)}>
+                                <span className={clsx(theme.text2)}>
                                   {item.icon}
                                 </span>
                               )}

@@ -1,24 +1,18 @@
-import { GlobeAltIcon, BoltIcon } from "@heroicons/react/24/solid";
-import clsx from "clsx";
-import { useCallback, useContext } from "react";
-import { Link } from "react-router-dom";
-
-import { useTheme } from "../../../../../design-system/theme-provider.js";
-import type { Endpoint } from "../../../../../utils/wrpc.js";
-import { useTimeAgo } from "../../../../../utils/time.js";
-import { useNotifications } from "../../../../../design-system/notification.js";
 import {
   ArrowTopRightOnSquareIcon,
   DocumentDuplicateIcon,
 } from "@heroicons/react/24/outline";
+import { GlobeAltIcon, BoltIcon } from "@heroicons/react/24/solid";
+import clsx from "clsx";
+import { useCallback } from "react";
+import { Link } from "react-router-dom";
 
-export const EndpointItem = ({
-  endpoint,
-  onClick,
-}: {
-  endpoint: Endpoint;
-  onClick: (endpoint: Endpoint) => void;
-}) => {
+import { useNotifications } from "../../../../../design-system/notification.js";
+import { useTheme } from "../../../../../design-system/theme-provider.js";
+import { useTimeAgo } from "../../../../../utils/time.js";
+import type { Endpoint } from "../../../../../utils/wrpc.js";
+
+export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
   const { theme } = useTheme();
   const updatedAt = useTimeAgo(endpoint.updatedAt);
   const { showNotification } = useNotifications();
@@ -29,18 +23,28 @@ export const EndpointItem = ({
   }, [endpoint.publicUrl, showNotification]);
 
   return (
-    <button
+    <div
       className={clsx(
         "rounded-md p-4 text-left w-full block",
         theme.bgInput,
         "border",
         theme.borderInput,
         theme.focusVisible,
-        "shadow-sm hover:shadow cursor-default",
+        "shadow-sm hover:shadow",
         "relative",
       )}
-      onClick={() => onClick}
     >
+      <Link
+        to={endpoint.publicUrl}
+        target="_blank"
+        className={clsx(
+          "-m-px",
+          "absolute inset-0 cursor-pointer rounded-md border",
+          theme.focusVisible,
+          theme.borderInput,
+        )}
+      />
+
       <div className="flex items-center gap-x-4">
         {endpoint.browserSupport && (
           <GlobeAltIcon
@@ -59,7 +63,7 @@ export const EndpointItem = ({
           <div className="text-xs space-y-1 truncate w-full">
             <div
               className={clsx(
-                "font-medium truncate relative",
+                "font-medium truncate",
                 theme.text1,
                 theme.text1Hover,
               )}
@@ -81,6 +85,7 @@ export const EndpointItem = ({
                     to={endpoint.publicUrl}
                     target="_blank"
                     className={clsx(
+                      "z-10",
                       "truncate items-end font-mono",
                       theme.text2,
                       theme.text2Hover,
@@ -132,6 +137,6 @@ export const EndpointItem = ({
           </div>
         </div>
       </div>
-    </button>
+    </div>
   );
 };
