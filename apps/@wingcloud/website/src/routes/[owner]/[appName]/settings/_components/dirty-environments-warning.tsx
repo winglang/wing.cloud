@@ -34,7 +34,7 @@ export const DirtyEnvironmentsWarning = ({
           "bg-yellow-50 border-yellow-200 text-yellow-800",
         )}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex gap-2">
           <div className="flex grow items-center gap-2">
             <ExclamationTriangleIcon className="w-5 h-5" />
             <span className="font-bold">Redeploy required</span>
@@ -45,7 +45,7 @@ export const DirtyEnvironmentsWarning = ({
               theme.text1Hover,
               theme.focusVisible,
               "transition-all",
-              "rounded p-0.5 -mt-4 -mr-2",
+              "rounded p-0.5",
             )}
             onClick={onClose}
           >
