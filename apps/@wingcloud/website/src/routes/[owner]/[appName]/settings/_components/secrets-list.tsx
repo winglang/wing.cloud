@@ -2,21 +2,36 @@ import { LockClosedIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useState, useMemo, useCallback } from "react";
 
+import { SectionTitle } from "../../../../../components/section-title.js";
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
 import { useNotifications } from "../../../../../design-system/notification.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
+import { useQueryCache } from "../../../../../utils/use-query-cache.js";
 import { type Secret } from "../../../../../utils/wrpc.js";
 import { wrpc } from "../../../../../utils/wrpc.js";
 import type { EnvironmentType } from "../../../../../utils/wrpc.js";
 
+import { DirtyEnvironmentsWarning } from "./dirty-environments-warning.js";
 import { NewSecret } from "./new-secret.js";
 import { SecretsListItem } from "./secrets-list-item.js";
-import { SectionTitle } from "../../../../../components/section-title.js";
 
-export const SecretsList = ({ appId }: { appId?: string }) => {
+export const SecretsList = ({
+  appId,
+  owner,
+  appName,
+}: {
+  appId?: string;
+  owner: string;
+  appName: string;
+}) => {
   const { showNotification } = useNotifications();
+  const [showWarning, setShowWarning] = useState(false);
+
   const { theme } = useTheme();
   const [updatingSecrets, setUpdatingSecrets] = useState(false);
+
+  const { addSecretItemToSecretList, deleteSecretItemFromSecretList } =
+    useQueryCache();
 
   const secretsQuery = wrpc["app.listSecrets"].useQuery(
     {
@@ -40,12 +55,14 @@ export const SecretsList = ({ appId }: { appId?: string }) => {
           throw new Error("App ID is required");
         }
         setUpdatingSecrets(true);
-        await createMutation.mutateAsync({
+        const { secret } = await createMutation.mutateAsync({
           appId: appId,
           environmentType: environmentType!,
           name,
           value,
         });
+        addSecretItemToSecretList(secret);
+        setShowWarning(true);
         showNotification("Secret created");
       } catch (error) {
         if (error instanceof Error) {
@@ -96,6 +113,8 @@ export const SecretsList = ({ appId }: { appId?: string }) => {
           environmentType: secret.environmentType,
           secretId: secret.id,
         });
+        deleteSecretItemFromSecretList(secret.id);
+        setShowWarning(true);
         showNotification("Secret deleted");
       } catch (error) {
         if (error instanceof Error) {
@@ -129,86 +148,93 @@ export const SecretsList = ({ appId }: { appId?: string }) => {
   }, [appId, secretsQuery.isLoading]);
 
   return (
-    <div className="space-y-2">
-      <SectionTitle>Secrets</SectionTitle>
-      <div
-        className={clsx(
-          "flex flex-col gap-2 rounded-md p-4 border",
-          theme.bgInput,
-          theme.borderInput,
-          "relative",
-        )}
-      >
+    <>
+      <div className="space-y-2">
+        <SectionTitle>Secrets</SectionTitle>
+        <DirtyEnvironmentsWarning
+          show={showWarning}
+          onClose={() => setShowWarning(false)}
+        />
+
         <div
           className={clsx(
-            "absolute inset-0 flex items-center justify-center",
-            "transition-all",
-            loading && "bg-opacity-50 z-10",
-            !loading && "bg-opacity-0 -z-10",
-            theme.bg3,
+            "flex flex-col gap-2 rounded-md p-4 border",
+            theme.bgInput,
+            theme.borderInput,
+            "relative",
           )}
         >
-          <SpinnerLoader size="sm" />
-        </div>
-
-        <div className="flex flex-col h-full">
-          <NewSecret loading={updatingSecrets} onCreate={onCreate} />
-          <div className="w-full flex flex-col gap-2 relative py-4">
-            {updatingSecrets && (
-              <div className="flex items-center justify-center absolute inset-0 z-10">
-                <SpinnerLoader size="sm" className="z-20" />
-              </div>
-            )}
-            {!updatingSecrets && groupedSecrets.length === 0 && (
-              <div className="text-xs flex flex-col truncate items-center gap-2">
-                <LockClosedIcon
-                  className={clsx("w-5 h-5 rounded-full", theme.text2)}
-                />
-                <span className={clsx("font-bold", theme.text1)}>
-                  No secrets
-                </span>
-              </div>
-            )}
-            {groupedSecrets.map((group) => (
-              <div
-                className={clsx(
-                  "w-full flex flex-col gap-2",
-                  updatingSecrets && "opacity-50",
-                )}
-                key={group[0]}
-              >
-                <div className={clsx("capitalize text-sm", theme.text1)}>
-                  {group[0]}
-                </div>
-                {group[1].map((secret, index) => (
-                  <SecretsListItem
-                    key={`${secret.id}`}
-                    secret={secret}
-                    onDecrypt={onDecrypt}
-                    onDelete={onDelete}
-                    loading={updatingSecrets}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-        <hr className="h-px bg-slate-200 border-0 dark:bg-slate-700" />
-        <span className={clsx("text-xs truncate", theme.text2)}>
-          Learn more about{" "}
-          <a
+          <div
             className={clsx(
-              "text-blue-600",
-              "focus:underline outline-none",
-              "hover:underline z-10 cursor-pointer",
+              "absolute inset-0 flex items-center justify-center",
+              "transition-all",
+              loading && "bg-opacity-50 z-10",
+              !loading && "bg-opacity-0 -z-10",
+              theme.bg3,
             )}
-            href="https://www.winglang.io/docs/standard-library/cloud/secret"
-            target="_blank"
           >
-            Secrets
-          </a>{" "}
-        </span>
+            <SpinnerLoader size="sm" />
+          </div>
+
+          <div className="flex flex-col h-full">
+            <NewSecret loading={updatingSecrets} onCreate={onCreate} />
+            <div className="w-full flex flex-col gap-2 relative py-4">
+              {updatingSecrets && (
+                <div className="flex items-center justify-center absolute inset-0 z-10">
+                  <SpinnerLoader size="sm" className="z-20" />
+                </div>
+              )}
+              {!updatingSecrets && groupedSecrets.length === 0 && (
+                <div className="text-xs flex flex-col truncate items-center gap-2">
+                  <LockClosedIcon
+                    className={clsx("w-5 h-5 rounded-full", theme.text2)}
+                  />
+                  <span className={clsx("font-bold", theme.text1)}>
+                    No secrets
+                  </span>
+                </div>
+              )}
+              {groupedSecrets.map((group) => (
+                <div
+                  className={clsx(
+                    "w-full flex flex-col gap-2",
+                    updatingSecrets && "opacity-50",
+                  )}
+                  key={group[0]}
+                >
+                  <div className={clsx("capitalize text-sm", theme.text1)}>
+                    {group[0]}
+                  </div>
+                  {group[1].map((secret, index) => (
+                    <SecretsListItem
+                      key={`${secret.id}`}
+                      secret={secret}
+                      onDecrypt={onDecrypt}
+                      onDelete={onDelete}
+                      loading={updatingSecrets}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+          <hr className="h-px bg-slate-200 border-0 dark:bg-slate-700" />
+          <span className={clsx("text-xs truncate", theme.text2)}>
+            Learn more about{" "}
+            <a
+              className={clsx(
+                "text-blue-600",
+                "focus:underline outline-none",
+                "hover:underline z-10 cursor-pointer",
+              )}
+              href="https://www.winglang.io/docs/standard-library/cloud/secret"
+              target="_blank"
+            >
+              Secrets
+            </a>{" "}
+          </span>
+        </div>
       </div>
-    </div>
+    </>
   );
 };

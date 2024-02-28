@@ -226,7 +226,7 @@ export const wrpc = createWRPCReact<{
       name: string;
       value: string;
     },
-    {}
+    { secret: Secret }
   >;
   "app.deleteSecret": MutationProcedure<
     { appId: string; environmentType: string; secretId: string },

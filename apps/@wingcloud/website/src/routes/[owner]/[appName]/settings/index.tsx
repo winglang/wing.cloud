@@ -34,6 +34,7 @@ const SettingsPage = ({
       enabled: !!owner && !!appName,
     },
   );
+
   const app = useMemo(() => {
     return getAppQuery.data?.app;
   }, [getAppQuery.data]);
@@ -52,7 +53,7 @@ const SettingsPage = ({
 
       <div
         className={clsx(
-          "space-y-4",
+          "space-y-4 pb-4",
           "relative transition-all",
           theme.pageMaxWidth,
           theme.pagePadding,
@@ -60,7 +61,7 @@ const SettingsPage = ({
       >
         <Entrypoints app={app} loading={isLoading} />
 
-        <SecretsList appId={app?.appId} />
+        <SecretsList appId={app?.appId} appName={appName} owner={owner} />
 
         <div className="space-y-2">
           <SectionTitle>Delete App</SectionTitle>

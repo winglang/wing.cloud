@@ -420,7 +420,7 @@ pub class EnvironmentManager {
     this.mrq.enqueue(
       groupId: options.statusReport.environmentId,
       timestamp: options.statusReport.timestamp,
-      body: Json.stringify(QueueMessage{
+      body: Json.stringify(QueueMessage {
         action: "updateStatus",
         options: options,
       })
