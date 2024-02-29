@@ -5,6 +5,7 @@ import {
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 
+import { SectionTitle } from "../../../../components/section-title.js";
 import { SpinnerLoader } from "../../../../components/spinner-loader.js";
 import { Button } from "../../../../design-system/button.js";
 import { useNotifications } from "../../../../design-system/notification.js";
@@ -13,7 +14,6 @@ import { useTheme } from "../../../../design-system/theme-provider.js";
 import { wrpc, type App } from "../../../../utils/wrpc.js";
 
 import { EntrypointUpdateModal } from "./_components/entrypoint-update-modal.js";
-import { SectionTitle } from "../../../../components/section-title.js";
 
 export interface EntrypointsProps {
   app?: App;
@@ -101,7 +101,7 @@ export const Entrypoints = ({ app, loading }: EntrypointsProps) => {
       </div>
 
       <div className="space-y-2">
-        <SectionTitle>Endpoints</SectionTitle>
+        <SectionTitle>Entrypoints</SectionTitle>
         <div
           className={clsx(
             "space-y-2",
