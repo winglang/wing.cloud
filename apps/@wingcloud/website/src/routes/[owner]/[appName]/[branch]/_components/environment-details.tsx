@@ -155,7 +155,7 @@ export const EnvironmentDetails = ({
                 )}
                 {environment && (
                   <div className="flex gap-x-1">
-                    <BranchIcon className={clsx("w-4 h-4", theme.text3)} />
+                    <BranchIcon className={clsx("w-4 h-4", theme.text2)} />
                     <Link
                       className={clsx(
                         "hover:underline focus:underline outline-none",
@@ -181,7 +181,7 @@ export const EnvironmentDetails = ({
                     {environment.type === "production" && (
                       <div className="flex gap-x-1 items-center">
                         <CommitIcon
-                          className={clsx("size-4 shrink-0", theme.text3)}
+                          className={clsx("size-4 shrink-0", theme.text2)}
                         />
                         <Link
                           className={clsx(
@@ -200,7 +200,7 @@ export const EnvironmentDetails = ({
                     {environment.type === "preview" && (
                       <div className="flex gap-x-1 items-center">
                         <PRIcon
-                          className={clsx("size-4 shrink-0", theme.text3)}
+                          className={clsx("size-4 shrink-0", theme.text2)}
                         />
                         <Link
                           className={clsx(
