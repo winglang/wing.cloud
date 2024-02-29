@@ -28,7 +28,7 @@ export const StatusWithDot = ({ status }: { status: EnvironmentStatus }) => {
         <div
           className={clsx(
             "py-0.5 capitalize truncate font-semibold",
-            theme.text2,
+            theme.text1,
           )}
         >
           {statusString}

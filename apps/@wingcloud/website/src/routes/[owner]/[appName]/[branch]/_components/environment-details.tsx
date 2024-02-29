@@ -160,7 +160,7 @@ export const EnvironmentDetails = ({
                       className={clsx(
                         "hover:underline focus:underline outline-none",
                         "font-semibold truncate",
-                        theme.text2,
+                        theme.text1,
                         "truncate relative z-10",
                       )}
                       onClick={(event) => {
@@ -181,14 +181,14 @@ export const EnvironmentDetails = ({
                     {environment.type === "production" && (
                       <div className="flex gap-x-1 items-center">
                         <CommitIcon
-                          className={clsx("w-4 h-4 shrink-0", theme.text3)}
+                          className={clsx("size-4 shrink-0", theme.text2)}
                         />
                         <Link
                           className={clsx(
                             "hover:underline focus:underline outline-none",
                             "truncate relative z-10",
                             "font-semibold truncate",
-                            theme.text2,
+                            theme.text1,
                           )}
                           to={`https://github.com/${environment.repo}/commit/${app.lastCommitSha}`}
                           target="_blank"
@@ -200,14 +200,14 @@ export const EnvironmentDetails = ({
                     {environment.type === "preview" && (
                       <div className="flex gap-x-1 items-center">
                         <PRIcon
-                          className={clsx("w-4 h-4 shrink-0", theme.text3)}
+                          className={clsx("size-4 shrink-0", theme.text3)}
                         />
                         <Link
                           className={clsx(
                             "hover:underline focus:underline outline-none",
                             "truncate relative z-10",
                             "font-semibold truncate",
-                            theme.text2,
+                            theme.text1,
                           )}
                           to={`https://github.com/${environment.repo}/pull/${environment.prNumber}`}
                           target="_blank"
@@ -229,7 +229,7 @@ export const EnvironmentDetails = ({
               Created at
             </div>
             <div
-              className={clsx("text-xs font-semibold truncate", theme.text2)}
+              className={clsx("text-xs font-semibold truncate", theme.text1)}
             >
               {!environment && (
                 <SkeletonLoader className="h-5 w-24 max-w-full" loading />
@@ -276,7 +276,7 @@ export const EnvironmentDetails = ({
                         <div
                           className={clsx(
                             "font-semibold truncate",
-                            theme.text2,
+                            theme.text1,
                           )}
                         >
                           {firstEndpoint.path}
@@ -311,7 +311,7 @@ export const EnvironmentDetails = ({
                               className={clsx(
                                 "hover:underline focus:underline outline-none",
                                 "truncate relative z-10 flex gap-x-1",
-                                theme.text2,
+                                theme.text1,
                                 "text-xs",
                               )}
                               to={endpoint.publicUrl}
