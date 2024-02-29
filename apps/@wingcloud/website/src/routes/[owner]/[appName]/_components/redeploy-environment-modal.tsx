@@ -36,7 +36,7 @@ export const RedeployEnvironmentModal = ({
       setDisabled(true);
     },
     onSuccess() {
-      showNotification(`Redeploying "${branch}" Environment`, {
+      showNotification(`Redeploying "${branch}" environment`, {
         type: "success",
       });
       restartEnvironmentStatus(branch);
