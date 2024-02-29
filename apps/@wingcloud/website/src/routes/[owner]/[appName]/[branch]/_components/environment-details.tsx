@@ -10,7 +10,7 @@ import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
 import { CommitIcon } from "../../../../../icons/commit-icon.js";
 import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js";
-import { PRIcon } from "../../../../../icons/pr-icon.js";
+import { PullRequestIcon } from "../../../../../icons/pull-request-icon.js";
 import { useStatus } from "../../../../../utils/status.js";
 import { getDateTime } from "../../../../../utils/time.js";
 import type { App, Endpoint, Environment } from "../../../../../utils/wrpc.js";
@@ -199,7 +199,7 @@ export const EnvironmentDetails = ({
                     )}
                     {environment.type === "preview" && (
                       <div className="flex gap-x-1 items-center">
-                        <PRIcon
+                        <PullRequestIcon
                           className={clsx("size-4 shrink-0", theme.text2)}
                         />
                         <Link
@@ -212,8 +212,7 @@ export const EnvironmentDetails = ({
                           to={`https://github.com/${environment.repo}/pull/${environment.prNumber}`}
                           target="_blank"
                         >
-                          {environment.prTitle}{" "}
-                          {environment.prNumber && `#${environment.prNumber}`}
+                          {environment.prTitle} #{environment.prNumber}
                         </Link>
                       </div>
                     )}

@@ -1,11 +1,13 @@
 import { forwardRef } from "react";
 
-type PRIconProps = React.PropsWithoutRef<React.SVGProps<SVGSVGElement>> & {
+type PullRequestIconProps = React.PropsWithoutRef<
+  React.SVGProps<SVGSVGElement>
+> & {
   title?: string;
   titleId?: string;
 } & React.RefAttributes<SVGSVGElement>;
 
-export const PRIcon = forwardRef<SVGSVGElement, PRIconProps>(
+export const PullRequestIcon = forwardRef<SVGSVGElement, PullRequestIconProps>(
   ({ title, titleId, ...props }, svgRef) => {
     return (
       <svg
