@@ -181,7 +181,7 @@ export const EnvironmentDetails = ({
                     {environment.type === "production" && (
                       <div className="flex gap-x-1 items-center">
                         <CommitIcon
-                          className={clsx("size-4 shrink-0", theme.text2)}
+                          className={clsx("size-4 shrink-0", theme.text3)}
                         />
                         <Link
                           className={clsx(
