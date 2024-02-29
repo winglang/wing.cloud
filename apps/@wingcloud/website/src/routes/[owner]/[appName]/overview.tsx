@@ -9,7 +9,7 @@ import { Input } from "../../../design-system/input.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
 import { GithubIcon } from "../../../icons/github-icon.js";
-import { wrpc, type Environment } from "../../../utils/wrpc.js";
+import { wrpc } from "../../../utils/wrpc.js";
 import { AppIcon } from "../_components/app-icon.js";
 
 import { EnvironmentDetails } from "./[branch]/_components/environment-details.js";
@@ -137,11 +137,11 @@ const OverviewPage = ({
                   theme.focusVisible,
                   theme.bgInput,
                   theme.bgInputHover,
-                  theme.textInput,
+                  theme.text1,
                 )}
                 target="_blank"
               >
-                <GithubIcon className="size-4 shrink-0" />
+                <GithubIcon className={clsx("size-4 shrink-0", theme.text2)} />
                 <div className="hidden sm:block">
                   {app.repoOwner}/{app.repoName}
                 </div>
@@ -173,7 +173,9 @@ const OverviewPage = ({
               if (!productionEnvironment?.branch) {
                 return;
               }
-              navigate(`/${owner}/${appName}/${productionEnvironment.branch}`);
+              navigate(
+                `/${owner}/${appName}/environment/${productionEnvironment.branch}`,
+              );
             }}
             actions={
               <>

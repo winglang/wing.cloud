@@ -123,10 +123,12 @@ export const Menu = ({
                                 "group flex w-full items-center rounded px-2 py-2 text-sm",
                                 theme.textInput,
                                 "flex gap-x-3",
+                                item.disabled &&
+                                  "cursor-not-allowed opacity-50",
                               )}
                             >
                               {item.icon && (
-                                <span className={clsx(theme.text3)}>
+                                <span className={clsx(theme.text2)}>
                                   {item.icon}
                                 </span>
                               )}
@@ -148,7 +150,7 @@ export const Menu = ({
                               )}
                             >
                               {item.icon && (
-                                <span className={clsx(theme.text3)}>
+                                <span className={clsx(theme.text2)}>
                                   {item.icon}
                                 </span>
                               )}

@@ -2,13 +2,13 @@ import clsx from "clsx";
 import { useCallback, useContext } from "react";
 import { useParams } from "react-router-dom";
 
-import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
+import { Duplicator } from "../../../../../components/duplicator.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { AnalyticsContext } from "../../../../../utils/analytics-provider.js";
 import type { Endpoint, Environment } from "../../../../../utils/wrpc.js";
-import { EndpointItem } from "./endpoint-item.js";
-import { Duplicator } from "../../../../../components/duplicator.js";
+
 import { EndpointItemSkeleton } from "./endpoint-item-skeleton.js";
+import { EndpointItem } from "./endpoint-item.js";
 
 export interface EndpointsProps {
   endpoints: Endpoint[];
@@ -23,8 +23,7 @@ export const Endpoints = ({
 }: EndpointsProps) => {
   const { theme } = useTheme();
   const { track } = useContext(AnalyticsContext);
-  const { appName, branch } = useParams();
-
+  const { appName, "*": branch } = useParams();
   const onEndpointClick = useCallback(
     (endpoint: Endpoint) => {
       track("cloud_endpoint_visited", {
@@ -65,11 +64,9 @@ export const Endpoints = ({
           )}
           {environment.status === "running" &&
             endpoints.map((endpoint, index) => (
-              <EndpointItem
-                key={index}
-                endpoint={endpoint}
-                onClick={onEndpointClick}
-              />
+              <div key={index} onClick={() => onEndpointClick(endpoint)}>
+                <EndpointItem key={index} endpoint={endpoint} />
+              </div>
             ))}
         </>
       )}

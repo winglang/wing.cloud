@@ -45,7 +45,7 @@ pub class GithubComment {
   }
 
   inflight envStatusToString(status: str, fullAppName: str, branch: str): str {
-    let inspect = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/{branch}\">Inspect</a>";
+    let inspect = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/environment/{branch}\">Inspect</a>";
     if status == "running-server" {
       return "Starting App";
     }
@@ -109,7 +109,7 @@ pub class GithubComment {
               let testResourcePath = pathParts.at(0);
               let var link = "";
               if environment.status == "running" && fullAppName? {
-                link = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/{environment.branch}/tests?testId={testId}\">Logs</a>";
+                link = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/tests/{environment.branch}?testId={testId}\">Logs</a>";
               }
               testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
               i += 1;
@@ -123,7 +123,7 @@ pub class GithubComment {
         if fullAppName? {
           appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}\">{props.appFullName ?? props.appName}</a>";
           if environment.status == "running" {
-            previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/{environment.branch}/console\">Visit</a>";
+            previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/console/{environment.branch}/\">Visit</a>";
           }
         }
 

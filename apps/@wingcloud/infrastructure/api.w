@@ -61,7 +61,7 @@ struct CreateProductionEnvironmentMessage {
   timestamp: num;
 }
 
-struct GetListOfEntrypointsProps{
+struct GetListOfEntrypointsProps {
   accessToken: str;
   owner: str;
   repo: str;
@@ -957,7 +957,7 @@ pub class Api {
 
       return {
         body: {
-          secretId: secret.id
+          secret: secret
         }
       };
     });

@@ -5,8 +5,11 @@ import { wrpc } from "../../../../utils/wrpc.js";
 export const TEST_LOGS_ID = "test-logs";
 
 import { SectionTitle } from "../../../../components/section-title.js";
+
 import { TestsLogs } from "./_components/tests-logs.js";
+
 import clsx from "clsx";
+
 import { PageHeader } from "../../../../components/page-header.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 
@@ -81,6 +84,6 @@ const TestsPage = ({
 };
 
 export const Component = () => {
-  const { owner, appName, branch } = useParams();
+  const { owner, appName, "*": branch } = useParams();
   return <TestsPage owner={owner!} appName={appName!} branch={branch!} />;
 };

@@ -54,8 +54,13 @@ export const HttpErrorPage = ({
           <Link
             to={link}
             className={clsx(
-              "text-sm font-semibold hover:underline",
-              theme.text1,
+              "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
+              "p-1.5 sm:px-2.5 sm:py-1.5 border shadow-sm truncate",
+              "font-semibold",
+              "text-white",
+              "bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600",
+              "border-sky-700",
+              theme.focusVisible,
             )}
           >
             Back to home

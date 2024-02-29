@@ -69,6 +69,6 @@ const LogsPage = ({
 };
 
 export const Component = () => {
-  const { owner, appName, branch } = useParams();
+  const { owner, appName, "*": branch } = useParams();
   return <LogsPage owner={owner!} appName={appName!} branch={branch!} />;
 };

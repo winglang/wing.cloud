@@ -1,7 +1,7 @@
 import { BoltIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { StatusWithDot } from "../../../../../components/status-with-dot.js";
 import Popover from "../../../../../design-system/popover.js";
@@ -13,7 +13,6 @@ import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js
 import { useStatus } from "../../../../../utils/status.js";
 import { getDateTime } from "../../../../../utils/time.js";
 import type { App, Endpoint, Environment } from "../../../../../utils/wrpc.js";
-import { EnvironmentMenu } from "../../_components/environment-menu.js";
 import { RedeployEnvironmentModal } from "../../_components/redeploy-environment-modal.js";
 
 export interface EvironmentDetailsProps {
@@ -76,9 +75,10 @@ export const EnvironmentDetails = ({
     <div
       className={clsx(
         "p-4 md:p-6 w-full rounded-md flex",
-        "shadow-sm group",
+        "group",
         "gap-0 sm:gap-4 md:gap-6",
-        onClick && "hover:shadow",
+        "transition-all",
+        onClick && "shadow-sm hover:shadow",
         ["border", theme.borderInput],
         theme.bgInput,
         "relative",
@@ -96,7 +96,7 @@ export const EnvironmentDetails = ({
         />
       )}
       <Link
-        to={`/${owner}/${app?.appName}/${environment?.branch}/console`}
+        to={`/${owner}/${app?.appName}/console/${environment?.branch}`}
         className={clsx(
           theme.focusVisible,
           "rounded border-0 sm:border",

@@ -1,8 +1,8 @@
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { CommandLineIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
@@ -11,8 +11,8 @@ import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
 import { STARTING_STATUS, wrpc } from "../../../../utils/wrpc.js";
 import {
-  RedeployEnvironmentModal,
   VALID_REDEPLOY_STATUS,
+  RedeployEnvironmentModal,
 } from "../_components/redeploy-environment-modal.js";
 
 import { Endpoints } from "./_components/endpoints.js";
@@ -92,7 +92,7 @@ const Overview = ({
               disabled={environment?.status !== "running"}
               icon={CommandLineIcon}
               onClick={() => {
-                navigate(`/${owner}/${appName}/${environment?.branch}/console`);
+                navigate(`/${owner}/${appName}/console/${environment?.branch}`);
               }}
             >
               Console
@@ -150,6 +150,6 @@ const Overview = ({
 };
 
 export const Component = () => {
-  const { owner, appName, branch } = useParams();
+  const { owner, appName, "*": branch } = useParams();
   return <Overview owner={owner!} appName={appName!} branch={branch!} />;
 };

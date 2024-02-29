@@ -47,12 +47,13 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
         "text-left border",
         theme.bgInput,
         theme.borderInput,
+        "transition-all",
         "shadow-sm hover:shadow",
         "relative",
       )}
     >
       <Link
-        className={clsx("absolute inset-0 rounded-md z-0", theme.focusInput)}
+        className={clsx("absolute inset-0 rounded-md z-0", theme.focusVisible)}
         to={`/${owner}/${app.appName}`}
       />
 
@@ -76,6 +77,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
             theme.text1Hover,
             "hover:underline z-10 cursor-pointer",
             "truncate",
+            theme.focusVisible,
           )}
           to={`/${owner}/${app.appName}`}
         >
@@ -102,13 +104,13 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
                 label: "Logs",
                 icon: <DocumentTextIcon className="size-4" />,
                 disabled: !app.defaultBranch,
-                link: `/${owner}/${app.appName}/${app.defaultBranch}/logs`,
+                link: `/${owner}/${app.appName}/logs/${app.defaultBranch}`,
               },
               {
                 label: "Console",
                 icon: <CommandLineIcon className="size-4" />,
                 disabled: app.status !== "running" || !app.defaultBranch,
-                link: `/${owner}/${app.appName}/${app.defaultBranch}/console`,
+                link: `/${owner}/${app.appName}/console/${app.defaultBranch}`,
               },
 
               {
@@ -126,11 +128,10 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
           <Link
             className={clsx(
               "truncate",
-              "text-xs font-medium",
+              "text-xs font-medium outline-none",
               "flex gap-x-2 truncate items-center z-10 group",
               theme.text2,
               theme.text2Hover,
-              theme.focusVisible,
             )}
             onClick={(event) => event.stopPropagation()}
             target="_blank"
@@ -156,8 +157,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
                     "text-xs",
                     theme.text3,
                     theme.text3Hover,
-                    theme.focusVisible,
-                    "focus:underline hover:underline z-10",
+                    "focus:underline hover:underline z-10 outline-none",
                   )}
                   target="_blank"
                   to={commitUrl}
@@ -198,8 +198,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
                       "truncate",
                       "text-xs",
                       theme.text2Hover,
-                      theme.focusVisible,
-                      "focus:underline hover:underline z-10",
+                      "focus:underline hover:underline z-10 outline-none",
                     )}
                     target="_blank"
                     to={branchUrl}
