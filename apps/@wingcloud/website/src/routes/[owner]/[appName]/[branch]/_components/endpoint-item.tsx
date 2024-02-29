@@ -77,7 +77,6 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
                     "gap-x-1",
                     "font-semibold",
                   )}
-                  onClick={copyEndpointLink}
                 >
                   <div className="truncate">{endpoint.publicUrl}</div>
                 </Link>
