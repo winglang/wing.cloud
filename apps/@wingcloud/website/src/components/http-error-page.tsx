@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
+import { ButtonLink } from "../design-system/button-link.js";
 import { useTheme } from "../design-system/theme-provider.js";
 
 export const HttpErrorPage = ({
@@ -51,20 +52,7 @@ export const HttpErrorPage = ({
           {formattedMessage}
         </p>
         <div className="mt-8 flex justify-center items-center">
-          <Link
-            to={link}
-            className={clsx(
-              "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
-              "p-1.5 sm:px-2.5 sm:py-1.5 border shadow-sm truncate",
-              "font-semibold",
-              "text-white",
-              "bg-sky-600 hover:bg-sky-700 dark:bg-sky-700 dark:hover:bg-sky-600",
-              "border-sky-700",
-              theme.focusVisible,
-            )}
-          >
-            Back to home
-          </Link>
+          <ButtonLink to={link}>Back to home</ButtonLink>
         </div>
       </div>
     </div>

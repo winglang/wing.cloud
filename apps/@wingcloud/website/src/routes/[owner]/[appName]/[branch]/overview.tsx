@@ -2,10 +2,11 @@ import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { CommandLineIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../../components/page-header.js";
 import { SectionTitle } from "../../../../components/section-title.js";
+import { ButtonLink } from "../../../../design-system/button-link.js";
 import { Button } from "../../../../design-system/button.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../icons/branch-icon.js";
@@ -88,15 +89,13 @@ const Overview = ({
         noBackground
         actions={
           <>
-            <Button
+            <ButtonLink
               disabled={environment?.status !== "running"}
+              to={`/${owner}/${appName}/console/${environment?.branch}`}
               icon={CommandLineIcon}
-              onClick={() => {
-                navigate(`/${owner}/${appName}/console/${environment?.branch}`);
-              }}
             >
               Console
-            </Button>
+            </ButtonLink>
             <Button
               disabled={!VALID_REDEPLOY_STATUS.includes(environment?.status!)}
               icon={ArrowPathIcon}

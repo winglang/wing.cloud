@@ -7,6 +7,7 @@ import clsx from "clsx";
 import { useCallback } from "react";
 import { Link } from "react-router-dom";
 
+import { ButtonLink } from "../../../../../design-system/button-link.js";
 import { useNotifications } from "../../../../../design-system/notification.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { useTimeAgo } from "../../../../../utils/time.js";
@@ -73,39 +74,34 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
 
             <div
               className={clsx(
-                "flex gap-x-1 items-center w-full",
+                "flex gap-x-2 items-center w-full",
                 "sm:gap-x-5 truncate",
                 "leading-5 py-0.5",
                 theme.text2,
               )}
             >
               <div className="flex gap-x-1 w-full">
-                <div className="group flex gap-x-1 items-center truncate">
-                  <Link
-                    to={endpoint.publicUrl}
-                    target="_blank"
-                    className={clsx(
-                      "z-10",
-                      "truncate items-end font-mono",
-                      theme.text2,
-                      theme.text2Hover,
-                      "hover:underline focus:underline outline-none",
-                    )}
-                  >
-                    {endpoint.publicUrl}
-                  </Link>
+                <button
+                  className={clsx(
+                    "z-10",
+                    theme.text3,
+                    theme.text3Hover,
+                    "group flex items-center truncate",
+                    "outline-none focus-visible:underline",
+                    "gap-x-1",
+                  )}
+                  onClick={copyEndpointLink}
+                >
+                  <div className="truncate">{endpoint.publicUrl}</div>
                   <DocumentDuplicateIcon
                     className={clsx(
                       "transition-all",
                       "cursor-pointer",
-                      theme.text3,
-                      theme.text3Hover,
                       "w-0 h-0 group-hover:block group-hover:w-4 group-hover:h-4",
-                      "z-10 shrink-0",
+                      "shrink-0",
                     )}
-                    onClick={copyEndpointLink}
                   />
-                </div>
+                </button>
                 <div
                   className={clsx(
                     "truncate items-center opacity-70",
@@ -120,20 +116,9 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
           </div>
 
           <div className="flex gap-x-4 text-xs items-center justify-end mx-0.5">
-            <Link
-              to={endpoint.publicUrl}
-              target="_blank"
-              className={clsx(
-                theme.text2,
-                theme.text3Hover,
-                theme.bg4Hover,
-                theme.focusVisible,
-                "transition-all",
-                "z-10 rounded-full p-1.5",
-              )}
-            >
-              <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-            </Link>
+            <ButtonLink to={endpoint.publicUrl} target="_blank">
+              Open
+            </ButtonLink>
           </div>
         </div>
       </div>

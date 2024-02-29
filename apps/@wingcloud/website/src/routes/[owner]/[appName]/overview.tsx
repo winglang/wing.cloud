@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../components/page-header.js";
 import { SectionTitle } from "../../../components/section-title.js";
+import { ButtonLink } from "../../../design-system/button-link.js";
 import { Input } from "../../../design-system/input.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../icons/branch-icon.js";
@@ -128,24 +129,15 @@ const OverviewPage = ({
         actions={
           <>
             {app?.repoOwner && app?.repoName && (
-              <Link
+              <ButtonLink
                 to={`https://github.com/${app.repoOwner}/${app.repoName}`}
-                className={clsx(
-                  "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
-                  "p-1.5 sm:px-2.5 sm:py-1.5 border shadow-sm truncate",
-                  theme.borderInput,
-                  theme.focusVisible,
-                  theme.bgInput,
-                  theme.bgInputHover,
-                  theme.text1,
-                )}
                 target="_blank"
+                icon={GithubIcon}
               >
-                <GithubIcon className={clsx("size-4 shrink-0", theme.text2)} />
                 <div className="hidden sm:block">
                   {app.repoOwner}/{app.repoName}
                 </div>
-              </Link>
+              </ButtonLink>
             )}
           </>
         }
