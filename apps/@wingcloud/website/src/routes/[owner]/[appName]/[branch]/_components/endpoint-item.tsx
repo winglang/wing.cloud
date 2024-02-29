@@ -1,7 +1,4 @@
-import {
-  ArrowTopRightOnSquareIcon,
-  DocumentDuplicateIcon,
-} from "@heroicons/react/24/outline";
+import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import { GlobeAltIcon, BoltIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { useCallback } from "react";
@@ -113,12 +110,6 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="flex gap-x-4 text-xs items-center justify-end mx-0.5">
-            <ButtonLink to={endpoint.publicUrl} target="_blank">
-              Open
-            </ButtonLink>
           </div>
         </div>
       </div>

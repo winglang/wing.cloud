@@ -12,17 +12,19 @@ export const StatusWithDot = ({ status }: { status: EnvironmentStatus }) => {
   return (
     <div className="text-xs">
       <div className="flex items-center truncate gap-x-1">
-        <div
-          title={status}
-          className={clsx(
-            "w-2.5 h-2.5",
-            "rounded-full shrink-0",
-            color === "yellow" && "bg-yellow-300 animate-pulse",
-            color === "green" && "bg-green-300",
-            color === "red" && "bg-red-300",
-            color === "gray" && "bg-gray-300",
-          )}
-        />
+        <div className="size-4 items-center flex justify-center">
+          <div
+            title={status}
+            className={clsx(
+              "w-2.5 h-2.5",
+              "rounded-full shrink-0",
+              color === "yellow" && "bg-yellow-300 animate-pulse",
+              color === "green" && "bg-green-300",
+              color === "red" && "bg-red-300",
+              color === "gray" && "bg-gray-300",
+            )}
+          />
+        </div>
         <div
           className={clsx(
             "py-0.5 capitalize truncate font-semibold",

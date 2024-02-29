@@ -1,4 +1,4 @@
-import { BoltIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
+import { GlobeAltIcon, BoltIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -128,7 +128,7 @@ export const EnvironmentDetails = ({
       </Link>
 
       <div className="grid grid-cols-9 flex-grow gap-4 md:gap-6 transition-all">
-        <div className="flex col-span-4 flex-col gap-1">
+        <div className="flex col-span-4 xl:col-span-3 flex-col gap-1">
           <div className={clsx("text-sm truncate", theme.text2)}>Status</div>
           {!environment && (
             <SkeletonLoader className="h-5 w-28 max-w-full" loading />
@@ -138,7 +138,7 @@ export const EnvironmentDetails = ({
           </div>
         </div>
 
-        <div className="flex col-span-4 flex-col gap-1">
+        <div className="flex col-span-4 xl:col-span-3 flex-col gap-1">
           <div className={clsx("text-sm truncate", theme.text2)}>
             Created at
           </div>
@@ -150,13 +150,15 @@ export const EnvironmentDetails = ({
           </div>
         </div>
 
-        <div className="flex justify-end items-start">{actions}</div>
+        <div className="flex justify-end items-start xl:col-span-3">
+          {actions}
+        </div>
 
         <div
           className={clsx(
             "flex flex-col gap-1",
-            showEndpoints && "col-span-4",
-            !showEndpoints && "col-span-8",
+            showEndpoints && "col-span-4 xl:col-span-3",
+            !showEndpoints && "col-span-9",
           )}
         >
           <div className={clsx("text-sm truncate", theme.text2)}>Source</div>
@@ -210,7 +212,7 @@ export const EnvironmentDetails = ({
         </div>
 
         {showEndpoints && (
-          <div className="col-span-4 transition-all flex flex-col gap-1">
+          <div className="col-span-4 xl:col-span-3 transition-all flex flex-col gap-1">
             <div className={clsx("text-sm truncate", theme.text2)}>
               Endpoints
             </div>
@@ -304,17 +306,17 @@ export const EnvironmentDetails = ({
             </div>
           </div>
         )}
-
-        {app && environment && (
-          <RedeployEnvironmentModal
-            owner={owner}
-            appName={app.appName}
-            branch={environment.branch}
-            show={showRestartModal}
-            onClose={setShowRestartModal}
-          />
-        )}
       </div>
+
+      {app && environment && (
+        <RedeployEnvironmentModal
+          owner={owner}
+          appName={app.appName}
+          branch={environment.branch}
+          show={showRestartModal}
+          onClose={setShowRestartModal}
+        />
+      )}
     </div>
   );
 };
