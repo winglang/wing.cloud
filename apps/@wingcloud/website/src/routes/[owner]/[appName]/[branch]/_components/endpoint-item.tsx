@@ -65,7 +65,7 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
                 theme.text2,
               )}
             >
-              <div className="flex gap-x-1 w-full">
+              <div className="flex gap-x-1.5 w-full items-center">
                 <Link
                   to={endpoint.publicUrl}
                   target="_blank"
@@ -84,8 +84,8 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
                 <div
                   className={clsx(
                     "truncate items-center opacity-70",
-                    "transition-all",
-                    theme.text2,
+                    "transition-all text-xs",
+                    theme.text3,
                   )}
                 >
                   updated {updatedAt}
