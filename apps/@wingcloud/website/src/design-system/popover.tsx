@@ -65,7 +65,6 @@ export default function Popover({
                     theme.bgInput,
                     "border shadow-lg p-4 rounded-md",
                     theme.borderInput,
-                    "text-xs",
                   )}
                 >
                   {children}
