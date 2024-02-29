@@ -29,7 +29,7 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
         theme.borderInput,
         theme.focusVisible,
         "shadow-sm hover:shadow",
-        "relative",
+        "relative group",
       )}
     >
       <Link
@@ -46,13 +46,13 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
       <div className="flex items-center gap-x-4">
         {endpoint.browserSupport && (
           <GlobeAltIcon
-            className="w-4 h-4 mr-1 text-violet-700 dark:text-violet-400 shrink-0"
+            className="size-4 text-violet-700 dark:text-violet-400 shrink-0"
             title="Website"
           />
         )}
         {!endpoint.browserSupport && (
           <BoltIcon
-            className="w-4 h-4 mr-1 text-amber-500 dark:text-amber-400 shrink-0"
+            className="size-4 text-amber-500 dark:text-amber-400 shrink-0"
             title="Function"
           />
         )}
@@ -74,31 +74,25 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
                 "flex gap-x-2 items-center w-full",
                 "sm:gap-x-5 truncate",
                 "leading-5 py-0.5",
+                "font-semibold",
                 theme.text2,
               )}
             >
               <div className="flex gap-x-1 w-full">
-                <button
+                <Link
+                  to={endpoint.publicUrl}
+                  target="_blank"
                   className={clsx(
                     "z-10",
-                    theme.text3,
-                    theme.text3Hover,
+                    theme.textFocus,
                     "group flex items-center truncate",
-                    "outline-none focus-visible:underline",
+                    "outline-none hover:underline focus-visible:underline",
                     "gap-x-1",
                   )}
                   onClick={copyEndpointLink}
                 >
                   <div className="truncate">{endpoint.publicUrl}</div>
-                  <DocumentDuplicateIcon
-                    className={clsx(
-                      "transition-all",
-                      "cursor-pointer",
-                      "w-0 h-0 group-hover:block group-hover:w-4 group-hover:h-4",
-                      "shrink-0",
-                    )}
-                  />
-                </button>
+                </Link>
                 <div
                   className={clsx(
                     "truncate items-center opacity-70",
@@ -111,6 +105,23 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
               </div>
             </div>
           </div>
+        </div>
+        <div className="flex items-center gap-x-4 px-2">
+          <button
+            className={clsx(
+              "z-10",
+              theme.text3,
+              theme.text3Hover,
+              theme.focusVisible,
+              "rounded p-1",
+              "flex items-center truncate",
+              "outline-none focus-visible:underline",
+              "opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-all",
+            )}
+            onClick={copyEndpointLink}
+          >
+            <DocumentDuplicateIcon className="size-4" />
+          </button>
         </div>
       </div>
     </div>

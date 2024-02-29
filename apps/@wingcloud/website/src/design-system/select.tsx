@@ -138,7 +138,12 @@ export const Select = memo(
                           {item.label ?? item.value}
                         </span>
                         {showSelected && selected ? (
-                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-sky-600">
+                          <span
+                            className={clsx(
+                              "absolute inset-y-0 left-0 flex items-center pl-3",
+                              theme.textFocus,
+                            )}
+                          >
                             <CheckIcon className="h-4 w-4" aria-hidden="true" />
                           </span>
                         ) : undefined}

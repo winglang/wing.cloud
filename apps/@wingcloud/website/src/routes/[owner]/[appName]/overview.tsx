@@ -241,7 +241,10 @@ const OverviewPage = ({
                       <span>
                         Get started by{" "}
                         <a
-                          className="text-sky-500 hover:underline focus:underline hover:text-sky-600 outline-none"
+                          className={clsx(
+                            "hover:underline focus:underline hover:text-sky-700 outline-none",
+                            theme.textFocus,
+                          )}
                           href={`${repoUrl}/compare`}
                           target="_blank"
                           rel="noopener noreferrer"
