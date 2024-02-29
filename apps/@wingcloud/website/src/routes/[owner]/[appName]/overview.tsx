@@ -1,4 +1,4 @@
-import { MagnifyingGlassCircleIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -193,7 +193,7 @@ const OverviewPage = ({
               {previewEnvs.length > 0 && (
                 <Input
                   type="text"
-                  leftIcon={MagnifyingGlassCircleIcon}
+                  leftIcon={MagnifyingGlassIcon}
                   className="block w-full"
                   containerClassName="w-full"
                   name="search"
