@@ -212,7 +212,8 @@ export const EnvironmentDetails = ({
                           to={`https://github.com/${environment.repo}/pull/${environment.prNumber}`}
                           target="_blank"
                         >
-                          {environment.prTitle} #{environment.prNumber}
+                          {environment.prTitle}{" "}
+                          {environment.prNumber && `#${environment.prNumber}`}
                         </Link>
                       </div>
                     )}
