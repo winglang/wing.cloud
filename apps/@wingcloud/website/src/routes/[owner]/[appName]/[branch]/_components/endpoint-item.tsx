@@ -1,10 +1,8 @@
-import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import { GlobeAltIcon, BoltIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { useCallback } from "react";
 import { Link } from "react-router-dom";
 
-import { ButtonLink } from "../../../../../design-system/button-link.js";
 import { Button } from "../../../../../design-system/button.js";
 import { useNotifications } from "../../../../../design-system/notification.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
@@ -33,17 +31,6 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
         "relative group",
       )}
     >
-      <Link
-        to={endpoint.publicUrl}
-        target="_blank"
-        className={clsx(
-          "-m-px",
-          "absolute inset-0 cursor-pointer rounded-md border",
-          theme.focusVisible,
-          theme.borderInput,
-        )}
-      />
-
       <div className="flex items-center gap-x-4">
         {endpoint.browserSupport && (
           <GlobeAltIcon
@@ -75,7 +62,6 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
                 "flex gap-x-2 items-center w-full",
                 "sm:gap-x-5 truncate",
                 "leading-5 py-0.5",
-                "font-semibold",
                 theme.text2,
               )}
             >
@@ -89,6 +75,7 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
                     "group flex items-center truncate",
                     "outline-none hover:underline focus-visible:underline",
                     "gap-x-1",
+                    "font-semibold",
                   )}
                   onClick={copyEndpointLink}
                 >
@@ -122,7 +109,7 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
             )}
             onClick={copyEndpointLink}
           >
-            Copy
+            Copy URL
           </Button>
         </div>
       </div>

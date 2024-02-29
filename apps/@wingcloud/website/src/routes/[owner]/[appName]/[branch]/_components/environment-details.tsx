@@ -10,6 +10,7 @@ import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { BranchIcon } from "../../../../../icons/branch-icon.js";
 import { CommitIcon } from "../../../../../icons/commit-icon.js";
 import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js";
+import { PRIcon } from "../../../../../icons/pr-icon.js";
 import { useStatus } from "../../../../../utils/status.js";
 import { getDateTime } from "../../../../../utils/time.js";
 import type { App, Endpoint, Environment } from "../../../../../utils/wrpc.js";
@@ -176,23 +177,46 @@ export const EnvironmentDetails = ({
                 )}
 
                 {app?.lastCommitMessage && environment && (
-                  <div className="flex gap-x-1 items-center">
-                    <CommitIcon
-                      className={clsx("w-4 h-4 shrink-0", theme.text3)}
-                    />
-                    <Link
-                      className={clsx(
-                        "hover:underline focus:underline outline-none",
-                        "truncate relative z-10",
-                        "font-semibold truncate",
-                        theme.text2,
-                      )}
-                      to={`https://github.com/${environment.repo}/commit/${app.lastCommitSha}`}
-                      target="_blank"
-                    >
-                      {app.lastCommitMessage}
-                    </Link>
-                  </div>
+                  <>
+                    {environment.type === "production" && (
+                      <div className="flex gap-x-1 items-center">
+                        <CommitIcon
+                          className={clsx("w-4 h-4 shrink-0", theme.text3)}
+                        />
+                        <Link
+                          className={clsx(
+                            "hover:underline focus:underline outline-none",
+                            "truncate relative z-10",
+                            "font-semibold truncate",
+                            theme.text2,
+                          )}
+                          to={`https://github.com/${environment.repo}/commit/${app.lastCommitSha}`}
+                          target="_blank"
+                        >
+                          {app.lastCommitMessage}
+                        </Link>
+                      </div>
+                    )}
+                    {environment.type === "preview" && (
+                      <div className="flex gap-x-1 items-center">
+                        <PRIcon
+                          className={clsx("w-4 h-4 shrink-0", theme.text3)}
+                        />
+                        <Link
+                          className={clsx(
+                            "hover:underline focus:underline outline-none",
+                            "truncate relative z-10",
+                            "font-semibold truncate",
+                            theme.text2,
+                          )}
+                          to={`https://github.com/${environment.repo}/pull/${environment.prNumber}`}
+                          target="_blank"
+                        >
+                          {environment.prTitle}
+                        </Link>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
