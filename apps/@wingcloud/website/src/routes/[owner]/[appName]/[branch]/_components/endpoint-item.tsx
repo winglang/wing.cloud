@@ -5,6 +5,7 @@ import { useCallback } from "react";
 import { Link } from "react-router-dom";
 
 import { ButtonLink } from "../../../../../design-system/button-link.js";
+import { Button } from "../../../../../design-system/button.js";
 import { useNotifications } from "../../../../../design-system/notification.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { useTimeAgo } from "../../../../../utils/time.js";
@@ -107,7 +108,8 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
           </div>
         </div>
         <div className="flex items-center gap-x-4 px-2">
-          <button
+          <Button
+            small
             className={clsx(
               "z-10",
               theme.text3,
@@ -120,8 +122,8 @@ export const EndpointItem = ({ endpoint }: { endpoint: Endpoint }) => {
             )}
             onClick={copyEndpointLink}
           >
-            <DocumentDuplicateIcon className="size-4" />
-          </button>
+            Copy
+          </Button>
         </div>
       </div>
     </div>
