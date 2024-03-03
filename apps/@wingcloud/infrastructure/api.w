@@ -792,7 +792,7 @@ pub class Api {
 
       if let owner = props.users.fromLogin(username: request.query.get("owner")) {
         let appName = request.query.get("appName");
-        let app = props.apps.getByName(appName: appName, userId: owner.id);
+        let app = props.apps.getByName(appName: appName, userId: owner.id, isAdmin: owner.isAdmin);
         checkAppAccessRights(userId, app, owner.isAdmin);
 
         let environments = props.environments.list(
@@ -819,6 +819,7 @@ pub class Api {
         let app = apps.getByName(
           userId: owner.id,
           appName: appName,
+          isAdmin: owner.isAdmin
         );
         checkAppAccessRights(userId, app, owner.isAdmin);
 
@@ -850,6 +851,7 @@ pub class Api {
       let app = apps.getByName(
         userId: userId,
         appName: appName,
+        isAdmin: user.isAdmin
       );
       checkAppAccessRights(userId, app, user.isAdmin);
 
