@@ -234,31 +234,49 @@ pub class Apps {
     let var exclusiveStartKey: Json? = nil;
     let var apps: Array<App> = [];
     let var searchTerm = options.userId;
-    let var condition = "pk = :pk AND begins_with(sk, :sk)";
     if options.isAdmin? {
       log("Running as an admin user");
-      searchTerm = "";
-      condition = "begins_with(pk, :pk) AND begins_with(sk, :sk)";
+      util.Util.do_while(
+        handler: () => {
+          let result = this.table.scan(
+            filterExpression: "begins_with(pk, :pk) AND begins_with(sk, :sk)",
+            expressionAttributeValues: {
+              ":pk": "USER#",
+              ":sk": "APP#",
+            },
+            exclusiveStartKey: exclusiveStartKey,
+          );
+          for item in result.items {
+            apps = apps.concat([App.fromJson(item)]);
+          }
+          exclusiveStartKey = result.lastEvaluatedKey;
+        },
+        condition: () => {
+          return exclusiveStartKey?;
+        },
+      );
+    } else {
+      util.Util.do_while(
+        handler: () => {
+          let result = this.table.query(
+            keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+            expressionAttributeValues: {
+              ":pk": "USER#{options.userId}",
+              ":sk": "APP#",
+            },
+            exclusiveStartKey: exclusiveStartKey,
+          );
+          for item in result.items {
+            apps = apps.concat([App.fromJson(item)]);
+          }
+          exclusiveStartKey = result.lastEvaluatedKey;
+        },
+        condition: () => {
+          return exclusiveStartKey?;
+        },
+      );
     }
-    util.Util.do_while(
-      handler: () => {
-        let result = this.table.query(
-          keyConditionExpression: condition,
-          expressionAttributeValues: {
-            ":pk": "USER#{searchTerm}",
-            ":sk": "APP#",
-          },
-          exclusiveStartKey: exclusiveStartKey,
-        );
-        for item in result.items {
-          apps = apps.concat([App.fromJson(item)]);
-        }
-        exclusiveStartKey = result.lastEvaluatedKey;
-      },
-      condition: () => {
-        return exclusiveStartKey?;
-      },
-    );
+
     return apps;
   }
 
