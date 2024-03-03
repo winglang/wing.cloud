@@ -50,6 +50,7 @@ struct GetAppOptions {
 struct GetAppByNameOptions {
   userId: str;
   appName: str;
+  isAdmin: bool?;
 }
 
 struct ListAppsOptions {
@@ -216,15 +217,29 @@ pub class Apps {
   }
 
   pub inflight getByName(options: GetAppByNameOptions): App {
-    let result = this.table.getItem(
-      key: {
-        pk: "USER#{options.userId}",
-        sk: "APP_NAME#{options.appName}",
-      },
-    );
 
-    if let item = result.item {
-      return App.fromJson(item);
+    if options.isAdmin? {
+      let result = this.table.scan(
+        filterExpression: "begins_with(pk, :pk) AND sk = :sk",
+        expressionAttributeValues: {
+          ":pk": "USER#",
+          ":sk": "APP_NAME#{options.appName}",
+        }
+      );
+
+      let item = result.items.at(0);
+      return App.fromJson(item); 
+    } else {
+      let result = this.table.getItem(
+        key: {
+          pk: "USER#{options.userId}",
+          sk: "APP_NAME#{options.appName}",
+        },
+      );
+
+      if let item = result.item {
+        return App.fromJson(item);
+      }
     }
 
     throw httpError.HttpError.notFound("App '{options.appName}' not found");
