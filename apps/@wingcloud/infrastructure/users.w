@@ -8,7 +8,6 @@ struct User {
   username: str;
   avatarUrl: str;
   email: str?;
-  isAdmin: bool?;
 }
 
 struct CreateOptions {
@@ -38,7 +37,6 @@ struct UpdateOptions {
   displayName: str;
   avatarUrl: str?;
   email: str?;
-  isAdmin: bool?;
 }
 
 pub class Users {
@@ -96,21 +94,16 @@ pub class Users {
   pub inflight update(
     options: UpdateOptions,
   ): User {
-    let var admin = false;
-    if options.isAdmin? {
-      admin = true;
-    }
     let result = this.table.updateItem(
       key: {
         pk: "USER#{options.userId}",
         sk: "#",
       },
-      updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email, isAdmin = :isAdmin",
+      updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email",
       expressionAttributeValues: {
         ":displayName": options.displayName,
         ":avatarUrl": options.avatarUrl,
-        ":email": options.email,
-        ":isAdmin": admin
+        ":email": options.email
       },
       returnValues: "ALL_NEW",
     );
@@ -149,8 +142,7 @@ pub class Users {
         userId: user.id,
         displayName: options.displayName,
         avatarUrl: options.avatarUrl,
-        email: options.email,
-        isAdmin: user.isAdmin
+        email: options.email
       );
     } else {
       return this.create(

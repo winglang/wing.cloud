@@ -50,12 +50,10 @@ struct GetAppOptions {
 struct GetAppByNameOptions {
   userId: str;
   appName: str;
-  isAdmin: bool?;
 }
 
 struct ListAppsOptions {
   userId: str;
-  isAdmin: bool?;
 }
 
 struct DeleteAppOptions {
@@ -217,29 +215,15 @@ pub class Apps {
   }
 
   pub inflight getByName(options: GetAppByNameOptions): App {
+    let result = this.table.getItem(
+      key: {
+        pk: "USER#{options.userId}",
+        sk: "APP_NAME#{options.appName}",
+      },
+    );
 
-    if options.isAdmin? {
-      let result = this.table.scan(
-        filterExpression: "begins_with(pk, :pk) AND sk = :sk",
-        expressionAttributeValues: {
-          ":pk": "USER#",
-          ":sk": "APP_NAME#{options.appName}",
-        }
-      );
-
-      let item = result.items.at(0);
-      return App.fromJson(item); 
-    } else {
-      let result = this.table.getItem(
-        key: {
-          pk: "USER#{options.userId}",
-          sk: "APP_NAME#{options.appName}",
-        },
-      );
-
-      if let item = result.item {
-        return App.fromJson(item);
-      }
+    if let item = result.item {
+      return App.fromJson(item);
     }
 
     throw httpError.HttpError.notFound("App '{options.appName}' not found");
@@ -248,50 +232,25 @@ pub class Apps {
   pub inflight list(options: ListAppsOptions): Array<App> {
     let var exclusiveStartKey: Json? = nil;
     let var apps: Array<App> = [];
-    let var searchTerm = options.userId;
-    if options.isAdmin? {
-      log("Running as an admin user");
-      util.Util.do_while(
-        handler: () => {
-          let result = this.table.scan(
-            filterExpression: "begins_with(pk, :pk) AND begins_with(sk, :sk)",
-            expressionAttributeValues: {
-              ":pk": "USER#",
-              ":sk": "APP#",
-            },
-            exclusiveStartKey: exclusiveStartKey,
-          );
-          for item in result.items {
-            apps = apps.concat([App.fromJson(item)]);
-          }
-          exclusiveStartKey = result.lastEvaluatedKey;
-        },
-        condition: () => {
-          return exclusiveStartKey?;
-        },
-      );
-    } else {
-      util.Util.do_while(
-        handler: () => {
-          let result = this.table.query(
-            keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-            expressionAttributeValues: {
-              ":pk": "USER#{options.userId}",
-              ":sk": "APP#",
-            },
-            exclusiveStartKey: exclusiveStartKey,
-          );
-          for item in result.items {
-            apps = apps.concat([App.fromJson(item)]);
-          }
-          exclusiveStartKey = result.lastEvaluatedKey;
-        },
-        condition: () => {
-          return exclusiveStartKey?;
-        },
-      );
-    }
-
+    util.Util.do_while(
+      handler: () => {
+        let result = this.table.query(
+          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          expressionAttributeValues: {
+            ":pk": "USER#{options.userId}",
+            ":sk": "APP#",
+          },
+          exclusiveStartKey: exclusiveStartKey,
+        );
+        for item in result.items {
+          apps = apps.concat([App.fromJson(item)]);
+        }
+        exclusiveStartKey = result.lastEvaluatedKey;
+      },
+      condition: () => {
+        return exclusiveStartKey?;
+      },
+    );
     return apps;
   }
 
