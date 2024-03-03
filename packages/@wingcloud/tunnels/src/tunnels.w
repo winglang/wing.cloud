@@ -36,6 +36,11 @@ struct ForwardResponseMessage extends Message {
   body: str?;
 }
 
+struct ErrorMessage extends Message {
+  type: str;
+  message: str;
+}
+
 pub struct TunnelsApiProps {
   zoneName: str;
   subDomain: str;
@@ -107,7 +112,7 @@ pub class TunnelsApi {
     
     
     this.ws.onConnect(inflight (connectionId: str) => {
-      connections.addConnection(connectionId);
+      log("onConnect: {connectionId}");  
     });
     
     this.ws.onDisconnect(inflight (connectionId: str) => {
@@ -130,10 +135,28 @@ pub class TunnelsApi {
       if msg?.action == "INITIALIZE" {
         let initialize = InitializeMessage.fromJson(jsn);
         let subdomain = initialize.subdomain ?? util.nanoid(alphabet: "0123456789abcdefghij", size: 10);
-        connections.updateConnectionWithSubdomain(conn.Connection{
-          connectionId: connectionId,
-          subdomain: subdomain
-        });
+
+        let isConnected = util.waitUntil(inflight () => {
+          try {
+            connections.addConnectionWithSubdomain(conn.Connection{
+              connectionId: connectionId,
+              subdomain: subdomain
+            });
+            return true;
+          } catch err {
+            log("error adding connection {connectionId}: {err}");
+            return false;
+          }
+        }, timeout: 3s, interval: 250ms);
+
+        if !isConnected {
+          this.ws.sendMessage(connectionId, Json.stringify(ErrorMessage{
+            action: "ERROR",
+            type: "SUBDOMAIN_IN_USE",
+            message: "Subdomain {subdomain} already in use",
+          }));
+          return;
+        }
         
         this.ws.sendMessage(connectionId, Json.stringify(InitializedMessage{
           action: "INITIALIZED",

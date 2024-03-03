@@ -6,8 +6,7 @@ pub struct Connection {
 }
 
 pub interface IConnections {
-  inflight addConnection(connectionId: str): void;
-  inflight updateConnectionWithSubdomain(conn: Connection): void;
+  inflight addConnectionWithSubdomain(conn: Connection): void;
   inflight removeConnection(connectionId: str): void;
   inflight findConnectionBySubdomain(subdomain: str): Connection?;
   inflight addResponseForRequest(requestId: str, req: Json): void;
@@ -19,34 +18,29 @@ pub class Connections impl IConnections {
   connections: ex.DynamodbTable;
   requests: ex.Redis;
   new() {
-    this.connections = new ex.DynamodbTable(name: "key", hashKey: "key", attributeDefinitions: { key: "S" });
+    this.connections = new ex.DynamodbTable(name: "connections", hashKey: "pk", attributeDefinitions: { pk: "S" }) as "connections";
     this.requests = new ex.Redis();
   }
 
-  pub inflight addConnection(connectionId: str) {
-    this.connections.putItem(item: {
-      key: "connectionId#{connectionId}",
-    });
-  }
-
-  pub inflight updateConnectionWithSubdomain(conn: Connection) {
+  pub inflight addConnectionWithSubdomain(conn: Connection) {
     this.connections.transactWriteItems(
       transactItems: [
         {
-          update: {
-            key: {
-              key: "connectionId#{conn.connectionId}",
+          put: {
+            item: {
+              pk: "connectionId#{conn.connectionId}",
+              subdomain: conn.subdomain
             },
-            updateExpression: "set subdomain = :subdomain",
-            expressionAttributeValues: { ":subdomain": conn.subdomain }
+            conditionExpression: "attribute_not_exists(pk)",
           },
         },
         {
           put: {
             item: {
-              key: "subdomain#{conn.subdomain}",
+              pk: "subdomain#{conn.subdomain}",
               connectionId: conn.connectionId
-            }
+            },
+            conditionExpression: "attribute_not_exists(pk)"
           },
         }
       ]
@@ -55,7 +49,7 @@ pub class Connections impl IConnections {
 
   pub inflight removeConnection(connectionId: str) {
     let item = this.connections.getItem(key: {
-      key: "connectionId#{connectionId}",
+      pk: "connectionId#{connectionId}",
     });
 
     if let item = item.item {
@@ -65,14 +59,14 @@ pub class Connections impl IConnections {
           {
             delete: {
               key: {
-                key: "connectionId#{connectionId}",
+                pk: "connectionId#{connectionId}",
               }
             },
           },
           {
             delete: {
               key: {
-                key: "subdomain#{subdomain}",
+                pk: "subdomain#{subdomain}",
               }
             },
           },
@@ -83,7 +77,7 @@ pub class Connections impl IConnections {
 
   pub inflight findConnectionBySubdomain(subdomain: str): Connection? {
     let item = this.connections.getItem(key: {
-      key: "subdomain#{subdomain}",
+      pk: "subdomain#{subdomain}",
     });
 
     if let item = item.item {
