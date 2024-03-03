@@ -25,7 +25,8 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         type="checkbox"
         className={clsx(
           theme.border3,
-          "h-4 w-4 rounded text-sky-600 focus:ring-sky-500 transition ease-in-out",
+          theme.textFocus,
+          "h-4 w-4 rounded focus:ring-sky-500 transition ease-in-out",
           disabled && "cursor-not-allowed opacity-50",
           className,
         )}

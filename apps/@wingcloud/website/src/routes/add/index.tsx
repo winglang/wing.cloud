@@ -206,7 +206,10 @@ const AddAppPage = () => {
                     Missing a repository?
                   </span>
                   <button
-                    className="text-sky-600 text-left hover:underline"
+                    className={clsx(
+                      "text-left hover:underline",
+                      theme.textFocus,
+                    )}
                     onClick={() =>
                       openPopupWindow({
                         url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,

@@ -95,7 +95,7 @@ export const EnvironmentsListItem = ({
             >
               {environment.prTitle}
             </Link>
-            <div className="flex gap-x-2 sm:gap-x-5">
+            <div className="flex gap-x-2 sm:gap-x-5 items-center">
               <div
                 className={clsx(
                   "truncate w-full",
@@ -109,7 +109,7 @@ export const EnvironmentsListItem = ({
                   to={`https://github.com/${environment.repo}/tree/${environment.branch}`}
                   target="_blank"
                   className={clsx(
-                    "font-mono truncate",
+                    "truncate",
                     theme.text2,
                     theme.text2Hover,
                     "focus:underline outline-none",
@@ -121,6 +121,7 @@ export const EnvironmentsListItem = ({
                 <span
                   className={clsx(
                     "truncate items-center opacity-70",
+                    "ml-0.5",
                     theme.text2,
                   )}
                 >
