@@ -8,6 +8,7 @@ struct User {
   username: str;
   avatarUrl: str;
   email: str?;
+  isAdmin: bool?;
 }
 
 struct CreateOptions {

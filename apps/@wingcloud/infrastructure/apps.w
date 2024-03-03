@@ -54,6 +54,7 @@ struct GetAppByNameOptions {
 
 struct ListAppsOptions {
   userId: str;
+  isAdmin: bool?;
 }
 
 struct DeleteAppOptions {
@@ -232,12 +233,16 @@ pub class Apps {
   pub inflight list(options: ListAppsOptions): Array<App> {
     let var exclusiveStartKey: Json? = nil;
     let var apps: Array<App> = [];
+    let var searchTerm = options.userId;
+    if options.isAdmin? {
+      searchTerm = "";
+    }
     util.Util.do_while(
       handler: () => {
         let result = this.table.query(
           keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
           expressionAttributeValues: {
-            ":pk": "USER#{options.userId}",
+            ":pk": "USER#{searchTerm}",
             ":sk": "APP#",
           },
           exclusiveStartKey: exclusiveStartKey,

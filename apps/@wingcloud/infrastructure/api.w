@@ -39,6 +39,7 @@ struct UserFromCookie {
   userId: str;
   username: str;
   email: str?;
+  isAdmin: bool?;
 }
 
 struct DeleteAppMessage {
@@ -232,19 +233,21 @@ pub class Api {
         userId: userId,
         username: user.username,
         email: user.email,
+        isAdmin: user.isAdmin,
       };
     };
 
     let checkOwnerAccessRights = inflight (request, owner: str) => {
       let user = getUserFromCookie(request);
       // TODO: Currently we only allow the signed in user to access their own resources.
-      if user.username != owner {
+      if !user.isAdmin? && user.username != owner {
         throw httpError.HttpError.notFound("User '{owner}' not found");
       }
+      return user;
     };
 
-    let checkAppAccessRights = inflight (userId: str, app: Apps.App): Apps.App => {
-      if userId != app.userId {
+    let checkAppAccessRights = inflight (userId: str, app: Apps.App, isAdmin: bool?): Apps.App => {
+      if !isAdmin? && userId != app.userId {
         throw httpError.HttpError.notFound("App not found");
       }
       return app;
@@ -695,11 +698,12 @@ pub class Api {
 
     api.get("/wrpc/app.list", inflight (request) => {
       let owner = request.query.get("owner");
-      checkOwnerAccessRights(request, owner);
+      let user = checkOwnerAccessRights(request, owner);
 
       if let user = props.users.fromLogin(username: owner) {
         let userApps = apps.list(
           userId: user.id,
+          isAdmin: user.isAdmin
         );
         return {
           body: {
@@ -789,7 +793,7 @@ pub class Api {
       if let owner = props.users.fromLogin(username: request.query.get("owner")) {
         let appName = request.query.get("appName");
         let app = props.apps.getByName(appName: appName, userId: owner.id);
-        checkAppAccessRights(userId, app);
+        checkAppAccessRights(userId, app, owner.isAdmin);
 
         let environments = props.environments.list(
           appId: app.appId,
@@ -816,7 +820,7 @@ pub class Api {
           userId: owner.id,
           appName: appName,
         );
-        checkAppAccessRights(userId, app);
+        checkAppAccessRights(userId, app, owner.isAdmin);
 
         let environment = props.environments.getByBranch(
           appId: app.appId,
@@ -841,13 +845,13 @@ pub class Api {
       let appName = input.get("appName").asStr();
       let branch = input.get("branch").asStr();
 
-      checkOwnerAccessRights(request, owner);
+      let user = checkOwnerAccessRights(request, owner);
 
       let app = apps.getByName(
         userId: userId,
         appName: appName,
       );
-      checkAppAccessRights(userId, app);
+      checkAppAccessRights(userId, app, user.isAdmin);
 
       let environment = props.environments.getByBranch(
         appId: app.appId,
