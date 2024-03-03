@@ -39,6 +39,7 @@ struct UserFromCookie {
   userId: str;
   username: str;
   email: str?;
+  isAdmin: bool?;
 }
 
 struct DeleteAppMessage {
@@ -232,13 +233,14 @@ pub class Api {
         userId: userId,
         username: user.username,
         email: user.email,
+        isAdmin: user.isAdmin,
       };
     };
 
     let checkOwnerAccessRights = inflight (request, owner: str) => {
       let user = getUserFromCookie(request);
       // TODO: Currently we only allow the signed in user to access their own resources.
-      if user.username != owner {
+      if !user.isAdmin? && user.username != owner {
         throw httpError.HttpError.notFound("User '{owner}' not found");
       }
     };
