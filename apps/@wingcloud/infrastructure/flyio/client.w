@@ -80,6 +80,14 @@ struct IGetAppResultDataApps {
   pageInfo: IClientPageInfo;
 }
 
+struct IGetOrgAppsResultData {
+  organization: IGetAppResultData;
+}
+
+struct IGetOrgAppsResult {
+  data: IGetOrgAppsResultData;
+}
+
 struct IGetAppResultData {
   apps: IGetAppResultDataApps;
 }
@@ -88,16 +96,20 @@ struct IAppsResult {
   data: IGetAppResultData;
 }
 
-struct ICountResultDataApps {
+struct IAppsCountResultData {
   totalCount: num;
 }
 
-struct ICountResultData {
-  apps: ICountResultDataApps;
+struct IAppsCountResult {
+  apps: IAppsCountResultData;
 }
 
-struct ICountResult {
-  data: ICountResultData;
+struct IOrgAppsCountResultData {
+  organization: IAppsCountResult;
+}
+
+struct IOrgAppsCountResult {
+  data: IOrgAppsCountResultData;
 }
 
 struct IRuntimeCreateMachineResult {
@@ -146,27 +158,26 @@ pub inflight class Client {
     };
   }
 
-  pub apps(cursor: str?): IAppsResult {
+  pub apps(cursor: str?): IGetOrgAppsResult {
     let appsRespone = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
-      query: "query getapps \{ apps(after: \"{cursor}\") \{ nodes\{ id machines \{ nodes \{ id instanceId state } totalCount } createdAt } pageInfo \{ endCursor hasNextPage } totalCount } }",
+      query: "query getapps \{organization(name: \"{this.orgSlug}\") \{ apps(after: \"{cursor}\") \{ nodes\{ id machines \{ nodes \{ id instanceId state } totalCount } createdAt } pageInfo \{ endCursor hasNextPage } totalCount } } }",
     }));
     if (!appsRespone.ok) {
       throw "failed to get apps {appsRespone.body}";
     }
-
-    return IAppsResult.fromJson(this.verifyJsonResponse(Json.parse(appsRespone.body)));
+    return IGetOrgAppsResult.fromJson(this.verifyJsonResponse(Json.parse(appsRespone.body)));
   }
 
   pub appsCount(): num {
     let countRes = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
-      query: "query getapps \{ apps \{ totalCount } }",
+      query: "query getapps \{organization(name: \"{this.orgSlug}\") \{ apps \{ totalCount } } }",
     }));
     if (!countRes.ok) {
       throw "failed to get app count {countRes.body}";
     }
 
-    let count = ICountResult.fromJson(this.verifyJsonResponse(Json.parse(countRes.body)));
-    return count.data.apps.totalCount;
+    let count = IOrgAppsCountResult.fromJson(this.verifyJsonResponse(Json.parse(countRes.body)));
+    return count.data.organization.apps.totalCount;
   }
 
   pub createApp(appName: str) {

@@ -198,10 +198,10 @@ inflight class FlyApp {
   pub listApps(): Array<FlyApp> {
     let queryApps = (cursor: str, apps: MutArray<FlyApp>): client.IClientPageInfo => {
       let res = this.client.apps(cursor);
-      for app in res.data.apps.nodes {
+      for app in res.data.organization.apps.nodes {
         apps.push(new FlyApp(client: this.client, name: app.id));
       }
-      return res.data.apps.pageInfo;
+      return res.data.organization.apps.pageInfo;
     };
 
     let apps = MutArray<FlyApp>[];
