@@ -53,6 +53,7 @@
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.394",
     "@octokit/rest": "^20.0.2",
+    "@playwright/test": "^1.42.1",
     "@types/express": "^4.17.21",
     "@types/http-proxy": "^1.17.14",
     "@types/jsonwebtoken": "^9.0.5",
@@ -77,6 +78,7 @@
     "preinstall": "npx only-allow pnpm",
     "test": "projen test",
     "example": "node ./bin/wing.mjs it example.main.w",
+    "test:playwright": "playwright test --update-snapshots",
     "default": "projen default",
     "compile": "projen compile",
     "build": "projen build",

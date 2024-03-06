@@ -380,6 +380,13 @@ infrastructure.addDeps("cdktf");
 infrastructure.addDeps("constructs");
 infrastructure.addDeps("aws-cdk-lib");
 
+infrastructure.addDevDeps("@playwright/test");
+infrastructure.addScript(
+  "test:playwright",
+  "playwright test --update-snapshots",
+);
+infrastructure.addGitIgnore("**/playwright-report/");
+
 ///////////////////////////////////////////////////////////////////////////////
 
 const aws = new NodeProject({
