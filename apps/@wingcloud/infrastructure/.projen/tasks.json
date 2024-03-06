@@ -121,7 +121,7 @@
       "description": "Run tests",
       "steps": [
         {
-          "exec": "node ./bin/wing.mjs test main.w"
+          "exec": "node ./bin/wing.mjs test tests"
         }
       ]
     },
@@ -129,7 +129,7 @@
       "name": "test-aws",
       "steps": [
         {
-          "exec": "node ./bin/wing.mjs test -t tf-aws main.w"
+          "exec": "node ./bin/wing.mjs test -t tf-aws tests"
         }
       ]
     }
