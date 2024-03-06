@@ -26,7 +26,7 @@ struct Item extends App {
   sk: str;
 }
 
-struct CreateAppOptions {
+pub struct CreateAppOptions {
   appName: str;
   appFullName: str;
   description: str;
