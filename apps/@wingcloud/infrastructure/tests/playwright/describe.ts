@@ -24,8 +24,13 @@ export const describe = (callback: () => void) => {
   });
 
   test.beforeEach(async ({ page }) => {
+    console.log("Logging in...");
     await page.goto(`http://localhost:${server.port}/`);
     await page.click("text=Login with GitHub");
+
+    await page.waitForURL(/localhost:3900\/\w+/);
+    const user = await page.url().split("/")[3];
+    console.log(`Logged in as: ${user}`);
   });
 
   callback();
