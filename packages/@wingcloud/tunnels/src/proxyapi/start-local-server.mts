@@ -31,9 +31,8 @@ export const startServer = (handler: (any) => any) => {
     }
   });
 
-  const port = Math.floor(Math.random() * 1000 + 3000);
-  const server = app.listen(port, () => {
-    console.log(`proxy api is running: http://localhost:${port}`);
+  const server = app.listen(0, () => {
+    console.log("proxy api is running", server.address());
   });
   const address = server.address();
   

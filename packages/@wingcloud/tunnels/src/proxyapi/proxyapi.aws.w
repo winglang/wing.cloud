@@ -8,34 +8,34 @@ bring "./dnsimple.w" as dnsimple;
 pub class ProxyApi impl types.IProxyApi {
   api: awsProvider.apiGatewayRestApi.ApiGatewayRestApi;
   apiEndpoint: str;
-  new(handler: inflight (types.IProxyApiEvent): types.IProxyApiResponse, props: types.ProxyApiProps) {
-    let fn = new cloud.Function(unsafeCast(inflight (event: types.IProxyApiAwsRequest): types.IProxyApiResponse => {
+  new(handler: inflight (types.ProxyApiEvent): types.ProxyApiResponse, props: types.ProxyApiProps) {
+    let fn = new cloud.Function(unsafeCast(inflight (event: types.ProxyApiAwsRequest): types.ProxyApiResponse => {
       let host = event.headers?.tryGet("Host");
       if host == nil {
         return {
-          statusCode: 404,
-          body: "Missing subdomain"
+          statusCode: 400,
+          body: "Bad Request"
         };
       }
 
       let parts = host?.split(".");
       if parts == nil {
         return {
-          statusCode: 404,
-          body: "Missing subdomain"
+          statusCode: 400,
+          body: "Bad Request"
         };
       }
 
       let subdomain = parts?.tryAt(0);
       if subdomain == nil {
         return {
-          statusCode: 404,
-          body: "Missing subdomain"
+          statusCode: 400,
+          body: "Bad Request"
         };
       }
 
-      let handlerEvent = types.IProxyApiEvent{
-        subdomain: subdomain ?? "should-not-happen",
+      let handlerEvent = types.ProxyApiEvent{
+        subdomain: subdomain!,
         body: event.body,
         headers: event.headers,
         httpMethod: event.httpMethod,

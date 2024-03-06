@@ -9,7 +9,7 @@ interface StartServerResult {
 
 pub class ProxyApi impl types.IProxyApi {
   bucket: cloud.Bucket;
-  new(handler: inflight (types.IProxyApiEvent): types.IProxyApiResponse, props: types.ProxyApiProps) {
+  new(handler: inflight (types.ProxyApiEvent): types.ProxyApiResponse, props: types.ProxyApiProps) {
     this.bucket = new cloud.Bucket();
     new cloud.Service(inflight () => {
       let res = ProxyApi.startServer(handler);
@@ -27,5 +27,5 @@ pub class ProxyApi impl types.IProxyApi {
     return this.bucket.get("url.txt");
   }
 
-  extern "./start-local-server.mts" static inflight startServer(handler: inflight (types.IProxyApiEvent): types.IProxyApiResponse): StartServerResult;
+  extern "./start-local-server.mts" static inflight startServer(handler: inflight (types.ProxyApiEvent): types.ProxyApiResponse): StartServerResult;
 }

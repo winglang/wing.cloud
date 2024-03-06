@@ -7,7 +7,7 @@ bring "./proxyapi.sim.w" as simapi;
 pub class ProxyApi impl types.IProxyApi {
   inner: types.IProxyApi;
 
-  new(handler: inflight (types.IProxyApiEvent): types.IProxyApiResponse, props: types.ProxyApiProps) {
+  new(handler: inflight (types.ProxyApiEvent): types.ProxyApiResponse, props: types.ProxyApiProps) {
     let target = util.env("WING_TARGET");
 
     if target == "sim" {

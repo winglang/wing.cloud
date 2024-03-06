@@ -34,18 +34,18 @@ interface IStartTunnelsClientResult {
   inflight close(): void;
 }
 
-struct testApiOptionResponse {
+struct TestApiOptionResponse {
   status: num;
   headers: Map<str>?;
   body: str?;
 }
 
-struct testApiOption {
+struct TestApiOption {
   url: str;
   method: str;
   body: str?;
   headers: Map<str>?;
-  response: testApiOptionResponse;
+  response: TestApiOptionResponse;
 }
 
 new std.Test(inflight () => {
@@ -74,7 +74,7 @@ new std.Test(inflight () => {
 
   let client = Util.startTunnelsClient(port, "stam", hostname, t.wsUrl());
   
-  let testOne = inflight (t: testApiOption) => {
+  let testOne = inflight (t: TestApiOption) => {
     let headers = MutMap<str>{
       "X-WING-SUBDOMAIN" => "stam"
     };
@@ -110,7 +110,7 @@ new std.Test(inflight () => {
   };
   
 
-  testOne(testApiOption{
+  testOne(TestApiOption{
     url: apiUrl,
     method: "GET",
     response: {
@@ -118,7 +118,7 @@ new std.Test(inflight () => {
     }
   });
 
-  testOne(testApiOption{
+  testOne(TestApiOption{
     url: "{apiUrl}/with-path",
     method: "GET",
     response: {
@@ -126,7 +126,7 @@ new std.Test(inflight () => {
     }
   });
 
-  testOne(testApiOption{
+  testOne(TestApiOption{
     url: apiUrl,
     method: "POST",
     body: Json.stringify({k:"v"}),

@@ -3,7 +3,7 @@ bring cloud;
 bring "@cdktf/provider-aws" as awsProvider;
 bring "@cdktf/provider-dnsimple" as dnsimple;
 
-struct DNSRecordProps {
+struct DnsRecordProps {
   zoneName: str;
   subDomain: str;
   recordType: str;
@@ -41,7 +41,7 @@ class DNSimpleProvider {
 pub class DNSimpleZoneRecord {
   pub record: dnsimple.zoneRecord.ZoneRecord;
 
-  new(props: DNSRecordProps) {
+  new(props: DnsRecordProps) {
     new DNSimpleProvider();
     this.record = new dnsimple.zoneRecord.ZoneRecord(
       zoneName: props.zoneName,

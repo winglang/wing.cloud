@@ -5,15 +5,40 @@ pub struct Connection {
   subdomain: str;
 }
 
+/**
+  * IConnections is an interface for managing websocket connections and websocket requests/responses.
+*/
 pub interface IConnections {
-  inflight addConnectionWithSubdomain(conn: Connection): void;
+  /**
+    * addConnection connects a websocket connction id with a subdomain.
+  */
+  inflight addConnection(conn: Connection): void;
+  /**
+    * removeConnection removes the given websocket connction id.
+  */
   inflight removeConnection(connectionId: str): void;
+  /**
+    * findConnectionBySubdomain finds a websocket connection from given connction id.
+  */
   inflight findConnectionBySubdomain(subdomain: str): Connection?;
+  /**
+    * addResponseForRequest add a websocket response for the given request id.
+  */
   inflight addResponseForRequest(requestId: str, req: Json): void;
+  /**
+    * findResponseForRequest gets a websocket response for the given request id.
+  */
   inflight findResponseForRequest(requestId: str): Json?;
+  /**
+    * removeResponseForRequest removes a request id and its websocket response.
+  */
   inflight removeResponseForRequest(requestId: str): void;
 }
 
+/**
+  * Connections implements the IConnections interface for managing websocket connections
+  * by using DynamoDB to manage websocket connections and Redis for handling websocket requests/responses.
+*/
 pub class Connections impl IConnections {
   connections: ex.DynamodbTable;
   requests: ex.Redis;
@@ -22,7 +47,7 @@ pub class Connections impl IConnections {
     this.requests = new ex.Redis();
   }
 
-  pub inflight addConnectionWithSubdomain(conn: Connection) {
+  pub inflight addConnection(conn: Connection) {
     this.connections.transactWriteItems(
       transactItems: [
         {
@@ -95,11 +120,10 @@ pub class Connections impl IConnections {
   }
 
   pub inflight findResponseForRequest(requestId: str): Json? {
-    let req = this.requests.get(requestId);
-    if req == nil {
-      return nil;
+    if let req = this.requests.get(requestId) {
+      return Json.parse(req);
     } else {
-      return Json.parse(req ?? "");
+      return nil;
     }
   }
 

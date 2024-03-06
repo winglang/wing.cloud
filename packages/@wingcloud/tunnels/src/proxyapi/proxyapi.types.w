@@ -7,7 +7,7 @@ pub interface IProxyApi {
   inflight url(): str;
 }
 
-pub struct IProxyApiEvent {
+pub struct ProxyApiEvent {
   subdomain: str;
   body: str?;
   headers: Map<str>?;
@@ -17,18 +17,18 @@ pub struct IProxyApiEvent {
   queryStringParameters: Map<str>?;
 }
 
-pub struct IProxyApiResponse {
+pub struct ProxyApiResponse {
   statusCode: num;
   body: str?;
   headers: Map<str>?;
 }
 
-pub struct IProxyApiAwsRequestContext {
+pub struct ProxyApiAwsRequestContext {
   domainName: str;
 }
 
-pub struct IProxyApiAwsRequest {
-  requestContext: IProxyApiAwsRequestContext;
+pub struct ProxyApiAwsRequest {
+  requestContext: ProxyApiAwsRequestContext;
   path: str;
   httpMethod: str;
   body: str?;

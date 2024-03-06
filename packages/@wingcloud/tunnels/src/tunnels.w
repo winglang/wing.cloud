@@ -60,7 +60,7 @@ pub class TunnelsApi {
     }();
     this.ws = new websockets.WebSocket(name: "tunnels-{props.subDomain}");
 
-    this.api = new proxyapi.ProxyApi(inflight (event: proxytypes.IProxyApiEvent): proxytypes.IProxyApiResponse => {
+    this.api = new proxyapi.ProxyApi(inflight (event: proxytypes.ProxyApiEvent): proxytypes.ProxyApiResponse => {
       let connection = connections.findConnectionBySubdomain(event.subdomain);
       if connection == nil {
         return {
@@ -87,7 +87,7 @@ pub class TunnelsApi {
       let found = util.waitUntil(inflight () => {
         let req = connections.findResponseForRequest(requestId);
         return req != nil;
-      }, timeout: 10s);
+      }, timeout: 30s);
 
       if (!found) {
         return {
@@ -138,7 +138,7 @@ pub class TunnelsApi {
 
         let isConnected = util.waitUntil(inflight () => {
           try {
-            connections.addConnectionWithSubdomain(conn.Connection{
+            connections.addConnection(conn.Connection{
               connectionId: connectionId,
               subdomain: subdomain
             });
