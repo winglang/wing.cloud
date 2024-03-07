@@ -321,3 +321,10 @@ new cdktf.TerraformOutput(value: dashboard.url) as "Dashboard URL";
 new cdktf.TerraformOutput(value: probotApp.githubApp.api.url) as "Probot API URL";
 new cdktf.TerraformOutput(value: proxyUrl) as "Proxy URL";
 new cdktf.TerraformOutput(value: siteURL) as "Site URL";
+
+
+
+test "API Health Check" {
+  let response = http.get("{api.url}/wrpc/health");
+  assert(response.status == 200);
+}
