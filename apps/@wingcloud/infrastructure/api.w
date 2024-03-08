@@ -564,7 +564,7 @@ pub class Api {
             timestamp: input.timestamp,
         }}));
 
-        apps.updatLastCommit(
+        apps.updateLastCommit(
           userId: input.userId,
           appId: input.appId,
           appName: input.appName,

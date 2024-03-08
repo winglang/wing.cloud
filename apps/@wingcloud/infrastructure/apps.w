@@ -409,7 +409,7 @@ pub class Apps {
     ]);
   }
 
-  pub inflight updatLastCommit(options: UpdateLastCommitOptions): void {
+  pub inflight updateLastCommit(options: UpdateLastCommitOptions): void {
     this.table.transactWriteItems(transactItems: [
       {
         update: {

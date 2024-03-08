@@ -3,6 +3,7 @@ bring cloud;
 bring ex;
 bring util;
 bring http;
+bring expect;
 
 bring "cdktf" as cdktf;
 
@@ -326,5 +327,5 @@ new cdktf.TerraformOutput(value: siteURL) as "Site URL";
 
 test "API Health Check" {
   let response = http.get("{api.url}/wrpc/health");
-  assert(response.status == 200);
+  expect.equal(response.status, 200);
 }
