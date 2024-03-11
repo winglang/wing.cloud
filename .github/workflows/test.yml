@@ -16,6 +16,10 @@ env:
   PROXY_ZONE_NAME: "wingcloud.io"
   AWS_REGION: "us-east-1"
 
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
 jobs:
   test:
     runs-on: ubuntu-latest
