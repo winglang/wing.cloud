@@ -246,9 +246,9 @@ infrastructure.addDeps("@winglibs/vite");
 
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
-infrastructure.testTask.exec("node ./bin/wing.mjs test");
+infrastructure.testTask.exec("node ./bin/wing.mjs test tests");
 infrastructure.addTask("test-aws", {
-  exec: "node ./bin/wing.mjs test -t tf-aws",
+  exec: "node ./bin/wing.mjs test -t tf-aws tests",
 });
 infrastructure.compileTask.exec("node ./bin/wing.mjs compile main.w -t tf-aws");
 
