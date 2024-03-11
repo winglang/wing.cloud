@@ -323,6 +323,18 @@ new cdktf.TerraformOutput(value: probotApp.githubApp.api.url) as "Probot API URL
 new cdktf.TerraformOutput(value: proxyUrl) as "Proxy URL";
 new cdktf.TerraformOutput(value: siteURL) as "Site URL";
 
+// Wing Tunnels
+bring "./node_modules/@wingcloud/tunnels/src/tunnels.w" as tunnels;
+let tunnelsSubdomain = (() => {
+  let var subDomain = util.tryEnv("TUNNELS_SUBDOMAIN");
+  if subDomain? && subDomain != "" {
+    return "{subDomain}";
+  } else {
+    return "endpoints";
+  }
+})();
+new tunnels.TunnelsApi(zoneName: "wingcloud.dev", subDomain: tunnelsSubdomain);
+
 
 
 test "API Health Check" {
