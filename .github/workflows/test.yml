@@ -1,4 +1,4 @@
-name: Build
+name: Test
 
 on:
   pull_request:
@@ -16,8 +16,9 @@ env:
   PROXY_ZONE_NAME: "wingcloud.io"
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    environment: testing
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -41,8 +42,9 @@ jobs:
       - name: Run Projen
         run: pnpm run default
 
-      - name: Compile Project
-        run: pnpm run compile
+      - name: Run Tests
+        working-directory: apps/@wingcloud/infrastructure
+        run: pnpm run test
         env:
           APP_SECRET: ${{ secrets.APP_SECRET }}
           WS_SECRET: ${{ secrets.WS_SECRET }}
