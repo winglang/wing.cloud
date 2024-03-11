@@ -14,6 +14,7 @@ env:
   PNPM_VERSION: "8.15.3"
   PROXY_SUBDOMAIN: "dev"
   PROXY_ZONE_NAME: "wingcloud.io"
+  AWS_REGION: "us-east-1"
 
 jobs:
   test:
@@ -41,6 +42,13 @@ jobs:
 
       - name: Run Projen
         run: pnpm run default
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          role-session-name: gh-actions-wingcloud-testing
+          aws-region: ${{ inputs.AWS_REGION }}
 
       - name: Run Tests
         working-directory: apps/@wingcloud/infrastructure
