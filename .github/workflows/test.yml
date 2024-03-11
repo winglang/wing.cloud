@@ -44,7 +44,7 @@ jobs:
 
       - name: Run Tests
         working-directory: apps/@wingcloud/infrastructure
-        run: pnpm run test-aws
+        run: pnpm run test
         env:
           APP_SECRET: ${{ secrets.APP_SECRET }}
           WS_SECRET: ${{ secrets.WS_SECRET }}
