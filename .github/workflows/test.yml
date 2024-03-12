@@ -74,8 +74,8 @@ jobs:
           GOOGLE_OAUTH_REDIRECT_ORIGIN: ${{ secrets.GOOGLE_OAUTH_REDIRECT_ORIGIN }}
           FLY_TOKEN: ${{ secrets.FLY_TOKEN }}
           FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
-          PROXY_ZONE_NAME: ${{ env.PROXY_ZONE_NAME }}
-          PROXY_SUBDOMAIN: ${{ env.PROXY_SUBDOMAIN }}
+          PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
+          PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
           LANDING_DOMAIN: ${{ secrets.LANDING_DOMAIN }}
           DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
           DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
