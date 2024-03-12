@@ -335,8 +335,6 @@ let tunnelsSubdomain = (() => {
 })();
 new tunnels.TunnelsApi(zoneName: "wingcloud.dev", subDomain: tunnelsSubdomain);
 
-
-
 test "API Health Check" {
   let response = http.get("{api.url}/wrpc/health");
   expect.equal(response.status, 200);
