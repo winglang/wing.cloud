@@ -86,6 +86,7 @@ jobs:
           TF_BACKEND_STATE_FILE: "${{ github.repository }}/testing/infrastructure/main.tfstate"
           LANDING_DOMAIN: ${{ vars.LANDING_DOMAIN }}
           TF_IN_AUTOMATION: true
+
           # for `flyctl auth docker` in terraform
           FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}
 
@@ -105,4 +106,4 @@ jobs:
           # Wing Platfrom
           WING_ENV: "test"
           # Wing debug logging
-          DEBUG: "wing:*"
+          # DEBUG: "wing:*"
