@@ -289,7 +289,7 @@ infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.testTask.exec("node ./bin/wing.mjs test");
 
 infrastructure.addTask("test-aws", {
-  exec: "node ./bin/wing.mjs test -t tf-aws",
+  exec: "node ./bin/wing.mjs test -t tf-aws tests components",
 });
 
 infrastructure.compileTask.exec("node ./bin/wing.mjs compile main.w -t tf-aws");
