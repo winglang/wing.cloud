@@ -640,7 +640,7 @@ pub class Api {
           return {
             status: 422,
             body: {
-              message: "Invalid app name. Must consist of alphanumeric characters and hiphens only.",
+              message: "The app name can only contain ASCII letters, digits, and the characters ., - and _.",
             },
           };
         }
