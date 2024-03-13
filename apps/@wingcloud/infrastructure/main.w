@@ -118,7 +118,7 @@ let siteURL = (() => {
 })();
 
 let dns = new Dns.DNS(token: (): str? => {
-  if util.env("WING_TARGET") != "sim" && util.tryEnv("WING_IS_TEST") != "true" {
+  if util.env("WING_TARGET") != "sim" {
     return util.env("DNSIMPLE_TOKEN");
   } else {
     return nil;
