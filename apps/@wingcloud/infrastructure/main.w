@@ -118,12 +118,13 @@ let siteURL = (() => {
 })();
 
 let dns = new Dns.DNS(token: (): str? => {
-  if util.env("WING_TARGET") != "sim" {
+  if util.env("WING_TARGET") != "sim" && util.tryEnv("WING_IS_TEST") != "true" {
     return util.env("DNSIMPLE_TOKEN");
   } else {
     return nil;
   }
 }());
+
 let endpointProvider = new PublicEndpoint.PublicEndpointProvider(
   dns: dns,
   domain: publicEndpointDomain,
@@ -168,16 +169,18 @@ let environmentManager = new EnvironmentManager.EnvironmentManager(
   logs: bucketLogs,
 );
 
-let rntm = new runtime.RuntimeService(
-  api: runtimeApi,
-  wingCloudUrl: apiUrlParam,
-  flyToken: util.tryEnv("FLY_TOKEN"),
-  flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
-  environments: environments,
-  environmentManager: environmentManager,
-  logs: bucketLogs,
-  publicEndpointFullDomainName: publicEndpointFullDomainName,
-);
+if util.tryEnv("WING_IS_TEST") != "true" {
+  let rntm = new runtime.RuntimeService(
+    api: runtimeApi,
+    wingCloudUrl: apiUrlParam,
+    flyToken: util.tryEnv("FLY_TOKEN"),
+    flyOrgSlug: util.tryEnv("FLY_ORG_SLUG"),
+    environments: environments,
+    environmentManager: environmentManager,
+    logs: bucketLogs,
+    publicEndpointFullDomainName: publicEndpointFullDomainName,
+  );
+}
 
 let dashboard = new vite.Vite(
   root: "../website",
@@ -323,18 +326,19 @@ new cdktf.TerraformOutput(value: probotApp.githubApp.api.url) as "Probot API URL
 new cdktf.TerraformOutput(value: proxyUrl) as "Proxy URL";
 new cdktf.TerraformOutput(value: siteURL) as "Site URL";
 
-// Wing Tunnels
-bring "./node_modules/@wingcloud/tunnels/src/tunnels.w" as tunnels;
-let tunnelsSubdomain = (() => {
-  let var subDomain = util.tryEnv("TUNNELS_SUBDOMAIN");
-  if subDomain? && subDomain != "" {
-    return "{subDomain}";
-  } else {
-    return "endpoints";
-  }
-})();
-new tunnels.TunnelsApi(zoneName: "wingcloud.dev", subDomain: tunnelsSubdomain);
-
+if util.tryEnv("WING_IS_TEST") != "true" {
+  // Wing Tunnels
+  bring "./node_modules/@wingcloud/tunnels/src/tunnels.w" as tunnels;
+  let tunnelsSubdomain = (() => {
+    let var subDomain = util.tryEnv("TUNNELS_SUBDOMAIN");
+    if subDomain? && subDomain != "" {
+      return "{subDomain}";
+    } else {
+      return "endpoints";
+    }
+  })();
+  new tunnels.TunnelsApi(zoneName: "wingcloud.dev", subDomain: tunnelsSubdomain);
+}
 test "API Health Check" {
   let response = http.get("{api.url}/wrpc/health");
   expect.equal(response.status, 200);

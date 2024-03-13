@@ -10,7 +10,7 @@ pub struct DNSProps {
 pub class DNS impl idns.IDNS {
   inner: idns.IDNS;
   new(props: DNSProps) {
-    if util.env("WING_TARGET") == "sim" {
+    if util.env("WING_TARGET") == "sim" || util.tryEnv("WING_IS_TEST") == "true"  {
       this.inner = new sim.DNS();
     } else {
       if let token = props.token {
