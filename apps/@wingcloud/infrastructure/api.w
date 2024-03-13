@@ -635,15 +635,7 @@ pub class Api {
          });
 
         // TODO: https://github.com/winglang/wing/issues/3644
-        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9-]+", "*");
-        if appName.contains("*") {
-          return {
-            status: 422,
-            body: {
-              message: "Invalid app name. Must consist of alphanumeric characters and hiphens only.",
-            },
-          };
-        }
+        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9.\-_]+", "-");
 
         let createAppOptions = {
           appName: appName,
