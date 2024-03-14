@@ -635,12 +635,12 @@ pub class Api {
          });
 
         // TODO: https://github.com/winglang/wing/issues/3644
-        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9.\-_]+", "*");
+        let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9._-]+", "*");
         if appName.contains("*") {
           return {
             status: 422,
             body: {
-              message: "The app name can only contain ASCII letters, digits, and the characters ., - and _.",
+              error: "The app name can only contain ASCII letters, digits, and the characters ., - and _.",
             },
           };
         }
