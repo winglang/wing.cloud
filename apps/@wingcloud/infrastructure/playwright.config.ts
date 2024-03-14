@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+export const AUTH_FILE = "tests/playwright/e2e/.auth/user.json";
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -24,17 +26,17 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      name: "setup",
+      testMatch: /.*\.setup\.ts/,
     },
-    // {
-    //   name: "firefox",
-    //   use: { ...devices["Desktop Firefox"] },
-    // },
-
-    // {
-    //   name: "webkit",
-    //   use: { ...devices["Desktop Safari"] },
-    // },
+    {
+      name: "chromium",
+      testMatch: /.*\.test\.ts/,
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: AUTH_FILE,
+      },
+      dependencies: ["setup"],
+    },
   ],
 });

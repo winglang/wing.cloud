@@ -250,6 +250,10 @@ infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
 infrastructure.addTask("test-aws", {
   exec: "node ./bin/wing.mjs test -t tf-aws main.w",
 });
+infrastructure.addScript(
+  "test-e2e",
+  "playwright test tests/playwright/e2e --update-snapshots",
+);
 infrastructure.compileTask.exec("node ./bin/wing.mjs compile main.w -t tf-aws");
 
 const terraformInitTask = infrastructure.addTask("terraformInit");
@@ -381,11 +385,9 @@ infrastructure.addDeps("constructs");
 infrastructure.addDeps("aws-cdk-lib");
 
 infrastructure.addDevDeps("@playwright/test");
-infrastructure.addScript(
-  "test:playwright",
-  "playwright test --update-snapshots",
-);
 infrastructure.addGitIgnore("**/playwright-report/");
+infrastructure.addGitIgnore("**/playwright/test-results/");
+infrastructure.addGitIgnore("**/playwright/.auth");
 
 ///////////////////////////////////////////////////////////////////////////////
 

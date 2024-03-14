@@ -15,3 +15,5 @@ node_modules/
 **/target/
 !/turbo.json
 **/playwright-report/
+**/playwright/test-results/
+**/playwright/.auth
