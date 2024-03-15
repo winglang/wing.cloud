@@ -16,7 +16,7 @@ test("Create an app and visit the Console", async ({ page }) => {
   page.goto(`${url}/add`);
 
   // Create a new app
-  await page.getByTestId(`connect-repo-${APP_NAME}`).click();
+  await page.getByTestId(`connect-${APP_NAME}-button`).click();
 
   // Wait for the app to be created
   await page.waitForURL(new RegExp(`^${url}/${GITHUB_USER}/${APP_NAME}`));
