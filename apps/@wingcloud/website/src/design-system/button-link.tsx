@@ -18,6 +18,7 @@ interface ButtonLinkProps {
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
   to: string;
   target?: "_blank" | "_self" | "_parent" | "_top";
+  dataTestId?: string;
 }
 
 export const ButtonLink = ({
@@ -35,6 +36,7 @@ export const ButtonLink = ({
   onClick,
   to,
   target = "_self",
+  dataTestId,
 }: PropsWithChildren<ButtonLinkProps>) => {
   const { theme } = useTheme();
 
@@ -68,6 +70,7 @@ export const ButtonLink = ({
       )}
       title={title}
       aria-disabled={disabled}
+      data-testid={dataTestId}
       onClick={(event) => {
         if (disabled) {
           event.preventDefault();
