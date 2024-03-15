@@ -78,7 +78,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "test": "projen test",
-    "test-e2e": "playwright test tests/playwright/e2e --update-snapshots",
+    "test-e2e": "playwright test tests/playwright/e2e",
     "example": "node ./bin/wing.mjs it example.main.w",
     "default": "projen default",
     "compile": "projen compile",

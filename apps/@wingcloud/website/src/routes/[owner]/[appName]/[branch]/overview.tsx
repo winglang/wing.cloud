@@ -93,6 +93,7 @@ const Overview = ({
               disabled={environment?.status !== "running"}
               to={`/${owner}/${appName}/console/${environment?.branch}`}
               icon={CommandLineIcon}
+              dataTestId="environment-console-button"
             >
               Console
             </ButtonLink>

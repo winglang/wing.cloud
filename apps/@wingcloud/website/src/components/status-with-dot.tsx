@@ -4,7 +4,13 @@ import { useTheme } from "../design-system/theme-provider.js";
 import { useStatus } from "../utils/status.js";
 import type { EnvironmentStatus } from "../utils/wrpc.js";
 
-export const StatusWithDot = ({ status }: { status: EnvironmentStatus }) => {
+export const StatusWithDot = ({
+  status,
+  dataTestId,
+}: {
+  status: EnvironmentStatus;
+  dataTestId?: string;
+}) => {
   const { statusString, color } = useStatus(status);
 
   const { theme } = useTheme();
@@ -26,6 +32,7 @@ export const StatusWithDot = ({ status }: { status: EnvironmentStatus }) => {
           />
         </div>
         <div
+          data-testid={dataTestId}
           className={clsx(
             "py-0.5 capitalize truncate font-semibold",
             theme.text1,

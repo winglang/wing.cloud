@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-export const AUTH_FILE = "tests/playwright/e2e/.auth/user.json";
+export const AUTH_FILE = "../.playwright/user.json";
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -21,7 +21,10 @@ export default defineConfig({
   use: {
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
+    ignoreHTTPSErrors: true,
   },
+
+  outputDir: "../.playwright/test-results",
 
   /* Configure projects for major browsers */
   projects: [
