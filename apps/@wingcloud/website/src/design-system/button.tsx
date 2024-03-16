@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import {
-  PropsWithChildren,
+  type PropsWithChildren,
   forwardRef,
   type ForwardRefExoticComponent,
 } from "react";
@@ -20,6 +20,7 @@ interface ButtonProps {
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
   small?: boolean;
   transparent?: boolean;
+  dataTestId?: string;
 }
 
 export const Button = forwardRef<
@@ -41,6 +42,7 @@ export const Button = forwardRef<
       children,
       small = false,
       transparent = false,
+      dataTestId,
     },
     ref,
   ) => {
@@ -51,6 +53,7 @@ export const Button = forwardRef<
         id={id}
         ref={ref}
         type={type}
+        data-testid={dataTestId}
         className={clsx(
           "whitespace-nowrap",
           "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
