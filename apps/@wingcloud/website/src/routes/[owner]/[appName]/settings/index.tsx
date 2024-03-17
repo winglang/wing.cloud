@@ -86,6 +86,7 @@ const SettingsPage = ({
             </div>
             <div className="flex">
               <Button
+                dataTestId="delete-app-button"
                 onClick={() => setDeleteModalOpen(true)}
                 disabled={isLoading}
                 className="truncate"
