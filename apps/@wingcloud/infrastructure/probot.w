@@ -179,7 +179,7 @@ pub class ProbotApp {
             continue;
           }
 
-          this.apps.updatLastCommit(
+          this.apps.updateLastCommit(
             appId: app.appId,
             appName: app.appName,
             repoId: app.repoId,

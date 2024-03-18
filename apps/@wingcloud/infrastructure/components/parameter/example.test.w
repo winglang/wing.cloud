@@ -7,7 +7,7 @@ let param = new p.Parameter(
   value: "bar"
 );
 
-let fn = new cloud.Function(inflight (event: str) => {
+let fn = new cloud.Function(inflight (event: str?): str? => {
   let value = param.get();
   log("value: " + value);
 });

@@ -26,7 +26,7 @@ struct Item extends App {
   sk: str;
 }
 
-struct CreateAppOptions {
+pub struct CreateAppOptions {
   appName: str;
   appFullName: str;
   description: str;
@@ -409,7 +409,7 @@ pub class Apps {
     ]);
   }
 
-  pub inflight updatLastCommit(options: UpdateLastCommitOptions): void {
+  pub inflight updateLastCommit(options: UpdateLastCommitOptions): void {
     this.table.transactWriteItems(transactItems: [
       {
         update: {

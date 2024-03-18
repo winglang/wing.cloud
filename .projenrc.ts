@@ -286,10 +286,13 @@ infrastructure.addDeps(tunnels.name);
 
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
 infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
-infrastructure.testTask.exec("node ./bin/wing.mjs test main.w");
+
+infrastructure.testTask.exec("node ./bin/wing.mjs test");
+
 infrastructure.addTask("test-aws", {
-  exec: "node ./bin/wing.mjs test -t tf-aws main.w",
+  exec: "node ./bin/wing.mjs test -t tf-aws tests components",
 });
+
 infrastructure.addScript("test-e2e", "playwright test tests/playwright/e2e");
 infrastructure.compileTask.exec("node ./bin/wing.mjs compile main.w -t tf-aws");
 
