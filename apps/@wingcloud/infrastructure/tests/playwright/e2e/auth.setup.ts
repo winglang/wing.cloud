@@ -19,7 +19,7 @@ interface OTPProps {
   secret: string;
 }
 
-const getOTP = (props: OTPProps) => {
+const getGitHubOTP = (props: OTPProps) => {
   // https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication#manually-configuring-a-totp-app
   const totp = new OTPAuth.TOTP({
     issuer: "GitHub",
@@ -57,7 +57,7 @@ setup("authenticate", async ({ page }) => {
       await page.goto("https://github.com/sessions/two-factor/app");
       await page.fill(
         "#app_totp",
-        getOTP({ username: GITHUB_USER, secret: GITHUB_OTP_SECRET }),
+        getGitHubOTP({ username: GITHUB_USER, secret: GITHUB_OTP_SECRET }),
       );
       page.waitForLoadState("networkidle");
     }
