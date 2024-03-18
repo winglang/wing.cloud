@@ -87,6 +87,7 @@ export const EnvironmentDetails = ({
     >
       {environment && onClick && (
         <button
+          data-testid="environment-details-button"
           onClick={onClick}
           className={clsx(
             "-m-px",
@@ -136,7 +137,12 @@ export const EnvironmentDetails = ({
               <SkeletonLoader className="h-5 w-28 max-w-full" loading />
             )}
             <div className="flex gap-x-1 items-center">
-              {environment && <StatusWithDot status={environment.status} />}
+              {environment && (
+                <StatusWithDot
+                  status={environment.status}
+                  dataTestId="environment-status"
+                />
+              )}
             </div>
           </div>
 

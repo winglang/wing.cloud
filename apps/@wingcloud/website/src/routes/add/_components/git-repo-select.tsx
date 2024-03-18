@@ -170,6 +170,7 @@ export const GitRepoSelect = ({
                   </div>
                   <div className="flex flex-grow justify-end">
                     <button
+                      data-testid={`connect-${repo.name}-button`}
                       className={clsx(
                         "rounded px-2 py-1 border text-xs",
                         theme.borderInput,
