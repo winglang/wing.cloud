@@ -64,9 +64,8 @@ test("Create an app and visit the Console", async ({ page }) => {
   console.log("App deleted successfully");
 });
 
-test.afterEach(async ({ page }) => {
+test.afterEach("Test teardown", async ({ page }) => {
   await page.goto(`${url}/${GITHUB_USER}/${appName}/settings`);
-
   await page.waitForLoadState("networkidle");
   if (await page.locator("text=404").isHidden()) {
     console.log("App was not deleted during the test, trying to delete it...");
