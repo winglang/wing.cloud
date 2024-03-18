@@ -1,8 +1,8 @@
 bring util;
 bring ex;
-bring "../crypto/icrypto.w" as icrypto;
-bring "../crypto/crypto.w" as crypto;
-bring "../secrets.w" as Secrets;
+bring "../../crypto/icrypto.w" as icrypto;
+bring "../../crypto/crypto.w" as crypto;
+bring "../../secrets.w" as Secrets;
 
 let secrets = new Secrets.Secrets();
 
