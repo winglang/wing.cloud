@@ -6,10 +6,10 @@ import { AUTH_FILE } from "../../../playwright.config.js";
 
 dotenv.config();
 
-const GITHUB_USER = process.env.TESTS_GITHUB_USER || "";
-const GITHUB_PASSWORD = process.env.TESTS_GITHUB_PASS || "";
-const GITHUB_OTP_SECRET = process.env.TESTS_GITHUB_OTP_SECRET || "";
-const WINGCLOUD_URL = process.env.TESTS_E2E_URL || "";
+const GITHUB_USER = process.env.TESTS_GITHUB_USER;
+const GITHUB_PASSWORD = process.env.TESTS_GITHUB_PASS";
+const GITHUB_OTP_SECRET = process.env.TESTS_GITHUB_OTP_SECRET;
+const WINGCLOUD_URL = process.env.TESTS_E2E_URL;
 
 if (!GITHUB_USER || !GITHUB_PASSWORD || !GITHUB_OTP_SECRET || !WINGCLOUD_URL) {
   throw new Error(
