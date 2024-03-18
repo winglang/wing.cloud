@@ -23,7 +23,7 @@ test("Create an app and visit the Console", async ({ page }) => {
   page.goto(`${url}/add`);
 
   // Create a new app
-  console.log("Creating a new app...");
+  console.log("\nTest: Create an app and visit the Console...");
   const connectAppButton = page.getByTestId(`connect-${appName}-button`);
   await expect(connectAppButton).toBeEnabled({
     timeout: 30_000,
