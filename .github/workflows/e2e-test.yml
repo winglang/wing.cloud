@@ -17,7 +17,7 @@ env:
   PNPM_VERSION: "8.15.3"
 
 jobs:
-  e2e-test:
+  test-e2e:
     runs-on: ubuntu-latest
     environment: testing
     steps:
