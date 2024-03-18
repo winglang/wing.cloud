@@ -1,0 +1,107 @@
+name: Test AWS
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+  push:
+    branches:
+      - main
+
+concurrency:
+  # this is a singleton build group, so only one build can run at a time
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "20.11.1"
+  PNPM_VERSION: "8.15.3"
+  AWS_REGION: "us-east-1"
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: testing
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          cache: "pnpm"
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Projen
+        run: pnpm run default
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          role-session-name: gh-actions-wingcloud-testing
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Run Tests
+        working-directory: apps/@wingcloud/infrastructure
+        run: pnpm run test-aws
+        env:
+          APP_SECRET: ${{ secrets.APP_SECRET }}
+          WS_SECRET: ${{ secrets.WS_SECRET }}
+          SEGMENT_WRITE_KEY: ${{ secrets.SEGMENT_WRITE_KEY }}
+          ENABLE_ANALYTICS: ${{ secrets.ENABLE_ANALYTICS }}
+          BOT_GITHUB_CLIENT_ID: ${{ secrets.BOT_GITHUB_CLIENT_ID }}
+          BOT_GITHUB_CLIENT_SECRET: ${{ secrets.BOT_GITHUB_CLIENT_SECRET }}
+          BOT_GITHUB_APP_ID: ${{ secrets.BOT_GITHUB_APP_ID }}
+          BOT_GITHUB_APP_NAME: ${{ secrets.BOT_GITHUB_APP_NAME }}
+          BOT_GITHUB_PRIVATE_KEY: ${{ secrets.BOT_GITHUB_PRIVATE_KEY }}
+          BOT_GITHUB_WEBHOOK_SECRET: ${{ secrets.BOT_GITHUB_WEBHOOK_SECRET }}
+          BOT_GITHUB_CALLBACK_ORIGIN: ${{ secrets.BOT_GITHUB_CALLBACK_ORIGIN }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REDIRECT_ORIGIN: ${{ secrets.GOOGLE_OAUTH_REDIRECT_ORIGIN }}
+          FLY_TOKEN: ${{ secrets.FLY_TOKEN }}
+          FLY_ORG_SLUG: ${{ secrets.FLY_ORG_SLUG }}
+          PROXY_ZONE_NAME: ${{ vars.PROXY_ZONE_NAME }}
+          PROXY_SUBDOMAIN: ${{ vars.PROXY_SUBDOMAIN }}
+          TF_BACKEND_BUCKET: ${{ vars.TF_BACKEND_BUCKET }}
+          TF_BACKEND_BUCKET_REGION: ${{ vars.TF_BACKEND_BUCKET_REGION }}
+          TF_BACKEND_LOCK_TABLE: ${{ vars.TF_BACKEND_LOCK_TABLE }}
+          TF_BACKEND_STATE_FILE: "${{ github.repository }}/testing/infrastructure/main.tfstate"
+          LANDING_DOMAIN: ${{ vars.LANDING_DOMAIN }}
+          TF_IN_AUTOMATION: true
+
+          # for `flyctl auth docker` in terraform
+          FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}
+
+          DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
+          DNSIMPLE_ACCOUNT: ${{ secrets.DNSIMPLE_ACCOUNT }}
+          ENVIRONMENT_SERVER_ZONE_NAME: ${{ vars.ENVIRONMENT_SERVER_ZONE_NAME }}
+          ENVIRONMENT_SERVER_CERTIFICATE_ID: ${{ vars.ENVIRONMENT_SERVER_CERTIFICATE_ID }}
+          PUBLIC_ENDPOINT_DOMAIN: ${{ secrets.PUBLIC_ENDPOINT_DOMAIN }}
+          PUBLIC_ENDPOINT_SUBDOMAIN: ${{ secrets.PUBLIC_ENDPOINT_SUBDOMAIN }}
+          TESTS_GITHUB_TOKEN: ${{ secrets.TESTS_GITHUB_TOKEN }}
+          TESTS_GITHUB_USER: ${{ vars.TESTS_GITHUB_USER }}
+
+          # wing tunnels
+          TUNNELS_SUBDOMAIN: ${{ vars.TUNNELS_SUBDOMAIN }}
+
+          # Wing Platfrom
+          WING_ENV: "test"
+          # Wing debug logging
+          # DEBUG: "wing:*"
