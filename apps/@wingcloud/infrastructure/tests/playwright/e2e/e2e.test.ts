@@ -1,14 +1,13 @@
 import { Page, expect, test } from "@playwright/test";
 
 const GITHUB_USER = process.env.TESTS_GITHUB_USER || "";
-
-const url = process.env.TESTS_E2E_URL || "";
-const appName = process.env.TESTS_E2E_APP_NAME || "";
-const branch = process.env.TESTS_E2E_PROD_BRANCH || "main";
+const WINGCLOUD_URL = process.env.TESTS_E2E_URL || "";
+const APP_NAME = process.env.TESTS_E2E_APP_NAME || "";
+const PROD_BRANCH = process.env.TESTS_E2E_PROD_BRANCH || "";
 
 const deleteApp = async (page: Page, appName: string) => {
   console.log("Deleting the app...");
-  page.goto(`${url}/${GITHUB_USER}/${appName}/settings`);
+  page.goto(`${WINGCLOUD_URL}/${GITHUB_USER}/${appName}/settings`);
   const deleteButton = page.getByTestId("delete-app-button");
   await expect(deleteButton).toBeEnabled({
     timeout: 30_000,
@@ -20,11 +19,17 @@ const deleteApp = async (page: Page, appName: string) => {
 };
 
 test("Create an app and visit the Console", async ({ page }) => {
-  page.goto(`${url}/add`);
+  if (!GITHUB_USER || !WINGCLOUD_URL || !APP_NAME || !PROD_BRANCH) {
+    throw new Error(
+      "Please provide the required environment variables 'TESTS_XXX'",
+    );
+  }
+
+  page.goto(`${WINGCLOUD_URL}/add`);
 
   // Create a new app
   console.log("\nTest: Create an app and visit the Console...");
-  const connectAppButton = page.getByTestId(`connect-${appName}-button`);
+  const connectAppButton = page.getByTestId(`connect-${APP_NAME}-button`);
   await expect(connectAppButton).toBeEnabled({
     timeout: 30_000,
   });
@@ -32,14 +37,18 @@ test("Create an app and visit the Console", async ({ page }) => {
 
   // Wait for the app to be created
   console.log("Waiting for the app to be created...");
-  await page.waitForURL(new RegExp(`^${url}/${GITHUB_USER}/${appName}`));
+  await page.waitForURL(
+    new RegExp(`^${WINGCLOUD_URL}/${GITHUB_USER}/${APP_NAME}`),
+  );
 
   // Visit the environment page
   console.log("Visiting the environment page...");
   await page.getByTestId("environment-details-button").click();
 
   await page.waitForURL(
-    new RegExp(`^${url}/${GITHUB_USER}/${appName}/environment/${branch}`),
+    new RegExp(
+      `^${WINGCLOUD_URL}/${GITHUB_USER}/${APP_NAME}/environment/${PROD_BRANCH}`,
+    ),
   );
 
   // Visit the console
@@ -51,25 +60,27 @@ test("Create an app and visit the Console", async ({ page }) => {
   console.log("Visiting the console...");
   await page.getByTestId("environment-console-button").click();
   await page.waitForURL(
-    new RegExp(`^${url}/${GITHUB_USER}/${appName}/console/${branch}`),
+    new RegExp(
+      `^${WINGCLOUD_URL}/${GITHUB_USER}/${APP_NAME}/console/${PROD_BRANCH}`,
+    ),
   );
   expect(page.getByTestId("map-view")).toBeVisible();
 
   // Delete the app
-  await deleteApp(page, appName);
+  await deleteApp(page, APP_NAME);
 
   // Wait for the app to be deleted and the user to be redirected to the add page
   console.log("Waiting for the app to be deleted...");
-  await page.waitForURL(new RegExp(`^${url}/add`));
+  await page.waitForURL(new RegExp(`^${WINGCLOUD_URL}/add`));
 
   console.log("App deleted successfully");
 });
 
 test.afterEach("Test teardown", async ({ page }) => {
-  await page.goto(`${url}/${GITHUB_USER}/${appName}/settings`);
+  await page.goto(`${WINGCLOUD_URL}/${GITHUB_USER}/${APP_NAME}/settings`);
   await page.waitForLoadState("networkidle");
   if (await page.locator("text=404").isHidden()) {
     console.log("App was not deleted during the test, trying to delete it...");
-    await deleteApp(page, appName);
+    await deleteApp(page, APP_NAME);
   }
 });

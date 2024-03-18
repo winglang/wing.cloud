@@ -1,6 +1,4 @@
-import fs from "node:fs/promises";
-
-import { BrowserContext, expect, test as setup } from "@playwright/test";
+import { expect, test as setup } from "@playwright/test";
 import dotenv from "dotenv";
 import * as OTPAuth from "otpauth";
 
@@ -11,8 +9,13 @@ dotenv.config();
 const GITHUB_USER = process.env.TESTS_GITHUB_USER || "";
 const GITHUB_PASSWORD = process.env.TESTS_GITHUB_PASS || "";
 const GITHUB_OTP_SECRET = process.env.TESTS_GITHUB_OTP_SECRET || "";
+const WINGCLOUD_URL = process.env.TESTS_E2E_URL || "";
 
-const wingcloudUrl = process.env.TESTS_E2E_URL || "";
+if (!GITHUB_USER || !GITHUB_PASSWORD || !GITHUB_OTP_SECRET || !WINGCLOUD_URL) {
+  throw new Error(
+    "Please provide the required environment variables 'TESTS_XXX'",
+  );
+}
 
 interface OTPProps {
   username: string;
@@ -33,7 +36,7 @@ const getGitHubOTP = (props: OTPProps) => {
 };
 
 setup("authenticate", async ({ page }) => {
-  await page.goto(wingcloudUrl);
+  await page.goto(WINGCLOUD_URL);
 
   await page.click("text=Sign In");
 
@@ -79,7 +82,7 @@ setup("authenticate", async ({ page }) => {
     }
 
     console.log("Logged in successfully!");
-    await page.waitForURL(new RegExp(`^${wingcloudUrl}`), {
+    await page.waitForURL(new RegExp(`^${WINGCLOUD_URL}`), {
       waitUntil: "networkidle",
       timeout: 30_000,
     });
