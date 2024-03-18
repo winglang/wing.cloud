@@ -1,7 +1,8 @@
 import fs from "node:fs/promises";
 
-import { BrowserContext, test as setup } from "@playwright/test";
+import { BrowserContext, expect, test as setup } from "@playwright/test";
 import dotenv from "dotenv";
+import * as OTPAuth from "otpauth";
 
 import { AUTH_FILE } from "../../../playwright.config.js";
 
@@ -9,8 +10,27 @@ dotenv.config();
 
 const GITHUB_USER = process.env.TESTS_GITHUB_USER || "";
 const GITHUB_PASSWORD = process.env.TESTS_GITHUB_PASS || "";
+const GITHUB_OTP_SECRET = process.env.TESTS_GITHUB_OTP_SECRET || "";
 
 const url = process.env.TESTS_E2E_WINCLOUD_URL || "";
+
+interface OTPProps {
+  username: string;
+  secret: string;
+}
+
+const getOTP = (props: OTPProps) => {
+  // https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication#manually-configuring-a-totp-app
+  const totp = new OTPAuth.TOTP({
+    issuer: "GitHub",
+    label: props.username,
+    algorithm: "SHA1",
+    digits: 6,
+    period: 30,
+    secret: props.secret,
+  });
+  return totp.generate();
+};
 
 setup("authenticate", async ({ browser }) => {
   let context: BrowserContext;
@@ -21,7 +41,6 @@ setup("authenticate", async ({ browser }) => {
   } catch {
     context = await browser.newContext();
   }
-
   const page = await context.newPage();
 
   console.log("Logging in...");
@@ -34,18 +53,31 @@ setup("authenticate", async ({ browser }) => {
     console.log("Logging in with GitHub...");
 
     // If it's the first time we visit the page, we need to log in
-    if (await page.$("#login_field")) {
+    if (page.locator("#login_field")) {
       await page.fill("#login_field", GITHUB_USER);
       await page.fill("#password", GITHUB_PASSWORD);
       await page.click('input[type="submit"]');
+      page.waitForLoadState("networkidle");
+    }
+
+    // If we have 2FA enabled, we need to fill the TOTP
+    if (page.url().includes("github.com/sessions/two-factor")) {
+      // Navigate to the TOTP page
+      await page.goto("https://github.com/sessions/two-factor/app");
+      await page.fill(
+        "#app_totp",
+        getOTP({ username: GITHUB_USER, secret: GITHUB_OTP_SECRET }),
+      );
+      page.waitForLoadState("networkidle");
     }
 
     // If we are already logged in, we may need to authorize the app
-    const authorizeButton = await page.$(
+    const authorizeButton = page.locator(
       'button[name="authorize"][value="1"][type="submit"]',
     );
     if (authorizeButton) {
-      await authorizeButton.click({ force: true });
+      await expect(authorizeButton).toBeEnabled();
+      await authorizeButton.click();
     }
 
     await page.waitForURL(new RegExp(`^${url}`), {

@@ -422,6 +422,7 @@ infrastructure.addDeps("constructs");
 infrastructure.addDeps("aws-cdk-lib");
 
 infrastructure.addDevDeps("@playwright/test");
+infrastructure.addDeps("otpauth");
 
 ///////////////////////////////////////////////////////////////////////////////
 

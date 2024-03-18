@@ -87,10 +87,10 @@ struct PullRequest {
 }
 
 struct GitHubUser {
-  name: str;
+  name: str?;
   login: str;
   avatar_url: str;
-  email: str;
+  email: str?;
 }
 
 struct PaginatedResponse {

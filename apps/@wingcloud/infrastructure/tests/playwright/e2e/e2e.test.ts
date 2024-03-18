@@ -6,11 +6,6 @@ const url = process.env.TESTS_E2E_WINCLOUD_URL || "";
 const APP_NAME = process.env.TESTS_E2E_APP_NAME || "";
 const branch = process.env.TESTS_E2E_PROD_BRANCH || "main";
 
-test("Visit the /add page", async ({ page }) => {
-  page.goto(`${url}/add`);
-  await page.waitForSelector("text=Connect");
-});
-
 test("Create an app and visit the Console", async ({ page }) => {
   page.goto(`${url}/add`);
 
@@ -26,8 +21,6 @@ test("Create an app and visit the Console", async ({ page }) => {
   await page.waitForURL(
     new RegExp(`^${url}/${GITHUB_USER}/${APP_NAME}/environment/${branch}`),
   );
-
-  //expect(page.getByTestId("environment-status")).toHaveText("running");
 
   // Visit the console
   const consoleButton = page.getByTestId("environment-console-button");
