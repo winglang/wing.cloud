@@ -88,7 +88,7 @@ setup("authenticate", async ({ browser }) => {
       }
     }
 
-    console.log("Logged in");
+    console.log("Logged in successfully!");
     await page.waitForURL(new RegExp(`^${wingcloudUrl}`), {
       waitUntil: "networkidle",
       timeout: 30_000,

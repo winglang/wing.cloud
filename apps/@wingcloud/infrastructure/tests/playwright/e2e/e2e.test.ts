@@ -9,13 +9,16 @@ const branch = process.env.TESTS_E2E_PROD_BRANCH || "main";
 test("Create an app and visit the Console", async ({ page }) => {
   page.goto(`${url}/add`);
 
-  // // Create a new app
+  // Create a new app
+  console.log("Creating a new app...");
   await page.getByTestId(`connect-${appName}-button`).click();
 
   // Wait for the app to be created
+  console.log("Waiting for the app to be created...");
   await page.waitForURL(new RegExp(`^${url}/${GITHUB_USER}/${appName}`));
 
   // Visit the environment page
+  console.log("Visiting the environment page...");
   await page.getByTestId("environment-details-button").click();
 
   await page.waitForURL(
@@ -23,6 +26,7 @@ test("Create an app and visit the Console", async ({ page }) => {
   );
 
   // Visit the console
+  console.log("Visiting the console...");
   const consoleButton = page.getByTestId("environment-console-button");
   await expect(consoleButton).toBeEnabled({
     timeout: 60_000 * 2,
@@ -36,6 +40,7 @@ test("Create an app and visit the Console", async ({ page }) => {
   expect(page.getByTestId("map-view")).toBeVisible();
 
   // Delete the app
+  console.log("Deleting the app...");
   page.goto(`${url}/${GITHUB_USER}/${appName}/settings`);
   const deleteButton = page.getByTestId("delete-app-button");
   await expect(deleteButton).toBeEnabled({
@@ -43,8 +48,12 @@ test("Create an app and visit the Console", async ({ page }) => {
   });
   deleteButton.click();
 
+  console.log("Confirming the delete modal...");
   page.getByTestId("modal-confirm-button").click();
 
   // Wait for the app to be deleted and the user to be redirected to the add page
+  console.log("Waiting for the app to be deleted...");
   await page.waitForURL(new RegExp(`^${url}/add`));
+
+  console.log("App deleted successfully");
 });
