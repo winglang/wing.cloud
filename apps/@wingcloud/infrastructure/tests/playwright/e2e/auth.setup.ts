@@ -63,6 +63,7 @@ setup("authenticate", async ({ browser }) => {
     // If we have 2FA enabled, we need to fill the TOTP
     if (page.url().includes("github.com/sessions/two-factor")) {
       // Navigate to the TOTP page
+      console.log("Filling OTP...");
       await page.goto("https://github.com/sessions/two-factor/app");
       await page.fill(
         "#app_totp",
@@ -76,12 +77,14 @@ setup("authenticate", async ({ browser }) => {
       'button[name="authorize"][value="1"][type="submit"]',
     );
     if (authorizeButton) {
+      console.log("Authorizing the app...");
       await expect(authorizeButton).toBeEnabled({
         timeout: 30_000,
       });
       await authorizeButton.click();
     }
 
+    console.log("Logged in");
     await page.waitForURL(new RegExp(`^${url}`), {
       waitUntil: "networkidle",
       timeout: 30_000,
