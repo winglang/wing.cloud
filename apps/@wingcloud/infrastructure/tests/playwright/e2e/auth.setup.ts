@@ -32,17 +32,7 @@ const getOTP = (props: OTPProps) => {
   return totp.generate();
 };
 
-setup("authenticate", async ({ browser }) => {
-  let context: BrowserContext;
-
-  try {
-    await fs.access(AUTH_FILE);
-    context = await browser.newContext({ storageState: AUTH_FILE });
-  } catch {
-    context = await browser.newContext();
-  }
-  const page = await context.newPage();
-
+setup("authenticate", async ({ page }) => {
   await page.goto(wingcloudUrl);
 
   await page.click("text=Sign In");

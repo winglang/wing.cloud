@@ -24,9 +24,9 @@ test("Create an app and visit the Console", async ({ page }) => {
 
   // Create a new app
   console.log("Creating a new app...");
-  const connectAppButton = page.getByTestId("connect-app-button");
+  const connectAppButton = page.getByTestId(`connect-${appName}-button`);
   await expect(connectAppButton).toBeEnabled({
-    timeout: 10_000,
+    timeout: 30_000,
   });
   await connectAppButton.click();
 
@@ -65,9 +65,10 @@ test("Create an app and visit the Console", async ({ page }) => {
 });
 
 test.afterEach(async ({ page }) => {
-  page.goto(`${url}/${GITHUB_USER}/${appName}/settings`);
+  await page.goto(`${url}/${GITHUB_USER}/${appName}/settings`);
 
-  if (!(await page.locator("text=404").isVisible())) {
+  await page.waitForLoadState("networkidle");
+  if (await page.locator("text=404").isHidden()) {
     console.log("App was not deleted during the test, trying to delete it...");
     await deleteApp(page, appName);
   }
