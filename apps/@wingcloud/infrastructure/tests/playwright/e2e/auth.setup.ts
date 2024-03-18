@@ -12,7 +12,7 @@ const GITHUB_USER = process.env.TESTS_GITHUB_USER || "";
 const GITHUB_PASSWORD = process.env.TESTS_GITHUB_PASS || "";
 const GITHUB_OTP_SECRET = process.env.TESTS_GITHUB_OTP_SECRET || "";
 
-const url = process.env.TESTS_E2E_URL || "";
+const wingcloudUrl = process.env.TESTS_E2E_URL || "";
 
 interface OTPProps {
   username: string;
@@ -43,7 +43,7 @@ setup("authenticate", async ({ browser }) => {
   }
   const page = await context.newPage();
 
-  await page.goto(url);
+  await page.goto(wingcloudUrl);
 
   await page.click("text=Sign In");
 
@@ -52,8 +52,8 @@ setup("authenticate", async ({ browser }) => {
   if (page.url().includes("github.com/login")) {
     console.log("Logging in...");
 
-    // If it's the first time we visit the page, we need to log in
-    if (page.locator("#login_field")) {
+    // Fill the login form and submit if needed
+    if (await page.$("#login_field")) {
       await page.fill("#login_field", GITHUB_USER);
       await page.fill("#password", GITHUB_PASSWORD);
       await page.click('input[type="submit"]');
@@ -64,7 +64,7 @@ setup("authenticate", async ({ browser }) => {
     if (page.url().includes("github.com/sessions/two-factor")) {
       // Navigate to the TOTP page
       console.log("Filling OTP...");
-      await page.goto("github.com/sessions/two-factor/app");
+      await page.goto("https://github.com/sessions/two-factor/app");
       await page.fill(
         "#app_totp",
         getOTP({ username: GITHUB_USER, secret: GITHUB_OTP_SECRET }),
@@ -74,18 +74,22 @@ setup("authenticate", async ({ browser }) => {
 
     // If we are already logged in, we may need to authorize the app
     if (page.url().includes("github.com/login/oauth/authorize")) {
-      console.log("Authorizing the app...");
       const authorizeButton = page.locator(
         'button[name="authorize"][value="1"][type="submit"]',
       );
-      await expect(authorizeButton).toBeEnabled({
-        timeout: 30_000,
-      });
-      await authorizeButton.click();
+      if (
+        await authorizeButton.isVisible({
+          timeout: 5000,
+        })
+      ) {
+        console.log("Authorizing the app...");
+        expect(authorizeButton).toBeEnabled({ timeout: 10_000 });
+        await authorizeButton.click();
+      }
     }
 
     console.log("Logged in");
-    await page.waitForURL(new RegExp(`^${url}`), {
+    await page.waitForURL(new RegExp(`^${wingcloudUrl}`), {
       waitUntil: "networkidle",
       timeout: 30_000,
     });
