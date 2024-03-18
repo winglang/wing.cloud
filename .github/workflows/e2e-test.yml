@@ -1,8 +1,7 @@
-name: E2E Tests
+name: Test E2E
 
 on:
   workflow_call:
-
   pull_request:
     types:
       - opened
