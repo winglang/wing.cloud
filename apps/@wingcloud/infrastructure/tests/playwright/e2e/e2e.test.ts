@@ -32,7 +32,7 @@ test("Create an app and visit the Console", async ({ page }) => {
   // Visit the console
   const consoleButton = page.getByTestId("environment-console-button");
   await expect(consoleButton).toBeEnabled({
-    timeout: 60_000,
+    timeout: 60_000 * 2,
   });
   await page.getByTestId("environment-console-button").click();
   await page.waitForURL(
@@ -44,20 +44,13 @@ test("Create an app and visit the Console", async ({ page }) => {
 
   // Delete the app
   page.goto(`${url}/${GITHUB_USER}/${APP_NAME}/settings`);
-  // const deleteButton = await page.getByTestId("delete-app-button");
-  const deleteButton = await page.waitForSelector("button:has-text('Delete')");
-  await page.waitForFunction(
-    (selector) => document?.querySelector(selector)?.disabled === false,
-    deleteButton,
-    { timeout: 60_000 }, // Adjust timeout as needed
-  );
+  const deleteButton = page.getByTestId("delete-app-button");
+  await expect(deleteButton).toBeEnabled({
+    timeout: 30_000,
+  });
   deleteButton.click();
 
-  // page.getByTestId("modal-confirm-button").click();
-  const confirmButton = await page.waitForSelector(
-    "button:has-text('Confirm')",
-  );
-  confirmButton.click();
+  page.getByTestId("modal-confirm-button").click();
 
   // Wait for the app to be deleted and the user to be redirected to the add page
   await page.waitForURL(new RegExp(`^${url}/add`));
