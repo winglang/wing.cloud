@@ -43,11 +43,12 @@ test("Create an app and visit the Console", async ({ page }) => {
   );
 
   // Visit the console
-  console.log("Visiting the console...");
+  console.log("Waiting for the console button to be enabled...");
   const consoleButton = page.getByTestId("environment-console-button");
   await expect(consoleButton).toBeEnabled({
     timeout: 60_000 * 2,
   });
+  console.log("Visiting the console...");
   await page.getByTestId("environment-console-button").click();
   await page.waitForURL(
     new RegExp(`^${url}/${GITHUB_USER}/${appName}/console/${branch}`),
