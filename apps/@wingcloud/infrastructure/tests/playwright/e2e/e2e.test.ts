@@ -2,24 +2,24 @@ import { expect, test } from "@playwright/test";
 
 const GITHUB_USER = process.env.TESTS_GITHUB_USER || "";
 
-const url = process.env.TESTS_E2E_WINCLOUD_URL || "";
-const APP_NAME = process.env.TESTS_E2E_APP_NAME || "";
+const url = process.env.TESTS_E2E_URL || "";
+const appName = process.env.TESTS_E2E_APP_NAME || "";
 const branch = process.env.TESTS_E2E_PROD_BRANCH || "main";
 
 test("Create an app and visit the Console", async ({ page }) => {
   page.goto(`${url}/add`);
 
   // // Create a new app
-  await page.getByTestId(`connect-${APP_NAME}-button`).click();
+  await page.getByTestId(`connect-${appName}-button`).click();
 
   // Wait for the app to be created
-  await page.waitForURL(new RegExp(`^${url}/${GITHUB_USER}/${APP_NAME}`));
+  await page.waitForURL(new RegExp(`^${url}/${GITHUB_USER}/${appName}`));
 
   // Visit the environment page
   await page.getByTestId("environment-details-button").click();
 
   await page.waitForURL(
-    new RegExp(`^${url}/${GITHUB_USER}/${APP_NAME}/environment/${branch}`),
+    new RegExp(`^${url}/${GITHUB_USER}/${appName}/environment/${branch}`),
   );
 
   // Visit the console
@@ -29,14 +29,14 @@ test("Create an app and visit the Console", async ({ page }) => {
   });
   await page.getByTestId("environment-console-button").click();
   await page.waitForURL(
-    new RegExp(`^${url}/${GITHUB_USER}/${APP_NAME}/console/${branch}`),
+    new RegExp(`^${url}/${GITHUB_USER}/${appName}/console/${branch}`),
   );
 
   // Check that the console is visible
   expect(page.getByTestId("map-view")).toBeVisible();
 
   // Delete the app
-  page.goto(`${url}/${GITHUB_USER}/${APP_NAME}/settings`);
+  page.goto(`${url}/${GITHUB_USER}/${appName}/settings`);
   const deleteButton = page.getByTestId("delete-app-button");
   await expect(deleteButton).toBeEnabled({
     timeout: 30_000,
