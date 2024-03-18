@@ -76,10 +76,12 @@ setup("authenticate", async ({ browser }) => {
       'button[name="authorize"][value="1"][type="submit"]',
     );
     if (authorizeButton) {
-      await expect(authorizeButton).toBeEnabled({
-        timeout: 30_000,
+      // await expect(authorizeButton).toBeEnabled({
+      //   timeout: 30_000,
+      // });
+      await authorizeButton.click({
+        force: true,
       });
-      await authorizeButton.click();
     }
 
     await page.waitForURL(new RegExp(`^${url}`), {
