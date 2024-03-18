@@ -11,7 +11,13 @@ test("Create an app and visit the Console", async ({ page }) => {
 
   // Create a new app
   console.log("Creating a new app...");
-  await page.getByTestId(`connect-${appName}-button`).click();
+
+  const connectAppButton = page.getByTestId("connect-app-button");
+  if (await connectAppButton.isDisabled()) {
+    console.log(`The app ${appName} already exists. The test will fail.`);
+    throw new Error(`The app ${appName} already exists`);
+  }
+  await connectAppButton.click();
 
   // Wait for the app to be created
   console.log("Waiting for the app to be created...");
