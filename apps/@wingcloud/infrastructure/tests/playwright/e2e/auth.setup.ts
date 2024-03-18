@@ -49,6 +49,7 @@ setup("authenticate", async ({ browser }) => {
   await page.click("text=Sign In");
 
   await page.waitForLoadState("networkidle");
+
   if (page.url().includes("github.com/login")) {
     console.log("Logging in with GitHub...");
 

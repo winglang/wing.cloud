@@ -1,0 +1,57 @@
+name: E2E Tests
+
+on:
+  workflow_call:
+
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+concurrency:
+  # this is a singleton build group, so only one build can run at a time
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "20.11.1"
+  PNPM_VERSION: "8.15.3"
+  AWS_REGION: "us-east-1"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: testing
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          cache: "pnpm"
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Projen
+        run: pnpm run default
+
+      - name: Run E2E Tests
+        working-directory: apps/@wingcloud/infrastructure
+        run: pnpm run test-e2e
+        env:
+          TESTS_GITHUB_USER: ${{ vars.TESTS_GITHUB_USER }}
+          TESTS_GITHUB_PASS: ${{ secrets.TESTS_GITHUB_PASS }}
+          TESTS_E2E_URL: ${{ vars.TESTS_E2E_URL }}
+          TESTS_E2E_APP_NAME: ${{ vars.TESTS_E2E_APP_NAME }}
+          TESTS_E2E_PROD_BRANCH: ${{ vars.TESTS_E2E_PROD_BRANCH }}
+          TESTS_GITHUB_OTP_SECRET: ${{ secrets.TESTS_GITHUB_OTP_SECRET }}
