@@ -43,7 +43,6 @@ setup("authenticate", async ({ browser }) => {
   }
   const page = await context.newPage();
 
-  console.log("Logging in...");
   await page.goto(url);
 
   await page.click("text=Sign In");
@@ -51,7 +50,7 @@ setup("authenticate", async ({ browser }) => {
   await page.waitForLoadState("networkidle");
 
   if (page.url().includes("github.com/login")) {
-    console.log("Logging in with GitHub...");
+    console.log("Logging in...");
 
     // If it's the first time we visit the page, we need to log in
     if (page.locator("#login_field")) {
@@ -77,7 +76,9 @@ setup("authenticate", async ({ browser }) => {
       'button[name="authorize"][value="1"][type="submit"]',
     );
     if (authorizeButton) {
-      await expect(authorizeButton).toBeEnabled();
+      await expect(authorizeButton).toBeEnabled({
+        timeout: 30_000,
+      });
       await authorizeButton.click();
     }
 
