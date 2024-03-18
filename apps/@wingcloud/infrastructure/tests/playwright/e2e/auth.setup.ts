@@ -64,7 +64,7 @@ setup("authenticate", async ({ browser }) => {
     if (page.url().includes("github.com/sessions/two-factor")) {
       // Navigate to the TOTP page
       console.log("Filling OTP...");
-      await page.goto("https://github.com/sessions/two-factor/app");
+      await page.goto("github.com/sessions/two-factor/app");
       await page.fill(
         "#app_totp",
         getOTP({ username: GITHUB_USER, secret: GITHUB_OTP_SECRET }),
@@ -73,11 +73,11 @@ setup("authenticate", async ({ browser }) => {
     }
 
     // If we are already logged in, we may need to authorize the app
-    const authorizeButton = page.locator(
-      'button[name="authorize"][value="1"][type="submit"]',
-    );
-    if (authorizeButton) {
+    if (page.url().includes("github.com/login/oauth/authorize")) {
       console.log("Authorizing the app...");
+      const authorizeButton = page.locator(
+        'button[name="authorize"][value="1"][type="submit"]',
+      );
       await expect(authorizeButton).toBeEnabled({
         timeout: 30_000,
       });
