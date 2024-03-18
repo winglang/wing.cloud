@@ -12,7 +12,7 @@ const GITHUB_USER = process.env.TESTS_GITHUB_USER || "";
 const GITHUB_PASSWORD = process.env.TESTS_GITHUB_PASS || "";
 const GITHUB_OTP_SECRET = process.env.TESTS_GITHUB_OTP_SECRET || "";
 
-const url = process.env.TESTS_E2E_WINCLOUD_URL || "";
+const url = process.env.TESTS_E2E_URL || "";
 
 interface OTPProps {
   username: string;
