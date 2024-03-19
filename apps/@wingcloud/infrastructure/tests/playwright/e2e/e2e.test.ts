@@ -5,6 +5,12 @@ const WINGCLOUD_URL = process.env.TESTS_E2E_URL;
 const APP_NAME = process.env.TESTS_E2E_APP_NAME;
 const PROD_BRANCH = process.env.TESTS_E2E_PROD_BRANCH;
 
+if (!GITHUB_USER || !WINGCLOUD_URL || !APP_NAME || !PROD_BRANCH) {
+  throw new Error(
+    "Please provide the following environment variables: TESTS_GITHUB_USER, TESTS_E2E_URL, TESTS_E2E_APP_NAME, TESTS_E2E_PROD_BRANCH",
+  );
+}
+
 const deleteApp = async (page: Page, appName: string) => {
   console.log("Deleting the app...");
   page.goto(`${WINGCLOUD_URL}/${GITHUB_USER}/${appName}/settings`);
@@ -19,12 +25,6 @@ const deleteApp = async (page: Page, appName: string) => {
 };
 
 test("Create an app and visit the Console", async ({ page }) => {
-  if (!GITHUB_USER || !WINGCLOUD_URL || !APP_NAME || !PROD_BRANCH) {
-    throw new Error(
-      "Please provide the required environment variables 'TESTS_XXX'",
-    );
-  }
-
   page.goto(`${WINGCLOUD_URL}/add`);
 
   // Create a new app

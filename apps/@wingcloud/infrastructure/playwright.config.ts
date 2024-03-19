@@ -1,10 +1,15 @@
 import { defineConfig, devices } from "@playwright/test";
+import dotenv from "dotenv";
 
 export const AUTH_FILE = "../.playwright/user.json";
+
+// load environment variables from .env file
+dotenv.config();
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+
 export default defineConfig({
   /* Run tests in files in parallel */
   fullyParallel: true,

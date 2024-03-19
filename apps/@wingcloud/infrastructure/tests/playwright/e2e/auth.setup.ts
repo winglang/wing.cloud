@@ -1,10 +1,7 @@
 import { expect, test as setup } from "@playwright/test";
-import dotenv from "dotenv";
 import * as OTPAuth from "otpauth";
 
 import { AUTH_FILE } from "../../../playwright.config.js";
-
-dotenv.config();
 
 const GITHUB_USER = process.env.TESTS_GITHUB_USER;
 const GITHUB_PASSWORD = process.env.TESTS_GITHUB_PASS;

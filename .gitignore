@@ -13,4 +13,5 @@ node_modules/
 !/.editorconfig
 examples/**/target/
 .playwright/
+playwright-report/
 !/.projenrc.ts

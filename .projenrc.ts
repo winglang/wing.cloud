@@ -46,6 +46,7 @@ const monorepo = new MonorepoProject({
 
 monorepo.addGitIgnore("examples/**/target/");
 monorepo.addGitIgnore(".playwright/");
+monorepo.addGitIgnore("playwright-report/");
 monorepo.devTask.reset("turbo dev --concurrency 12");
 
 ///////////////////////////////////////////////////////////////////////////////
