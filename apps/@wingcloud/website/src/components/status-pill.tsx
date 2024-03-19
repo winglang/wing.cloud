@@ -26,7 +26,7 @@ export const StatusPill = ({
           color === "green" && "text-green-700",
           color === "red" && "text-red-600",
           color === "gray" && "text-gray-600",
-          "text-xs capitalize font-[500]",
+          "text-xs capitalize font-[500] whitespace-nowrap",
         )}
       >
         {children || statusString}

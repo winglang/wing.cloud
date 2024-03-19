@@ -402,7 +402,7 @@ pub class Api {
       let githubUser = GitHub.Client.getUser(tokens.access_token);
 
       let user = users.updateOrCreate(
-        displayName: githubUser.name,
+        displayName: githubUser.name ?? githubUser.login,
         username: githubUser.login,
         avatarUrl: githubUser.avatar_url,
         email: githubUser.email,

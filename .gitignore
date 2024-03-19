@@ -12,4 +12,6 @@ node_modules/
 !/.prettierrc.json
 !/.editorconfig
 examples/**/target/
+.playwright/
+playwright-report/
 !/.projenrc.ts

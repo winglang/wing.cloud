@@ -45,6 +45,7 @@
     "minimatch": "^9.0.3",
     "node-fetch": "^3.3.2",
     "octokit": "^3.1.2",
+    "otpauth": "^9.2.2",
     "punycode": "^2.3.1",
     "semver": "^7.6.0",
     "table": "^6.8.1",
@@ -54,6 +55,7 @@
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.394",
     "@octokit/rest": "^20.0.2",
+    "@playwright/test": "^1.42.1",
     "@types/express": "^4.17.21",
     "@types/http-proxy": "^1.17.14",
     "@types/jsonwebtoken": "^9.0.5",
@@ -77,6 +79,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "test": "projen test",
+    "test-e2e": "playwright test tests/playwright/e2e",
     "example": "node ./bin/wing.mjs it example.main.w",
     "default": "projen default",
     "compile": "projen compile",

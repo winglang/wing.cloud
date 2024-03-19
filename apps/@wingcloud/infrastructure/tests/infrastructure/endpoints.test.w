@@ -1,6 +1,6 @@
 bring ex;
-bring "../endpoints.w" as Endpoints;
-bring "./util.w" as Util;
+bring "../../endpoints.w" as Endpoints;
+bring "../util.w" as Util;
 
 let table = new Util.MakeTable().get();
 

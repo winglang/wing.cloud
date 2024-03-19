@@ -3,16 +3,16 @@ bring util;
 bring fs;
 bring http;
 bring expect;
-bring "../octokit.w" as ok;
+bring "../../octokit.w" as ok;
 bring "./dir.w" as dir;
-bring "../users.w" as users;
-bring "../apps.w" as apps;
-bring "../environments.w" as environments;
-bring "../types/octokit-types.w" as octokit;
-bring "../github-app.w" as github_app;
-bring "../cookie.w" as Cookie;
-bring "../jwt.w" as JWT;
-bring "../components/parameter/iparameter.w" as parameter;
+bring "../../users.w" as users;
+bring "../../apps.w" as apps;
+bring "../../environments.w" as environments;
+bring "../../types/octokit-types.w" as octokit;
+bring "../../github-app.w" as github_app;
+bring "../../cookie.w" as Cookie;
+bring "../../jwt.w" as JWT;
+bring "../../components/parameter/iparameter.w" as parameter;
 
 struct EnvironmentsTestProps {
   users: users.Users;

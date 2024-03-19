@@ -45,6 +45,8 @@ const monorepo = new MonorepoProject({
 });
 
 monorepo.addGitIgnore("examples/**/target/");
+monorepo.addGitIgnore(".playwright/");
+monorepo.addGitIgnore("playwright-report/");
 monorepo.devTask.reset("turbo dev --concurrency 12");
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -292,6 +294,7 @@ infrastructure.addTask("test-aws", {
   exec: "node ./bin/wing.mjs test -t tf-aws tests components",
 });
 
+infrastructure.addScript("test-e2e", "playwright test tests/playwright/e2e");
 infrastructure.compileTask.exec("node ./bin/wing.mjs compile main.w -t tf-aws");
 
 const terraformInitTask = infrastructure.addTask("terraformInit");
@@ -421,6 +424,9 @@ infrastructure.addDeps("@cdktf/provider-aws");
 infrastructure.addDeps("cdktf");
 infrastructure.addDeps("constructs");
 infrastructure.addDeps("aws-cdk-lib");
+
+infrastructure.addDevDeps("@playwright/test");
+infrastructure.addDeps("otpauth");
 
 ///////////////////////////////////////////////////////////////////////////////
 
