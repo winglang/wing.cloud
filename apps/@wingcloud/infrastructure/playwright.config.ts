@@ -3,10 +3,8 @@ import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
 
-export const AUTH_FILE = path.resolve(
-  import.meta.dirname,
-  "../.playwright/user.json",
-);
+// eslint-disable-next-line unicorn/prefer-module
+export const AUTH_FILE = path.resolve(__dirname, "../.playwright/user.json");
 
 // load environment variables from .env file
 dotenv.config();
