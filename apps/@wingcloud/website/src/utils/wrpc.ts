@@ -268,4 +268,10 @@ export const wrpc = createWRPCReact<{
       app: App;
     }
   >;
+  "admin.users.list": QueryProcedure<
+    undefined,
+    {
+      users: User[];
+    }
+  >;
 }>();

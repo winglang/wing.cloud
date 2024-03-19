@@ -19,6 +19,7 @@ bring "./lowkeys-map.w" as lowkeys;
 bring "./http-error.w" as httpError;
 bring "./authenticated-websocket-server.w" as wsServer;
 bring "./invalidate-query.w" as InvalidateQuery;
+bring "./admin.w" as Admin;
 
 struct Log {
   message: str;
@@ -218,7 +219,7 @@ pub class Api {
       }
     };
 
-    let getUserIdFromCookie = inflight (request: cloud.ApiRequest) => {
+    let getUserIdFromCookie = inflight (request: cloud.ApiRequest): str => {
       if let payload = getJWTPayloadFromCookie(request) {
         return payload.userId;
       }
@@ -309,6 +310,16 @@ pub class Api {
         return response;
       }
     });
+
+     // add the admin API
+     new Admin.Admin(
+      api: api,
+      apps: apps,
+      users: users,
+      environments: props.environments,
+      logs: logs,
+      getUserIdFromCookie: getUserIdFromCookie
+    );
 
     api.get("/wrpc/ws.invalidateQuery.auth", inflight (request) => {
       try {

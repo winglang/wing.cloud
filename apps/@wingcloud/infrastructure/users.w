@@ -169,4 +169,21 @@ pub class Users {
       throw httpError.HttpError.notFound("User not found");
     }
   }
+
+  pub inflight list(): Array<User> {
+    let result = this.table.query(
+      keyConditionExpression: "begins_with(pk, :prefix)",
+      expressionAttributeValues: {
+        ":prefix": "USER#",
+      },
+    );
+
+    let var users = MutArray<User>[];
+
+    for item in result.items {
+      users.push(User.fromJson(item));
+    }
+
+    return users.copy();
+  }
 }
