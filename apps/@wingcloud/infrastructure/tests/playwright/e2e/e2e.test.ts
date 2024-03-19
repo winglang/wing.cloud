@@ -1,9 +1,9 @@
 import { Page, expect, test } from "@playwright/test";
 
-const GITHUB_USER = process.env.TESTS_GITHUB_USER || "";
-const WINGCLOUD_URL = process.env.TESTS_E2E_URL || "";
-const APP_NAME = process.env.TESTS_E2E_APP_NAME || "";
-const PROD_BRANCH = process.env.TESTS_E2E_PROD_BRANCH || "";
+const GITHUB_USER = process.env.TESTS_GITHUB_USER;
+const WINGCLOUD_URL = process.env.TESTS_E2E_URL;
+const APP_NAME = process.env.TESTS_E2E_APP_NAME;
+const PROD_BRANCH = process.env.TESTS_E2E_PROD_BRANCH;
 
 const deleteApp = async (page: Page, appName: string) => {
   console.log("Deleting the app...");
