@@ -121,13 +121,12 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
       {showAdminWarning && (
         <div
           className={clsx(
-            "w-full bg-[#dd6f2c] text-white",
-            "flex justify-center",
-            "text-xs font-bold",
-            "py-0.5 gap-1.5",
+            "text-sm leading-6 py-1",
+            "text-white bg-amber-600",
+            theme.pagePadding,
           )}
         >
-          Admin Mode
+          Admin mode
         </div>
       )}
 

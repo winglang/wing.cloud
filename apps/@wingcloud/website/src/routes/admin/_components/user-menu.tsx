@@ -29,10 +29,10 @@ export const UserMenu = ({
   return (
     <>
       <Menu
-        btnClassName={clsx(theme.text2Hover, "rounded-sm")}
+        btnClassName={clsx(theme.text3Hover, "rounded-sm")}
         icon={
           <MenuIcon
-            className={clsx("w-6 h-6", "transition-all", "p-1", theme.text2)}
+            className={clsx("w-6 h-6", "transition-all", "p-1", theme.text3)}
           />
         }
         items={[

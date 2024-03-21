@@ -35,6 +35,7 @@ let appSecret = util.env("APP_SECRET");
 let wsSecret = util.env("WS_SECRET");
 let segmentWriteKey = util.tryEnv("SEGMENT_WRITE_KEY") ?? "";
 let enableAnalytics = util.env("ENABLE_ANALYTICS") == "true" && segmentWriteKey != "";
+let ADMIN_USERNAMES = util.env("ADMIN_USERNAMES").split(",");
 
 let publicEndpointDomain = (): str => {
   if util.env("WING_TARGET") == "sim" {

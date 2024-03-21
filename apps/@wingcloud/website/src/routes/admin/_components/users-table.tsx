@@ -36,7 +36,7 @@ export const UsersTable = ({
             key={user.id}
             className={clsx(
               "border-b transition-all text-xs relative",
-              "bg-white hover:bg-gray-50",
+              "bg-white hover:bg-slate-50",
             )}
           >
             <td className="px-4 py-2 flex justify-center">
