@@ -67,7 +67,12 @@ export const UsersTable = ({
 
               <div className="flex gap-x-4 items-center justify-end">
                 {user.isAdmin && (
-                  <div className="text-white bg-orange-400 rounded px-1.5 text-2xs font-bold">
+                  <div
+                    className={clsx(
+                      "text-white rounded px-1.5 text-2xs font-bold",
+                      "bg-[#dd6f2c]",
+                    )}
+                  >
                     Admin
                   </div>
                 )}
