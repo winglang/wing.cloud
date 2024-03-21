@@ -240,7 +240,6 @@ pub class Api {
       throw httpError.HttpError.unauthorized();
     };
 
-
     // This method checks if the user has access rights to the owner's resources.
     // The user must be an admin or the owner of the resource.
     let checkOwnerAccessRights = inflight (request, owner: str) => {
