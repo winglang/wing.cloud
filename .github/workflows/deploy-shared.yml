@@ -80,7 +80,7 @@ jobs:
           WING_ENV: "production" # both staging and production have the same resource config for now
           # wing tunnels
           TUNNELS_SUBDOMAIN: ${{ vars.TUNNELS_SUBDOMAIN }}
-          ADMIN_USERNAMES: ${{ vars.ADMIN_USERNAMES }}
+          ADMIN_USERS: ${{ vars.ADMIN_USERS }}
         run: pnpm wing compile --value wrpc/mergeLambdas=true --value wrpc/warmLambdas=true --platform @wingcloud/platform main.w
         working-directory: "apps/@wingcloud/infrastructure"
       - name: Configure AWS credentials

@@ -15,7 +15,7 @@ struct AdminProps {
 pub class Admin {
   new(props: AdminProps) {
     let ADMIN_LOGS_KEY = "admin-logs";
-    let ADMIN_USERNAMES = util.tryEnv("ADMIN_USERNAMES")?.split(",") ?? [];
+    let ADMIN_USERS = util.tryEnv("ADMIN_USERS")?.split(",") ?? [];
 
     let api = props.api;
     let users = props.users;
@@ -57,11 +57,11 @@ pub class Admin {
     });
 
     new cloud.OnDeploy(inflight () => {
-      if ADMIN_USERNAMES.length == 0 {
+      if ADMIN_USERS.length == 0 {
         log("No admin usernames provided. No users will be set as admins.");
         return;
       }
-      for username in ADMIN_USERNAMES {
+      for username in ADMIN_USERS {
         try {
           let user = users.getByName({
             username: username.trim()
