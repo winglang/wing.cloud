@@ -70,7 +70,7 @@ export const UsersTable = ({
                   <div
                     className={clsx(
                       "text-white rounded px-1.5 text-2xs font-bold",
-                      "bg-[#dd6f2c]",
+                      "bg-amber-600",
                     )}
                   >
                     Admin

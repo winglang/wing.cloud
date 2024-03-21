@@ -15,7 +15,7 @@ struct AdminProps {
 pub class Admin {
   new(props: AdminProps) {
     let ADMIN_LOGS_KEY = "admin-logs";
-    let ADMIN_USERNAMES = util.env("ADMIN_USERNAMES").split(",");
+    let ADMIN_USERNAMES = util.tryEnv("ADMIN_USERNAMES")?.split(",") ?? [];
 
     let api = props.api;
     let users = props.users;
