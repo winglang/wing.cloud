@@ -68,7 +68,6 @@ export const Menu = ({
             "flex",
             theme.focusVisible,
             "items-center",
-            "group",
           )}
           onClick={(event) => {
             onClick?.(event);
