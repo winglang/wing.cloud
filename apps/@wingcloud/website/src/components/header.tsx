@@ -1,3 +1,4 @@
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { UserIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { Fragment, useContext, useMemo } from "react";
@@ -124,6 +125,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
         theme.bgInput,
         theme.pagePadding,
         "relative",
+        showAdminWarning && ["mb-2", tabs && "pb-px"],
       )}
     >
       {showAdminWarning && (
@@ -134,8 +136,8 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
             "flex justify-center",
           )}
         >
-          <div className="text-white bg-orange-500 rounded-b px-1.5 text-2xs font-bold">
-            Admin
+          <div className="text-white bg-orange-500 rounded-b px-1.5 text-2xs font-bold flex gap-1 py-0.5">
+            <ExclamationTriangleIcon className="size-4" /> Admin Mode
           </div>
         </div>
       )}
