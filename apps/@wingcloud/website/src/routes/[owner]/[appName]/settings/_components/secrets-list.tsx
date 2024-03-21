@@ -35,10 +35,11 @@ export const SecretsList = ({
 
   const secretsQuery = wrpc["app.listSecrets"].useQuery(
     {
-      appId: appId!,
+      owner: owner!,
+      appName: appName!,
     },
     {
-      enabled: !!appId,
+      enabled: !!owner && !!appName,
     },
   );
 

@@ -1,5 +1,4 @@
 import { Menu as HeadlessMenu, Transition } from "@headlessui/react";
-import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import {
   Fragment,
@@ -69,6 +68,7 @@ export const Menu = ({
             "flex",
             theme.focusVisible,
             "items-center",
+            "group",
           )}
           onClick={(event) => {
             onClick?.(event);

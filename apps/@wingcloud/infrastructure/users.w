@@ -2,12 +2,13 @@ bring ex;
 bring "./nanoid62.w" as Nanoid62;
 bring "./http-error.w" as httpError;
 
-struct User {
+pub struct User {
   id: str;
   displayName: str;
   username: str;
   avatarUrl: str;
   email: str?;
+  isAdmin: bool?;
 }
 
 struct CreateOptions {
@@ -28,15 +29,26 @@ struct GetOrCreateOptions {
   email: str?;
 }
 
-struct GetUsernameOptions {
+struct GetUserOptions {
   userId: str;
+}
+
+struct GetUserByNameOptions {
+  username: str;
 }
 
 struct UpdateOptions {
   userId: str;
   displayName: str;
+  username: str;
   avatarUrl: str?;
   email: str?;
+}
+
+struct SetAdminRoleOptions {
+  userId: str;
+  username: str;
+  isAdmin: bool;
 }
 
 pub class Users {
@@ -60,8 +72,8 @@ pub class Users {
               id: userId,
               displayName: options.displayName,
               username: options.username,
-              avatarUrl: options.avatarUrl,
-              email: options.email,
+              avatarUrl: options.avatarUrl ?? "",
+              email: options.email ?? "",
             },
             conditionExpression: "attribute_not_exists(pk)",
           },
@@ -74,8 +86,8 @@ pub class Users {
               id: userId,
               displayName: options.displayName,
               username: options.username,
-              avatarUrl: options.avatarUrl,
-              email: options.email,
+              avatarUrl: options.avatarUrl ?? "",
+              email: options.email ?? "",
             },
           }
         }
@@ -91,24 +103,37 @@ pub class Users {
     };
   }
 
-  pub inflight update(
-    options: UpdateOptions,
-  ): User {
-    let result = this.table.updateItem(
-      key: {
-        pk: "USER#{options.userId}",
-        sk: "#",
+  pub inflight update(options: UpdateOptions): void {
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "LOGIN#{options.username}",
+            sk: "#",
+          },
+          updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email",
+          expressionAttributeValues: {
+            ":displayName": options.displayName,
+            ":avatarUrl": options.avatarUrl,
+            ":email": options.email,
+          },
+        }
       },
-      updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email",
-      expressionAttributeValues: {
-        ":displayName": options.displayName,
-        ":avatarUrl": options.avatarUrl,
-        ":email": options.email
-      },
-      returnValues: "ALL_NEW",
-    );
-
-    return User.fromJson(result.attributes);
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "#",
+          },
+          updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email",
+          expressionAttributeValues: {
+            ":displayName": options.displayName,
+            ":avatarUrl": options.avatarUrl,
+            ":email": options.email,
+          },
+        }
+      }
+    ]);
   }
 
   pub inflight fromLogin(options: FromLoginOptions): User? {
@@ -129,7 +154,6 @@ pub class Users {
     throw httpError.HttpError.notFound("User not found");
   }
 
-
   pub inflight updateOrCreate(options: GetOrCreateOptions): User {
     if let user = this.fromLogin(username: options.username) {
       if user.displayName == options.displayName &&
@@ -138,12 +162,22 @@ pub class Users {
           return user;
       }
 
-      return this.update(
+      this.update(
         userId: user.id,
         displayName: options.displayName,
         avatarUrl: options.avatarUrl,
-        email: options.email
+        email: options.email,
+        username: options.username,
       );
+
+      return User {
+        username: options.username,
+        avatarUrl: options.avatarUrl ?? "",
+        displayName: options.displayName,
+        email: options.email,
+        id: user.id,
+        isAdmin: user.isAdmin,
+      };
     } else {
       return this.create(
         displayName: options.displayName,
@@ -154,13 +188,29 @@ pub class Users {
     }
   }
 
-  pub inflight get(options: GetUsernameOptions): User {
+  pub inflight get(options: GetUserOptions): User {
     let result = this.table.getItem(
       key: {
         pk: "USER#{options.userId}",
         sk: "#",
       },
-      projectionExpression: "id, displayName, username, avatarUrl, email",
+      projectionExpression: "id, displayName, username, avatarUrl, email, isAdmin",
+    );
+
+    if let user = User.tryFromJson(result.item) {
+      return user;
+    } else {
+      throw httpError.HttpError.notFound("User not found");
+    }
+  }
+
+  pub inflight getByName(options: GetUserByNameOptions): User {
+    let result = this.table.getItem(
+      key: {
+        pk: "LOGIN#{options.username}",
+        sk: "#",
+      },
+      projectionExpression: "id, displayName, username, avatarUrl, email, isAdmin",
     );
 
     if let user = User.tryFromJson(result.item) {
@@ -171,10 +221,10 @@ pub class Users {
   }
 
   pub inflight list(): Array<User> {
-    let result = this.table.query(
-      keyConditionExpression: "begins_with(pk, :prefix)",
+    let result = this.table.scan(
+      filterExpression: "begins_with(pk, :prefix)",
       expressionAttributeValues: {
-        ":prefix": "USER#",
+        ":prefix": "LOGIN#",
       },
     );
 
@@ -185,5 +235,34 @@ pub class Users {
     }
 
     return users.copy();
+  }
+
+  pub inflight setAdminRole(options: SetAdminRoleOptions): void {
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "LOGIN#{options.username}",
+            sk: "#",
+          },
+          updateExpression: "SET isAdmin = :isAdmin",
+          expressionAttributeValues: {
+            ":isAdmin": options.isAdmin,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "#",
+          },
+          updateExpression: "SET isAdmin = :isAdmin",
+          expressionAttributeValues: {
+            ":isAdmin": options.isAdmin,
+          },
+        }
+      }
+    ]);
   }
 }

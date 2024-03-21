@@ -111,6 +111,10 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
     return `/${owner}`;
   }, [owner]);
 
+  const showAdminWarning = useMemo(() => {
+    return user?.isAdmin && owner !== user?.username;
+  }, [user?.isAdmin, owner, user?.username]);
+
   return (
     <header
       className={clsx(
@@ -119,8 +123,23 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
         !tabs && "pb-4",
         theme.bgInput,
         theme.pagePadding,
+        "relative",
       )}
     >
+      {showAdminWarning && (
+        <div
+          className={clsx(
+            "absolute inset-x-0",
+            "border-t border-orange-500 top-full",
+            "flex justify-center",
+          )}
+        >
+          <div className="text-white bg-orange-500 rounded-b px-1.5 text-2xs font-bold">
+            Admin
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center gap-6">
         <Link
           to={dashboardLink}

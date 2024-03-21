@@ -3,6 +3,9 @@ bring util;
 struct SignOptions {
   secret: str;
   userId: str;
+  username: str;
+  email: str?;
+  isAdmin: bool;
   expirationTime: str?;
 }
 
@@ -13,6 +16,9 @@ struct VerifyOptions {
 
 pub struct JWTPayload {
   userId: str;
+  username: str;
+  email: str?;
+  isAdmin: bool;
 }
 
 pub class JWT {
