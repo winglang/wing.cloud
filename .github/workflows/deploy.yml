@@ -30,6 +30,7 @@ jobs:
     needs: deploy-staging
     name: Test Staging
     uses: ./.github/workflows/e2e-test.yml
+    secrets: inherit
 
   # This deploys into the "Wing Cloud Production" AWS account
   # https://wingcloud.awsapps.com/start
