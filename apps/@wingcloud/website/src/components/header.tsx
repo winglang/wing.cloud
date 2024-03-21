@@ -126,7 +126,6 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
           theme.bgInput,
           theme.pagePadding,
           "relative",
-          showAdminWarning && "mb-2",
         )}
       >
         {showAdminWarning && (
@@ -141,7 +140,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
               className={clsx(
                 "text-2xs px-2",
                 "text-gray-50 bg-orange-500",
-                "rounded-b",
+                "rounded-b shadow",
                 "text-center uppercase",
               )}
             >
