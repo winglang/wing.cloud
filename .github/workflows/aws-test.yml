@@ -105,3 +105,4 @@ jobs:
           WING_ENV: "test"
           # Wing debug logging
           # DEBUG: "wing:*"
+          ADMIN_USERNAMES: ${{ vars.ADMIN_USERNAMES }}
