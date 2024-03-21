@@ -290,6 +290,7 @@ pub class Api {
       if let user = users.fromLogin(username: owner) {
         return user.id;
       }
+      throw httpError.HttpError.notFound();
     };
 
     let getLoggedUserAccessToken = inflight (request: cloud.ApiRequest): str? => {

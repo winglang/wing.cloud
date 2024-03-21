@@ -118,18 +118,6 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
 
   return (
     <>
-      {showAdminWarning && (
-        <div
-          className={clsx(
-            "text-sm leading-6 py-1",
-            "text-white bg-amber-600",
-            theme.pagePadding,
-          )}
-        >
-          Admin mode
-        </div>
-      )}
-
       <header
         className={clsx(
           "transition-all",
@@ -138,8 +126,29 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
           theme.bgInput,
           theme.pagePadding,
           "relative",
+          showAdminWarning && "mb-2",
         )}
       >
+        {showAdminWarning && (
+          <div
+            className={clsx(
+              "absolute inset-x-0 top-full",
+              "flex items-center justify-center",
+              "border-t border-orange-500",
+            )}
+          >
+            <div
+              className={clsx(
+                "text-2xs px-2",
+                "text-gray-50 bg-orange-500",
+                "rounded-b",
+                "text-center uppercase",
+              )}
+            >
+              Admin mode
+            </div>
+          </div>
+        )}
         <div className="flex items-center gap-6">
           <Link
             to={dashboardLink}
