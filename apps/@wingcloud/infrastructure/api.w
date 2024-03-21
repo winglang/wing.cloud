@@ -360,7 +360,7 @@ pub class Api {
       return response;
     });
 
-    // This middleware checks the owner  access rights
+    // This middleware checks the owner access rights
     api.addMiddleware(inflight (request, next) => {
       if request.method == cloud.HttpMethod.GET {
         if let owner = request.query.tryGet("owner") {
