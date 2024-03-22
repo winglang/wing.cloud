@@ -1,5 +1,7 @@
 import { Page, expect, test } from "@playwright/test";
 
+import { reloadUntil } from "./utils.js";
+
 const GITHUB_USER = process.env.TESTS_GITHUB_USER;
 const WINGCLOUD_URL = process.env.TESTS_E2E_URL;
 const APP_NAME = process.env.TESTS_E2E_APP_NAME;
@@ -57,6 +59,16 @@ test("Create an app and visit the Console", async ({ page }) => {
 
   // Visit the environment page
   console.log("Visiting the environment page...");
+
+  // Reload the page to avoid ws connection issues on localhost
+  if (WINGCLOUD_URL.includes("localhost")) {
+    await reloadUntil(
+      page,
+      async () =>
+        await page.getByTestId("environment-details-button").isVisible(),
+    );
+  }
+
   await page.getByTestId("environment-details-button").click();
 
   await page.waitForURL(
@@ -67,7 +79,16 @@ test("Create an app and visit the Console", async ({ page }) => {
 
   // Visit the console
   console.log("Waiting for the console button to be enabled...");
+
   const consoleButton = page.getByTestId("environment-console-button");
+
+  // Reload the page to avoid ws connection issues on localhost
+  if (WINGCLOUD_URL.includes("localhost")) {
+    await reloadUntil(page, async () => await consoleButton.isEnabled(), {
+      timeout: 60_000 * 2,
+    });
+  }
+
   await expect(consoleButton).toBeEnabled({
     timeout: 60_000 * 2,
   });
