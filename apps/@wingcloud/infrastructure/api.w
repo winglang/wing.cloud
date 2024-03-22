@@ -263,7 +263,6 @@ pub class Api {
       throw httpError.HttpError.notFound("User '{owner}' not found");
     };
 
-
     // Checks if the user has access rights to the app.
     // The user must be an admin or the owner of the app.
     let checkAppAccessRights = inflight (request: cloud.ApiRequest, app: Apps.App): Apps.App => {
@@ -281,8 +280,6 @@ pub class Api {
       throw httpError.HttpError.notFound("App not found");
     };
 
-    // Gets the user id from the owner's username.
-    // The user must be an admin or the owner of the resource.
     let getOwnerUserId = inflight (request: cloud.ApiRequest, owner: str): str => {
       if let loggedUser = getUserFromCookie(request) {
         if loggedUser.username == owner {
