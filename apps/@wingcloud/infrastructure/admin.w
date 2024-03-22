@@ -8,7 +8,6 @@ bring util;
 struct AdminProps {
   api: json_api.JsonApi;
   users: Users.Users;
-  logs: cloud.Bucket;
   getUserFromCookie: inflight(cloud.ApiRequest): JWT.JWTPayload?;
 }
 
@@ -19,7 +18,6 @@ pub class Admin {
 
     let api = props.api;
     let users = props.users;
-    let logs = props.logs;
     let getUserFromCookie = props.getUserFromCookie;
 
     // This method checks if the user has admin rights.

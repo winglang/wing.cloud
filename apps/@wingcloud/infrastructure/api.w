@@ -380,7 +380,6 @@ pub class Api {
      new Admin.Admin(
       api: api,
       users: users,
-      logs: logs,
       getUserFromCookie: getUserFromCookie,
     );
 
