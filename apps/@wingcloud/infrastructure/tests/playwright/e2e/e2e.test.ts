@@ -13,16 +13,30 @@ if (!GITHUB_USER || !WINGCLOUD_URL || !APP_NAME || !PROD_BRANCH) {
 
 const deleteApp = async (page: Page, appName: string) => {
   console.log("Deleting the app...");
-  page.goto(`${WINGCLOUD_URL}/${GITHUB_USER}/${appName}/settings`);
+  const url = `${WINGCLOUD_URL}/${GITHUB_USER}/${appName}/settings`;
+  if (page.url() !== url) {
+    await page.goto(url);
+  }
   const deleteButton = page.getByTestId("delete-app-button");
   await expect(deleteButton).toBeEnabled({
     timeout: 30_000,
   });
-  deleteButton.click();
+  await deleteButton.click();
 
   console.log("Confirming the delete modal...");
-  page.getByTestId("modal-confirm-button").click();
+  await page.getByTestId("modal-confirm-button").click();
 };
+
+test.beforeEach("Remove the app if needed", async ({ page }) => {
+  await page.goto(`${WINGCLOUD_URL}/${GITHUB_USER}/${APP_NAME}/settings`);
+  await page.waitForLoadState("networkidle");
+  if (await page.locator("text=404").isHidden()) {
+    console.log("App, already exists, deleting it...");
+    await deleteApp(page, APP_NAME);
+  } else {
+    console.log("App does not exist, continuing...");
+  }
+});
 
 test("Create an app and visit the Console", async ({ page }) => {
   page.goto(`${WINGCLOUD_URL}/add`);
@@ -74,13 +88,4 @@ test("Create an app and visit the Console", async ({ page }) => {
   await page.waitForURL(new RegExp(`^${WINGCLOUD_URL}/add`));
 
   console.log("App deleted successfully");
-});
-
-test.afterEach("Test teardown", async ({ page }) => {
-  await page.goto(`${WINGCLOUD_URL}/${GITHUB_USER}/${APP_NAME}/settings`);
-  await page.waitForLoadState("networkidle");
-  if (await page.locator("text=404").isHidden()) {
-    console.log("App was not deleted during the test, trying to delete it...");
-    await deleteApp(page, APP_NAME);
-  }
 });
