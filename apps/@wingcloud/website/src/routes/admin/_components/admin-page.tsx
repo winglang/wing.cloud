@@ -53,7 +53,12 @@ export const AdminPage = (props: AdminPageProps) => {
       {!isLoading && (
         <div className="flex flex-wrap gap-6 w-full">
           <div className="w-full space-y-2">
-            <SectionTitle>Users</SectionTitle>
+            <SectionTitle>
+              <span>Users</span>{" "}
+              <span className="text-gray-500 font-normal">
+                ({data?.users.length})
+              </span>
+            </SectionTitle>
             <div className="overflow-x-auto relative shadow-sm rounded-md w-full">
               <UsersTable users={filteredUsers} refetch={refetch} />
             </div>
