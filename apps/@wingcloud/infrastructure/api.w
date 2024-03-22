@@ -292,7 +292,7 @@ pub class Api {
       throw httpError.HttpError.notFound("User '{owner}' not found");
     };
 
-    let getLoggedUserAccessToken = inflight (request: cloud.ApiRequest): str? => {
+    let getAccessTokenFromCookie = inflight (request: cloud.ApiRequest): str? => {
       if let user = getUserFromCookie(request) {
         return githubAccessTokens.get(user.userId)?.access_token;
       }
@@ -540,7 +540,7 @@ pub class Api {
     });
 
     api.get("/wrpc/github.listInstallations", inflight (request) => {
-      if let accessToken = getLoggedUserAccessToken(request) {
+      if let accessToken = getAccessTokenFromCookie(request) {
         let page = num.fromStr(request.query.get("page"));
         let data = GitHub.Client.listUserInstallations(accessToken, page);
 
@@ -553,7 +553,7 @@ pub class Api {
     });
 
     api.get("/wrpc/github.listRepositories", inflight (request) => {
-      if let accessToken = getLoggedUserAccessToken(request) {
+      if let accessToken = getAccessTokenFromCookie(request) {
         let installationId = num.fromStr(request.query.get("installationId"));
         let page = num.fromStr(request.query.get("page"));
 
@@ -568,7 +568,7 @@ pub class Api {
     });
 
     api.get("/wrpc/github.getRepository", inflight (request) => {
-      if let accessToken = getLoggedUserAccessToken(request) {
+      if let accessToken = getAccessTokenFromCookie(request) {
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
 
@@ -589,7 +589,7 @@ pub class Api {
     });
 
     api.get("/wrpc/github.getPullRequest", inflight (request) => {
-      if let accessToken = getLoggedUserAccessToken(request) {
+      if let accessToken = getAccessTokenFromCookie(request) {
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
         let pullNumber = request.query.get("pullNumber");
@@ -689,7 +689,7 @@ pub class Api {
     };
 
     api.post("/wrpc/app.create", inflight (request) => {
-      if let accessToken = getLoggedUserAccessToken(request) {
+      if let accessToken = getAccessTokenFromCookie(request) {
         let input = Json.parse(request.body ?? "");
 
         let owner = input.get("owner").asStr();
@@ -1048,7 +1048,7 @@ pub class Api {
     });
 
     api.get("/wrpc/app.listEntrypoints", inflight (request) => {
-      if let accessToken = getLoggedUserAccessToken(request) {
+      if let accessToken = getAccessTokenFromCookie(request) {
         let owner = request.query.get("owner");
         let repo = request.query.get("repo");
         let defaultBranch = request.query.get("default_branch");
