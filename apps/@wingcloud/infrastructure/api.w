@@ -240,7 +240,7 @@ pub class Api {
       throw httpError.HttpError.unauthorized();
     };
 
-    // This method checks if the user has access rights to the owner's resources.
+    // Checks if the user has access rights to the owner's resources.
     // The user must be an admin or the owner of the resource.
     let checkOwnerAccessRights = inflight (request, owner: str) => {
       if let user = getUserFromCookie(request) {
@@ -264,7 +264,7 @@ pub class Api {
     };
 
 
-    // This method checks if the user has access rights to the app.
+    // Checks if the user has access rights to the app.
     // The user must be an admin or the owner of the app.
     let checkAppAccessRights = inflight (request: cloud.ApiRequest, app: Apps.App): Apps.App => {
       if let user = getUserFromCookie(request) {
@@ -281,6 +281,8 @@ pub class Api {
       throw httpError.HttpError.notFound("App not found");
     };
 
+    // Gets the user id from the owner's username.
+    // The user must be an admin or the owner of the resource.
     let getOwnerUserId = inflight (request: cloud.ApiRequest, owner: str): str => {
       if let loggedUser = getUserFromCookie(request) {
         if loggedUser.username == owner {
@@ -290,7 +292,7 @@ pub class Api {
       if let user = users.fromLogin(username: owner) {
         return user.id;
       }
-      throw httpError.HttpError.notFound();
+      throw httpError.HttpError.notFound("User '{owner}' not found");
     };
 
     let getLoggedUserAccessToken = inflight (request: cloud.ApiRequest): str? => {
@@ -767,17 +769,14 @@ pub class Api {
 
     api.get("/wrpc/app.list", inflight (request) => {
       let owner = request.query.get("owner");
-      try {
-        let userId = getOwnerUserId(request, owner);
-        let userApps = apps.list(userId: userId);
-        return {
-          body: {
-            apps: userApps,
-          },
-        };
-      } catch error {
-        throw httpError.HttpError.notFound();
-      }
+      let userId = getOwnerUserId(request, owner);
+
+      let userApps = apps.list(userId: userId);
+      return {
+        body: {
+          apps: userApps,
+        },
+      };
     });
 
     let deleteAppQueue = new cloud.Queue() as "DeleteApp-Queue";
@@ -831,72 +830,62 @@ pub class Api {
     });
 
     api.get("/wrpc/app.getByName", inflight (request) => {
-      let owner = request.query.get("owner");
-      try {
-        let userId = getOwnerUserId(request, owner);
-        let app = apps.getByName(
-          userId: userId,
-          appName: request.query.get("appName"),
-        );
-        checkAppAccessRights(request, app);
-        return {
-          body: {
-            app: app,
-          },
-        };
-      }
-      catch {
-        throw httpError.HttpError.notFound();
-      }
+      let userId = getOwnerUserId(request, request.query.get("owner"));
+
+      let app = apps.getByName(
+        userId: userId,
+        appName: request.query.get("appName"),
+      );
+      checkAppAccessRights(request, app);
+
+      return {
+        body: {
+          app: app,
+        },
+      };
     });
 
     api.get("/wrpc/app.listEnvironments", inflight (request) => {
       let owner = request.query.get("owner");
-      try {
-        let userId = getOwnerUserId(request, owner);
-        let app = apps.getByName(
-          userId: userId,
-          appName: request.query.get("appName")
-        );
-        checkAppAccessRights(request, app);
+      let userId = getOwnerUserId(request, owner);
 
-        let environmentsList = environments.list(
-          appId: app.appId,
-        );
+      let app = apps.getByName(
+        userId: userId,
+        appName: request.query.get("appName")
+      );
+      checkAppAccessRights(request, app);
 
-        return {
-          body: {
-            environments: environmentsList,
-          },
-        };
-      } catch {
-        throw httpError.HttpError.notFound();
-      }
+      let environmentsList = environments.list(
+        appId: app.appId,
+      );
+
+      return {
+        body: {
+          environments: environmentsList,
+        },
+      };
     });
 
     api.get("/wrpc/app.environment", inflight (request) => {
       let owner = request.query.get("owner");
-      try {
-        let userId = getOwnerUserId(request, owner);
-        let app = apps.getByName(
-          userId: userId,
-          appName: request.query.get("appName"),
-        );
-        checkAppAccessRights(request, app);
+      let userId = getOwnerUserId(request, owner);
 
-        let environment = props.environments.getByBranch(
-          appId: app.appId,
-          branch: request.query.get("branch"),
-        );
+      let app = apps.getByName(
+        userId: userId,
+        appName: request.query.get("appName"),
+      );
+      checkAppAccessRights(request, app);
 
-        return {
-          body: {
-            environment: environment,
-          },
-        };
-      } catch {
-        throw httpError.HttpError.notFound();
-      }
+      let environment = props.environments.getByBranch(
+        appId: app.appId,
+        branch: request.query.get("branch"),
+      );
+
+      return {
+        body: {
+          environment: environment,
+        },
+      };
     });
 
     api.post("/wrpc/app.environment.restart", inflight (request) => {
@@ -945,25 +934,22 @@ pub class Api {
 
     api.get("/wrpc/app.listSecrets", inflight (request) => {
       let owner = request.query.get("owner");
-      try {
-        let userId = getOwnerUserId(request, owner);
-        let app = apps.getByName(
-          userId: userId,
-          appName: request.query.get("appName"),
-        );
-        checkAppAccessRights(request, app);
+      let userId = getOwnerUserId(request, owner);
 
-        let prodSecrets = props.secrets.list(appId: app.appId, environmentType: "production");
-        let previewSecrets = props.secrets.list(appId: app.appId, environmentType: "preview");
+      let app = apps.getByName(
+        userId: userId,
+        appName: request.query.get("appName"),
+      );
+      checkAppAccessRights(request, app);
 
-        return {
-          body: {
-            secrets: prodSecrets.concat(previewSecrets)
-          },
-        };
-      } catch {
-        throw httpError.HttpError.notFound();
-      }
+      let prodSecrets = props.secrets.list(appId: app.appId, environmentType: "production");
+      let previewSecrets = props.secrets.list(appId: app.appId, environmentType: "preview");
+
+      return {
+        body: {
+          secrets: prodSecrets.concat(previewSecrets)
+        },
+      };
     });
 
     api.post("/wrpc/app.decryptSecret", inflight (request) => {
@@ -1153,90 +1139,83 @@ pub class Api {
 
     api.get("/wrpc/app.environment.logs", inflight (request) => {
       let owner = request.query.get("owner");
+      let appName = request.query.get("appName");
+      let branch = request.query.get("branch");
+      let userId = getOwnerUserId(request, owner);
+
+      let app = apps.getByName(
+        userId: userId,
+        appName: appName,
+      );
+      checkAppAccessRights(request, app);
+
+      let environment = props.environments.getByBranch(
+        appId: app.appId,
+        branch: branch,
+      );
+
+      let envId = environment.id;
+
+      let var deployLogs = [];
       try {
-        let userId = getOwnerUserId(request, owner);
-        let appName = request.query.get("appName");
-        let branch = request.query.get("branch");
-
-        let app = apps.getByName(
-          userId: userId,
-          appName: appName,
-        );
-        checkAppAccessRights(request, app);
-
-        let environment = props.environments.getByBranch(
-          appId: app.appId,
-          branch: branch,
-        );
-
-        let envId = environment.id;
-
-        let var deployLogs = [];
-        try {
-          let deployMessages = logs.tryGet("{envId}/deployment.log")?.split("\n") ?? [];
-          deployLogs = Util.parseLogs(deployMessages);
-        } catch err {
-          deployLogs = [];
-          log("failed to parse deployment logs {err}");
-        }
-
-        let var runtimeLogs = [];
-        try {
-          let runtimeMessages = logs.tryGet("{envId}/runtime.log")?.split("\n") ?? [];
-          runtimeLogs = Util.parseLogs(runtimeMessages);
-        } catch err {
-          runtimeLogs = [];
-          log("failed to parse runtime logs {err}");
-        }
-
-        let var testLogs = MutArray<TestLog>[];
-        try {
-          let testEntries = logs.list("{envId}/tests");
-          for entry in testEntries {
-            let testResults = logs.getJson(entry);
-            testLogs.push(TestLog.fromJson(testResults));
-          }
-        } catch err {
-          testLogs = MutArray<TestLog>[];
-          log("failed to parse test logs {err}");
-        }
-
-        return {
-          body: {
-            deploy: deployLogs,
-            runtime: runtimeLogs,
-            tests: testLogs.copy()
-          },
-        };
-      } catch {
-        throw httpError.HttpError.notFound();
+        let deployMessages = logs.tryGet("{envId}/deployment.log")?.split("\n") ?? [];
+        deployLogs = Util.parseLogs(deployMessages);
+      } catch err {
+        deployLogs = [];
+        log("failed to parse deployment logs {err}");
       }
+
+      let var runtimeLogs = [];
+      try {
+        let runtimeMessages = logs.tryGet("{envId}/runtime.log")?.split("\n") ?? [];
+        runtimeLogs = Util.parseLogs(runtimeMessages);
+      } catch err {
+        runtimeLogs = [];
+        log("failed to parse runtime logs {err}");
+      }
+
+      let var testLogs = MutArray<TestLog>[];
+      try {
+        let testEntries = logs.list("{envId}/tests");
+        for entry in testEntries {
+          let testResults = logs.getJson(entry);
+          testLogs.push(TestLog.fromJson(testResults));
+        }
+      } catch err {
+        testLogs = MutArray<TestLog>[];
+        log("failed to parse test logs {err}");
+      }
+
+      return {
+        body: {
+          deploy: deployLogs,
+          runtime: runtimeLogs,
+          tests: testLogs.copy()
+        },
+      };
     });
 
     api.get("/wrpc/app.environment.endpoints", inflight (request) => {
       let owner = request.query.get("owner");
-      try {
-        let userId = getOwnerUserId(request, owner);
-        let app = apps.getByName(
-          userId: userId,
-          appName: request.query.get("appName"),
-        );
+      let userId = getOwnerUserId(request, owner);
 
-        let environment = props.environments.getByBranch(
-          appId: app.appId,
-          branch: request.query.get("branch"),
-        );
+      let app = apps.getByName(
+        userId: userId,
+        appName: request.query.get("appName"),
+      );
 
-        let endpoints = props.endpoints.list(environmentId: environment.id);
+      let environment = props.environments.getByBranch(
+        appId: app.appId,
+        branch: request.query.get("branch"),
+      );
 
-        return {
-          body: {
-            endpoints: endpoints,
-          },
-        };
-      } catch {
-        throw httpError.HttpError.notFound();
-      }
+      let endpoints = props.endpoints.list(environmentId: environment.id);
+
+      return {
+        body: {
+          endpoints: endpoints,
+        },
+      };
     });
 
 
