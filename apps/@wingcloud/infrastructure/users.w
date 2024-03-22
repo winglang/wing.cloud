@@ -220,6 +220,7 @@ pub class Users {
     }
   }
 
+  // Intended for admin use only
   pub inflight list(): Array<User> {
     let result = this.table.scan(
       filterExpression: "begins_with(pk, :prefix)",
@@ -237,6 +238,7 @@ pub class Users {
     return users.copy();
   }
 
+  // Intended for admin use only
   pub inflight setAdminRole(options: SetAdminRoleOptions): void {
     this.table.transactWriteItems(transactItems: [
       {
