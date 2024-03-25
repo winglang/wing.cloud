@@ -14,6 +14,7 @@ import { useStatus } from "../../../../utils/status.js";
 import { getDateTime } from "../../../../utils/time.js";
 import type { App, Environment, Endpoint } from "../../../../utils/wrpc.js";
 
+import { EnvironmentMenu } from "./environment-menu.js";
 import { RedeployEnvironmentModal } from "./redeploy-environment-modal.js";
 
 export interface AppDetailsProps {
@@ -79,29 +80,43 @@ export const AppDetails = ({
         "flex flex-col",
       )}
     >
-      <div className="space-y-1">
-        <h3 className="text-base font-semibold leading-7 text-gray-900">
-          {app && environment?.branch && (
-            <Link
-              className={clsx(
-                "hover:underline focus:underline outline-none",
-                "font-semibold truncate",
-                "transition-all",
-                theme.text1,
-                "flex items-center gap-x-1 group",
-              )}
-              to={`/${owner}/${app?.appName}/environment/${environment.branch}`}
-            >
-              {`${app.appName}/${environment.branch}`}
-            </Link>
+      <div className="space-y-1 flex">
+        <div className="grow">
+          <h3 className="text-base font-semibold leading-7 text-gray-900">
+            {app && environment?.branch && (
+              <Link
+                className={clsx(
+                  "hover:underline focus:underline outline-none",
+                  "font-semibold truncate",
+                  "transition-all",
+                  theme.text1,
+                  "flex items-center gap-x-1 group",
+                )}
+                to={`/${owner}/${app?.appName}/environment/${environment.branch}`}
+              >
+                {`${app.appName}/${environment.branch}`}
+              </Link>
+            )}
+          </h3>
+          <p
+            className={clsx(
+              "max-w-2xl text-sm leading-6 truncate",
+              theme.text3,
+            )}
+            title={app?.description || "No description"}
+          >
+            {app?.description || "No description"}
+          </p>
+        </div>
+        <div className="flex justify-end items-start xl:col-span-3">
+          {environment && app?.appName && (
+            <EnvironmentMenu
+              owner={owner}
+              appName={app?.appName}
+              environment={environment}
+            />
           )}
-        </h3>
-        <p
-          className={clsx("max-w-2xl text-sm leading-6 truncate", theme.text3)}
-          title={app?.description || "No description"}
-        >
-          {app?.description || "No description"}
-        </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2">
