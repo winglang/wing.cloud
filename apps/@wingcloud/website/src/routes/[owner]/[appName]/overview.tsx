@@ -151,7 +151,7 @@ const OverviewPage = ({
         )}
       >
         <div className="space-y-2">
-          <SectionTitle>Application Overview</SectionTitle>
+          <SectionTitle>App Overview</SectionTitle>
           <AppDetails
             owner={owner}
             app={app}
