@@ -86,17 +86,18 @@ export const AppDetails = ({
               className={clsx(
                 "hover:underline focus:underline outline-none",
                 "font-semibold truncate",
+                "transition-all",
                 theme.text1,
                 "flex items-center gap-x-1 group",
               )}
               to={`/${owner}/${app?.appName}/environment/${environment.branch}`}
             >
-              <div>{`${app.appName}/${environment.branch}`}</div>
+              {`${app.appName}/${environment.branch}`}
             </Link>
           )}
         </h3>
         <p
-          className="max-w-2xl text-sm leading-6 text-gray-500 truncate"
+          className={clsx("max-w-2xl text-sm leading-6 truncate", theme.text3)}
           title={app?.description || "No description"}
         >
           {app?.description || "No description"}
