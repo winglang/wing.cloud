@@ -73,40 +73,53 @@ export const AppDetails = ({
     <div
       className={clsx(
         "p-6 w-full rounded-md",
-        "gap-4",
         "transition-all",
         ["border", theme.borderInput],
         theme.bgInput,
         "flex flex-col",
       )}
     >
-      <div className="space-y-1 flex">
+      <div className="space-y-1 flex relative pb-4">
         <div className="grow">
-          <h3 className="text-base font-semibold leading-7 text-gray-900">
-            {app && environment?.branch && (
-              <Link
-                className={clsx(
-                  "hover:underline focus:underline outline-none",
-                  "font-semibold truncate",
-                  "transition-all",
-                  theme.text1,
-                  "flex items-center gap-x-1 group",
-                )}
-                to={`/${owner}/${app?.appName}/environment/${environment.branch}`}
-              >
-                {`${app.appName}/${environment.branch}`}
-              </Link>
-            )}
-          </h3>
-          <p
+          {app && (
+            <Link
+              className={clsx(
+                "absolute inset-0 peer",
+                "border-b border-gray-100 hover:border-gray-200",
+                "w-full transition-all",
+              )}
+              to={`/${owner}/${app?.appName}/environment/${app.defaultBranch}`}
+              onClick={(event) => {
+                if (!environment) {
+                  event.preventDefault();
+                }
+              }}
+            />
+          )}
+          <div
             className={clsx(
-              "max-w-2xl text-sm leading-6 truncate",
-              theme.text3,
+              "text-base font-semibold leading-7",
+              "peer-hover:underline focus:underline outline-none",
+              "font-semibold truncate",
+              "transition-all",
+              theme.textInput,
+              "flex items-center gap-x-1",
             )}
-            title={app?.description || "No description"}
           >
-            {app?.description || "No description"}
-          </p>
+            {app && `${app.appName} / ${app.defaultBranch}`}
+          </div>
+
+          {app?.description && (
+            <p
+              className={clsx(
+                "max-w-2xl text-sm leading-6 truncate",
+                theme.text3,
+              )}
+              title={app?.description || "No description"}
+            >
+              {app.description}
+            </p>
+          )}
         </div>
         <div className="flex justify-end items-start xl:col-span-3">
           {environment && app?.appName && (
@@ -120,7 +133,7 @@ export const AppDetails = ({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2">
-        <div className="border-t border-gray-100 py-4 sm:col-span-1">
+        <div className="py-4 sm:col-span-1">
           <div className="flex flex-col gap-1">
             <div className={clsx("text-sm truncate", theme.textInput)}>
               Status
@@ -138,7 +151,7 @@ export const AppDetails = ({
             </div>
           </div>
         </div>
-        <div className="border-t border-gray-100 py-4 sm:col-span-1">
+        <div className="border-t sm:border-none border-gray-100 py-4 sm:col-span-1">
           <div className="flex flex-col gap-1 truncate">
             <div className={clsx("text-sm truncate", theme.textInput)}>
               Deployed at

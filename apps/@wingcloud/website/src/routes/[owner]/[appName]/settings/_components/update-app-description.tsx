@@ -51,6 +51,7 @@ export const UpdateAppDescription = ({
           theme.focusInput,
           loading && "cursor-not-allowed opacity-50",
         )}
+        placeholder="App description..."
         value={newDescription || app?.description || ""}
         onChange={(e) => {
           const value = e.target.value;
