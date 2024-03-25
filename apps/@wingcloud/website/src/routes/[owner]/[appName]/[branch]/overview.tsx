@@ -119,7 +119,7 @@ const Overview = ({
         )}
       >
         <div className="space-y-2">
-          <SectionTitle>Overview</SectionTitle>
+          <SectionTitle>Environment Overview</SectionTitle>
           <EnvironmentDetails
             owner={owner}
             app={app}

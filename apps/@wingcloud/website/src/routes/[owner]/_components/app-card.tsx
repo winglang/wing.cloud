@@ -13,6 +13,7 @@ import { GithubIcon } from "../../../icons/github-icon.js";
 import { MenuIcon } from "../../../icons/menu-icon.js";
 import { useTimeAgo } from "../../../utils/time.js";
 import type { App } from "../../../utils/wrpc.js";
+import { GitHubLink } from "../[appName]/_components/github-link.js";
 
 import { AppIcon } from "./app-icon.js";
 
@@ -21,10 +22,6 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
 
   const timeAgo = useTimeAgo(app.lastCommitDate, true);
   const navigate = useNavigate();
-
-  const projectUrl = useMemo(() => {
-    return `https://github.com/${app.repoOwner}/${app.repoName}`;
-  }, [app]);
 
   const branchUrl = useMemo(() => {
     if (!app.defaultBranch) {
@@ -125,23 +122,7 @@ export const AppCard = ({ app, owner }: { app: App; owner: string }) => {
 
       <div className="p-4 space-y-4">
         <div className="flex grow gap-x-2">
-          <Link
-            className={clsx(
-              "truncate",
-              "text-xs font-medium outline-none",
-              "flex gap-x-2 truncate items-center z-10 group",
-              theme.text2,
-              theme.text2Hover,
-            )}
-            onClick={(event) => event.stopPropagation()}
-            target="_blank"
-            to={projectUrl}
-          >
-            <GithubIcon className="w-4 h-4 shrink-0" />
-            <div className="truncate group-hover:underline group-focus:underline">
-              {app.repoOwner}/{app.repoName}
-            </div>
-          </Link>
+          <GitHubLink app={app} />
           <div className="flex grow justify-end">
             {app.status && <StatusPill status={app.status} />}
           </div>
