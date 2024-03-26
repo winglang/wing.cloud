@@ -17,5 +17,5 @@ export const reloadUntil = async (
     await page.reload();
     await page.waitForLoadState("networkidle");
   }
-  throw new Error("Condition not met");
+  throw new Error("Reloading until condition timeout: condition not met");
 };
