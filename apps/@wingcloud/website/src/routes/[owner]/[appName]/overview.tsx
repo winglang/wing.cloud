@@ -69,6 +69,7 @@ const OverviewPage = ({
 
   const endpointsQuery = wrpc["app.environment.endpoints"].useQuery(
     {
+      owner: owner!,
       appName: appName!,
       branch: productionEnvironment?.branch!,
     },

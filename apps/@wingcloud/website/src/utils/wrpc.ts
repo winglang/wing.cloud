@@ -8,9 +8,11 @@ import {
 
 export interface User {
   id: string;
+  isAdmin: boolean;
   username: string;
+  displayName: string;
   avatarUrl: string;
-  email: string;
+  email?: string;
 }
 
 export interface Installation {
@@ -204,13 +206,13 @@ export const wrpc = createWRPCReact<{
     }
   >;
   "app.environment.endpoints": QueryProcedure<
-    { appName: string; branch: string },
+    { owner: string; appName: string; branch: string },
     {
       endpoints: Endpoint[];
     }
   >;
   "app.listSecrets": QueryProcedure<
-    { appId: string },
+    { owner: string; appName: string },
     {
       secrets: Secret[];
     }
@@ -267,5 +269,15 @@ export const wrpc = createWRPCReact<{
     {
       app: App;
     }
+  >;
+  "admin.users.list": QueryProcedure<
+    undefined,
+    {
+      users: User[];
+    }
+  >;
+  "admin.setAdminRole": MutationProcedure<
+    { userId: string; isAdmin: boolean },
+    {}
   >;
 }>();

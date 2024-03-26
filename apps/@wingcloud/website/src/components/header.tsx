@@ -1,3 +1,4 @@
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { UserIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { Fragment, useContext, useMemo } from "react";
@@ -111,90 +112,117 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
     return `/${owner}`;
   }, [owner]);
 
-  return (
-    <header
-      className={clsx(
-        "transition-all",
-        "pt-4 shadow z-30",
-        !tabs && "pb-4",
-        theme.bgInput,
-        theme.pagePadding,
-      )}
-    >
-      <div className="flex items-center gap-6">
-        <Link
-          to={dashboardLink}
-          className={clsx(theme.text1, theme.text1Hover, theme.focusVisible)}
-          // HACK: This is a workaround for a bug in React Router where the
-          // page components don't re-render when the URL changes.
-          reloadDocument={dashboardLink !== ownerLink}
-        >
-          <WingIcon className="h-5 w-auto" />
-        </Link>
+  const showAdminWarning = useMemo(() => {
+    return user?.isAdmin && owner !== user?.username;
+  }, [user?.isAdmin, owner, user?.username]);
 
-        <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto">
-          <div>
-            <Link
-              to={ownerLink}
+  return (
+    <>
+      <header
+        className={clsx(
+          "transition-all",
+          "pt-4 shadow z-30",
+          !tabs && "pb-4",
+          theme.bgInput,
+          theme.pagePadding,
+          "relative",
+        )}
+      >
+        {showAdminWarning && (
+          <div
+            className={clsx(
+              "absolute inset-x-0 top-full",
+              "flex items-center justify-center",
+              "border-t border-orange-500",
+            )}
+          >
+            <div
               className={clsx(
-                "transition-all",
-                "rounded hover:bg-gray-100 px-0 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
-                "focus-visible:bg-gray-50 outline-none",
-                theme.text1,
+                "text-2xs px-2",
+                "text-gray-50 bg-orange-500",
+                "rounded-b shadow",
+                "text-center uppercase",
               )}
             >
-              <UserIcon className="size-3.5" />
-              {!owner && (
-                <span className="w-32 bg-gray-300 animate-pulse rounded">
-                  &nbsp;
-                </span>
-              )}
-              {owner && <span>{owner}</span>}
-            </Link>
+              Admin mode
+            </div>
           </div>
-          {breadcrumbs?.map((breadcrumb, index) => (
-            <Fragment key={index}>
-              <Separator />
+        )}
+        <div className="flex items-center gap-6">
+          <Link
+            to={dashboardLink}
+            className={clsx(theme.text1, theme.text1Hover, theme.focusVisible)}
+            // HACK: This is a workaround for a bug in React Router where the
+            // page components don't re-render when the URL changes.
+            reloadDocument={dashboardLink !== ownerLink}
+          >
+            <WingIcon className="h-5 w-auto" />
+          </Link>
+
+          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto">
+            <div>
               <Link
-                to={breadcrumb.to}
+                to={ownerLink}
                 className={clsx(
                   "transition-all",
-                  "rounded hover:bg-gray-100 px-1 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
-                  theme.text1,
+                  "rounded hover:bg-gray-100 px-0 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
                   "focus-visible:bg-gray-50 outline-none",
+                  theme.text1,
                 )}
               >
-                {breadcrumb.icon ? (
-                  <span className="-ml-1">{breadcrumb.icon}</span>
-                ) : undefined}
-                <span
+                <UserIcon className="size-3.5" />
+                {!owner && (
+                  <span className="w-32 bg-gray-300 animate-pulse rounded">
+                    &nbsp;
+                  </span>
+                )}
+                {owner && <span>{owner}</span>}
+              </Link>
+            </div>
+            {breadcrumbs?.map((breadcrumb, index) => (
+              <Fragment key={index}>
+                <Separator />
+                <Link
+                  to={breadcrumb.to}
                   className={clsx(
-                    {
-                      "hidden sm:block":
-                        breadcrumb.icon && index === breadcrumbs.length - 1,
-                      "-ml-0.5": breadcrumb.icon,
-                    },
-                    "whitespace-nowrap",
+                    "transition-all",
+                    "rounded hover:bg-gray-100 px-1 sm:px-2 py-1 text-sm font-medium flex items-center gap-1.5",
+                    theme.text1,
+                    "focus-visible:bg-gray-50 outline-none",
                   )}
                 >
-                  {breadcrumb.label}
-                </span>
-              </Link>
-            </Fragment>
-          ))}
-        </div>
+                  {breadcrumb.icon ? (
+                    <span className="-ml-1">{breadcrumb.icon}</span>
+                  ) : undefined}
+                  <span
+                    className={clsx(
+                      {
+                        "hidden sm:block":
+                          breadcrumb.icon && index === breadcrumbs.length - 1,
+                        "-ml-0.5": breadcrumb.icon,
+                      },
+                      "whitespace-nowrap",
+                    )}
+                  >
+                    {breadcrumb.label}
+                  </span>
+                </Link>
+              </Fragment>
+            ))}
+          </div>
 
-        <div className="flex flex-grow justify-end items-center gap-x-2">
-          <UserMenu user={user} />
-        </div>
-      </div>
-      {tabs && (
-        <div className="pt-3 -mx-4">
-          <div className="px-2">
-            <Tabs tabs={tabs} />
+          <div className="flex flex-grow justify-end items-center gap-x-2">
+            <UserMenu user={user} />
           </div>
         </div>
-      )}
-    </header>
+        {tabs && (
+          <div className="pt-3 -mx-4">
+            <div className="px-2">
+              <Tabs tabs={tabs} />
+            </div>
+          </div>
+        )}
+      </header>
+    </>
   );
 };
