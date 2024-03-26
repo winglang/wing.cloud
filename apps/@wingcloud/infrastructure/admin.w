@@ -22,8 +22,9 @@ pub class Admin {
 
     // This method checks if the user has admin rights.
     let checkAdminAccessRights = inflight (request) => {
-      if let user = getUserFromCookie(request) {
-        if user.isAdmin {
+      if let userFromCookie = getUserFromCookie(request) {
+        let user = users.get(userId: userFromCookie.userId);
+        if user?.isAdmin? {
             return;
         }
       }

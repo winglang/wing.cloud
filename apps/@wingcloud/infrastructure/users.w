@@ -194,7 +194,7 @@ pub class Users {
         pk: "USER#{options.userId}",
         sk: "#",
       },
-      projectionExpression: "id, displayName, username, avatarUrl, email",
+      projectionExpression: "id, displayName, username, avatarUrl, email, isAdmin",
     );
 
     if let user = User.tryFromJson(result.item) {
@@ -210,7 +210,7 @@ pub class Users {
         pk: "LOGIN#{options.username}",
         sk: "#",
       },
-      projectionExpression: "id, displayName, username, avatarUrl, email",
+      projectionExpression: "id, displayName, username, avatarUrl, email, isAdmin",
     );
 
     if let user = User.tryFromJson(result.item) {
@@ -240,15 +240,31 @@ pub class Users {
 
   // Intended for admin use only
   pub inflight setAdminRole(options: SetAdminRoleOptions): void {
-    this.table.updateItem(
-      key: {
-        pk: "LOGIN#{options.username}",
-        sk: "#",
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "LOGIN#{options.username}",
+            sk: "#",
+          },
+          updateExpression: "SET isAdmin = :isAdmin",
+          expressionAttributeValues: {
+            ":isAdmin": options.isAdmin,
+          },
+        }
       },
-      updateExpression: "SET isAdmin = :isAdmin",
-      expressionAttributeValues: {
-        ":isAdmin": options.isAdmin,
-      },
-    );
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "#",
+          },
+          updateExpression: "SET isAdmin = :isAdmin",
+          expressionAttributeValues: {
+            ":isAdmin": options.isAdmin,
+          },
+        }
+      }
+    ]);
   }
 }

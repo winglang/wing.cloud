@@ -406,20 +406,15 @@ pub class Api {
 
     api.get("/wrpc/auth.check", inflight (request) => {
       try {
-        // check if the user from the cookie is valid
-        let userId = getUserIdFromCookie(request);
-
-        // check if user exists in the db
-        let user = users.get(userId: userId);
-
-        return {
-          body: {
-            user: user
-          },
-        };
-      } catch {
-        throw httpError.HttpError.unauthorized();
-      }
+        if let userFromCookie = getUserFromCookie(request) {
+          return {
+            body: {
+              user: userFromCookie
+            },
+          };
+        }
+      } catch {}
+      throw httpError.HttpError.unauthorized();
     });
 
     api.post("/wrpc/auth.signOut", inflight (request) => {
