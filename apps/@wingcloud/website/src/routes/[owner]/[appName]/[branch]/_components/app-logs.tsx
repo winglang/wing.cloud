@@ -1,5 +1,6 @@
 import clsx from "clsx";
 
+import { SectionContent } from "../../../../../components/section-content.js";
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
 import { useTheme } from "../../../../../design-system/theme-provider.js";
 import { getTime } from "../../../../../utils/time.js";
@@ -16,22 +17,14 @@ export const AppLogs = ({ id, logs, loading, label }: AppLogsProps) => {
   const { theme } = useTheme();
 
   return (
-    <div
-      id={id}
-      className={clsx(
-        "w-full rounded-md border",
-        theme.bgInput,
-        theme.borderInput,
-        "shadow-sm",
-      )}
-    >
+    <SectionContent>
       {loading && (
-        <div className="flex items-center justify-center p-4 md:p-6">
+        <div className="flex items-center justify-center">
           <SpinnerLoader size="sm" />
         </div>
       )}
       {!loading && (
-        <div className="text-2xs font-mono p-4 md:p-6">
+        <div id={id} className="text-2xs font-mono">
           {logs.length === 0 ? (
             <div className={clsx(theme.text2, "w-full py-0.5 text-center")}>
               No {label} logs.
@@ -60,6 +53,6 @@ export const AppLogs = ({ id, logs, loading, label }: AppLogsProps) => {
           )}
         </div>
       )}
-    </div>
+    </SectionContent>
   );
 };

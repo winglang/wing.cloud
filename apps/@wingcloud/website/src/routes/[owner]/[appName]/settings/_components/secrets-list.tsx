@@ -2,6 +2,7 @@ import { LockClosedIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useState, useMemo, useCallback } from "react";
 
+import { SectionContent } from "../../../../../components/section-content.js";
 import { SectionTitle } from "../../../../../components/section-title.js";
 import { SpinnerLoader } from "../../../../../components/spinner-loader.js";
 import { useNotifications } from "../../../../../design-system/notification.js";
@@ -156,15 +157,7 @@ export const SecretsList = ({
           show={showWarning}
           onClose={() => setShowWarning(false)}
         />
-
-        <div
-          className={clsx(
-            "flex flex-col gap-2 rounded-md p-4 border",
-            theme.bgInput,
-            theme.borderInput,
-            "relative",
-          )}
-        >
+        <SectionContent>
           <div
             className={clsx(
               "absolute inset-0 flex items-center justify-center",
@@ -234,7 +227,7 @@ export const SecretsList = ({
               Secrets
             </a>{" "}
           </span>
-        </div>
+        </SectionContent>
       </div>
     </>
   );

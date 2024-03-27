@@ -5,6 +5,7 @@ import {
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 
+import { SectionContent } from "../../../../components/section-content.js";
 import { SectionTitle } from "../../../../components/section-title.js";
 import { SpinnerLoader } from "../../../../components/spinner-loader.js";
 import { Button } from "../../../../design-system/button.js";
@@ -102,14 +103,7 @@ export const Entrypoints = ({ app, loading }: EntrypointsProps) => {
 
       <div className="space-y-2">
         <SectionTitle>Entrypoints</SectionTitle>
-        <div
-          className={clsx(
-            "space-y-2",
-            "flex flex-col gap-x-2 rounded-md p-4 border",
-            theme.bgInput,
-            theme.borderInput,
-          )}
-        >
+        <SectionContent>
           <div className={clsx("flex flex-col text-x truncate", theme.text1)}>
             <div className="flex flex-row items-center gap-2">
               {!isValidEntrypoint && !entrypointsQuery.isLoading && (
@@ -169,7 +163,7 @@ export const Entrypoints = ({ app, loading }: EntrypointsProps) => {
               </a>{" "}
             </span>
           </div>
-        </div>
+        </SectionContent>
       </div>
       <EntrypointUpdateModal
         appName={app?.appName || ""}

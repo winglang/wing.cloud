@@ -1,24 +1,38 @@
 bring cloud;
 bring "./json-api.w" as json_api;
-bring "./users.w" as Users;
+bring "./users.w" as users;
+bring "./early-access.w" as early_access;
+
 bring "./http-error.w" as httpError;
 bring "./jwt.w" as JWT;
+bring "./invalidate-query.w" as invalidate_query;
 bring util;
 
 struct AdminProps {
   api: json_api.JsonApi;
-  users: Users.Users;
+  users: users.Users;
+  earlyAccess: early_access.EarlyAccess;
   getUserFromCookie: inflight(cloud.ApiRequest): JWT.JWTPayload?;
+  invalidateQuery: invalidate_query.InvalidateQuery;
+}
+
+struct EarlyAccess {
+  email: str;
+  link: str;
 }
 
 pub class Admin {
   new(props: AdminProps) {
     let ADMIN_LOGS_KEY = "admin-logs";
     let ADMIN_USERNAMES = util.tryEnv("ADMIN_USERNAMES")?.split(",") ?? [];
+    let EARLY_ACCESS_LINK_ORIGIN = util.tryEnv("EARLY_ACCESS_LINK_ORIGIN");
+    let EARLY_ACCESS_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 7 days
 
     let api = props.api;
     let users = props.users;
+    let earlyAccess = props.earlyAccess;
     let getUserFromCookie = props.getUserFromCookie;
+    let invalidateQuery = props.invalidateQuery;
 
     // This method checks if the user has admin rights.
     let checkAdminAccessRights = inflight (request) => {
@@ -94,23 +108,100 @@ pub class Admin {
     });
 
     api.post("/wrpc/admin.setAdminRole", inflight (request) => {
-      let input = Json.parse(request.body ?? "");
-      let userId = input.get("userId").asStr();
-      let isAdmin = input.get("isAdmin").asBool();
+      if let userFromCookie = getUserFromCookie(request) {
+        let input = Json.parse(request.body ?? "");
+        let userId = input.get("userId").asStr();
+        let isAdmin = input.get("isAdmin").asBool();
 
-      let user = users.get({
-        userId: userId
-      });
+        let user = users.get({
+          userId: userId
+        });
 
-      users.setAdminRole({
-        userId: userId,
-        username: user.username,
-        isAdmin: isAdmin,
-      });
+        users.setAdminRole({
+          userId: userId,
+          username: user.username,
+          isAdmin: isAdmin,
+        });
+
+        invalidateQuery.invalidate(
+          userId: userFromCookie.userId,
+          queries: [
+          "admin.users.list"
+          ]
+        );
+
+        return {
+          body: {},
+        };
+      }
+      throw httpError.HttpError.unauthorized();
+    });
+
+    api.post("/wrpc/admin.earlyAccess.create", inflight (request) => {
+      if let userFromCookie = getUserFromCookie(request) {
+        let input = Json.parse(request.body ?? "");
+        let email = input.get("email").asStr();
+
+        let userList = users.list();
+        for user in userList {
+          if user.email == email {
+            throw httpError.HttpError.badRequest("User already has an account.");
+          }
+        }
+
+        let item = earlyAccess.create(
+          expirationTime: EARLY_ACCESS_EXPIRATION_TIME,
+          code: util.uuidv4(),
+          email: email,
+        );
+
+        invalidateQuery.invalidate(
+          userId: userFromCookie.userId,
+          queries: [
+          "admin.earlyAccess.list"
+          ]
+        );
+
+        return {
+          body: {
+            earlyAccessItem: item
+          }
+        };
+      }
+      throw httpError.HttpError.unauthorized();
+    });
+
+    api.post("/wrpc/admin.earlyAccess.delete", inflight (request) => {
+      if let userFromCookie = getUserFromCookie(request) {
+        let input = Json.parse(request.body ?? "");
+        let email = input.get("email").asStr();
+
+        earlyAccess.delete(email: email);
+
+        invalidateQuery.invalidate(
+          userId: userFromCookie.userId,
+          queries: [
+          "admin.earlyAccess.list"
+          ]
+        );
+
+        return {
+          body: {}
+        };
+      }
+      throw httpError.HttpError.unauthorized();
+    });
+
+    api.get("/wrpc/admin.earlyAccess.list", inflight (request) => {
+      let list = earlyAccess.list();
 
       return {
-        body: {},
+        body: {
+          url: EARLY_ACCESS_LINK_ORIGIN,
+          earlyAccessList: list
+        },
       };
     });
+
   }
 }

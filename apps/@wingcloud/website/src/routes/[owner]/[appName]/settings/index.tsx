@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../../components/page-header.js";
+import { SectionContent } from "../../../../components/section-content.js";
 import { SectionTitle } from "../../../../components/section-title.js";
 import { SpinnerLoader } from "../../../../components/spinner-loader.js";
 import { Button } from "../../../../design-system/button.js";
@@ -65,14 +66,7 @@ const SettingsPage = ({
 
         <div className="space-y-2">
           <SectionTitle>Delete App</SectionTitle>
-          <div
-            className={clsx(
-              "flex flex-col gap-2 rounded-md p-4 border",
-              theme.bgInput,
-              theme.borderInput,
-              "relative",
-            )}
-          >
+          <SectionContent>
             <div
               className={clsx(
                 "absolute inset-0 flex items-center justify-center",
@@ -94,7 +88,7 @@ const SettingsPage = ({
                 Delete
               </Button>
             </div>
-          </div>
+          </SectionContent>
         </div>
 
         {appName && owner && app?.appId && (

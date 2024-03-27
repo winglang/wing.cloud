@@ -145,6 +145,15 @@ export interface Endpoint {
   updatedAt: string;
 }
 
+export interface EarlyAccessItem {
+  id: string;
+  email: string;
+  code: string;
+  createdAt: string;
+  expiresAt: string;
+  used: boolean;
+}
+
 export const wrpc = createWRPCReact<{
   "ws.invalidateQuery.auth": QueryProcedure<
     undefined,
@@ -279,5 +288,19 @@ export const wrpc = createWRPCReact<{
   "admin.setAdminRole": MutationProcedure<
     { userId: string; isAdmin: boolean },
     {}
+  >;
+  "admin.earlyAccess.create": MutationProcedure<
+    { email: string },
+    {
+      earlyAccessItem: EarlyAccessItem;
+    }
+  >;
+  "admin.earlyAccess.delete": MutationProcedure<{ email: string }, {}>;
+  "admin.earlyAccess.list": QueryProcedure<
+    undefined,
+    {
+      url: string;
+      earlyAccessList: EarlyAccessItem[];
+    }
   >;
 }>();

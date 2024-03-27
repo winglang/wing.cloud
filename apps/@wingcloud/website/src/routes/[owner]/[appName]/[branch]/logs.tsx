@@ -11,6 +11,8 @@ export const DEPLOYMENT_LOGS_ID = "deployment-logs";
 
 import { AppLogs } from "./_components/app-logs.js";
 
+import { DocumentIcon } from "@heroicons/react/24/outline";
+
 const LogsPage = ({
   owner,
   appName,
@@ -36,7 +38,11 @@ const LogsPage = ({
 
   return (
     <>
-      <PageHeader title="Logs" noBackground />
+      <PageHeader
+        title="Logs"
+        icon={<DocumentIcon className="size-full" />}
+        noBackground
+      />
       <div
         className={clsx(
           "relative transition-all pb-4",

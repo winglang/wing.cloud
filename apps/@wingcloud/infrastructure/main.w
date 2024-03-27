@@ -30,6 +30,7 @@ bring "./components/public-endpoint/public-endpoint.w" as PublicEndpoint;
 bring "./components/certificate/certificate.w" as certificate;
 bring "./patches/react-app.patch.w" as reactAppPatch;
 bring "./google-oauth.w" as google_oauth;
+bring "./early-access.w" as early_access;
 
 let appSecret = util.env("APP_SECRET");
 let wsSecret = util.env("WS_SECRET");
@@ -83,6 +84,8 @@ let table = new ex.DynamodbTable(
   hashKey: "pk",
   rangeKey: "sk",
 );
+
+let earlyAccess = new early_access.EarlyAccess(table);
 let apps = new Apps.Apps(table);
 let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
@@ -212,6 +215,7 @@ let wingCloudApi = new wingcloud_api.Api(
   logs: bucketLogs,
   analytics: analytics,
   segmentWriteKey: segmentWriteKey,
+  earlyAccess: earlyAccess,
 );
 
 new google_oauth.GoogleOAuth(

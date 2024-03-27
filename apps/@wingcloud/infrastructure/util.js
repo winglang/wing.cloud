@@ -17,3 +17,7 @@ exports.parseLog = (log) => {
 };
 
 exports.encodeURIComponent = encodeURIComponent;
+
+exports.addMiliseconds = (date, ms) => {
+  return new Date(new Date(date).getTime() + ms);
+};

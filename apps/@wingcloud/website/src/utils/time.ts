@@ -27,13 +27,13 @@ export const getTime = (datetime: string) => {
   });
 };
 
-const getTimeFromNow = (datetime?: string, short: boolean = false) => {
+const getTimeString = (datetime?: string, short: boolean = false) => {
   if (!datetime) {
     return;
   }
   const date = new Date(datetime);
   const now = new Date();
-  const diff = now.getTime() - date.getTime();
+  const diff = Math.abs(now.getTime() - date.getTime());
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
@@ -43,45 +43,68 @@ const getTimeFromNow = (datetime?: string, short: boolean = false) => {
 
   if (years > 0) {
     if (short) {
-      return `${years}y ago`;
+      return `${years}y`;
     }
     const label = years === 1 ? "year" : "years";
-    return `${years} ${label} ago`;
+    return `${years} ${label}`;
   }
 
   if (months > 0) {
     if (short) {
-      return `${months}mo ago`;
+      return `${months}mo`;
     }
     const label = months === 1 ? "month" : "months";
-    return `${months} ${label} ago`;
+    return `${months} ${label}`;
   }
 
   if (hours > 24) {
     if (short) {
-      return `${days}d ago`;
+      return `${days}d`;
     }
     const label = days === 1 ? "day" : "days";
-    return `${days} ${label}  ago`;
+    return `${days} ${label} `;
   }
 
   if (hours > 0) {
     if (short) {
-      return `${hours}h ago`;
+      return `${hours}h`;
     }
     const label = hours === 1 ? "hour" : "hours";
-    return `${hours} ${label} ago`;
+    return `${hours} ${label}`;
   }
 
   if (minutes > 0) {
     if (short) {
-      return `${minutes}m ago`;
+      return `${minutes}m`;
     }
     const label = minutes === 1 ? "minute" : "minutes";
-    return `${minutes} ${label} ago`;
+    return `${minutes} ${label}`;
   }
 
-  return "just now";
+  return "";
+};
+
+export const getTimeFromNow = (datetime?: string, short: boolean = false) => {
+  const time = getTimeString(datetime, short);
+  if (time === undefined) {
+    return;
+  }
+  if (time === "") {
+    return "just now";
+  }
+
+  return `${time} ago`;
+};
+
+export const getTimeUntil = (datetime?: string, short: boolean = false) => {
+  const time = getTimeString(datetime, short);
+  if (time === undefined) {
+    return;
+  }
+  if (time === "") {
+    return "just now";
+  }
+  return `in ${time}`;
 };
 
 export const useTimeAgo = (datetime?: string, short: boolean = false) => {

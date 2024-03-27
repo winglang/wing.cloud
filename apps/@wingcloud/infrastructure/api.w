@@ -113,6 +113,7 @@ bring "./status-reports.w" as status_reports;
 bring "./probot-adapter.w" as adapter;
 bring "./octokit.w" as Octokit;
 bring "./segment-analytics.w" as analytics;
+bring "./early-access.w" as early_access;
 
 struct ApiProps {
   api: cloud.Api;
@@ -132,6 +133,7 @@ struct ApiProps {
   logs: cloud.Bucket;
   analytics: analytics.SegmentAnalytics;
   segmentWriteKey: str;
+  earlyAccess: early_access.EarlyAccess;
 }
 
 
@@ -151,6 +153,7 @@ pub class Api {
     let environments = props.environments;
     let logs = props.logs;
     let environmentsQueue = new cloud.Queue() as "Environments-Queue";
+    let earlyAccess = props.earlyAccess;
 
     let INVALIDATE_SUBSCRIPTION_ID = "invalidateQuery";
     let invalidateQuery = new InvalidateQuery.InvalidateQuery(
@@ -379,63 +382,10 @@ pub class Api {
      new Admin.Admin(
       api: api,
       users: users,
+      earlyAccess: earlyAccess,
       getUserFromCookie: getUserFromCookie,
+      invalidateQuery: invalidateQuery,
     );
-
-    api.get("/wrpc/ws.invalidateQuery.auth", inflight (request) => {
-      try {
-        if let user = getUserFromCookie(request) {
-          let jwt = JWT.JWT.sign(
-            secret: props.wsSecret,
-            userId: user.userId,
-            email: user.email,
-            username: user.username,
-            isAdmin: user.isAdmin,
-            expirationTime: "1m",
-          );
-          return {
-            body: {
-              token: jwt,
-              subscriptionId: INVALIDATE_SUBSCRIPTION_ID,
-            },
-          };
-        }
-      } catch {}
-      throw httpError.HttpError.unauthorized();
-    });
-
-    api.get("/wrpc/auth.check", inflight (request) => {
-      try {
-        if let userFromCookie = getUserFromCookie(request) {
-          return {
-            body: {
-              user: userFromCookie
-            },
-          };
-        }
-      } catch {}
-      throw httpError.HttpError.unauthorized();
-    });
-
-    api.post("/wrpc/auth.signOut", inflight (request) => {
-      return {
-        headers: {
-          "Set-Cookie": Cookie.Cookie.serialize(
-            AUTH_COOKIE_NAME,
-            "",
-            {
-              httpOnly: true,
-              secure: true,
-              sameSite: "strict",
-              expires: 0,
-              path: "/",
-            },
-          ),
-        },
-        body: {
-        },
-      };
-    });
 
     let analyticsSignInQueue = new cloud.Queue() as "AnalyticsSignIn-Queue";
     analyticsSignInQueue.setConsumer(inflight (message) => {
@@ -515,6 +465,61 @@ pub class Api {
         headers: {
           Location: location,
           "Set-Cookie": authCookie,
+        },
+      };
+    });
+
+    api.get("/wrpc/ws.invalidateQuery.auth", inflight (request) => {
+      try {
+        if let user = getUserFromCookie(request) {
+          let jwt = JWT.JWT.sign(
+            secret: props.wsSecret,
+            userId: user.userId,
+            email: user.email,
+            username: user.username,
+            isAdmin: user.isAdmin,
+            expirationTime: "1m",
+          );
+          return {
+            body: {
+              token: jwt,
+              subscriptionId: INVALIDATE_SUBSCRIPTION_ID,
+            },
+          };
+        }
+      } catch {}
+      throw httpError.HttpError.unauthorized();
+    });
+
+    api.get("/wrpc/auth.check", inflight (request) => {
+      try {
+        if let userFromCookie = getUserFromCookie(request) {
+          return {
+            body: {
+              user: userFromCookie
+            },
+          };
+        }
+      } catch {}
+      throw httpError.HttpError.unauthorized();
+    });
+
+    api.post("/wrpc/auth.signOut", inflight (request) => {
+      return {
+        headers: {
+          "Set-Cookie": Cookie.Cookie.serialize(
+            AUTH_COOKIE_NAME,
+            "",
+            {
+              httpOnly: true,
+              secure: true,
+              sameSite: "strict",
+              expires: 0,
+              path: "/",
+            },
+          ),
+        },
+        body: {
         },
       };
     });

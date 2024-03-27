@@ -60,7 +60,6 @@ pub class Users {
 
   pub inflight create(options: CreateOptions): User {
     let userId = "user_{Nanoid62.Nanoid62.generate()}";
-    log("userId = {userId}");
 
     this.table.transactWriteItems(
       transactItems: [
