@@ -112,9 +112,9 @@ pub class EarlyAccess {
 
     if let user = EarlyAccessItem.tryFromJson(result.item) {
       if user.code != options.code {
-        throw httpError.HttpError.forbidden("Invalid code");
+        throw httpError.HttpError.badRequest("Invalid code");
       } if user.used {
-        throw httpError.HttpError.forbidden("Code already used");
+        throw httpError.HttpError.badRequest("Code already used");
       } if datetime.fromIso(user.expiresAt).timestamp < now.timestamp {
         throw httpError.HttpError.forbidden("Code expired");
       }
@@ -132,7 +132,7 @@ pub class EarlyAccess {
       return true;
     }
 
-    throw httpError.HttpError.notFound("User not found");
+    throw httpError.HttpError.notFound("Invalid code or email");
   }
 
   pub inflight delete(options: DeleteOptions) {

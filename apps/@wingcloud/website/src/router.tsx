@@ -14,7 +14,11 @@ export const router = (onReady: () => void) => {
       children: [
         {
           path: "/login",
-          lazy: () => import("./routes/login/index.js"),
+          lazy: () => lazyLoading(import("./routes/login/index.js")),
+        },
+        {
+          path: "/error",
+          lazy: () => lazyLoading(import("./routes/error/index.js")),
         },
         {
           path: "/add",

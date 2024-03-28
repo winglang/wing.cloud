@@ -36,6 +36,10 @@ export const Component = () => {
 
   const [showModal, setShowModal] = useState(false);
 
+  const showLoginModal = useMemo(() => {
+    return !["/", "/error", "/login"].includes(location.pathname);
+  }, [location.pathname]);
+
   useEffect(() => {
     if (error) {
       setShowModal(true);
@@ -44,8 +48,7 @@ export const Component = () => {
 
   return (
     <>
-      {location.pathname === "/" && <GithubLogin url={AUTHORIZE_URL} />}
-      {location.pathname !== "/" && (
+      {showLoginModal && (
         <>
           <Outlet />
           <Modal show={showModal} backdropBlur>
@@ -101,6 +104,12 @@ export const Component = () => {
               </div>
             </div>
           </Modal>
+        </>
+      )}
+      {!showLoginModal && (
+        <>
+          {location.pathname === "/" && <GithubLogin url={AUTHORIZE_URL} />}
+          <Outlet />
         </>
       )}
     </>

@@ -412,81 +412,94 @@ pub class Api {
     });
 
     api.get("/wrpc/github.callback", inflight (request) => {
-      let code = request.query.get("code");
+      try {
+        let code = request.query.get("code");
+        let tokens = GitHub.Exchange.codeForTokens(
+          code: code,
+          clientId: props.githubAppClientId,
+          clientSecret: props.githubAppClientSecret,
+        );
 
-      let tokens = GitHub.Exchange.codeForTokens(
-        code: code,
-        clientId: props.githubAppClientId,
-        clientSecret: props.githubAppClientSecret,
-      );
+        let githubUser = GitHub.Client.getUser(tokens.access_token);
 
-      let githubUser = GitHub.Client.getUser(tokens.access_token);
-
-      if REQUIRE_EARLY_ACCESS_CODE {
-        if let user = users.fromLogin(username: githubUser.login) {
-          // If the user is already registered, we don't need to check for early access.
-        } else {
-          if let email = githubUser.email {
-            if let code = request.query.tryGet("early-access-code") {
-              if earlyAccess.validate(email: email, code: code) {
+        if REQUIRE_EARLY_ACCESS_CODE {
+          if let user = users.fromLogin(username: githubUser.login) {
+            // If the user is already registered, we don't need to check for early access.
+          } else {
+            if let email = githubUser.email {
+              if let code = request.query.tryGet("early-access-code") {
+                earlyAccess.validate(email: email, code: code)
                 log("Email {email} is allowed to access the early access");
+              } else {
+                throw httpError.HttpError.badRequest("Request an early access code to be able to log in.");
               }
             } else {
-              throw httpError.HttpError.unauthorized("Request an early access code to be able to log in.");
+              throw httpError.HttpError.badRequest("Set your email in GitHub as public to be able to access.");
             }
-          } else {
-            throw httpError.HttpError.unauthorized("Set your email in GitHub as public to be able to access.");
           }
         }
-      }
 
-      let user = users.updateOrCreate(
-        displayName: githubUser.name ?? githubUser.login,
-        username: githubUser.login,
-        avatarUrl: githubUser.avatar_url,
-        email: githubUser.email,
-      );
+        let user = users.updateOrCreate(
+          displayName: githubUser.name ?? githubUser.login,
+          username: githubUser.login,
+          avatarUrl: githubUser.avatar_url,
+          email: githubUser.email,
+        );
 
-      githubAccessTokens.set(user.id, tokens);
+        githubAccessTokens.set(user.id, tokens);
 
-      let authCookie = createAuthCookie(
-        userId: user.id,
-        username: user.username,
-        email: user.email,
-        isAdmin: user.isAdmin ?? false,
-      );
+        let authCookie = createAuthCookie(
+          userId: user.id,
+          username: user.username,
+          email: user.email,
+          isAdmin: user.isAdmin ?? false,
+        );
 
-      // The default redirect location is the user's profile page,
-      // but in the case of the Console Sign In process, we want to redirect
-      // to the Console instead.
-      let var location = "/{user.username}";
+        // The default redirect location is the user's profile page,
+        // but in the case of the Console Sign In process, we want to redirect
+        // to the Console instead.
+        let var location = "/{user.username}";
 
-      log("anonymousId = {request.query.tryGet("anonymousId") ?? ""}");
+        log("anonymousId = {request.query.tryGet("anonymousId") ?? ""}");
 
-      if let anonymousId = request.query.tryGet("anonymousId") {
-        log("segmentWriteKey = {props.segmentWriteKey}");
-        log("Identifying anonymous user as {user.username}");
-        if let port = request.query.tryGet("port") {
-          analyticsSignInQueue.push(Json.stringify(AnalyticsSignInMessage {
-            anonymousId: anonymousId,
-            userId: user.id,
-            email: user.email,
-            github: user.username,
-          }));
-          log("redirecting to console");
-          // Redirect back to the local Console, using the `signedIn`
-          // GET parameter so the Console dismisses the sign in modal.
-          location = "http://localhost:{port}/?signedIn";
+        if let anonymousId = request.query.tryGet("anonymousId") {
+          log("segmentWriteKey = {props.segmentWriteKey}");
+          log("Identifying anonymous user as {user.username}");
+          if let port = request.query.tryGet("port") {
+            analyticsSignInQueue.push(Json.stringify(AnalyticsSignInMessage {
+              anonymousId: anonymousId,
+              userId: user.id,
+              email: user.email,
+              github: user.username,
+            }));
+            log("redirecting to console");
+            // Redirect back to the local Console, using the `signedIn`
+            // GET parameter so the Console dismisses the sign in modal.
+            location = "http://localhost:{port}/?signedIn";
+          }
         }
-      }
 
-      return {
-        status: 302,
-        headers: {
-          Location: location,
-          "Set-Cookie": authCookie,
-        },
-      };
+        return {
+          status: 302,
+          headers: {
+            Location: location,
+            "Set-Cookie": authCookie,
+          },
+        };
+      } catch error {
+        let errorData = Json.tryParse(error);
+
+        let code = errorData?.tryGet("code")?.tryAsStr() ?? "500";
+        let message = errorData?.tryGet("message")?.tryAsStr() ?? "Something went wrong.";
+
+        return {
+          status: 302,
+          headers: {
+            Location: "/error?error={util.base64Encode(error)}",
+          },
+          body: error,
+        };
+      }
     });
 
     api.get("/wrpc/ws.invalidateQuery.auth", inflight (request) => {
