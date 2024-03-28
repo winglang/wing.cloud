@@ -145,7 +145,7 @@ struct EnvironmentAction {
 pub class Api {
   pub api: json_api.JsonApi;
   new(props: ApiProps) {
-    let REQUIRE_EARLY_ACCESS_CODE = util.env("REQUIRE_EARLY_ACCESS_CODE") == "true";
+    let REQUIRE_EARLY_ACCESS_CODE = util.tryEnv("REQUIRE_EARLY_ACCESS_CODE") == "true";
 
     let api = new json_api.JsonApi(api: props.api);
     this.api = api;
