@@ -428,7 +428,7 @@ pub class Api {
           } else {
             if let email = githubUser.email {
               if let code = request.query.tryGet("early-access-code") {
-                earlyAccess.validate(email: email, code: code)
+                earlyAccess.validate(email: email, code: code);
                 log("Email {email} is allowed to access the early access");
               } else {
                 throw httpError.HttpError.badRequest("Request an early access code to be able to log in.");
