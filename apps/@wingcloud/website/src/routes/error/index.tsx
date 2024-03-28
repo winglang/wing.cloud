@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { HeaderSkeleton } from "../../components/header-skeleton.js";
-import { Header } from "../../components/header.js";
 import { HttpErrorPage } from "../../components/http-error-page.js";
 
 export const Component = () => {
