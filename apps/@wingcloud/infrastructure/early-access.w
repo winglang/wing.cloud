@@ -25,6 +25,11 @@ struct DeleteOptions {
   email: str;
 }
 
+struct ValidateOptions {
+  email: str;
+  code: str;
+}
+
 class Util {
   extern "./util.js" pub static inflight addMiliseconds(date:str, ms: num): str;
 }
@@ -92,6 +97,42 @@ pub class EarlyAccess {
     } else {
       throw httpError.HttpError.notFound("User not found");
     }
+  }
+
+  pub inflight validate(options: ValidateOptions): bool {
+    let now = datetime.utcNow();
+
+    let result = this.table.getItem(
+      key: {
+        pk: "EARLY_ACCESS#{options.email}",
+        sk: "#",
+      },
+      projectionExpression: "id, email, code, createdAt, expiresAt, used",
+    );
+
+    if let user = EarlyAccessItem.tryFromJson(result.item) {
+      if user.code != options.code {
+        throw httpError.HttpError.forbidden("Invalid code");
+      } if user.used {
+        throw httpError.HttpError.forbidden("Code already used");
+      } if datetime.fromIso(user.expiresAt).timestamp < now.timestamp {
+        throw httpError.HttpError.forbidden("Code expired");
+      }
+
+      this.table.updateItem(
+        key: {
+          pk: "EARLY_ACCESS#{options.email}",
+          sk: "#",
+        },
+        updateExpression: "SET used = :used",
+        expressionAttributeValues: {
+          ":used": true,
+        },
+      );
+      return true;
+    }
+
+    throw httpError.HttpError.notFound("User not found");
   }
 
   pub inflight delete(options: DeleteOptions) {

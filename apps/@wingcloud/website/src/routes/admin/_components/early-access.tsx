@@ -12,12 +12,14 @@ import { Button } from "../../../design-system/button.js";
 import { Input } from "../../../design-system/input.js";
 import { useNotifications } from "../../../design-system/notification.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
-import { getTimeUntil } from "../../../utils/time.js";
+import { getDateTime, getTimeUntil } from "../../../utils/time.js";
 import { wrpc } from "../../../utils/wrpc.js";
 
 import { DeleteEarlyAccessModal } from "./delete-early-access-modal.js";
 
 export const EarlyAccess = () => {
+  const { WINGCLOUD_ORIGIN, EARLY_ACCESS_CODE_QUERY_PARAM } = wing.env;
+
   const { theme } = useTheme();
   const { showNotification } = useNotifications();
 
@@ -57,14 +59,21 @@ export const EarlyAccess = () => {
     );
   }, [data, search]);
 
+  const getUrl = useCallback(
+    (code: string) => {
+      return `${WINGCLOUD_ORIGIN}/login?${EARLY_ACCESS_CODE_QUERY_PARAM}=${code}`;
+    },
+    [WINGCLOUD_ORIGIN],
+  );
+
   const copyLink = useCallback(
     (code: string) => {
-      navigator.clipboard.writeText(`${data?.url}/?code=${code}`);
+      navigator.clipboard.writeText(getUrl(code));
       showNotification("Link copied to clipboard", {
         type: "success",
       });
     },
-    [data?.url, showNotification],
+    [WINGCLOUD_ORIGIN, showNotification, getUrl],
   );
 
   return (
@@ -110,35 +119,47 @@ export const EarlyAccess = () => {
                   "bg-white hover:bg-slate-50",
                 )}
               >
-                <td className="px-4 py-2 text-center">
-                  {item.used ? (
-                    <div className="text-green-500">Used</div>
-                  ) : (
-                    <div className="text-red-500">Unused</div>
-                  )}
-                </td>
-                <td className="px-4 py-2">{item.email}</td>
-                <td className="px-4 py-2">
-                  <div className="text-gray-400">
-                    {getTimeUntil(item.expiresAt, true)}
-                  </div>
+                <td />
+                <td className="px-4 py-2 whitespace-nowrap">{item.email}</td>
+                <td className="px-4 py-2 whitespace-nowrap">
+                  {getDateTime(item.expiresAt)}
                 </td>
                 <td className="px-4 py-2 flex items-center">
                   <div className="flex grow justify-between">
-                    <button
-                      onClick={() => {
-                        copyLink(item.code);
-                      }}
-                      className={clsx(
-                        theme.text3,
-                        theme.text3Hover,
-                        "flex items-center gap-x-1",
-                        "hover:underline cursor-pointer",
-                      )}
-                    >
-                      <div className="truncate">{`${data?.url}/${item.code}`}</div>
-                      <DocumentDuplicateIcon className="size-4" />
-                    </button>
+                    <div className="flex items-center gap-x-1">
+                      <button
+                        onClick={() => {
+                          copyLink(item.code);
+                        }}
+                        className={clsx(
+                          theme.text3,
+                          theme.text2Hover,
+                          "group flex items-center",
+                          "cursor-pointer",
+                        )}
+                      >
+                        <div
+                          className="truncate max-w-32"
+                          title={getUrl(item.code)}
+                        >
+                          {getUrl(item.code)}
+                        </div>
+                        <div
+                          className={clsx(
+                            theme.text3,
+                            theme.text3Hover,
+                            "cursor-pointer",
+                            "p-1 rounded hover:bg-gray-100",
+                          )}
+                        >
+                          <DocumentDuplicateIcon className="size-4" />
+                        </div>
+                      </button>
+
+                      <div className="text-gray-500 italic">
+                        {item.used ? "(Used)" : "(Not used)"}
+                      </div>
+                    </div>
 
                     <div className="flex justify-end">
                       <button
@@ -148,7 +169,8 @@ export const EarlyAccess = () => {
                         className={clsx(
                           theme.text3,
                           theme.text3Hover,
-                          "hover:underline cursor-pointer",
+                          "cursor-pointer",
+                          "p-1 rounded hover:bg-gray-100",
                         )}
                       >
                         <TrashIcon className="size-4" />

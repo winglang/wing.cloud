@@ -25,7 +25,7 @@ pub class Admin {
   new(props: AdminProps) {
     let ADMIN_LOGS_KEY = "admin-logs";
     let ADMIN_USERNAMES = util.tryEnv("ADMIN_USERNAMES")?.split(",") ?? [];
-    let EARLY_ACCESS_LINK_ORIGIN = util.tryEnv("EARLY_ACCESS_LINK_ORIGIN");
+    let WINGCLOUD_ORIGIN = util.tryEnv("WINGCLOUD_ORIGIN");
     let EARLY_ACCESS_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 7 days
 
     let api = props.api;
@@ -197,7 +197,6 @@ pub class Admin {
 
       return {
         body: {
-          url: EARLY_ACCESS_LINK_ORIGIN,
           earlyAccessList: list
         },
       };

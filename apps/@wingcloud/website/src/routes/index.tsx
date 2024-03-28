@@ -1,12 +1,12 @@
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import clsx from "clsx";
 import { useContext, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { Outlet } from "react-router-dom";
 
 import { GithubLogin } from "../components/github-login.js";
 import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
 import { Modal } from "../design-system/modal.js";
-import { useMemo } from "react";
-import clsx from "clsx";
 import { useTheme } from "../design-system/theme-provider.js";
 
 export const Component = () => {

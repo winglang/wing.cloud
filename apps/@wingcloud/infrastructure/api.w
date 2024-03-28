@@ -145,6 +145,9 @@ struct EnvironmentAction {
 pub class Api {
   pub api: json_api.JsonApi;
   new(props: ApiProps) {
+    let REQUIRE_EARLY_ACCESS_CODE = util.env("REQUIRE_EARLY_ACCESS_CODE") == "true";
+    let EARLY_ACCESS_CODE_QUERY_PARAM = util.env("EARLY_ACCESS_CODE_QUERY_PARAM");
+
     let api = new json_api.JsonApi(api: props.api);
     this.api = api;
     let ws = props.ws;
@@ -419,6 +422,24 @@ pub class Api {
       );
 
       let githubUser = GitHub.Client.getUser(tokens.access_token);
+
+      if REQUIRE_EARLY_ACCESS_CODE {
+        if let user = users.fromLogin(username: githubUser.login) {
+          // If the user is already registered, we don't need to check for early access.
+        } else {
+          if let email = githubUser.email {
+            if let code = request.query.tryGet(EARLY_ACCESS_CODE_QUERY_PARAM) {
+              if earlyAccess.validate(email: email, code: code) {
+                log("Email {email} is allowed to access the early access");
+              }
+            } else {
+              throw httpError.HttpError.unauthorized("Early access code required");
+            }
+          } else {
+            throw httpError.HttpError.unauthorized("Set your email in GitHub as public to be able to access.");
+          }
+        }
+      }
 
       let user = users.updateOrCreate(
         displayName: githubUser.name ?? githubUser.login,

@@ -299,7 +299,6 @@ export const wrpc = createWRPCReact<{
   "admin.earlyAccess.list": QueryProcedure<
     undefined,
     {
-      url: string;
       earlyAccessList: EarlyAccessItem[];
     }
   >;
