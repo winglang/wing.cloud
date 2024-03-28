@@ -13,12 +13,12 @@ import { Input } from "../../../design-system/input.js";
 import { useNotifications } from "../../../design-system/notification.js";
 import { useTheme } from "../../../design-system/theme-provider.js";
 import { getDateTime, getTimeUntil } from "../../../utils/time.js";
-import { wrpc } from "../../../utils/wrpc.js";
+import { EARLY_ACCESS_CODE_QUERY_PARAM, wrpc } from "../../../utils/wrpc.js";
 
 import { DeleteEarlyAccessModal } from "./delete-early-access-modal.js";
 
 export const EarlyAccess = () => {
-  const { WINGCLOUD_ORIGIN, EARLY_ACCESS_CODE_QUERY_PARAM } = wing.env;
+  const { WINGCLOUD_ORIGIN } = wing.env;
 
   const { theme } = useTheme();
   const { showNotification } = useNotifications();

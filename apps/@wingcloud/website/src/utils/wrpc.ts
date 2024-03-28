@@ -154,6 +154,8 @@ export interface EarlyAccessItem {
   used: boolean;
 }
 
+export const EARLY_ACCESS_CODE_QUERY_PARAM = "early-access-code";
+
 export const wrpc = createWRPCReact<{
   "ws.invalidateQuery.auth": QueryProcedure<
     undefined,

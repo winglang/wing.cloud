@@ -195,7 +195,6 @@ let dashboard = new vite.Vite(
     "GITHUB_APP_CLIENT_ID": util.env("BOT_GITHUB_CLIENT_ID"),
     "GITHUB_APP_NAME": util.env("BOT_GITHUB_APP_NAME"),
     "WINGCLOUD_ORIGIN": util.env("WINGCLOUD_ORIGIN"),
-    "EARLY_ACCESS_CODE_QUERY_PARAM": util.env("EARLY_ACCESS_CODE_QUERY_PARAM"),
   },
 ) as "website";
 
