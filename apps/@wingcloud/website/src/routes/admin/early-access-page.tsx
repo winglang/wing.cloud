@@ -93,134 +93,132 @@ const EarlyAccessPage = () => {
           }}
         />
       </div>
-      <table
+
+      <div
         className={clsx(
-          "w-full text-sm text-left text-gray-500 dark:text-gray-400 border",
+          "w-full text-xs text-gray-500 dark:text-gray-400 border",
           theme.bgInput,
           theme.borderInput,
+          "grid grid-cols-7",
         )}
       >
-        <thead className="text-xs text-gray-600 uppercase bg-gray-50">
-          <tr>
-            <th className="px-4 py-2 w-20 text-center"></th>
-            <th className="px-4 py-2 w-1/3">Email</th>
-            <th className="px-4 py-2">Expires</th>
-            <th className="px-4 py-2">Link</th>
-          </tr>
-        </thead>
-        <tbody>
-          {earlyAccessList.map((item) => (
-            <tr
-              key={item.email}
-              className={clsx(
-                "border-b transition-all text-xs relative",
-                "bg-white hover:bg-slate-50",
-              )}
-            >
-              <td />
-              <td className="px-4 py-2 whitespace-nowrap">{item.email}</td>
-              <td className="px-4 py-2 whitespace-nowrap">
-                {getDateTime(item.expiresAt)}
-              </td>
-              <td className="px-4 py-2 flex items-center">
-                <div className="flex grow justify-between">
-                  <div className="flex items-center gap-x-1">
-                    <button
-                      onClick={() => {
-                        copyLink(item.code);
-                      }}
-                      className={clsx(
-                        theme.text3,
-                        theme.text2Hover,
-                        "group flex items-center",
-                        "cursor-pointer",
-                      )}
-                    >
-                      <div
-                        className="truncate max-w-32"
-                        title={getUrl(item.code)}
-                      >
-                        {getUrl(item.code)}
-                      </div>
-                      <div
-                        className={clsx(
-                          theme.text3,
-                          theme.text3Hover,
-                          "cursor-pointer",
-                          "p-1 rounded hover:bg-gray-100",
-                        )}
-                      >
-                        <DocumentDuplicateIcon className="size-4" />
-                      </div>
-                    </button>
+        <div className="col-span-2 font-bold text-gray-600 uppercase bg-gray-50 px-4 py-2">
+          Email
+        </div>
+        <div className="font-bold text-gray-600 uppercase bg-gray-50 px-4 py-2">
+          Expires
+        </div>
+        <div className="col-span-3 font-bold text-gray-600 uppercase bg-gray-50 px-4 py-2">
+          Link
+        </div>
+        <div className="bg-gray-50 px-4 py-2" />
 
-                    <div className="text-gray-500 italic">
-                      {item.used ? "(Used)" : "(Not used)"}
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end">
-                    <button
-                      onClick={() => {
-                        setDeleteItem(item.email);
-                      }}
-                      className={clsx(
-                        theme.text3,
-                        theme.text3Hover,
-                        "cursor-pointer",
-                        "p-1 rounded hover:bg-gray-100",
-                      )}
-                    >
-                      <TrashIcon className="size-4" />
-                    </button>
-                  </div>
+        {earlyAccessList.map((item) => (
+          <>
+            <div className="col-span-2 px-4 py-2 flex items-center truncate">
+              <div className="truncate">{item.email}</div>
+            </div>
+            <div className="px-4 py-2 flex items-center truncate">
+              <div className="truncate">{getDateTime(item.expiresAt)}</div>
+            </div>
+            <div className="col-span-3 flex items-center px-4 py-2 gap-x-2 grow justify-between">
+              <div
+                className={clsx(
+                  theme.text2,
+                  "group flex items-center",
+                  "truncate",
+                  "gap-x-1",
+                )}
+              >
+                <div className="truncate" title={getUrl(item.code)}>
+                  {getUrl(item.code)}
                 </div>
-              </td>
-            </tr>
-          ))}
-          {earlyAccessList.length === 0 && (
-            <tr>
-              <td colSpan={5} className="text-center px-4 py-2 bg-white">
-                <div className="h-6 text-xs flex items-center justify-center">
-                  No items found.
-                </div>
-              </td>
-            </tr>
-          )}
-          <tr className="bg-gray-50 border-t border-gray-100">
-            <td></td>
-            <td className="text-center px-3 py-2">
-              <Input
-                type="email"
-                leftIcon={EnvelopeIcon}
-                className={clsx("w-full", {
-                  "border-red-500": !isEmailValid && email,
-                  "focus:border-red-500": !isEmailValid && email,
-                })}
-                containerClassName="w-full"
-                name="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
-              />
-            </td>
-            <td colSpan={2} className="text-center px-4 py-2">
-              <div className="flex gap-x-4 items-center justify-end">
-                <Button
-                  disabled={!isEmailValid}
+                <button
+                  className={clsx(
+                    theme.text3,
+                    theme.text3Hover,
+                    "cursor-pointer",
+                    "p-1 rounded hover:bg-gray-100",
+                  )}
                   onClick={() => {
-                    createEarlyAcces.mutate({ email });
+                    copyLink(item.code);
                   }}
                 >
-                  Create
-                </Button>
+                  <DocumentDuplicateIcon className="size-4" />
+                </button>
+                <div className="text-gray-500 italic ml-1">
+                  {item.used ? "(Used)" : "(Not used)"}
+                </div>
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+            <div className="flex justify-end px-4 py-2">
+              <button
+                onClick={() => {
+                  setDeleteItem(item.email);
+                }}
+                className={clsx(
+                  theme.text3,
+                  theme.text3Hover,
+                  "cursor-pointer",
+                  "p-1 rounded hover:bg-gray-100",
+                )}
+              >
+                <TrashIcon className="size-4" />
+              </button>
+            </div>
+          </>
+        ))}
+        {earlyAccessList.length === 0 && (
+          <div className="col-span-7 text-center px-4 py-2 bg-white">
+            <div className="h-6 text-xs flex items-center justify-center">
+              No items found.
+            </div>
+          </div>
+        )}
+        <>
+          <div
+            className={clsx(
+              "col-span-2",
+              "text-center px-4 py-2",
+              "bg-gray-50 border-t border-gray-100",
+            )}
+          >
+            <Input
+              type="email"
+              leftIcon={EnvelopeIcon}
+              className={clsx("w-full", {
+                "border-red-500": !isEmailValid && email,
+                "focus:border-red-500": !isEmailValid && email,
+              })}
+              containerClassName="w-full"
+              name="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
+          </div>
+          <div
+            className={clsx(
+              "col-span-5",
+              "text-center px-4 py-2",
+              "bg-gray-50 border-t border-gray-100",
+            )}
+          >
+            <div className="flex gap-x-4 items-center justify-end">
+              <Button
+                disabled={!isEmailValid}
+                onClick={() => {
+                  createEarlyAcces.mutate({ email });
+                }}
+              >
+                Create
+              </Button>
+            </div>
+          </div>
+        </>
+      </div>
       {emailToDelete && (
         <DeleteEarlyAccessModal
           email={emailToDelete}

@@ -62,7 +62,7 @@ export const DeleteEarlyAccessModal = ({
       isPending={disabled}
       onClose={onClose}
       onConfirm={() => deleteEarlyAccess.mutate({ email })}
-      modalTitle={"Delete"}
+      modalTitle="Delete Early Access"
       modalBody={dialogBody}
       confirmButtonTextPending="Deleting..."
     />
