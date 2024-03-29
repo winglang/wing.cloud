@@ -47,7 +47,7 @@ setup("authenticate", async ({ page }) => {
       await page.fill("#login_field", GITHUB_USER);
       await page.fill("#password", GITHUB_PASSWORD);
       await page.click('input[type="submit"]');
-      page.waitForLoadState("networkidle");
+      await page.waitForLoadState("networkidle");
     }
 
     // If we have 2FA enabled, we need to fill the TOTP
@@ -59,7 +59,7 @@ setup("authenticate", async ({ page }) => {
         "#app_totp",
         getGitHubOTP({ username: GITHUB_USER, secret: GITHUB_OTP_SECRET }),
       );
-      page.waitForLoadState("networkidle");
+      await page.waitForLoadState("networkidle");
     }
 
     // If we are already logged in, we may need to authorize the app
@@ -76,13 +76,18 @@ setup("authenticate", async ({ page }) => {
         expect(authorizeButton).toBeEnabled({ timeout: 10_000 });
         await authorizeButton.click();
       }
+      await page.waitForLoadState("networkidle");
     }
 
     console.log("Logged in successfully!");
-    await page.waitForURL(new RegExp(`^${WINGCLOUD_URL}`), {
-      waitUntil: "networkidle",
-      timeout: 30_000,
-    });
+
+    // Playwright doesn't support 302 redirects on localhost.
+    if (WINGCLOUD_URL.includes("localhost")) {
+      // check if we left the github domain
+      expect(page.url()).not.toMatch(/github.com/);
+    } else {
+      expect(page.url()).toMatch(WINGCLOUD_URL);
+    }
 
     await page.context().storageState({ path: AUTH_FILE });
   } else {

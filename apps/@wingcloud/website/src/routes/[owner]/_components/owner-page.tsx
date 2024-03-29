@@ -22,6 +22,7 @@ export interface OwnerPageProps {
 
 export const OwnerPage = (props: OwnerPageProps) => {
   const { user } = useContext(AuthDataProviderContext);
+
   const owner = useMemo(() => {
     return props.ownerParam ?? user?.username;
   }, [props.ownerParam, user?.username]);
@@ -38,16 +39,23 @@ export const OwnerPage = (props: OwnerPageProps) => {
 
   const apps = data?.apps;
 
+  const redirectIfNoApps = useMemo(() => {
+    if (user?.isAdmin && user.username !== owner) {
+      return false;
+    }
+    return true;
+  }, [user, owner]);
+
   const loading = useMemo(() => {
     // Show loading if there are no apps until we redirect to add page
-    return isLoading || !apps || apps.length === 0;
+    return isLoading || (redirectIfNoApps && (!apps || apps.length === 0));
   }, [isLoading, apps]);
 
   useEffect(() => {
     if (!apps || isFetching) {
       return;
     }
-    if (apps.length === 0) {
+    if (apps.length === 0 && redirectIfNoApps) {
       navigate("/add");
     }
   }, [apps, isFetching]);
