@@ -80,6 +80,8 @@ const getTimeFromNow = (datetime?: string, short: boolean = false) => {
     const label = minutes === 1 ? "minute" : "minutes";
     return `${minutes} ${label} ago`;
   }
+
+  return "just now";
 };
 
 export const useTimeAgo = (datetime?: string, short: boolean = false) => {
