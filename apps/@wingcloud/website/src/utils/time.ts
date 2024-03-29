@@ -27,7 +27,7 @@ export const getTime = (datetime: string) => {
   });
 };
 
-export const getTimeFromNow = (datetime?: string, short: boolean = false) => {
+const getTimeFromNow = (datetime?: string, short: boolean = false) => {
   if (!datetime) {
     return;
   }
@@ -62,7 +62,7 @@ export const getTimeFromNow = (datetime?: string, short: boolean = false) => {
       return `${days}d ago`;
     }
     const label = days === 1 ? "day" : "days";
-    return `${days} ${label} `;
+    return `${days} ${label} ago`;
   }
 
   if (hours > 0) {
