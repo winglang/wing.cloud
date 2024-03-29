@@ -6,16 +6,16 @@ import clsx from "clsx";
 import { useContext, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { SectionTitle } from "../../../components/section-title.js";
-import { SpinnerLoader } from "../../../components/spinner-loader.js";
-import { AuthDataProviderContext } from "../../../data-store/auth-data-provider.js";
-import { Input } from "../../../design-system/input.js";
-import { useTheme } from "../../../design-system/theme-provider.js";
-import { wrpc } from "../../../utils/wrpc.js";
+import { SectionTitle } from "../../components/section-title.js";
+import { SpinnerLoader } from "../../components/spinner-loader.js";
+import { AuthDataProviderContext } from "../../data-store/auth-data-provider.js";
+import { Input } from "../../design-system/input.js";
+import { useTheme } from "../../design-system/theme-provider.js";
+import { wrpc } from "../../utils/wrpc.js";
 
-import { UserMenu } from "./user-menu.js";
+import { UserMenu } from "./_components/user-menu.js";
 
-export const UsersTable = () => {
+const UsersPage = () => {
   const { theme } = useTheme();
 
   const [search, setSearch] = useState("");
@@ -35,13 +35,7 @@ export const UsersTable = () => {
   const { user: currentUser } = useContext(AuthDataProviderContext);
 
   return (
-    <div className="space-y-2">
-      <SectionTitle>
-        <span>Users</span>{" "}
-        <span className="text-gray-500 font-normal">
-          ({data?.users.length})
-        </span>
-      </SectionTitle>
+    <div className="space-y-4">
       <div className="flex gap-x-2">
         <Input
           type="text"
@@ -145,4 +139,8 @@ export const UsersTable = () => {
       )}
     </div>
   );
+};
+
+export const Component = () => {
+  return <UsersPage />;
 };

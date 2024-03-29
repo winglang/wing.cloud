@@ -31,6 +31,17 @@ export const router = (onReady: () => void) => {
         {
           path: "/admin",
           lazy: () => lazyLoading(import("./routes/admin/index.js")),
+          children: [
+            {
+              path: "/admin/users",
+              lazy: () => lazyLoading(import("./routes/admin/users-page.js")),
+            },
+            {
+              path: "/admin/early-access",
+              lazy: () =>
+                lazyLoading(import("./routes/admin/early-access-page.js")),
+            },
+          ],
         },
         {
           path: "/:owner",

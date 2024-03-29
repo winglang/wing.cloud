@@ -1,24 +1,35 @@
 import clsx from "clsx";
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 
 import { ErrorBoundary } from "../../components/error-boundary.js";
 import { Header } from "../../components/header.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 
-import { AdminPage } from "./_components/admin-page.js";
-
 export const Component = () => {
-  const { owner } = useParams();
   const { theme } = useTheme();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (window.location.pathname === "/admin") {
+      navigate("/admin/users");
+    }
+  }, [navigate]);
 
   return (
     <div className="flex flex-col h-full">
       <ErrorBoundary>
         <Header
+          breadcrumbs={[{ label: "Admin", to: "/admin/users" }]}
           tabs={[
             {
-              name: "Admin",
-              to: "/admin",
+              name: "Users",
+              to: "/admin/users",
+            },
+            {
+              name: "Early Access",
+              to: "/admin/early-access",
             },
           ]}
         />
@@ -31,7 +42,7 @@ export const Component = () => {
               theme.pagePadding,
             )}
           >
-            <AdminPage ownerParam={owner!} />
+            <Outlet />
           </div>
         </div>
       </ErrorBoundary>
