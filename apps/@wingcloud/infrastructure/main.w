@@ -42,7 +42,7 @@ if util.tryEnv("WING_IS_TEST") != "true" {
       return "endpoints";
     }
   })();
-  new tunnels.TunnelsApi(zoneName: "wingcloud.dev", subDomain: tunnelsSubdomain);
+  new tunnels.TunnelsApi(zoneName: "wingcloud.dev", subDomain: tunnelsSubdomain) as "tunnels";
 }
 
 let appSecret = util.env("APP_SECRET");
