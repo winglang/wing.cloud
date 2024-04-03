@@ -96,7 +96,6 @@ jobs:
       - name: Terraform Apply
         id: apply
         env:
-          TF_LOG: debug
           TF_IN_AUTOMATION: true
           # dnsimple provider
           DNSIMPLE_TOKEN: ${{ secrets.DNSIMPLE_TOKEN }}
