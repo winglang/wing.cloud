@@ -64,7 +64,7 @@ test("Create an app and visit the Console", async ({ page }) => {
   if (WINGCLOUD_URL.includes("localhost")) {
     await reloadUntil(
       page,
-      async () => await page.getByTestId("app-details-link").isVisible(),
+      async () => await page.getByTestId("app-details-link").isEnabled(),
     );
   }
 

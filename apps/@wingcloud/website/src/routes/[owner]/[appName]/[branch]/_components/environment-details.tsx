@@ -99,6 +99,7 @@ export const EnvironmentDetails = ({
       )}
       <Link
         to={`/${owner}/${app?.appName}/console/${environment?.branch}`}
+        aria-disabled={environment?.status !== "running"}
         className={clsx(
           theme.focusVisible,
           "rounded border-0 sm:border",
