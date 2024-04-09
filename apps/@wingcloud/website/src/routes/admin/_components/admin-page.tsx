@@ -54,10 +54,14 @@ export const AdminPage = (props: AdminPageProps) => {
         <div className="flex flex-wrap gap-6 w-full">
           <div className="w-full space-y-2">
             <SectionTitle>
-              <span>Users</span>{" "}
-              <span className="text-gray-500 font-normal">
-                ({data?.users.length})
-              </span>
+              <div className="flex items-center gap-x-2">
+                <div className="flex gap-x-1">
+                  <span>Users</span>
+                  <span className="text-gray-500 font-normal">
+                    ({filteredUsers.length})
+                  </span>
+                </div>
+              </div>
             </SectionTitle>
             <div className="overflow-x-auto relative shadow-sm rounded-md w-full">
               <UsersTable users={filteredUsers} refetch={refetch} />
