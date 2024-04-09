@@ -1,14 +1,17 @@
 bring cloud;
 bring "./json-api.w" as json_api;
-bring "./users.w" as Users;
+bring "./users.w" as users;
+
 bring "./http-error.w" as httpError;
 bring "./jwt.w" as JWT;
+bring "./invalidate-query.w" as invalidate_query;
 bring util;
 
 struct AdminProps {
   api: json_api.JsonApi;
-  users: Users.Users;
+  users: users.Users;
   getUserFromCookie: inflight(cloud.ApiRequest): JWT.JWTPayload?;
+  invalidateQuery: invalidate_query.InvalidateQuery;
 }
 
 pub class Admin {
@@ -19,11 +22,13 @@ pub class Admin {
     let api = props.api;
     let users = props.users;
     let getUserFromCookie = props.getUserFromCookie;
+    let invalidateQuery = props.invalidateQuery;
 
     // This method checks if the user has admin rights.
     let checkAdminAccessRights = inflight (request) => {
-      if let user = getUserFromCookie(request) {
-        if user.isAdmin {
+      if let userFromCookie = getUserFromCookie(request) {
+        let user = users.get(userId: userFromCookie.userId);
+        if user?.isAdmin? {
             return;
         }
       }
@@ -93,23 +98,33 @@ pub class Admin {
     });
 
     api.post("/wrpc/admin.setAdminRole", inflight (request) => {
-      let input = Json.parse(request.body ?? "");
-      let userId = input.get("userId").asStr();
-      let isAdmin = input.get("isAdmin").asBool();
+      if let userFromCookie = getUserFromCookie(request) {
+        let input = Json.parse(request.body ?? "");
+        let userId = input.get("userId").asStr();
+        let isAdmin = input.get("isAdmin").asBool();
 
-      let user = users.get({
-        userId: userId
-      });
+        let user = users.get({
+          userId: userId
+        });
 
-      users.setAdminRole({
-        userId: userId,
-        username: user.username,
-        isAdmin: isAdmin,
-      });
+        users.setAdminRole({
+          userId: userId,
+          username: user.username,
+          isAdmin: isAdmin,
+        });
 
-      return {
-        body: {},
-      };
+        invalidateQuery.invalidate(
+          userId: userFromCookie.userId,
+          queries: [
+          "admin.users.list"
+          ]
+        );
+
+        return {
+          body: {},
+        };
+      }
+      throw httpError.HttpError.unauthorized();
     });
   }
 }

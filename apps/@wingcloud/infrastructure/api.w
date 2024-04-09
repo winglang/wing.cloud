@@ -380,6 +380,7 @@ pub class Api {
       api: api,
       users: users,
       getUserFromCookie: getUserFromCookie,
+      invalidateQuery: invalidateQuery
     );
 
     api.get("/wrpc/ws.invalidateQuery.auth", inflight (request) => {
