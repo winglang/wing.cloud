@@ -3,39 +3,36 @@ import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { StatusWithDot } from "../../../../../components/status-with-dot.js";
-import Popover from "../../../../../design-system/popover.js";
-import { SkeletonLoader } from "../../../../../design-system/skeleton-loader.js";
-import { useTheme } from "../../../../../design-system/theme-provider.js";
-import { BranchIcon } from "../../../../../icons/branch-icon.js";
-import { CommitIcon } from "../../../../../icons/commit-icon.js";
-import { ConsolePreviewIcon } from "../../../../../icons/console-preview-icon.js";
-import { PullRequestIcon } from "../../../../../icons/pull-request-icon.js";
-import { useStatus } from "../../../../../utils/status.js";
-import { getDateTime } from "../../../../../utils/time.js";
-import type { App, Endpoint, Environment } from "../../../../../utils/wrpc.js";
-import { RedeployEnvironmentModal } from "../../_components/redeploy-environment-modal.js";
+import { StatusWithDot } from "../../../../components/status-with-dot.js";
+import Popover from "../../../../design-system/popover.js";
+import { SkeletonLoader } from "../../../../design-system/skeleton-loader.js";
+import { useTheme } from "../../../../design-system/theme-provider.js";
+import { BranchIcon } from "../../../../icons/branch-icon.js";
+import { CommitIcon } from "../../../../icons/commit-icon.js";
+import { PullRequestIcon } from "../../../../icons/pull-request-icon.js";
+import { useStatus } from "../../../../utils/status.js";
+import { getDateTime } from "../../../../utils/time.js";
+import type { App, Environment, Endpoint } from "../../../../utils/wrpc.js";
 
-export interface EvironmentDetailsProps {
+import { EnvironmentMenu } from "./environment-menu.js";
+import { RedeployEnvironmentModal } from "./redeploy-environment-modal.js";
+
+export interface AppDetailsProps {
   loading?: boolean;
   owner: string;
   app?: App;
   environment?: Environment;
   endpoints?: Endpoint[];
   endpointsLoading?: boolean;
-  onClick?: () => void;
-  actions?: React.ReactNode;
 }
 
-export const EnvironmentDetails = ({
+export const AppDetails = ({
   owner,
   app,
   environment,
   endpoints,
   endpointsLoading,
-  onClick,
-  actions,
-}: EvironmentDetailsProps) => {
+}: AppDetailsProps) => {
   const { theme } = useTheme();
 
   const environmentStopped = useMemo(() => {
@@ -75,63 +72,69 @@ export const EnvironmentDetails = ({
   return (
     <div
       className={clsx(
-        "p-4 md:p-6 w-full rounded-md flex",
-        "group",
-        "gap-0 sm:gap-4 md:gap-6",
+        "p-6 w-full rounded-md",
         "transition-all",
-        onClick && "shadow-sm hover:shadow",
         ["border", theme.borderInput],
         theme.bgInput,
-        "relative",
+        "flex flex-col",
       )}
     >
-      {environment && onClick && (
-        <button
-          data-testid="environment-details-button"
-          onClick={onClick}
-          className={clsx(
-            "-m-px",
-            "absolute inset-0 cursor-pointer rounded-md border",
-            theme.focusVisible,
-            theme.borderInput,
+      <div className="space-y-1 flex relative pb-4">
+        <div className="grow">
+          {app && (
+            <Link
+              className={clsx(
+                "absolute inset-0 peer",
+                "border-b border-gray-100 hover:border-gray-200",
+                "w-full transition-all",
+              )}
+              to={`/${owner}/${app?.appName}/environment/${app.defaultBranch}`}
+              onClick={(event) => {
+                if (!environment) {
+                  event.preventDefault();
+                }
+              }}
+            />
           )}
-        />
-      )}
-      <Link
-        to={`/${owner}/${app?.appName}/console/${environment?.branch}`}
-        className={clsx(
-          theme.focusVisible,
-          "rounded border-0 sm:border",
-          theme.borderInput,
-        )}
-        onClick={(event) => {
-          if (environment?.status !== "running") {
-            event.preventDefault();
-          }
-        }}
-      >
-        <div
-          className={clsx(
-            "hidden sm:flex",
-            "rounded items-center justify-center",
-            "shrink-0",
-            "transition-all",
-            theme.bg3,
-            "cursor-default",
-            environment?.status === "running" && [
-              "hover:cursor-pointer",
-              "relative z-10 shadow-sm hover:shadow",
-              "cursor-pointer",
-            ],
-          )}
-        >
-          <ConsolePreviewIcon className="w-64 md:w-80 p-8 transition-all" />
-        </div>
-      </Link>
+          <div
+            className={clsx(
+              "text-base font-semibold leading-7",
+              "peer-hover:underline focus:underline outline-none",
+              "font-semibold truncate",
+              "transition-all",
+              theme.textInput,
+              "flex items-center gap-x-1",
+            )}
+          >
+            {app && `${app.appName} / ${app.defaultBranch}`}
+          </div>
 
-      <div className="flex w-full gap-4 md:gap-6 truncate">
-        <div className="flex flex-col gap-4 md:gap-6 transition-all w-1/2 max-w-64 truncate">
-          <div className="flex col-span-4 xl:col-span-3 flex-col gap-1">
+          {app?.description && (
+            <p
+              className={clsx(
+                "max-w-2xl text-sm leading-6 truncate",
+                theme.text3,
+              )}
+              title={app?.description || "No description"}
+            >
+              {app.description}
+            </p>
+          )}
+        </div>
+        <div className="flex justify-end items-start xl:col-span-3">
+          {environment && app?.appName && (
+            <EnvironmentMenu
+              owner={owner}
+              appName={app?.appName}
+              environment={environment}
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2">
+        <div className="py-4 sm:col-span-1">
+          <div className="flex flex-col gap-1">
             <div className={clsx("text-sm truncate", theme.textInput)}>
               Status
             </div>
@@ -147,14 +150,24 @@ export const EnvironmentDetails = ({
               )}
             </div>
           </div>
-
-          <div
-            className={clsx(
-              "flex flex-col gap-1",
-              showEndpoints && "col-span-4 xl:col-span-3",
-              !showEndpoints && "col-span-9",
-            )}
-          >
+        </div>
+        <div className="border-t sm:border-none border-gray-100 py-4 sm:col-span-1">
+          <div className="flex flex-col gap-1 truncate">
+            <div className={clsx("text-sm truncate", theme.textInput)}>
+              Deployed at
+            </div>
+            <div
+              className={clsx("text-xs font-semibold truncate", theme.text1)}
+            >
+              {!environment && (
+                <SkeletonLoader className="h-5 w-24 max-w-full" loading />
+              )}
+              {environment && getDateTime(environment.createdAt)}
+            </div>
+          </div>
+        </div>
+        <div className="border-t border-gray-100 py-4 sm:col-span-1">
+          <div className={clsx("flex flex-col gap-1")}>
             <div className={clsx("text-sm truncate", theme.textInput)}>
               Source
             </div>
@@ -232,24 +245,9 @@ export const EnvironmentDetails = ({
             </div>
           </div>
         </div>
-
-        <div className="flex flex-col gap-4 md:gap-6 transition-all grow truncate">
-          <div className="flex col-span-4 xl:col-span-3 flex-col gap-1 truncate">
-            <div className={clsx("text-sm truncate", theme.textInput)}>
-              Deployed at
-            </div>
-            <div
-              className={clsx("text-xs font-semibold truncate", theme.text1)}
-            >
-              {!environment && (
-                <SkeletonLoader className="h-5 w-24 max-w-full" loading />
-              )}
-              {environment && getDateTime(environment.createdAt)}
-            </div>
-          </div>
-
-          {showEndpoints && (
-            <div className="col-span-4 xl:col-span-3 transition-all flex flex-col gap-1">
+        {showEndpoints && (
+          <div className="border-t border-gray-100 pt-4 sm:py-4 sm:col-span-1">
+            <div className="transition-all flex flex-col gap-1">
               <div className={clsx("text-sm truncate", theme.textInput)}>
                 Endpoints
               </div>
@@ -346,12 +344,8 @@ export const EnvironmentDetails = ({
                 )}
               </div>
             </div>
-          )}
-        </div>
-
-        <div className="flex justify-end items-start xl:col-span-3">
-          {actions}
-        </div>
+          </div>
+        )}
       </div>
 
       {app && environment && (

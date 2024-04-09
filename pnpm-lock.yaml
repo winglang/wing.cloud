@@ -245,8 +245,8 @@ importers:
   apps/@wingcloud/runtime:
     dependencies:
       '@wingconsole/app':
-        specifier: ^0.59.6
-        version: 0.59.6(constructs@10.3.0)(typescript@5.3.3)
+        specifier: ^0.63.3
+        version: 0.63.3(constructs@10.3.0)(typescript@5.3.3)
       '@winglang/compiler':
         specifier: ^0.59.6
         version: 0.59.6(constructs@10.3.0)(typescript@5.3.3)
@@ -369,8 +369,8 @@ importers:
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/wrpc
       '@wingconsole/ui':
-        specifier: ^0.59.6
-        version: 0.59.6(@types/react@18.2.56)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^0.63.3
+        version: 0.63.3(@types/react@18.2.56)(react@18.2.0)
       clsx:
         specifier: ^2.1.0
         version: 2.1.0
@@ -1767,6 +1767,13 @@ packages:
 
   /@babel/runtime@7.23.9:
     resolution: {integrity: sha512-0CX6F+BI2s9dkUqr08KFrAIZgNFj75rdBU/DjCyYLIaV/quFjkk6T+EJ2LkZHyZTbEV4L5p97mNkUsHl2wLFAw==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      regenerator-runtime: 0.14.1
+    dev: false
+
+  /@babel/runtime@7.24.1:
+    resolution: {integrity: sha512-+BIznRzyqBf+2wCTxcKE3wDjfGeCoVE61KSHGpkzqrLi8qxqFwBeUFyId2cxkTmm55fzDGnm0+yCxaxygrLUnQ==}
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.14.1
@@ -5002,32 +5009,32 @@ packages:
     resolution: {integrity: sha512-SYXOBTjJb05rXa2vl55TTwO40A6wKu0R5i1qQwhJYNDIqaIGF7D0HsLw+pJAyi2OvntlEIVusx3xtbbgSUi6zg==}
     dev: false
 
-  /@trpc/client@10.45.1(@trpc/server@10.45.1):
-    resolution: {integrity: sha512-nVbAk1xpIiI64WgzXGgfxPOGgHoYvffn1IsjV1D/Ri7DL4BKuo2qtZ7UQ+OuHkzH2M8j4ikSVBDpk545fOdvpw==}
+  /@trpc/client@10.45.2(@trpc/server@10.45.2):
+    resolution: {integrity: sha512-ykALM5kYWTLn1zYuUOZ2cPWlVfrXhc18HzBDyRhoPYN0jey4iQHEFSEowfnhg1RvYnrAVjNBgHNeSAXjrDbGwg==}
     peerDependencies:
-      '@trpc/server': 10.45.1
+      '@trpc/server': 10.45.2
     dependencies:
-      '@trpc/server': 10.45.1
+      '@trpc/server': 10.45.2
     dev: false
 
-  /@trpc/react-query@10.45.1(@tanstack/react-query@4.36.1)(@trpc/client@10.45.1)(@trpc/server@10.45.1)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-48OOMpwVjQFUQJqlp9/tW1lqESZg9YEqB5iVci7mYaDzZPEs/YUcV85XKvYzgeW+7K9oShX/JMVce8muON/6uQ==}
+  /@trpc/react-query@10.45.2(@tanstack/react-query@4.36.1)(@trpc/client@10.45.2)(@trpc/server@10.45.2)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-BAqb9bGZIscroradlNx+Cc9522R+idY3BOSf5z0jHUtkxdMbjeGKxSSMxxu7JzoLqSIEC+LVzL3VvF8sdDWaZQ==}
     peerDependencies:
       '@tanstack/react-query': ^4.18.0
-      '@trpc/client': 10.45.1
-      '@trpc/server': 10.45.1
+      '@trpc/client': 10.45.2
+      '@trpc/server': 10.45.2
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
     dependencies:
       '@tanstack/react-query': 4.36.1(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/client': 10.45.1(@trpc/server@10.45.1)
-      '@trpc/server': 10.45.1
+      '@trpc/client': 10.45.2(@trpc/server@10.45.2)
+      '@trpc/server': 10.45.2
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@trpc/server@10.45.1:
-    resolution: {integrity: sha512-KOzBEVaHW9IxEedUP9E50y0tYxAuvlzyjn80Bpemw4rcNbT4WtJnhkFPUY+qDJl7Crt3B/oY2qMgSxVWi9toLg==}
+  /@trpc/server@10.45.2:
+    resolution: {integrity: sha512-wOrSThNNE4HUnuhJG6PfDRp4L2009KDVxsd+2VYH8ro6o/7/jwYZ8Uu5j+VaW+mOmc8EHerHzGcdbGNQSAUPgg==}
     dev: false
 
   /@tufjs/canonical-json@2.0.0:
@@ -5462,6 +5469,16 @@ packages:
       '@winglang/sdk': 0.59.6(constructs@10.3.0)
       typescript: 5.3.3
 
+  /@wingcloud/framework@0.63.3(@winglang/sdk@0.63.3)(typescript@5.3.3):
+    resolution: {integrity: sha512-s029vP/DuZrJw0m+DJwdmidhhUj27s9334V9ETT3Tpj6jKUW9ZAQ0Ueyc1R0RPPVGJPZoGI4eUZoDbP0Q4FgXA==}
+    peerDependencies:
+      '@winglang/sdk': '*'
+      typescript: ^5.3.3
+    dependencies:
+      '@winglang/sdk': 0.63.3(constructs@10.3.0)
+      typescript: 5.3.3
+    dev: false
+
   /@wingconsole/app@0.54.63(constructs@10.3.0)(typescript@5.3.3):
     resolution: {integrity: sha512-VMP3EBHBsSJ6EXV8BjBguRZUUxDG/RtiyYeOpfAvjoHiUwgnZGvcGIe63aoeIThVdz5blzkuCqE0MMG7T5UH3g==}
     dependencies:
@@ -5492,8 +5509,24 @@ packages:
       - typescript
     dev: false
 
-  /@wingconsole/design-system@0.59.6:
-    resolution: {integrity: sha512-NbOLIT+otVmYqFpNnj1HDZDIE4ER3lFnDwjIuFS5DExuJqKedqmmWZFQcnepgP5BzMQ4wc4r92Hez2hbVoFubg==}
+  /@wingconsole/app@0.63.3(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-yyt1CaVO8fD9Ub+70t2G85lpKixl2kihRVPUMDe6kLUu05sjmju9VOy4F09MFitIdvFMFe/axJaXwbeh9pMskw==}
+    dependencies:
+      '@segment/analytics-node': 1.3.0
+      '@wingconsole/server': 0.63.3(constructs@10.3.0)(typescript@5.3.3)
+      cross-spawn: 7.0.3
+      express: 4.18.2
+      open: 8.4.2
+      picocolors: 1.0.0
+    transitivePeerDependencies:
+      - constructs
+      - encoding
+      - supports-color
+      - typescript
+    dev: false
+
+  /@wingconsole/design-system@0.63.3:
+    resolution: {integrity: sha512-oyFQbweceu2tfGCuibFd1pFBRk7jjrUTI5YowBZXNWmK9E8ctgtKJBynkkYlH8j3Vu5/DT86SpWi6dh6SYEC5g==}
     dependencies:
       '@headlessui/react': 1.7.18(react-dom@18.2.0)(react@18.2.0)
       '@heroicons/react': 2.1.1(react@18.2.0)
@@ -5541,8 +5574,23 @@ packages:
       - typescript
     dev: false
 
-  /@wingconsole/ui@0.59.6(@types/react@18.2.56)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-TXh2d1vqXJMG+DfEblhvKemcFaRvbcHAOTZRgK3AQy+lPM247Nv+7CRb9ayL7HANrxbzO1A/fUNDt/uJc9pCHw==}
+  /@wingconsole/server@0.63.3(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-2730C1MMzhOEs/newZmAqSOhr1AG/HY0Ga8GAxuZT7JzyLzSXEWHKLcDbvENKeKz8HOt7gMYVpzrdi5P/Pdb2Q==}
+    dependencies:
+      '@winglang/compiler': 0.63.3(constructs@10.3.0)(typescript@5.3.3)
+      '@winglang/sdk': 0.63.3(constructs@10.3.0)
+      codespan-wasm: 0.4.0
+      debug: 4.3.4
+      launch-editor: 2.6.1
+      ms: 2.1.3
+    transitivePeerDependencies:
+      - constructs
+      - supports-color
+      - typescript
+    dev: false
+
+  /@wingconsole/ui@0.63.3(@types/react@18.2.56)(react@18.2.0):
+    resolution: {integrity: sha512-ozCt0AuEVdoIjHFJeLt3wTGZcIyj0LLGLeNZZFwVLB7uiHOpzoGEldqPAX3zvJvu5wW4BVqF3FuB+nSljqQI7g==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
@@ -5550,10 +5598,10 @@ packages:
       '@heroicons/react': 2.1.1(react@18.2.0)
       '@popperjs/core': 2.11.8
       '@tanstack/react-query': 4.36.1(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/client': 10.45.1(@trpc/server@10.45.1)
-      '@trpc/react-query': 10.45.1(@tanstack/react-query@4.36.1)(@trpc/client@10.45.1)(@trpc/server@10.45.1)(react-dom@18.2.0)(react@18.2.0)
-      '@trpc/server': 10.45.1
-      '@wingconsole/design-system': 0.59.6
+      '@trpc/client': 10.45.2(@trpc/server@10.45.2)
+      '@trpc/react-query': 10.45.2(@tanstack/react-query@4.36.1)(@trpc/client@10.45.2)(@trpc/server@10.45.2)(react-dom@18.2.0)(react@18.2.0)
+      '@trpc/server': 10.45.2
+      '@wingconsole/design-system': 0.63.3
       classnames: 2.5.1
       elkjs: 0.8.2
       framer-motion: 10.18.0(react-dom@18.2.0)(react@18.2.0)
@@ -5565,12 +5613,12 @@ packages:
       lodash.uniqby: 4.7.0
       nanoid: 4.0.2
       react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
       react-markdown: 9.0.1(@types/react@18.2.56)(react@18.2.0)
       react-use: 17.5.0(react-dom@18.2.0)(react@18.2.0)
       zod: 3.22.4
     transitivePeerDependencies:
       - '@types/react'
-      - react-dom
       - react-native
       - supports-color
       - ts-node
@@ -5598,6 +5646,19 @@ packages:
     transitivePeerDependencies:
       - constructs
       - typescript
+    bundledDependencies:
+      - wasi-js
+
+  /@winglang/compiler@0.63.3(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-/4MVemHvCrlLzEKLqu+NNxkS6L5v0jjEJ29y8o78fmBxkzd6cZ2NwIqt8LRisy8wGNNxwgta/vPhpzaP6AkKkg==}
+    engines: {node: '>=v20.0.0'}
+    dependencies:
+      '@wingcloud/framework': 0.63.3(@winglang/sdk@0.63.3)(typescript@5.3.3)
+      '@winglang/sdk': 0.63.3(constructs@10.3.0)
+    transitivePeerDependencies:
+      - constructs
+      - typescript
+    dev: false
     bundledDependencies:
       - wasi-js
 
@@ -5693,6 +5754,57 @@ packages:
       - toml
       - ulid
       - undici
+      - uuid
+      - yaml
+
+  /@winglang/sdk@0.63.3(constructs@10.3.0):
+    resolution: {integrity: sha512-QwKtnp5ykS8O+dlGtmTYyaJvk9nPr2m0OG2Kg8uC6/vKVDNOTvrCQbIAfA7HDXLXcdZMMxJzb+eqBX15+U/ONg==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      constructs: ^10.3
+    dependencies:
+      constructs: 10.3.0
+    optionalDependencies:
+      esbuild: 0.19.12
+    dev: false
+    bundledDependencies:
+      - '@aws-sdk/client-cloudwatch-logs'
+      - '@aws-sdk/client-dynamodb'
+      - '@aws-sdk/client-elasticache'
+      - '@aws-sdk/client-lambda'
+      - '@aws-sdk/client-s3'
+      - '@aws-sdk/client-secrets-manager'
+      - '@aws-sdk/client-sns'
+      - '@aws-sdk/client-sqs'
+      - '@aws-sdk/s3-request-presigner'
+      - '@aws-sdk/types'
+      - '@aws-sdk/util-dynamodb'
+      - '@azure/core-paging'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/storage-blob'
+      - '@google-cloud/datastore'
+      - '@google-cloud/storage'
+      - '@smithy/util-stream'
+      - '@smithy/util-utf8'
+      - '@types/aws-lambda'
+      - '@winglang/wingtunnels'
+      - ajv
+      - cdktf
+      - cron-parser
+      - express
+      - glob
+      - google-auth-library
+      - ioredis
+      - jsonschema
+      - mime
+      - mime-types
+      - nanoid
+      - protobufjs
+      - safe-stable-stringify
+      - stacktracey
+      - toml
+      - ulid
       - uuid
       - yaml
 
@@ -7922,7 +8034,7 @@ packages:
       estree-util-is-identifier-name: 3.0.0
       hast-util-whitespace: 3.0.0
       mdast-util-mdx-expression: 2.0.0
-      mdast-util-mdx-jsx: 3.1.0
+      mdast-util-mdx-jsx: 3.1.2
       mdast-util-mdxjs-esm: 2.0.1
       property-information: 6.4.1
       space-separated-tokens: 2.0.2
@@ -8876,8 +8988,8 @@ packages:
       - supports-color
     dev: false
 
-  /mdast-util-mdx-jsx@3.1.0:
-    resolution: {integrity: sha512-A8AJHlR7/wPQ3+Jre1+1rq040fX9A4Q1jG8JxmSNp/PLPHg80A6475wxTp3KzHpApFH6yWxFotHrJQA3dXP6/w==}
+  /mdast-util-mdx-jsx@3.1.2:
+    resolution: {integrity: sha512-eKMQDeywY2wlHc97k5eD8VC+9ASMjN8ItEZQNGwJ6E0XWKiW/Z0V5/H8pvoXUf+y+Mj0VIgeRRbujBmFn4FTyA==}
     dependencies:
       '@types/estree-jsx': 1.0.5
       '@types/hast': 3.0.4
@@ -10756,7 +10868,7 @@ packages:
   /rtl-css-js@1.16.1:
     resolution: {integrity: sha512-lRQgou1mu19e+Ya0LsTvKrVJ5TYUbqCVPAiImX3UfLTenarvPUl1QFdvu5Z3PYmHT9RCcwIfbjRQBntExyj3Zg==}
     dependencies:
-      '@babel/runtime': 7.23.9
+      '@babel/runtime': 7.24.1
     dev: false
 
   /run-async@2.4.1:

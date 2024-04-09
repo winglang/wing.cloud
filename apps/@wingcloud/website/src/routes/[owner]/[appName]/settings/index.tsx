@@ -1,9 +1,10 @@
 import { Cog8ToothIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../../components/page-header.js";
+import { SectionSubtitle } from "../../../../components/section-subtitle.js";
 import { SectionTitle } from "../../../../components/section-title.js";
 import { SpinnerLoader } from "../../../../components/spinner-loader.js";
 import { Button } from "../../../../design-system/button.js";
@@ -12,6 +13,7 @@ import { wrpc } from "../../../../utils/wrpc.js";
 import { DeleteModal } from "../_components/delete-modal.js";
 
 import { SecretsList } from "./_components/secrets-list.js";
+import { UpdateAppDescription } from "./_components/update-app-description.js";
 import { Entrypoints } from "./entrypoints.js";
 
 const SettingsPage = ({
@@ -59,7 +61,25 @@ const SettingsPage = ({
           theme.pagePadding,
         )}
       >
-        <Entrypoints app={app} loading={isLoading} />
+        <div className="space-y-2">
+          <SectionTitle>Overview</SectionTitle>
+          <div
+            className={clsx(
+              "flex flex-col gap-y-6 rounded-md p-4 border",
+              theme.bgInput,
+              theme.borderInput,
+            )}
+          >
+            <div className="space-y-2">
+              <SectionSubtitle>Description</SectionSubtitle>
+              <UpdateAppDescription app={app} loading={isLoading} />
+            </div>
+            <div className="space-y-2">
+              <SectionSubtitle>Entrypoints</SectionSubtitle>
+              <Entrypoints app={app} loading={isLoading} />
+            </div>
+          </div>
+        </div>
 
         <SecretsList appId={app?.appId} appName={appName} owner={owner} />
 

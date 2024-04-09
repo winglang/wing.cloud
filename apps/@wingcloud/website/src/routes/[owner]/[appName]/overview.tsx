@@ -13,7 +13,7 @@ import { GithubIcon } from "../../../icons/github-icon.js";
 import { wrpc } from "../../../utils/wrpc.js";
 import { AppIcon } from "../_components/app-icon.js";
 
-import { EnvironmentDetails } from "./[branch]/_components/environment-details.js";
+import { AppDetails } from "./_components/app-details.js";
 import { EnvironmentMenu } from "./_components/environment-menu.js";
 import { EnvironmentsListItemSkeleton } from "./_components/environments-list-item-skeleton.js";
 import { EnvironmentsListItem } from "./_components/environments-list-item.js";
@@ -152,8 +152,8 @@ const OverviewPage = ({
         )}
       >
         <div className="space-y-2">
-          <SectionTitle>Production</SectionTitle>
-          <EnvironmentDetails
+          <SectionTitle>App Overview</SectionTitle>
+          <AppDetails
             owner={owner}
             app={app}
             environment={productionEnvironment}
@@ -161,25 +161,6 @@ const OverviewPage = ({
             endpoints={endpoints}
             endpointsLoading={
               endpointsQuery.isLoading || endpointsQuery.data === undefined
-            }
-            onClick={() => {
-              if (!productionEnvironment?.branch) {
-                return;
-              }
-              navigate(
-                `/${owner}/${appName}/environment/${productionEnvironment.branch}`,
-              );
-            }}
-            actions={
-              <>
-                {productionEnvironment && app?.appName && (
-                  <EnvironmentMenu
-                    owner={owner}
-                    appName={app?.appName}
-                    environment={productionEnvironment}
-                  />
-                )}
-              </>
             }
           />
         </div>
