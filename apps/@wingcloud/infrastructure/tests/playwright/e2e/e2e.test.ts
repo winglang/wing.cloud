@@ -64,12 +64,11 @@ test("Create an app and visit the Console", async ({ page }) => {
   if (WINGCLOUD_URL.includes("localhost")) {
     await reloadUntil(
       page,
-      async () =>
-        await page.getByTestId("environment-details-button").isVisible(),
+      async () => await page.getByTestId("app-details-link").isVisible(),
     );
   }
 
-  await page.getByTestId("environment-details-button").click();
+  await page.getByTestId("app-details-link").click();
 
   await page.waitForURL(
     new RegExp(
