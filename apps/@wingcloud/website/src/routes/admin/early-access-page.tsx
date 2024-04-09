@@ -94,6 +94,17 @@ const EarlyAccessPage = () => {
         />
       </div>
 
+      <SectionTitle>
+        <div className="flex items-center gap-x-2">
+          <div className="flex gap-x-1">
+            <span>Links</span>
+            <span className="text-gray-500 font-normal">
+              ({earlyAccessList.length})
+            </span>
+          </div>
+        </div>
+      </SectionTitle>
+
       <div
         className={clsx(
           "w-full text-xs text-gray-500 dark:text-gray-400 border",

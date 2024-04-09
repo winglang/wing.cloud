@@ -27,9 +27,21 @@ const UsersPage = () => {
       return [];
     }
 
-    return data.users.filter((user) =>
-      user.username.toLowerCase().includes(search.toLowerCase()),
-    );
+    return data.users
+      .filter((user) =>
+        `${user.username.toLowerCase()}${user.email?.toLowerCase()}`.includes(
+          search.toLowerCase(),
+        ),
+      )
+      .sort((a, b) => {
+        if (a.isAdmin && !b.isAdmin) {
+          return -1;
+        }
+        if (!a.isAdmin && b.isAdmin) {
+          return 1;
+        }
+        return a.username.localeCompare(b.username);
+      });
   }, [data, search]);
 
   const { user: currentUser } = useContext(AuthDataProviderContext);
@@ -56,6 +68,18 @@ const UsersPage = () => {
           <SpinnerLoader size="md" />
         </div>
       )}
+
+      <SectionTitle>
+        <div className="flex items-center gap-x-2">
+          <div className="flex gap-x-1">
+            <span>Users</span>
+            <span className="text-gray-500 font-normal">
+              ({filteredUsers.length})
+            </span>
+          </div>
+        </div>
+      </SectionTitle>
+
       {!isLoading && (
         <table
           className={clsx(
