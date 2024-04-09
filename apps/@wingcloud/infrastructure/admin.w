@@ -35,14 +35,6 @@ pub class Admin {
       throw httpError.HttpError.unauthorized();
     };
 
-    // This middleware checks if the user is an admin before allowing access to the admin API
-    api.addMiddleware(inflight (request, next) => {
-      if request.path.startsWith("/wrpc/admin.") {
-        checkAdminAccessRights(request);
-      }
-      return next(request);
-    });
-
     // This middleware logs all admin actions
     api.addMiddleware(inflight (request, next) => {
       if request.path.startsWith("/wrpc/admin.") {
@@ -89,6 +81,7 @@ pub class Admin {
     });
 
     api.get("/wrpc/admin.users.list", inflight (request) => {
+      checkAdminAccessRights(request);
       let users = users.list();
       return {
         body: {
@@ -98,6 +91,7 @@ pub class Admin {
     });
 
     api.post("/wrpc/admin.setAdminRole", inflight (request) => {
+      checkAdminAccessRights(request);
       if let userFromCookie = getUserFromCookie(request) {
         let input = Json.parse(request.body ?? "");
         let userId = input.get("userId").asStr();
