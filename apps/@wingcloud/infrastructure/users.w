@@ -231,7 +231,7 @@ pub class Users {
     let var users = MutArray<User>[];
 
     for item in result.items {
-      users.push(User.fromJson(item));
+      users.push(this.fromDB(item));
     }
 
     return users.copy();
@@ -265,5 +265,16 @@ pub class Users {
         }
       }
     ]);
+  }
+
+  inflight fromDB(item: Json): User {
+    return {
+      id: item.get("id").asStr(),
+      username: item.get("username").asStr(),
+      avatarUrl: item.get("avatarUrl").asStr(),
+      displayName: item.tryGet("displayName")?.tryAsStr() ?? "",
+      email: item.tryGet("email")?.tryAsStr() ?? "",
+      isAdmin: item.tryGet("isAdmin")?.tryAsBool() ?? false,
+    };
   }
 }
