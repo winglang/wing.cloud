@@ -21,10 +21,21 @@ export const AdminPage = (props: AdminPageProps) => {
     if (!data?.users) {
       return [];
     }
-
-    return data.users.filter((user) =>
-      user.username.toLowerCase().includes(search.toLowerCase()),
-    );
+    return data.users
+      .filter((user) =>
+        `${user.username.toLowerCase()}${user.email?.toLowerCase()}`.includes(
+          search.toLowerCase(),
+        ),
+      )
+      .sort((a, b) => {
+        if (a.isAdmin && !b.isAdmin) {
+          return -1;
+        }
+        if (!a.isAdmin && b.isAdmin) {
+          return 1;
+        }
+        return a.username.localeCompare(b.username);
+      });
   }, [data, search]);
 
   return (
