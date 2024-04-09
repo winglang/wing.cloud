@@ -231,7 +231,14 @@ pub class Users {
     let var users = MutArray<User>[];
 
     for item in result.items {
-      users.push(User.fromJson(item));
+      users.push(User {
+        id: item.id,
+        displayName: item.displayName,
+        username: item.username,
+        avatarUrl: item.avatarUrl,
+        email: item.email,
+        isAdmin: item.isAdmin,
+      });
     }
 
     return users.copy();
