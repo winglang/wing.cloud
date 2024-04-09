@@ -1,6 +1,6 @@
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { AuthDataProviderContext } from "../../../data-store/auth-data-provider.js";
@@ -20,6 +20,18 @@ export const UsersTable = ({
 
   const { user: currentUser } = useContext(AuthDataProviderContext);
 
+  const sortedUsers = useMemo(() => {
+    return users.sort((a, b) => {
+      if (a.isAdmin && !b.isAdmin) {
+        return -1;
+      }
+      if (!a.isAdmin && b.isAdmin) {
+        return 1;
+      }
+      return a.username.localeCompare(b.username);
+    });
+  }, [users]);
+
   return (
     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
       <thead className="text-xs text-gray-600 uppercase bg-gray-50">
@@ -31,7 +43,7 @@ export const UsersTable = ({
         </tr>
       </thead>
       <tbody>
-        {users.map((user) => (
+        {sortedUsers.map((user) => (
           <tr
             key={user.id}
             className={clsx(
