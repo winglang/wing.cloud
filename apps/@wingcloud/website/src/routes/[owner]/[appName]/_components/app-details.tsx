@@ -84,6 +84,7 @@ export const AppDetails = ({
           {app && (
             <Link
               data-testid="app-details-link"
+              aria-disabled={!environment}
               className={clsx(
                 "absolute inset-0 peer",
                 "border-b border-gray-100 hover:border-gray-200",
