@@ -81,21 +81,15 @@ export const AppDetails = ({
     >
       <div className="space-y-1 flex relative pb-4">
         <div className="grow">
-          {app && (
+          {app && environment && (
             <Link
               data-testid="app-details-link"
-              aria-disabled={!environment}
               className={clsx(
                 "absolute inset-0 peer",
                 "border-b border-gray-100 hover:border-gray-200",
                 "w-full transition-all",
               )}
               to={`/${owner}/${app?.appName}/environment/${app.defaultBranch}`}
-              onClick={(event) => {
-                if (!environment) {
-                  event.preventDefault();
-                }
-              }}
             />
           )}
           <div
