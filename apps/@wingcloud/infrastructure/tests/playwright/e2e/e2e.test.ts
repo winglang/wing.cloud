@@ -61,12 +61,12 @@ test("Create an app and visit the Console", async ({ page }) => {
   console.log("Visiting the environment page...");
 
   // Reload the page to avoid ws connection issues on localhost
-  if (WINGCLOUD_URL.includes("localhost")) {
-    await reloadUntil(
-      page,
-      async () => await page.getByTestId("app-details-link").isEnabled(),
-    );
-  }
+  await (WINGCLOUD_URL.includes("localhost")
+    ? reloadUntil(
+        page,
+        async () => await page.getByTestId("app-details-link").isEnabled(),
+      )
+    : page.getByTestId("app-details-link").isEnabled());
 
   await page.getByTestId("app-details-link").click();
 
