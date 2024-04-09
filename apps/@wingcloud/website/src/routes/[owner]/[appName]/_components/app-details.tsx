@@ -83,6 +83,7 @@ export const AppDetails = ({
         <div className="grow">
           {app && (
             <Link
+              data-testid="app-details-link"
               className={clsx(
                 "absolute inset-0 peer",
                 "border-b border-gray-100 hover:border-gray-200",
