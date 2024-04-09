@@ -87,26 +87,28 @@ const SettingsPage = ({
         <div className="space-y-2">
           <SectionTitle>Delete App</SectionTitle>
           <SectionContent>
-            <div
-              className={clsx(
-                "absolute inset-0 flex items-center justify-center",
-                "transition-all",
-                isLoading && "bg-opacity-50 z-10",
-                !isLoading && "bg-opacity-0 -z-10",
-                theme.bg3,
-              )}
-            >
-              <SpinnerLoader size="sm" />
-            </div>
-            <div className="flex">
-              <Button
-                dataTestId="delete-app-button"
-                onClick={() => setDeleteModalOpen(true)}
-                disabled={isLoading}
-                className="truncate"
+            <div>
+              <div
+                className={clsx(
+                  "absolute inset-0 flex items-center justify-center",
+                  "transition-all",
+                  isLoading && "bg-opacity-50 z-10",
+                  !isLoading && "bg-opacity-0 -z-10",
+                  theme.bg3,
+                )}
               >
-                Delete
-              </Button>
+                <SpinnerLoader size="sm" />
+              </div>
+              <div className="flex">
+                <Button
+                  dataTestId="delete-app-button"
+                  onClick={() => setDeleteModalOpen(true)}
+                  disabled={isLoading}
+                  className="truncate"
+                >
+                  Delete
+                </Button>
+              </div>
             </div>
           </SectionContent>
         </div>
