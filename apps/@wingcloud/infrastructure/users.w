@@ -4,7 +4,7 @@ bring "./http-error.w" as httpError;
 
 pub struct User {
   id: str;
-  displayName: str;
+  displayName: str?;
   username: str;
   avatarUrl: str;
   email: str?;

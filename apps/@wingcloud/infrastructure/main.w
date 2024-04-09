@@ -32,6 +32,20 @@ bring "./patches/react-app.patch.w" as reactAppPatch;
 bring "./google-oauth.w" as google_oauth;
 bring "./early-access.w" as early_access;
 
+if util.tryEnv("WING_IS_TEST") != "true" {
+  // Wing Tunnels
+  bring "./node_modules/@wingcloud/tunnels/src/tunnels.w" as tunnels;
+  let tunnelsSubdomain = (() => {
+    let var subDomain = util.tryEnv("TUNNELS_SUBDOMAIN");
+    if subDomain? && subDomain != "" {
+      return "{subDomain}";
+    } else {
+      return "endpoints";
+    }
+  })();
+  new tunnels.TunnelsApi(zoneName: "wingcloud.dev", subDomain: tunnelsSubdomain) as "tunnels";
+}
+
 let appSecret = util.env("APP_SECRET");
 let wsSecret = util.env("WS_SECRET");
 let segmentWriteKey = util.tryEnv("SEGMENT_WRITE_KEY") ?? "";
@@ -331,19 +345,6 @@ new cdktf.TerraformOutput(value: probotApp.githubApp.api.url) as "Probot API URL
 new cdktf.TerraformOutput(value: proxyUrl) as "Proxy URL";
 new cdktf.TerraformOutput(value: siteURL) as "Site URL";
 
-if util.tryEnv("WING_IS_TEST") != "true" {
-  // Wing Tunnels
-  bring "./node_modules/@wingcloud/tunnels/src/tunnels.w" as tunnels;
-  let tunnelsSubdomain = (() => {
-    let var subDomain = util.tryEnv("TUNNELS_SUBDOMAIN");
-    if subDomain? && subDomain != "" {
-      return "{subDomain}";
-    } else {
-      return "endpoints";
-    }
-  })();
-  new tunnels.TunnelsApi(zoneName: "wingcloud.dev", subDomain: tunnelsSubdomain);
-}
 test "API Health Check" {
   let response = http.get("{api.url}/wrpc/health");
   expect.equal(response.status, 200);

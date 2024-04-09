@@ -96,7 +96,6 @@ export const Select = memo(
                 className={clsx(
                   "absolute",
                   theme.bgInput,
-                  theme.textInput,
                   "z-10 mt-1 max-h-60 w-full overflow-auto rounded-md",
                   "py-1 text-xs shadow-lg ring-1 ring-black ring-opacity-5 outline-none",
                 )}
@@ -107,6 +106,7 @@ export const Select = memo(
                       clsx(
                         "relative cursor-default select-none py-2 px-4",
                         active && theme.bgInputHover,
+                        theme.text2,
                         (showSelected && "pl-8") || "pl-4",
                       )
                     }
@@ -122,6 +122,7 @@ export const Select = memo(
                       clsx(
                         "relative cursor-default select-none py-2 px-4",
                         active && theme.bgInputHover,
+                        theme.textInput,
                         (showSelected && "pl-8") || "pl-4",
                       )
                     }
