@@ -28,7 +28,7 @@ export const Component = () => {
               to: "/admin/users",
             },
             {
-              name: "Early Access",
+              name: "Early Access Links",
               to: "/admin/early-access",
             },
           ]}
