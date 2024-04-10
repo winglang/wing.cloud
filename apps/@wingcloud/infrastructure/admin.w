@@ -1,6 +1,7 @@
 bring cloud;
 bring "./json-api.w" as json_api;
-bring "./users.w" as users;
+bring "./users.w" as Users;
+bring "./apps.w" as Apps;
 bring "./early-access.w" as early_access;
 
 bring "./http-error.w" as httpError;
@@ -10,7 +11,8 @@ bring util;
 
 struct AdminProps {
   api: json_api.JsonApi;
-  users: users.Users;
+  users: Users.Users;
+  apps: Apps.Apps;
   earlyAccess: early_access.EarlyAccess;
   getUserFromCookie: inflight(cloud.ApiRequest): JWT.JWTPayload?;
   invalidateQuery: invalidate_query.InvalidateQuery;
@@ -30,6 +32,7 @@ pub class Admin {
 
     let api = props.api;
     let users = props.users;
+    let apps = props.apps;
     let earlyAccess = props.earlyAccess;
     let getUserFromCookie = props.getUserFromCookie;
     let invalidateQuery = props.invalidateQuery;
@@ -96,6 +99,16 @@ pub class Admin {
       return {
         body: {
           users: users
+        },
+      };
+    });
+
+    api.get("/wrpc/admin.apps.list", inflight (request) => {
+      checkAdminAccessRights(request);
+      let apps = apps.listAll();
+      return {
+        body: {
+          apps: apps
         },
       };
     });

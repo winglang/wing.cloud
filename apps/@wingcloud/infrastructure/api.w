@@ -384,6 +384,7 @@ pub class Api {
      new Admin.Admin(
       api: api,
       users: users,
+      apps: apps,
       earlyAccess: earlyAccess,
       getUserFromCookie: getUserFromCookie,
       invalidateQuery: invalidateQuery,
