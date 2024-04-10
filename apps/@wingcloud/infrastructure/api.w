@@ -745,7 +745,7 @@ pub class Api {
         if let isEarlyAccessUser = user.isEarlyAccessUser {
           let userApps = apps.list(userId: user.id);
           if userApps.length >= EARLY_ACCESS_USERS_MAX_APPS {
-            throw httpError.HttpError.badRequest(
+            throw httpError.HttpError.forbidden(
               "You have reached the maximum number of apps allowed for early access users."
             );
           }
