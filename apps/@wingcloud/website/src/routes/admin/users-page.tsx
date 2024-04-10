@@ -37,7 +37,7 @@ const AppList = ({ user, apps }: { user: User; apps: App[] }) => {
           button={`${apps.length} app${apps.length > 1 ? "s" : ""}`}
         >
           <div className="flex gap-x-3">
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {apps.map((app) => (
                 <div key={app.appId} className="flex gap-2 items-center">
                   <Link
