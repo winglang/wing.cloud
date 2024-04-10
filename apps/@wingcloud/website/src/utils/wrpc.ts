@@ -287,6 +287,12 @@ export const wrpc = createWRPCReact<{
       users: User[];
     }
   >;
+  "admin.apps.list": QueryProcedure<
+    undefined,
+    {
+      apps: App[];
+    }
+  >;
   "admin.setAdminRole": MutationProcedure<
     { userId: string; isAdmin: boolean },
     {}
