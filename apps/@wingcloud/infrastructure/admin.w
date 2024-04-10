@@ -198,6 +198,5 @@ pub class Admin {
         },
       };
     });
-
   }
 }

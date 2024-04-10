@@ -9,6 +9,7 @@ pub struct User {
   avatarUrl: str;
   email: str?;
   isAdmin: bool?;
+  isEarlyAccessUser: bool?;
 }
 
 struct CreateOptions {
@@ -16,6 +17,7 @@ struct CreateOptions {
   username: str;
   avatarUrl: str?;
   email: str?;
+  isEarlyAccessUser: bool?;
 }
 
 struct FromLoginOptions {
@@ -27,6 +29,7 @@ struct GetOrCreateOptions {
   username: str;
   avatarUrl: str?;
   email: str?;
+  isEarlyAccessUser: bool?;
 }
 
 struct GetUserOptions {
@@ -51,6 +54,12 @@ struct SetAdminRoleOptions {
   isAdmin: bool;
 }
 
+struct SetIsEarlyAccessUserOptions {
+  userId: str;
+  username: str;
+  isEarlyAccessUser: bool;
+}
+
 pub class Users {
   table: ex.DynamodbTable;
 
@@ -73,6 +82,7 @@ pub class Users {
               username: options.username,
               avatarUrl: options.avatarUrl ?? "",
               email: options.email ?? "",
+              isEarlyAccessUser: options.isEarlyAccessUser ?? false,
             },
             conditionExpression: "attribute_not_exists(pk)",
           },
@@ -87,9 +97,10 @@ pub class Users {
               username: options.username,
               avatarUrl: options.avatarUrl ?? "",
               email: options.email ?? "",
+              isEarlyAccessUser: options.isEarlyAccessUser ?? false,
             },
           }
-        }
+        },
       ],
     );
 
@@ -99,6 +110,7 @@ pub class Users {
       username: options.username,
       avatarUrl: options.avatarUrl ?? "",
       email: options.email ?? "",
+      isEarlyAccessUser: options.isEarlyAccessUser,
     };
   }
 
@@ -182,7 +194,8 @@ pub class Users {
         displayName: options.displayName,
         username: options.username,
         avatarUrl: options.avatarUrl,
-        email: options.email
+        email: options.email,
+        isEarlyAccessUser: options.isEarlyAccessUser ?? false,
       );
     }
   }
@@ -193,7 +206,7 @@ pub class Users {
         pk: "USER#{options.userId}",
         sk: "#",
       },
-      projectionExpression: "id, displayName, username, avatarUrl, email, isAdmin",
+      projectionExpression: "id, displayName, username, avatarUrl, email, isAdmin, isEarlyAccessUser",
     );
 
     if let user = User.tryFromJson(result.item) {
@@ -267,6 +280,36 @@ pub class Users {
     ]);
   }
 
+  // Intended for admin use only
+  pub inflight setIsEarlyAccessUser(options: SetIsEarlyAccessUserOptions): void {
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "LOGIN#{options.username}",
+            sk: "#",
+          },
+          updateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser",
+          expressionAttributeValues: {
+            ":isEarlyAccessUser": options.isEarlyAccessUser,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "#",
+          },
+          updateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser",
+          expressionAttributeValues: {
+            ":isEarlyAccessUser": options.isEarlyAccessUser,
+          },
+        }
+      }
+    ]);
+  }
+
   inflight fromDB(item: Json): User {
     return {
       id: item.get("id").asStr(),
@@ -275,6 +318,7 @@ pub class Users {
       displayName: item.tryGet("displayName")?.tryAsStr() ?? "",
       email: item.tryGet("email")?.tryAsStr() ?? "",
       isAdmin: item.tryGet("isAdmin")?.tryAsBool() ?? false,
+      isEarlyAccessUser: item.tryGet("isEarlyAccessUser")?.tryAsBool() ?? false,
     };
   }
 }

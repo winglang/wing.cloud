@@ -146,6 +146,7 @@ pub class Api {
   pub api: json_api.JsonApi;
   new(props: ApiProps) {
     let REQUIRE_EARLY_ACCESS_CODE = util.tryEnv("REQUIRE_EARLY_ACCESS_CODE") == "true";
+    let EARLY_ACCESS_USERS_MAX_APPS = 5;
 
     let api = new json_api.JsonApi(api: props.api);
     this.api = api;
@@ -422,14 +423,16 @@ pub class Api {
 
         let githubUser = GitHub.Client.getUser(tokens.access_token);
 
+        let var isEarlyAccessUser = false;
         if REQUIRE_EARLY_ACCESS_CODE {
-          if let user = users.fromLogin(username: githubUser.login) {
+          if let userExists = users.fromLogin(username: githubUser.login) {
             // If the user is already registered, we don't need to check for early access.
           } else {
             if let email = githubUser.email {
               if let code = request.query.tryGet("early-access-code") {
                 earlyAccess.validate(email: email, code: code);
                 log("Email {email} is allowed to access the early access");
+                isEarlyAccessUser = true;
               } else {
                 throw httpError.HttpError.badRequest("Request an early access code to be able to log in.");
               }
@@ -444,6 +447,7 @@ pub class Api {
           username: githubUser.login,
           avatarUrl: githubUser.avatar_url,
           email: githubUser.email,
+          isEarlyAccessUser: isEarlyAccessUser,
         );
 
         githubAccessTokens.set(user.id, tokens);
@@ -736,6 +740,19 @@ pub class Api {
         let repoName = input.get("repoName").asStr();
 
         let user = users.fromLoginOrFail(username: owner);
+
+        if let isEarlyAccessUser = user.isEarlyAccessUser {
+          let userApps = apps.list(userId: user.id);
+          if userApps.length >= EARLY_ACCESS_USERS_MAX_APPS {
+            return {
+              status: 422,
+              body: {
+                error: "You have reached the maximum number of apps allowed for early access users.",
+              },
+            };
+          }
+        }
+
         let installationId = getInstallationId(accessToken, repoOwner);
 
         // get application default entrypoint path (main.w)

@@ -304,4 +304,10 @@ export const wrpc = createWRPCReact<{
       earlyAccessList: EarlyAccessItem[];
     }
   >;
+  "admin.earlyAccess.listUsers": QueryProcedure<
+    undefined,
+    {
+      users: User[];
+    }
+  >;
 }>();
