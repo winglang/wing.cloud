@@ -19,7 +19,7 @@ export const AppListPopover = ({ user, apps }: { user: User; apps: App[] }) => {
             "border",
             theme.borderInput,
             theme.focusVisible,
-            theme.bg1,
+            theme.bg2,
             theme.bg2Hover,
             "transition-all",
           )}
