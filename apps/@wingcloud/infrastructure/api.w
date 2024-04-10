@@ -745,12 +745,9 @@ pub class Api {
         if let isEarlyAccessUser = user.isEarlyAccessUser {
           let userApps = apps.list(userId: user.id);
           if userApps.length >= EARLY_ACCESS_USERS_MAX_APPS {
-            return {
-              status: 422,
-              body: {
-                error: "You have reached the maximum number of apps allowed for early access users.",
-              },
-            };
+            throw httpError.HttpError.badRequest(
+              "You have reached the maximum number of apps allowed for early access users."
+            );
           }
         }
 
@@ -767,12 +764,9 @@ pub class Api {
         // TODO: https://github.com/winglang/wing/issues/3644
         let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9._-]+", "*");
         if appName.contains("*") {
-          return {
-            status: 422,
-            body: {
-              error: "The app name can only contain ASCII letters, digits, and the characters ., - and _.",
-            },
-          };
+          throw httpError.HttpError.badRequest(
+            "The app name can only contain ASCII letters, digits, and the characters ., - and _."
+          );
         }
 
         let repoId = "{repoOwner}/{repoName}";
