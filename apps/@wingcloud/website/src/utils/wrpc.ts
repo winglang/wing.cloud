@@ -9,6 +9,7 @@ import {
 export interface User {
   id: string;
   isAdmin: boolean;
+  isEarlyAccessUser: boolean;
   username: string;
   displayName: string;
   avatarUrl: string;
@@ -295,6 +296,10 @@ export const wrpc = createWRPCReact<{
   >;
   "admin.setAdminRole": MutationProcedure<
     { userId: string; isAdmin: boolean },
+    {}
+  >;
+  "admin.setEarlyAccessUser": MutationProcedure<
+    { userId: string; isEarlyAccessUser: boolean },
     {}
   >;
   "admin.earlyAccess.create": MutationProcedure<

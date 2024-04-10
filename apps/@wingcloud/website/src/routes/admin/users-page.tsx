@@ -10,58 +10,11 @@ import { SectionTitle } from "../../components/section-title.js";
 import { SpinnerLoader } from "../../components/spinner-loader.js";
 import { AuthDataProviderContext } from "../../data-store/auth-data-provider.js";
 import { Input } from "../../design-system/input.js";
-import Popover from "../../design-system/popover.js";
 import { useTheme } from "../../design-system/theme-provider.js";
 import { wrpc, type App, type User } from "../../utils/wrpc.js";
 
+import { AppListPopover } from "./_components/app-list-popover.js";
 import { UserMenu } from "./_components/user-menu.js";
-
-const AppList = ({ user, apps }: { user: User; apps: App[] }) => {
-  const { theme } = useTheme();
-
-  return (
-    <div className="flex items-center gap-x-1">
-      {apps.length > 0 && (
-        <Popover
-          classNames={clsx(
-            "z-10",
-            "rounded-full py-0.5 px-1.5 flex text-xs font-semibold",
-            theme.textInput,
-            "border",
-            theme.borderInput,
-            theme.focusVisible,
-            theme.bg1,
-            theme.bg2Hover,
-            "transition-all",
-          )}
-          button={`${apps.length} app${apps.length > 1 ? "s" : ""}`}
-        >
-          <div className="flex gap-x-3">
-            <div className="space-y-1">
-              {apps.map((app) => (
-                <div key={app.appId} className="flex gap-2 items-center">
-                  <Link
-                    className={clsx(
-                      "hover:underline focus:underline outline-none",
-                      "truncate relative z-10 flex gap-x-1",
-                      theme.text1,
-                      "text-xs",
-                    )}
-                    to={`/${user.username}/${app.appName}`}
-                    rel="noopener noreferrer"
-                  >
-                    {app.appName}
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Popover>
-      )}
-      {apps?.length === 0 && <div className="px-1.5">0 apps</div>}
-    </div>
-  );
-};
 
 const UsersPage = () => {
   const { theme } = useTheme();
@@ -93,6 +46,12 @@ const UsersPage = () => {
         }
         if (!a.isAdmin && b.isAdmin) {
           return 1;
+        }
+        if (a.isEarlyAccessUser && !b.isEarlyAccessUser) {
+          return 1;
+        }
+        if (!a.isEarlyAccessUser && b.isEarlyAccessUser) {
+          return -1;
         }
         return a.username.localeCompare(b.username);
       });
@@ -161,7 +120,7 @@ const UsersPage = () => {
               <th className="px-4 py-2 w-20 text-center"></th>
               <th className="px-4 py-2 w-1/3">Username</th>
               <th className="px-4 py-2 w-1/3">Email</th>
-              <th className="px-4 py-2 w-1/3">Apps</th>
+              <th className="px-4 py-2 w-1/3 text-center">Apps</th>
               <th className="px-4 py-2"></th>
             </tr>
           </thead>
@@ -192,7 +151,9 @@ const UsersPage = () => {
                 </td>
                 <td className="px-4 py-2">{user.email}</td>
                 <td className="px-4 py-2">
-                  <AppList user={user} apps={user.apps} />
+                  <div className="flex w-full justify-center">
+                    <AppListPopover user={user} apps={user.apps} />
+                  </div>
                 </td>
                 <td className="px-4 py-2">
                   <Link
@@ -203,7 +164,18 @@ const UsersPage = () => {
                     to={`/${user.username}`}
                   />
 
-                  <div className="flex gap-x-4 items-center justify-end">
+                  <div className="flex gap-x-2 items-center justify-end">
+                    {user.isEarlyAccessUser && (
+                      <div
+                        className={clsx(
+                          "text-white rounded px-1.5 text-2xs font-bold",
+                          "bg-yellow-500",
+                          "whitespace-nowrap",
+                        )}
+                      >
+                        Early Access
+                      </div>
+                    )}
                     {user.isAdmin && (
                       <div
                         className={clsx(
@@ -214,6 +186,7 @@ const UsersPage = () => {
                         Admin
                       </div>
                     )}
+
                     <div className="z-10">
                       <UserMenu user={user} onClose={() => refetch()} />
                     </div>
