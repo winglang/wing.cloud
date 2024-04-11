@@ -57,7 +57,8 @@ export const SetEarlyAccessModal = ({
     () => (
       <p className="text-sm text-slate-500">
         User <span className="text-slate-700 italic">{user.username}</span> will
-        be set as a{" "}
+        be set as
+        {user.isEarlyAccessUser ? " a " : " an "}
         <span className="bg-slate-200 text-slate-700 px-1 rounded">
           {user.isEarlyAccessUser ? "regular" : "early-access"}
         </span>{" "}

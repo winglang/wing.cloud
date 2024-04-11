@@ -59,8 +59,8 @@ export const UserMenu = ({
           {
             icon: <UserGroupIcon className="size-4" />,
             label: user.isEarlyAccessUser
-              ? "Set as normal user"
-              : "Set as early-access user",
+              ? "Set as 'regular' user"
+              : "Set as 'early access' user",
             onClick: () => setShowEarlyAccessModal(true),
           },
         ]}

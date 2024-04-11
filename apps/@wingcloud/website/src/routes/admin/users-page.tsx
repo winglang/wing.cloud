@@ -37,7 +37,7 @@ const UsersPage = () => {
 
     return usersData.users
       .filter((user) =>
-        `${user.username.toLowerCase()}${user.email?.toLowerCase()}`.includes(
+        `${user.username.toLowerCase()}${user.email?.toLowerCase()}${user.isEarlyAccessUser && "early access"}`.includes(
           search.toLowerCase(),
         ),
       )
@@ -46,12 +46,6 @@ const UsersPage = () => {
           return -1;
         }
         if (!a.isAdmin && b.isAdmin) {
-          return 1;
-        }
-        if (a.isEarlyAccessUser && !b.isEarlyAccessUser) {
-          return -1;
-        }
-        if (!a.isEarlyAccessUser && b.isEarlyAccessUser) {
           return 1;
         }
         return a.username.localeCompare(b.username);
