@@ -1,5 +1,6 @@
 import {
   ExclamationCircleIcon,
+  UserGroupIcon,
   UserIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
@@ -13,6 +14,7 @@ import { MenuIcon } from "../../../icons/menu-icon.js";
 import { type User } from "../../../utils/wrpc.js";
 
 import { GrantAdminRightsModal } from "./grant-admin-rights-modal.js";
+import { SetEarlyAccessModal } from "./set-early-access-modal.js";
 
 export const UserMenu = ({
   user,
@@ -25,6 +27,7 @@ export const UserMenu = ({
   const { user: currentUser } = useContext(AuthDataProviderContext);
 
   const [showAdminRightsModal, setShowAdminRightsModal] = useState(false);
+  const [showEarlyAccessModal, setShowEarlyAccessModal] = useState(false);
 
   return (
     <>
@@ -53,6 +56,13 @@ export const UserMenu = ({
             label: user.isAdmin ? "Revoke admin rights" : "Grant admin rights",
             onClick: () => setShowAdminRightsModal(true),
           },
+          {
+            icon: <UserGroupIcon className="size-4" />,
+            label: user.isEarlyAccessUser
+              ? "Set as normal user"
+              : "Set as early-access user",
+            onClick: () => setShowEarlyAccessModal(true),
+          },
         ]}
       />
       <GrantAdminRightsModal
@@ -60,6 +70,14 @@ export const UserMenu = ({
         show={showAdminRightsModal}
         onClose={(success) => {
           setShowAdminRightsModal(false);
+          onClose?.(success);
+        }}
+      />
+      <SetEarlyAccessModal
+        user={user}
+        show={showEarlyAccessModal}
+        onClose={(success) => {
+          setShowEarlyAccessModal(false);
           onClose?.(success);
         }}
       />

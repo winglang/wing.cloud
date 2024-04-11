@@ -291,7 +291,7 @@ export const wrpc = createWRPCReact<{
   "admin.apps.list": QueryProcedure<
     undefined,
     {
-      apps: App[];
+      apps: { [key: string]: App[] };
     }
   >;
   "admin.setAdminRole": MutationProcedure<

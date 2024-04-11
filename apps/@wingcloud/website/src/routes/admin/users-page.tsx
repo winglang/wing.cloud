@@ -22,12 +22,13 @@ const UsersPage = () => {
   const [search, setSearch] = useState("");
 
   const {
-    isLoading,
     data: usersData,
+    isLoading: usersLoading,
     refetch,
   } = wrpc["admin.users.list"].useQuery();
 
-  const { data: appsData } = wrpc["admin.apps.list"].useQuery();
+  const { data: appsData, isLoading: appsLoading } =
+    wrpc["admin.apps.list"].useQuery();
 
   const filteredUsers = useMemo(() => {
     if (!usersData?.users) {
@@ -48,25 +49,20 @@ const UsersPage = () => {
           return 1;
         }
         if (a.isEarlyAccessUser && !b.isEarlyAccessUser) {
-          return 1;
+          return -1;
         }
         if (!a.isEarlyAccessUser && b.isEarlyAccessUser) {
-          return -1;
+          return 1;
         }
         return a.username.localeCompare(b.username);
       });
   }, [usersData, search]);
 
   const usersWithApps = useMemo(() => {
-    if (!appsData?.apps) {
-      return [];
-    }
-
     return filteredUsers.map((user) => {
-      const userApps = appsData.apps.filter((app) => app.userId === user.id);
       return {
         ...user,
-        apps: userApps,
+        apps: appsData?.apps[user.id] || [],
       };
     });
   }, [filteredUsers, appsData]);
@@ -90,7 +86,7 @@ const UsersPage = () => {
           }}
         />
       </div>
-      {isLoading && (
+      {usersLoading && (
         <div className="w-full flex justify-center p-4">
           <SpinnerLoader size="md" />
         </div>
@@ -107,7 +103,7 @@ const UsersPage = () => {
         </div>
       </SectionTitle>
 
-      {!isLoading && (
+      {!usersLoading && (
         <table
           className={clsx(
             "w-full text-sm text-left text-gray-500 dark:text-gray-400 border",
@@ -152,7 +148,10 @@ const UsersPage = () => {
                 <td className="px-4 py-2">{user.email}</td>
                 <td className="px-4 py-2">
                   <div className="flex w-full justify-center">
-                    <AppListPopover user={user} apps={user.apps} />
+                    {appsLoading && <SpinnerLoader size="xs" />}
+                    {!appsLoading && (
+                      <AppListPopover user={user} apps={user.apps} />
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-2">

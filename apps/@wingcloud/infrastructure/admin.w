@@ -211,5 +211,30 @@ pub class Admin {
         },
       };
     });
+
+    api.post("/wrpc/admin.setEarlyAccessUser", inflight (request) => {
+      checkAdminAccessRights(request);
+      if let userFromCookie = getUserFromCookie(request) {
+        let input = Json.parse(request.body ?? "");
+
+        let userId = input.get("userId").asStr();
+        let isEarlyAccessUser = input.get("isEarlyAccessUser").asBool();
+
+        let user = users.get({
+          userId: userId
+        });
+
+        users.setIsEarlyAccessUser(
+          userId: userId,
+          username: user.username,
+          isEarlyAccessUser: isEarlyAccessUser
+        );
+
+        return {
+          body: {}
+        };
+      }
+      throw httpError.HttpError.unauthorized();
+    });
   }
 }

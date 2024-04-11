@@ -99,7 +99,7 @@ pub class EarlyAccess {
     }
   }
 
-  pub inflight validate(options: ValidateOptions): bool {
+  pub inflight validate(options: ValidateOptions): void {
     let now = datetime.utcNow();
 
     let result = this.table.getItem(
@@ -129,7 +129,6 @@ pub class EarlyAccess {
           ":used": true,
         },
       );
-      return true;
     }
 
     throw httpError.HttpError.notFound("Invalid code or email");

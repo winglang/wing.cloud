@@ -639,7 +639,7 @@ pub class Apps {
   }
 
    // Intended for admin use only
-   pub inflight listAll(): Array<App> {
+   pub inflight listAll(): Map<Array<App>> {
     let result = this.table.scan(
       filterExpression: "begins_with(pk, :prefix) and sk = :sk",
       expressionAttributeValues: {
@@ -648,10 +648,12 @@ pub class Apps {
       },
     );
 
-    let var apps = MutArray<App>[];
+    let var apps = MutMap<Array<App>>{};
 
     for item in result.items {
-      apps.push(this.fromDB(item));
+      let app = this.fromDB(item);
+      let userApps = apps.tryGet(app.userId) ?? [];
+      apps.set(app.userId, userApps.concat([app]));
     }
 
     return apps.copy();
