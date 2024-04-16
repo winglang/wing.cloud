@@ -48,7 +48,7 @@ export const LoginPage = () => {
             <Link
               to={AUTHORIZE_URL}
               className={clsx(
-                "w-full  text-white text-center py-2 rounded",
+                "w-full text-white text-center py-2 rounded-md",
                 "bg-gray-800 hover:bg-gray-900 transition-all",
                 "hover:shadow-md",
               )}
@@ -59,8 +59,8 @@ export const LoginPage = () => {
             <Link
               to={HOME_URL}
               className={clsx(
-                "text-gray-700 hover:text-gray-600 transition-colors",
-                "gap-1 text-sm",
+                "w-full text-gray-700 text-center py-2 rounded-md text-sm",
+                "bg-white hover:bg-gray-50 transition-all",
               )}
             >
               Go back Home
