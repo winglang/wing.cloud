@@ -1,6 +1,7 @@
 import { useContext, useEffect, useMemo } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
+import { ErrorBoundary } from "../components/error-boundary.js";
 import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
 
 const ROUTES_WITHOUT_AUTH = new Set(["/", "/login"]);
@@ -21,5 +22,9 @@ export const Component = () => {
     }
   }, [routeRequiresAuth, authError]);
 
-  return <>{(!routeRequiresAuth || !authError) && <Outlet />}</>;
+  return (
+    <ErrorBoundary>
+      <>{(!routeRequiresAuth || !authError) && <Outlet />}</>
+    </ErrorBoundary>
+  );
 };

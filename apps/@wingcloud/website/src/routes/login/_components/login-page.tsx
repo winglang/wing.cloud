@@ -1,14 +1,16 @@
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { useTheme } from "../../../design-system/theme-provider.js";
+import { SpinnerLoader } from "../../../components/spinner-loader.js";
 import { WingIcon } from "../../../icons/wing-icon.js";
 
 export const LoginPage = () => {
   // TODO: Use state to prevent man-in-the-middle attacks.
   const { GITHUB_APP_CLIENT_ID } = wing.env;
+
+  const [loading, setLoading] = useState(false);
 
   const HOME_URL = useMemo(() => {
     const url = new URL(location.href);
@@ -48,12 +50,24 @@ export const LoginPage = () => {
             <Link
               to={AUTHORIZE_URL}
               className={clsx(
-                "w-full text-white text-center py-2 rounded-md",
-                "bg-gray-800 hover:bg-gray-900 transition-all",
-                "hover:shadow-md",
+                "text-white py-2 rounded-md",
+                "flex items-center justify-center gap-x-4",
+                "bg-gray-800 transition-all",
+                !loading && "hover:bg-gray-900 hover:shadow-md",
+                loading && "opacity-90 cursor-not-allowed",
               )}
+              onClick={(event) => {
+                setLoading(true);
+              }}
             >
-              Sign in with GitHub
+              <div className="relative">
+                Sign in with GitHub{" "}
+                {loading && (
+                  <div className="absolute -right-8 top-1/2 transform -translate-y-1/2">
+                    <SpinnerLoader size="sm" />
+                  </div>
+                )}
+              </div>
             </Link>
             <div className="text-sm text-gray-600">or</div>
             <Link
