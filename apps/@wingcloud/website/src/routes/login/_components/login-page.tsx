@@ -47,7 +47,11 @@ export const LoginPage = () => {
           <div className="flex flex-col gap-y-2">
             <Link
               to={AUTHORIZE_URL}
-              className="block w-full bg-gray-800 text-white text-center py-2 rounded hover:bg-gray-900 transition-colors"
+              className={clsx(
+                "w-full  text-white text-center py-2 rounded",
+                "bg-gray-800 hover:bg-gray-900 transition-all",
+                "hover:shadow-md",
+              )}
             >
               Sign in with GitHub
             </Link>
