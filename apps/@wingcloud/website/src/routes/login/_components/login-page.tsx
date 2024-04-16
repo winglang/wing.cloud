@@ -44,7 +44,7 @@ export const LoginPage = () => {
             <b className="font-bold text-slate-800">Wing Cloud</b> account
           </p>
 
-          <div className="flex flex-col gap-y-2">
+          <div className="flex flex-col space-y-2">
             <Link
               to={AUTHORIZE_URL}
               className={clsx(
@@ -59,8 +59,8 @@ export const LoginPage = () => {
             <Link
               to={HOME_URL}
               className={clsx(
-                "w-full text-gray-700 text-center py-2 rounded-md text-sm",
-                "bg-white hover:bg-gray-50 transition-all",
+                "w-full text-center text-sm",
+                "text-gray-700 hover:text-gray-800 transition-all",
               )}
             >
               Go back Home
