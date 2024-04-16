@@ -39,22 +39,23 @@ export const LoginPage = () => {
       >
         <WingIcon className="size-20 text-gray-800 self-center" />
         <div className="space-y-4">
-          <p className="text-gray-500">
+          <p className="text-gray-600">
             Sign in to your{" "}
-            <b className="font-bold text-slate-600">Wing Cloud</b> account.
+            <b className="font-bold text-slate-800">Wing Cloud</b> account.
           </p>
 
-          <div className="flex flex-col gap-y-4">
+          <div className="flex flex-col gap-y-2">
             <Link
               to={AUTHORIZE_URL}
               className="block w-full bg-gray-800 text-white text-center py-2 rounded hover:bg-gray-900 transition-colors"
             >
               Sign in with GitHub
             </Link>
+            <div className="text-sm text-gray-600">or</div>
             <Link
               to={HOME_URL}
               className={clsx(
-                "text-gray-600 hover:text-gray-800 transition-colors",
+                "text-gray-700 hover:text-gray-600 transition-colors",
                 "gap-1 text-sm",
               )}
             >
