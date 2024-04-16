@@ -9,9 +9,17 @@ export const router = (onReady: () => void) => {
   };
   return createBrowserRouter([
     {
+      path: "",
+      lazy: () => import("./routes/login/index.js"),
+    },
+    {
       path: "/",
       lazy: () => import("./routes/index.js"),
       children: [
+        {
+          path: "/login",
+          lazy: () => import("./routes/login/index.js"),
+        },
         {
           path: "/add",
           lazy: () => lazyLoading(import("./routes/add/index.js")),
