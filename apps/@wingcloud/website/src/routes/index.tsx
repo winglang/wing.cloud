@@ -1,5 +1,5 @@
 import { useContext, useEffect, useMemo } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
 import { ErrorBoundary } from "../components/error-boundary.js";
 import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
