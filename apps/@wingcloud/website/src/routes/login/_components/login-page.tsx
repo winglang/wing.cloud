@@ -41,7 +41,7 @@ export const LoginPage = () => {
         <div className="space-y-4">
           <p className="text-gray-600">
             Sign in to your{" "}
-            <b className="font-bold text-slate-800">Wing Cloud</b> account.
+            <b className="font-bold text-slate-800">Wing Cloud</b> account
           </p>
 
           <div className="flex flex-col gap-y-2">
