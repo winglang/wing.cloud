@@ -2,10 +2,6 @@ name: Test E2E
 
 on:
   workflow_call:
-  pull_request:
-    types:
-      - opened
-      - synchronize
 
 concurrency:
   # this is a singleton build group, so only one build can run at a time
