@@ -143,7 +143,7 @@ pub class Users {
       },
     );
 
-    return User.fromJson(result.item);
+    return this.fromDB(result.item);
   }
 
   pub inflight fromLoginOrFail(options: FromLoginOptions): User {
