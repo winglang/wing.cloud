@@ -76,6 +76,11 @@ export const LoginPage = () => {
                 "w-full text-center text-sm",
                 "text-gray-700 hover:text-gray-800 transition-all",
               )}
+              onClick={(event) => {
+                event.preventDefault();
+                // Needed to navigate to the landing page.
+                location.href = HOME_URL;
+              }}
             >
               Go back Home
             </Link>
