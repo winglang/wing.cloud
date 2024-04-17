@@ -142,8 +142,10 @@ pub class Users {
         sk: "#",
       },
     );
-
-    return this.fromDB(result.item);
+    if let item = result.item {
+      return this.fromDB(item);
+    }
+    return nil;
   }
 
   pub inflight fromLoginOrFail(options: FromLoginOptions): User {
