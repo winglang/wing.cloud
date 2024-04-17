@@ -2,9 +2,7 @@
 const { createHash } = require("node:crypto");
 
 const { ENDPOINT_FQN } = require("@winglang/sdk/lib/cloud");
-const { REACT_APP_FQN } = require("@winglang/sdk/lib/ex");
 const { Endpoint } = require("@winglang/sdk/lib/target-sim/endpoint");
-const { ReactApp } = require("@winglang/sdk/lib/target-sim/react-app");
 
 exports.Platform = class Platform {
   target = "sim";
@@ -26,14 +24,6 @@ exports.Platform = class Platform {
       }
 
       return new CustomEndpoint(scope, id, ...args);
-    } else if (type === REACT_APP_FQN) {
-      return new ReactApp(
-        scope,
-        id,
-        Object.assign({}, props, {
-          useBuildCommand: true,
-        }),
-      );
     }
   }
 };
