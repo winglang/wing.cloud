@@ -500,7 +500,7 @@ pub class Api {
         return {
           status: 302,
           headers: {
-            Location: "/error?error={util.base64Encode(error)}",
+            Location: "/login?error={util.base64Encode(error)}",
           },
           body: error,
         };

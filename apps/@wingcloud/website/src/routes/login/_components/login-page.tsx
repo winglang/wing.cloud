@@ -1,14 +1,18 @@
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 
 import { SpinnerLoader } from "../../../components/spinner-loader.js";
+import { useNotifications } from "../../../design-system/notification.js";
 import { WingIcon } from "../../../icons/wing-icon.js";
+import { EARLY_ACCESS_CODE_QUERY_PARAM } from "../../../utils/wrpc.js";
 
 export const LoginPage = () => {
+  const [searchParams] = useSearchParams();
+  const { showNotification } = useNotifications();
+
   // TODO: Use state to prevent man-in-the-middle attacks.
-  const { GITHUB_APP_CLIENT_ID } = wing.env;
+  const { GITHUB_APP_CLIENT_ID, WINGCLOUD_ORIGIN } = wing.env;
 
   const [loading, setLoading] = useState(false);
 
@@ -21,14 +25,38 @@ export const LoginPage = () => {
   const AUTHORIZE_URL = (() => {
     const url = new URL("https://github.com/login/oauth/authorize");
     url.searchParams.append("client_id", GITHUB_APP_CLIENT_ID);
-    if (import.meta.env.DEV) {
-      url.searchParams.append(
-        "redirect_uri",
-        "http://localhost:3900/wrpc/github.callback",
-      );
+
+    const redirectUrl = new URL(WINGCLOUD_ORIGIN);
+    redirectUrl.pathname = "/wrpc/github.callback";
+
+    const params = new URLSearchParams(location.search);
+    const eacode = params.get(EARLY_ACCESS_CODE_QUERY_PARAM);
+    if (eacode) {
+      redirectUrl.searchParams.append(EARLY_ACCESS_CODE_QUERY_PARAM, eacode);
     }
+    url.searchParams.append("redirect_uri", redirectUrl.toString());
     return url.toString();
   })();
+
+  useEffect(() => {
+    const errorBase64 = searchParams.get("error") ?? "";
+    if (!errorBase64) {
+      return;
+    }
+    try {
+      const errorString = atob(errorBase64);
+      const error = JSON.parse(errorString);
+
+      searchParams.delete("error");
+
+      showNotification(error.message, {
+        type: "error",
+      });
+      console.log("error", error);
+    } catch (error) {
+      console.log("error", error);
+    }
+  }, []);
 
   return (
     <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
