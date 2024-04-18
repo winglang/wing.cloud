@@ -1,6 +1,7 @@
 bring websockets;
 bring ex;
 bring "./jwt.w" as JWT;
+
 struct SendMessageOptions {
   subscriptionId: str;
   userId: str;
