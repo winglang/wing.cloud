@@ -6,13 +6,13 @@ import { useNotifications } from "../../../design-system/notification.js";
 import { wrpc } from "../../../utils/wrpc.js";
 
 export interface DeleteEarlyAccessModalProps {
-  email: string;
+  code: string;
   show: boolean;
   onClose: (value: boolean) => void;
 }
 
 export const DeleteEarlyAccessModal = ({
-  email,
+  code,
   show,
   onClose,
 }: DeleteEarlyAccessModalProps) => {
@@ -21,12 +21,12 @@ export const DeleteEarlyAccessModal = ({
 
   const navigate = useNavigate();
 
-  const deleteEarlyAccess = wrpc["admin.earlyAccess.delete"].useMutation({
+  const deleteEarlyAccess = wrpc["admin.earlyAccess.deleteCode"].useMutation({
     onMutate() {
       setDisabled(true);
     },
     onSuccess() {
-      showNotification(`User "${email}" removed from early access list`, {
+      showNotification(`Code "${code}" removed from early access list`, {
         type: "success",
       });
       onClose(true);
@@ -45,14 +45,12 @@ export const DeleteEarlyAccessModal = ({
   const dialogBody = useMemo(
     () => (
       <p className="text-sm text-slate-500">
-        The Early Access for{" "}
-        <span className="bg-slate-200 text-slate-700 px-1 rounded">
-          {email}
-        </span>{" "}
+        The Early Access code{" "}
+        <span className="bg-slate-200 text-slate-700 px-1 rounded">{code}</span>{" "}
         will be deleted.
       </p>
     ),
-    [email],
+    [code],
   );
 
   return (
@@ -61,8 +59,8 @@ export const DeleteEarlyAccessModal = ({
       isIdle={deleteEarlyAccess.isIdle}
       isPending={disabled}
       onClose={onClose}
-      onConfirm={() => deleteEarlyAccess.mutate({ email })}
-      modalTitle="Delete Early Access"
+      onConfirm={() => deleteEarlyAccess.mutate({ code })}
+      modalTitle="Delete early access code"
       modalBody={dialogBody}
       confirmButtonTextPending="Deleting..."
     />

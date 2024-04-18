@@ -148,8 +148,8 @@ export interface Endpoint {
 
 export interface EarlyAccessItem {
   id: string;
-  email: string;
   code: string;
+  description?: string;
   createdAt: string;
   expiresAt: string;
   used: boolean;
@@ -302,14 +302,14 @@ export const wrpc = createWRPCReact<{
     { userId: string; isEarlyAccessUser: boolean },
     {}
   >;
-  "admin.earlyAccess.create": MutationProcedure<
-    { email: string },
+  "admin.earlyAccess.createCode": MutationProcedure<
+    { description?: string },
     {
       earlyAccessItem: EarlyAccessItem;
     }
   >;
-  "admin.earlyAccess.delete": MutationProcedure<{ email: string }, {}>;
-  "admin.earlyAccess.list": QueryProcedure<
+  "admin.earlyAccess.deleteCode": MutationProcedure<{ code: string }, {}>;
+  "admin.earlyAccess.listCodes": QueryProcedure<
     undefined,
     {
       earlyAccessList: EarlyAccessItem[];

@@ -28,7 +28,6 @@ pub class Admin {
     let ADMIN_LOGS_KEY = "admin-logs";
     let ADMIN_USERNAMES = util.tryEnv("ADMIN_USERNAMES")?.split(",") ?? [];
     let WINGCLOUD_ORIGIN = util.tryEnv("WINGCLOUD_ORIGIN");
-    let EARLY_ACCESS_EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 7; // 7 days
 
     let api = props.api;
     let users = props.users;
@@ -144,29 +143,20 @@ pub class Admin {
       throw httpError.HttpError.unauthorized();
     });
 
-    api.post("/wrpc/admin.earlyAccess.create", inflight (request) => {
+    api.post("/wrpc/admin.earlyAccess.createCode", inflight (request) => {
       checkAdminAccessRights(request);
       if let userFromCookie = getUserFromCookie(request) {
         let input = Json.parse(request.body ?? "");
-        let email = input.get("email").asStr();
+        let description = input.tryGet("description")?.tryAsStr() ?? "";
 
-        let userList = users.list();
-        for user in userList {
-          if user.email == email {
-            throw httpError.HttpError.badRequest("User already has an account.");
-          }
-        }
-
-        let item = earlyAccess.create(
-          expirationTime: EARLY_ACCESS_EXPIRATION_TIME,
-          code: util.uuidv4(),
-          email: email,
+        let item = earlyAccess.createCode(
+          description: description,
         );
 
         invalidateQuery.invalidate(
           userId: userFromCookie.userId,
           queries: [
-          "admin.earlyAccess.list"
+          "admin.earlyAccess.listCodes"
           ]
         );
 
@@ -179,18 +169,18 @@ pub class Admin {
       throw httpError.HttpError.unauthorized();
     });
 
-    api.post("/wrpc/admin.earlyAccess.delete", inflight (request) => {
+    api.post("/wrpc/admin.earlyAccess.deleteCode", inflight (request) => {
       checkAdminAccessRights(request);
       if let userFromCookie = getUserFromCookie(request) {
         let input = Json.parse(request.body ?? "");
-        let email = input.get("email").asStr();
+        let code = input.get("code").asStr();
 
-        earlyAccess.delete(email: email);
+        earlyAccess.deleteCode(code: code);
 
         invalidateQuery.invalidate(
           userId: userFromCookie.userId,
           queries: [
-          "admin.earlyAccess.list"
+          "admin.earlyAccess.listCodes"
           ]
         );
 
@@ -201,10 +191,10 @@ pub class Admin {
       throw httpError.HttpError.unauthorized();
     });
 
-    api.get("/wrpc/admin.earlyAccess.list", inflight (request) => {
+    api.get("/wrpc/admin.earlyAccess.listCodes", inflight (request) => {
       checkAdminAccessRights(request);
 
-      let list = earlyAccess.list();
+      let list = earlyAccess.listCodes();
       return {
         body: {
           earlyAccessList: list

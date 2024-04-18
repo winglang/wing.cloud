@@ -660,8 +660,6 @@ pub class Apps {
   }
 
   inflight fromDB(item: Json): App {
-    log("fromDB");
-    log(Json.stringify(item));
     return {
       appId: item.get("appId").asStr(),
       appName: item.get("appName").asStr(),
@@ -671,13 +669,13 @@ pub class Apps {
       userId: item.get("userId").asStr(),
       entrypoint: item.get("entrypoint").asStr(),
       createdAt: item.get("createdAt").asStr(),
-      appFullName: item.tryGet("appFullName")?.asStr(),
-      description: item.tryGet("description")?.asStr(),
-      defaultBranch: item.tryGet("defaultBranch")?.asStr(),
-      lastCommitMessage: item.tryGet("lastCommitMessage")?.asStr(),
-      lastCommitDate: item.tryGet("lastCommitDate")?.asStr(),
-      lastCommitSha: item.tryGet("lastCommitSha")?.asStr(),
-      status: item.tryGet("status")?.asStr(),
+      appFullName: item.tryGet("appFullName")?.tryAsStr(),
+      description: item.tryGet("description")?.tryAsStr(),
+      defaultBranch: item.tryGet("defaultBranch")?.tryAsStr(),
+      lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
+      lastCommitDate: item.tryGet("lastCommitDate")?.tryAsStr(),
+      lastCommitSha: item.tryGet("lastCommitSha")?.tryAsStr(),
+      status: item.tryGet("status")?.tryAsStr(),
     };
   }
 

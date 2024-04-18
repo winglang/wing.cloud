@@ -1,6 +1,5 @@
 import {
   DocumentDuplicateIcon,
-  EnvelopeIcon,
   MagnifyingGlassIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
@@ -25,17 +24,14 @@ const EarlyAccessPage = () => {
 
   const [search, setSearch] = useState("");
 
-  const [email, setEmail] = useState("");
-  const isEmailValid = useMemo(() => {
-    return email.match(/.+@.+\..+/);
-  }, [email]);
+  const [description, setDescription] = useState("");
 
-  const createEarlyAcces = wrpc["admin.earlyAccess.create"].useMutation({
+  const createEarlyAcces = wrpc["admin.earlyAccess.createCode"].useMutation({
     onSuccess() {
-      showNotification(`User "${email}" added to early access list`, {
+      showNotification("The early access code was created", {
         type: "success",
       });
-      setEmail("");
+      setDescription("");
       refetch();
     },
     onError: (error: any) => {
@@ -45,9 +41,9 @@ const EarlyAccessPage = () => {
     },
   });
 
-  const [emailToDelete, setDeleteItem] = useState<string>();
+  const [codeToDelete, setDeleteItem] = useState<string>();
 
-  const { data, refetch } = wrpc["admin.earlyAccess.list"].useQuery();
+  const { data, refetch } = wrpc["admin.earlyAccess.listCodes"].useQuery();
 
   const earlyAccessList = useMemo(() => {
     if (!data?.earlyAccessList) {
@@ -55,7 +51,7 @@ const EarlyAccessPage = () => {
     }
 
     return data.earlyAccessList.filter((item) =>
-      item.email.toLowerCase().includes(search.toLowerCase()),
+      item.description?.toLowerCase().includes(search.toLowerCase()),
     );
   }, [data, search]);
 
@@ -114,7 +110,7 @@ const EarlyAccessPage = () => {
         )}
       >
         <div className="col-span-2 font-bold text-gray-600 uppercase bg-gray-50 px-4 py-2">
-          Email
+          Description
         </div>
         <div className="font-bold text-gray-600 uppercase bg-gray-50 px-4 py-2">
           Expires
@@ -127,7 +123,7 @@ const EarlyAccessPage = () => {
         {earlyAccessList.map((item) => (
           <>
             <div className="col-span-2 px-4 py-2 flex items-center truncate">
-              <div className="truncate">{item.email}</div>
+              <div className="truncate">{item.description}</div>
             </div>
             <div className="px-4 py-2 flex items-center truncate">
               <div className="truncate">{getDateTime(item.expiresAt)}</div>
@@ -165,7 +161,7 @@ const EarlyAccessPage = () => {
             <div className="flex justify-end px-4 py-2">
               <button
                 onClick={() => {
-                  setDeleteItem(item.email);
+                  setDeleteItem(item.code);
                 }}
                 className={clsx(
                   theme.text3,
@@ -195,18 +191,14 @@ const EarlyAccessPage = () => {
             )}
           >
             <Input
-              type="email"
-              leftIcon={EnvelopeIcon}
-              className={clsx("w-full", {
-                "border-red-500": !isEmailValid && email,
-                "focus:border-red-500": !isEmailValid && email,
-              })}
+              type="text"
+              className="w-full"
               containerClassName="w-full"
-              name="email"
-              placeholder="Email"
-              value={email}
+              name=""
+              placeholder="Description"
+              value={description}
               onChange={(e) => {
-                setEmail(e.target.value);
+                setDescription(e.target.value);
               }}
             />
           </div>
@@ -219,9 +211,8 @@ const EarlyAccessPage = () => {
           >
             <div className="flex gap-x-4 items-center justify-end">
               <Button
-                disabled={!isEmailValid}
                 onClick={() => {
-                  createEarlyAcces.mutate({ email });
+                  createEarlyAcces.mutate({ description });
                 }}
               >
                 Create
@@ -230,10 +221,10 @@ const EarlyAccessPage = () => {
           </div>
         </>
       </div>
-      {emailToDelete && (
+      {codeToDelete && (
         <DeleteEarlyAccessModal
-          email={emailToDelete}
-          show={emailToDelete !== undefined}
+          code={codeToDelete}
+          show={codeToDelete !== undefined}
           onClose={(value) => {
             setDeleteItem(undefined);
             if (value) {

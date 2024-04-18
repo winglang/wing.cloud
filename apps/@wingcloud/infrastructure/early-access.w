@@ -1,10 +1,11 @@
 bring ex;
+bring util;
 bring "./nanoid62.w" as Nanoid62;
 bring "./http-error.w" as httpError;
 
 pub struct EarlyAccessItem {
   id: str;
-  email: str;
+  description: str?;
   code: str;
   createdAt: str;
   expiresAt: str;
@@ -12,21 +13,18 @@ pub struct EarlyAccessItem {
 }
 
 struct CreateOptions {
-  expirationTime: num; // in milliseconds
-  email: str;
-  code: str;
+  description: str?;
 }
 
 struct GetOptions {
-  email: str;
+  code: str;
 }
 
 struct DeleteOptions {
-  email: str;
+  code: str;
 }
 
 struct ValidateOptions {
-  email: str;
   code: str;
 }
 
@@ -36,28 +34,31 @@ class Util {
 
 pub class EarlyAccess {
   table: ex.DynamodbTable;
+  expirationTime: num;
 
   new(table: ex.DynamodbTable) {
     this.table = table;
+    this.expirationTime = 1000 * 60 * 60 * 24 * 7; // 7 days
   }
 
-  pub inflight create(options: CreateOptions): EarlyAccessItem {
+  pub inflight createCode(options: CreateOptions): EarlyAccessItem {
     let id = "early_access_{Nanoid62.Nanoid62.generate()}";
 
+    let code = util.uuidv4();
     let createdAt = datetime.utcNow().toIso();
+    let expiresAt = Util.addMiliseconds(createdAt, this.expirationTime);
 
-    let expiresAt = Util.addMiliseconds(createdAt, options.expirationTime);
 
     try {
       this.table.transactWriteItems(transactItems: [
         {
           put: {
             item: Json.deepCopy({
-              pk: "EARLY_ACCESS#{options.email}",
+              pk: "EARLY_ACCESS#{code}",
               sk: "#",
               id: id,
-              email: options.email,
-              code: options.code,
+              code: code,
+              description: options.description,
               createdAt: createdAt,
               expiresAt: expiresAt,
               used: false,
@@ -67,61 +68,41 @@ pub class EarlyAccess {
         },
       ]);
     } catch error {
-      if error.contains("ConditionalCheckFailed") {
-        throw httpError.HttpError.forbidden("Email '{options.email}' already has an early access code");
-      } else {
-        throw httpError.HttpError.error(error);
-      }
+      throw httpError.HttpError.error(error);
     }
     return EarlyAccessItem {
       id: id,
-      email: options.email,
-      code: options.code,
+      code: code,
+      description: options.description,
       createdAt: createdAt,
       expiresAt: "",
       used: false,
     };
   }
 
-  pub inflight get(options: GetOptions): EarlyAccessItem {
-    let result = this.table.getItem(
-      key: {
-        pk: "EARLY_ACCESS#{options.email}",
-        sk: "#",
-      },
-      projectionExpression: "id, email, code, createdAt, expiresAt, used",
-    );
-
-    if let user = EarlyAccessItem.tryFromJson(result.item) {
-      return user;
-    } else {
-      throw httpError.HttpError.notFound("User not found");
-    }
-  }
-
-  pub inflight validate(options: ValidateOptions): void {
+  pub inflight validateCode(options: ValidateOptions): void {
     let now = datetime.utcNow();
 
     let result = this.table.getItem(
       key: {
-        pk: "EARLY_ACCESS#{options.email}",
+        pk: "EARLY_ACCESS#{options.code}",
         sk: "#",
       },
-      projectionExpression: "id, email, code, createdAt, expiresAt, used",
+      projectionExpression: "id, description, code, createdAt, expiresAt, used",
     );
 
-    if let user = EarlyAccessItem.tryFromJson(result.item) {
-      if user.code != options.code {
+    if let item = EarlyAccessItem.tryFromJson(result.item) {
+      if item.code != options.code {
         throw httpError.HttpError.badRequest("Invalid code");
-      } if user.used {
+      } if item.used {
         throw httpError.HttpError.badRequest("Code already used");
-      } if datetime.fromIso(user.expiresAt).timestamp < now.timestamp {
+      } if datetime.fromIso(item.expiresAt).timestamp < now.timestamp {
         throw httpError.HttpError.forbidden("Code expired");
       }
 
       this.table.updateItem(
         key: {
-          pk: "EARLY_ACCESS#{options.email}",
+          pk: "EARLY_ACCESS#{options.code}",
           sk: "#",
         },
         updateExpression: "SET used = :used",
@@ -129,21 +110,22 @@ pub class EarlyAccess {
           ":used": true,
         },
       );
+      return;
     }
 
     throw httpError.HttpError.notFound("Invalid code or email");
   }
 
-  pub inflight delete(options: DeleteOptions) {
+  pub inflight deleteCode(options: DeleteOptions) {
     this.table.deleteItem(
       key: {
-        pk: "EARLY_ACCESS#{options.email}",
+        pk: "EARLY_ACCESS#{options.code}",
         sk: "#",
       },
     );
   }
 
-  pub inflight list(): Array<EarlyAccessItem> {
+  pub inflight listCodes(): Array<EarlyAccessItem> {
     let result = this.table.scan(
       filterExpression: "begins_with(pk, :prefix)",
       expressionAttributeValues: {

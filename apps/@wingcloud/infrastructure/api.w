@@ -429,16 +429,12 @@ pub class Api {
           if let userExists = users.fromLogin(username: githubUser.login) {
             // If the user is already registered, we don't need to check for early access.
           } else {
-            if let email = githubUser.email {
-              if let code = request.query.tryGet("early-access-code") {
-                earlyAccess.validate(email: email, code: code);
-                log("Email {email} is allowed to access the early access");
-                isEarlyAccessUser = true;
-              } else {
-                throw httpError.HttpError.badRequest("Request an early access code to be able to log in.");
-              }
+            if let code = request.query.tryGet("early-access-code") {
+              earlyAccess.validateCode(code: code);
+              log("{githubUser.login} is allowed to access the early access");
+              isEarlyAccessUser = true;
             } else {
-              throw httpError.HttpError.badRequest("Set your email in GitHub as public to be able to access.");
+              throw httpError.HttpError.badRequest("Request a valid early access code to be able to log in.");
             }
           }
         }
