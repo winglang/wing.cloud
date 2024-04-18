@@ -79,16 +79,18 @@ export const AppDetails = ({
         "flex flex-col",
       )}
     >
-      <div className="space-y-1 flex relative pb-4">
+      <div
+        className={clsx(
+          "space-y-1 flex relative pb-4",
+          "border-b border-gray-100 transition-all",
+          app && "hover:border-gray-200",
+        )}
+      >
         <div className="grow">
           {app && environment && (
             <Link
               data-testid="app-details-link"
-              className={clsx(
-                "absolute inset-0 peer",
-                "border-b border-gray-100 hover:border-gray-200",
-                "w-full transition-all",
-              )}
+              className="absolute inset-0 peer w-full"
               to={`/${owner}/${app?.appName}/environment/${app.defaultBranch}`}
             />
           )}
@@ -103,6 +105,7 @@ export const AppDetails = ({
             )}
           >
             {app && `${app.appName} / ${app.defaultBranch}`}
+            {!app && <SkeletonLoader className="h-5 w-40 max-w-full" loading />}
           </div>
 
           {app?.description && (

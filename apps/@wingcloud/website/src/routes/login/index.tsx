@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 
-import { HeaderSkeleton } from "../../components/header-skeleton.js";
 import { EARLY_ACCESS_CODE_QUERY_PARAM } from "../../utils/wrpc.js";
+
+import { LoginPage } from "./_components/login-page.js";
 
 export const Component = () => {
   // TODO: Use state to prevent man-in-the-middle attacks.
@@ -27,9 +28,5 @@ export const Component = () => {
     window.location.href = AUTHORIZE_URL;
   }, [AUTHORIZE_URL]);
 
-  return (
-    <>
-      <HeaderSkeleton />
-    </>
-  );
+  return <LoginPage />;
 };
