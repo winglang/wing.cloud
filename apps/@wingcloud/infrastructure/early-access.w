@@ -93,7 +93,7 @@ pub class EarlyAccess {
 
     if let item = EarlyAccessItem.tryFromJson(result.item) {
       if item.code != options.code {
-        throw httpError.HttpError.badRequest("Invalid code");
+        throw httpError.HttpError.badRequest("The provided code is invalid");
       } if item.used {
         throw httpError.HttpError.badRequest("Code already used");
       } if datetime.fromIso(item.expiresAt).timestamp < now.timestamp {
@@ -112,8 +112,7 @@ pub class EarlyAccess {
       );
       return;
     }
-
-    throw httpError.HttpError.notFound("Invalid code or email");
+    throw httpError.HttpError.notFound("The provided code is invalid");
   }
 
   pub inflight deleteCode(options: DeleteOptions) {
