@@ -1,3 +1,4 @@
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -60,58 +61,77 @@ export const LoginPage = () => {
 
   return (
     <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-      <div
-        className={clsx(
-          "bg-white pt-10 pb-6 px-6 rounded-xl shadow-lg w-full max-w-md text-center",
-          "flex flex-col justify-center",
-          "space-y-6",
-        )}
-      >
-        <WingIcon className="size-20 text-gray-800 self-center" />
-        <div className="space-y-4">
-          <p className="text-gray-600">
-            Sign in to your{" "}
-            <b className="font-bold text-slate-800">Wing Cloud</b> account
-          </p>
+      <div className="flex flex-col grow max-w-md gap-4">
+        <div className="rounded-xl shadow  bg-blue-100 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <InformationCircleIcon className="size-5 text-blue-700" />
+            </div>
+            <div className="ml-3 flex-1 md:flex md:justify-between">
+              <p className="text-sm text-blue-700">
+                An early access code is required to sign in.
+              </p>
+            </div>
+          </div>
+        </div>
 
-          <div className="flex flex-col space-y-2">
-            <Link
-              to={AUTHORIZE_URL}
-              className={clsx(
-                "text-white py-2 rounded-md",
-                "flex items-center justify-center gap-x-4",
-                "bg-gray-800 transition-all",
-                !loading && "hover:bg-gray-900 hover:shadow-md",
-                loading && "opacity-90 cursor-not-allowed",
-              )}
-              onClick={(event) => {
-                setLoading(true);
-              }}
-            >
-              <div className="relative">
-                Sign in with GitHub{" "}
-                {loading && (
-                  <div className="absolute -right-8 top-1/2 transform -translate-y-1/2">
-                    <SpinnerLoader size="sm" />
-                  </div>
+        <div
+          className={clsx(
+            "bg-white pt-10 pb-6 px-6 rounded-xl shadow-lg w-full text-center",
+            "flex flex-col justify-center",
+            "space-y-6",
+          )}
+        >
+          <WingIcon className="size-20 text-gray-800 self-center" />
+          <div className="space-y-8">
+            <p className="text-gray-600">
+              Sign in to your{" "}
+              <b className="font-bold text-slate-800">Wing Cloud</b> account
+            </p>
+
+            <div className="flex flex-col space-y-2">
+              <Link
+                to={AUTHORIZE_URL}
+                className={clsx(
+                  "text-white py-2 rounded-md",
+                  "flex items-center justify-center gap-x-4",
+                  "bg-gray-800 transition-all",
+                  !loading && "hover:bg-gray-900 hover:shadow-md",
+                  loading && "opacity-90 cursor-not-allowed",
                 )}
+                onClick={(event) => {
+                  setLoading(true);
+                }}
+              >
+                <div className="relative">
+                  Sign in with GitHub{" "}
+                  {loading && (
+                    <div className="absolute -right-8 top-1/2 transform -translate-y-1/2">
+                      <SpinnerLoader size="sm" />
+                    </div>
+                  )}
+                </div>
+              </Link>
+              <div className="text-sm text-gray-600">or</div>
+              <div className="flex grow justify-center">
+                <Link
+                  to={HOME_URL}
+                  className={clsx(
+                    "px-1 py-0.5 rounded",
+                    "text-center text-sm",
+                    "font-semibold",
+                    "text-gray-800 hover:bg-gray-100 transition-all",
+                  )}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    // Needed to navigate to the landing page.
+                    location.href = HOME_URL;
+                  }}
+                >
+                  ← Go to the homepage
+                </Link>
               </div>
-            </Link>
-            <div className="text-sm text-gray-600">or</div>
-            <Link
-              to={HOME_URL}
-              className={clsx(
-                "w-full text-center text-sm",
-                "text-gray-700 hover:text-gray-800 transition-all",
-              )}
-              onClick={(event) => {
-                event.preventDefault();
-                // Needed to navigate to the landing page.
-                location.href = HOME_URL;
-              }}
-            >
-              Go back Home
-            </Link>
+            </div>
           </div>
         </div>
       </div>
