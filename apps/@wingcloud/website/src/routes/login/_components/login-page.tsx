@@ -62,22 +62,26 @@ export const LoginPage = () => {
 
   return (
     <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-      <div className="flex flex-col grow max-w-md gap-4">
-        {REQUIRE_EARLY_ACCESS_CODE === "true" && (
-          <div className="rounded-xl shadow  bg-blue-100 p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <InformationCircleIcon className="size-5 text-blue-700" />
-              </div>
-              <div className="ml-3 flex-1 md:flex md:justify-between">
-                <p className="text-sm text-blue-700">
-                  An early access code is required to sign in.
-                </p>
-              </div>
+      {REQUIRE_EARLY_ACCESS_CODE === "true" && (
+        <div
+          className={clsx(
+            "fixed top-0 w-full flex justify-center",
+            "bg-blue-100 p-4",
+          )}
+        >
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <InformationCircleIcon className="size-5 text-blue-700" />
+            </div>
+            <div className="ml-3 flex-1 md:flex md:justify-between">
+              <p className="text-sm text-blue-700">
+                An early access code is required to sign in.
+              </p>
             </div>
           </div>
-        )}
-
+        </div>
+      )}
+      <div className="flex flex-col grow max-w-md gap-4">
         <div
           className={clsx(
             "bg-white pt-10 pb-6 px-6 rounded-xl shadow-lg w-full text-center",
@@ -120,10 +124,8 @@ export const LoginPage = () => {
                 <Link
                   to={HOME_URL}
                   className={clsx(
-                    "px-1 py-0.5 rounded",
                     "text-center text-sm",
-                    "font-semibold",
-                    "text-gray-800 hover:bg-gray-100 transition-all",
+                    "text-gray-800 hover:underline",
                   )}
                   onClick={(event) => {
                     event.preventDefault();
