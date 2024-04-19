@@ -1,7 +1,11 @@
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowLeftStartOnRectangleIcon,
+  ExclamationTriangleIcon,
+  PencilSquareIcon,
+} from "@heroicons/react/24/outline";
 import { UserIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { Fragment, useContext, useMemo } from "react";
+import { Fragment, useCallback, useContext, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
@@ -45,12 +49,23 @@ const UserMenu = ({ user }: UserMenuProps) => {
     },
   });
 
+  const openFeedback = useCallback(() => {
+    // open in a new tab
+    window.open("https://github.com/winglang/wing/issues/new/choose", "_blank");
+  }, []);
+
   return (
     <Menu
       btnClassName="flex items-center rounded-full"
       items={[
         {
+          label: "Give us feedback",
+          icon: <PencilSquareIcon className="size-5" />,
+          onClick: openFeedback,
+        },
+        {
           label: "Sign out",
+          icon: <ArrowLeftStartOnRectangleIcon className="size-5" />,
           onClick: () => {
             signOut.mutate(undefined);
           },
