@@ -133,7 +133,7 @@ export const LoginPage = () => {
                     location.href = HOME_URL;
                   }}
                 >
-                  ← Go to the homepage
+                  ← Go to homepage
                 </Link>
               </div>
             </div>
