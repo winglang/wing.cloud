@@ -75,7 +75,7 @@ export const LoginPage = () => {
             </div>
             <div className="ml-3 flex-1 md:flex md:justify-between">
               <p className="text-sm text-blue-700">
-                An early access code is required to sign in.
+                An early access code is required to sign in for the first time.
               </p>
             </div>
           </div>
@@ -119,12 +119,12 @@ export const LoginPage = () => {
                   )}
                 </div>
               </Link>
-              <div className="text-sm text-gray-600">or</div>
+              <div className="text-sm text-gray-500">or</div>
               <div className="flex grow justify-center">
                 <Link
                   to={HOME_URL}
                   className={clsx(
-                    "text-center text-sm",
+                    "text-center",
                     "text-gray-800 hover:underline",
                   )}
                   onClick={(event) => {
