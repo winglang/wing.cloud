@@ -1,9 +1,10 @@
 import { Cog8ToothIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../../components/page-header.js";
+import { SectionContent } from "../../../../components/section-content.js";
 import { SectionSubtitle } from "../../../../components/section-subtitle.js";
 import { SectionTitle } from "../../../../components/section-title.js";
 import { SpinnerLoader } from "../../../../components/spinner-loader.js";
@@ -85,36 +86,31 @@ const SettingsPage = ({
 
         <div className="space-y-2">
           <SectionTitle>Delete App</SectionTitle>
-          <div
-            className={clsx(
-              "flex flex-col gap-2 rounded-md p-4 border",
-              theme.bgInput,
-              theme.borderInput,
-              "relative",
-            )}
-          >
-            <div
-              className={clsx(
-                "absolute inset-0 flex items-center justify-center",
-                "transition-all",
-                isLoading && "bg-opacity-50 z-10",
-                !isLoading && "bg-opacity-0 -z-10",
-                theme.bg3,
-              )}
-            >
-              <SpinnerLoader size="sm" />
-            </div>
-            <div className="flex">
-              <Button
-                dataTestId="delete-app-button"
-                onClick={() => setDeleteModalOpen(true)}
-                disabled={isLoading}
-                className="truncate"
+          <SectionContent>
+            <div>
+              <div
+                className={clsx(
+                  "absolute inset-0 flex items-center justify-center",
+                  "transition-all",
+                  isLoading && "bg-opacity-50 z-10",
+                  !isLoading && "bg-opacity-0 -z-10",
+                  theme.bg3,
+                )}
               >
-                Delete
-              </Button>
+                <SpinnerLoader size="sm" />
+              </div>
+              <div className="flex">
+                <Button
+                  dataTestId="delete-app-button"
+                  onClick={() => setDeleteModalOpen(true)}
+                  disabled={isLoading}
+                  className="truncate"
+                >
+                  Delete
+                </Button>
+              </div>
             </div>
-          </div>
+          </SectionContent>
         </div>
 
         {appName && owner && app?.appId && (

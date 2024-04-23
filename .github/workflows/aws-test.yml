@@ -106,3 +106,5 @@ jobs:
           # Wing debug logging
           # DEBUG: "wing:*"
           ADMIN_USERNAMES: ${{ vars.ADMIN_USERNAMES }}
+          WINGCLOUD_ORIGIN: ${{ vars.WINGCLOUD_ORIGIN }}
+          REQUIRE_EARLY_ACCESS_CODE: ${{ vars.REQUIRE_EARLY_ACCESS_CODE }}

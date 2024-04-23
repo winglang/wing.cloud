@@ -9,6 +9,7 @@ import {
 export interface User {
   id: string;
   isAdmin: boolean;
+  isEarlyAccessUser: boolean;
   username: string;
   displayName: string;
   avatarUrl: string;
@@ -145,6 +146,17 @@ export interface Endpoint {
   updatedAt: string;
 }
 
+export interface EarlyAccessItem {
+  id: string;
+  code: string;
+  description?: string;
+  createdAt: string;
+  expiresAt: string;
+  used: boolean;
+}
+
+export const EARLY_ACCESS_CODE_QUERY_PARAM = "early-access-code";
+
 export const wrpc = createWRPCReact<{
   "ws.invalidateQuery.auth": QueryProcedure<
     undefined,
@@ -276,8 +288,37 @@ export const wrpc = createWRPCReact<{
       users: User[];
     }
   >;
+  "admin.apps.list": QueryProcedure<
+    undefined,
+    {
+      apps: { [key: string]: App[] };
+    }
+  >;
   "admin.setAdminRole": MutationProcedure<
     { userId: string; isAdmin: boolean },
     {}
+  >;
+  "admin.setEarlyAccessUser": MutationProcedure<
+    { userId: string; isEarlyAccessUser: boolean },
+    {}
+  >;
+  "admin.earlyAccess.createCode": MutationProcedure<
+    { description?: string },
+    {
+      earlyAccessItem: EarlyAccessItem;
+    }
+  >;
+  "admin.earlyAccess.deleteCode": MutationProcedure<{ code: string }, {}>;
+  "admin.earlyAccess.listCodes": QueryProcedure<
+    undefined,
+    {
+      earlyAccessList: EarlyAccessItem[];
+    }
+  >;
+  "admin.earlyAccess.listUsers": QueryProcedure<
+    undefined,
+    {
+      users: User[];
+    }
   >;
 }>();

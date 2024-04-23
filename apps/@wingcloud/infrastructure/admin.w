@@ -1,6 +1,8 @@
 bring cloud;
 bring "./json-api.w" as json_api;
-bring "./users.w" as users;
+bring "./users.w" as Users;
+bring "./apps.w" as Apps;
+bring "./early-access.w" as early_access;
 
 bring "./http-error.w" as httpError;
 bring "./jwt.w" as JWT;
@@ -9,18 +11,28 @@ bring util;
 
 struct AdminProps {
   api: json_api.JsonApi;
-  users: users.Users;
+  users: Users.Users;
+  apps: Apps.Apps;
+  earlyAccess: early_access.EarlyAccess;
   getUserFromCookie: inflight(cloud.ApiRequest): JWT.JWTPayload?;
   invalidateQuery: invalidate_query.InvalidateQuery;
+}
+
+struct EarlyAccess {
+  email: str;
+  link: str;
 }
 
 pub class Admin {
   new(props: AdminProps) {
     let ADMIN_LOGS_KEY = "admin-logs";
     let ADMIN_USERNAMES = util.tryEnv("ADMIN_USERNAMES")?.split(",") ?? [];
+    let WINGCLOUD_ORIGIN = util.tryEnv("WINGCLOUD_ORIGIN");
 
     let api = props.api;
     let users = props.users;
+    let apps = props.apps;
+    let earlyAccess = props.earlyAccess;
     let getUserFromCookie = props.getUserFromCookie;
     let invalidateQuery = props.invalidateQuery;
 
@@ -90,6 +102,16 @@ pub class Admin {
       };
     });
 
+    api.get("/wrpc/admin.apps.list", inflight (request) => {
+      checkAdminAccessRights(request);
+      let apps = apps.listAll();
+      return {
+        body: {
+          apps: apps
+        },
+      };
+    });
+
     api.post("/wrpc/admin.setAdminRole", inflight (request) => {
       checkAdminAccessRights(request);
       if let userFromCookie = getUserFromCookie(request) {
@@ -116,6 +138,90 @@ pub class Admin {
 
         return {
           body: {},
+        };
+      }
+      throw httpError.HttpError.unauthorized();
+    });
+
+    api.post("/wrpc/admin.earlyAccess.createCode", inflight (request) => {
+      checkAdminAccessRights(request);
+      if let userFromCookie = getUserFromCookie(request) {
+        let input = Json.parse(request.body ?? "");
+        let description = input.tryGet("description")?.tryAsStr() ?? "";
+
+        let item = earlyAccess.createCode(
+          description: description,
+        );
+
+        invalidateQuery.invalidate(
+          userId: userFromCookie.userId,
+          queries: [
+          "admin.earlyAccess.listCodes"
+          ]
+        );
+
+        return {
+          body: {
+            earlyAccessItem: item
+          }
+        };
+      }
+      throw httpError.HttpError.unauthorized();
+    });
+
+    api.post("/wrpc/admin.earlyAccess.deleteCode", inflight (request) => {
+      checkAdminAccessRights(request);
+      if let userFromCookie = getUserFromCookie(request) {
+        let input = Json.parse(request.body ?? "");
+        let code = input.get("code").asStr();
+
+        earlyAccess.deleteCode(code: code);
+
+        invalidateQuery.invalidate(
+          userId: userFromCookie.userId,
+          queries: [
+          "admin.earlyAccess.listCodes"
+          ]
+        );
+
+        return {
+          body: {}
+        };
+      }
+      throw httpError.HttpError.unauthorized();
+    });
+
+    api.get("/wrpc/admin.earlyAccess.listCodes", inflight (request) => {
+      checkAdminAccessRights(request);
+
+      let list = earlyAccess.listCodes();
+      return {
+        body: {
+          earlyAccessList: list
+        },
+      };
+    });
+
+    api.post("/wrpc/admin.setEarlyAccessUser", inflight (request) => {
+      checkAdminAccessRights(request);
+      if let userFromCookie = getUserFromCookie(request) {
+        let input = Json.parse(request.body ?? "");
+
+        let userId = input.get("userId").asStr();
+        let isEarlyAccessUser = input.get("isEarlyAccessUser").asBool();
+
+        let user = users.get({
+          userId: userId
+        });
+
+        users.setIsEarlyAccessUser(
+          userId: userId,
+          username: user.username,
+          isEarlyAccessUser: isEarlyAccessUser
+        );
+
+        return {
+          body: {}
         };
       }
       throw httpError.HttpError.unauthorized();

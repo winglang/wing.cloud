@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { PageHeader } from "../../../components/page-header.js";
+import { SectionContent } from "../../../components/section-content.js";
 import { SectionTitle } from "../../../components/section-title.js";
 import { ButtonLink } from "../../../design-system/button-link.js";
 import { Input } from "../../../design-system/input.js";
@@ -198,15 +199,7 @@ const OverviewPage = ({
               ))}
 
               {filteredPreviewEnvs.length === 0 && (
-                <div
-                  className={clsx(
-                    "space-y-2",
-                    "p-4 w-full border text-center rounded-md",
-                    theme.bgInput,
-                    theme.borderInput,
-                    theme.text1,
-                  )}
-                >
+                <SectionContent>
                   <BranchIcon
                     className={clsx("w-10 h-10 mx-auto", theme.text3)}
                   />
@@ -220,7 +213,7 @@ const OverviewPage = ({
                     )}
                   >
                     {previewEnvs.length === 0 && (
-                      <span>
+                      <span className={clsx(theme.text1)}>
                         Get started by{" "}
                         <a
                           className={clsx(
@@ -242,7 +235,7 @@ const OverviewPage = ({
                       </span>
                     )}
                   </p>
-                </div>
+                </SectionContent>
               )}
             </>
           )}
