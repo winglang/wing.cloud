@@ -113,7 +113,7 @@ export const LoginPage = () => {
                 </div>
               </Link>
               <div className="text-sm text-gray-500">or</div>
-              <div className="flex grow justify-center text-base">
+              <div className="flex grow justify-center text-sm">
                 <Link
                   to={HOME_URL}
                   className={clsx(
