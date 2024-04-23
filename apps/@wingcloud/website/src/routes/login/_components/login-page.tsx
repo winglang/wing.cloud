@@ -86,7 +86,7 @@ export const LoginPage = () => {
           <div className="space-y-8">
             <p className="text-gray-600">
               Sign in to your{" "}
-              <b className="font-bold text-slate-800">Wing Cloud</b> account
+              <b className="font-bold text-gray-800">Wing Cloud</b> account
             </p>
 
             <div className="flex flex-col space-y-2">
@@ -113,7 +113,7 @@ export const LoginPage = () => {
                 </div>
               </Link>
               <div className="text-sm text-gray-500">or</div>
-              <div className="flex grow justify-center">
+              <div className="flex grow justify-center text-base">
                 <Link
                   to={HOME_URL}
                   className={clsx(
