@@ -5,7 +5,6 @@ import {
 import clsx from "clsx";
 import { useCallback, useMemo, useState } from "react";
 
-import { SectionTitle } from "../../../../components/section-title.js";
 import { SpinnerLoader } from "../../../../components/spinner-loader.js";
 import { Button } from "../../../../design-system/button.js";
 import { useNotifications } from "../../../../design-system/notification.js";

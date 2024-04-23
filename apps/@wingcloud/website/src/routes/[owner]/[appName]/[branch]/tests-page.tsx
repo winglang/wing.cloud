@@ -13,6 +13,8 @@ import clsx from "clsx";
 import { PageHeader } from "../../../../components/page-header.js";
 import { useTheme } from "../../../../design-system/theme-provider.js";
 
+import { BeakerIcon } from "@heroicons/react/24/outline";
+
 const TestsPage = ({
   owner,
   appName,
@@ -59,7 +61,11 @@ const TestsPage = ({
 
   return (
     <>
-      <PageHeader title="Tests" noBackground />
+      <PageHeader
+        title="Tests"
+        icon={<BeakerIcon className="size-full" />}
+        noBackground
+      />
       <div
         className={clsx(
           "relative transition-all pb-4",

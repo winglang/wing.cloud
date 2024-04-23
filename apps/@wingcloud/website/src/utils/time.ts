@@ -62,7 +62,7 @@ const getTimeFromNow = (datetime?: string, short: boolean = false) => {
       return `${days}d ago`;
     }
     const label = days === 1 ? "day" : "days";
-    return `${days} ${label}  ago`;
+    return `${days} ${label} ago`;
   }
 
   if (hours > 0) {

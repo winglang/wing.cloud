@@ -4,7 +4,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { ErrorBoundary } from "../components/error-boundary.js";
 import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
 
-const ROUTES_WITHOUT_AUTH = new Set(["/", "/login"]);
+const ROUTES_WITHOUT_AUTH = new Set(["/", "/login", "/error"]);
 
 export const Component = () => {
   const navigate = useNavigate();

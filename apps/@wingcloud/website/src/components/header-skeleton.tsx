@@ -4,7 +4,7 @@ import { SkeletonLoader } from "../design-system/skeleton-loader.js";
 import { useTheme } from "../design-system/theme-provider.js";
 import { WingIcon } from "../icons/wing-icon.js";
 
-export const HeaderSkeleton = () => {
+export const HeaderSkeleton = ({ loading = true }: { loading?: boolean }) => {
   const { theme } = useTheme();
 
   return (
@@ -19,15 +19,15 @@ export const HeaderSkeleton = () => {
         <WingIcon className={clsx("h-5 w-auto", theme.text1)} />
         <div className="flex items-center gap-1 sm:gap-2">
           <div>
-            <SkeletonLoader
-              className="w-32 h-5 bg-slate-300 animate-pulse rounded px-2 py-1"
-              loading
-            />
+            <SkeletonLoader className="w-32 h-5" loading={loading} />
           </div>
         </div>
       </div>
       <div className="flex-grow"></div>
-      <div className={"h-7 w-7 animate-pulse rounded-full bg-slate-300"} />
+      <SkeletonLoader
+        className="size-7 rounded-full truncate"
+        loading={loading}
+      />
     </header>
   );
 };

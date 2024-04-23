@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
 
 import { ButtonLink } from "../design-system/button-link.js";
 import { useTheme } from "../design-system/theme-provider.js";
@@ -20,6 +19,7 @@ export const HttpErrorPage = ({
     if (!message.endsWith(".")) {
       return message + ".";
     }
+    return message;
   }, [message]);
 
   const link = useMemo(() => {

@@ -37,7 +37,7 @@ export default function Popover({
   }, [root]);
 
   return (
-    <HeadlessPopover className="relative">
+    <HeadlessPopover className="relative z-10">
       {({ open }) => (
         <>
           <HeadlessPopover.Button

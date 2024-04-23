@@ -637,4 +637,46 @@ pub class Apps {
       },
     ]);
   }
+
+   // Intended for admin use only
+   pub inflight listAll(): Map<Array<App>> {
+    let result = this.table.scan(
+      filterExpression: "begins_with(pk, :prefix) and sk = :sk",
+      expressionAttributeValues: {
+        ":prefix": "APP#",
+        ":sk": "#",
+      },
+    );
+
+    let var apps = MutMap<Array<App>>{};
+
+    for item in result.items {
+      let app = this.fromDB(item);
+      let userApps = apps.tryGet(app.userId) ?? [];
+      apps.set(app.userId, userApps.concat([app]));
+    }
+
+    return apps.copy();
+  }
+
+  inflight fromDB(item: Json): App {
+    return {
+      appId: item.get("appId").asStr(),
+      appName: item.get("appName").asStr(),
+      repoOwner: item.get("repoOwner").asStr(),
+      repoName: item.get("repoName").asStr(),
+      repoId: item.get("repoId").asStr(),
+      userId: item.get("userId").asStr(),
+      entrypoint: item.get("entrypoint").asStr(),
+      createdAt: item.get("createdAt").asStr(),
+      appFullName: item.tryGet("appFullName")?.tryAsStr(),
+      description: item.tryGet("description")?.tryAsStr(),
+      defaultBranch: item.tryGet("defaultBranch")?.tryAsStr(),
+      lastCommitMessage: item.tryGet("lastCommitMessage")?.tryAsStr(),
+      lastCommitDate: item.tryGet("lastCommitDate")?.tryAsStr(),
+      lastCommitSha: item.tryGet("lastCommitSha")?.tryAsStr(),
+      status: item.tryGet("status")?.tryAsStr(),
+    };
+  }
+
 }

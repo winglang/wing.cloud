@@ -113,6 +113,7 @@ bring "./status-reports.w" as status_reports;
 bring "./probot-adapter.w" as adapter;
 bring "./octokit.w" as Octokit;
 bring "./segment-analytics.w" as analytics;
+bring "./early-access.w" as early_access;
 
 struct ApiProps {
   api: cloud.Api;
@@ -132,6 +133,7 @@ struct ApiProps {
   logs: cloud.Bucket;
   analytics: analytics.SegmentAnalytics;
   segmentWriteKey: str;
+  earlyAccess: early_access.EarlyAccess;
 }
 
 
@@ -143,6 +145,9 @@ struct EnvironmentAction {
 pub class Api {
   pub api: json_api.JsonApi;
   new(props: ApiProps) {
+    let REQUIRE_EARLY_ACCESS_CODE = util.tryEnv("REQUIRE_EARLY_ACCESS_CODE") == "true";
+    let EARLY_ACCESS_USERS_MAX_APPS = 5;
+
     let api = new json_api.JsonApi(api: props.api);
     this.api = api;
     let ws = props.ws;
@@ -151,6 +156,7 @@ pub class Api {
     let environments = props.environments;
     let logs = props.logs;
     let environmentsQueue = new cloud.Queue() as "Environments-Queue";
+    let earlyAccess = props.earlyAccess;
 
     let INVALIDATE_SUBSCRIPTION_ID = "invalidateQuery";
     let invalidateQuery = new InvalidateQuery.InvalidateQuery(
@@ -379,9 +385,123 @@ pub class Api {
      new Admin.Admin(
       api: api,
       users: users,
+      apps: apps,
+      earlyAccess: earlyAccess,
       getUserFromCookie: getUserFromCookie,
-      invalidateQuery: invalidateQuery
+      invalidateQuery: invalidateQuery,
     );
+
+    let analyticsSignInQueue = new cloud.Queue() as "AnalyticsSignIn-Queue";
+    analyticsSignInQueue.setConsumer(inflight (message) => {
+      let event = AnalyticsSignInMessage.fromJson(Json.parse(message));
+      props.analytics.identify(
+        anonymousId: event.anonymousId,
+        userId: event.userId,
+        traits: {
+          email: event.email,
+          github: event.github,
+        },
+      );
+      props.analytics.track(
+        anonymousId: event.anonymousId,
+        userId: event.userId,
+        event: "console_sign_in",
+        properties: {
+          email: event.email,
+          github: event.github,
+        },
+      );
+    });
+
+    api.get("/wrpc/github.callback", inflight (request) => {
+      try {
+        let code = request.query.get("code");
+        let tokens = GitHub.Exchange.codeForTokens(
+          code: code,
+          clientId: props.githubAppClientId,
+          clientSecret: props.githubAppClientSecret,
+        );
+
+        let githubUser = GitHub.Client.getUser(tokens.access_token);
+
+        let var isEarlyAccessUser = false;
+        if REQUIRE_EARLY_ACCESS_CODE {
+          if let userExists = users.fromLogin(username: githubUser.login) {
+            // If the user is already registered, we don't need to check for early access.
+          } else {
+            if let code = request.query.tryGet("early-access-code") {
+              earlyAccess.validateCode(code: code);
+              log("{githubUser.login} is allowed to access the early access");
+              isEarlyAccessUser = true;
+            } else {
+              throw httpError.HttpError.badRequest("Can't sign in because no early access code was provided.");
+            }
+          }
+        }
+
+        let user = users.updateOrCreate(
+          displayName: githubUser.name ?? githubUser.login,
+          username: githubUser.login,
+          avatarUrl: githubUser.avatar_url,
+          email: githubUser.email,
+          isEarlyAccessUser: isEarlyAccessUser,
+        );
+
+        githubAccessTokens.set(user.id, tokens);
+
+        let authCookie = createAuthCookie(
+          userId: user.id,
+          username: user.username,
+          email: user.email,
+          isAdmin: user.isAdmin ?? false,
+        );
+
+        // The default redirect location is the user's profile page,
+        // but in the case of the Console Sign In process, we want to redirect
+        // to the Console instead.
+        let var location = "/{user.username}";
+
+        log("anonymousId = {request.query.tryGet("anonymousId") ?? ""}");
+
+        if let anonymousId = request.query.tryGet("anonymousId") {
+          log("segmentWriteKey = {props.segmentWriteKey}");
+          log("Identifying anonymous user as {user.username}");
+          if let port = request.query.tryGet("port") {
+            analyticsSignInQueue.push(Json.stringify(AnalyticsSignInMessage {
+              anonymousId: anonymousId,
+              userId: user.id,
+              email: user.email,
+              github: user.username,
+            }));
+            log("redirecting to console");
+            // Redirect back to the local Console, using the `signedIn`
+            // GET parameter so the Console dismisses the sign in modal.
+            location = "http://localhost:{port}/?signedIn";
+          }
+        }
+
+        return {
+          status: 302,
+          headers: {
+            Location: location,
+            "Set-Cookie": authCookie,
+          },
+        };
+      } catch error {
+        let errorData = Json.tryParse(error);
+
+        let code = errorData?.tryGet("code")?.tryAsStr() ?? "500";
+        let message = errorData?.tryGet("message")?.tryAsStr() ?? "Something went wrong.";
+
+        return {
+          status: 302,
+          headers: {
+            Location: "/login?error={util.base64Encode(error)}",
+          },
+          body: error,
+        };
+      }
+    });
 
     api.get("/wrpc/ws.invalidateQuery.auth", inflight (request) => {
       try {
@@ -439,88 +559,6 @@ pub class Api {
           ),
         },
         body: {
-        },
-      };
-    });
-
-    let analyticsSignInQueue = new cloud.Queue() as "AnalyticsSignIn-Queue";
-    analyticsSignInQueue.setConsumer(inflight (message) => {
-      let event = AnalyticsSignInMessage.fromJson(Json.parse(message));
-      props.analytics.identify(
-        anonymousId: event.anonymousId,
-        userId: event.userId,
-        traits: {
-          email: event.email,
-          github: event.github,
-        },
-      );
-      props.analytics.track(
-        anonymousId: event.anonymousId,
-        userId: event.userId,
-        event: "console_sign_in",
-        properties: {
-          email: event.email,
-          github: event.github,
-        },
-      );
-    });
-
-    api.get("/wrpc/github.callback", inflight (request) => {
-      let code = request.query.get("code");
-
-      let tokens = GitHub.Exchange.codeForTokens(
-        code: code,
-        clientId: props.githubAppClientId,
-        clientSecret: props.githubAppClientSecret,
-      );
-
-      let githubUser = GitHub.Client.getUser(tokens.access_token);
-
-      let user = users.updateOrCreate(
-        displayName: githubUser.name ?? githubUser.login,
-        username: githubUser.login,
-        avatarUrl: githubUser.avatar_url,
-        email: githubUser.email,
-      );
-
-      githubAccessTokens.set(user.id, tokens);
-
-      let authCookie = createAuthCookie(
-        userId: user.id,
-        username: user.username,
-        email: user.email,
-        isAdmin: user.isAdmin ?? false,
-      );
-
-      // The default redirect location is the user's profile page,
-      // but in the case of the Console Sign In process, we want to redirect
-      // to the Console instead.
-      let var location = "/{user.username}";
-
-      log("anonymousId = {request.query.tryGet("anonymousId") ?? ""}");
-
-      if let anonymousId = request.query.tryGet("anonymousId") {
-        log("segmentWriteKey = {props.segmentWriteKey}");
-        log("Identifying anonymous user as {user.username}");
-        if let port = request.query.tryGet("port") {
-          analyticsSignInQueue.push(Json.stringify(AnalyticsSignInMessage {
-            anonymousId: anonymousId,
-            userId: user.id,
-            email: user.email,
-            github: user.username,
-          }));
-          log("redirecting to console");
-          // Redirect back to the local Console, using the `signedIn`
-          // GET parameter so the Console dismisses the sign in modal.
-          location = "http://localhost:{port}/?signedIn";
-        }
-      }
-
-      return {
-        status: 302,
-        headers: {
-          Location: location,
-          "Set-Cookie": authCookie,
         },
       };
     });
@@ -699,6 +737,16 @@ pub class Api {
         let repoName = input.get("repoName").asStr();
 
         let user = users.fromLoginOrFail(username: owner);
+
+        if let isEarlyAccessUser = user.isEarlyAccessUser {
+          let userApps = apps.list(userId: user.id);
+          if userApps.length >= EARLY_ACCESS_USERS_MAX_APPS {
+            throw httpError.HttpError.forbidden(
+              "You have reached the maximum number of apps allowed for early access users."
+            );
+          }
+        }
+
         let installationId = getInstallationId(accessToken, repoOwner);
 
         // get application default entrypoint path (main.w)
@@ -712,12 +760,9 @@ pub class Api {
         // TODO: https://github.com/winglang/wing/issues/3644
         let appName = Util.replaceAll(input.get("appName").asStr(), "[^a-zA-Z0-9._-]+", "*");
         if appName.contains("*") {
-          return {
-            status: 422,
-            body: {
-              error: "The app name can only contain ASCII letters, digits, and the characters ., - and _.",
-            },
-          };
+          throw httpError.HttpError.badRequest(
+            "The app name can only contain ASCII letters, digits, and the characters ., - and _."
+          );
         }
 
         let repoId = "{repoOwner}/{repoName}";
