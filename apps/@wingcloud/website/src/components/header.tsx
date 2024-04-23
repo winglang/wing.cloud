@@ -1,7 +1,6 @@
 import {
   ArrowLeftStartOnRectangleIcon,
-  ChatBubbleLeftEllipsisIcon,
-  PencilSquareIcon,
+  QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
 import { UserIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
@@ -223,7 +222,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
               iconClassName="size-5"
               to="https://github.com/winglang/wing/issues/new/choose"
               target="_blank"
-              icon={ChatBubbleLeftEllipsisIcon}
+              icon={QuestionMarkCircleIcon}
               title="Feedback"
             />
 
