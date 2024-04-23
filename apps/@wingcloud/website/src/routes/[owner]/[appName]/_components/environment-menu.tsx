@@ -39,7 +39,7 @@ export const EnvironmentMenu = ({
         btnClassName={clsx(theme.bgInputHover, "rounded-sm")}
         icon={
           <MenuIcon
-            className={clsx("w-6 h-6", "transition-all", "p-1", theme.text2)}
+            className={clsx("size-6 transition-all p-1", theme.text2)}
           />
         }
         items={[

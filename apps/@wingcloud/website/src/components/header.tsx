@@ -1,5 +1,6 @@
 import {
   ArrowLeftStartOnRectangleIcon,
+  ChatBubbleLeftEllipsisIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 import { UserIcon } from "@heroicons/react/24/solid";
@@ -8,6 +9,7 @@ import { Fragment, useCallback, useContext, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
+import { ButtonLink } from "../design-system/button-link.js";
 import { Menu } from "../design-system/menu.js";
 import { useTheme } from "../design-system/theme-provider.js";
 import { WingIcon } from "../icons/wing-icon.js";
@@ -48,20 +50,10 @@ const UserMenu = ({ user }: UserMenuProps) => {
     },
   });
 
-  const openFeedback = useCallback(() => {
-    // open in a new tab
-    window.open("https://github.com/winglang/wing/issues/new/choose", "_blank");
-  }, []);
-
   return (
     <Menu
       btnClassName="flex items-center rounded-full"
       items={[
-        {
-          label: "Give us feedback",
-          icon: <PencilSquareIcon className="size-5" />,
-          onClick: openFeedback,
-        },
         {
           label: "Sign out",
           icon: <ArrowLeftStartOnRectangleIcon className="size-5" />,
@@ -225,7 +217,16 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
             ))}
           </div>
 
-          <div className="flex flex-grow justify-end items-center gap-x-2">
+          <div className="flex flex-grow justify-end items-center gap-x-4">
+            <ButtonLink
+              transparent
+              iconClassName="size-5"
+              to="https://github.com/winglang/wing/issues/new/choose"
+              target="_blank"
+              icon={ChatBubbleLeftEllipsisIcon}
+              title="Feedback"
+            />
+
             <UserMenu user={user} />
           </div>
         </div>
