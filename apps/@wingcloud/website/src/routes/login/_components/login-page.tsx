@@ -1,16 +1,14 @@
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { SpinnerLoader } from "../../../components/spinner-loader.js";
-import { useNotifications } from "../../../design-system/notification.js";
+import { Banner } from "../../../design-system/banner.js";
 import { WingIcon } from "../../../icons/wing-icon.js";
 import { EARLY_ACCESS_CODE_QUERY_PARAM } from "../../../utils/wrpc.js";
 
 export const LoginPage = () => {
   const [searchParams] = useSearchParams();
-  const { showNotification } = useNotifications();
 
   // TODO: Use state to prevent man-in-the-middle attacks.
   const { GITHUB_APP_CLIENT_ID, WINGCLOUD_ORIGIN, REQUIRE_EARLY_ACCESS_CODE } =
@@ -40,6 +38,9 @@ export const LoginPage = () => {
     return url.toString();
   })();
 
+  const [error, setError] = useState("");
+  const [showErrorBanner, setShowErrorBanner] = useState(false);
+
   useEffect(() => {
     const errorBase64 = searchParams.get("error") ?? "";
     if (!errorBase64) {
@@ -48,13 +49,11 @@ export const LoginPage = () => {
     try {
       const errorString = atob(errorBase64);
       const error = JSON.parse(errorString);
+      console.log("error", error);
 
       searchParams.delete("error");
-
-      showNotification(error.message, {
-        type: "error",
-      });
-      console.log("error", error);
+      setError(error.message);
+      setShowErrorBanner(true);
     } catch (error) {
       console.log("error", error);
     }
@@ -63,24 +62,18 @@ export const LoginPage = () => {
   return (
     <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
       {REQUIRE_EARLY_ACCESS_CODE === "true" && (
-        <div
-          className={clsx(
-            "fixed top-0 w-full flex justify-center",
-            "bg-blue-100 p-4",
-          )}
-        >
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <InformationCircleIcon className="size-5 text-blue-700" />
-            </div>
-            <div className="ml-3 flex-1 md:flex md:justify-between">
-              <p className="text-sm text-blue-700">
-                An early access code is required to sign in for the first time.
-              </p>
-            </div>
-          </div>
-        </div>
+        <Banner>
+          An early access code is required to sign in for the first time.
+        </Banner>
       )}
+      <Banner
+        type="error"
+        visible={showErrorBanner}
+        onClose={() => setShowErrorBanner(false)}
+      >
+        {error}
+      </Banner>
+
       <div className="flex flex-col grow max-w-md gap-4">
         <div
           className={clsx(

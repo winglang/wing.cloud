@@ -434,7 +434,7 @@ pub class Api {
               log("{githubUser.login} is allowed to access the early access");
               isEarlyAccessUser = true;
             } else {
-              throw httpError.HttpError.badRequest("Request an early access code to be able to log in.");
+              throw httpError.HttpError.badRequest("Can't sign in because no early access code was provided.");
             }
           }
         }
