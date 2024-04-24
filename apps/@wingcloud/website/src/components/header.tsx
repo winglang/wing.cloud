@@ -1,7 +1,4 @@
-import {
-  ArrowLeftStartOnRectangleIcon,
-  QuestionMarkCircleIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowLeftStartOnRectangleIcon } from "@heroicons/react/24/outline";
 import { UserIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { Fragment, useCallback, useContext, useMemo } from "react";
@@ -218,13 +215,13 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
 
           <div className="flex flex-grow justify-end items-center gap-x-4">
             <ButtonLink
-              transparent
-              iconClassName="size-5"
+              small
               to="https://github.com/winglang/wing/issues/new/choose"
               target="_blank"
-              icon={QuestionMarkCircleIcon}
               title="Feedback"
-            />
+            >
+              Give us feedback
+            </ButtonLink>
 
             <UserMenu user={user} />
           </div>
