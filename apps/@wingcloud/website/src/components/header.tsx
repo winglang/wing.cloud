@@ -94,6 +94,8 @@ export interface HeaderProps {
 }
 
 export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
+  const WINGCLOUD_ISSUE_URL =
+    "https://github.com/winglang/wing/issues/new/choose?labels=wing-cloud";
   const { theme } = useTheme();
 
   const { user } = useContext(AuthDataProviderContext);
@@ -216,7 +218,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
           <div className="flex flex-grow justify-end items-center gap-x-4">
             <ButtonLink
               small
-              to="https://github.com/winglang/wing/issues/new/choose"
+              to={WINGCLOUD_ISSUE_URL}
               target="_blank"
               title="Feedback"
             >
