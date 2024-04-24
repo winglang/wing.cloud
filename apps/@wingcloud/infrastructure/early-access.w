@@ -33,10 +33,10 @@ class Util {
 }
 
 pub class EarlyAccess {
-  table: ex.DynamodbTable;
+  table: dynamodb.Table;
   expirationTime: num;
 
-  new(table: ex.DynamodbTable) {
+  new(table: dynamodb.Table) {
     this.table = table;
     this.expirationTime = 1000 * 60 * 60 * 24 * 7; // 7 days
   }
@@ -50,7 +50,7 @@ pub class EarlyAccess {
 
 
     try {
-      this.table.transactWriteItems(transactItems: [
+      this.table.transactWrite(transactItems: [
         {
           put: {
             item: Json.deepCopy({
@@ -63,7 +63,7 @@ pub class EarlyAccess {
               expiresAt: expiresAt,
               used: false,
             }),
-            conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
+            ConditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
           },
         },
       ]);

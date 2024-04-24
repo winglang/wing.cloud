@@ -47,11 +47,11 @@ pub struct DeleteSecretOptions {
 }
 
 pub class Secrets {
-  pub table: ex.DynamodbTable;
+  pub table: dynamodb.Table;
   crypto: crypto.Crypto;
 
   new() {
-    this.table = new ex.DynamodbTable(
+    this.table = new dynamodb.Table(
       name: "secrets",
       attributeDefinitions: {
         "pk": "S",
@@ -88,11 +88,11 @@ pub class Secrets {
     };
 
     try {
-      this.table.transactWriteItems(transactItems: [
+      this.table.transactWrite(transactItems: [
         {
           put: {
             item: Json.deepCopy(item),
-            conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
+            ConditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
           },
         },
       ]);

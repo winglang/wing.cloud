@@ -35,11 +35,11 @@ pub struct AuthenticatedWebSocketServerProps {
 
 pub class AuthenticatedWebsocketServer {
   pub ws: websockets.WebSocket;
-  table: ex.DynamodbTable;
+  table: dynamodb.Table;
   pub url: str;
 
   new(props: AuthenticatedWebSocketServerProps) {
-    this.table = new ex.DynamodbTable(
+    this.table = new dynamodb.Table(
       name: "ws_table",
       attributeDefinitions: {
         "pk": "S",
@@ -103,7 +103,7 @@ pub class AuthenticatedWebsocketServer {
           subscriptionId: opts.subscriptionId,
           userId: "{opts.userId}",
         },
-        conditionExpression: "attribute_not_exists(pk)",
+        ConditionExpression: "attribute_not_exists(pk)",
       );
     };
 

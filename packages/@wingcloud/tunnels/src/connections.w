@@ -40,15 +40,15 @@ pub interface IConnections {
   * by using DynamoDB to manage websocket connections and Redis for handling websocket requests/responses.
 */
 pub class Connections impl IConnections {
-  connections: ex.DynamodbTable;
+  connections: dynamodb.Table;
   requests: ex.Redis;
   new() {
-    this.connections = new ex.DynamodbTable(name: "connections", hashKey: "pk", attributeDefinitions: { pk: "S" }) as "connections";
+    this.connections = new dynamodb.Table(name: "connections", hashKey: "pk", attributeDefinitions: { pk: "S" }) as "connections";
     this.requests = new ex.Redis();
   }
 
   pub inflight addConnection(conn: Connection) {
-    this.connections.transactWriteItems(
+    this.connections.transactWrite(
       transactItems: [
         {
           put: {
@@ -56,7 +56,7 @@ pub class Connections impl IConnections {
               pk: "connectionId#{conn.connectionId}",
               subdomain: conn.subdomain
             },
-            conditionExpression: "attribute_not_exists(pk)",
+            ConditionExpression: "attribute_not_exists(pk)",
           },
         },
         {
@@ -65,7 +65,7 @@ pub class Connections impl IConnections {
               pk: "subdomain#{conn.subdomain}",
               connectionId: conn.connectionId
             },
-            conditionExpression: "attribute_not_exists(pk)"
+            ConditionExpression: "attribute_not_exists(pk)"
           },
         }
       ]
@@ -79,7 +79,7 @@ pub class Connections impl IConnections {
 
     if let item = item.item {
       let subdomain = item.get("subdomain").asStr();
-      this.connections.transactWriteItems(
+      this.connections.transactWrite(
         transactItems: [
           {
             delete: {

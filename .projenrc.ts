@@ -283,6 +283,8 @@ infrastructure.addGitIgnore("!/.env.example");
 infrastructure.addGitIgnore("**/target/");
 infrastructure.addDeps("winglang");
 infrastructure.addDeps("@winglibs/vite");
+infrastructure.addDeps("@winglibs/websockets");
+infrastructure.addDeps("@winglibs/dynamodb");
 infrastructure.addDeps(tunnels.name);
 
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
@@ -400,8 +402,6 @@ infrastructure.addDevDeps("@octokit/rest");
 
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(runtime.name);
-
-infrastructure.addDeps("@winglibs/websockets");
 
 // TODO: We need to install all of these deps because of we are using pnpm
 // and wing is not resolving deps correctly.

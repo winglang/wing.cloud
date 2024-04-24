@@ -89,7 +89,7 @@ let apiUrlParam = new parameter.Parameter(
   value: api.url,
 ) as "wrpc-url";
 
-let table = new ex.DynamodbTable(
+let table = new dynamodb.Table(
   name: "data",
   attributeDefinitions: {
     "pk": "S",

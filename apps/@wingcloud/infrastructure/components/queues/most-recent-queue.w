@@ -21,11 +21,11 @@ pub struct MostRecentQueueProps {
 
 pub class MostRecentQueue {
   queue: fifoqueue.FifoQueue;
-  pub table: ex.DynamodbTable;
+  pub table: dynamodb.Table;
 
   new(props: MostRecentQueueProps) {
     let handler = props.handler;
-    this.table = new ex.DynamodbTable(
+    this.table = new dynamodb.Table(
       name: "table",
       attributeDefinitions: {
         "groupId": "S",
@@ -64,7 +64,7 @@ pub class MostRecentQueue {
           ":lastMessageTimestamp": message.timestamp,
           ":id": id,
         },
-        conditionExpression: "attribute_not_exists(lastMessageTimestamp) OR lastMessageTimestamp < :lastMessageTimestamp",
+        ConditionExpression: "attribute_not_exists(lastMessageTimestamp) OR lastMessageTimestamp < :lastMessageTimestamp",
         returnValues: "ALL_NEW"
       );
       log("message enqueued: {Json.stringify(message)}");

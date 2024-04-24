@@ -1,8 +1,8 @@
-bring ex;
 bring "./nanoid62.w" as nanoid62;
 bring "./status-reports.w" as status_report;
 bring "./http-error.w" as httpError;
 bring "./util.w" as util;
+bring dynamodb;
 
 pub struct Environment {
   id: str;
@@ -116,9 +116,9 @@ struct DeleteEnvironmentOptions {
 }
 
 pub class Environments {
-  table: ex.DynamodbTable;
+  table: dynamodb.Table;
 
-  new(table: ex.DynamodbTable) {
+  new(table: dynamodb.Table) {
     this.table = table;
   }
 
@@ -175,10 +175,10 @@ pub class Environments {
       publicKey: options.publicKey,
     };
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(transactItems: [
       {
-        put: {
-          item: this.makeItem(
+        Put: {
+          Item: this.makeItem(
             pk: "ENVIRONMENT#{environment.id}",
             sk: "#",
             environment: environment
@@ -187,8 +187,8 @@ pub class Environments {
         },
       },
       {
-        put: {
-          item: this.makeItem(
+        Put: {
+          Item: this.makeItem(
             pk: "APP#{environment.appId}",
             sk: "ENVIRONMENT#{environment.id}",
             environment: environment,
@@ -196,8 +196,8 @@ pub class Environments {
         },
       },
       {
-        put: {
-          item: this.makeItem(
+        Put: {
+          Item: this.makeItem(
             pk: "APP#{environment.appId}",
             sk: "BRANCH#{environment.branch}",
             environment: environment,
@@ -205,8 +205,8 @@ pub class Environments {
         },
       },
       {
-        put: {
-          item: this.makeItem(
+        Put: {
+          Item: this.makeItem(
             pk: "DEPLOYED#{statusUpdatedAt}",
             sk: "ENV#{environment.id}",
             environment: environment,
@@ -224,7 +224,7 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(transactItems: [
       {
         update: {
           key: {
@@ -369,8 +369,8 @@ pub class Environments {
           }
         },
         {
-          put: {
-            item: this.makeItem(
+          Put: {
+            Item: this.makeItem(
               pk: "DEPLOYED#{statusUpdatedAt}",
               sk: "ENV#{environment.id}",
               environment: environment,
@@ -402,7 +402,7 @@ pub class Environments {
       ]);
     }
 
-    this.table.transactWriteItems(transactItems: transactItems.copy());
+    this.table.transactWrite(transactItems: transactItems.copy());
   }
 
   pub inflight updateSha(options: UpdateEnvironmentShaOptions) {
@@ -411,7 +411,7 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(transactItems: [
       {
         update: {
           key: {
@@ -485,7 +485,7 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(transactItems: [
       {
         update: {
           key: {
@@ -559,7 +559,7 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(transactItems: [
       {
         update: {
           key: {
@@ -633,7 +633,7 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(transactItems: [
       {
         update: {
           key: {
@@ -707,7 +707,7 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(transactItems: [
       {
         update: {
           key: {
@@ -858,7 +858,7 @@ pub class Environments {
     if let app = result.item {
       let updatedAt = datetime.fromIso(app.get("updatedAt").asStr());
       let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
-      let result = this.table.transactWriteItems(transactItems: [
+      let result = this.table.transactWrite(transactItems: [
         {
           delete: {
             key: {
@@ -902,7 +902,7 @@ pub class Environments {
     throw httpError.HttpError.notFound("Environment '{options.environmentId}' not found");
   }
 
-  inflight fromDB(item: Json): Environment {
+  inflight fromDB(Item: Json): Environment {
     return {
       id: item.get("id").asStr(),
       appId: item.get("appId").asStr(),

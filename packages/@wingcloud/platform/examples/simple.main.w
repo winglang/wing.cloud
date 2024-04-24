@@ -2,7 +2,7 @@ bring cloud;
 bring ex;
 
 let bucket = new cloud.Bucket();
-let table = new ex.DynamodbTable({
+let table = new dynamodb.Table({
   name: "my-table",
   attributeDefinitions: {
     "pk": "S",

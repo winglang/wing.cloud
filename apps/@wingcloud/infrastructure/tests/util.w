@@ -4,9 +4,9 @@ bring "../environments.w" as Environments;
 bring "../status-reports.w" as StatusReports;
 
 pub class MakeTable {
-  table: ex.DynamodbTable;
+  table: dynamodb.Table;
   new(name: str?) {
-    this.table = new ex.DynamodbTable(
+    this.table = new dynamodb.Table(
       name: name ?? "data",
       attributeDefinitions: {
         "pk": "S",
@@ -17,7 +17,7 @@ pub class MakeTable {
     );
   }
 
-  pub get(): ex.DynamodbTable {
+  pub get(): dynamodb.Table {
     return this.table;
   }
 }

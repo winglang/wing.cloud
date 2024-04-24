@@ -55,9 +55,9 @@ struct MakeItemOptions {
 }
 
 pub class Endpoints {
-  table: ex.DynamodbTable;
+  table: dynamodb.Table;
 
-  new(table: ex.DynamodbTable) {
+  new(table: dynamodb.Table) {
     this.table = table;
   }
 
@@ -99,11 +99,11 @@ pub class Endpoints {
       return item;
     };
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(transactItems: [
       {
         put: {
           item: makeItem(pk: "ENVIRONMENT#{endpoint.environmentId}", sk: "ENDPOINT#{endpoint.id}"),
-          conditionExpression: "attribute_not_exists(pk)"
+          ConditionExpression: "attribute_not_exists(pk)"
         },
       },
     ]);
