@@ -1,10 +1,11 @@
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftStartOnRectangleIcon } from "@heroicons/react/24/outline";
 import { UserIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
-import { Fragment, useContext, useMemo } from "react";
+import { Fragment, useCallback, useContext, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { AuthDataProviderContext } from "../data-store/auth-data-provider.js";
+import { ButtonLink } from "../design-system/button-link.js";
 import { Menu } from "../design-system/menu.js";
 import { useTheme } from "../design-system/theme-provider.js";
 import { WingIcon } from "../icons/wing-icon.js";
@@ -51,6 +52,7 @@ const UserMenu = ({ user }: UserMenuProps) => {
       items={[
         {
           label: "Sign out",
+          icon: <ArrowLeftStartOnRectangleIcon className="size-5" />,
           onClick: () => {
             signOut.mutate(undefined);
           },
@@ -92,6 +94,8 @@ export interface HeaderProps {
 }
 
 export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
+  const template = "feature.yml";
+  const WINGCLOUD_ISSUE_URL = `https://github.com/winglang/wing/issues/new?labels=wing-cloud&template=${template}`;
   const { theme } = useTheme();
 
   const { user } = useContext(AuthDataProviderContext);
@@ -211,7 +215,16 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
             ))}
           </div>
 
-          <div className="flex flex-grow justify-end items-center gap-x-2">
+          <div className="flex flex-grow justify-end items-center gap-x-4">
+            <ButtonLink
+              small
+              to={WINGCLOUD_ISSUE_URL}
+              target="_blank"
+              title="Feedback"
+            >
+              Give us feedback
+            </ButtonLink>
+
             <UserMenu user={user} />
           </div>
         </div>

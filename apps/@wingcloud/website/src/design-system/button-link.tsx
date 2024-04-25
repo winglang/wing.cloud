@@ -48,6 +48,7 @@ export const ButtonLink = ({
       className={clsx(
         "whitespace-nowrap",
         "inline-flex gap-2 items-center text-xs font-medium outline-none rounded-md",
+        Icon && !label && "justify-center px-1",
         theme.focusVisible,
         primary &&
           !transparent && [
