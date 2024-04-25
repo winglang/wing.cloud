@@ -94,8 +94,8 @@ export interface HeaderProps {
 }
 
 export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
-  const WINGCLOUD_ISSUE_URL =
-    "https://github.com/winglang/wing/issues/new/choose?labels=wing-cloud";
+  const template = "feature.yml";
+  const WINGCLOUD_ISSUE_URL = `https://github.com/winglang/wing/issues/new?labels=wing-cloud&template=${template}`;
   const { theme } = useTheme();
 
   const { user } = useContext(AuthDataProviderContext);
