@@ -15,9 +15,18 @@ FROM docker:24.0.6-git
 
 RUN apk update
 RUN apk add bash ip6tables pigz sysstat procps lsof libstdc++
-RUN apk add  --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main/ nodejs npm
+RUN apk add --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main/ nodejs npm
 
-RUN npm i -g pnpm projen winglang@latest
+# Update npm to the latest version
+RUN npm install -g npm@latest
+
+# Install pnpm and projen
+RUN npm install -g pnpm
+RUN npm install -g projen
+
+# Install winglang latest version
+RUN npm install -g winglang@latest
+RUN wing --version  # This line will confirm the installed version of winglang
 
 WORKDIR /app
 
