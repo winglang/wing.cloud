@@ -19,7 +19,7 @@ bring "../components/queues/fifoqueue" as fifoqueue;
 
 class Consts {
   pub static inflight secretsPath(): str {
-    return "/root/.wing/secrets.json";
+    return "/app/.env";
   }
 
   pub static inflight statePath(): str {
@@ -93,9 +93,16 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       repo = "file:///source";
     }
 
-    // write wing secrets.json
+    // write wing secrets env file
     let secretsFile = fs.join(fs.mkdtemp("secrets-"), nanoid62.Nanoid62.generate());
-    fs.writeFile(secretsFile, Json.stringify(opts.secrets), encoding: "utf8");
+
+    // convert secrets from map to env file
+    let var secretsEnv = "";
+    for secret in opts.secrets.entries() {
+      secretsEnv += "{secret.key}={secret.value}\n";
+    }
+
+    fs.writeFile(secretsFile, secretsEnv, encoding: "utf8");
     volumes.set(secretsFile, Consts.secretsPath());
 
     // setup the state directory
@@ -333,7 +340,7 @@ pub class RuntimeService {
         msg = types.Message.fromJson(Json.parse(message));
         if let message = msg {
           log("wing url: {props.wingCloudUrl}");
-  
+
           let url = this.runtimeHandler.start(
             gitToken: message.token,
             gitRepo: message.repo,
@@ -350,9 +357,9 @@ pub class RuntimeService {
             awsSecretAccessKey: awsSecretAccessKey,
             publicEndpointFullDomainName: props.publicEndpointFullDomainName,
           );
-  
+
           log("preview environment url: {url}");
-  
+
           props.environments.updateUrl(
             id: message.environmentId,
             appId: message.appId,
