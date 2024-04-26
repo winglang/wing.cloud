@@ -96,7 +96,6 @@ class RuntimeHandler_sim impl IRuntimeHandler {
     // write wing secrets env file
     let secretsFile = fs.join(fs.mkdtemp("secrets-"), nanoid62.Nanoid62.generate());
 
-    // convert secrets from map to env file
     let var secretsEnv = "";
     for secret in opts.secrets.entries() {
       secretsEnv += "{secret.key}={secret.value}\n";
