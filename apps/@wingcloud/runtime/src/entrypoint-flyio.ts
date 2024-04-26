@@ -17,7 +17,7 @@ if (process.env["WING_TARGET"] == "tf-aws") {
   if (!simulatorUrl) {
     throw new Error("missing simulator url");
   }
-  logsBucket = makeSimulatorClient(simulatorUrl, bucketName);
+  logsBucket = makeSimulatorClient(simulatorUrl, bucketName, "bucket");
 }
 
 const wingApiUrl = process.env["WING_CLOUD_URL"];
