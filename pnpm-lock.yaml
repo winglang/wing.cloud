@@ -245,14 +245,14 @@ importers:
   apps/@wingcloud/runtime:
     dependencies:
       '@wingconsole/app':
-        specifier: ^0.63.3
-        version: 0.63.3(constructs@10.3.0)(typescript@5.3.3)
+        specifier: ^0.72.11
+        version: 0.72.12(constructs@10.3.0)(typescript@5.3.3)
       '@winglang/compiler':
-        specifier: ^0.59.6
-        version: 0.59.6(constructs@10.3.0)(typescript@5.3.3)
+        specifier: ^0.72.11
+        version: 0.72.12(constructs@10.3.0)(typescript@5.3.3)
       '@winglang/sdk':
-        specifier: ^0.59.6
-        version: 0.59.6(constructs@10.3.0)
+        specifier: ^0.72.11
+        version: 0.72.12(constructs@10.3.0)
       chalk:
         specifier: ^5.3.0
         version: 5.3.0
@@ -287,8 +287,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0
       winglang:
-        specifier: ^0.59.6
-        version: 0.59.6(constructs@10.3.0)(typescript@5.3.3)
+        specifier: ^0.72.11
+        version: 0.72.12(constructs@10.3.0)(typescript@5.3.3)
     devDependencies:
       '@cloudy-ts/eslint-plugin':
         specifier: ^0.0.394
@@ -5469,13 +5469,13 @@ packages:
       '@winglang/sdk': 0.59.6(constructs@10.3.0)
       typescript: 5.3.3
 
-  /@wingcloud/framework@0.63.3(@winglang/sdk@0.63.3)(typescript@5.3.3):
-    resolution: {integrity: sha512-s029vP/DuZrJw0m+DJwdmidhhUj27s9334V9ETT3Tpj6jKUW9ZAQ0Ueyc1R0RPPVGJPZoGI4eUZoDbP0Q4FgXA==}
+  /@wingcloud/framework@0.72.12(@winglang/sdk@0.72.12)(typescript@5.3.3):
+    resolution: {integrity: sha512-YvHHj+bfwidSZEJHS+YFWGOgblFZeDN8G2E4Ur/oi1+ElvNTEz8OnmQI6DgqMhoS1CKK7FFdbP94h77MlFa8Jw==}
     peerDependencies:
       '@winglang/sdk': '*'
       typescript: ^5.3.3
     dependencies:
-      '@winglang/sdk': 0.63.3(constructs@10.3.0)
+      '@winglang/sdk': 0.72.12(constructs@10.3.0)
       typescript: 5.3.3
     dev: false
 
@@ -5509,13 +5509,13 @@ packages:
       - typescript
     dev: false
 
-  /@wingconsole/app@0.63.3(constructs@10.3.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-yyt1CaVO8fD9Ub+70t2G85lpKixl2kihRVPUMDe6kLUu05sjmju9VOy4F09MFitIdvFMFe/axJaXwbeh9pMskw==}
+  /@wingconsole/app@0.72.12(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-BW3OYw/0pv7bnjt0Rj98h8SDiEeuklS4bUr2DkZklB6jxaVwLzJ+FlCWsDwCqOIY0TtfqGXmNHZ8ej1RJMrZuw==}
     dependencies:
       '@segment/analytics-node': 1.3.0
-      '@wingconsole/server': 0.63.3(constructs@10.3.0)(typescript@5.3.3)
+      '@wingconsole/server': 0.72.12(constructs@10.3.0)(typescript@5.3.3)
       cross-spawn: 7.0.3
-      express: 4.18.2
+      express: 4.19.2
       open: 8.4.2
       picocolors: 1.0.0
     transitivePeerDependencies:
@@ -5574,11 +5574,11 @@ packages:
       - typescript
     dev: false
 
-  /@wingconsole/server@0.63.3(constructs@10.3.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-2730C1MMzhOEs/newZmAqSOhr1AG/HY0Ga8GAxuZT7JzyLzSXEWHKLcDbvENKeKz8HOt7gMYVpzrdi5P/Pdb2Q==}
+  /@wingconsole/server@0.72.12(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-W3znJ/FvLXelWoJ7PAj191bQuKLxCgGQDEDJjl1hLn8wLJf0u9c8AacBFQGLyUtZSH/gSZvrQ0sm4uvV0NuUog==}
     dependencies:
-      '@winglang/compiler': 0.63.3(constructs@10.3.0)(typescript@5.3.3)
-      '@winglang/sdk': 0.63.3(constructs@10.3.0)
+      '@winglang/compiler': 0.72.12(constructs@10.3.0)(typescript@5.3.3)
+      '@winglang/sdk': 0.72.12(constructs@10.3.0)
       codespan-wasm: 0.4.0
       debug: 4.3.4
       launch-editor: 2.6.1
@@ -5649,12 +5649,13 @@ packages:
     bundledDependencies:
       - wasi-js
 
-  /@winglang/compiler@0.63.3(constructs@10.3.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-/4MVemHvCrlLzEKLqu+NNxkS6L5v0jjEJ29y8o78fmBxkzd6cZ2NwIqt8LRisy8wGNNxwgta/vPhpzaP6AkKkg==}
+  /@winglang/compiler@0.72.12(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-aEpwRatuhrf/SS1e670cEvdpfEJea6tPMhZ3GkkREvfqzY0dOFZQ4HGffpBb4daGh3DWhVj9FRlFM6oqZNHpQg==}
     engines: {node: '>=v20.0.0'}
     dependencies:
-      '@wingcloud/framework': 0.63.3(@winglang/sdk@0.63.3)(typescript@5.3.3)
-      '@winglang/sdk': 0.63.3(constructs@10.3.0)
+      '@wingcloud/framework': 0.72.12(@winglang/sdk@0.72.12)(typescript@5.3.3)
+      '@winglang/sdk': 0.72.12(constructs@10.3.0)
+      jiti: 1.21.0
     transitivePeerDependencies:
       - constructs
       - typescript
@@ -5757,8 +5758,8 @@ packages:
       - uuid
       - yaml
 
-  /@winglang/sdk@0.63.3(constructs@10.3.0):
-    resolution: {integrity: sha512-QwKtnp5ykS8O+dlGtmTYyaJvk9nPr2m0OG2Kg8uC6/vKVDNOTvrCQbIAfA7HDXLXcdZMMxJzb+eqBX15+U/ONg==}
+  /@winglang/sdk@0.72.12(constructs@10.3.0):
+    resolution: {integrity: sha512-4DzrOPiHUaNdTrl9qTmBJ2UyxLZGe+9bFIcbJ9LHzW41JfTDV+3qA113kVfIk0En55IRWJPkV6CMA6G7l6+3xg==}
     engines: {node: '>= 20.0.0'}
     peerDependencies:
       constructs: ^10.3
@@ -5792,11 +5793,12 @@ packages:
       - ajv
       - cdktf
       - cron-parser
+      - cron-validator
       - express
       - glob
       - google-auth-library
       - ioredis
-      - jsonschema
+      - jiti
       - mime
       - mime-types
       - nanoid
@@ -5806,6 +5808,7 @@ packages:
       - toml
       - ulid
       - uuid
+      - vlq
       - yaml
 
   /@winglibs/vite@0.0.4(@types/node@20.11.19)(constructs@10.3.0):
@@ -6690,6 +6693,11 @@ packages:
     engines: {node: '>= 0.6'}
     dev: false
 
+  /cookie@0.6.0:
+    resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
+    engines: {node: '>= 0.6'}
+    dev: false
+
   /copy-to-clipboard@3.3.3:
     resolution: {integrity: sha512-2KV8NhB5JqC3ky0r9PMCAZKbUHSwtEo4CwCs0KXgruG43gX5PMqDEBbVU4OUzw2MuAWUfsuFmWvEKG5QRfSnJA==}
     dependencies:
@@ -7494,6 +7502,45 @@ packages:
       content-disposition: 0.5.4
       content-type: 1.0.5
       cookie: 0.5.0
+      cookie-signature: 1.0.6
+      debug: 2.6.9
+      depd: 2.0.0
+      encodeurl: 1.0.2
+      escape-html: 1.0.3
+      etag: 1.8.1
+      finalhandler: 1.2.0
+      fresh: 0.5.2
+      http-errors: 2.0.0
+      merge-descriptors: 1.0.1
+      methods: 1.1.2
+      on-finished: 2.4.1
+      parseurl: 1.3.3
+      path-to-regexp: 0.1.7
+      proxy-addr: 2.0.7
+      qs: 6.11.0
+      range-parser: 1.2.1
+      safe-buffer: 5.2.1
+      send: 0.18.0
+      serve-static: 1.15.0
+      setprototypeof: 1.2.0
+      statuses: 2.0.1
+      type-is: 1.6.18
+      utils-merge: 1.0.1
+      vary: 1.1.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /express@4.19.2:
+    resolution: {integrity: sha512-5T6nhjsT+EOMzuck8JjBHARTHfMht0POzlA60WV2pMD3gyXw2LZnZ+ueGdNxG+0calOJcWKbpFcuzLZ91YWq9Q==}
+    engines: {node: '>= 0.10.0'}
+    dependencies:
+      accepts: 1.3.8
+      array-flatten: 1.1.1
+      body-parser: 1.20.2
+      content-disposition: 0.5.4
+      content-type: 1.0.5
+      cookie: 0.6.0
       cookie-signature: 1.0.6
       debug: 2.6.9
       depd: 2.0.0
@@ -12334,6 +12381,43 @@ packages:
       dotenv-expand: 10.0.0
       glob: 10.3.10
       inquirer: 8.2.6
+      nanoid: 3.3.7
+      npm-packlist: 8.0.2
+      open: 8.4.2
+      ora: 5.4.1
+      tar: 6.2.0
+      tiny-updater: 3.5.1
+      uuid: 8.3.2
+      vscode-languageserver: 8.1.0
+    transitivePeerDependencies:
+      - bluebird
+      - constructs
+      - encoding
+      - supports-color
+      - typescript
+    dev: false
+
+  /winglang@0.72.12(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-fAV5SvxoHR9taW1+1CDTLFpP5wdcwzMkIgQl6w28J3PBifOWJ2vngw7TUKzC5RhMDr+atlhdS9Q+cbNSNrObVg==}
+    engines: {node: '>=v18.0.0'}
+    hasBin: true
+    dependencies:
+      '@npmcli/arborist': 7.3.1
+      '@segment/analytics-node': 1.3.0
+      '@wingconsole/app': 0.72.12(constructs@10.3.0)(typescript@5.3.3)
+      '@wingconsole/server': 0.72.12(constructs@10.3.0)(typescript@5.3.3)
+      '@winglang/compiler': 0.72.12(constructs@10.3.0)(typescript@5.3.3)
+      '@winglang/sdk': 0.72.12(constructs@10.3.0)
+      chalk: 4.1.2
+      codespan-wasm: 0.4.0
+      commander: 10.0.1
+      compare-versions: 5.0.3
+      debug: 4.3.4
+      dotenv: 16.4.4
+      dotenv-expand: 10.0.0
+      glob: 10.3.10
+      inquirer: 8.2.6
+      lodash.once: 4.1.1
       nanoid: 3.3.7
       npm-packlist: 8.0.2
       open: 8.4.2
