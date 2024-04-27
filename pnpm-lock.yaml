@@ -245,14 +245,14 @@ importers:
   apps/@wingcloud/runtime:
     dependencies:
       '@wingconsole/app':
-        specifier: ^0.72.12
-        version: 0.72.12(constructs@10.3.0)(typescript@5.3.3)
+        specifier: ^0.73.0
+        version: 0.73.0(constructs@10.3.0)(typescript@5.3.3)
       '@winglang/compiler':
-        specifier: ^0.72.12
-        version: 0.72.12(constructs@10.3.0)(typescript@5.3.3)
+        specifier: ^0.73.0
+        version: 0.73.0(constructs@10.3.0)(typescript@5.3.3)
       '@winglang/sdk':
-        specifier: ^0.72.12
-        version: 0.72.12(constructs@10.3.0)
+        specifier: ^0.73.0
+        version: 0.73.0(constructs@10.3.0)
       chalk:
         specifier: ^5.3.0
         version: 5.3.0
@@ -512,11 +512,11 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(eslint@8.57.0)(typescript@5.3.3)
       '@winglang/compiler':
-        specifier: ^0.72.12
-        version: 0.72.12(constructs@10.3.0)(typescript@5.3.3)
+        specifier: ^0.73.0
+        version: 0.73.0(constructs@10.3.0)(typescript@5.3.3)
       '@winglang/sdk':
-        specifier: ^0.72.12
-        version: 0.72.12(constructs@10.3.0)
+        specifier: ^0.73.0
+        version: 0.73.0(constructs@10.3.0)
       cdktf:
         specifier: ^0.20.3
         version: 0.20.3(constructs@10.3.0)
@@ -690,11 +690,6 @@ importers:
         version: 1.3.0(@types/node@20.11.19)
 
 packages:
-
-  /@aashutoshrathi/word-wrap@1.2.6:
-    resolution: {integrity: sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==}
-    engines: {node: '>=0.10.0'}
-    dev: true
 
   /@alloc/quick-lru@5.2.0:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -5470,13 +5465,13 @@ packages:
       typescript: 5.3.3
     dev: false
 
-  /@wingcloud/framework@0.72.12(@winglang/sdk@0.72.12)(typescript@5.3.3):
-    resolution: {integrity: sha512-YvHHj+bfwidSZEJHS+YFWGOgblFZeDN8G2E4Ur/oi1+ElvNTEz8OnmQI6DgqMhoS1CKK7FFdbP94h77MlFa8Jw==}
+  /@wingcloud/framework@0.73.0(@winglang/sdk@0.73.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-XfdqNIPCmpO+QacGQB1AiCwEYbcG0znpiKZsWS40o5HKPeTewFvyX2ufhb+tX2b6lL5Uqxp30lSzK7qUK57odQ==}
     peerDependencies:
       '@winglang/sdk': '*'
       typescript: ^5.3.3
     dependencies:
-      '@winglang/sdk': 0.72.12(constructs@10.3.0)
+      '@winglang/sdk': 0.73.0(constructs@10.3.0)
       typescript: 5.3.3
 
   /@wingconsole/app@0.54.63(constructs@10.3.0)(typescript@5.3.3):
@@ -5509,11 +5504,11 @@ packages:
       - typescript
     dev: false
 
-  /@wingconsole/app@0.72.12(constructs@10.3.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-BW3OYw/0pv7bnjt0Rj98h8SDiEeuklS4bUr2DkZklB6jxaVwLzJ+FlCWsDwCqOIY0TtfqGXmNHZ8ej1RJMrZuw==}
+  /@wingconsole/app@0.73.0(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-MnQxeOHDxVoFD3MdSclILeq98LH8a1GONS7n2ZKBtX1WDINhuTusbZBhhtxltH1JtGbOak1feUrCW2UD4Cu8qA==}
     dependencies:
       '@segment/analytics-node': 1.3.0
-      '@wingconsole/server': 0.72.12(constructs@10.3.0)(typescript@5.3.3)
+      '@wingconsole/server': 0.73.0(constructs@10.3.0)(typescript@5.3.3)
       cross-spawn: 7.0.3
       express: 4.19.2
       open: 8.4.2
@@ -5574,11 +5569,11 @@ packages:
       - typescript
     dev: false
 
-  /@wingconsole/server@0.72.12(constructs@10.3.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-W3znJ/FvLXelWoJ7PAj191bQuKLxCgGQDEDJjl1hLn8wLJf0u9c8AacBFQGLyUtZSH/gSZvrQ0sm4uvV0NuUog==}
+  /@wingconsole/server@0.73.0(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-c5SYAsUCIsiDQpaI+ZRxiU7ZE7R/FryLGCCLN5zgPy+NEvJxXRHgXS2FRI7TFIH9GGGjLfdfEv8o50n4P00ctA==}
     dependencies:
-      '@winglang/compiler': 0.72.12(constructs@10.3.0)(typescript@5.3.3)
-      '@winglang/sdk': 0.72.12(constructs@10.3.0)
+      '@winglang/compiler': 0.73.0(constructs@10.3.0)(typescript@5.3.3)
+      '@winglang/sdk': 0.73.0(constructs@10.3.0)
       codespan-wasm: 0.4.0
       debug: 4.3.4
       launch-editor: 2.6.1
@@ -5650,12 +5645,12 @@ packages:
     bundledDependencies:
       - wasi-js
 
-  /@winglang/compiler@0.72.12(constructs@10.3.0)(typescript@5.3.3):
-    resolution: {integrity: sha512-aEpwRatuhrf/SS1e670cEvdpfEJea6tPMhZ3GkkREvfqzY0dOFZQ4HGffpBb4daGh3DWhVj9FRlFM6oqZNHpQg==}
+  /@winglang/compiler@0.73.0(constructs@10.3.0)(typescript@5.3.3):
+    resolution: {integrity: sha512-W9WcAo0s8pxxSpDLYQJoN2pfU17II5Erjitbr45ar1WzRm+i8r12s9a5d9RLNxPEUDVIzDyAWyOsyN6Wu2lChA==}
     engines: {node: '>=v20.0.0'}
     dependencies:
-      '@wingcloud/framework': 0.72.12(@winglang/sdk@0.72.12)(typescript@5.3.3)
-      '@winglang/sdk': 0.72.12(constructs@10.3.0)
+      '@wingcloud/framework': 0.73.0(@winglang/sdk@0.73.0)(typescript@5.3.3)
+      '@winglang/sdk': 0.73.0(constructs@10.3.0)
       jiti: 1.21.0
     transitivePeerDependencies:
       - constructs
@@ -5759,8 +5754,8 @@ packages:
       - uuid
       - yaml
 
-  /@winglang/sdk@0.72.12(constructs@10.3.0):
-    resolution: {integrity: sha512-4DzrOPiHUaNdTrl9qTmBJ2UyxLZGe+9bFIcbJ9LHzW41JfTDV+3qA113kVfIk0En55IRWJPkV6CMA6G7l6+3xg==}
+  /@winglang/sdk@0.73.0(constructs@10.3.0):
+    resolution: {integrity: sha512-Hs9DO5rqllCKzAYw/a42jTUyPOYyqXrbuS5UdOkxt3YrNBZrfoHI8H5QXgoFxrSJPz1rmn8rg8vFGzGJAFDzVw==}
     engines: {node: '>= 20.0.0'}
     peerDependencies:
       constructs: ^10.3
@@ -7331,7 +7326,7 @@ packages:
       lodash.merge: 4.6.2
       minimatch: 3.1.2
       natural-compare: 1.4.0
-      optionator: 0.9.3
+      optionator: 0.9.4
       strip-ansi: 6.0.1
       text-table: 0.2.0
     transitivePeerDependencies:
@@ -9878,16 +9873,16 @@ packages:
       is-wsl: 2.2.0
     dev: false
 
-  /optionator@0.9.3:
-    resolution: {integrity: sha512-JjCoypp+jKn1ttEFExxhetCKeJt9zhAgAve5FXHixTvFDW/5aEktX9bufBKLRRMdU7bNtpLfcGu94B3cdEJgjg==}
+  /optionator@0.9.4:
+    resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
     dependencies:
-      '@aashutoshrathi/word-wrap': 1.2.6
       deep-is: 0.1.4
       fast-levenshtein: 2.0.6
       levn: 0.4.1
       prelude-ls: 1.2.1
       type-check: 0.4.0
+      word-wrap: 1.2.5
     dev: true
 
   /ora@5.4.1:
@@ -12412,6 +12407,11 @@ packages:
       - supports-color
       - typescript
     dev: false
+
+  /word-wrap@1.2.5:
+    resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
+    engines: {node: '>=0.10.0'}
+    dev: true
 
   /wordwrap@1.0.0:
     resolution: {integrity: sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q==}
