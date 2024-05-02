@@ -203,7 +203,12 @@ const OverviewPage = ({
                   <BranchIcon
                     className={clsx("w-10 h-10 mx-auto", theme.text3)}
                   />
-                  <h3 className={clsx("text-sm font-medium", theme.text2)}>
+                  <h3
+                    className={clsx(
+                      "text-sm font-medium text-center",
+                      theme.text2,
+                    )}
+                  >
                     No preview environments found.
                   </h3>
                   <p
