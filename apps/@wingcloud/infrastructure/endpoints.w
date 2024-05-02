@@ -1,7 +1,8 @@
-bring ex;
+
 bring "./nanoid62.w" as nanoid62;
 bring "./status-reports.w" as status_report;
 bring "./util.w" as util;
+bring dynamodb;
 
 pub struct Endpoint {
   id: str;
@@ -99,10 +100,10 @@ pub class Endpoints {
       return item;
     };
 
-    this.table.transactWrite(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        put: {
-          item: makeItem(pk: "ENVIRONMENT#{endpoint.environmentId}", sk: "ENDPOINT#{endpoint.id}"),
+        Put: {
+          Item: makeItem(pk: "ENVIRONMENT#{endpoint.environmentId}", sk: "ENDPOINT#{endpoint.id}"),
           ConditionExpression: "attribute_not_exists(pk)"
         },
       },
@@ -112,14 +113,14 @@ pub class Endpoints {
   }
 
   pub inflight get(options: GetEndpointOptions): Endpoint {
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "ENVIRONMENT#{options.environmentId}",
         sk: "ENDPOINT#{options.id}",
       },
     );
 
-    if let item = result.item {
+    if let item = result.Item {
       return this.fromDB(item);
     }
 
@@ -127,8 +128,8 @@ pub class Endpoints {
   }
 
   pub inflight delete(options: DeleteEndpointOptions) {
-    let result = this.table.deleteItem(
-      key: {
+    let result = this.table.delete(
+      Key: {
         pk: "ENVIRONMENT#{options.environmentId}",
         sk: "ENDPOINT#{options.id}",
       },
@@ -141,17 +142,17 @@ pub class Endpoints {
     util.Util.do_while(
       handler: () => {
         let result = this.table.query(
-          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-          expressionAttributeValues: {
+          KeyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          ExpressionAttributeValues: {
             ":pk": "ENVIRONMENT#{options.environmentId}",
             ":sk": "ENDPOINT#",
           },
-          exclusiveStartKey: exclusiveStartKey,
+          ExclusiveStartKey: exclusiveStartKey,
         );
-        for item in result.items {
+        for item in result.Items {
           endpoints = endpoints.concat([this.fromDB(item)]);
         }
-        exclusiveStartKey = result.lastEvaluatedKey;
+        exclusiveStartKey = result.LastEvaluatedKey;
       },
       condition: () => {
         return exclusiveStartKey?;

@@ -160,7 +160,7 @@ pub inflight class Client {
 
   pub apps(cursor: str?): IGetOrgAppsResult {
     let appsRespone = http.post(this.graphqlUrl, headers: this._headers(), body: Json.stringify({
-      query: "query getapps \{organization(name: \"{this.orgSlug}\") \{ apps(after: \"{cursor}\") \{ nodes\{ id machines \{ nodes \{ id instanceId state } totalCount } createdAt } pageInfo \{ endCursor hasNextPage } totalCount } } }",
+      query: "query getapps \{organization(name: \"{this.orgSlug}\") \{ apps(after: \"{cursor ?? ""}\") \{ nodes\{ id machines \{ nodes \{ id instanceId state } totalCount } createdAt } pageInfo \{ endCursor hasNextPage } totalCount } } }",
     }));
     if (!appsRespone.ok) {
       throw "failed to get apps {appsRespone.body}";
@@ -228,7 +228,7 @@ pub inflight class Client {
       instanceId: rdata.instance_id,
     };
     if (data.id == "" || data.instanceId == "") {
-      throw "unexpected create machine data: {data}";
+      throw "unexpected create machine data: {Json.stringify(data)}";
     }
     return data;
   }
@@ -249,7 +249,7 @@ pub inflight class Client {
       instanceId: rdata.instance_id,
     };
     if (data.id == "" || data.instanceId == "") {
-      throw "unexpected update machine data: {data}";
+      throw "unexpected update machine data: {Json.stringify(data)}";
     }
     return data;
   }
@@ -310,7 +310,7 @@ pub inflight class Client {
     if (!volumesRes.ok) {
       throw "failed to list volumes for app {appName}: {volumesRes.body}";
     }
-    
+
     let volumes: Array<IClientVolume> = unsafeCast(this.verifyJsonResponse(Json.parse(volumesRes.body)));
     return volumes;
   }

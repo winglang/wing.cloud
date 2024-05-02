@@ -332,8 +332,8 @@ pub class RuntimeService {
 
         msg = types.Message.fromJson(Json.parse(message));
         if let message = msg {
-          log("wing url: {props.wingCloudUrl}");
-  
+          log("wing url: {Json.stringify(props.wingCloudUrl)}");
+
           let url = this.runtimeHandler.start(
             gitToken: message.token,
             gitRepo: message.repo,
@@ -350,9 +350,9 @@ pub class RuntimeService {
             awsSecretAccessKey: awsSecretAccessKey,
             publicEndpointFullDomainName: props.publicEndpointFullDomainName,
           );
-  
+
           log("preview environment url: {url}");
-  
+
           props.environments.updateUrl(
             id: message.environmentId,
             appId: message.appId,

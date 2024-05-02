@@ -87,8 +87,8 @@ pub class WebsiteProxy {
     ) as "RemoveTrailingSlashes";
 
     let domain: str = (() => {
-      let subDomain = props.subDomain;
-      if subDomain? && subDomain != "" {
+      let subDomain = props.subDomain ?? "";
+      if subDomain != "" {
         return "{subDomain}.{props.zoneName}";
       }
       return props.zoneName;

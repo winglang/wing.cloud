@@ -1,6 +1,6 @@
 // And the sun, and the moon, and the stars, and the flowers.
 bring cloud;
-bring ex;
+bring dynamodb;
 bring util;
 bring http;
 bring expect;
@@ -28,7 +28,6 @@ bring "./components/parameter/parameter.w" as parameter;
 bring "./components/dns/dns.w" as Dns;
 bring "./components/public-endpoint/public-endpoint.w" as PublicEndpoint;
 bring "./components/certificate/certificate.w" as certificate;
-bring "./patches/react-app.patch.w" as reactAppPatch;
 bring "./google-oauth.w" as google_oauth;
 bring "./early-access.w" as early_access;
 
@@ -38,7 +37,7 @@ if util.tryEnv("WING_IS_TEST") != "true" {
   let tunnelsSubdomain = (() => {
     let var subDomain = util.tryEnv("TUNNELS_SUBDOMAIN");
     if subDomain? && subDomain != "" {
-      return "{subDomain}";
+      return "{subDomain ?? ""}";
     } else {
       return "endpoints";
     }
@@ -80,7 +79,7 @@ let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey, enableAna
 let api = new cloud.Api(
   cors: true,
   corsOptions: cloud.ApiCorsOptions {
-    allowOrigin: ["*"],
+    allowOrigin: "*",
   }
 ) as "wrpc";
 
@@ -91,10 +90,16 @@ let apiUrlParam = new parameter.Parameter(
 
 let table = new dynamodb.Table(
   name: "data",
-  attributeDefinitions: {
-    "pk": "S",
-    "sk": "S",
-  },
+  attributes: [
+    {
+      name: "pk",
+      type: "S",
+    },
+    {
+      name: "sk",
+      type: "S",
+    },
+  ],
   hashKey: "pk",
   rangeKey: "sk",
 );
@@ -123,8 +128,8 @@ let runtimeUrlParam = new parameter.Parameter(
 
 let siteURL = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
-    let var subDomain = util.tryEnv("PROXY_SUBDOMAIN");
-    if subDomain? && subDomain != "" {
+    let var subDomain = util.tryEnv("PROXY_SUBDOMAIN") ?? "";
+    if subDomain != "" {
       subDomain = "{subDomain}.";
     }
     let zoneName = util.env("PROXY_ZONE_NAME");

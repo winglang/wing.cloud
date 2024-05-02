@@ -78,8 +78,8 @@ pub class GithubComment {
     let tableHeader = "<tr><th>App</th><th>Status</th><th>Console</th><th>Endpoints</th><th>Updated (UTC)</th></tr>";
     let var commentBody = "<table>{tableHeader}";
 
-    let var fullAppName = props.appFullName;
-    if !fullAppName? {
+    let var fullAppName = props.appFullName ?? "";
+    if fullAppName == "" {
       if let appOwner = this.getAppOwner(props.appId) {
         fullAppName = "${appOwner}/${props.appName}";
       }
@@ -108,7 +108,7 @@ pub class GithubComment {
               let testName = pathParts.at(pathParts.length - 1);
               let testResourcePath = pathParts.at(0);
               let var link = "";
-              if environment.status == "running" && fullAppName? {
+              if environment.status == "running" && fullAppName != "" {
                 link = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/tests/{environment.branch}?testId={testId}\">Logs</a>";
               }
               testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
@@ -120,7 +120,7 @@ pub class GithubComment {
         let var previewUrl = "";
         let var appNameLink = props.appName;
 
-        if fullAppName? {
+        if fullAppName != "" {
           appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}\">{props.appFullName ?? props.appName}</a>";
           if environment.status == "running" {
             previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/console/{environment.branch}/\">Visit</a>";
@@ -142,7 +142,7 @@ pub class GithubComment {
 
         let date = std.Datetime.utcNow();
         let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
-        let envStatus = this.envStatusToString(environment.status, fullAppName ?? "", environment.branch);
+        let envStatus = this.envStatusToString(environment.status, fullAppName, environment.branch);
         let tableRows = "<tr><td>{appNameLink}</td><td>{envStatus}</td><td>{previewUrl}</td><td>{endpointsString}</td><td>{dateStr}</td></tr>";
         let testSummary = "Tests: ✅ {passedTests} Passed  | ❌ {failedTests} Failed";
         let testsSection = "<details><summary>{testSummary}</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";

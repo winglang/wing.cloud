@@ -1,3 +1,4 @@
+bring dynamodb;
 bring ex;
 
 pub struct Connection {
@@ -43,16 +44,25 @@ pub class Connections impl IConnections {
   connections: dynamodb.Table;
   requests: ex.Redis;
   new() {
-    this.connections = new dynamodb.Table(name: "connections", hashKey: "pk", attributeDefinitions: { pk: "S" }) as "connections";
+    this.connections = new dynamodb.Table(
+      name: "connections",
+      hashKey: "pk",
+      attributes: [
+        {
+          name: "pk",
+          type: "S",
+        }
+      ]
+    ) as "connections";
     this.requests = new ex.Redis();
   }
 
   pub inflight addConnection(conn: Connection) {
     this.connections.transactWrite(
-      transactItems: [
+      TransactItems: [
         {
-          put: {
-            item: {
+          Put: {
+            Item: {
               pk: "connectionId#{conn.connectionId}",
               subdomain: conn.subdomain
             },
@@ -60,8 +70,8 @@ pub class Connections impl IConnections {
           },
         },
         {
-          put: {
-            item: {
+          Put: {
+            Item: {
               pk: "subdomain#{conn.subdomain}",
               connectionId: conn.connectionId
             },
@@ -73,24 +83,24 @@ pub class Connections impl IConnections {
   }
 
   pub inflight removeConnection(connectionId: str) {
-    let item = this.connections.getItem(key: {
+    let item = this.connections.get(Key: {
       pk: "connectionId#{connectionId}",
     });
 
-    if let item = item.item {
+    if let item = item.Item {
       let subdomain = item.get("subdomain").asStr();
       this.connections.transactWrite(
-        transactItems: [
+        TransactItems: [
           {
-            delete: {
-              key: {
+            Delete: {
+              Key: {
                 pk: "connectionId#{connectionId}",
               }
             },
           },
           {
-            delete: {
-              key: {
+            Delete: {
+              Key: {
                 pk: "subdomain#{subdomain}",
               }
             },
@@ -101,11 +111,11 @@ pub class Connections impl IConnections {
   }
 
   pub inflight findConnectionBySubdomain(subdomain: str): Connection? {
-    let item = this.connections.getItem(key: {
+    let item = this.connections.get(Key: {
       pk: "subdomain#{subdomain}",
     });
 
-    if let item = item.item {
+    if let item = item.Item {
       return Connection{
         connectionId: item.get("connectionId").asStr(),
         subdomain: subdomain

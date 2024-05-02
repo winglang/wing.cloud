@@ -106,6 +106,7 @@ tunnels.addDeps("@cdktf/provider-dnsimple");
 tunnels.addDeps("@types/express");
 tunnels.addDeps("@types/ws");
 tunnels.addDeps("@winglibs/websockets");
+tunnels.addDeps("@winglibs/dynamodb");
 tunnels.addDeps("cdktf");
 tunnels.addDeps("constructs");
 tunnels.addDeps("express");

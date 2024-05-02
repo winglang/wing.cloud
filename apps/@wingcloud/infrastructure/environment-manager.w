@@ -327,7 +327,7 @@ pub class EnvironmentManager {
       this.endpointProvider.from(
         digest: endpoint.digest,
         port: endpoint.port,
-        targetUrl: "{options.environment.url}").delete();
+        targetUrl: "{options.environment.url ?? ""}").delete();
     }
 
     this.postComment(

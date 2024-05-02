@@ -4,7 +4,7 @@ bring http;
 bring expect;
 
 let bucket = new cloud.Bucket();
-let table = new dynamodb.Table({
+let table = new ex.Table({
   name: "my-table",
   attributeDefinitions: {
     "pk": "S",
