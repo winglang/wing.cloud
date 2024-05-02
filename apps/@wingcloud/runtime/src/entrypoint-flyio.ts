@@ -9,7 +9,7 @@ if (!bucketName) {
   throw new Error("missing bucket name");
 }
 
-let logsBucket: cloud.IBucketClient | undefined; 
+let logsBucket: cloud.IBucketClient | undefined;
 if (process.env["WING_TARGET"] == "tf-aws") {
   logsBucket = new BucketClient(bucketName);
 } else {
@@ -17,7 +17,7 @@ if (process.env["WING_TARGET"] == "tf-aws") {
   if (!simulatorUrl) {
     throw new Error("missing simulator url");
   }
-  logsBucket = makeSimulatorClient(simulatorUrl, bucketName, "bucket");
+  logsBucket = makeSimulatorClient(simulatorUrl, bucketName, bucketName);
 }
 
 const wingApiUrl = process.env["WING_CLOUD_URL"];
