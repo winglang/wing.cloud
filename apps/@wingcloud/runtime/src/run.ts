@@ -93,7 +93,7 @@ export const run = async function ({
     deployLogger.log("Loading secrets from project .env file");
     config({ path: join(dirname(entrypointPath), ".env") });
 
-    deployLogger.log("Loading secrets from app .env file");
+    deployLogger.log("Loading secrets from app settings");
     config({ path: "/app/.env", override: true });
 
     deployLogger.log("Starting wing console server");
