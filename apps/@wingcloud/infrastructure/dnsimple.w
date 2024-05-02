@@ -71,7 +71,7 @@ class Certificate {
       lifecycle: {
        createBeforeDestroy: true,
       }
-    );
+    )as "{props.domainName}.awsprovider.acmCertificate.AcmCertificate";
   }
 }
 
