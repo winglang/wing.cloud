@@ -96,6 +96,9 @@ export const run = async function ({
     deployLogger.log("Loading secrets from app settings");
     config({ path: "/app/.env", override: true });
 
+    // Update redact function with secrets from te project .env file
+    deployLogger.setRedact(redactSecrets());
+
     deployLogger.log("Starting wing console server");
     const { port, close, endpoints } = await startServer({
       consolePath: paths["@wingconsole/app"],

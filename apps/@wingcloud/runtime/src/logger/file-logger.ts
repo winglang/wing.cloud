@@ -21,6 +21,10 @@ export class FileLogger implements LoggerInterface {
     }
   }
 
+  setRedact(redact: (message: string) => string) {
+    this.redact = redact;
+  }
+
   log(message: string, props?: any[]) {
     const time = new Date().toISOString();
     let line = `${time} ${message}${
