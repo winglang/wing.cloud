@@ -425,16 +425,20 @@ pub class Api {
         let githubUser = GitHub.Client.getUser(tokens.access_token);
 
         let var isEarlyAccessUser = false;
+        let var isEarlyAccessCodeRequired = false;
+
         if REQUIRE_EARLY_ACCESS_CODE {
           if let userExists = users.fromLogin(username: githubUser.login) {
-            // If the user is already registered, we don't need to check for early access.
+            isEarlyAccessCodeRequired = userExists.isEarlyAccessCodeRequired == true;
           } else {
+            isEarlyAccessCodeRequired = true;
+          }
+          if isEarlyAccessCodeRequired {
             if let code = request.query.tryGet("early-access-code") {
               earlyAccess.validateCode(code: code);
               log("{githubUser.login} is allowed to access the early access");
               isEarlyAccessUser = true;
-            } else {
-              throw httpError.HttpError.badRequest("An early access code is required.");
+              isEarlyAccessCodeRequired = false;
             }
           }
         }
@@ -445,6 +449,7 @@ pub class Api {
           avatarUrl: githubUser.avatar_url,
           email: githubUser.email,
           isEarlyAccessUser: isEarlyAccessUser,
+          isEarlyAccessCodeRequired: isEarlyAccessCodeRequired,
         );
 
         githubAccessTokens.set(user.id, tokens);
@@ -463,6 +468,7 @@ pub class Api {
 
         log("anonymousId = {request.query.tryGet("anonymousId") ?? ""}");
 
+        // Console Sign In process
         if let anonymousId = request.query.tryGet("anonymousId") {
           log("segmentWriteKey = {props.segmentWriteKey}");
           log("Identifying anonymous user as {user.username}");
@@ -477,7 +483,19 @@ pub class Api {
             // Redirect back to the local Console, using the `signedIn`
             // GET parameter so the Console dismisses the sign in modal.
             location = "http://localhost:{port}/?signedIn";
+
+            return {
+              status: 302,
+              headers: {
+                Location: location,
+                "Set-Cookie": authCookie,
+              },
+            };
           }
+        }
+
+        if isEarlyAccessCodeRequired {
+          throw httpError.HttpError.badRequest("An early access code is required.");
         }
 
         return {
