@@ -15,10 +15,9 @@ FROM docker:24.0.6-git
 
 RUN apk update
 RUN apk add bash ip6tables pigz sysstat procps lsof libstdc++
-RUN apk add --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main/ nodejs npm
+RUN apk add  --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main/ nodejs npm
 
-RUN npm cache clean --force
-RUN npm install -g pnpm projen winglang@latest
+RUN npm i -g pnpm projen winglang@latest
 
 WORKDIR /app
 
