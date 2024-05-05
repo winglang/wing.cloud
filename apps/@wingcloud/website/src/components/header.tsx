@@ -95,7 +95,7 @@ export interface HeaderProps {
 
 export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
   const template = "feature.yml";
-  const WINGCLOUD_ISSUE_URL = `https://github.com/winglang/wing/issues/new?labels=wing-cloud&template=${template}`;
+  const WING_CLOUD_FEEDBACK_URL = `https://t.winglang.io/slack`;
   const { theme } = useTheme();
 
   const { user } = useContext(AuthDataProviderContext);
@@ -218,7 +218,7 @@ export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
           <div className="flex flex-grow justify-end items-center gap-x-4">
             <ButtonLink
               small
-              to={WINGCLOUD_ISSUE_URL}
+              to={WING_CLOUD_FEEDBACK_URL}
               target="_blank"
               title="Feedback"
             >
