@@ -75,7 +75,7 @@ pub class Container_sim {
 
       shellArgs.push(image);
 
-      log("building locally from {image}, tagging {tag} and args {shellArgs}...");
+      log("building locally from {image}, tagging {tag} and args {Json.stringify(shellArgs)}...");
       Container_sim.shell("docker", shellArgs.copy(), this.appDir);
     } else {
       Container_sim.shell("docker", ["pull", this.opts.image]);

@@ -30,8 +30,8 @@ const start = async () => {
   const logsBucket = sim.getResource(
     "root/Default/deployment logs",
   ) as cloud.IBucketClient;
-  const config = sim.getResourceConfig("root/Default/cloud.Api") as ApiSchema;
-  await handler({ logsBucket, wingApiUrl: config.attrs.url });
+  const config = sim.getResourceConfig("root/Default/cloud.Api");
+  await handler({ logsBucket, wingApiUrl: config.attrs["url"] });
 };
 
 start();
