@@ -229,6 +229,7 @@ runtime.addDeps("codespan-wasm");
 runtime.addDeps("chalk");
 runtime.addDeps("stacktracey");
 runtime.addDeps("chokidar");
+runtime.addDeps("dotenv");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/http-proxy");
