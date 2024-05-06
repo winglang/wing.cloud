@@ -16,11 +16,8 @@ export const LoginPage = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const HOME_URL = useMemo(() => {
-    const url = new URL(location.href);
-    url.pathname = "";
-    return url.toString();
-  }, [location.href]);
+  const EARLY_ACCESS_URL =
+    "https://docs.google.com/forms/d/e/1FAIpQLSer0ZVQkROHnBsQYjBVGVGSMNcECjGKC0MTE4PbErEp0mocvw/viewform";
 
   const AUTHORIZE_URL = (() => {
     const url = new URL("https://github.com/login/oauth/authorize");
@@ -72,6 +69,18 @@ export const LoginPage = () => {
         onClose={() => setShowErrorBanner(false)}
       >
         {error}
+        &nbsp;&nbsp;&nbsp;
+        <Link
+          to={EARLY_ACCESS_URL}
+          className={clsx("text-center", "text-blue-800 hover:underline")}
+          onClick={(event) => {
+            event.preventDefault();
+            // Needed to navigate to the landing page.
+            location.href = EARLY_ACCESS_URL;
+          }}
+        >
+          Apply here!
+        </Link>
       </Banner>
 
       <div className="flex flex-col grow max-w-md gap-4">
@@ -115,7 +124,7 @@ export const LoginPage = () => {
               <div className="text-sm text-gray-500">or</div>
               <div className="flex grow justify-center text-sm">
                 <Link
-                  to={HOME_URL}
+                  to={EARLY_ACCESS_URL}
                   className={clsx(
                     "text-center",
                     "text-gray-800 hover:underline",
@@ -123,10 +132,10 @@ export const LoginPage = () => {
                   onClick={(event) => {
                     event.preventDefault();
                     // Needed to navigate to the landing page.
-                    location.href = HOME_URL;
+                    location.href = EARLY_ACCESS_URL;
                   }}
                 >
-                  ← Go to homepage
+                  ← Apply for an Early Access
                 </Link>
               </div>
             </div>
