@@ -1,11 +1,14 @@
 import { existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
 import { join } from "node:path";
 
 import * as redactEnv from "redact-env";
 
-export const redactSecrets = () => {
-  const secrets = [...collectEnvSecrets(), ...collectWingSecrets()];
+export const redactSecrets = (envFile?: string) => {
+  const secrets = [
+    ...collectEnvSecrets(),
+    ...collectWingSecrets(),
+    ...collectWingSecrets(envFile),
+  ];
   const obj: Record<string, string> = {};
   for (const [index, secret] of secrets.entries()) {
     obj[`secret_${index}`] = secret;
@@ -30,12 +33,20 @@ const collectEnvSecrets = (): string[] => {
   return secrets;
 };
 
-const collectWingSecrets = (): string[] => {
+const collectWingSecrets = (envFile?: string): string[] => {
   try {
-    const secretsFile = join(homedir(), ".wing", "secrets.json");
+    const secretsFile = envFile ?? join("/app", ".env");
     if (existsSync(secretsFile)) {
-      const secretsJson = readFileSync(secretsFile, "utf8");
-      const secretsMap: Record<string, string> = JSON.parse(secretsJson);
+      const secretsEnv = readFileSync(secretsFile, "utf8");
+      const secretsMap = Object.fromEntries(
+        secretsEnv
+          .split("\n")
+          .filter((line) => line.includes("="))
+          .map((line) => {
+            const [key, ...valueParts] = line.trim().split("=");
+            return [key, valueParts.join("=")];
+          }),
+      );
       return Object.values(secretsMap);
     } else {
       return [];

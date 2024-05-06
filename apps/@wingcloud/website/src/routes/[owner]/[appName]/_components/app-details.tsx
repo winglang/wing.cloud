@@ -147,6 +147,18 @@ export const AppDetails = ({
                   dataTestId="environment-status"
                 />
               )}
+              {environment?.status === "error" && (
+                <Link
+                  to={`/${owner}/${app?.appName}/logs/${environment.branch}`}
+                  className={clsx(
+                    "ml-1",
+                    "hover:underline focus:underline outline-none",
+                    theme.text4,
+                  )}
+                >
+                  (View logs)
+                </Link>
+              )}
             </div>
           </div>
         </div>

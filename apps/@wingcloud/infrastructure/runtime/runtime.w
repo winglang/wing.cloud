@@ -19,7 +19,7 @@ bring "../components/queues/fifoqueue" as fifoqueue;
 
 class Consts {
   pub static inflight secretsPath(): str {
-    return "/root/.wing/secrets.json";
+    return "/app/.env";
   }
 
   pub static inflight statePath(): str {
@@ -93,9 +93,15 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       repo = "file:///source";
     }
 
-    // write wing secrets.json
+    // write wing secrets env file
     let secretsFile = fs.join(fs.mkdtemp("secrets-"), nanoid62.Nanoid62.generate());
-    fs.writeFile(secretsFile, Json.stringify(opts.secrets), encoding: "utf8");
+
+    let var secretsEnv = "";
+    for secret in opts.secrets.entries() {
+      secretsEnv += "{secret.key}={secret.value}\n";
+    }
+
+    fs.writeFile(secretsFile, secretsEnv, encoding: "utf8");
     volumes.set(secretsFile, Consts.secretsPath());
 
     // setup the state directory
@@ -179,8 +185,13 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       });
     }
 
+    let var secretsEnv = "";
+    for secret in opts.secrets.entries() {
+      secretsEnv += "{secret.key}={secret.value}\n";
+    }
+
     app.addSecrets({
-      "WING_SECRETS": util.base64Encode(Json.stringify(opts.secrets)),
+      "WING_SECRETS": util.base64Encode(secretsEnv),
       "SSL_PRIVATE_KEY": util.base64Encode(opts.certificate.privateKey),
       "SSL_CERTIFICATE": util.base64Encode(opts.certificate.certificate)
     });
