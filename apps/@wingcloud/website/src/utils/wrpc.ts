@@ -300,11 +300,11 @@ export const wrpc = createWRPCReact<{
     {}
   >;
   "admin.setEarlyAccessUser": MutationProcedure<
-    { userId: string; isEarlyAccessUser: boolean },
-    {}
-  >;
-  "admin.setEarlyAccessCodeRequired": MutationProcedure<
-    { userId: string; isEarlyAccessCodeRequired: boolean },
+    {
+      userId: string;
+      isEarlyAccessUser: boolean;
+      isEarlyAccessCodeRequired: boolean;
+    },
     {}
   >;
   "admin.earlyAccess.createCode": MutationProcedure<

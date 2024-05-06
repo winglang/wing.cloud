@@ -9,8 +9,8 @@ pub struct User {
   avatarUrl: str;
   email: str?;
   isAdmin: bool?;
-  isEarlyAccessUser: bool?;
-  isEarlyAccessCodeRequired: bool?;
+  isEarlyAccessUser: bool?; // User is an early access user
+  isEarlyAccessCodeRequired: bool?; // User must provide an early access code to sign in
 }
 
 struct CreateOptions {
@@ -62,6 +62,7 @@ struct SetIsEarlyAccessUserOptions {
   userId: str;
   username: str;
   isEarlyAccessUser: bool;
+  isEarlyAccessCodeRequired: bool;
 }
 
 struct SetEarlyAccessCodeRequiredOptions {
@@ -310,38 +311,9 @@ pub class Users {
             pk: "LOGIN#{options.username}",
             sk: "#",
           },
-          updateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser",
+          updateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
           expressionAttributeValues: {
             ":isEarlyAccessUser": options.isEarlyAccessUser,
-          },
-        }
-      },
-      {
-        update: {
-          key: {
-            pk: "USER#{options.userId}",
-            sk: "#",
-          },
-          updateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser",
-          expressionAttributeValues: {
-            ":isEarlyAccessUser": options.isEarlyAccessUser,
-          },
-        }
-      }
-    ]);
-  }
-
-  // Intended for admin use only
-  pub inflight setEarlyAccessCodeRequired(options: SetEarlyAccessCodeRequiredOptions): void {
-    this.table.transactWriteItems(transactItems: [
-      {
-        update: {
-          key: {
-            pk: "LOGIN#{options.username}",
-            sk: "#",
-          },
-          updateExpression: "SET isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
-          expressionAttributeValues: {
             ":isEarlyAccessCodeRequired": options.isEarlyAccessCodeRequired,
           },
         }
@@ -352,14 +324,14 @@ pub class Users {
             pk: "USER#{options.userId}",
             sk: "#",
           },
-          updateExpression: "SET isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
+          updateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
           expressionAttributeValues: {
+            ":isEarlyAccessUser": options.isEarlyAccessUser,
             ":isEarlyAccessCodeRequired": options.isEarlyAccessCodeRequired,
           },
         }
       }
     ]);
-
   }
 
   inflight fromDB(item: Json): User {

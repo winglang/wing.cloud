@@ -95,9 +95,10 @@ pub class Admin {
         if let codeRequired = user.isEarlyAccessCodeRequired {
           // If already set, skip
         } elif user.isAdmin != true {
-          users.setEarlyAccessCodeRequired(
+          users.setIsEarlyAccessUser(
             userId: user.id,
             username: user.username,
+            isEarlyAccessUser: true,
             isEarlyAccessCodeRequired: true
           );
         }
@@ -221,6 +222,7 @@ pub class Admin {
 
         let userId = input.get("userId").asStr();
         let isEarlyAccessUser = input.get("isEarlyAccessUser").asBool();
+        let isEarlyAccessCodeRequired = input.get("isEarlyAccessCodeRequired").asBool();
 
         let user = users.get({
           userId: userId
@@ -229,31 +231,7 @@ pub class Admin {
         users.setIsEarlyAccessUser(
           userId: userId,
           username: user.username,
-          isEarlyAccessUser: isEarlyAccessUser
-        );
-
-        return {
-          body: {}
-        };
-      }
-      throw httpError.HttpError.unauthorized();
-    });
-
-    api.post("/wrpc/admin.requireEarlyAccessCode", inflight (request) => {
-      checkAdminAccessRights(request);
-      if let userFromCookie = getUserFromCookie(request) {
-        let input = Json.parse(request.body ?? "");
-
-        let userId = input.get("userId").asStr();
-        let isEarlyAccessCodeRequired = input.get("isEarlyAccessCodeRequired").asBool();
-
-        let user = users.get({
-          userId: userId
-        });
-
-        users.setEarlyAccessCodeRequired(
-          userId: userId,
-          username: user.username,
+          isEarlyAccessUser: isEarlyAccessUser,
           isEarlyAccessCodeRequired: isEarlyAccessCodeRequired
         );
 
