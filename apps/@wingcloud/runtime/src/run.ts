@@ -78,6 +78,7 @@ export const run = async function ({
 
     const { paths, entrypointPath } = await setup.run();
     wingPaths = paths;
+    const appEnvFile = join(dirname(entrypointPath), ".env");
 
     await report("running-tests");
     const testResults = await setup.runWingTests(paths, entrypointPath);
@@ -91,13 +92,12 @@ export const run = async function ({
     }
 
     deployLogger.log("Loading secrets from project .env file");
-    config({ path: join(dirname(entrypointPath), ".env") });
+    config({ path: appEnvFile });
 
     deployLogger.log("Loading secrets from app settings");
     config({ path: "/app/.env", override: true });
 
-    // Update redact function with secrets from te project .env file
-    deployLogger.setRedact(redactSecrets());
+    deployLogger.setRedact(redactSecrets(appEnvFile));
 
     deployLogger.log("Starting wing console server");
     const { port, close, endpoints } = await startServer({
