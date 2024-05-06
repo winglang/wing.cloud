@@ -66,7 +66,6 @@ pub class Admin {
     new cloud.OnDeploy(inflight () => {
       if ADMIN_USERNAMES.length == 0 {
         log("No admin usernames provided. No users will be set as admins.");
-        return;
       }
       for username in ADMIN_USERNAMES {
         try {
@@ -88,6 +87,19 @@ pub class Admin {
             username: user.username,
             isAdmin: true,
           });
+        }
+      }
+
+      let usersList = users.list();
+      for user in usersList {
+        if let codeRequired = user.isEarlyAccessCodeRequired {
+          // If already set, skip
+        } elif user.isAdmin != true {
+          users.setEarlyAccessCodeRequired(
+            userId: user.id,
+            username: user.username,
+            isEarlyAccessCodeRequired: true
+          );
         }
       }
     });
@@ -218,6 +230,31 @@ pub class Admin {
           userId: userId,
           username: user.username,
           isEarlyAccessUser: isEarlyAccessUser
+        );
+
+        return {
+          body: {}
+        };
+      }
+      throw httpError.HttpError.unauthorized();
+    });
+
+    api.post("/wrpc/admin.requireEarlyAccessCode", inflight (request) => {
+      checkAdminAccessRights(request);
+      if let userFromCookie = getUserFromCookie(request) {
+        let input = Json.parse(request.body ?? "");
+
+        let userId = input.get("userId").asStr();
+        let isEarlyAccessCodeRequired = input.get("isEarlyAccessCodeRequired").asBool();
+
+        let user = users.get({
+          userId: userId
+        });
+
+        users.setEarlyAccessCodeRequired(
+          userId: userId,
+          username: user.username,
+          isEarlyAccessCodeRequired: isEarlyAccessCodeRequired
         );
 
         return {

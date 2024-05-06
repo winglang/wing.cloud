@@ -424,12 +424,13 @@ pub class Api {
 
         let githubUser = GitHub.Client.getUser(tokens.access_token);
 
-        let var isEarlyAccessUser = false;
         let var isEarlyAccessCodeRequired = false;
 
         if REQUIRE_EARLY_ACCESS_CODE {
           if let userExists = users.fromLogin(username: githubUser.login) {
-            isEarlyAccessCodeRequired = userExists.isEarlyAccessCodeRequired == true;
+            isEarlyAccessCodeRequired =
+              userExists.isEarlyAccessUser == true &&
+              userExists.isEarlyAccessCodeRequired == true;
           } else {
             isEarlyAccessCodeRequired = true;
           }
@@ -437,7 +438,6 @@ pub class Api {
             if let code = request.query.tryGet("early-access-code") {
               earlyAccess.validateCode(code: code);
               log("{githubUser.login} is allowed to access the early access");
-              isEarlyAccessUser = true;
               isEarlyAccessCodeRequired = false;
             }
           }
@@ -448,7 +448,7 @@ pub class Api {
           username: githubUser.login,
           avatarUrl: githubUser.avatar_url,
           email: githubUser.email,
-          isEarlyAccessUser: isEarlyAccessUser,
+          isEarlyAccessUser: REQUIRE_EARLY_ACCESS_CODE,
           isEarlyAccessCodeRequired: isEarlyAccessCodeRequired,
         );
 
@@ -757,11 +757,13 @@ pub class Api {
         let user = users.fromLoginOrFail(username: owner);
 
         if let isEarlyAccessUser = user.isEarlyAccessUser {
-          let userApps = apps.list(userId: user.id);
-          if userApps.length >= EARLY_ACCESS_USERS_MAX_APPS {
-            throw httpError.HttpError.forbidden(
-              "You have reached the maximum number of apps allowed for early access users."
-            );
+          if isEarlyAccessUser {
+            let userApps = apps.list(userId: user.id);
+            if userApps.length >= EARLY_ACCESS_USERS_MAX_APPS {
+              throw httpError.HttpError.forbidden(
+                "You have reached the maximum number of apps allowed for early access users."
+              );
+            }
           }
         }
 

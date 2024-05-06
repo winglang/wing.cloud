@@ -64,6 +64,12 @@ struct SetIsEarlyAccessUserOptions {
   isEarlyAccessUser: bool;
 }
 
+struct SetEarlyAccessCodeRequiredOptions {
+  userId: str;
+  username: str;
+  isEarlyAccessCodeRequired: bool;
+}
+
 pub class Users {
   table: ex.DynamodbTable;
 
@@ -144,11 +150,12 @@ pub class Users {
             pk: "USER#{options.userId}",
             sk: "#",
           },
-          updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email",
+          updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
           expressionAttributeValues: {
             ":displayName": options.displayName,
             ":avatarUrl": options.avatarUrl,
             ":email": options.email,
+            ":isEarlyAccessCodeRequired": options.isEarlyAccessCodeRequired,
           },
         }
       }
@@ -322,6 +329,37 @@ pub class Users {
         }
       }
     ]);
+  }
+
+  // Intended for admin use only
+  pub inflight setEarlyAccessCodeRequired(options: SetEarlyAccessCodeRequiredOptions): void {
+    this.table.transactWriteItems(transactItems: [
+      {
+        update: {
+          key: {
+            pk: "LOGIN#{options.username}",
+            sk: "#",
+          },
+          updateExpression: "SET isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
+          expressionAttributeValues: {
+            ":isEarlyAccessCodeRequired": options.isEarlyAccessCodeRequired,
+          },
+        }
+      },
+      {
+        update: {
+          key: {
+            pk: "USER#{options.userId}",
+            sk: "#",
+          },
+          updateExpression: "SET isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
+          expressionAttributeValues: {
+            ":isEarlyAccessCodeRequired": options.isEarlyAccessCodeRequired,
+          },
+        }
+      }
+    ]);
+
   }
 
   inflight fromDB(item: Json): User {

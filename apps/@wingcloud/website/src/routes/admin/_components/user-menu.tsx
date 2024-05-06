@@ -1,5 +1,7 @@
 import {
   ExclamationCircleIcon,
+  LockClosedIcon,
+  LockOpenIcon,
   UserGroupIcon,
   UserIcon,
   XCircleIcon,
@@ -14,6 +16,7 @@ import { MenuIcon } from "../../../icons/menu-icon.js";
 import { type User } from "../../../utils/wrpc.js";
 
 import { GrantAdminRightsModal } from "./grant-admin-rights-modal.js";
+import { RequireEarlyAccessCodeModal } from "./require-early-access-code-modal.js";
 import { SetEarlyAccessModal } from "./set-early-access-modal.js";
 
 export const UserMenu = ({
@@ -28,6 +31,8 @@ export const UserMenu = ({
 
   const [showAdminRightsModal, setShowAdminRightsModal] = useState(false);
   const [showEarlyAccessModal, setShowEarlyAccessModal] = useState(false);
+  const [showRequireEarlyAccessCodeModal, setShowRequireEarlyAccessCodeModal] =
+    useState(false);
 
   return (
     <>
@@ -63,6 +68,20 @@ export const UserMenu = ({
               : "Set as 'early access' user",
             onClick: () => setShowEarlyAccessModal(true),
           },
+          {
+            icon:
+              user.isEarlyAccessUser && user.isEarlyAccessCodeRequired ? (
+                <LockOpenIcon className="size-4" />
+              ) : (
+                <LockClosedIcon className="size-4" />
+              ),
+            label:
+              user.isEarlyAccessUser && user.isEarlyAccessCodeRequired
+                ? "Remove early access code"
+                : "Require early access code",
+            onClick: () => setShowRequireEarlyAccessCodeModal(true),
+            disabled: !user.isEarlyAccessUser,
+          },
         ]}
       />
       <GrantAdminRightsModal
@@ -78,6 +97,14 @@ export const UserMenu = ({
         show={showEarlyAccessModal}
         onClose={(success) => {
           setShowEarlyAccessModal(false);
+          onClose?.(success);
+        }}
+      />
+      <RequireEarlyAccessCodeModal
+        user={user}
+        show={showRequireEarlyAccessCodeModal}
+        onClose={(success) => {
+          setShowRequireEarlyAccessCodeModal(false);
           onClose?.(success);
         }}
       />

@@ -166,7 +166,9 @@ const UsersPage = () => {
                           "whitespace-nowrap",
                         )}
                       >
-                        Early Access
+                        {user.isEarlyAccessCodeRequired
+                          ? "Code required"
+                          : "Early access"}
                       </div>
                     )}
                     {user.isAdmin && (
