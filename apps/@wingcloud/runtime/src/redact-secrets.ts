@@ -32,10 +32,18 @@ const collectEnvSecrets = (): string[] => {
 
 const collectWingSecrets = (): string[] => {
   try {
-    const secretsFile = join(homedir(), ".wing", "secrets.json");
+    const secretsFile = join("/app", ".env");
     if (existsSync(secretsFile)) {
-      const secretsJson = readFileSync(secretsFile, "utf8");
-      const secretsMap: Record<string, string> = JSON.parse(secretsJson);
+      const secretsEnv = readFileSync(secretsFile, "utf8");
+      const secretsMap = Object.fromEntries(
+        secretsEnv
+          .split("\n")
+          .filter((line) => line.includes("="))
+          .map((line) => {
+            const [key, ...valueParts] = line.trim().split("=");
+            return [key, valueParts.join("=")];
+          }),
+      );
       return Object.values(secretsMap);
     } else {
       return [];

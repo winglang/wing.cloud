@@ -1,3 +1,7 @@
+import { dirname, join } from "node:path";
+
+import { config } from "dotenv";
+
 import { createKeyStore } from "./auth/key-store.js";
 import { cleanEnvironment } from "./clean.js";
 import { type EnvironmentContext } from "./environment.js";
@@ -85,6 +89,15 @@ export const run = async function ({
       await report("tests-error", { message });
       deployLogger.log(message);
     }
+
+    deployLogger.log("Loading secrets from project .env file");
+    config({ path: join(dirname(entrypointPath), ".env") });
+
+    deployLogger.log("Loading secrets from app settings");
+    config({ path: "/app/.env", override: true });
+
+    // Update redact function with secrets from te project .env file
+    deployLogger.setRedact(redactSecrets());
 
     deployLogger.log("Starting wing console server");
     const { port, close, endpoints } = await startServer({
