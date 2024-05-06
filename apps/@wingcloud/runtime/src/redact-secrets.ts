@@ -1,5 +1,4 @@
 import { existsSync, readFileSync } from "node:fs";
-import { homedir } from "node:os";
 import { join } from "node:path";
 
 import * as redactEnv from "redact-env";

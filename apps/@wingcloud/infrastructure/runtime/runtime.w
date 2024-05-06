@@ -185,8 +185,13 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       });
     }
 
+    let var secretsEnv = "";
+    for secret in opts.secrets.entries() {
+      secretsEnv += "{secret.key}={secret.value}\n";
+    }
+
     app.addSecrets({
-      "WING_SECRETS": util.base64Encode(Json.stringify(opts.secrets)),
+      "WING_SECRETS": util.base64Encode(secretsEnv),
       "SSL_PRIVATE_KEY": util.base64Encode(opts.certificate.privateKey),
       "SSL_CERTIFICATE": util.base64Encode(opts.certificate.certificate)
     });
