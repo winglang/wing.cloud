@@ -9,11 +9,12 @@ import {
 export interface User {
   id: string;
   isAdmin: boolean;
-  isEarlyAccessUser: boolean;
   username: string;
   displayName: string;
   avatarUrl: string;
   email?: string;
+  isEarlyAccessUser: boolean;
+  isEarlyAccessCodeRequired?: boolean;
 }
 
 export interface Installation {
@@ -299,7 +300,11 @@ export const wrpc = createWRPCReact<{
     {}
   >;
   "admin.setEarlyAccessUser": MutationProcedure<
-    { userId: string; isEarlyAccessUser: boolean },
+    {
+      userId: string;
+      isEarlyAccessUser: boolean;
+      isEarlyAccessCodeRequired: boolean;
+    },
     {}
   >;
   "admin.earlyAccess.createCode": MutationProcedure<

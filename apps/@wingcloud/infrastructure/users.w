@@ -9,7 +9,8 @@ pub struct User {
   avatarUrl: str;
   email: str?;
   isAdmin: bool?;
-  isEarlyAccessUser: bool?;
+  isEarlyAccessUser: bool?; // User is an early access user
+  isEarlyAccessCodeRequired: bool?; // User must provide an early access code to sign in
 }
 
 struct CreateOptions {
@@ -18,6 +19,7 @@ struct CreateOptions {
   avatarUrl: str?;
   email: str?;
   isEarlyAccessUser: bool?;
+  isEarlyAccessCodeRequired: bool?;
 }
 
 struct FromLoginOptions {
@@ -30,6 +32,7 @@ struct GetOrCreateOptions {
   avatarUrl: str?;
   email: str?;
   isEarlyAccessUser: bool?;
+  isEarlyAccessCodeRequired: bool?;
 }
 
 struct GetUserOptions {
@@ -46,6 +49,7 @@ struct UpdateOptions {
   username: str;
   avatarUrl: str?;
   email: str?;
+  isEarlyAccessCodeRequired: bool?;
 }
 
 struct SetAdminRoleOptions {
@@ -58,6 +62,13 @@ struct SetIsEarlyAccessUserOptions {
   userId: str;
   username: str;
   isEarlyAccessUser: bool;
+  isEarlyAccessCodeRequired: bool;
+}
+
+struct SetEarlyAccessCodeRequiredOptions {
+  userId: str;
+  username: str;
+  isEarlyAccessCodeRequired: bool;
 }
 
 pub class Users {
@@ -83,6 +94,7 @@ pub class Users {
               avatarUrl: options.avatarUrl ?? "",
               email: options.email ?? "",
               isEarlyAccessUser: options.isEarlyAccessUser ?? false,
+              isEarlyAccessCodeRequired: options.isEarlyAccessCodeRequired ?? false,
             },
             conditionExpression: "attribute_not_exists(pk)",
           },
@@ -98,6 +110,7 @@ pub class Users {
               avatarUrl: options.avatarUrl ?? "",
               email: options.email ?? "",
               isEarlyAccessUser: options.isEarlyAccessUser ?? false,
+              isEarlyAccessCodeRequired: options.isEarlyAccessCodeRequired ?? false,
             },
           }
         },
@@ -111,6 +124,7 @@ pub class Users {
       avatarUrl: options.avatarUrl ?? "",
       email: options.email ?? "",
       isEarlyAccessUser: options.isEarlyAccessUser,
+      isEarlyAccessCodeRequired: options.isEarlyAccessCodeRequired ?? false,
     };
   }
 
@@ -122,11 +136,12 @@ pub class Users {
             pk: "LOGIN#{options.username}",
             sk: "#",
           },
-          updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email",
+          updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
           expressionAttributeValues: {
             ":displayName": options.displayName,
             ":avatarUrl": options.avatarUrl,
             ":email": options.email,
+            ":isEarlyAccessCodeRequired": options.isEarlyAccessCodeRequired,
           },
         }
       },
@@ -136,11 +151,12 @@ pub class Users {
             pk: "USER#{options.userId}",
             sk: "#",
           },
-          updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email",
+          updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
           expressionAttributeValues: {
             ":displayName": options.displayName,
             ":avatarUrl": options.avatarUrl,
             ":email": options.email,
+            ":isEarlyAccessCodeRequired": options.isEarlyAccessCodeRequired,
           },
         }
       }
@@ -171,6 +187,7 @@ pub class Users {
     if let user = this.fromLogin(username: options.username) {
       if user.displayName == options.displayName &&
         user.avatarUrl == options.avatarUrl ?? "" &&
+        user.isEarlyAccessCodeRequired == options.isEarlyAccessCodeRequired &&
         user.email == options.email {
           return user;
       }
@@ -181,6 +198,7 @@ pub class Users {
         avatarUrl: options.avatarUrl,
         email: options.email,
         username: options.username,
+        isEarlyAccessCodeRequired: options.isEarlyAccessCodeRequired,
       );
 
       return User {
@@ -190,6 +208,7 @@ pub class Users {
         email: options.email,
         id: user.id,
         isAdmin: user.isAdmin,
+        isEarlyAccessCodeRequired: options.isEarlyAccessCodeRequired,
       };
     } else {
       return this.create(
@@ -198,6 +217,7 @@ pub class Users {
         avatarUrl: options.avatarUrl,
         email: options.email,
         isEarlyAccessUser: options.isEarlyAccessUser ?? false,
+        isEarlyAccessCodeRequired: options.isEarlyAccessCodeRequired ?? false,
       );
     }
   }
@@ -291,9 +311,10 @@ pub class Users {
             pk: "LOGIN#{options.username}",
             sk: "#",
           },
-          updateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser",
+          updateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
           expressionAttributeValues: {
             ":isEarlyAccessUser": options.isEarlyAccessUser,
+            ":isEarlyAccessCodeRequired": options.isEarlyAccessCodeRequired,
           },
         }
       },
@@ -303,9 +324,10 @@ pub class Users {
             pk: "USER#{options.userId}",
             sk: "#",
           },
-          updateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser",
+          updateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
           expressionAttributeValues: {
             ":isEarlyAccessUser": options.isEarlyAccessUser,
+            ":isEarlyAccessCodeRequired": options.isEarlyAccessCodeRequired,
           },
         }
       }
@@ -321,6 +343,7 @@ pub class Users {
       email: item.tryGet("email")?.tryAsStr() ?? "",
       isAdmin: item.tryGet("isAdmin")?.tryAsBool() ?? false,
       isEarlyAccessUser: item.tryGet("isEarlyAccessUser")?.tryAsBool() ?? false,
+      isEarlyAccessCodeRequired: item.tryGet("isEarlyAccessCodeRequired")?.tryAsBool(),
     };
   }
 }
