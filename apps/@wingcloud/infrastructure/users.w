@@ -268,8 +268,7 @@ pub class Users {
     for item in result.Items {
       users.push(this.fromDB(item));
     }
-
-    return users.copy();
+      return users.copy();
   }
 
   // Intended for admin use only
@@ -338,7 +337,7 @@ pub class Users {
     return {
       id: item.get("id").asStr(),
       username: item.get("username").asStr(),
-      avatarUrl: item.get("avatarUrl").asStr(),
+      avatarUrl: item.tryGet("avatarUrl")?.tryAsStr() ?? "",
       displayName: item.tryGet("displayName")?.tryAsStr() ?? "",
       email: item.tryGet("email")?.tryAsStr() ?? "",
       isAdmin: item.tryGet("isAdmin")?.tryAsBool() ?? false,

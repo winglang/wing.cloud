@@ -45,14 +45,14 @@ export const LoginPage = () => {
     }
     try {
       const errorString = atob(errorBase64);
-      const error = JSON.parse(errorString);
+      const error = JSON.parse(errorString) as Error;
       console.log("error", error);
 
       searchParams.delete("error");
       setError(error.message);
       setShowErrorBanner(true);
-    } catch (error) {
-      console.log("error", error);
+    } catch {
+      console.error(atob(errorBase64));
     }
   }, []);
 

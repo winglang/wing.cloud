@@ -329,7 +329,7 @@ pub class Apps {
           ExclusiveStartKey: exclusiveStartKey,
         );
         for item in result.Items {
-          apps = apps.concat([App.fromJson(item)]);
+          apps = apps.concat([this.fromDB(item)]);
         }
         exclusiveStartKey = result.LastEvaluatedKey;
       },

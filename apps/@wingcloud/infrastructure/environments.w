@@ -903,6 +903,10 @@ pub class Environments {
   }
 
   inflight fromDB(item: Json): Environment {
+
+    let installationId = item.get("installationId").get("value").asStr();
+    let commentId = item.tryGet("commentId")?.tryGet("value")?.tryAsStr();
+
     return {
       id: item.get("id").asStr(),
       appId: item.get("appId").asStr(),
@@ -911,11 +915,11 @@ pub class Environments {
       branch: item.get("branch").asStr(),
       sha: item.get("sha").asStr(),
       status: item.get("status").asStr(),
-      installationId: item.get("installationId").asNum(),
-      prNumber: item.tryGet("prNumber")?.tryAsNum(),
+      installationId: num.fromStr(installationId),
+      prNumber: item.tryGet("prNumber")?.tryGet("value")?.tryAsNum(),
       prTitle: item.tryGet("prTitle")?.tryAsStr(),
       url: item.tryGet("url")?.tryAsStr(),
-      commentId: item.tryGet("commentId")?.tryAsNum(),
+      commentId: num.fromStr(commentId ?? ""),
       testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
       createdAt: item.get("createdAt").asStr(),
       updatedAt: item.get("updatedAt").asStr(),
