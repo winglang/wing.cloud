@@ -66,7 +66,6 @@ pub class Admin {
     new cloud.OnDeploy(inflight () => {
       if ADMIN_USERNAMES.length == 0 {
         log("No admin usernames provided. No users will be set as admins.");
-        return;
       }
       for username in ADMIN_USERNAMES {
         try {
@@ -88,6 +87,20 @@ pub class Admin {
             username: user.username,
             isAdmin: true,
           });
+        }
+      }
+
+      let usersList = users.list();
+      for user in usersList {
+        if let codeRequired = user.isEarlyAccessCodeRequired {
+          // If already set, skip
+        } elif user.isAdmin != true {
+          users.setIsEarlyAccessUser(
+            userId: user.id,
+            username: user.username,
+            isEarlyAccessUser: true,
+            isEarlyAccessCodeRequired: true
+          );
         }
       }
     });
@@ -209,6 +222,7 @@ pub class Admin {
 
         let userId = input.get("userId").asStr();
         let isEarlyAccessUser = input.get("isEarlyAccessUser").asBool();
+        let isEarlyAccessCodeRequired = input.get("isEarlyAccessCodeRequired").asBool();
 
         let user = users.get({
           userId: userId
@@ -217,7 +231,8 @@ pub class Admin {
         users.setIsEarlyAccessUser(
           userId: userId,
           username: user.username,
-          isEarlyAccessUser: isEarlyAccessUser
+          isEarlyAccessUser: isEarlyAccessUser,
+          isEarlyAccessCodeRequired: isEarlyAccessCodeRequired
         );
 
         return {

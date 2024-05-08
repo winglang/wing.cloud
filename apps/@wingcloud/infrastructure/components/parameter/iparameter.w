@@ -1,6 +1,6 @@
 bring cloud;
 
-pub interface IParameter {
+pub inflight interface IParameter {
   inflight get(): str;
 }
 

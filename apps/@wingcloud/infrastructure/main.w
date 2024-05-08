@@ -325,7 +325,7 @@ if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" 
   let devNgrok = new ngrok.Ngrok(
     url: probotApp.githubApp.api.url,
     domain: util.tryEnv("NGROK_DOMAIN"),
-  );
+  ) as "ngrok";
 }
 if util.tryEnv("WING_TARGET") != "sim" {
   let webhookUrl = probotApp.githubApp.api.url;

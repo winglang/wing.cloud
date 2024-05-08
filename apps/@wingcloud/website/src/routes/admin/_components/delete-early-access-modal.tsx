@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { ConfirmationModal } from "../../../components/confirmation-modal.js";
 import { useNotifications } from "../../../design-system/notification.js";
@@ -18,8 +17,6 @@ export const DeleteEarlyAccessModal = ({
 }: DeleteEarlyAccessModalProps) => {
   const { showNotification } = useNotifications();
   const [disabled, setDisabled] = useState(false);
-
-  const navigate = useNavigate();
 
   const deleteEarlyAccess = wrpc["admin.earlyAccess.deleteCode"].useMutation({
     onMutate() {

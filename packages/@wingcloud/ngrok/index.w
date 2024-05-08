@@ -26,7 +26,7 @@ pub class Ngrok {
 			onData: inflight (data) => {
 				log("[ngrok] {data}");
 			},
-		);
+		) as "NgrokService";
 		let state = new sim.State();
 		this.url = state.token("url");
 		let urlRetriever = new cloud.Service(inflight () => {

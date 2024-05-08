@@ -2,7 +2,7 @@ bring cloud;
 bring util;
 bring "./proxyapi.types.w" as types;
 
-interface StartServerResult {
+inflight interface StartServerResult {
   inflight port(): num;
   inflight close(): void;
 }
@@ -11,9 +11,11 @@ pub class ProxyApi impl types.IProxyApi {
   bucket: cloud.Bucket;
   new(handler: inflight (types.ProxyApiEvent): types.ProxyApiResponse, props: types.ProxyApiProps) {
     this.bucket = new cloud.Bucket();
+
     new cloud.Service(inflight () => {
       let res = ProxyApi.startServer(handler);
       this.bucket.put("url.txt", "http://localhost:{res.port()}");
+
       return () => {
         res.close();
       };

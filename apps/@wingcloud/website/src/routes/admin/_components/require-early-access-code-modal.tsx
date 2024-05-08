@@ -4,17 +4,17 @@ import { ConfirmationModal } from "../../../components/confirmation-modal.js";
 import { useNotifications } from "../../../design-system/notification.js";
 import { wrpc, type User } from "../../../utils/wrpc.js";
 
-export interface SetEarlyAccessModalProps {
+export interface RequireEarlyAccessCodeModalProps {
   user: User;
   show: boolean;
   onClose: (value: boolean) => void;
 }
 
-export const SetEarlyAccessModal = ({
+export const RequireEarlyAccessCodeModal = ({
   user,
   show,
   onClose,
-}: SetEarlyAccessModalProps) => {
+}: RequireEarlyAccessCodeModalProps) => {
   const { showNotification } = useNotifications();
   const [disabled, setDisabled] = useState(false);
 
@@ -24,10 +24,9 @@ export const SetEarlyAccessModal = ({
     },
     onSuccess() {
       showNotification(
-        `Changed ${user.username} user to ${
-          user.isEarlyAccessUser ? "regular" : "early-access"
-        }
-        successfully.`,
+        `${user.username} ${
+          user.isEarlyAccessCodeRequired ? "no longer" : ""
+        } requires an early access code to sign in.`,
         {
           type: "success",
         },
@@ -57,12 +56,12 @@ export const SetEarlyAccessModal = ({
     () => (
       <p className="text-sm text-slate-500">
         User <span className="text-slate-700 italic">{user.username}</span> will
-        be set as
-        {user.isEarlyAccessUser ? " a " : " an "}
+        be
+        {user.isEarlyAccessCodeRequired ? " no longer" : ""} required to use an{" "}
         <span className="bg-slate-200 text-slate-700 px-1 rounded">
-          {user.isEarlyAccessUser ? "regular" : "early-access"}
+          early access code
         </span>{" "}
-        user.
+        to sign in.
       </p>
     ),
     [user.isEarlyAccessUser, user.username],
@@ -78,11 +77,15 @@ export const SetEarlyAccessModal = ({
       onConfirm={() =>
         setEarlyAccessUser.mutate({
           userId: user.id,
-          isEarlyAccessUser: !user.isEarlyAccessUser,
-          isEarlyAccessCodeRequired: false,
+          isEarlyAccessUser: user.isEarlyAccessUser,
+          isEarlyAccessCodeRequired: !user.isEarlyAccessCodeRequired,
         })
       }
-      modalTitle="Change user type"
+      modalTitle={
+        user.isEarlyAccessCodeRequired
+          ? "Remove early access code"
+          : "Require early access code"
+      }
       modalBody={dialogBody}
       confirmButtonText="Change"
       confirmButtonTextPending="Processing..."

@@ -5,7 +5,7 @@ pub struct Record {
   content: str;
 }
 
-pub interface IDNS {
+pub inflight interface IDNS {
   inflight createRecords(records: Array<Record>): void;
   inflight deleteRecords(records: Array<Record>): void;
 }
