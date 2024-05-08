@@ -279,6 +279,10 @@ pub class Api {
         if user.isAdmin {
           if request.method == cloud.HttpMethod.GET {
             return app;
+          } if request.method == cloud.HttpMethod.POST {
+            if request.path == "/wrpc/app.environment.restart" {
+              return app;
+            }
           }
           throw httpError.HttpError.unauthorized("Admin is not authorized to perform this action");
         }
