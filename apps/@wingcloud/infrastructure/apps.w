@@ -200,7 +200,7 @@ pub class Apps {
     );
 
     if let item = result.Item {
-      return App.fromJson(item);
+      return this.fromDB(item);
     }
 
     throw httpError.HttpError.notFound("Get App: '{options.appId}' not found");
@@ -223,7 +223,7 @@ pub class Apps {
     );
 
     if let item = result.Item {
-      return App.fromJson(item);
+      return this.fromDB(item);
     }
 
     throw httpError.HttpError.notFound("App '{options.appName}' not found");
@@ -243,7 +243,7 @@ pub class Apps {
           ExclusiveStartKey: exclusiveStartKey,
         );
         for item in result.Items {
-          apps = apps.concat([App.fromJson(item)]);
+          apps = apps.concat([this.fromDB(item)]);
         }
         exclusiveStartKey = result.LastEvaluatedKey;
       },
