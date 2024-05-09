@@ -158,7 +158,7 @@ pub class EnvironmentManager {
         log("unknown action {action}");
       }
     } catch err {
-      log("Failed to handle action {action}: {err}");
+      log("Failed to handle action '{action}': {err}");
     }
   }
 
@@ -167,12 +167,16 @@ pub class EnvironmentManager {
 
     let secrets = this.secretsForEnvironment(options.environment);
 
-    this.postComment(
-      appId: app.appId,
-      appName: app.appName,
-      environmentId: options.environment.id,
-      octokit: octokit
-    );
+    try {
+      this.postComment(
+        appId: app.appId,
+        appName: app.appName,
+        environmentId: options.environment.id,
+        octokit: octokit
+      );
+    } catch err {
+      log("Failed to post comment: {err}");
+    }
 
     let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: options.environment.installationId);
     if tokenRes.status >= 300 || tokenRes.status < 200 {

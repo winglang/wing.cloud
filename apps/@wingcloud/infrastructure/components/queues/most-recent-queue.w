@@ -42,8 +42,8 @@ pub class MostRecentQueue {
           groupId: message.groupId,
         }
       });
-
-      if let lastTimestamp = item.Item?.tryGet("lastMessageTimestamp")?.tryAsNum() {
+      if let lastMessageTimestamp = item.Item?.tryGet("lastMessageTimestamp")?.tryGet("value")?.tryAsStr() {
+        let lastTimestamp = num.fromStr(lastMessageTimestamp);
         if lastTimestamp <= message.timestamp {
           log("handling message: {event}, {lastTimestamp}");
           handler(message);

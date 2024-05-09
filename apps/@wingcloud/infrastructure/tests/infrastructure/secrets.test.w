@@ -8,11 +8,11 @@ let secrets = new Secrets.Secrets();
 
 test "not storing sensitive data" {
   let secret = secrets.create(appId: "app-id", environmentType: "production", name: "test-secret", value: "secret-value");
-  let item = secrets.table.getItem(key: {
+  let item = secrets.table.get(Key: {
     pk: "APP#{secret.appId}",
     sk: "SECRET#TYPE#production#SECRET#{secret.id}",
   });
-  let encryptedValue = item.item?.get("value");
+  let encryptedValue = item.Item?.get("value");
   let value = Json secret.value;
   assert(Json value != encryptedValue);
 }

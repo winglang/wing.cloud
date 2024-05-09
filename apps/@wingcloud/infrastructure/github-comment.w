@@ -68,7 +68,8 @@ pub class GithubComment {
     try {
       let app = this.apps.get(appId: appId);
       return (this.users.get(userId: app.userId)).username;
-    } catch {
+    } catch error {
+      log("Failed to get app owner {error}");
       return nil;
     }
   }
@@ -84,79 +85,82 @@ pub class GithubComment {
         fullAppName = "${appOwner}/${props.appName}";
       }
     }
+    let environmentList = this.environments.list(appId: props.appId);
 
-    for environment in this.environments.list(appId: props.appId) {
-      if environment.repo == props.repo && environment.prNumber == props.prNumber {
-        let var testRows = "";
-        let var passedTests = 0;
-        let var failedTests = 0;
-        if environment.status == "running" || environment.status == "running-server" {
-          if let testResults = environment.testResults {
-            let var i = 0;
-            for testResult in testResults.testResults {
-              let var testRes = "";
-              if !testResult.pass {
-                testRes = "❌ Failed";
-                failedTests += 1;
-              } else {
-                testRes = "✅ Passed";
-                passedTests += 1;
-              }
+    log("Found {environmentList.length} environments for app {props.appId}");
 
-              let testId = testResult.id;
-              let pathParts = testResult.path.split(":");
-              let testName = pathParts.at(pathParts.length - 1);
-              let testResourcePath = pathParts.at(0);
-              let var link = "";
-              if environment.status == "running" && fullAppName != "" {
-                link = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/tests/{environment.branch}?testId={testId}\">Logs</a>";
-              }
-              testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
-              i += 1;
+    for environment in environmentList {
+    if environment.repo == props.repo && environment.prNumber == props.prNumber {
+      let var testRows = "";
+      let var passedTests = 0;
+      let var failedTests = 0;
+      if environment.status == "running" || environment.status == "running-server" {
+        if let testResults = environment.testResults {
+          let var i = 0;
+          for testResult in testResults.testResults {
+            let var testRes = "";
+            if !testResult.pass {
+              testRes = "❌ Failed";
+              failedTests += 1;
+            } else {
+              testRes = "✅ Passed";
+              passedTests += 1;
             }
-          }
-        }
 
-        let var previewUrl = "";
-        let var appNameLink = props.appName;
-
-        if fullAppName != "" {
-          appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}\">{props.appFullName ?? props.appName}</a>";
-          if environment.status == "running" {
-            previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/console/{environment.branch}/\">Visit</a>";
-          }
-        }
-
-        let var endpointsString = "";
-        if environment.status == "running" {
-          for endpoint in this.endpoints.list(environmentId: environment.id) {
-            let var endpointText = endpoint.label;
-            let var endpointIcon = "🔗";
-            if endpoint.browserSupport {
-              endpointIcon = "🌐";
+            let testId = testResult.id;
+            let pathParts = testResult.path.split(":");
+            let testName = pathParts.at(pathParts.length - 1);
+            let testResourcePath = pathParts.at(0);
+            let var link = "";
+            if environment.status == "running" && fullAppName != "" {
+              link = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/tests/{environment.branch}?testId={testId}\">Logs</a>";
             }
-            endpointText = "{endpointIcon} <a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.label}</a>";
-            endpointsString = "{endpointText}<br> {endpointsString}";
+            testRows = "{testRows}<tr><td>{testName}</td><td>{testResourcePath}</td><td>{testRes}</td><td>{link}</td></tr>";
+            i += 1;
           }
-        }
-
-        let date = std.Datetime.utcNow();
-        let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
-        let envStatus = this.envStatusToString(environment.status, fullAppName, environment.branch);
-        let tableRows = "<tr><td>{appNameLink}</td><td>{envStatus}</td><td>{previewUrl}</td><td>{endpointsString}</td><td>{dateStr}</td></tr>";
-        let testSummary = "Tests: ✅ {passedTests} Passed  | ❌ {failedTests} Failed";
-        let testsSection = "<details><summary>{testSummary}</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
-
-        commentBody = "{commentBody}{tableRows}</table>";
-
-        if testRows != "" {
-          commentBody = "{commentBody}<br>{testsSection}";
-        }
-
-        if !commentId? && environment.commentId? {
-          commentId = environment.commentId;
         }
       }
+
+      let var previewUrl = "";
+      let var appNameLink = props.appName;
+
+      if fullAppName != "" {
+        appNameLink = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}\">{props.appFullName ?? props.appName}</a>";
+        if environment.status == "running" {
+          previewUrl = "<a target=\"_blank\" href=\"{this.siteDomain}/{fullAppName}/console/{environment.branch}/\">Visit</a>";
+        }
+      }
+
+      let var endpointsString = "";
+      if environment.status == "running" {
+        for endpoint in this.endpoints.list(environmentId: environment.id) {
+          let var endpointText = endpoint.label;
+          let var endpointIcon = "🔗";
+          if endpoint.browserSupport {
+            endpointIcon = "🌐";
+          }
+          endpointText = "{endpointIcon} <a target=\"_blank\" href=\"{endpoint.publicUrl}\">{endpoint.label}</a>";
+          endpointsString = "{endpointText}<br> {endpointsString}";
+        }
+      }
+
+      let date = std.Datetime.utcNow();
+      let dateStr = "{date.dayOfMonth}-{date.month}-{date.year} {date.hours}:{date.min} (UTC)";
+      let envStatus = this.envStatusToString(environment.status, fullAppName, environment.branch);
+      let tableRows = "<tr><td>{appNameLink}</td><td>{envStatus}</td><td>{previewUrl}</td><td>{endpointsString}</td><td>{dateStr}</td></tr>";
+      let testSummary = "Tests: ✅ {passedTests} Passed  | ❌ {failedTests} Failed";
+      let testsSection = "<details><summary>{testSummary}</summary><br><table><tr><th>Test</th><th>Resource Path</th><th>Result</th><th>Logs</th></tr>{testRows}</table></details>";
+
+      commentBody = "{commentBody}{tableRows}</table>";
+
+      if testRows != "" {
+        commentBody = "{commentBody}<br>{testsSection}";
+      }
+
+      if !commentId? && environment.commentId? {
+        commentId = environment.commentId;
+      }
+    }
     }
 
     let owner = props.repo.split("/").at(0);

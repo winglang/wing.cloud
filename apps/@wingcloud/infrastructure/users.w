@@ -231,8 +231,8 @@ pub class Users {
       ProjectionExpression: "id, displayName, username, avatarUrl, email, isAdmin, isEarlyAccessUser",
     );
 
-    if let user = User.tryFromJson(result.Item) {
-      return user;
+    if let item = result.Item {
+      return this.fromDB(item);
     } else {
       throw httpError.HttpError.notFound("User not found");
     }
@@ -247,8 +247,8 @@ pub class Users {
       ProjectionExpression: "id, displayName, username, avatarUrl, email, isAdmin",
     );
 
-    if let user = User.tryFromJson(result.Item) {
-      return user;
+    if let item = result.Item {
+      return this.fromDB(item);
     } else {
       throw httpError.HttpError.notFound("User not found");
     }
