@@ -23,7 +23,6 @@ pub class Parameter impl i.IParameter {
   }
 
   pub onLift(host: std.IInflightHost, ops: Array<str>) {
-    log("onLift called on Config with ops {Json.stringify(ops)} {Json.stringify(host)}");
     if let host = aws.Function.from(host) {
       host.addPolicyStatements(aws.PolicyStatement {
         actions: ["ssm:GetParameter"],

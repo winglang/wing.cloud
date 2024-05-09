@@ -14,13 +14,14 @@ import {
   type ApiPutOptions,
   type IApiEndpointHandler,
 } from "@winglang/sdk/lib/cloud";
+import { Api as cloudApi } from "@winglang/sdk/lib/cloud";
+import { lift, inflight } from "@winglang/sdk/lib/core";
 import { App, Lifting } from "@winglang/sdk/lib/core";
-import { convertBetweenHandlers } from "@winglang/sdk/lib/shared/convert.js";
 import {
   ResourceNames,
   type NameOptions,
 } from "@winglang/sdk/lib/shared/resource-names.js";
-import { Testing } from "@winglang/sdk/lib/simulator";
+import { ApiEndpointHandler } from "@winglang/sdk/lib/shared-aws";
 import { Duration, Node } from "@winglang/sdk/lib/std";
 import { App as TfAwsApp } from "@winglang/sdk/lib/target-tf-aws/app.js";
 import { Schedule } from "@winglang/sdk/lib/target-tf-aws/schedule.js";
@@ -44,20 +45,29 @@ export class CustomApi extends Api {
       this.handlersLines,
       this,
       `${id}-function`,
-      Testing.makeHandler(`
-async handle(event) {
-console.log(JSON.stringify(event, null, 2))
-const fn = exports[\`\${event.httpMethod.toUpperCase()}__\${event.path.substring(5) || "/"}\`];
-if (!fn) {
-return {
-"isBase64Encoded" : false,
-"statusCode": 404,
-"headers": {},
-"body": "Not Found"
-};
-}
-return fn(event);
-}`),
+      // eslint-disable-next-line @typescript-eslint/require-await
+      inflight(async (_ctx, e) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+        const event: any = e as unknown;
+        console.log(JSON.stringify(event, undefined, 2));
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const fn =
+          // eslint-disable-next-line unicorn/prefer-module
+          exports[
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            `${event.httpMethod.toUpperCase()}__${event.path.slice(5) || "/"}`
+          ];
+        if (!fn) {
+          return {
+            isBase64Encoded: false,
+            statusCode: 404,
+            headers: {},
+            body: "Not Found",
+          };
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+        return fn(event);
+      }),
     );
     const api = new cdktf.apigatewayv2Api.Apigatewayv2Api(this, `${id}`, {
       name: ResourceNames.generateName(this, this.NAME_OPTS),
@@ -102,31 +112,24 @@ return fn(event);
       label: `Api ${this.node.path}`,
     });
 
-    if (
-      App.of(scope).platformParameters.getParameterValue(id)?.warmLambdas ===
-      "true"
-    ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (App.of(scope).parameters.value(id)?.warmLambdas === "true") {
       const schedule = new Schedule(this, "Schedule", {
         rate: Duration.fromMinutes(5),
       });
-      const onTickHandler = Testing.makeHandler(
-        `
-  async handle(event) {
-    try {
-      console.log("Warming up");
-      const promises = [];
-      for (let i = 0; i < 50; i++) {
-        promises.push(fetch(this.url + "/_ready"));
-      }
-      await Promise.all(promises);
-      console.log("Warming up done");
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  `,
-        { url: { obj: url, ops: [] } },
-      );
+      const onTickHandler = lift({ url }).inflight(async (ctx) => {
+        try {
+          console.log("Warming up");
+          const promises = [];
+          for (let i = 0; i < 50; i++) {
+            promises.push(fetch(ctx.url + "/_ready"));
+          }
+          await Promise.all(promises);
+          console.log("Warming up done");
+        } catch (error) {
+          console.error(error);
+        }
+      });
       const onTickFn = schedule.onTick(onTickHandler);
       Lifting.lift(onTickHandler, onTickFn, ["handle"]);
     }
@@ -207,7 +210,6 @@ return fn(event);
     props?: ApiGetOptions,
   ): void {
     const lowerMethod = method.toLowerCase();
-    const upperMethod = method.toUpperCase();
 
     if (props) {
       console.warn(`Api.${lowerMethod} does not support props yet`);
@@ -221,16 +223,15 @@ return fn(event);
   public _preSynthesize(): void {
     super._preSynthesize();
 
-    const readyHandler = Testing.makeHandler(`
-async handle(event) {
-  return {
-    "isBase64Encoded" : false,
-    "statusCode": 200,
-    "headers": {},
-    "body": "OK"
-  };
-}
-`);
+    // eslint-disable-next-line @typescript-eslint/require-await
+    const readyHandler = inflight(async () => {
+      return {
+        isBase64Encoded: false,
+        statusCode: 200,
+        headers: {},
+        body: "OK",
+      };
+    });
 
     this.handlers["GET__/_ready"] = readyHandler;
 
@@ -246,15 +247,9 @@ async handle(event) {
     id: string,
     handler: IApiEndpointHandler,
   ): string[] {
-    const newInflight = convertBetweenHandlers(
+    const newInflight = ApiEndpointHandler.toFunctionHandler(
       handler,
-      // eslint-disable-next-line unicorn/prefer-module
-      require.resolve("@winglang/sdk/lib/shared-aws/api.onrequest.inflight.js"),
-      "ApiOnRequestHandlerClient",
-      {
-        corsHeaders: this._generateCorsHeaders(this.corsOptions)
-          ?.defaultResponse,
-      },
+      cloudApi.renderCorsHeaders(this.corsOptions)?.defaultResponse,
     );
 
     const inflightClient = newInflight._toInflight();
