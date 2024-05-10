@@ -902,11 +902,23 @@ pub class Environments {
     throw httpError.HttpError.notFound("Environment '{options.environmentId}' not found");
   }
 
+  inflight tryGetInt(item: Json, key: str ): num? {
+    if let value = item.tryGet(key)?.tryGet("value")?.tryAsStr() {
+      return num.fromStr(value);
+    }
+    return nil;
+  }
+
   inflight fromDB(item: Json): Environment {
 
     let var commentId: num? = nil;
     if let commentIdStr = item.tryGet("commentId")?.tryGet("value")?.tryAsStr() {
       commentId = num.fromStr(commentIdStr);
+    }
+
+    let var prNumber: num? = nil;
+    if let prNumberStr = item.tryGet("prNumber")?.tryGet("value")?.tryAsStr() {
+      prNumber = num.fromStr(prNumberStr);
     }
 
     return {
@@ -918,10 +930,10 @@ pub class Environments {
       sha: item.get("sha").asStr(),
       status: item.get("status").asStr(),
       installationId: num.fromStr(item.get("installationId").get("value").asStr()),
-      prNumber: num.fromStr(item.tryGet("prNumber")?.tryGet("value")?.tryAsStr() ?? ""),
+      prNumber: this.tryGetInt(item, "prNumber"),
       prTitle: item.tryGet("prTitle")?.tryAsStr(),
       url: item.tryGet("url")?.tryAsStr(),
-      commentId: commentId,
+      commentId: this.tryGetInt(item, "commentId"),
       testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
       createdAt: item.get("createdAt").asStr(),
       updatedAt: item.get("updatedAt").asStr(),

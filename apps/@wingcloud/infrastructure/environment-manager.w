@@ -167,16 +167,12 @@ pub class EnvironmentManager {
 
     let secrets = this.secretsForEnvironment(options.environment);
 
-    try {
-      this.postComment(
-        appId: app.appId,
-        appName: app.appName,
-        environmentId: options.environment.id,
-        octokit: octokit
-      );
-    } catch err {
-      log("Failed to post comment: {err}");
-    }
+    this.postComment(
+      appId: app.appId,
+      appName: app.appName,
+      environmentId: options.environment.id,
+      octokit: octokit
+    );
 
     let tokenRes = octokit.apps.createInstallationAccessToken(installation_id: options.environment.installationId);
     if tokenRes.status >= 300 || tokenRes.status < 200 {
