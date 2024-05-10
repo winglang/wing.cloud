@@ -1,4 +1,4 @@
-bring ex;
+bring dynamodb;
 bring "../apps.w" as Apps;
 bring "../environments.w" as Environments;
 bring "../status-reports.w" as StatusReports;
@@ -8,10 +8,16 @@ pub class MakeTable {
   new(name: str?) {
     this.table = new dynamodb.Table(
       name: name ?? "data",
-      attributeDefinitions: {
-        "pk": "S",
-        "sk": "S",
-      },
+      attributes: [
+        {
+          name: "pk",
+          type: "S",
+        },
+        {
+          name: "sk",
+          type: "S",
+        },
+      ],
       hashKey: "pk",
       rangeKey: "sk",
     );
