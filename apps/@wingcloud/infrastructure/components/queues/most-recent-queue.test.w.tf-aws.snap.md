@@ -75,7 +75,7 @@
         ],
         "billing_mode": "PAY_PER_REQUEST",
         "hash_key": "groupId",
-        "name": "table",
+        "name": "MostRecentQueue-Table-Table_tfaws-bcefe85e",
         "stream_enabled": true,
         "stream_view_type": "NEW_AND_OLD_IMAGES"
       }
@@ -260,7 +260,7 @@
         },
         "bucket": "${aws_s3_bucket.Code.bucket}",
         "key": "asset.c89c034c00b101615a4b7e3927af0e9fcfa1de941a.9ed99881caa946bd3cc141bf0858ca2e.zip",
-        "source": "assets/MostRecentQueue_FifoQueue_tf-aws_Function_Asset_F5E36AD1/E89957B4AD89F77FEA109A8269DD4B83/archive.zip"
+        "source": "assets/MostRecentQueue_FifoQueue_tf-aws_Function_Asset_F5E36AD1/19697E9711B3025E0A13B1614A945CCF/archive.zip"
       },
       "MostRecentQueue_Table_Field_Handler_S3Object_743B20E1": {
         "//": {

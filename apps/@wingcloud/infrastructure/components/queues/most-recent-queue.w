@@ -26,7 +26,6 @@ pub class MostRecentQueue {
   new(props: MostRecentQueueProps) {
     let handler = props.handler;
     this.table = new dynamodb.Table(
-      name: "table",
       attributes: [{
         "name": "groupId",
         "type": "S",
