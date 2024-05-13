@@ -149,8 +149,8 @@
           }
         },
         "bucket": "${aws_s3_bucket.Code.bucket}",
-        "key": "asset.c8c54e697f45cd85a763a59bf99efa3d1d8b4dac6c.faff11e9ff48fb8a0c10ccee2602e8e1.zip",
-        "source": "assets/MakeTable_Field_Handler_Asset_3F830041/ACCAE3708B399E689E3623736F7F51EB/archive.zip"
+        "key": "asset.c8c54e697f45cd85a763a59bf99efa3d1d8b4dac6c.d4a8409905dd8eff13edf707259c26c1.zip",
+        "source": "assets/MakeTable_Field_Handler_Asset_3F830041/54DFEF2363B11902221156BDB28443CE/archive.zip"
       }
     }
   },
