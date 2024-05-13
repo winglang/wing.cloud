@@ -52,7 +52,7 @@
         ],
         "billing_mode": "PAY_PER_REQUEST",
         "hash_key": "pk",
-        "name": "data",
+        "name": "MakeTable-Table-Table_tfaws-9500dcf1",
         "range_key": "sk",
         "stream_enabled": true,
         "stream_view_type": "NEW_AND_OLD_IMAGES"

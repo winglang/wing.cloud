@@ -171,7 +171,7 @@ pub class Endpoints {
       browserSupport: item.get("browserSupport").asBool(),
       localUrl: item.get("localUrl").asStr(),
       publicUrl: item.get("publicUrl").asStr(),
-      port: item.get("port").asNum(),
+      port: num.fromStr(item.get("port").get("value").asStr()),
       digest: item.get("digest").asStr(),
       createdAt: item.get("createdAt").asStr(),
       updatedAt: item.get("updatedAt").asStr(),

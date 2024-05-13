@@ -7,7 +7,6 @@ pub class MakeTable {
   table: dynamodb.Table;
   new(name: str?) {
     this.table = new dynamodb.Table(
-      name: name ?? "data",
       attributes: [
         {
           name: "pk",
