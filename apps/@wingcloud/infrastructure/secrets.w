@@ -46,13 +46,17 @@ pub struct DeleteSecretOptions {
   environmentType: str;
 }
 
+pub struct SecretsOptions {
+  tableName: str?;
+}
+
 pub class Secrets {
   pub table: dynamodb.Table;
   crypto: crypto.Crypto;
 
-  new() {
+  new(opts: SecretsOptions) {
     this.table = new dynamodb.Table(
-      name: "secrets",
+      name: opts.tableName,
       attributes: [
         {
           name: "pk",

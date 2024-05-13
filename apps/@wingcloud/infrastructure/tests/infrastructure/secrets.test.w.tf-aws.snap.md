@@ -52,7 +52,7 @@
         ],
         "billing_mode": "PAY_PER_REQUEST",
         "hash_key": "pk",
-        "name": "secrets",
+        "name": "Secrets-Table-Table_tfaws-f1f2df07",
         "range_key": "sk",
         "stream_enabled": true,
         "stream_view_type": "NEW_AND_OLD_IMAGES"

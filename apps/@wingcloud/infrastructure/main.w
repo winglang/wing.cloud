@@ -108,7 +108,7 @@ let earlyAccess = new early_access.EarlyAccess(table);
 let apps = new Apps.Apps(table);
 let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
-let secrets = new Secrets.Secrets();
+let secrets = new Secrets.Secrets(tableName: "secrets");
 let endpoints = new Endpoints.Endpoints(table);
 let ws = new wsServer.AuthenticatedWebsocketServer(secret: wsSecret) as "WebsocketServer";
 
