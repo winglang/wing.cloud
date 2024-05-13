@@ -259,8 +259,8 @@
           }
         },
         "bucket": "${aws_s3_bucket.Code.bucket}",
-        "key": "asset.c89c034c00b101615a4b7e3927af0e9fcfa1de941a.2f332aa0635a8662297f67e974606559.zip",
-        "source": "assets/MostRecentQueue_FifoQueue_tf-aws_Function_Asset_F5E36AD1/58D61FB5004B0D1A4880B350B6372D32/archive.zip"
+        "key": "asset.c89c034c00b101615a4b7e3927af0e9fcfa1de941a.ce8577e78c17e416d6c9f10768c82172.zip",
+        "source": "assets/MostRecentQueue_FifoQueue_tf-aws_Function_Asset_F5E36AD1/4266B308C80C129405037611F7303FEA/archive.zip"
       },
       "MostRecentQueue_Table_Field_Handler_S3Object_743B20E1": {
         "//": {
@@ -270,8 +270,8 @@
           }
         },
         "bucket": "${aws_s3_bucket.Code.bucket}",
-        "key": "asset.c8f430c08423507445b144602f84de8035e3df7585.783ef8d3139b02bcaad665a7b8eb8235.zip",
-        "source": "assets/MostRecentQueue_Table_Field_Handler_Asset_258342E0/DB7AA297F14588D5196DEEA72720E3BC/archive.zip"
+        "key": "asset.c8f430c08423507445b144602f84de8035e3df7585.6e68133481ee1309a3581279d502e048.zip",
+        "source": "assets/MostRecentQueue_Table_Field_Handler_Asset_258342E0/306CC936BD915320788B09E7C458C02B/archive.zip"
       }
     },
     "aws_sqs_queue": {
