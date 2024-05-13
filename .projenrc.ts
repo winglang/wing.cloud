@@ -298,6 +298,11 @@ infrastructure.addTask("test-aws", {
   exec: "node ./bin/wing.mjs test -t tf-aws tests components",
 });
 
+infrastructure.addScript(
+  "update-snapshots",
+  "node ./bin/wing.mjs test -t tf-aws tests components --snapshots=update",
+);
+
 infrastructure.addScript("test-e2e", "playwright test tests/playwright/e2e");
 infrastructure.compileTask.exec("node ./bin/wing.mjs compile main.w -t tf-aws");
 

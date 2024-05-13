@@ -155,8 +155,8 @@
           }
         },
         "bucket": "${aws_s3_bucket.Code.bucket}",
-        "key": "asset.c8d6a2d58798bcbd04b1f8482909af4c1ac2e4b56b.92e0fbcb8793ac4cb786a7d2930ea920.zip",
-        "source": "assets/FifoQueue_tf-aws_Function_Asset_8F1F35CA/F3F27F026C6B4EE2BCD8B6DE678A6AF3/archive.zip"
+        "key": "asset.c8d6a2d58798bcbd04b1f8482909af4c1ac2e4b56b.16dac126fdc9369e415efce19ecd4137.zip",
+        "source": "assets/FifoQueue_tf-aws_Function_Asset_8F1F35CA/7E20718196C76B92FF33E703E65C2205/archive.zip"
       }
     },
     "aws_sqs_queue": {

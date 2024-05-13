@@ -80,6 +80,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "test": "projen test",
+    "update-snapshots": "node ./bin/wing.mjs test -t tf-aws tests components --snapshots=update",
     "test-e2e": "playwright test tests/playwright/e2e",
     "example": "node ./bin/wing.mjs it example.main.w",
     "default": "projen default",

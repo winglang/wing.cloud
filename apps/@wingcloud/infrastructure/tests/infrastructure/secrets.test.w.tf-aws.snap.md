@@ -159,8 +159,8 @@
           }
         },
         "bucket": "${aws_s3_bucket.Code.bucket}",
-        "key": "asset.c82e8394bea3047eafa9e8abdb6b16ddeb90c8a597.6e4419b9265976b974f03e03c0432251.zip",
-        "source": "assets/Secrets_Table_Field_Handler_Asset_69958F92/42716E449454A1CE15B59241BB214C3F/archive.zip"
+        "key": "asset.c82e8394bea3047eafa9e8abdb6b16ddeb90c8a597.682208a96aed8377c3dc3ac04765414b.zip",
+        "source": "assets/Secrets_Table_Field_Handler_Asset_69958F92/03BD7B094B2317EFA3C2C30369A90127/archive.zip"
       }
     }
   },

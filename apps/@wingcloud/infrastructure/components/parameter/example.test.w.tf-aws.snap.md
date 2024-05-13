@@ -122,8 +122,8 @@
           }
         },
         "bucket": "${aws_s3_bucket.Code.bucket}",
-        "key": "asset.c852aba6d7cbe50c86bbedd1463b05db52425574b5.8c7bad82311f2a21e2faff71c058956a.zip",
-        "source": "assets/Function_Asset_212D1EED/2807D4A9493BE87E74E0534A8CE1220F/archive.zip"
+        "key": "asset.c852aba6d7cbe50c86bbedd1463b05db52425574b5.aa4e01b0b0148aa2b5ee13867752e47f.zip",
+        "source": "assets/Function_Asset_212D1EED/C48ABE1D6E708B95C11092228C1E341C/archive.zip"
       }
     },
     "aws_ssm_parameter": {
