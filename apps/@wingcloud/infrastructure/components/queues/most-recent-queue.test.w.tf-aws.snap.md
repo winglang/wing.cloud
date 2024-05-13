@@ -260,7 +260,7 @@
         },
         "bucket": "${aws_s3_bucket.Code.bucket}",
         "key": "asset.c89c034c00b101615a4b7e3927af0e9fcfa1de941a.9ed99881caa946bd3cc141bf0858ca2e.zip",
-        "source": "assets/MostRecentQueue_FifoQueue_tf-aws_Function_Asset_F5E36AD1/19697E9711B3025E0A13B1614A945CCF/archive.zip"
+        "source": "assets/MostRecentQueue_FifoQueue_tf-aws_Function_Asset_F5E36AD1/E093F8A7D9646EB8E4302D3CC706F2F0/archive.zip"
       },
       "MostRecentQueue_Table_Field_Handler_S3Object_743B20E1": {
         "//": {
