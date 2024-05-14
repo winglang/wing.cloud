@@ -62,6 +62,7 @@ pub class Container_sim {
       tag = this.containerNameBase;
 
       let shellArgs = MutArray<str>[];
+      shellArgs.push("--context=default");
       shellArgs.push("build");
       shellArgs.push("-t");
       shellArgs.push(tag);

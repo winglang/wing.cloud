@@ -16,7 +16,7 @@ struct SegmentAnalyticsOptions {
   writeKey: str;
 }
 
-interface Analytics {
+inflight interface Analytics {
   inflight identify(options: SegmentIdentifyOptions): void;
   inflight track(options: SegmentTrackOptions): void;
 }

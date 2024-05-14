@@ -65,7 +65,7 @@ struct ListInstallationsResponse extends BaseResponse {
   data: Array<ListInstallationsResponseInstallation>;
 }
 
-interface OctoKitApps {
+inflight interface OctoKitApps {
   inflight listInstallations(): ListInstallationsResponse;
   inflight createInstallationAccessToken(options: CreateInstallationAccessTokenOptions): CreateInstallationAccessTokenResponse;
 }
@@ -119,7 +119,7 @@ struct CreateRefOptions {
   sha: str;
 }
 
-interface OctoKitGit {
+inflight interface OctoKitGit {
   inflight getTree(options: GetTreeOptions): GetTreeOptionsResponse;
   inflight getRef(options: GetRefOptions): GetRefOptionsResponse;
   inflight createRef(options: CreateRefOptions): BaseResponse;
@@ -171,7 +171,7 @@ struct ListCommentsOptions {
   body: str?;
 }
 
-interface OctoKitIssues {
+inflight interface OctoKitIssues {
   inflight createComment(options: CreateCommentOptions): CommentResponse;
   inflight updateComment(options: UpdateCommentOptions): CommentResponse;
   inflight deleteComment(options: DeleteCommentOptions): CommentResponse;

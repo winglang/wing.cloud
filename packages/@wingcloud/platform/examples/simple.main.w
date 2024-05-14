@@ -1,16 +1,22 @@
 bring cloud;
-bring ex;
+bring dynamodb;
 
 let bucket = new cloud.Bucket();
-let table = new ex.DynamodbTable({
-  name: "my-table",
-  attributeDefinitions: {
-    "pk": "S",
-    "sk": "S",
-  },
-  hashKey: "pk",
-  rangeKey: "sk",
-});
+let table = new dynamodb.Table(
+      name: "my-table",
+      attributes: [
+        {
+          name: "pk",
+          type: "S",
+        },
+        {
+          name: "sk",
+          type: "S",
+        },
+      ],
+      hashKey: "pk",
+      rangeKey: "sk",
+    );
 
 bucket.onCreate(inflight () => {
   log("hello world");

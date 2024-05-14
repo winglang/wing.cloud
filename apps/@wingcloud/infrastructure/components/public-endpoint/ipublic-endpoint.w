@@ -8,7 +8,7 @@ pub struct PublicEndpointProps {
   subdomain: str?;
 }
 
-pub interface IPublicEndpoint {
+pub inflight interface IPublicEndpoint {
   inflight create(): void;
   inflight delete(): void;
   inflight url(): str;

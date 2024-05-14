@@ -1,5 +1,5 @@
 bring websockets;
-bring ex;
+bring dynamodb;
 bring "./jwt.w" as JWT;
 
 struct SendMessageOptions {
@@ -35,16 +35,22 @@ pub struct AuthenticatedWebSocketServerProps {
 
 pub class AuthenticatedWebsocketServer {
   pub ws: websockets.WebSocket;
-  table: ex.DynamodbTable;
+  table: dynamodb.Table;
   pub url: str;
 
   new(props: AuthenticatedWebSocketServerProps) {
-    this.table = new ex.DynamodbTable(
+    this.table = new dynamodb.Table(
       name: "ws_table",
-      attributeDefinitions: {
-        "pk": "S",
-        "sk": "S",
-      },
+      attributes: [
+        {
+          name: "pk",
+          type: "S",
+        },
+        {
+          name: "sk",
+          type: "S",
+        },
+      ],
       hashKey: "pk",
       rangeKey: "sk",
     );
@@ -53,57 +59,65 @@ pub class AuthenticatedWebsocketServer {
     this.url = this.ws.url;
 
     let deleteConnection = inflight(id: str): void => {
-      let item = this.table.deleteItem(
-        key: {
+      let item = this.table.delete(
+        Key: {
           pk: "WS_CONNECTION#{id}",
           sk: "#",
         },
-        returnValues: "ALL_OLD",
+        ReturnValues: "ALL_OLD",
       );
-      if let connection = ConnectionItem.tryFromJson(item.attributes) {
-        let userItem = this.table.getItem(
-          key: {
+      if let connection = ConnectionItem.tryFromJson(item.Attributes) {
+        let userItem = this.table.get(
+          Key: {
             pk: "USER#{connection.userId}",
             sk: "SUBSCRIPTION#{connection.subscriptionId}",
           },
-          projectionExpression: "connectionIds",
+          ProjectionExpression: "connectionIds",
         );
-        if let userData = UserItem.tryFromJson(userItem.item) {
+        if let userData = UserItem.tryFromJson(userItem.Item) {
           let index = userData.connectionIds.toArray().indexOf(id);
           if index != -1 {
-            this.table.updateItem({
-              key: {
-                  pk: "USER#{connection.userId}",
-                  sk: "SUBSCRIPTION#{connection.subscriptionId}",
-              },
-              updateExpression: "REMOVE connectionIds[{index}]",
-            });
+            this.table.transactWrite(
+              TransactItems: [{
+                Update: {
+                  Key: {
+                      pk: "USER#{connection.userId}",
+                      sk: "SUBSCRIPTION#{connection.subscriptionId}",
+                  },
+                  UpdateExpression: "REMOVE connectionIds[{index}]",
+                }
+              }]
+            );
           }
         }
       }
     };
 
     let saveConnection = inflight (opts: SaveConnectionOpts): void => {
-      this.table.updateItem(
-        key: {
-          pk: "USER#{opts.userId}",
-          sk: "SUBSCRIPTION#{opts.subscriptionId}",
-        },
-        updateExpression: "SET connectionIds = list_append(if_not_exists(connectionIds, :empty_list), :connectionId)",
-        expressionAttributeValues: {
-            ":connectionId": [opts.connectionId],
-            ":empty_list": []
-        },
+      this.table.transactWrite(
+        TransactItems: [{
+          Update: {
+            Key: {
+                pk: "USER#{opts.userId}",
+                sk: "SUBSCRIPTION#{opts.subscriptionId}",
+            },
+            UpdateExpression: "SET connectionIds = list_append(if_not_exists(connectionIds, :empty_list), :connectionId)",
+            ExpressionAttributeValues: {
+                ":connectionId": [opts.connectionId],
+                ":empty_list": []
+            },
+          }
+        }]
       );
 
-      this.table.putItem(
-        item: {
+      this.table.put(
+        Item: {
           pk: "WS_CONNECTION#{opts.connectionId}",
           sk: "#",
           subscriptionId: opts.subscriptionId,
           userId: "{opts.userId}",
         },
-        conditionExpression: "attribute_not_exists(pk)",
+        ConditionExpression: "attribute_not_exists(pk)",
       );
     };
 
@@ -133,15 +147,15 @@ pub class AuthenticatedWebsocketServer {
   }
 
   pub inflight sendMessage(opts: SendMessageOptions): void {
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "USER#{opts.userId}",
         sk: "SUBSCRIPTION#{opts.subscriptionId}"
       },
-      projectionExpression: "connectionIds",
+      ProjectionExpression: "connectionIds",
     );
 
-    if let item = result.item {
+    if let item = result.Item {
       let connectionIds = UserItem.fromJson(item).connectionIds;
       for connectionId in connectionIds {
         try {

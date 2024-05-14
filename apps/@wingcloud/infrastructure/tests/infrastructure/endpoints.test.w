@@ -1,8 +1,7 @@
-bring ex;
 bring "../../endpoints.w" as Endpoints;
 bring "../util.w" as Util;
 
-let table = new Util.MakeTable().get();
+let table = new Util.MakeTable("endpoints-tests").get();
 
 let endpoints = new Endpoints.Endpoints(table);
 

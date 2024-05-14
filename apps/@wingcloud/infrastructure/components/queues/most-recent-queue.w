@@ -1,5 +1,5 @@
 bring "./fifoqueue" as fifoqueue;
-bring ex;
+bring dynamodb;
 bring util;
 
 pub struct MostRecentQueueMessage {
@@ -21,28 +21,28 @@ pub struct MostRecentQueueProps {
 
 pub class MostRecentQueue {
   queue: fifoqueue.FifoQueue;
-  pub table: ex.DynamodbTable;
+  pub table: dynamodb.Table;
 
   new(props: MostRecentQueueProps) {
     let handler = props.handler;
-    this.table = new ex.DynamodbTable(
-      name: "table",
-      attributeDefinitions: {
-        "groupId": "S",
-      },
+    this.table = new dynamodb.Table(
+      attributes: [{
+        "name": "groupId",
+        "type": "S",
+      }],
       hashKey: "groupId",
     );
     this.queue = new fifoqueue.FifoQueue();
     this.queue.setConsumer(inflight (event: str) => {
       log("consuming message: {event}");
       let message = MostRecentQueueMessage.parseJson(event);
-      let item = this.table.getItem({
-        key:{
+      let item = this.table.get({
+        Key:{
           groupId: message.groupId,
         }
       });
-
-      if let lastTimestamp = item?.item?.tryGet("lastMessageTimestamp")?.tryAsNum() {
+      if let lastMessageTimestamp = item.Item?.tryGet("lastMessageTimestamp")?.tryGet("value")?.tryAsStr() {
+        let lastTimestamp = num.fromStr(lastMessageTimestamp);
         if lastTimestamp <= message.timestamp {
           log("handling message: {event}, {lastTimestamp}");
           handler(message);
@@ -55,18 +55,22 @@ pub class MostRecentQueue {
     try {
       log("enqueueing message: {Json.stringify(message)} {datetime.utcNow().timestampMs}");
       let id = util.nanoid();
-      this.table.updateItem(
-        key: {
-          groupId: message.groupId,
+      this.table.transactWrite(TransactItems: [
+        {
+         Update: {
+          Key: {
+            groupId: message.groupId,
+          },
+          UpdateExpression: "SET lastMessageTimestamp = :lastMessageTimestamp, id = :id",
+          ExpressionAttributeValues: {
+            ":lastMessageTimestamp": message.timestamp,
+            ":id": id,
+          },
+          ConditionExpression: "attribute_not_exists(lastMessageTimestamp) OR lastMessageTimestamp < :lastMessageTimestamp",
+          },
         },
-        updateExpression: "SET lastMessageTimestamp = :lastMessageTimestamp, id = :id",
-        expressionAttributeValues: {
-          ":lastMessageTimestamp": message.timestamp,
-          ":id": id,
-        },
-        conditionExpression: "attribute_not_exists(lastMessageTimestamp) OR lastMessageTimestamp < :lastMessageTimestamp",
-        returnValues: "ALL_NEW"
-      );
+      ]);
+
       log("message enqueued: {Json.stringify(message)}");
 
       this.queue.push(Json.stringify(MostRecentQueueMessage{

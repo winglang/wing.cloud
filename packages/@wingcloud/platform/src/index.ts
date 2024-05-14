@@ -1,5 +1,5 @@
 import { API_FQN } from "@winglang/sdk/lib/cloud";
-import { type AppProps, App, Lifting } from "@winglang/sdk/lib/core";
+import { type AppProps, App } from "@winglang/sdk/lib/core";
 import type { IPlatform } from "@winglang/sdk/lib/platform";
 import { Aspects } from "cdktf";
 import type { Construct } from "constructs";
@@ -8,8 +8,8 @@ import { CustomApi } from "./api.js";
 import { App as CustomApp } from "./app.js";
 import { ProductionPlatform } from "./platform-production.js";
 import { TestPlatform } from "./platform-test.js";
-import { EnableXray } from "./production/enable_xray.js";
 import { OverrideApiGatewayDeployment } from "./production/cyclic_hack.js";
+import { EnableXray } from "./production/enable_xray.js";
 
 const WING_ENV = process.env["WING_ENV"] || "production";
 
@@ -68,8 +68,8 @@ export class Platform implements IPlatform {
   ): any {
     if (
       type === API_FQN &&
-      App.of(scope).platformParameters.getParameterValue(id)?.mergeLambdas ===
-        "true"
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      App.of(scope).parameters.value(id)?.mergeLambdas === "true"
     ) {
       return new CustomApi(scope, id, props);
     }

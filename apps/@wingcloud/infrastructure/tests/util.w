@@ -1,23 +1,28 @@
-bring ex;
+bring dynamodb;
 bring "../apps.w" as Apps;
 bring "../environments.w" as Environments;
 bring "../status-reports.w" as StatusReports;
 
 pub class MakeTable {
-  table: ex.DynamodbTable;
+  table: dynamodb.Table;
   new(name: str?) {
-    this.table = new ex.DynamodbTable(
-      name: name ?? "data",
-      attributeDefinitions: {
-        "pk": "S",
-        "sk": "S",
-      },
+    this.table = new dynamodb.Table(
+      attributes: [
+        {
+          name: "pk",
+          type: "S",
+        },
+        {
+          name: "sk",
+          type: "S",
+        },
+      ],
       hashKey: "pk",
       rangeKey: "sk",
     );
   }
 
-  pub get(): ex.DynamodbTable {
+  pub get(): dynamodb.Table {
     return this.table;
   }
 }

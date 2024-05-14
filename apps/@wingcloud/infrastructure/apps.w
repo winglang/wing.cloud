@@ -1,7 +1,7 @@
-bring ex;
 bring "./http-error.w" as httpError;
 bring "./nanoid62.w" as nanoid62;
 bring "./util.w" as util;
+bring dynamodb;
 
 pub struct App {
   appId: str;
@@ -106,9 +106,9 @@ struct UpdateDescriptionOptions {
 }
 
 pub class Apps {
-  table: ex.DynamodbTable;
+  table: dynamodb.Table;
 
-  new(table: ex.DynamodbTable) {
+  new(table: dynamodb.Table) {
     this.table = table;
   }
 
@@ -139,30 +139,30 @@ pub class Apps {
     };
 
     try {
-      this.table.transactWriteItems(transactItems: [
+      this.table.transactWrite(TransactItems: [
         {
-          put: {
-            item: makeItem(
+          Put: {
+            Item: makeItem(
               appId: appId,
               pk: "APP#{appId}",
               sk: "#",
             ),
-            conditionExpression: "attribute_not_exists(pk)"
+            ConditionExpression: "attribute_not_exists(pk)"
           },
         },
         {
-          put: {
-            item: makeItem(
+          Put: {
+            Item: makeItem(
               appId: appId,
               pk: "USER#{options.userId}",
               sk: "APP_NAME#{options.appName}",
             ),
-            conditionExpression: "attribute_not_exists(pk)"
+            ConditionExpression: "attribute_not_exists(pk)"
           },
         },
         {
-          put: {
-            item: makeItem(
+          Put: {
+            Item: makeItem(
               appId: appId,
               pk: "USER#{options.userId}",
               sk: "APP#{appId}",
@@ -170,8 +170,8 @@ pub class Apps {
           },
         },
         {
-          put: {
-            item: makeItem(
+          Put: {
+            Item: makeItem(
               appId: appId,
               pk: "REPOSITORY#{options.repoId}",
               sk: "APP#{appId}",
@@ -192,15 +192,15 @@ pub class Apps {
   }
 
   pub inflight get(options: GetAppOptions): App {
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "APP#{options.appId}",
         sk: "#",
       },
     );
 
-    if let item = result.item {
-      return App.fromJson(item);
+    if let item = result.Item {
+      return this.fromDB(item);
     }
 
     throw httpError.HttpError.notFound("Get App: '{options.appId}' not found");
@@ -215,15 +215,15 @@ pub class Apps {
   }
 
   pub inflight getByName(options: GetAppByNameOptions): App {
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "USER#{options.userId}",
         sk: "APP_NAME#{options.appName}",
       },
     );
 
-    if let item = result.item {
-      return App.fromJson(item);
+    if let item = result.Item {
+      return this.fromDB(item);
     }
 
     throw httpError.HttpError.notFound("App '{options.appName}' not found");
@@ -235,17 +235,17 @@ pub class Apps {
     util.Util.do_while(
       handler: () => {
         let result = this.table.query(
-          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-          expressionAttributeValues: {
+          KeyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          ExpressionAttributeValues: {
             ":pk": "USER#{options.userId}",
             ":sk": "APP#",
           },
-          exclusiveStartKey: exclusiveStartKey,
+          ExclusiveStartKey: exclusiveStartKey,
         );
-        for item in result.items {
-          apps = apps.concat([App.fromJson(item)]);
+        for item in result.Items {
+          apps = apps.concat([this.fromDB(item)]);
         }
-        exclusiveStartKey = result.lastEvaluatedKey;
+        exclusiveStartKey = result.LastEvaluatedKey;
       },
       condition: () => {
         return exclusiveStartKey?;
@@ -255,53 +255,53 @@ pub class Apps {
   }
 
   pub inflight delete(options: DeleteAppOptions): void {
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "APP#{options.appId}",
         sk: "#",
       },
     );
 
-    if let app = result.item {
+    if let app = result.Item {
       let appName = app.get("appName").asStr();
       let repoId = app.get("repoId").asStr();
 
-      this.table.transactWriteItems(
-        transactItems: [
+      this.table.transactWrite(
+        TransactItems: [
           {
-            delete: {
-              key: {
+            Delete: {
+              Key: {
                 pk: "APP#{options.appId}",
                 sk: "#",
               },
-              conditionExpression: "#userId = :userId",
-              expressionAttributeNames: {
+              ConditionExpression: "#userId = :userId",
+              ExpressionAttributeNames: {
                 "#userId": "userId",
               },
-              expressionAttributeValues: {
+              ExpressionAttributeValues: {
                 ":userId": options.userId,
               },
             },
           },
           {
-            delete: {
-              key: {
+            Delete: {
+              Key: {
                 pk: "USER#{options.userId}",
                 sk: "APP#{options.appId}",
               },
             },
           },
           {
-            delete: {
-              key: {
+            Delete: {
+              Key: {
                 pk: "USER#{options.userId}",
                 sk: "APP_NAME#{appName}",
               },
             },
           },
           {
-            delete: {
-              key: {
+            Delete: {
+              Key: {
                 pk: "REPOSITORY#{repoId}",
                 sk: "APP#{options.appId}",
               },
@@ -321,17 +321,17 @@ pub class Apps {
     util.Util.do_while(
       handler: () => {
         let result = this.table.query(
-          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-          expressionAttributeValues: {
+          KeyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          ExpressionAttributeValues: {
             ":pk": "REPOSITORY#{options.repository}",
             ":sk": "APP#",
           },
-          exclusiveStartKey: exclusiveStartKey,
+          ExclusiveStartKey: exclusiveStartKey,
         );
-        for item in result.items {
-          apps = apps.concat([App.fromJson(item)]);
+        for item in result.Items {
+          apps = apps.concat([this.fromDB(item)]);
         }
-        exclusiveStartKey = result.lastEvaluatedKey;
+        exclusiveStartKey = result.LastEvaluatedKey;
       },
       condition: () => {
         return exclusiveStartKey?;
@@ -341,67 +341,67 @@ pub class Apps {
   }
 
   pub inflight updateEntrypoint(options: UpdateEntrypointOptions): void {
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "#",
           },
-          updateExpression: "SET #entrypoint = :entrypoint",
-          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #entrypoint = :entrypoint",
+          ConditionExpression: "attribute_exists(#pk) and #userId = :userId",
+          ExpressionAttributeNames: {
             "#pk": "pk",
             "#entrypoint": "entrypoint",
             "#userId": "userId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":entrypoint": options.entrypoint,
             ":userId": options.userId,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "USER#{options.userId}",
             sk: "APP#{options.appId}",
           },
-          updateExpression: "SET #entrypoint = :entrypoint",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #entrypoint = :entrypoint",
+          ExpressionAttributeNames: {
             "#entrypoint": "entrypoint",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":entrypoint": options.entrypoint,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "USER#{options.userId}",
             sk: "APP_NAME#{options.appName}",
           },
-          updateExpression: "SET #entrypoint = :entrypoint",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #entrypoint = :entrypoint",
+          ExpressionAttributeNames: {
             "#entrypoint": "entrypoint",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":entrypoint": options.entrypoint,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "REPOSITORY#{options.repository}",
             sk: "APP#{options.appId}",
           },
-          updateExpression: "SET #entrypoint = :entrypoint",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #entrypoint = :entrypoint",
+          ExpressionAttributeNames: {
             "#entrypoint": "entrypoint",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":entrypoint": options.entrypoint,
           },
         }
@@ -410,23 +410,23 @@ pub class Apps {
   }
 
   pub inflight updateLastCommit(options: UpdateLastCommitOptions): void {
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "#",
           },
-          updateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate, #lastCommitSha = :lastCommitSha",
-          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate, #lastCommitSha = :lastCommitSha",
+          ConditionExpression: "attribute_exists(#pk) and #userId = :userId",
+          ExpressionAttributeNames: {
             "#pk": "pk",
             "#lastCommitMessage": "lastCommitMessage",
             "#lastCommitDate": "lastCommitDate",
             "#lastCommitSha": "lastCommitSha",
             "#userId": "userId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":userId": options.userId,
             ":lastCommitMessage": options.lastCommitMessage,
             ":lastCommitDate": options.lastCommitDate,
@@ -435,18 +435,18 @@ pub class Apps {
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "USER#{options.userId}",
             sk: "APP#{options.appId}",
           },
-          updateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate, #lastCommitSha = :lastCommitSha",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate, #lastCommitSha = :lastCommitSha",
+          ExpressionAttributeNames: {
             "#lastCommitMessage": "lastCommitMessage",
             "#lastCommitDate": "lastCommitDate",
             "#lastCommitSha": "lastCommitSha",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":lastCommitMessage": options.lastCommitMessage,
             ":lastCommitDate": options.lastCommitDate,
             ":lastCommitSha": options.lastCommitSha,
@@ -454,18 +454,18 @@ pub class Apps {
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "USER#{options.userId}",
             sk: "APP_NAME#{options.appName}",
           },
-          updateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate, #lastCommitSha = :lastCommitSha",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate, #lastCommitSha = :lastCommitSha",
+          ExpressionAttributeNames: {
             "#lastCommitMessage": "lastCommitMessage",
             "#lastCommitDate": "lastCommitDate",
             "#lastCommitSha": "lastCommitSha",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":lastCommitMessage": options.lastCommitMessage,
             ":lastCommitDate": options.lastCommitDate,
             ":lastCommitSha": options.lastCommitSha,
@@ -473,18 +473,18 @@ pub class Apps {
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "REPOSITORY#{options.repoId}",
             sk: "APP#{options.appId}",
           },
-          updateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate, #lastCommitSha = :lastCommitSha",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #lastCommitMessage = :lastCommitMessage, #lastCommitDate = :lastCommitDate, #lastCommitSha = :lastCommitSha",
+          ExpressionAttributeNames: {
             "#lastCommitMessage": "lastCommitMessage",
             "#lastCommitDate": "lastCommitDate",
             "#lastCommitSha": "lastCommitSha",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":lastCommitMessage": options.lastCommitMessage,
             ":lastCommitDate": options.lastCommitDate,
             ":lastCommitSha": options.lastCommitSha,
@@ -495,70 +495,70 @@ pub class Apps {
   }
 
   pub inflight updateStatus(options: UpdateStatusOptions): void {
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "#",
           },
-          updateExpression: "SET #status = :status",
-          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #status = :status",
+          ConditionExpression: "attribute_exists(#pk) and #userId = :userId",
+          ExpressionAttributeNames: {
             "#pk": "pk",
             "#status": "status",
             "#userId": "userId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":userId": options.userId,
             ":status": options.status,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "USER#{options.userId}",
             sk: "APP#{options.appId}",
           },
-          updateExpression: "SET #status = :status",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #status = :status",
+          ExpressionAttributeNames: {
             "#status": "status",
 
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":status": options.status,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "USER#{options.userId}",
             sk: "APP_NAME#{options.appName}",
           },
-          updateExpression: "SET #status = :status",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #status = :status",
+          ExpressionAttributeNames: {
             "#status": "status",
 
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":status": options.status,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "REPOSITORY#{options.repoId}",
             sk: "APP#{options.appId}",
           },
-          updateExpression: "SET #status = :status",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #status = :status",
+          ExpressionAttributeNames: {
             "#status": "status",
 
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":status": options.status,
           },
         }
@@ -567,70 +567,70 @@ pub class Apps {
   }
 
   pub inflight updateDescription(options: UpdateDescriptionOptions): void {
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "#",
           },
-          updateExpression: "SET #description = :description",
-          conditionExpression: "attribute_exists(#pk) and #userId = :userId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #description = :description",
+          ConditionExpression: "attribute_exists(#pk) and #userId = :userId",
+          ExpressionAttributeNames: {
             "#pk": "pk",
             "#description": "description",
             "#userId": "userId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":userId": options.userId,
             ":description": options.description,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "USER#{options.userId}",
             sk: "APP#{options.appId}",
           },
-          updateExpression: "SET #description = :description",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #description = :description",
+          ExpressionAttributeNames: {
             "#description": "description",
 
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":description": options.description,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "USER#{options.userId}",
             sk: "APP_NAME#{options.appName}",
           },
-          updateExpression: "SET #description = :description",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #description = :description",
+          ExpressionAttributeNames: {
             "#description": "description",
 
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":description": options.description,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "REPOSITORY#{options.repoId}",
             sk: "APP#{options.appId}",
           },
-          updateExpression: "SET #description = :description",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #description = :description",
+          ExpressionAttributeNames: {
             "#description": "description",
 
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":description": options.description,
           },
         }
@@ -641,8 +641,8 @@ pub class Apps {
    // Intended for admin use only
    pub inflight listAll(): Map<Array<App>> {
     let result = this.table.scan(
-      filterExpression: "begins_with(pk, :prefix) and sk = :sk",
-      expressionAttributeValues: {
+      FilterExpression: "begins_with(pk, :prefix) and sk = :sk",
+      ExpressionAttributeValues: {
         ":prefix": "APP#",
         ":sk": "#",
       },
@@ -650,7 +650,7 @@ pub class Apps {
 
     let var apps = MutMap<Array<App>>{};
 
-    for item in result.items {
+    for item in result.Items {
       let app = this.fromDB(item);
       let userApps = apps.tryGet(app.userId) ?? [];
       apps.set(app.userId, userApps.concat([app]));

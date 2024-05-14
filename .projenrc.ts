@@ -106,6 +106,7 @@ tunnels.addDeps("@cdktf/provider-dnsimple");
 tunnels.addDeps("@types/express");
 tunnels.addDeps("@types/ws");
 tunnels.addDeps("@winglibs/websockets");
+tunnels.addDeps("@winglibs/dynamodb");
 tunnels.addDeps("cdktf");
 tunnels.addDeps("constructs");
 tunnels.addDeps("express");
@@ -264,6 +265,7 @@ platform.addDevDeps("@winglang/sdk");
 platform.addDevDeps("cdktf");
 platform.addDevDeps("constructs");
 platform.addDevDeps("@cdktf/provider-aws");
+platform.addDevDeps("@winglibs/dynamodb");
 
 platform.addGitIgnore("**/target/");
 platform.addGitIgnore("tmp/");
@@ -284,6 +286,8 @@ infrastructure.addGitIgnore("!/.env.example");
 infrastructure.addGitIgnore("**/target/");
 infrastructure.addDeps("winglang");
 infrastructure.addDeps("@winglibs/vite");
+infrastructure.addDeps("@winglibs/websockets");
+infrastructure.addDeps("@winglibs/dynamodb");
 infrastructure.addDeps(tunnels.name);
 
 // TODO: Remove .env sourcing after https://github.com/winglang/wing/issues/4595 is completed.
@@ -291,9 +295,15 @@ infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 
 infrastructure.testTask.exec("node ./bin/wing.mjs test");
 
+// TODO: Remove the --snapshots=never flag after https://github.com/winglang/wing/issues/6469 is completed.
 infrastructure.addTask("test-aws", {
-  exec: "node ./bin/wing.mjs test -t tf-aws tests components",
+  exec: "node ./bin/wing.mjs test -t tf-aws tests components --snapshots=never",
 });
+
+infrastructure.addScript(
+  "update-snapshots",
+  "node ./bin/wing.mjs test -t tf-aws tests components --snapshots=update",
+);
 
 infrastructure.addScript("test-e2e", "playwright test tests/playwright/e2e");
 infrastructure.compileTask.exec("node ./bin/wing.mjs compile main.w -t tf-aws");
@@ -401,8 +411,6 @@ infrastructure.addDevDeps("@octokit/rest");
 
 infrastructure.addDevDeps(website.name);
 infrastructure.addDevDeps(runtime.name);
-
-infrastructure.addDeps("@winglibs/websockets");
 
 // TODO: We need to install all of these deps because of we are using pnpm
 // and wing is not resolving deps correctly.

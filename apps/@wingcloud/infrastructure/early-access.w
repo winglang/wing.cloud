@@ -1,4 +1,4 @@
-bring ex;
+bring dynamodb;
 bring util;
 bring "./nanoid62.w" as Nanoid62;
 bring "./http-error.w" as httpError;
@@ -33,10 +33,10 @@ class Util {
 }
 
 pub class EarlyAccess {
-  table: ex.DynamodbTable;
+  table: dynamodb.Table;
   expirationTime: num;
 
-  new(table: ex.DynamodbTable) {
+  new(table: dynamodb.Table) {
     this.table = table;
     this.expirationTime = 1000 * 60 * 60 * 24 * 7; // 7 days
   }
@@ -50,10 +50,10 @@ pub class EarlyAccess {
 
 
     try {
-      this.table.transactWriteItems(transactItems: [
+      this.table.transactWrite(TransactItems: [
         {
-          put: {
-            item: Json.deepCopy({
+          Put: {
+            Item: Json.deepCopy({
               pk: "EARLY_ACCESS#{code}",
               sk: "#",
               id: id,
@@ -63,7 +63,7 @@ pub class EarlyAccess {
               expiresAt: expiresAt,
               used: false,
             }),
-            conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
+            ConditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
           },
         },
       ]);
@@ -83,15 +83,15 @@ pub class EarlyAccess {
   pub inflight validateCode(options: ValidateOptions): void {
     let now = datetime.utcNow();
 
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "EARLY_ACCESS#{options.code}",
         sk: "#",
       },
-      projectionExpression: "id, description, code, createdAt, expiresAt, used",
+      ProjectionExpression: "id, description, code, createdAt, expiresAt, used",
     );
 
-    if let item = EarlyAccessItem.tryFromJson(result.item) {
+    if let item = EarlyAccessItem.tryFromJson(result.Item) {
       if item.code != options.code {
         throw httpError.HttpError.badRequest("The provided code is invalid");
       } if item.used {
@@ -100,15 +100,19 @@ pub class EarlyAccess {
         throw httpError.HttpError.forbidden("Code expired");
       }
 
-      this.table.updateItem(
-        key: {
-          pk: "EARLY_ACCESS#{options.code}",
-          sk: "#",
-        },
-        updateExpression: "SET used = :used",
-        expressionAttributeValues: {
-          ":used": true,
-        },
+      this.table.transactWrite(TransactItems: [
+        {
+          Update: {
+            Key: {
+              pk: "EARLY_ACCESS#{options.code}",
+              sk: "#",
+            },
+            UpdateExpression: "SET used = :used",
+            ExpressionAttributeValues: {
+              ":used": true,
+            },
+          }
+        }]
       );
       return;
     }
@@ -116,8 +120,8 @@ pub class EarlyAccess {
   }
 
   pub inflight deleteCode(options: DeleteOptions) {
-    this.table.deleteItem(
-      key: {
+    this.table.delete(
+      Key: {
         pk: "EARLY_ACCESS#{options.code}",
         sk: "#",
       },
@@ -126,15 +130,15 @@ pub class EarlyAccess {
 
   pub inflight listCodes(): Array<EarlyAccessItem> {
     let result = this.table.scan(
-      filterExpression: "begins_with(pk, :prefix)",
-      expressionAttributeValues: {
+      FilterExpression: "begins_with(pk, :prefix)",
+      ExpressionAttributeValues: {
         ":prefix": "EARLY_ACCESS#",
       },
     );
 
     let var users = MutArray<EarlyAccessItem>[];
 
-    for item in result.items {
+    for item in result.Items {
       users.push(EarlyAccessItem.fromJson(item));
     }
 

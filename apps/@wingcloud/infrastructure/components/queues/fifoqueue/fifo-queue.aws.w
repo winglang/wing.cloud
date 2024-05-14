@@ -51,7 +51,7 @@ pub class FifoQueue_aws impl api.IFifoQueue {
     });
 
     new aws.lambdaEventSourceMapping.LambdaEventSourceMapping(
-      functionName: "{lambda?.functionName}",
+      functionName: "{lambda?.functionName ?? "unknown"}",
       eventSourceArn: this.arn,
       batchSize: options?.batchSize ?? 1
     );

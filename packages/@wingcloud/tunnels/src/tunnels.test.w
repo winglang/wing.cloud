@@ -30,7 +30,7 @@ api.post("/", inflight (req) => {
   };
 });
 
-interface IStartTunnelsClientResult {
+inflight interface IStartTunnelsClientResult {
   inflight close(): void;
 }
 
@@ -56,7 +56,7 @@ new std.Test(inflight () => {
 
     }
   });
-  
+
   let var apiUrl = t.apiUrl();
   let target = util.env("WING_TARGET");
   let url = api.url;
@@ -73,7 +73,7 @@ new std.Test(inflight () => {
   }
 
   let client = Util.startTunnelsClient(port, "stam", hostname, t.wsUrl());
-  
+
   let testOne = inflight (t: TestApiOption) => {
     let headers = MutMap<str>{
       "X-WING-SUBDOMAIN" => "stam"
@@ -95,7 +95,7 @@ new std.Test(inflight () => {
     } elif t.method == "PATCH" {
       res = http.patch(t.url, headers: headers.copy(), body: t.body);
     }
-    
+
     if let response = res {
       assert(response.status == t.response.status);
 
@@ -105,10 +105,10 @@ new std.Test(inflight () => {
         }
       }
 
-      assert(response.body == t.response.body ?? "OK");      
+      assert(response.body == t.response.body ?? "OK");
     }
   };
-  
+
 
   testOne(TestApiOption{
     url: apiUrl,

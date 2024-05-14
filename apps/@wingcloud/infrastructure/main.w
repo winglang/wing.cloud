@@ -1,6 +1,6 @@
 // And the sun, and the moon, and the stars, and the flowers.
 bring cloud;
-bring ex;
+bring dynamodb;
 bring util;
 bring http;
 bring expect;
@@ -28,7 +28,6 @@ bring "./components/parameter/parameter.w" as parameter;
 bring "./components/dns/dns.w" as Dns;
 bring "./components/public-endpoint/public-endpoint.w" as PublicEndpoint;
 bring "./components/certificate/certificate.w" as certificate;
-bring "./patches/react-app.patch.w" as reactAppPatch;
 bring "./google-oauth.w" as google_oauth;
 bring "./early-access.w" as early_access;
 
@@ -38,7 +37,7 @@ if util.tryEnv("WING_IS_TEST") != "true" {
   let tunnelsSubdomain = (() => {
     let var subDomain = util.tryEnv("TUNNELS_SUBDOMAIN");
     if subDomain? && subDomain != "" {
-      return "{subDomain}";
+      return "{subDomain ?? ""}";
     } else {
       return "endpoints";
     }
@@ -80,7 +79,7 @@ let analytics = new SegmentAnalytics.SegmentAnalytics(segmentWriteKey, enableAna
 let api = new cloud.Api(
   cors: true,
   corsOptions: cloud.ApiCorsOptions {
-    allowOrigin: ["*"],
+    allowOrigin: "*",
   }
 ) as "wrpc";
 
@@ -89,12 +88,18 @@ let apiUrlParam = new parameter.Parameter(
   value: api.url,
 ) as "wrpc-url";
 
-let table = new ex.DynamodbTable(
+let table = new dynamodb.Table(
   name: "data",
-  attributeDefinitions: {
-    "pk": "S",
-    "sk": "S",
-  },
+  attributes: [
+    {
+      name: "pk",
+      type: "S",
+    },
+    {
+      name: "sk",
+      type: "S",
+    },
+  ],
   hashKey: "pk",
   rangeKey: "sk",
 );
@@ -103,7 +108,7 @@ let earlyAccess = new early_access.EarlyAccess(table);
 let apps = new Apps.Apps(table);
 let users = new Users.Users(table);
 let environments = new Environments.Environments(table);
-let secrets = new Secrets.Secrets();
+let secrets = new Secrets.Secrets(tableName: "secrets");
 let endpoints = new Endpoints.Endpoints(table);
 let ws = new wsServer.AuthenticatedWebsocketServer(secret: wsSecret) as "WebsocketServer";
 
@@ -123,8 +128,8 @@ let runtimeUrlParam = new parameter.Parameter(
 
 let siteURL = (() => {
   if util.env("WING_TARGET") == "tf-aws" {
-    let var subDomain = util.tryEnv("PROXY_SUBDOMAIN");
-    if subDomain? && subDomain != "" {
+    let var subDomain = util.tryEnv("PROXY_SUBDOMAIN") ?? "";
+    if subDomain != "" {
       subDomain = "{subDomain}.";
     }
     let zoneName = util.env("PROXY_ZONE_NAME");
@@ -320,7 +325,7 @@ if util.tryEnv("WING_TARGET") == "sim" && util.tryEnv("WING_IS_TEST") != "true" 
   let devNgrok = new ngrok.Ngrok(
     url: probotApp.githubApp.api.url,
     domain: util.tryEnv("NGROK_DOMAIN"),
-  );
+  ) as "ngrok";
 }
 if util.tryEnv("WING_TARGET") != "sim" {
   let webhookUrl = probotApp.githubApp.api.url;

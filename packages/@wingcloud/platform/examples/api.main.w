@@ -1,24 +1,30 @@
 bring cloud;
-bring ex;
+bring dynamodb;
 bring http;
 bring expect;
 
 let bucket = new cloud.Bucket();
-let table = new ex.DynamodbTable({
+let table = new dynamodb.Table(
   name: "my-table",
-  attributeDefinitions: {
-    "pk": "S",
-    "sk": "S",
-  },
+  attributes: [
+    {
+      name: "pk",
+      type: "S",
+    },
+    {
+      name: "sk",
+      type: "S",
+    },
+  ],
   hashKey: "pk",
   rangeKey: "sk",
-});
+);
 
 bucket.onCreate(inflight (event) => {
   log("hello form bucket handler {event}");
 
-  table.putItem({
-    item: {
+  table.put({
+    Item: {
       "pk": "key1",
       "sk": "value1",
       "k3": "other-value1"
@@ -43,6 +49,6 @@ api.get("/hello", inflight (request) => {
 
 test "hello world" {
   let response = http.get("{api.url}/hello");
-  log("response: {response}");
+  log("response: {Json.stringify(response)}");
   expect.equal(200, response.status);
 }

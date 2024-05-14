@@ -52,7 +52,7 @@ pub class Ngrok {
         ngrokAPIPort += 1;
       }
 			throw "Couldn't find the ngrok tunnel for {props.url}";
-		});
+		}) as "UrlRetriever";
 		urlRetriever.node.addDependency(ngrok);
 	}
 }

@@ -1,6 +1,6 @@
-bring ex;
 bring "./nanoid62.w" as Nanoid62;
 bring "./http-error.w" as httpError;
+bring dynamodb;
 
 pub struct User {
   id: str;
@@ -72,20 +72,20 @@ struct SetEarlyAccessCodeRequiredOptions {
 }
 
 pub class Users {
-  table: ex.DynamodbTable;
+  table: dynamodb.Table;
 
-  new(table: ex.DynamodbTable) {
+  new(table: dynamodb.Table) {
     this.table = table;
   }
 
   pub inflight create(options: CreateOptions): User {
     let userId = "user_{Nanoid62.Nanoid62.generate()}";
 
-    this.table.transactWriteItems(
-      transactItems: [
+    this.table.transactWrite(
+      TransactItems: [
         {
-          put: {
-            item: {
+          Put: {
+            Item: {
               pk: "LOGIN#{options.username}",
               sk: "#",
               id: userId,
@@ -96,12 +96,12 @@ pub class Users {
               isEarlyAccessUser: options.isEarlyAccessUser ?? false,
               isEarlyAccessCodeRequired: options.isEarlyAccessCodeRequired ?? false,
             },
-            conditionExpression: "attribute_not_exists(pk)",
+            ConditionExpression: "attribute_not_exists(pk)",
           },
         },
         {
-          put: {
-            item: {
+          Put: {
+            Item: {
               pk: "USER#{userId}",
               sk: "#",
               id: userId,
@@ -129,15 +129,15 @@ pub class Users {
   }
 
   pub inflight update(options: UpdateOptions): void {
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "LOGIN#{options.username}",
             sk: "#",
           },
-          updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
-          expressionAttributeValues: {
+          UpdateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
+          ExpressionAttributeValues: {
             ":displayName": options.displayName,
             ":avatarUrl": options.avatarUrl,
             ":email": options.email,
@@ -146,13 +146,13 @@ pub class Users {
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "USER#{options.userId}",
             sk: "#",
           },
-          updateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
-          expressionAttributeValues: {
+          UpdateExpression: "SET displayName = :displayName, avatarUrl = :avatarUrl, email = :email, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
+          ExpressionAttributeValues: {
             ":displayName": options.displayName,
             ":avatarUrl": options.avatarUrl,
             ":email": options.email,
@@ -164,13 +164,13 @@ pub class Users {
   }
 
   pub inflight fromLogin(options: FromLoginOptions): User? {
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "LOGIN#{options.username}",
         sk: "#",
       },
     );
-    if let item = result.item {
+    if let item = result.Item {
       return this.fromDB(item);
     }
     return nil;
@@ -223,32 +223,32 @@ pub class Users {
   }
 
   pub inflight get(options: GetUserOptions): User {
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "USER#{options.userId}",
         sk: "#",
       },
-      projectionExpression: "id, displayName, username, avatarUrl, email, isAdmin, isEarlyAccessUser",
+      ProjectionExpression: "id, displayName, username, avatarUrl, email, isAdmin, isEarlyAccessUser",
     );
 
-    if let user = User.tryFromJson(result.item) {
-      return user;
+    if let item = result.Item {
+      return this.fromDB(item);
     } else {
       throw httpError.HttpError.notFound("User not found");
     }
   }
 
   pub inflight getByName(options: GetUserByNameOptions): User {
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "LOGIN#{options.username}",
         sk: "#",
       },
-      projectionExpression: "id, displayName, username, avatarUrl, email, isAdmin",
+      ProjectionExpression: "id, displayName, username, avatarUrl, email, isAdmin",
     );
 
-    if let user = User.tryFromJson(result.item) {
-      return user;
+    if let item = result.Item {
+      return this.fromDB(item);
     } else {
       throw httpError.HttpError.notFound("User not found");
     }
@@ -257,44 +257,43 @@ pub class Users {
   // Intended for admin use only
   pub inflight list(): Array<User> {
     let result = this.table.scan(
-      filterExpression: "begins_with(pk, :prefix)",
-      expressionAttributeValues: {
+      FilterExpression: "begins_with(pk, :prefix)",
+      ExpressionAttributeValues: {
         ":prefix": "LOGIN#",
       },
     );
 
     let var users = MutArray<User>[];
 
-    for item in result.items {
+    for item in result.Items {
       users.push(this.fromDB(item));
     }
-
-    return users.copy();
+      return users.copy();
   }
 
   // Intended for admin use only
   pub inflight setAdminRole(options: SetAdminRoleOptions): void {
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "LOGIN#{options.username}",
             sk: "#",
           },
-          updateExpression: "SET isAdmin = :isAdmin",
-          expressionAttributeValues: {
+          UpdateExpression: "SET isAdmin = :isAdmin",
+          ExpressionAttributeValues: {
             ":isAdmin": options.isAdmin,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "USER#{options.userId}",
             sk: "#",
           },
-          updateExpression: "SET isAdmin = :isAdmin",
-          expressionAttributeValues: {
+          UpdateExpression: "SET isAdmin = :isAdmin",
+          ExpressionAttributeValues: {
             ":isAdmin": options.isAdmin,
           },
         }
@@ -304,28 +303,28 @@ pub class Users {
 
   // Intended for admin use only
   pub inflight setIsEarlyAccessUser(options: SetIsEarlyAccessUserOptions): void {
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "LOGIN#{options.username}",
             sk: "#",
           },
-          updateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
-          expressionAttributeValues: {
+          UpdateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
+          ExpressionAttributeValues: {
             ":isEarlyAccessUser": options.isEarlyAccessUser,
             ":isEarlyAccessCodeRequired": options.isEarlyAccessCodeRequired,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "USER#{options.userId}",
             sk: "#",
           },
-          updateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
-          expressionAttributeValues: {
+          UpdateExpression: "SET isEarlyAccessUser = :isEarlyAccessUser, isEarlyAccessCodeRequired = :isEarlyAccessCodeRequired",
+          ExpressionAttributeValues: {
             ":isEarlyAccessUser": options.isEarlyAccessUser,
             ":isEarlyAccessCodeRequired": options.isEarlyAccessCodeRequired,
           },
@@ -338,7 +337,7 @@ pub class Users {
     return {
       id: item.get("id").asStr(),
       username: item.get("username").asStr(),
-      avatarUrl: item.get("avatarUrl").asStr(),
+      avatarUrl: item.tryGet("avatarUrl")?.tryAsStr() ?? "",
       displayName: item.tryGet("displayName")?.tryAsStr() ?? "",
       email: item.tryGet("email")?.tryAsStr() ?? "",
       isAdmin: item.tryGet("isAdmin")?.tryAsBool() ?? false,

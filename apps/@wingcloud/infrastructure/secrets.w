@@ -1,8 +1,8 @@
-bring ex;
 bring "./crypto/crypto.w" as crypto;
 bring "./crypto/icrypto.w" as icrypto;
 bring "./http-error.w" as httpError;
 bring "./util.w" as util;
+bring dynamodb;
 
 
 pub struct Secret {
@@ -46,17 +46,27 @@ pub struct DeleteSecretOptions {
   environmentType: str;
 }
 
+pub struct SecretsOptions {
+  tableName: str?;
+}
+
 pub class Secrets {
-  pub table: ex.DynamodbTable;
+  pub table: dynamodb.Table;
   crypto: crypto.Crypto;
 
-  new() {
-    this.table = new ex.DynamodbTable(
-      name: "secrets",
-      attributeDefinitions: {
-        "pk": "S",
-        "sk": "S",
-      },
+  new(opts: SecretsOptions) {
+    this.table = new dynamodb.Table(
+      name: opts.tableName,
+      attributes: [
+        {
+          name: "pk",
+          type: "S",
+        },
+        {
+          name: "sk",
+          type: "S",
+        },
+      ],
       hashKey: "pk",
       rangeKey: "sk",
     );
@@ -88,11 +98,11 @@ pub class Secrets {
     };
 
     try {
-      this.table.transactWriteItems(transactItems: [
+      this.table.transactWrite(TransactItems: [
         {
-          put: {
-            item: Json.deepCopy(item),
-            conditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
+          Put: {
+            Item: Json.deepCopy(item),
+            ConditionExpression: "attribute_not_exists(pk) AND attribute_not_exists(sk)"
           },
         },
       ]);
@@ -108,14 +118,14 @@ pub class Secrets {
   }
 
   pub inflight get(options: GetSecretOptions): Secret {
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "APP#{options.appId}",
         sk: "SECRET#TYPE#{options.environmentType}#SECRET#{options.id}",
       },
     );
 
-    if let item = result.item {
+    if let item = result.Item {
       return Secret.fromJson(this.fromDB(item, options.decryptValue ?? false));
     }
 
@@ -128,18 +138,18 @@ pub class Secrets {
     util.Util.do_while(
       handler: () => {
         let result = this.table.query(
-          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-          expressionAttributeValues: {
+          KeyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          ExpressionAttributeValues: {
             ":pk": "APP#{options.appId}",
             ":sk": "SECRET#TYPE#{options.environmentType}#",
           },
-          exclusiveStartKey: exclusiveStartKey,
+          ExclusiveStartKey: exclusiveStartKey,
         );
-        for item in result.items {
+        for item in result.Items {
           let secret = Secret.fromJson(this.fromDB(item, options.decryptValues ?? false));
           secrets.push(secret);
         }
-        exclusiveStartKey = result.lastEvaluatedKey;
+        exclusiveStartKey = result.LastEvaluatedKey;
       },
       condition: () => {
         return exclusiveStartKey?;
@@ -154,7 +164,7 @@ pub class Secrets {
     // make sure secret exists
     let item = this.get(id: options.id, appId: options.appId, environmentType: options.environmentType);
 
-    let res = this.table.deleteItem(key: {
+    let res = this.table.delete(Key: {
       pk: "APP#{item.appId}",
       sk: "SECRET#TYPE#{item.environmentType}#SECRET#{item.id}",
     });

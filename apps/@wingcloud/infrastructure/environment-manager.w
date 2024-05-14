@@ -158,7 +158,7 @@ pub class EnvironmentManager {
         log("unknown action {action}");
       }
     } catch err {
-      log("Failed to handle action {action}: {err}");
+      log("Failed to handle action '{action}': {err}");
     }
   }
 
@@ -327,7 +327,7 @@ pub class EnvironmentManager {
       this.endpointProvider.from(
         digest: endpoint.digest,
         port: endpoint.port,
-        targetUrl: "{options.environment.url}").delete();
+        targetUrl: "{options.environment.url ?? ""}").delete();
     }
 
     this.postComment(

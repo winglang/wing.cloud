@@ -88,7 +88,7 @@ pub class DNSimpleValidatedCertificate {
   new(props: DNSimpleValidateCertificateProps) {
     let domainName = (() => {
       if props.subDomain? && props.subDomain != "" {
-        return "{props.subDomain}.{props.zoneName}";
+        return "{props.subDomain ?? ""}.{props.zoneName}";
       }
       return props.zoneName;
     })();

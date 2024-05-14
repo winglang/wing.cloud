@@ -9,14 +9,24 @@ module.exports.entrypointDir = function (obj) {
 
 module.exports.shell = async function (command, args, cwd) {
   return new Promise((resolve, reject) => {
-    console.log("execFile", command, args, { cwd });
-    child_process.execFile(command, args, { cwd }, (error, stdout, stderr) => {
-      if (error) {
-        console.error(stderr);
-        return reject(error);
-      }
-
-      return resolve(stdout ? stdout : stderr);
+    const env = Object.assign({}, process.env, {
+      PATH: `${process.env.PATH}:/usr/local/bin`,
     });
+
+    console.log("execFile", command, args, { cwd, env });
+    child_process.execFile(
+      command,
+      args,
+      { cwd, env },
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error("Shell Error:", error);
+          console.error("Stderr:", stderr);
+          console.error();
+          return reject(error);
+        }
+        return resolve(stdout ?? stderr);
+      },
+    );
   });
 };

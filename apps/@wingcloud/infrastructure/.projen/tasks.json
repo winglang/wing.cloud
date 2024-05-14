@@ -129,7 +129,7 @@
       "name": "test-aws",
       "steps": [
         {
-          "exec": "node ./bin/wing.mjs test -t tf-aws tests components"
+          "exec": "node ./bin/wing.mjs test -t tf-aws tests components --snapshots=never"
         }
       ]
     }

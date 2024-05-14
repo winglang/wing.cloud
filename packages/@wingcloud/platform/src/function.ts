@@ -29,8 +29,10 @@ export class CustomFunction extends Function {
   ) {
     super(scope, id, inflight, props);
     this.lines = lines;
-    const concurrency =
-      App.of(scope).platformParameters.getParameterValue(id)?.concurrency;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const concurrency: string =
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      App.of(scope).parameters.value(id)?.concurrency;
     const concurrencyValue = Number.parseInt(concurrency, 10);
     if (!Number.isNaN(concurrencyValue)) {
       new EnableConcurrentExecutions(
@@ -38,6 +40,7 @@ export class CustomFunction extends Function {
       ).enableConcurrentExecutionsForLambda(this);
     }
     new cdktf.iamRolePolicy.IamRolePolicy(this, "IamRolePolicy-initial", {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
       role: (this as any).role.name,
       policy: cdkfLib.Lazy.stringValue({
         produce: () => {
@@ -67,6 +70,7 @@ export class CustomFunction extends Function {
     });
   }
   public addEnvironment(name: string, value: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     (this as any)._env[name] = value;
   }
   public addPolicyStatements(...statements: PolicyStatement[]) {
@@ -99,6 +103,7 @@ export class CustomFunction extends Function {
           this,
           `IamRolePolicyAttachment${count}`,
           {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
             role: (this as any).role.name,
             policyArn: policy.arn,
           },

@@ -1,8 +1,8 @@
-bring ex;
 bring "./nanoid62.w" as nanoid62;
 bring "./status-reports.w" as status_report;
 bring "./http-error.w" as httpError;
 bring "./util.w" as util;
+bring dynamodb;
 
 pub struct Environment {
   id: str;
@@ -116,9 +116,9 @@ struct DeleteEnvironmentOptions {
 }
 
 pub class Environments {
-  table: ex.DynamodbTable;
+  table: dynamodb.Table;
 
-  new(table: ex.DynamodbTable) {
+  new(table: dynamodb.Table) {
     this.table = table;
   }
 
@@ -175,20 +175,20 @@ pub class Environments {
       publicKey: options.publicKey,
     };
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        put: {
-          item: this.makeItem(
+        Put: {
+          Item: this.makeItem(
             pk: "ENVIRONMENT#{environment.id}",
             sk: "#",
             environment: environment
           ),
-          conditionExpression: "attribute_not_exists(pk)"
+          ConditionExpression: "attribute_not_exists(pk)"
         },
       },
       {
-        put: {
-          item: this.makeItem(
+        Put: {
+          Item: this.makeItem(
             pk: "APP#{environment.appId}",
             sk: "ENVIRONMENT#{environment.id}",
             environment: environment,
@@ -196,8 +196,8 @@ pub class Environments {
         },
       },
       {
-        put: {
-          item: this.makeItem(
+        Put: {
+          Item: this.makeItem(
             pk: "APP#{environment.appId}",
             sk: "BRANCH#{environment.branch}",
             environment: environment,
@@ -205,8 +205,8 @@ pub class Environments {
         },
       },
       {
-        put: {
-          item: this.makeItem(
+        Put: {
+          Item: this.makeItem(
             pk: "DEPLOYED#{statusUpdatedAt}",
             sk: "ENV#{environment.id}",
             environment: environment,
@@ -224,67 +224,67 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
-          updateExpression: "SET #publicKey = :publicKey",
-          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #publicKey = :publicKey",
+          ConditionExpression: "attribute_exists(#pk) and #appId = :appId",
+          ExpressionAttributeNames: {
             "#pk": "pk",
             "#publicKey": "publicKey",
             "#appId": "appId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":publicKey": options.publicKey,
             ":appId": options.appId,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "ENVIRONMENT#{options.id}",
           },
-          updateExpression: "SET #publicKey = :publicKey",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #publicKey = :publicKey",
+          ExpressionAttributeNames: {
             "#publicKey": "publicKey",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":publicKey": options.publicKey,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "BRANCH#{branch}",
           },
-          updateExpression: "SET #publicKey = :publicKey",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #publicKey = :publicKey",
+          ExpressionAttributeNames: {
             "#publicKey": "publicKey",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":publicKey": options.publicKey,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "DEPLOYED#{statusUpdatedAt}",
             sk: "ENV#{options.id}",
           },
-          updateExpression: "SET #publicKey = :publicKey",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #publicKey = :publicKey",
+          ExpressionAttributeNames: {
             "#publicKey": "publicKey",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":publicKey": options.publicKey,
           },
         }
@@ -299,22 +299,22 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let lastStatusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    let var transactItems: MutArray<ex.DynamodbTransactWriteItem> = MutArray<ex.DynamodbTransactWriteItem>[
+    let var transactItems: MutArray<dynamodb.TransactWriteItem> = MutArray<dynamodb.TransactWriteItem>[
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
-          updateExpression: "SET #status = :status, #updatedAt = :updatedAt",
-          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #status = :status, #updatedAt = :updatedAt",
+          ConditionExpression: "attribute_exists(#pk) and #appId = :appId",
+          ExpressionAttributeNames: {
             "#pk": "pk",
             "#appId": "appId",
             "#status": "status",
             "#updatedAt": "updatedAt",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":appId": options.appId,
             ":status": options.status,
             ":updatedAt": now.toIso(),
@@ -322,34 +322,34 @@ pub class Environments {
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "ENVIRONMENT#{options.id}",
           },
-          updateExpression: "SET #status = :status, #updatedAt = :updatedAt",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #status = :status, #updatedAt = :updatedAt",
+          ExpressionAttributeNames: {
             "#status": "status",
             "#updatedAt": "updatedAt",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":status": options.status,
             ":updatedAt": now.toIso(),
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "BRANCH#{environment.branch}",
           },
-          updateExpression: "SET #status = :status, #updatedAt = :updatedAt",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #status = :status, #updatedAt = :updatedAt",
+          ExpressionAttributeNames: {
             "#status": "status",
             "#updatedAt": "updatedAt",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":status": options.status,
             ":updatedAt": now.toIso(),
           },
@@ -359,18 +359,18 @@ pub class Environments {
 
     if lastStatusUpdatedAt != statusUpdatedAt {
       // replace last status update
-      transactItems = transactItems.concat(MutArray<ex.DynamodbTransactWriteItem>[
+      transactItems = transactItems.concat(MutArray<dynamodb.TransactWriteItem>[
         {
-          delete: {
-            key: {
+          Delete: {
+            Key: {
               pk: "DEPLOYED#{lastStatusUpdatedAt}",
               sk: "ENV#{environment.id}"
             },
           }
         },
         {
-          put: {
-            item: this.makeItem(
+          Put: {
+            Item: this.makeItem(
               pk: "DEPLOYED#{statusUpdatedAt}",
               sk: "ENV#{environment.id}",
               environment: environment,
@@ -381,19 +381,19 @@ pub class Environments {
         }
       ]);
     } else {
-      transactItems = transactItems.concat(MutArray<ex.DynamodbTransactWriteItem>[
+      transactItems = transactItems.concat(MutArray<dynamodb.TransactWriteItem>[
         {
-          update: {
-            key: {
+          Update: {
+            Key: {
               pk: "DEPLOYED#{statusUpdatedAt}",
               sk: "ENV#{environment.id}",
             },
-            updateExpression: "SET #status = :status, #updatedAt = :updatedAt",
-            expressionAttributeNames: {
+            UpdateExpression: "SET #status = :status, #updatedAt = :updatedAt",
+            ExpressionAttributeNames: {
               "#status": "status",
               "#updatedAt": "updatedAt",
             },
-            expressionAttributeValues: {
+            ExpressionAttributeValues: {
               ":status": options.status,
               ":updatedAt": now.toIso(),
             },
@@ -402,7 +402,7 @@ pub class Environments {
       ]);
     }
 
-    this.table.transactWriteItems(transactItems: transactItems.copy());
+    this.table.transactWrite(TransactItems: transactItems.copy());
   }
 
   pub inflight updateSha(options: UpdateEnvironmentShaOptions) {
@@ -411,67 +411,67 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
-          updateExpression: "SET #sha = :sha",
-          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #sha = :sha",
+          ConditionExpression: "attribute_exists(#pk) and #appId = :appId",
+          ExpressionAttributeNames: {
             "#pk": "pk",
             "#sha": "sha",
             "#appId": "appId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":sha": options.sha,
             ":appId": options.appId,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "ENVIRONMENT#{options.id}",
           },
-          updateExpression: "SET #sha = :sha",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #sha = :sha",
+          ExpressionAttributeNames: {
             "#sha": "sha",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":sha": options.sha,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "BRANCH#{branch}",
           },
-          updateExpression: "SET #sha = :sha",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #sha = :sha",
+          ExpressionAttributeNames: {
             "#sha": "sha",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":sha": options.sha,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "DEPLOYED#{statusUpdatedAt}",
             sk: "ENV#{options.id}",
           },
-          updateExpression: "SET #sha = :sha",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #sha = :sha",
+          ExpressionAttributeNames: {
             "#sha": "sha",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":sha": options.sha,
           },
         }
@@ -485,67 +485,67 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
-          updateExpression: "SET #url = :url",
-          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #url = :url",
+          ConditionExpression: "attribute_exists(#pk) and #appId = :appId",
+          ExpressionAttributeNames: {
             "#pk": "pk",
             "#url": "url",
             "#appId": "appId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":url": options.url,
             ":appId": options.appId,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "ENVIRONMENT#{options.id}",
           },
-          updateExpression: "SET #url = :url",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #url = :url",
+          ExpressionAttributeNames: {
             "#url": "url",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":url": options.url,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "BRANCH#{branch}",
           },
-          updateExpression: "SET #url = :url",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #url = :url",
+          ExpressionAttributeNames: {
             "#url": "url",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":url": options.url,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "DEPLOYED#{statusUpdatedAt}",
             sk: "ENV#{options.id}",
           },
-          updateExpression: "SET #url = :url",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #url = :url",
+          ExpressionAttributeNames: {
             "#url": "url",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":url": options.url,
           },
         }
@@ -559,67 +559,67 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
-          updateExpression: "SET #commentId = :commentId",
-          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #commentId = :commentId",
+          ConditionExpression: "attribute_exists(#pk) and #appId = :appId",
+          ExpressionAttributeNames: {
             "#pk": "pk",
             "#commentId": "commentId",
             "#appId": "appId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":commentId": options.commentId,
             ":appId": options.appId,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "ENVIRONMENT#{options.id}",
           },
-          updateExpression: "SET #commentId = :commentId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #commentId = :commentId",
+          ExpressionAttributeNames: {
             "#commentId": "commentId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":commentId": options.commentId,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "BRANCH#{branch}",
           },
-          updateExpression: "SET #commentId = :commentId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #commentId = :commentId",
+          ExpressionAttributeNames: {
             "#commentId": "commentId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":commentId": options.commentId,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "DEPLOYED#{statusUpdatedAt}",
             sk: "ENV#{options.id}",
           },
-          updateExpression: "SET #commentId = :commentId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #commentId = :commentId",
+          ExpressionAttributeNames: {
             "#commentId": "commentId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":commentId": options.commentId,
           },
         }
@@ -633,67 +633,67 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
-          updateExpression: "SET #testResults = :testResults",
-          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #testResults = :testResults",
+          ConditionExpression: "attribute_exists(#pk) and #appId = :appId",
+          ExpressionAttributeNames: {
             "#pk": "pk",
             "#testResults": "testResults",
             "#appId": "appId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":testResults": options.testResults,
             ":appId": options.appId,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "ENVIRONMENT#{options.id}",
           },
-          updateExpression: "SET #testResults = :testResults",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #testResults = :testResults",
+          ExpressionAttributeNames: {
             "#testResults": "testResults",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":testResults": options.testResults,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "BRANCH#{branch}",
           },
-          updateExpression: "SET #testResults = :testResults",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #testResults = :testResults",
+          ExpressionAttributeNames: {
             "#testResults": "testResults",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":testResults": options.testResults,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "DEPLOYED#{statusUpdatedAt}",
             sk: "ENV#{options.id}",
           },
-          updateExpression: "SET #testResults = :testResults",
-          expressionAttributeNames: {
+          UpdateExpression: "SET #testResults = :testResults",
+          ExpressionAttributeNames: {
             "#testResults": "testResults",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":testResults": options.testResults,
           },
         }
@@ -707,49 +707,49 @@ pub class Environments {
     let updatedAt = datetime.fromIso(environment.updatedAt);
     let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
 
-    this.table.transactWriteItems(transactItems: [
+    this.table.transactWrite(TransactItems: [
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "ENVIRONMENT#{options.id}",
             sk: "#",
           },
-          updateExpression: "REMOVE testResults",
-          conditionExpression: "attribute_exists(#pk) and #appId = :appId",
-          expressionAttributeNames: {
+          UpdateExpression: "REMOVE testResults",
+          ConditionExpression: "attribute_exists(#pk) and #appId = :appId",
+          ExpressionAttributeNames: {
             "#pk": "pk",
             "#appId": "appId",
           },
-          expressionAttributeValues: {
+          ExpressionAttributeValues: {
             ":appId": options.appId,
           },
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "ENVIRONMENT#{options.id}",
           },
-          updateExpression: "REMOVE testResults",
+          UpdateExpression: "REMOVE testResults",
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "APP#{options.appId}",
             sk: "BRANCH#{branch}",
           },
-          updateExpression: "REMOVE testResults",
+          UpdateExpression: "REMOVE testResults",
         }
       },
       {
-        update: {
-          key: {
+        Update: {
+          Key: {
             pk: "DEPLOYED#{statusUpdatedAt}",
             sk: "ENV#{options.id}",
           },
-          updateExpression: "REMOVE testResults",
+          UpdateExpression: "REMOVE testResults",
         }
       }
     ]);
@@ -764,14 +764,14 @@ pub class Environments {
   }
 
   pub inflight get(options: GetEnvironmentOptions): Environment {
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "ENVIRONMENT#{options.id}",
         sk: "#",
       },
     );
 
-    if let item = result.item {
+    if let item = result.Item {
       return this.fromDB(item);
     }
 
@@ -783,14 +783,14 @@ pub class Environments {
   }
 
   pub inflight getByBranch(options: GetEnvironmentByBranchOptions): Environment {
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "APP#{options.appId}",
         sk: "BRANCH#{options.branch}",
       },
     );
 
-    if let item = result.item {
+    if let item = result.Item {
       return this.fromDB(item);
     }
 
@@ -803,17 +803,17 @@ pub class Environments {
     util.Util.do_while(
       handler: () => {
         let result = this.table.query(
-          keyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
-          expressionAttributeValues: {
+          KeyConditionExpression: "pk = :pk AND begins_with(sk, :sk)",
+          ExpressionAttributeValues: {
             ":pk": "APP#{options.appId}",
             ":sk": "ENVIRONMENT#",
           },
-          exclusiveStartKey: exclusiveStartKey,
+          ExclusiveStartKey: exclusiveStartKey,
         );
-        for item in result.items {
+        for item in result.Items {
           environments = environments.concat([this.fromDB(item)]);
         }
-        exclusiveStartKey = result.lastEvaluatedKey;
+        exclusiveStartKey = result.LastEvaluatedKey;
       },
       condition: () => {
         return exclusiveStartKey?;
@@ -829,16 +829,16 @@ pub class Environments {
     util.Util.do_while(
       handler: () => {
         let result = this.table.query(
-          keyConditionExpression: "pk = :pk",
-          expressionAttributeValues: {
+          KeyConditionExpression: "pk = :pk",
+          ExpressionAttributeValues: {
             ":pk": "DEPLOYED#{statusUpdatedAt}",
           },
-          exclusiveStartKey: exclusiveStartKey,
+          ExclusiveStartKey: exclusiveStartKey,
         );
-        for item in result.items {
+        for item in result.Items {
           environments = environments.concat([this.fromDB(item)]);
         }
-        exclusiveStartKey = result.lastEvaluatedKey;
+        exclusiveStartKey = result.LastEvaluatedKey;
       },
       condition: () => {
         return exclusiveStartKey?;
@@ -848,48 +848,48 @@ pub class Environments {
   }
 
   pub inflight delete(options: DeleteEnvironmentOptions): void {
-    let result = this.table.getItem(
-      key: {
+    let result = this.table.get(
+      Key: {
         pk: "ENVIRONMENT#{options.environmentId}",
         sk: "#",
       },
     );
 
-    if let app = result.item {
+    if let app = result.Item {
       let updatedAt = datetime.fromIso(app.get("updatedAt").asStr());
       let statusUpdatedAt = "{updatedAt.dayOfMonth}_{updatedAt.month}";
-      let result = this.table.transactWriteItems(transactItems: [
+      let result = this.table.transactWrite(TransactItems: [
         {
-          delete: {
-            key: {
+          Delete: {
+            Key: {
               pk: "ENVIRONMENT#{options.environmentId}",
               sk: "#",
             },
-            conditionExpression: "attribute_exists(#pk)",
-            expressionAttributeNames: {
+            ConditionExpression: "attribute_exists(#pk)",
+            ExpressionAttributeNames: {
               "#pk": "pk",
             },
           }
         },
         {
-          delete: {
-            key: {
+          Delete: {
+            Key: {
               pk: "APP#{options.appId}",
               sk: "ENVIRONMENT#{options.environmentId}",
             },
           }
         },
         {
-          delete: {
-            key: {
+          Delete: {
+            Key: {
               pk: "APP#{options.appId}",
               sk: "BRANCH#{app.get("branch").asStr()}",
             },
           }
         },
         {
-          delete: {
-            key: {
+          Delete: {
+            Key: {
               pk: "DEPLOYED#{statusUpdatedAt}",
               sk: "ENV#{options.environmentId}"
             },
@@ -902,7 +902,25 @@ pub class Environments {
     throw httpError.HttpError.notFound("Environment '{options.environmentId}' not found");
   }
 
+  inflight tryGetInt(item: Json, key: str ): num? {
+    if let value = item.tryGet(key)?.tryGet("value")?.tryAsStr() {
+      return num.fromStr(value);
+    }
+    return nil;
+  }
+
   inflight fromDB(item: Json): Environment {
+
+    let var commentId: num? = nil;
+    if let commentIdStr = item.tryGet("commentId")?.tryGet("value")?.tryAsStr() {
+      commentId = num.fromStr(commentIdStr);
+    }
+
+    let var prNumber: num? = nil;
+    if let prNumberStr = item.tryGet("prNumber")?.tryGet("value")?.tryAsStr() {
+      prNumber = num.fromStr(prNumberStr);
+    }
+
     return {
       id: item.get("id").asStr(),
       appId: item.get("appId").asStr(),
@@ -911,11 +929,11 @@ pub class Environments {
       branch: item.get("branch").asStr(),
       sha: item.get("sha").asStr(),
       status: item.get("status").asStr(),
-      installationId: item.get("installationId").asNum(),
-      prNumber: item.tryGet("prNumber")?.tryAsNum(),
+      installationId: num.fromStr(item.get("installationId").get("value").asStr()),
+      prNumber: this.tryGetInt(item, "prNumber"),
       prTitle: item.tryGet("prTitle")?.tryAsStr(),
       url: item.tryGet("url")?.tryAsStr(),
-      commentId: item.tryGet("commentId")?.tryAsNum(),
+      commentId: this.tryGetInt(item, "commentId"),
       testResults: status_report.TestResults.tryFromJson(item.tryGet("testResults")),
       createdAt: item.get("createdAt").asStr(),
       updatedAt: item.get("updatedAt").asStr(),

@@ -48,7 +48,7 @@ struct RuntimeStartOptions {
   logsBucketRegion: str;
   awsAccessKeyId: str;
   awsSecretAccessKey: str;
-  wingCloudUrl: parameter.IParameter;
+  wingCloudUrl: str;
   environmentId: str;
   secrets: Map<str>;
   certificate: certificate.Certificate;
@@ -117,7 +117,7 @@ class RuntimeHandler_sim impl IRuntimeHandler {
       "ENTRYPOINT" => opts.entrypoint,
       "WING_TARGET" => util.env("WING_TARGET"),
       "LOGS_BUCKET_NAME" => util.env(opts.logsBucketName), // get simulator handle for the bucket
-      "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
+      "WING_CLOUD_URL" => opts.wingCloudUrl,
       "ENVIRONMENT_ID" => opts.environmentId,
       "WING_SIMULATOR_URL" => util.env("WING_SIMULATOR_URL"),
       "SSL_PRIVATE_KEY" => util.base64Encode(opts.certificate.privateKey),
@@ -206,7 +206,7 @@ class RuntimeHandler_flyio impl IRuntimeHandler {
       "GIT_SHA" => opts.gitSha,
       "ENTRYPOINT" => opts.entrypoint,
       "WING_TARGET" => util.env("WING_TARGET"),
-      "WING_CLOUD_URL" => opts.wingCloudUrl.get(),
+      "WING_CLOUD_URL" => opts.wingCloudUrl,
       "LOGS_BUCKET_NAME" => opts.logsBucketName,
       "ENVIRONMENT_ID" => opts.environmentId,
       "AWS_ACCESS_KEY_ID" => opts.awsAccessKeyId,
@@ -340,17 +340,18 @@ pub class RuntimeService {
       try {
         // hack to get bucket in this environment
         this.logs.put;
+        props.wingCloudUrl.get;
 
         msg = types.Message.fromJson(Json.parse(message));
         if let message = msg {
-          log("wing url: {props.wingCloudUrl}");
+          log("wing url: {Json.stringify(props.wingCloudUrl.get())}");
 
           let url = this.runtimeHandler.start(
             gitToken: message.token,
             gitRepo: message.repo,
             gitSha: message.sha,
             entrypoint: message.entrypoint,
-            wingCloudUrl: props.wingCloudUrl,
+            wingCloudUrl: props.wingCloudUrl.get(),
             environmentId: message.environmentId,
             secrets: message.secrets,
             certificate: message.certificate,

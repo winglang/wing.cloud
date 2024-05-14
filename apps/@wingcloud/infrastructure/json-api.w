@@ -15,7 +15,7 @@ struct HttpErrorResponse {
   message: str;
 }
 
-interface Middleware {
+inflight interface Middleware {
   inflight handle(request: cloud.ApiRequest, next: inflight (cloud.ApiRequest): JsonApiResponse): JsonApiResponse;
 }
 
