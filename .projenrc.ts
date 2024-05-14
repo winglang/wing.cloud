@@ -295,8 +295,9 @@ infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 
 infrastructure.testTask.exec("node ./bin/wing.mjs test");
 
+// TODO: Remove the --snapshots=never flag after https://github.com/winglang/wing/issues/6469 is completed.
 infrastructure.addTask("test-aws", {
-  exec: "node ./bin/wing.mjs test -t tf-aws tests components",
+  exec: "node ./bin/wing.mjs test -t tf-aws tests components --snapshots=never",
 });
 
 infrastructure.addScript(
