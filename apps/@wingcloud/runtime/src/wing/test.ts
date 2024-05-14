@@ -55,23 +55,31 @@ async function runWingTest(
 
 export async function runWingTests(props: WingTestProps) {
   try {
+    console.log("runWingTests", props);
     props.logger.log("Starting wing tests app");
     const simfile = await wingCompile(
       props.wingCompilerPath,
       props.entrypointPath,
     );
+    console.log("simfile", simfile);
 
     const wingSdk = await import(props.wingSdkPath);
+    console.log("wingSdk", wingSdk);
 
     let simulatorLogs: { message: string; timestamp: string }[] = [];
+    console.log("before new simulator");
     const simulator: simulator.Simulator =
       await new wingSdk.simulator.Simulator({
         simfile,
       });
+    console.log("after new simulator", simulator);
+    console.log("before simulator.start");
     await simulator.start();
+    console.log("after simulator.start");
 
     simulator.onTrace({
       async callback(trace) {
+        console.log("on trace", trace);
         if (trace.data.status === "failure") {
           let message = await prettyPrintError(trace.data.error);
           simulatorLogs.push({
@@ -85,9 +93,12 @@ export async function runWingTests(props: WingTestProps) {
     const client = simulator.getResource(
       "root/cloud.TestRunner",
     ) as std.ITestRunnerClient;
+    console.log("simulator.getResource(root/cloud.TestRunner)", client);
 
     const testResults = [];
+    console.log("before client.listTests");
     for (let test of await client.listTests()) {
+      console.log("test", test);
       // reset simulator logs
       simulatorLogs = [];
       props.logger.log("Running test", [test]);
@@ -100,15 +111,19 @@ export async function runWingTests(props: WingTestProps) {
         traces: [...result.traces, ...simulatorLogs],
       };
 
+      console.log("before bucketWrite");
       await props.bucketWrite(
         props.environment.testKey(testResult.pass, testResult.id),
         JSON.stringify(testResult),
       );
+      console.log("after bucketWrite");
 
       testResults.push(testResult);
     }
 
+    console.log("before simulator.stop");
     await simulator.stop();
+    console.log("after simulator.stop");
 
     return { testsRun: true, testResults };
   } catch (error) {
