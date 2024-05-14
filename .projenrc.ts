@@ -296,7 +296,7 @@ infrastructure.devTask.exec("node ./bin/wing.mjs it main.w");
 infrastructure.testTask.exec("node ./bin/wing.mjs test");
 
 infrastructure.addTask("test-aws", {
-  exec: "node ./bin/wing.mjs test -t tf-aws tests components --snapshots=never",
+  exec: "node ./bin/wing.mjs test -t tf-aws tests components",
 });
 
 infrastructure.addScript(
