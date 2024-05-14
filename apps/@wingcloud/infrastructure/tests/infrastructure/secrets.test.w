@@ -35,7 +35,7 @@ test "can store and get a secret" {
 }
 
 test "can list secrets" {
-  let secret1 = secrets.create(appId: "app-id", environmentType: "preview", name: "test-secret", value: "secret-value");
+  let secret1 = secrets.create(appId: "app-id", environmentType: "preview", name: "test-secret-1", value: "secret-value");
   let secret2 = secrets.create(appId: "app-id", environmentType: "preview", name: "test-secret-2", value: "secret-value-2");
   let secret3 = secrets.create(appId: "app-id", environmentType: "production", name: "test-secret-3", value: "secret-value-3");
 
