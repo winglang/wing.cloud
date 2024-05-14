@@ -80,6 +80,7 @@ export const run = async function ({
     wingPaths = paths;
     const appEnvFile = join(dirname(entrypointPath), ".env");
 
+    console.log("before running-tests");
     await report("running-tests");
     const testResults = await setup.runWingTests(paths, entrypointPath);
 
@@ -137,6 +138,7 @@ export const run = async function ({
   }
 
   async function handleError(error: any) {
+    console.error(error);
     let errorMessage = error.message;
 
     if (wingPaths) {
