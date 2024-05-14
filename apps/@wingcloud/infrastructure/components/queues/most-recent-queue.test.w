@@ -50,8 +50,8 @@ test "will handle only recent messages" {
   util.sleep(5s);
   expect.equal(1, counter.peek());
 
-  expect.equal(true, mrq.enqueue(groupId: "k1", timestamp: 4, body: "body1"));
-  expect.equal(true, mrq.enqueue(groupId: "k1", timestamp: 5, body: "body1"));
+  expect.equal(true, mrq.enqueue(groupId: "k2", timestamp: 4, body: "body1"));
+  expect.equal(true, mrq.enqueue(groupId: "k2", timestamp: 5, body: "body1"));
 
   util.sleep(5s);
   expect.equal(2, counter.peek());
