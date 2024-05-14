@@ -55,7 +55,7 @@ async function runWingTest(
 
 export async function runWingTests(props: WingTestProps) {
   try {
-    console.log("runWingTests", props);
+    console.log("runWingTests", props.wingSdkPath, props.wingCompilerPath);
     props.logger.log("Starting wing tests app");
     const simfile = await wingCompile(
       props.wingCompilerPath,
@@ -64,19 +64,17 @@ export async function runWingTests(props: WingTestProps) {
     console.log("simfile", simfile);
 
     const wingSdk = await import(props.wingSdkPath);
-    console.log("wingSdk", wingSdk);
+    // console.log("wingSdk", wingSdk);
 
     let simulatorLogs: { message: string; timestamp: string }[] = [];
-    console.log("before new simulator");
+    // console.log("before new simulator");
     const simulator: simulator.Simulator =
       await new wingSdk.simulator.Simulator({
         simfile,
       });
-    console.log("after new simulator", simulator);
-    console.log("before simulator.start");
-    await simulator.start();
-    console.log("after simulator.start");
+    // console.log("after new simulator", simulator);
 
+    console.log("listen to simulator traces");
     simulator.onTrace({
       async callback(trace) {
         console.log("on trace", trace);
@@ -89,6 +87,10 @@ export async function runWingTests(props: WingTestProps) {
         }
       },
     });
+
+    console.log("before simulator.start");
+    await simulator.start();
+    console.log("after simulator.start");
 
     const client = simulator.getResource(
       "root/cloud.TestRunner",
