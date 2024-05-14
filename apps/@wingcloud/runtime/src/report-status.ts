@@ -44,10 +44,13 @@ export function useReportStatus(
       data: payload,
       timestamp: Date.now(),
     };
+    console.log("before keyStore.createToken");
     const token = await keyStore.createToken({
       environmentId: data.environmentId,
     });
+    console.log("after keyStore.createToken");
     lastStatus = status;
+    console.log("before await fetch environment.report");
     await fetch(`${context.wingApiUrl}/environment.report`, {
       method: "POST",
       headers: {
@@ -57,5 +60,6 @@ export function useReportStatus(
         ...data,
       }),
     });
+    console.log("after await fetch environment.report");
   };
 }
