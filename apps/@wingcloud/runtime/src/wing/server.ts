@@ -170,6 +170,7 @@ export async function prepareServer({
           info: log,
           error: log,
           verbose: log,
+          warning: log,
         },
         config: {
           addEventListener(event: any, listener: any) {},
