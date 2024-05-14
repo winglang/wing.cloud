@@ -83,10 +83,15 @@ export const run = async function ({
     console.log("before running-tests");
     await report("running-tests");
     console.log("after running-tests");
+    console.log("before setup.runWingTests");
     const testResults = await setup.runWingTests(paths, entrypointPath);
+    console.log("after setup.runWingTests");
 
+    console.log("testResults.testsRun", testResults.testsRun);
     if (testResults.testsRun) {
+      console.log("before running-server");
       await report("running-server", { testResults: testResults.testResults });
+      console.log("after running-server");
     } else {
       const message = `failed to run tests: ${testResults.error?.toString()}`;
       await report("tests-error", { message });
