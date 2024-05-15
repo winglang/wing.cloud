@@ -9,7 +9,7 @@
     "@segment/analytics-next": "^1.69.0",
     "@tanstack/react-query": "^5.35.1",
     "@wingcloud/wrpc": "workspace:^",
-    "@wingconsole/ui": "^0.73.42",
+    "@wingconsole/ui": "^0.73.44",
     "clsx": "^2.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -19,7 +19,7 @@
     "vite": "^5.2.11"
   },
   "devDependencies": {
-    "@aws-sdk/client-dynamodb": "^3.569.0",
+    "@aws-sdk/client-dynamodb": "^3.574.0",
     "@cloudy-ts/eslint-plugin": "^0.0.394",
     "@ibm/plex": "^6.4.0",
     "@types/node": "20",

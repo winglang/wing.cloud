@@ -50,7 +50,7 @@
     "punycode": "^2.3.1",
     "semver": "^7.6.0",
     "table": "^6.8.1",
-    "winglang": "^0.73.41",
+    "winglang": "^0.73.44",
     "yaml": "^2.3.4"
   },
   "devDependencies": {
