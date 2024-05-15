@@ -109,29 +109,29 @@ pub class TunnelsApi {
         headers: response.headers
       };
     }, zoneName: props.zoneName, subDomain: props.subDomain) as "tunnels public endpoint";
-    
-    
-    this.ws.onConnect(inflight (connectionId: str) => {
-      log("onConnect: {connectionId}");  
-    });
-    
+
+
+    // this.ws.onConnect(inflight (connectionId: str) => {
+    //   log("onConnect: {connectionId}");
+    // });
+
     this.ws.onDisconnect(inflight (connectionId: str) => {
       connections.removeConnection(connectionId);
     });
-    
+
     this.ws.onMessage(inflight (connectionId: str, message: str) => {
       log("onMessage: {connectionId}");
-    
+
       let jsn = Json.tryParse(message);
       if jsn == nil {
         return;
       }
-    
+
       let msg = Message.tryFromJson(jsn);
       if msg == nil {
         return;
       }
-    
+
       if msg?.action == "INITIALIZE" {
         let initialize = InitializeMessage.fromJson(jsn);
         let subdomain = initialize.subdomain ?? util.nanoid(alphabet: "0123456789abcdefghij", size: 10);
@@ -157,7 +157,7 @@ pub class TunnelsApi {
           }));
           return;
         }
-        
+
         this.ws.sendMessage(connectionId, Json.stringify(InitializedMessage{
           action: "INITIALIZED",
           subdomain: subdomain,
