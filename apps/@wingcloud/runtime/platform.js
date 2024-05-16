@@ -12,11 +12,6 @@ exports.Platform = class Platform {
     if (type === ENDPOINT_FQN) {
       class CustomEndpoint extends Endpoint {
         get url() {
-          const isTestEnvironment = App.of(scope).isTestEnvironment;
-          if (isTestEnvironment) {
-            return super.url;
-          }
-
           const environmentId = process.env["ENVIRONMENT_ID"];
           const publicEndpointDomain = process.env["PUBLIC_ENDPOINT_DOMAIN"];
 
@@ -27,6 +22,11 @@ exports.Platform = class Platform {
 
           return `https://${digest}.${publicEndpointDomain}`;
         }
+      }
+
+      const isTestEnvironment = App.of(scope).isTestEnvironment;
+      if (isTestEnvironment) {
+        return;
       }
 
       return new CustomEndpoint(scope, id, ...args);
