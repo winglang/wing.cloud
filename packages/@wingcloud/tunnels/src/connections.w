@@ -1,5 +1,4 @@
 bring dynamodb;
-bring ex;
 
 pub struct Connection {
   connectionId: str;
@@ -42,9 +41,8 @@ pub interface IConnections {
 */
 pub class Connections impl IConnections {
   connections: dynamodb.Table;
-  requests: ex.Redis;
   new() {
-    this.connections = new dynamodb.Table(
+    this.connections =  new dynamodb.Table(
       name: "connections",
       hashKey: "pk",
       attributes: [
@@ -54,7 +52,6 @@ pub class Connections impl IConnections {
         }
       ]
     ) as "connections";
-    this.requests = new ex.Redis();
   }
 
   pub inflight addConnection(conn: Connection) {
@@ -126,18 +123,31 @@ pub class Connections impl IConnections {
   }
 
   pub inflight addResponseForRequest(requestId: str, req: Json) {
-    this.requests.set(requestId, Json.stringify(req));
+    this.connections.put(
+      Item: {
+        pk: "request#{requestId}",
+        req: req,
+      },
+    );
   }
 
   pub inflight findResponseForRequest(requestId: str): Json? {
-    if let req = this.requests.get(requestId) {
-      return Json.parse(req);
+    let response = this.connections.get(Key: {
+      pk: "request#{requestId}",
+    });
+
+    if let item = response.Item {
+      return item.get("req");
     } else {
       return nil;
     }
   }
 
   pub inflight removeResponseForRequest(requestId: str) {
-    this.requests.del(requestId);
+    this.connections.delete(
+      Key: {
+        pk: "request#{requestId}",
+      },
+    );
   }
 }
