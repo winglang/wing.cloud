@@ -11,6 +11,12 @@ exports.Platform = class Platform {
     if (type === ENDPOINT_FQN) {
       class CustomEndpoint extends Endpoint {
         get url() {
+          const { App } = require("@winglang/sdk/lib/core/app");
+          const isTestEnvironment = App.of(scope).isTestEnvironment;
+          if (isTestEnvironment) {
+            return this.url;
+          }
+
           const environmentId = process.env["ENVIRONMENT_ID"];
           const publicEndpointDomain = process.env["PUBLIC_ENDPOINT_DOMAIN"];
 
