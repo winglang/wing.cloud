@@ -111,13 +111,13 @@ pub class TunnelsApi {
     }, zoneName: props.zoneName, subDomain: props.subDomain) as "tunnels public endpoint";
 
 
-    // this.ws.onConnect(inflight (connectionId: str) => {
-    //   log("onConnect: {connectionId}");
-    // });
+    this.ws.onConnect(inflight (connectionId: str) => {
+      log("onConnect: {connectionId}");
+    });
 
-    // this.ws.onDisconnect(inflight (connectionId: str) => {
-    //   connections.removeConnection(connectionId);
-    // });
+    this.ws.onDisconnect(inflight (connectionId: str) => {
+      connections.removeConnection(connectionId);
+    });
 
     this.ws.onMessage(inflight (connectionId: str, message: str) => {
       log("onMessage: {connectionId}");
