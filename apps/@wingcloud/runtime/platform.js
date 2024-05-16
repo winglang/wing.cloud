@@ -14,7 +14,7 @@ exports.Platform = class Platform {
         get url() {
           const isTestEnvironment = App.of(scope).isTestEnvironment;
           if (isTestEnvironment) {
-            return this.url;
+            return super.url;
           }
 
           const environmentId = process.env["ENVIRONMENT_ID"];
