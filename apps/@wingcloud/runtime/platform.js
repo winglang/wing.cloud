@@ -2,6 +2,7 @@
 const { createHash } = require("node:crypto");
 
 const { ENDPOINT_FQN } = require("@winglang/sdk/lib/cloud");
+const { App } = require("@winglang/sdk/lib/core/app");
 const { Endpoint } = require("@winglang/sdk/lib/target-sim/endpoint");
 
 exports.Platform = class Platform {
@@ -11,7 +12,6 @@ exports.Platform = class Platform {
     if (type === ENDPOINT_FQN) {
       class CustomEndpoint extends Endpoint {
         get url() {
-          const { App } = require("@winglang/sdk/lib/core/app");
           const isTestEnvironment = App.of(scope).isTestEnvironment;
           if (isTestEnvironment) {
             return this.url;
