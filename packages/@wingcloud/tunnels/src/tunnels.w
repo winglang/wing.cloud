@@ -115,9 +115,9 @@ pub class TunnelsApi {
     //   log("onConnect: {connectionId}");
     // });
 
-    this.ws.onDisconnect(inflight (connectionId: str) => {
-      connections.removeConnection(connectionId);
-    });
+    // this.ws.onDisconnect(inflight (connectionId: str) => {
+    //   connections.removeConnection(connectionId);
+    // });
 
     this.ws.onMessage(inflight (connectionId: str, message: str) => {
       log("onMessage: {connectionId}");
