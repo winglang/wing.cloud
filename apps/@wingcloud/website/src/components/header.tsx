@@ -95,7 +95,7 @@ export interface HeaderProps {
 
 export const Header = ({ breadcrumbs, tabs }: HeaderProps) => {
   const template = "feature.yml";
-  const WING_CLOUD_FEEDBACK_URL = `https://t.winglang.io/slack`;
+  const WING_CLOUD_FEEDBACK_URL = `https://t.winglang.io/discord`;
   const { theme } = useTheme();
 
   const { user } = useContext(AuthDataProviderContext);
