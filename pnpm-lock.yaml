@@ -248,11 +248,11 @@ importers:
         specifier: ^0.73.42
         version: 0.73.42(constructs@10.3.0)(typescript@5.4.5)
       '@winglang/compiler':
-        specifier: ^0.73.42
-        version: 0.73.42(constructs@10.3.0)(typescript@5.4.5)
+        specifier: ^0.73.52
+        version: 0.73.52(constructs@10.3.0)(typescript@5.4.5)
       '@winglang/sdk':
-        specifier: ^0.73.42
-        version: 0.73.42(constructs@10.3.0)
+        specifier: ^0.73.52
+        version: 0.73.52(constructs@10.3.0)
       chalk:
         specifier: ^5.3.0
         version: 5.3.0
@@ -372,8 +372,8 @@ importers:
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/wrpc
       '@wingconsole/ui':
-        specifier: ^0.73.42
-        version: 0.73.42(@types/react@18.2.56)(react@18.2.0)
+        specifier: ^0.73.52
+        version: 0.73.52(@types/react@18.2.56)(react@18.2.0)
       clsx:
         specifier: ^2.1.0
         version: 2.1.0
@@ -515,11 +515,11 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(eslint@8.57.0)(typescript@5.4.5)
       '@winglang/compiler':
-        specifier: ^0.59.6
-        version: 0.59.6(constructs@10.3.0)(typescript@5.4.5)
+        specifier: ^0.73.52
+        version: 0.73.52(constructs@10.3.0)(typescript@5.4.5)
       '@winglang/sdk':
-        specifier: ^0.59.6
-        version: 0.59.6(constructs@10.3.0)
+        specifier: ^0.73.52
+        version: 0.73.52(constructs@10.3.0)
       cdktf:
         specifier: ^0.20.3
         version: 0.20.3(constructs@10.3.0)
@@ -5685,6 +5685,7 @@ packages:
     dependencies:
       '@winglang/sdk': 0.59.6(constructs@10.3.0)
       typescript: 5.4.5
+    dev: false
 
   /@wingcloud/framework@0.73.42(@winglang/sdk@0.73.42)(typescript@5.4.5):
     resolution: {integrity: sha512-kkGKPkgmpK4ZdjvFr0YnS0Su4cuCfVQBTa0aFoHQbJdU7tqdB0AP/ziCtn22lvglyQh3uvrhIMEHIjNDfqijEw==}
@@ -5695,6 +5696,15 @@ packages:
       '@winglang/sdk': 0.73.42(constructs@10.3.0)
       typescript: 5.4.5
     dev: false
+
+  /@wingcloud/framework@0.73.52(@winglang/sdk@0.73.52)(typescript@5.4.5):
+    resolution: {integrity: sha512-eX3qbe/ojogA+J99CVm/IDmzVrmuz8xD4ridhsILyHXHG6/qfHN61YH4f20+DjLB7FH0pv/VkhW6OOjn6AVJjw==}
+    peerDependencies:
+      '@winglang/sdk': '*'
+      typescript: ^5.3.3
+    dependencies:
+      '@winglang/sdk': 0.73.52(constructs@10.3.0)
+      typescript: 5.4.5
 
   /@wingconsole/app@0.54.63(constructs@10.3.0)(typescript@5.4.5):
     resolution: {integrity: sha512-VMP3EBHBsSJ6EXV8BjBguRZUUxDG/RtiyYeOpfAvjoHiUwgnZGvcGIe63aoeIThVdz5blzkuCqE0MMG7T5UH3g==}
@@ -5742,8 +5752,8 @@ packages:
       - typescript
     dev: false
 
-  /@wingconsole/design-system@0.73.42:
-    resolution: {integrity: sha512-ew+S+Gz63pp9u1R58vp/eUqc9i6XqDZlQPanfUrv24jQFWRsqdpsbvgn8nqovpQOfK4CuVV4U4yw5DnOAwbIYA==}
+  /@wingconsole/design-system@0.73.52:
+    resolution: {integrity: sha512-H7e9CHYbC6HZie04miwKTfsuB/9OTFOhOQm2/e459bz1gLTIpEgdzQn/Aprfl7ykyfvi4uXPmJaNGMHTZ6Fnmg==}
     dependencies:
       '@headlessui/react': 1.7.18(react-dom@18.2.0)(react@18.2.0)
       '@heroicons/react': 2.1.1(react@18.2.0)
@@ -5806,8 +5816,8 @@ packages:
       - typescript
     dev: false
 
-  /@wingconsole/ui@0.73.42(@types/react@18.2.56)(react@18.2.0):
-    resolution: {integrity: sha512-vOC2nb0ay6KoIPHdNSCa7zVJitiP/aDagSMpXja+xJrEmbkNJkIN8T3eDsdGYlpvRJsedZBKyWmN2HLAM5C17w==}
+  /@wingconsole/ui@0.73.52(@types/react@18.2.56)(react@18.2.0):
+    resolution: {integrity: sha512-HaYMjmkMfh389YLugxa4aLbd0CRwn820AyUHoCpwI2xuu5uxEVO2CsWgG02oj/zCiZz3xno0lRjG329PuO+MRQ==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
@@ -5818,7 +5828,7 @@ packages:
       '@trpc/client': 10.45.2(@trpc/server@10.45.2)
       '@trpc/react-query': 10.45.2(@tanstack/react-query@4.36.1)(@trpc/client@10.45.2)(@trpc/server@10.45.2)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/server': 10.45.2
-      '@wingconsole/design-system': 0.73.42
+      '@wingconsole/design-system': 0.73.52
       classnames: 2.5.1
       elkjs: 0.8.2
       framer-motion: 10.18.0(react-dom@18.2.0)(react@18.2.0)
@@ -5863,6 +5873,7 @@ packages:
     transitivePeerDependencies:
       - constructs
       - typescript
+    dev: false
     bundledDependencies:
       - wasi-js
 
@@ -5877,6 +5888,19 @@ packages:
       - constructs
       - typescript
     dev: false
+    bundledDependencies:
+      - wasi-js
+
+  /@winglang/compiler@0.73.52(constructs@10.3.0)(typescript@5.4.5):
+    resolution: {integrity: sha512-h35C0/e2O88OYQZcJ8Sreystoaaf64CtP/pS+ddlX7r0wTmnRbcCtU2OHHh+gh2RxL+EqCQK/S2f9pR9WIaD5w==}
+    engines: {node: '>=v20.0.0'}
+    dependencies:
+      '@wingcloud/framework': 0.73.52(@winglang/sdk@0.73.52)(typescript@5.4.5)
+      '@winglang/sdk': 0.73.52(constructs@10.3.0)
+      jiti: 1.21.0
+    transitivePeerDependencies:
+      - constructs
+      - typescript
     bundledDependencies:
       - wasi-js
 
@@ -5935,6 +5959,7 @@ packages:
       constructs: 10.3.0
     optionalDependencies:
       esbuild: 0.19.12
+    dev: false
     bundledDependencies:
       - '@aws-sdk/client-cloudwatch-logs'
       - '@aws-sdk/client-dynamodb'
@@ -5985,6 +6010,58 @@ packages:
     optionalDependencies:
       esbuild: 0.19.12
     dev: false
+    bundledDependencies:
+      - '@aws-sdk/client-cloudwatch-logs'
+      - '@aws-sdk/client-dynamodb'
+      - '@aws-sdk/client-elasticache'
+      - '@aws-sdk/client-lambda'
+      - '@aws-sdk/client-s3'
+      - '@aws-sdk/client-secrets-manager'
+      - '@aws-sdk/client-sns'
+      - '@aws-sdk/client-sqs'
+      - '@aws-sdk/s3-request-presigner'
+      - '@aws-sdk/types'
+      - '@aws-sdk/util-dynamodb'
+      - '@azure/core-paging'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/storage-blob'
+      - '@google-cloud/datastore'
+      - '@google-cloud/storage'
+      - '@smithy/util-stream'
+      - '@smithy/util-utf8'
+      - '@types/aws-lambda'
+      - '@winglang/wingtunnels'
+      - ajv
+      - cdktf
+      - cron-parser
+      - cron-validator
+      - express
+      - glob
+      - google-auth-library
+      - ioredis
+      - jiti
+      - mime
+      - mime-types
+      - nanoid
+      - protobufjs
+      - safe-stable-stringify
+      - stacktracey
+      - toml
+      - ulid
+      - uuid
+      - vlq
+      - yaml
+
+  /@winglang/sdk@0.73.52(constructs@10.3.0):
+    resolution: {integrity: sha512-vCmfPUiWGW9fcNq12ZKNWDXP3NFFhuCgEw0uKcxhk4+xSWNTbnhy5Y0EtRk7VkYlqzBMCrOEdyzOCywBzXVl1g==}
+    engines: {node: '>= 20.0.0'}
+    peerDependencies:
+      constructs: ^10.3
+    dependencies:
+      constructs: 10.3.0
+    optionalDependencies:
+      esbuild: 0.19.12
     bundledDependencies:
       - '@aws-sdk/client-cloudwatch-logs'
       - '@aws-sdk/client-dynamodb'
