@@ -515,11 +515,11 @@ importers:
         specifier: ^7.0.1
         version: 7.0.1(eslint@8.57.0)(typescript@5.4.5)
       '@winglang/compiler':
-        specifier: ^0.73.52
-        version: 0.73.52(constructs@10.3.0)(typescript@5.4.5)
+        specifier: ^0.59.6
+        version: 0.59.6(constructs@10.3.0)(typescript@5.4.5)
       '@winglang/sdk':
-        specifier: ^0.73.52
-        version: 0.73.52(constructs@10.3.0)
+        specifier: ^0.59.6
+        version: 0.59.6(constructs@10.3.0)
       cdktf:
         specifier: ^0.20.3
         version: 0.20.3(constructs@10.3.0)
@@ -5685,7 +5685,6 @@ packages:
     dependencies:
       '@winglang/sdk': 0.59.6(constructs@10.3.0)
       typescript: 5.4.5
-    dev: false
 
   /@wingcloud/framework@0.73.42(@winglang/sdk@0.73.42)(typescript@5.4.5):
     resolution: {integrity: sha512-kkGKPkgmpK4ZdjvFr0YnS0Su4cuCfVQBTa0aFoHQbJdU7tqdB0AP/ziCtn22lvglyQh3uvrhIMEHIjNDfqijEw==}
@@ -5705,6 +5704,7 @@ packages:
     dependencies:
       '@winglang/sdk': 0.73.52(constructs@10.3.0)
       typescript: 5.4.5
+    dev: false
 
   /@wingconsole/app@0.54.63(constructs@10.3.0)(typescript@5.4.5):
     resolution: {integrity: sha512-VMP3EBHBsSJ6EXV8BjBguRZUUxDG/RtiyYeOpfAvjoHiUwgnZGvcGIe63aoeIThVdz5blzkuCqE0MMG7T5UH3g==}
@@ -5873,7 +5873,6 @@ packages:
     transitivePeerDependencies:
       - constructs
       - typescript
-    dev: false
     bundledDependencies:
       - wasi-js
 
@@ -5901,6 +5900,7 @@ packages:
     transitivePeerDependencies:
       - constructs
       - typescript
+    dev: false
     bundledDependencies:
       - wasi-js
 
@@ -5959,7 +5959,6 @@ packages:
       constructs: 10.3.0
     optionalDependencies:
       esbuild: 0.19.12
-    dev: false
     bundledDependencies:
       - '@aws-sdk/client-cloudwatch-logs'
       - '@aws-sdk/client-dynamodb'
@@ -6062,6 +6061,7 @@ packages:
       constructs: 10.3.0
     optionalDependencies:
       esbuild: 0.19.12
+    dev: false
     bundledDependencies:
       - '@aws-sdk/client-cloudwatch-logs'
       - '@aws-sdk/client-dynamodb'
