@@ -74,12 +74,8 @@ export class Setup {
 
   private async niInstall(cwd: string) {
     if (existsSync(join(cwd, "package.json"))) {
-      const installArgs = [];
-      if (this.context.cacheDir) {
-        installArgs.push("--cache", this.context.cacheDir);
-      }
       this.logger.log("Installing npm dependencies");
-      return this.executer.exec("ni", installArgs, {
+      return this.executer.exec("ni", [], {
         cwd,
         throwOnFailure: true,
       });

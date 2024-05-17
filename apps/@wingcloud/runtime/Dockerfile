@@ -17,7 +17,8 @@ RUN apk update
 RUN apk add bash ip6tables pigz sysstat procps lsof libstdc++
 RUN apk add  --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main/ nodejs npm
 
-RUN npm i -g pnpm yarn projen winglang@latest @antfu/ni
+RUN npm i -g projen winglang@latest
+RUN npm i -g pnpm yarn @antfu/ni
 
 WORKDIR /app
 
