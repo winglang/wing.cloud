@@ -42,7 +42,7 @@ export class Setup {
     );
     const entrydir = dirname(entrypointPath);
     await this.gitClone();
-    await this.npmInstall(entrydir);
+    await this.niInstall(entrydir);
     await this.runCustomScript(entrydir);
     const wingPaths = await this.runInstallWing(entrydir);
 
@@ -72,14 +72,14 @@ export class Setup {
     );
   }
 
-  private async npmInstall(cwd: string) {
+  private async niInstall(cwd: string) {
     if (existsSync(join(cwd, "package.json"))) {
-      const installArgs = ["install"];
+      const installArgs = [];
       if (this.context.cacheDir) {
         installArgs.push("--cache", this.context.cacheDir);
       }
       this.logger.log("Installing npm dependencies");
-      return this.executer.exec("npm", installArgs, {
+      return this.executer.exec("ni", installArgs, {
         cwd,
         throwOnFailure: true,
       });
