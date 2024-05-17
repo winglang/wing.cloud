@@ -48,7 +48,7 @@ const ConsolePage = () => {
   }, [environment.data?.environment.url]);
 
   return (
-    <div className={clsx("w-full flex-grow overflow-auto")}>
+    <div className={clsx("w-full flex-grow overflow-auto relative")}>
       {environment.isLoading && (
         <div className="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <SpinnerLoader />
