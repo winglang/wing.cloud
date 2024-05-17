@@ -43,8 +43,8 @@ test("run() - installs npm packages and run tests", async () => {
   expect(files.length).toBe(3);
 
   const deploymentLogs = await logsBucket.get(environment.deploymentKey());
-  expect(deploymentLogs).toContain("Running npm install");
-  expect(deploymentLogs).toContain("added 1 package");
+  expect(deploymentLogs).toContain("Running ni");
+  expect(deploymentLogs).toContain("Command ni exited with status 0");
 
   const testLogs = await logsBucket.get(
     environment.testKey(true, "rootenv0testHelloworld"),
