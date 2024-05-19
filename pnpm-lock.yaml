@@ -248,8 +248,8 @@ importers:
   apps/@wingcloud/runtime:
     dependencies:
       '@wingconsole/app':
-        specifier: ^0.73.59
-        version: 0.73.59(constructs@10.3.0)(encoding@0.1.13)(typescript@5.4.5)
+        specifier: ^0.74.0
+        version: 0.74.0(constructs@10.3.0)(encoding@0.1.13)(typescript@5.4.5)
       '@winglang/compiler':
         specifier: ^0.74.0
         version: 0.74.0(constructs@10.3.0)(typescript@5.4.5)
@@ -3445,29 +3445,17 @@ packages:
   '@vitest/utils@1.3.0':
     resolution: {integrity: sha512-/LibEY/fkaXQufi4GDlQZhikQsPO2entBKtfuyIpr1jV4DpaeasqkeHjhdOhU24vSHshcSuEyVlWdzvv2XmYCw==}
 
-  '@wingcloud/framework@0.73.59':
-    resolution: {integrity: sha512-YWKu7eYzfPdU8vdll6nFpFhhCxFxsW1vKrKXrnVugKLBGEsVJwSjhZVl2auktjrzYJYTOB2cwp+yIIHPBJdq0w==}
-    peerDependencies:
-      '@winglang/sdk': '*'
-      typescript: ^5.3.3
-
   '@wingcloud/framework@0.74.0':
     resolution: {integrity: sha512-uVGNLBDFfvhb18uB5biYFx6eNY9F0IjCd3hbklQAsFNHB2i9+V9oQ76a670ybhw7b6IHv71PDnzCvAGBDSvEFw==}
     peerDependencies:
       '@winglang/sdk': '*'
       typescript: ^5.3.3
 
-  '@wingconsole/app@0.73.59':
-    resolution: {integrity: sha512-jmZ9idHPH9i/J0T/XQHvIz7W0g2rsm/nkPiKMs4qPqCUyOVXLCqD2870qLLYMA/s1GbflAmB1glDMEA6s/gSSQ==}
-
   '@wingconsole/app@0.74.0':
     resolution: {integrity: sha512-/+fynZZi4/IY818pCXaIcTstTH3ebUhwuhJkfYPXQXZ1rk7EUQvYW6Exup0+5Yffwq/UNK0N1vX9Jjw9Q8kJRQ==}
 
   '@wingconsole/design-system@0.74.0':
     resolution: {integrity: sha512-YahaxYTjMHhziBudKuNE1MSQJL3/isxlMgJx0kAaYerMrwJlrma5IEXtGjEyHYPVDYRIE5Dm/IURWQl0bB7Fmw==}
-
-  '@wingconsole/server@0.73.59':
-    resolution: {integrity: sha512-VUUzkJ9EFjdUjJTryzHHYN6V2elVhlfFFMcl7dx/6EtronDmqYybxubJ8smvUDYaQAFfWN1JbrU/afts/XkedQ==}
 
   '@wingconsole/server@0.74.0':
     resolution: {integrity: sha512-Yv7obQo/fn7KNQw7AQIapEatQJwLG4NhknnmBuscUjyQ31MNK1wqlgz2D2ruNGqDzv7vWpyagaExhe4S0pddew==}
@@ -3477,65 +3465,11 @@ packages:
     peerDependencies:
       react: ^18.2.0
 
-  '@winglang/compiler@0.73.59':
-    resolution: {integrity: sha512-1gUFo2t1OgiJaoJT0hkVDEJXVb7QPTuFExsoSrQg7fkfnvbBSUia1iPcrdpg+P+11nSzH+4RxlV7wkE64N3lFw==}
-    engines: {node: '>=v20.0.0'}
-    bundledDependencies:
-      - wasi-js
-
   '@winglang/compiler@0.74.0':
     resolution: {integrity: sha512-h2eZ0y4u2jEYC8A4U1mlhQBJ7pjfh6LtYzBdOGq8zWrWHdcEyOPe2D39ttqYCXPVzK3cAVWQJldrv7wBHNXNmw==}
     engines: {node: '>=v20.0.0'}
     bundledDependencies:
       - wasi-js
-
-  '@winglang/sdk@0.73.59':
-    resolution: {integrity: sha512-HAa8UW6di1D14i9AD65NVGjgtcXOF/LViBi23poZquxpit3BHU3a7pHI16wIM0ihQu3W6LQcnbuZX0bRhBZxFQ==}
-    engines: {node: '>= 20.0.0'}
-    peerDependencies:
-      constructs: ^10.3
-    bundledDependencies:
-      - '@aws-sdk/client-cloudwatch-logs'
-      - '@aws-sdk/client-dynamodb'
-      - '@aws-sdk/client-elasticache'
-      - '@aws-sdk/client-lambda'
-      - '@aws-sdk/client-s3'
-      - '@aws-sdk/client-secrets-manager'
-      - '@aws-sdk/client-sns'
-      - '@aws-sdk/client-sqs'
-      - '@aws-sdk/s3-request-presigner'
-      - '@aws-sdk/types'
-      - '@aws-sdk/util-dynamodb'
-      - '@azure/core-paging'
-      - '@azure/data-tables'
-      - '@azure/identity'
-      - '@azure/storage-blob'
-      - '@google-cloud/datastore'
-      - '@google-cloud/storage'
-      - '@smithy/util-stream'
-      - '@smithy/util-utf8'
-      - '@types/aws-lambda'
-      - '@winglang/wingtunnels'
-      - ajv
-      - cdktf
-      - cron-parser
-      - cron-validator
-      - express
-      - glob
-      - google-auth-library
-      - ioredis
-      - jiti
-      - mime
-      - mime-types
-      - nanoid
-      - protobufjs
-      - safe-stable-stringify
-      - stacktracey
-      - toml
-      - ulid
-      - uuid
-      - vlq
-      - yaml
 
   '@winglang/sdk@0.74.0':
     resolution: {integrity: sha512-WuFieURXENDat/oQSFiOcLwzqwDFEnYAgDQkWbzOhduEXNtiqrFX4FUpJg3yRcjhQkBuGjFsIcBsaIWoRtQ/Ow==}
@@ -11276,29 +11210,10 @@ snapshots:
       loupe: 2.3.7
       pretty-format: 29.7.0
 
-  '@wingcloud/framework@0.73.59(@winglang/sdk@0.73.59(constructs@10.3.0))(typescript@5.4.5)':
-    dependencies:
-      '@winglang/sdk': 0.73.59(constructs@10.3.0)
-      typescript: 5.4.5
-
   '@wingcloud/framework@0.74.0(@winglang/sdk@0.74.0(constructs@10.3.0))(typescript@5.4.5)':
     dependencies:
       '@winglang/sdk': 0.74.0(constructs@10.3.0)
       typescript: 5.4.5
-
-  '@wingconsole/app@0.73.59(constructs@10.3.0)(encoding@0.1.13)(typescript@5.4.5)':
-    dependencies:
-      '@segment/analytics-node': 1.3.0(encoding@0.1.13)
-      '@wingconsole/server': 0.73.59(constructs@10.3.0)(typescript@5.4.5)
-      cross-spawn: 7.0.3
-      express: 4.19.2
-      open: 8.4.2
-      picocolors: 1.0.1
-    transitivePeerDependencies:
-      - constructs
-      - encoding
-      - supports-color
-      - typescript
 
   '@wingconsole/app@0.74.0(constructs@10.3.0)(encoding@0.1.13)(typescript@5.4.5)':
     dependencies:
@@ -11330,19 +11245,6 @@ snapshots:
       tailwindcss: 3.4.3
     transitivePeerDependencies:
       - ts-node
-
-  '@wingconsole/server@0.73.59(constructs@10.3.0)(typescript@5.4.5)':
-    dependencies:
-      '@winglang/compiler': 0.73.59(constructs@10.3.0)(typescript@5.4.5)
-      '@winglang/sdk': 0.73.59(constructs@10.3.0)
-      codespan-wasm: 0.4.0
-      debug: 4.3.4
-      launch-editor: 2.6.1
-      ms: 2.1.3
-    transitivePeerDependencies:
-      - constructs
-      - supports-color
-      - typescript
 
   '@wingconsole/server@0.74.0(constructs@10.3.0)(typescript@5.4.5)':
     dependencies:
@@ -11388,15 +11290,6 @@ snapshots:
       - supports-color
       - ts-node
 
-  '@winglang/compiler@0.73.59(constructs@10.3.0)(typescript@5.4.5)':
-    dependencies:
-      '@wingcloud/framework': 0.73.59(@winglang/sdk@0.73.59(constructs@10.3.0))(typescript@5.4.5)
-      '@winglang/sdk': 0.73.59(constructs@10.3.0)
-      jiti: 1.21.0
-    transitivePeerDependencies:
-      - constructs
-      - typescript
-
   '@winglang/compiler@0.74.0(constructs@10.3.0)(typescript@5.4.5)':
     dependencies:
       '@wingcloud/framework': 0.74.0(@winglang/sdk@0.74.0(constructs@10.3.0))(typescript@5.4.5)
@@ -11405,12 +11298,6 @@ snapshots:
     transitivePeerDependencies:
       - constructs
       - typescript
-
-  '@winglang/sdk@0.73.59(constructs@10.3.0)':
-    dependencies:
-      constructs: 10.3.0
-    optionalDependencies:
-      esbuild: 0.19.12
 
   '@winglang/sdk@0.74.0(constructs@10.3.0)':
     dependencies:
