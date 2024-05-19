@@ -216,6 +216,7 @@ let dashboard = new vite.Vite(
     "WINGCLOUD_ORIGIN": util.tryEnv("WINGCLOUD_ORIGIN") ?? "",
     "REQUIRE_EARLY_ACCESS_CODE": util.tryEnv("REQUIRE_EARLY_ACCESS_CODE") ?? "false",
   },
+  openBrowser: true,
 ) as "website";
 
 let wingCloudApi = new wingcloud_api.Api(

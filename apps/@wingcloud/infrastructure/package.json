@@ -26,8 +26,8 @@
     "@wingcloud/platform": "workspace:^",
     "@wingcloud/simutils": "workspace:^",
     "@wingcloud/tunnels": "workspace:^",
-    "@winglibs/dynamodb": "^0.1.7",
-    "@winglibs/vite": "^0.1.6",
+    "@winglibs/dynamodb": "^0.1.8",
+    "@winglibs/vite": "^0.2.0",
     "@winglibs/websockets": "^0.3.7",
     "aws-cdk-lib": "^2.140.0",
     "case": "^1.6.3",
@@ -50,7 +50,7 @@
     "punycode": "^2.3.1",
     "semver": "^7.6.0",
     "table": "^6.8.1",
-    "winglang": "^0.73.44",
+    "winglang": "^0.74.0",
     "yaml": "^2.3.4"
   },
   "devDependencies": {
