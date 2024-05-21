@@ -8,7 +8,7 @@ import { BucketLogger } from "./logger/bucket-logger.js";
 import { useBucketWrite } from "./storage/bucket-write.js";
 import { installWing } from "./wing/install.js";
 import { runWingTests } from "./wing/test.js";
-import { globSync } from "glob";
+import { glob } from "glob";
 
 export interface SetupProps {
   executer: Executer;
@@ -74,32 +74,31 @@ export class Setup {
   }
 
   private async npmInstall(cwd: string) {
-    const packageJsonFiles = globSync("**/package.json", {
+    return glob("**/package.json", {
       cwd,
       absolute: true,
       ignore: ["**/node_modules/**"],
-    });
-
-    this.logger.log("Installing npm dependencies");
-    const installPromises = packageJsonFiles.map((packageJsonFile) => {
-      this.logger.log(`- path: ${packageJsonFile}`);
-      if (packageJsonFile) {
-        const installArgs = ["install"];
-        if (this.context.cacheDir) {
-          installArgs.push("--cache", this.context.cacheDir);
+    }).then((files) => {
+      this.logger.log("Installing npm dependencies");
+      const installPromises = files.map((packageJsonFile) => {
+        this.logger.log(`- path: ${packageJsonFile}`);
+        if (packageJsonFile) {
+          const installArgs = ["install"];
+          if (this.context.cacheDir) {
+            installArgs.push("--cache", this.context.cacheDir);
+          }
+          return this.executer.exec("npm", installArgs, {
+            cwd: packageJsonFile.slice(
+              0,
+              Math.max(0, packageJsonFile.lastIndexOf("/")),
+            ),
+            throwOnFailure: true,
+          });
         }
-        return this.executer.exec("npm", installArgs, {
-          cwd: packageJsonFile.slice(
-            0,
-            Math.max(0, packageJsonFile.lastIndexOf("/")),
-          ),
-          throwOnFailure: true,
-        });
-      }
-      return Promise.resolve();
+        return Promise.resolve();
+      });
+      return Promise.all(installPromises);
     });
-
-    return Promise.all(installPromises);
   }
 
   private async runCustomScript(cwd: string) {
