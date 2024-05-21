@@ -1,6 +1,6 @@
 import { existsSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import path, { dirname, join } from "node:path";
 
 import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
@@ -88,10 +88,7 @@ export class Setup {
             installArgs.push("--cache", this.context.cacheDir);
           }
           return this.executer.exec("npm", installArgs, {
-            cwd: packageJsonFile.slice(
-              0,
-              Math.max(0, packageJsonFile.lastIndexOf("/")),
-            ),
+            cwd: path.dirname(packageJsonFile),
             throwOnFailure: true,
           });
         }
