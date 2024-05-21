@@ -80,21 +80,20 @@ export class Setup {
       ignore: ["**/node_modules/**"],
     }).then((files) => {
       this.logger.log("Installing npm dependencies");
-      const installPromises = files.map((packageJsonFile) => {
-        this.logger.log(`- path: ${packageJsonFile}`);
-        if (packageJsonFile) {
+      return new Promise<void>(async (resolve, reject) => {
+        for (const file of files) {
+          this.logger.log(`- path: ${file}`);
           const installArgs = ["install"];
           if (this.context.cacheDir) {
             installArgs.push("--cache", this.context.cacheDir);
           }
-          return this.executer.exec("npm", installArgs, {
-            cwd: path.dirname(packageJsonFile),
+          await this.executer.exec("npm", installArgs, {
+            cwd: path.dirname(file),
             throwOnFailure: true,
           });
         }
-        return Promise.resolve();
+        resolve();
       });
-      return Promise.all(installPromises);
     });
   }
 
