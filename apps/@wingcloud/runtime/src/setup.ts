@@ -76,11 +76,11 @@ export class Setup {
   private async npmInstall(cwd: string) {
     const packageJsonFiles = globSync("**/package.json", {
       cwd,
-      ignore: ["node_modules/**"],
+      absolute: true,
+      ignore: ["**/node_modules/**"],
     });
 
     this.logger.log("Installing npm dependencies");
-
     const installPromises = packageJsonFiles.map((packageJsonFile) => {
       this.logger.log(`- path: ${packageJsonFile}`);
       if (packageJsonFile) {
