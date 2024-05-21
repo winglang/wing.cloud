@@ -24,6 +24,8 @@ export class Executer {
     }
     // eslint-disable-next-line unicorn/no-null
     let statusCode: number | null = null;
+    let stdout = "";
+    let stderr = "";
     const onData = (data: any) => {
       const output = data.toString();
       if (options?.logfile) {
@@ -40,8 +42,14 @@ export class Executer {
           ? { ...options.env, PATH: process.env["PATH"] }
           : process.env,
       });
-      subprocess.stdout.on("data", onData);
-      subprocess.stderr.on("data", onData);
+      subprocess.stdout.on("data", (data) => {
+        stdout += data.toString();
+        onData(data);
+      });
+      subprocess.stderr.on("data", (data) => {
+        stderr += data.toString();
+        onData(data);
+      });
       subprocess.on("close", (code) => {
         statusCode = code;
         resolve();
@@ -53,6 +61,6 @@ export class Executer {
     if ((options?.throwOnFailure && statusCode !== 0) || statusCode === null) {
       throw new Error(`command ${command} failed with status ${statusCode}`);
     }
-    return statusCode;
+    return { statusCode, stdout, stderr };
   }
 }

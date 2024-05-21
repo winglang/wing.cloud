@@ -42,7 +42,7 @@ export class Setup {
     );
     const entrydir = dirname(entrypointPath);
     await this.gitClone();
-    await this.npmInstall(entrydir);
+    await this.npmInstall(this.sourceDir);
     await this.runCustomScript(entrydir);
     const wingPaths = await this.runInstallWing(entrydir);
 
@@ -73,17 +73,37 @@ export class Setup {
   }
 
   private async npmInstall(cwd: string) {
-    if (existsSync(join(cwd, "package.json"))) {
-      const installArgs = ["install"];
-      if (this.context.cacheDir) {
-        installArgs.push("--cache", this.context.cacheDir);
-      }
-      this.logger.log("Installing npm dependencies");
-      return this.executer.exec("npm", installArgs, {
-        cwd,
+    // find all package.json files in the source directory
+    const response = await this.executer.exec(
+      "find",
+      [cwd, "-name", "package.json"],
+      {
         throwOnFailure: true,
-      });
-    }
+      },
+    );
+    const packageJsonFiles = response.stdout.split("\n");
+
+    this.logger.log("Installing npm dependencies");
+
+    const installPromises = packageJsonFiles.map((packageJsonFile) => {
+      this.logger.log(`- path: ${packageJsonFile}`);
+      if (packageJsonFile) {
+        const installArgs = ["install"];
+        if (this.context.cacheDir) {
+          installArgs.push("--cache", this.context.cacheDir);
+        }
+        return this.executer.exec("npm", installArgs, {
+          cwd: packageJsonFile.slice(
+            0,
+            Math.max(0, packageJsonFile.lastIndexOf("/")),
+          ),
+          throwOnFailure: true,
+        });
+      }
+      return Promise.resolve();
+    });
+
+    return Promise.all(installPromises);
   }
 
   private async runCustomScript(cwd: string) {
