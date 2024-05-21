@@ -41,10 +41,8 @@ pub interface IConnections {
 */
 pub class Connections impl IConnections {
   connections: ex.DynamodbTable;
-  requests: ex.Redis;
   new() {
     this.connections = new ex.DynamodbTable(name: "connections", hashKey: "pk", attributeDefinitions: { pk: "S" }) as "connections";
-    this.requests = new ex.Redis();
   }
 
   pub inflight addConnection(conn: Connection) {
@@ -116,18 +114,31 @@ pub class Connections impl IConnections {
   }
 
   pub inflight addResponseForRequest(requestId: str, req: Json) {
-    this.requests.set(requestId, Json.stringify(req));
+    this.connections.putItem(
+      item: {
+        pk: "request#{requestId}",
+        req: req,
+      },
+    );
   }
 
   pub inflight findResponseForRequest(requestId: str): Json? {
-    if let req = this.requests.get(requestId) {
-      return Json.parse(req);
+    let response = this.connections.getItem(key: {
+      pk: "request#{requestId}",
+    });
+
+    if let item = response.item {
+      return item.get("req");
     } else {
       return nil;
     }
   }
 
   pub inflight removeResponseForRequest(requestId: str) {
-    this.requests.del(requestId);
+    this.connections.deleteItem(
+      key: {
+        pk: "request#{requestId}",
+      },
+    );
   }
 }
