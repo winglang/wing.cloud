@@ -268,6 +268,9 @@ importers:
       express:
         specifier: ^4.18.2
         version: 4.18.2
+      glob:
+        specifier: ^10.3.15
+        version: 10.3.15
       http-proxy:
         specifier: ^1.18.1
         version: 1.18.1
@@ -8081,7 +8084,7 @@ snapshots:
       agent-base: 7.1.0
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.4
-      lru-cache: 10.2.0
+      lru-cache: 10.2.2
       socks-proxy-agent: 8.0.2
     transitivePeerDependencies:
       - supports-color
@@ -8218,8 +8221,8 @@ snapshots:
   '@npmcli/map-workspaces@3.0.4':
     dependencies:
       '@npmcli/name-from-folder': 2.0.0
-      glob: 10.3.10
-      minimatch: 9.0.3
+      glob: 10.3.15
+      minimatch: 9.0.4
       read-package-json-fast: 3.0.2
 
   '@npmcli/map-workspaces@3.0.6':
@@ -8257,7 +8260,7 @@ snapshots:
   '@npmcli/package-json@5.0.0':
     dependencies:
       '@npmcli/git': 5.0.4
-      glob: 10.3.10
+      glob: 10.3.15
       hosted-git-info: 7.0.1
       json-parse-even-better-errors: 3.0.1
       normalize-package-data: 6.0.0
@@ -10775,9 +10778,9 @@ snapshots:
     dependencies:
       '@npmcli/fs': 3.1.0
       fs-minipass: 3.0.3
-      glob: 10.3.10
+      glob: 10.3.15
       lru-cache: 10.2.0
-      minipass: 7.0.4
+      minipass: 7.1.1
       minipass-collect: 2.0.1
       minipass-flush: 1.0.5
       minipass-pipeline: 1.2.4
@@ -11702,7 +11705,7 @@ snapshots:
 
   fs-minipass@3.0.3:
     dependencies:
-      minipass: 7.0.4
+      minipass: 7.1.1
 
   fs.realpath@1.0.0: {}
 
@@ -11990,7 +11993,7 @@ snapshots:
 
   ignore-walk@6.0.4:
     dependencies:
-      minimatch: 9.0.3
+      minimatch: 9.0.4
 
   ignore@5.3.1: {}
 
@@ -12444,7 +12447,7 @@ snapshots:
       cacache: 18.0.2
       http-cache-semantics: 4.1.1
       is-lambda: 1.0.1
-      minipass: 7.0.4
+      minipass: 7.1.1
       minipass-fetch: 3.0.4
       minipass-flush: 1.0.5
       minipass-pipeline: 1.2.4
@@ -12746,7 +12749,7 @@ snapshots:
 
   minipass-collect@2.0.1:
     dependencies:
-      minipass: 7.0.4
+      minipass: 7.1.1
 
   minipass-fetch@3.0.4:
     dependencies:
@@ -12891,7 +12894,7 @@ snapshots:
     dependencies:
       env-paths: 2.2.1
       exponential-backoff: 3.1.1
-      glob: 10.3.10
+      glob: 10.3.15
       graceful-fs: 4.2.11
       make-fetch-happen: 13.0.0
       nopt: 7.2.0
@@ -12979,7 +12982,7 @@ snapshots:
   npm-registry-fetch@16.1.0:
     dependencies:
       make-fetch-happen: 13.0.0
-      minipass: 7.0.4
+      minipass: 7.1.1
       minipass-fetch: 3.0.4
       minipass-json-stream: 1.0.1
       minizlib: 2.1.2
@@ -13170,7 +13173,7 @@ snapshots:
       '@npmcli/run-script': 7.0.4
       cacache: 18.0.2
       fs-minipass: 3.0.3
-      minipass: 7.0.4
+      minipass: 7.1.1
       npm-package-arg: 11.0.1
       npm-packlist: 8.0.2
       npm-pick-manifest: 9.0.0
@@ -13632,7 +13635,7 @@ snapshots:
 
   read-package-json@7.0.0:
     dependencies:
-      glob: 10.3.10
+      glob: 10.3.15
       json-parse-even-better-errors: 3.0.1
       normalize-package-data: 6.0.0
       npm-normalize-package-bin: 3.0.1
@@ -14038,7 +14041,7 @@ snapshots:
 
   ssri@10.0.5:
     dependencies:
-      minipass: 7.0.4
+      minipass: 7.1.1
 
   stack-generator@2.0.10:
     dependencies:

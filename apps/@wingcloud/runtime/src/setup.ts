@@ -8,6 +8,7 @@ import { BucketLogger } from "./logger/bucket-logger.js";
 import { useBucketWrite } from "./storage/bucket-write.js";
 import { installWing } from "./wing/install.js";
 import { runWingTests } from "./wing/test.js";
+import { globSync } from "glob";
 
 export interface SetupProps {
   executer: Executer;
@@ -73,15 +74,10 @@ export class Setup {
   }
 
   private async npmInstall(cwd: string) {
-    // find all package.json files in the source directory
-    const response = await this.executer.exec(
-      "find",
-      [cwd, "-name", "package.json"],
-      {
-        throwOnFailure: true,
-      },
-    );
-    const packageJsonFiles = response.stdout.split("\n");
+    const packageJsonFiles = globSync("**/package.json", {
+      cwd,
+      ignore: ["node_modules/**"],
+    });
 
     this.logger.log("Installing npm dependencies");
 
