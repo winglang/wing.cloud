@@ -8,6 +8,7 @@ import { BucketLogger } from "./logger/bucket-logger.js";
 import { useBucketWrite } from "./storage/bucket-write.js";
 import { installWing } from "./wing/install.js";
 import { runWingTests } from "./wing/test.js";
+import { glob } from "glob";
 
 export interface SetupProps {
   executer: Executer;
@@ -73,10 +74,21 @@ export class Setup {
   }
 
   private async niInstall(cwd: string) {
-    if (existsSync(join(cwd, "package.json"))) {
-      this.logger.log("Installing npm dependencies");
-      return this.executer.exec("ni", [], {
-        cwd,
+    const files = await glob("**/package.json", {
+      cwd,
+      absolute: true,
+      ignore: ["**/node_modules/**"],
+    });
+    this.logger.log("Installing npm dependencies");
+
+    for (const file of files) {
+      this.logger.log(`- path: ${file}`);
+      const installArgs = [];
+      if (this.context.cacheDir) {
+        installArgs.push("--cache", this.context.cacheDir);
+      }
+      await this.executer.exec("ni", installArgs, {
+        cwd: dirname(file),
         throwOnFailure: true,
       });
     }

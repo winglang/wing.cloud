@@ -3,7 +3,6 @@ import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { simulator, cloud } from "@winglang/sdk";
-import { type ApiSchema } from "@winglang/sdk/lib/target-sim/schema-resources.js";
 
 import { handler } from "./index.js";
 
