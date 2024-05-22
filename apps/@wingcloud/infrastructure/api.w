@@ -489,7 +489,8 @@ pub class Api {
             // We are going though the wing.cloud/signupredirect endpoint in order
             // for it to close the attribution loop in Plausible.
             // It then redirects to http://localhost:{port}/?signedIn
-            location = "https://wing.cloud/signupredirect/?port={port}";
+            let redirect = Util.encodeURIComponent("http://localhost:{port}/?signedIn");
+            location = "https://wing.cloud/signupredirect/?redirect={redirect}";
             return {
               status: 302,
               headers: {
