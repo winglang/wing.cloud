@@ -1,6 +1,6 @@
 import { existsSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
-import path, { dirname, join } from "node:path";
+import { dirname, join } from "node:path";
 
 import { type EnvironmentContext } from "./environment.js";
 import { Executer } from "./executer.js";
@@ -80,20 +80,18 @@ export class Setup {
       ignore: ["**/node_modules/**"],
     });
     this.logger.log("Installing npm dependencies");
-    return new Promise<void>(async (resolve, reject) => {
-      for (const file of files) {
-        this.logger.log(`- path: ${file}`);
-        const installArgs = ["install"];
-        if (this.context.cacheDir) {
-          installArgs.push("--cache", this.context.cacheDir);
-        }
-        await this.executer.exec("npm", installArgs, {
-          cwd: path.dirname(file),
-          throwOnFailure: true,
-        });
+
+    for (const file of files) {
+      this.logger.log(`- path: ${file}`);
+      const installArgs = ["install"];
+      if (this.context.cacheDir) {
+        installArgs.push("--cache", this.context.cacheDir);
       }
-      resolve();
-    });
+      await this.executer.exec("npm", installArgs, {
+        cwd: dirname(file),
+        throwOnFailure: true,
+      });
+    }
   }
 
   private async runCustomScript(cwd: string) {
