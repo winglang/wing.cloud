@@ -375,7 +375,7 @@ importers:
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/wrpc
       '@wingconsole/ui':
-        specifier: ^0.74.6
+        specifier: ^0.74.3
         version: 0.74.6(@types/react@18.2.56)(react@18.2.0)
       clsx:
         specifier: ^2.1.0
