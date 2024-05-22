@@ -231,6 +231,7 @@ runtime.addDeps("chalk");
 runtime.addDeps("stacktracey");
 runtime.addDeps("chokidar");
 runtime.addDeps("dotenv");
+runtime.addDeps("glob");
 
 runtime.addDevDeps("@types/express");
 runtime.addDevDeps("@types/http-proxy");
