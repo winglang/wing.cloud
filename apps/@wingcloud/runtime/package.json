@@ -19,7 +19,7 @@
     "redact-env": "^1.0.0",
     "stacktracey": "^2.1.8",
     "which": "^4.0.0",
-    "winglang": "^0.73.42"
+    "winglang": "^0.73.59"
   },
   "devDependencies": {
     "@cloudy-ts/eslint-plugin": "^0.0.394",
