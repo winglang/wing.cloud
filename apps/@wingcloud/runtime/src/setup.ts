@@ -74,26 +74,25 @@ export class Setup {
   }
 
   private async npmInstall(cwd: string) {
-    return glob("**/package.json", {
+    const files = await glob("**/package.json", {
       cwd,
       absolute: true,
       ignore: ["**/node_modules/**"],
-    }).then((files) => {
-      this.logger.log("Installing npm dependencies");
-      return new Promise<void>(async (resolve, reject) => {
-        for (const file of files) {
-          this.logger.log(`- path: ${file}`);
-          const installArgs = ["install"];
-          if (this.context.cacheDir) {
-            installArgs.push("--cache", this.context.cacheDir);
-          }
-          await this.executer.exec("npm", installArgs, {
-            cwd: path.dirname(file),
-            throwOnFailure: true,
-          });
+    });
+    this.logger.log("Installing npm dependencies");
+    return new Promise<void>(async (resolve, reject) => {
+      for (const file of files) {
+        this.logger.log(`- path: ${file}`);
+        const installArgs = ["install"];
+        if (this.context.cacheDir) {
+          installArgs.push("--cache", this.context.cacheDir);
         }
-        resolve();
-      });
+        await this.executer.exec("npm", installArgs, {
+          cwd: path.dirname(file),
+          throwOnFailure: true,
+        });
+      }
+      resolve();
     });
   }
 
