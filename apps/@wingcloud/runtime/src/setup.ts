@@ -43,7 +43,7 @@ export class Setup {
     );
     const entrydir = dirname(entrypointPath);
     await this.gitClone();
-    await this.niInstall(entrydir);
+    await this.niInstall(this.sourceDir);
     await this.runCustomScript(entrydir);
     const wingPaths = await this.runInstallWing(entrydir);
 
