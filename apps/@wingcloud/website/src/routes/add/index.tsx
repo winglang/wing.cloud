@@ -214,6 +214,8 @@ const AddAppPage = () => {
                       openPopupWindow({
                         url: `https://github.com/apps/${GITHUB_APP_NAME}/installations/select_target`,
                         onClose: onCloseMissingRepoModal,
+                        width: 1024,
+                        height: 720,
                       })
                     }
                   >
