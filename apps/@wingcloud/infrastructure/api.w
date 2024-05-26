@@ -486,11 +486,8 @@ pub class Api {
             log("redirecting to console");
             // Redirect back to the local Console, using the `signedIn`
             // GET parameter so the Console dismisses the sign in modal.
-            // We are going though the wing.cloud/signupredirect endpoint in order
-            // for it to close the attribution loop in Plausible.
-            // It then redirects to http://localhost:{port}/?signedIn
-            let redirect = Util.encodeURIComponent("http://localhost:{port}/?signedIn");
-            location = "https://wing.cloud/signupredirect/?redirect={redirect}";
+            location = "http://localhost:{port}/?signedIn";
+
             return {
               status: 302,
               headers: {
