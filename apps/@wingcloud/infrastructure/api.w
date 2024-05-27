@@ -248,7 +248,7 @@ pub class Api {
 
     // Checks if the user has access rights to the owner's resources.
     // The user must be an admin or the owner of the resource.
-    let checkOwnerAccessRights = inflight (request, owner: str) => {
+    let checkOwnerAccessRights = inflight (request: cloud.ApiRequest, owner: str) => {
       if let user = getUserFromCookie(request) {
         if user.username == owner {
           return;
@@ -258,7 +258,8 @@ pub class Api {
             return;
           }
           if request.method == cloud.HttpMethod.POST {
-            if request.path == "/wrpc/app.environment.restart" {
+            // The path starts with "/prod" in production
+            if request.path.endsWith("/wrpc/app.environment.restart") {
               return;
             }
           }
@@ -280,7 +281,8 @@ pub class Api {
           if request.method == cloud.HttpMethod.GET {
             return app;
           } if request.method == cloud.HttpMethod.POST {
-            if request.path == "/wrpc/app.environment.restart" {
+            // The path starts with "/prod" in production
+            if request.path.endsWith("/wrpc/app.environment.restart") {
               return app;
             }
           }
