@@ -258,7 +258,7 @@ pub class Api {
             return;
           }
           if request.method == cloud.HttpMethod.POST {
-            if request.path == "/wrpc/app.environment.restart" {
+            if request.path.startsWith("/wrpc/app.environment.restart") {
               return;
             }
           }
@@ -280,7 +280,7 @@ pub class Api {
           if request.method == cloud.HttpMethod.GET {
             return app;
           } if request.method == cloud.HttpMethod.POST {
-            if request.path == "/wrpc/app.environment.restart" {
+            if request.path.startsWith("/wrpc/app.environment.restart") {
               return app;
             }
           }
