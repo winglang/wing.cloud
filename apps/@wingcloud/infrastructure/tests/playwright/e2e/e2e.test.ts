@@ -109,3 +109,16 @@ test("Create an app and visit the Console", async ({ page }) => {
 
   console.log("App deleted successfully");
 });
+
+test("Console Sign In", async ({ page }) => {
+  const requestUrls: string[] = [];
+  page.on('request', request => {
+    requestUrls.push(request.url())
+  });
+
+  await page.goto("https://wing.cloud/wrpc/console.signIn?port=1000&anonymousId=12345");
+
+  await page.waitForLoadState("networkidle");
+
+  expect(requestUrls).toContainEqual("http://localhost:1000/?signedIn");
+});
