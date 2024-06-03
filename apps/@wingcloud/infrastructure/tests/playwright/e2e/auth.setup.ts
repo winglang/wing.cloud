@@ -66,7 +66,7 @@ export const githubLogin = async ({ page }) => {
       })
     ) {
       console.log("Authorizing the app...");
-      expect(authorizeButton).toBeEnabled({ timeout: 10_000 });
+      expect(authorizeButton).toBeEnabled({ timeout: 20_000 });
       await authorizeButton.click();
     }
     await page.waitForLoadState("networkidle");

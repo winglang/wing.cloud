@@ -116,7 +116,7 @@ test("Console Sign In", async ({ page }) => {
     requestUrls.push(request.url())
   });
 
-  await page.goto("https://wing.cloud/wrpc/console.signIn?port=1000&anonymousId=12345");
+  await page.goto(`${WINGCLOUD_URL}/wrpc/console.signIn?port=1000&anonymousId=12345`);
 
   await page.waitForLoadState("networkidle");
 
