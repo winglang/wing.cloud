@@ -112,13 +112,17 @@ test("Create an app and visit the Console", async ({ page }) => {
 
 test("Console Sign In", async ({ page }) => {
   const requestUrls: string[] = [];
-  page.on('request', request => {
-    requestUrls.push(request.url())
+  page.on("request", (request) => {
+    requestUrls.push(request.url());
   });
 
-  await page.goto(`${WINGCLOUD_URL}/wrpc/console.signIn?port=1000&anonymousId=12345`);
+  // Visit the console sign in page
+  await page.goto(
+    `${WINGCLOUD_URL}/wrpc/console.signIn?port=1000&anonymousId=12345`,
+  );
 
   await page.waitForLoadState("networkidle");
 
+  // If the sign in was successful, we should be redirected to the console
   expect(requestUrls).toContainEqual("http://localhost:1000/?signedIn");
 });
