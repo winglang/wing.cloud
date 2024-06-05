@@ -245,14 +245,14 @@ importers:
   apps/@wingcloud/runtime:
     dependencies:
       '@wingconsole/app':
-        specifier: ^0.74.35
-        version: 0.74.35(constructs@10.3.0)(typescript@5.4.5)
+        specifier: ^0.74.38
+        version: 0.74.38(constructs@10.3.0)(typescript@5.4.5)
       '@winglang/compiler':
-        specifier: ^0.73.59
-        version: 0.73.59(constructs@10.3.0)(typescript@5.4.5)
+        specifier: ^0.74.38
+        version: 0.74.38(constructs@10.3.0)(typescript@5.4.5)
       '@winglang/sdk':
-        specifier: ^0.73.59
-        version: 0.73.59(constructs@10.3.0)
+        specifier: ^0.74.38
+        version: 0.74.38(constructs@10.3.0)
       chalk:
         specifier: ^5.3.0
         version: 5.3.0
@@ -375,8 +375,8 @@ importers:
         specifier: workspace:^
         version: link:../../../packages/@wingcloud/wrpc
       '@wingconsole/ui':
-        specifier: ^0.74.35
-        version: 0.74.35(@types/react@18.2.56)(react@18.2.0)
+        specifier: ^0.74.38
+        version: 0.74.38(@types/react@18.2.56)(react@18.2.0)
       clsx:
         specifier: ^2.1.0
         version: 2.1.0
@@ -9010,13 +9010,13 @@ packages:
       typescript: 5.4.5
     dev: false
 
-  /@wingcloud/framework@0.74.35(@winglang/sdk@0.74.35)(typescript@5.4.5):
-    resolution: {integrity: sha512-QkiiOC2wDLIPcxAY05kv4ITAFlQ89fafy6LUVjjoPtxbpMrTNWXAcg4MeJ5BWXB3ZWvP/6bt4M14bGbBjvgntQ==}
+  /@wingcloud/framework@0.74.38(@winglang/sdk@0.74.38)(typescript@5.4.5):
+    resolution: {integrity: sha512-105mpupvGagUnPVq2DFXi1wP46tzL57mO0+ktH/7ZezMGuXoAMJlcRaL3wLUoxIIdtnTeb008YFTkgu1GyvGAw==}
     peerDependencies:
       '@winglang/sdk': '*'
       typescript: ^5.3.3
     dependencies:
-      '@winglang/sdk': 0.74.35(constructs@10.3.0)
+      '@winglang/sdk': 0.74.38(constructs@10.3.0)
       typescript: 5.4.5
     dev: false
 
@@ -9044,7 +9044,6 @@ packages:
       express: 4.18.2
       picocolors: 1.0.0
     transitivePeerDependencies:
-      - aws-crt
       - constructs
       - encoding
       - supports-color
@@ -9061,20 +9060,17 @@ packages:
       open: 8.4.2
       picocolors: 1.0.1
     transitivePeerDependencies:
-      - aws-crt
-      - bufferutil
       - constructs
       - encoding
       - supports-color
       - typescript
-      - utf-8-validate
     dev: false
 
-  /@wingconsole/app@0.74.35(constructs@10.3.0)(typescript@5.4.5):
-    resolution: {integrity: sha512-FNjFdURWyvxtyKO+zjDq0OQOycW9iE0iGT+uUKGRugxVmyGj3P2AKezpWXboIYG4tqMKc+lOSqP5EE8eCl+K/Q==}
+  /@wingconsole/app@0.74.38(constructs@10.3.0)(typescript@5.4.5):
+    resolution: {integrity: sha512-hdzJVr9AzYgSpsEomqshzSmFjukjy+inGOKtj1eYSCfI5VTOGMKx2fa7gB8mH/H9vCZYh33twdyr+qbXBzDobw==}
     dependencies:
       '@segment/analytics-node': 1.3.0
-      '@wingconsole/server': 0.74.35(constructs@10.3.0)(typescript@5.4.5)
+      '@wingconsole/server': 0.74.38(constructs@10.3.0)(typescript@5.4.5)
       cross-spawn: 7.0.3
       express: 4.19.2
       open: 8.4.2
@@ -9086,8 +9082,8 @@ packages:
       - typescript
     dev: false
 
-  /@wingconsole/design-system@0.74.35:
-    resolution: {integrity: sha512-xVgVF7fxKq3fuSt+5TLoAJiz7UsX2G2QrOavZc8+o1Rm5b2IeaZxV3BCj8DtetImo5aLcdrpDb6gc3yEcmAG1Q==}
+  /@wingconsole/design-system@0.74.38:
+    resolution: {integrity: sha512-Ageyzjut9m0cPujVk64U0iiE80fE/BpL07wdpzYK4aTaLvmuv2yf5Bu/wSImubtM1Sq11cPzE8UmAceR5XiiiQ==}
     dependencies:
       '@headlessui/react': 1.7.18(react-dom@18.2.0)(react@18.2.0)
       '@heroicons/react': 2.1.1(react@18.2.0)
@@ -9130,9 +9126,7 @@ packages:
       launch-editor: 2.6.1
       ms: 2.1.3
     transitivePeerDependencies:
-      - aws-crt
       - constructs
-      - encoding
       - supports-color
       - typescript
     dev: false
@@ -9147,20 +9141,16 @@ packages:
       launch-editor: 2.6.1
       ms: 2.1.3
     transitivePeerDependencies:
-      - aws-crt
-      - bufferutil
       - constructs
-      - encoding
       - supports-color
       - typescript
-      - utf-8-validate
     dev: false
 
-  /@wingconsole/server@0.74.35(constructs@10.3.0)(typescript@5.4.5):
-    resolution: {integrity: sha512-P5A1MVlXoGSlSmb+DksOzvuA3ayKhCvn9S+4irdtY/hULoWTztxH8LnsYx50S7alGZp+T4SE6pIFpyY1POhyLQ==}
+  /@wingconsole/server@0.74.38(constructs@10.3.0)(typescript@5.4.5):
+    resolution: {integrity: sha512-E7jzWsjwYEW4Tns/419gePBdZl6RM/4i4gdBK2jZvwAm4r2q7VHsjk/mDfPez2Muxf0lGhwtuerA55qV2dGhtw==}
     dependencies:
-      '@winglang/compiler': 0.74.35(constructs@10.3.0)(typescript@5.4.5)
-      '@winglang/sdk': 0.74.35(constructs@10.3.0)
+      '@winglang/compiler': 0.74.38(constructs@10.3.0)(typescript@5.4.5)
+      '@winglang/sdk': 0.74.38(constructs@10.3.0)
       codespan-wasm: 0.4.0
       debug: 4.3.5
       launch-editor: 2.6.1
@@ -9171,8 +9161,8 @@ packages:
       - typescript
     dev: false
 
-  /@wingconsole/ui@0.74.35(@types/react@18.2.56)(react@18.2.0):
-    resolution: {integrity: sha512-2Z/c+H0zVhD+deMiq3LK7AFnF4ALFk4hGyAGYkmbcTf4PSPNZPV4ZiOdk3srUvyVJIYQnr/oXUJmXcyVHur2AQ==}
+  /@wingconsole/ui@0.74.38(@types/react@18.2.56)(react@18.2.0):
+    resolution: {integrity: sha512-5zN1bYFsQNAP8e/4i7eEkYo6JvY6oW876MFBBJEHNFBqrkEIy6VoQhzx0nmpyYviNvkOscToRBSFgK1mJ7RBNQ==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
@@ -9183,7 +9173,7 @@ packages:
       '@trpc/client': 10.45.2(@trpc/server@10.45.2)
       '@trpc/react-query': 10.45.2(@tanstack/react-query@4.36.1)(@trpc/client@10.45.2)(@trpc/server@10.45.2)(react-dom@18.2.0)(react@18.2.0)
       '@trpc/server': 10.45.2
-      '@wingconsole/design-system': 0.74.35
+      '@wingconsole/design-system': 0.74.38
       classnames: 2.5.1
       elkjs: 0.8.2
       framer-motion: 10.18.0(react-dom@18.2.0)(react@18.2.0)
@@ -9227,10 +9217,7 @@ packages:
       '@winglang/sdk': 0.59.6(constructs@10.3.0)
       wasi-js: 1.7.3
     transitivePeerDependencies:
-      - aws-crt
       - constructs
-      - encoding
-      - supports-color
       - typescript
     bundledDependencies:
       - wasi-js
@@ -9244,23 +9231,18 @@ packages:
       jiti: 1.21.0
       wasi-js: 1.7.3
     transitivePeerDependencies:
-      - aws-crt
-      - bufferutil
       - constructs
-      - encoding
-      - supports-color
       - typescript
-      - utf-8-validate
     dev: false
     bundledDependencies:
       - wasi-js
 
-  /@winglang/compiler@0.74.35(constructs@10.3.0)(typescript@5.4.5):
-    resolution: {integrity: sha512-h7Gd9fh7ZQfNpljJZ+tLUmwZAyM2sSYh6r+OPXZqGBp5rQa0rPQ0m2JzTQ3FCCMIWgDoGXBB8p5E8ODlvjw4VQ==}
+  /@winglang/compiler@0.74.38(constructs@10.3.0)(typescript@5.4.5):
+    resolution: {integrity: sha512-ndge96fsPM/vg81dG326DnGiKuGtTqNZRQkqAi7GlgRAIto+68urDaESZYeQD92XIAEMYTCLSmqUE33aPF+8GQ==}
     engines: {node: '>=v20.0.0'}
     dependencies:
-      '@wingcloud/framework': 0.74.35(@winglang/sdk@0.74.35)(typescript@5.4.5)
-      '@winglang/sdk': 0.74.35(constructs@10.3.0)
+      '@wingcloud/framework': 0.74.38(@winglang/sdk@0.74.38)(typescript@5.4.5)
+      '@winglang/sdk': 0.74.38(constructs@10.3.0)
       jiti: 1.21.0
     transitivePeerDependencies:
       - constructs
@@ -9362,10 +9344,6 @@ packages:
       yaml: 2.3.4
     optionalDependencies:
       esbuild: 0.19.12
-    transitivePeerDependencies:
-      - aws-crt
-      - encoding
-      - supports-color
     bundledDependencies:
       - '@aws-sdk/client-cloudwatch-logs'
       - '@aws-sdk/client-dynamodb'
@@ -9456,12 +9434,6 @@ packages:
       yaml: 2.4.2
     optionalDependencies:
       esbuild: 0.19.12
-    transitivePeerDependencies:
-      - aws-crt
-      - bufferutil
-      - encoding
-      - supports-color
-      - utf-8-validate
     dev: false
     bundledDependencies:
       - '@aws-sdk/client-cloudwatch-logs'
@@ -9506,8 +9478,8 @@ packages:
       - vlq
       - yaml
 
-  /@winglang/sdk@0.74.35(constructs@10.3.0):
-    resolution: {integrity: sha512-8RjBUFLHcOIhnb0UhTwooMweh6hjN5kIYzix0hxEcDDp2FEnru9SdaVDSWk9ELABPcp/F7TLVbMDhIs9n6RlTA==}
+  /@winglang/sdk@0.74.38(constructs@10.3.0):
+    resolution: {integrity: sha512-pRcOwwUNmh6UEJAaJuHc6vUqJS+QKmrJLN0dB/1+RQpdJUL0E//4wmEbRrEN3ntkEsYNTMm8YqNvhA6jfMB8fA==}
     engines: {node: '>= 20.0.0'}
     peerDependencies:
       constructs: ^10.3
@@ -12054,6 +12026,7 @@ packages:
 
   /glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
+    deprecated: Glob versions prior to v9 are no longer supported
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -14622,7 +14595,6 @@ packages:
 
   /picocolors@1.0.1:
     resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
-    dev: false
 
   /picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
@@ -16887,7 +16859,7 @@ packages:
     dependencies:
       browserslist: 4.22.3
       escalade: 3.1.1
-      picocolors: 1.0.0
+      picocolors: 1.0.1
     dev: true
 
   /update-dotenv@1.1.1(dotenv@8.6.0):
@@ -17290,7 +17262,6 @@ packages:
       uuid: 8.3.2
       vscode-languageserver: 8.1.0
     transitivePeerDependencies:
-      - aws-crt
       - bluebird
       - constructs
       - encoding
@@ -17329,14 +17300,11 @@ packages:
       uuid: 8.3.2
       vscode-languageserver: 8.1.0
     transitivePeerDependencies:
-      - aws-crt
       - bluebird
-      - bufferutil
       - constructs
       - encoding
       - supports-color
       - typescript
-      - utf-8-validate
     dev: false
 
   /word-wrap@1.2.5:
