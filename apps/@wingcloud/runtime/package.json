@@ -4,7 +4,7 @@
   "type": "module",
   "sideEffects": false,
   "dependencies": {
-    "@wingconsole/app": "^0.74.35",
+    "@wingconsole/app": "^0.77.13",
     "@winglang/compiler": "^0.73.59",
     "@winglang/sdk": "^0.73.59",
     "chalk": "^5.3.0",
