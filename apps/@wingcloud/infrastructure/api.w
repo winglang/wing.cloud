@@ -285,6 +285,9 @@ pub class Api {
             if request.path.endsWith("/wrpc/app.environment.restart") {
               return app;
             }
+            if request.path.endsWith("/wrpc/app.delete") {
+              return app;
+            }
           }
           throw httpError.HttpError.unauthorized("Admin is not authorized to perform this action");
         }
