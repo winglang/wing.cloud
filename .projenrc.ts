@@ -43,9 +43,6 @@ const monorepo = new MonorepoProject({
   devDeps: ["@skyrpex/wingen"],
   name: "@wingcloud/monorepo",
 });
-monorepo.addFields({
-  packageManager: "pnpm@8.15.1",
-});
 
 monorepo.addGitIgnore("examples/**/target/");
 monorepo.addGitIgnore(".playwright/");
