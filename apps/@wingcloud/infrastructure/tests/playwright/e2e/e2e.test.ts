@@ -40,7 +40,7 @@ test.beforeEach("Remove the app if needed", async ({ page }) => {
   }
 });
 
-test.skip("Create an app and visit the Console", async ({ page }) => {
+test("Create an app and visit the Console", async ({ page }) => {
   page.goto(`${WINGCLOUD_URL}/add`);
 
   // Create a new app
