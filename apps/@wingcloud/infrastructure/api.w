@@ -877,9 +877,11 @@ pub class Api {
     });
 
     api.post("/wrpc/app.delete", inflight (request) => {
-      let userId = getUserIdFromCookie(request);
+
       let input = Json.parse(request.body ?? "");
       let appName = input.get("appName").asStr();
+
+      let userId = getOwnerUserId(request, input.get("owner").asStr());
 
       let app = apps.getByName(
         userId: userId,
