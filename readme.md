@@ -119,7 +119,7 @@ The `production` branch is supposed to eventually mirror `main`. This means, mak
 - `git push --set-upstream origin release/my-new-release`
 - create a new pull request, change the base branch to `production`
 - name the pull request: "release: my new release"
-- wait for the Terraform production diff to be commented on the PR
+- wait for the Terraform production diff to be commented on the PR!
 - make sure the Terraform plan applies cleanly and reflects the intended changes
 - Merge with a _Merge Commit_ - don't squash - the pull request into `production`
 
